@@ -14,8 +14,8 @@ class MCRInvSlot : public QFrame
 public:
     explicit MCRInvSlot(QWidget *parent = nullptr, MCRInvItem *item = nullptr);
 
-    void setItem(MCRInvItem *item, bool emitSignal = true);
-    void removeItem(bool emitSignal = true);
+    void setItem(MCRInvItem *item, bool emitSignal = false);
+    void removeItem(bool emitSignal = false);
     MCRInvItem* getItem();
 
     void setBackground(QString color = "#8B8B8B");

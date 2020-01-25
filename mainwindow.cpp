@@ -42,36 +42,26 @@ void MainWindow::openFile(QString filename) {
         return;
     else {
         QFile file(filename);
-        //qDebug() << "Created " << file;
         if(!file.open(QIODevice::ReadOnly)) {
             QMessageBox::information(0, "error", file.errorString());
         } else {
             QTextStream in(&file);
-            //qDebug() << "Created QTextStream";
 
             in.setCodec("UTF-8");
-            //ui->codeEditor->clear();
 
             int c = 0;
             QString content;
             while(!in.atEnd()) {
                 content += in.readLine();
                 if(!in.atEnd()) content += '\n';
-                //qDebug() << c;
-                c++;
+                ++c;
             }
-
-            //qDebug() << "Reading completed";
-
-            //ui->codeEditor->insertPlainText(content);
             ui->codeEditor->setPlainText(content);
             this->fileName = filename;
             ui->codeEditor->setFileName(filename);
-
-            //qDebug() << "Setting text done";
         }
     file.close();
-    //qDebug() << "Closed " << file;
+    emit fileOpened(QFileInfo(fileName).completeSuffix());
     }
 }
 

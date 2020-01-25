@@ -70,10 +70,10 @@ void VisualRecipeEditorDock::setupItemList() {
 
 void VisualRecipeEditorDock::onRecipeChanged() {
     int tabIdx = ui->tabWidget->currentIndex();
-    if(tabIdx == 0) {
+    if(tabIdx == 0) { // Crafting tab
         QJsonObject root;
         int craftTypeIdx = ui->craftTypeInput->currentIndex();
-        if(craftTypeIdx < 2) {
+        if(craftTypeIdx < 2) { // Shaped crafting
             root.insert("type", "crafting_shaped");
 
             QMap<QString, QString> keys;
@@ -102,7 +102,7 @@ void VisualRecipeEditorDock::onRecipeChanged() {
                 patternStr.remove(0, 3);
             }
 
-            if(craftTypeIdx == 1) {
+            if(craftTypeIdx == 1) { // Relative shape
                 {
                     int width = 0;
                     int xstart = 3;
@@ -112,8 +112,6 @@ void VisualRecipeEditorDock::onRecipeChanged() {
                     for(auto row : pattern) {
                         width = qMax(row.toString().length(), width);
                     }
-
-                    qDebug() << "width:" << width;
 
                     for(int y = 0; y < width; ++y) {
 
@@ -128,7 +126,19 @@ void VisualRecipeEditorDock::onRecipeChanged() {
                         }
                     }
 
-                    qDebug() << xstart << xend << ystart << yend;
+                    //qDebug() << xstart << xend << ystart << yend;
+
+                    QJsonArray tmpPattern;
+                    for(int y = 0; y < 3; ++y) {
+                        if(y >= ystart && y <= yend) {
+                            tmpPattern.push_back(pattern[y]);
+                        }
+                    }
+                    pattern = tmpPattern;
+
+                    for(auto row : pattern) {
+                        row = row.toString().mid(xstart, xend - xstart + 1);
+                    }
                 }
             }
 
@@ -143,7 +153,7 @@ void VisualRecipeEditorDock::onRecipeChanged() {
             }
             root.insert("key", key);
 
-        } else {
+        } else { // Shapeless crafting
             root.insert("type", "crafting_shapeless");
         }
 

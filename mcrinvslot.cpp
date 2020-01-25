@@ -35,7 +35,7 @@ void MCRInvSlot::setBackground(QString color) {
 
 void MCRInvSlot::setItem(MCRInvItem *item, bool emitSignal) {
     if(item != nullptr) {
-        removeItem(false);
+        removeItem();
         this->item = item;
         layout()->addWidget(item);
         if(emitSignal) emit itemChanged();
@@ -44,8 +44,6 @@ void MCRInvSlot::setItem(MCRInvItem *item, bool emitSignal) {
 
 void MCRInvSlot::removeItem(bool emitSignal) {
     //if(layout()->isEmpty() || layout()->count() == 0) return;
-
-    //qDebug() << layout()->count();
     layout()->removeWidget(this->item);
     delete this->item;
     this->item = nullptr;
@@ -115,17 +113,13 @@ void MCRInvSlot::dropEvent(QDropEvent *event)
             QString itemID;
             if(this->item) itemID = this->item->namespacedID;
             if(itemID != id) {
-//                qDebug() << itemID << id;
-//                qDebug() << "event->source() != this:" << (event->source() != this);
-//                qDebug() << "!itemID.isEmpty():" << (!itemID.isEmpty());
-//                qDebug() << "!source->isCreative:" << (!source->isCreative);
                 if ((event->source() != this) && (!itemID.isEmpty())
                                               && (!source->isCreative)) {
                     MCRInvItem *swapItem = new MCRInvItem(this, itemID);
-                    source->setItem(swapItem, false);
+                    source->setItem(swapItem);
                 }
                 MCRInvItem *nitem = new MCRInvItem(this, id);
-                setItem(nitem, false);
+                setItem(nitem, true);
             }
         }
 
@@ -188,7 +182,7 @@ void MCRInvSlot::mousePressEvent(QMouseEvent *event)
     } else if(dragActions == Qt::MoveAction) {
         //qDebug() << "Dragged and dropped for moving (Qt::MoveAction)";
         if(this->item == before) {
-            removeItem();
+            removeItem(true);
         } else {
             emit itemChanged();
         }

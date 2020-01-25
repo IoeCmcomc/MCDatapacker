@@ -19,6 +19,9 @@ public:
     void openFile(QString filename);
     void setCodeEditorText(QString text);
 
+signals:
+    void fileOpened(QString fileExt);;
+
 private slots:
     void onActionOpen();
     void openFolder();
