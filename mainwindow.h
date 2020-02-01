@@ -24,6 +24,7 @@ signals:
 
 private slots:
     void onActionOpen();
+    void onActionNewDatapack();
     void openFolder();
     void saveFile();
 

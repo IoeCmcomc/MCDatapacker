@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include "visualrecipeeditordock.h"
+#include "newdatapackdialog.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -23,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->codeEditor->setFont(monoFont);
     ui->codeEditor->setFocus();
 
+    connect(ui->actionNewDatapack, &QAction::triggered, this, &MainWindow::onActionNewDatapack);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onActionOpen);
     connect(ui->actionOpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
@@ -30,11 +33,61 @@ MainWindow::MainWindow(QWidget *parent)
 
     VisualRecipeEditorDock *visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
+}
 
+void MainWindow::onActionNewDatapack() {
+    NewDatapackDialog *dialog = new NewDatapackDialog(this);
+    int dialogCode = dialog->exec();
+    if(dialogCode == 1) {
+        QString dirPath = dialog->getDirPath() + "/" + dialog->getName();
+        QDir dir(dirPath);
+        if(!dir.exists()) {
+            dir.mkpath(dirPath);
+        } else if(!dir.isEmpty()) {
+            if(QMessageBox::warning
+                    (this,
+                     "Directory not empty",
+                     "The directory is not empty. Do you want to delete this directory?",
+                     QMessageBox::Yes | QMessageBox::No,
+                     QMessageBox::No)
+                    == QMessageBox::No) {
+                return;
+            } else {
+                dir.removeRecursively();
+                dir.mkpath(dirPath);
+            }
+        }
+
+        QFile file(dirPath+"/pack.mcmeta");
+        if(file.open(QIODevice::ReadWrite)) {
+            QJsonObject root;
+            QJsonObject pack;
+            pack.insert("description", dialog->getDesc());
+            pack.insert("pack_format", dialog->getFormat());
+            root.insert("pack", pack);
+
+            QTextStream stream(&file);
+            stream << QJsonDocument(root).toJson();
+        }
+        file.close();
+
+        dir.mkpath(dirPath+"/data");
+        QString namesp = dialog->getName()
+                .toLower()
+                .replace(" ", "_")
+                .replace("/", "_")
+                .replace(".", "_")
+                .replace(":", "_");
+        dir.mkpath(dirPath+"/data/"+namesp);
+
+        ui->datapackTreeView->load(dirPath);
+    }
+    qDebug() << dialogCode;
+    //qDebug() << dialog->getFormat() << dialog->getDesc() << dialog->getDirPath();
 }
 
 void MainWindow::onActionOpen() {
-    this->openFile(QFileDialog::getOpenFileName(this, tr("Open File")));
+    this->openFile(QFileDialog::getOpenFileName(this, tr("Open File"), ""));
 }
 
 void MainWindow::openFile(QString filename) {
@@ -67,7 +120,7 @@ void MainWindow::openFile(QString filename) {
 
 void MainWindow::saveFile() {
     if(this->fileName.isEmpty()) {
-        this->fileName = QFileDialog::getSaveFileName(this, tr("Save File"));
+        this->fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "");
     }
 
     QFile file(this->fileName);

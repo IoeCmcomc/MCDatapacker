@@ -206,6 +206,10 @@ void CodeEditor::followCurrentNamespacedID() {
             path += fileExt;
             this->prevFileName = path;
             qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->openFile(path);
+            qobject_cast<DatapackTreeView*>(
+                        qobject_cast<QSplitter*>(this->parent()->parent())->widget(0)
+                    )->selectFromPath(path);
+
         }
     }
 }

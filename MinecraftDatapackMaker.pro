@@ -24,6 +24,7 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     mcrinvitem.cpp \
     mcrinvslot.cpp \
+    newdatapackdialog.cpp \
     visualrecipeeditordock.cpp
 
 HEADERS += \
@@ -35,10 +36,12 @@ HEADERS += \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
     mcrinvslot.h \
+    newdatapackdialog.h \
     visualrecipeeditordock.h
 
 FORMS += \
     mainwindow.ui \
+    newdatapackdialog.ui \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \

@@ -20,7 +20,7 @@
    <set>QDockWidget::AllDockWidgetFeatures</set>
   </property>
   <property name="allowedAreas">
-   <set>Qt::BottomDockWidgetArea|Qt::RightDockWidgetArea|Qt::TopDockWidgetArea</set>
+   <set>Qt::AllDockWidgetAreas</set>
   </property>
   <property name="windowTitle">
    <string>Recipe Editor</string>
