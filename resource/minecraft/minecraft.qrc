@@ -889,5 +889,6 @@
         <file>texture/item/zombie_spawn_egg.png</file>
         <file>texture/item/zombie_villager_spawn_egg.png</file>
         <file>texture/right_arrow.png</file>
+        <file>texture/gui_fire.png</file>
     </qresource>
 </RCC>

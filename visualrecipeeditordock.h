@@ -19,14 +19,21 @@ public:
     ~VisualRecipeEditorDock();
 
 private slots:
+    void onRecipeTabChanged(int index);
     void onRecipeChanged();
 
 private:
     Ui::VisualRecipeEditorDock *ui;
 
     QVector<MCRInvSlot*> CraftingSlots;
+    int lastTabIndex = 0;
+    int lastStackIndex = 0;
 
     void setupItemList();
+    void setupTabBar();
+    QJsonObject genCraftingJson(QJsonObject root);
+    QJsonObject genSmeltingJson(QJsonObject root);
+    QJsonObject genStonecuttingJson(QJsonObject root);
 
 };
 

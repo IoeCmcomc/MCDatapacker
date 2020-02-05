@@ -29,7 +29,15 @@ void MCRInvSlot::setBackground(QString color) {
         setFrameShadow(QFrame::Sunken);
         setLineWidth(2);
     } else {
-        setStyleSheet(".MCRInvSlot { background: "+color+"; border: 2px solid; border-color: #373737 #FFF #FFF #373737;}");
+        setStyleSheet(
+            ".MCRInvSlot {"
+            "   background: "+color+";"
+            "   border: 2px solid;"
+            "   border-color: #373737 #FFF #FFF #373737;"
+            "}"
+            ".MCRInvSlot:hover {"
+            "   background-color: hsla(0,0%,100%,.4);"
+            "}");
     }
 }
 
@@ -52,6 +60,10 @@ void MCRInvSlot::removeItem(bool emitSignal) {
 
 MCRInvItem* MCRInvSlot::getItem() {
     return this->item;
+}
+
+QString MCRInvSlot::getCurrentID() {
+    return (item != nullptr) ? item->namespacedID : "";
 }
 
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event)
@@ -144,7 +156,7 @@ void MCRInvSlot::mousePressEvent(QMouseEvent *event)
 {
     //qDebug() << "mousePressEvent";
 
-    if (!this->item)
+    if (!this->item || this->item->namespacedID.isEmpty())
         return;
 
     QPoint offset(event->pos() - this->item->pos());

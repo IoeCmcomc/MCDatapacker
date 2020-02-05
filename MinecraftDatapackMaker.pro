@@ -25,6 +25,7 @@ SOURCES += \
     mcrinvitem.cpp \
     mcrinvslot.cpp \
     newdatapackdialog.cpp \
+    stackedwidget.cpp \
     visualrecipeeditordock.cpp
 
 HEADERS += \
@@ -37,6 +38,7 @@ HEADERS += \
     mcrinvitem.h \
     mcrinvslot.h \
     newdatapackdialog.h \
+    stackedwidget.h \
     visualrecipeeditordock.h
 
 FORMS += \

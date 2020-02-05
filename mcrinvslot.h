@@ -17,6 +17,7 @@ public:
     void setItem(MCRInvItem *item, bool emitSignal = false);
     void removeItem(bool emitSignal = false);
     MCRInvItem* getItem();
+    QString getCurrentID();
 
     void setBackground(QString color = "#8B8B8B");
 
