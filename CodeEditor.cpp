@@ -205,11 +205,15 @@ void CodeEditor::followCurrentNamespacedID() {
         if(!path.isEmpty() && !fileExt.isEmpty()) {
             path += fileExt;
             this->prevFileName = path;
+            /*
             qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->openFile(path);
             qobject_cast<DatapackTreeView*>(
                         qobject_cast<QSplitter*>(this->parent()->parent())->widget(0)
                     )->selectFromPath(path);
-
+                    */
+            qobject_cast<DatapackTreeView*>(
+                        qobject_cast<QSplitter*>(this->parent()->parent())->widget(0)
+                    )->openFromPath(path);
         }
     }
 }

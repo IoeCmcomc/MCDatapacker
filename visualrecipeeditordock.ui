@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>322</width>
-    <height>604</height>
+    <width>300</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,9 +18,16 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>322</width>
+    <width>300</width>
     <height>500</height>
    </size>
+  </property>
+  <property name="font">
+   <font>
+    <weight>50</weight>
+    <bold>false</bold>
+    <kerning>true</kerning>
+   </font>
   </property>
   <property name="features">
    <set>QDockWidget::AllDockWidgetFeatures</set>
@@ -132,7 +139,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>20</width>
+                <width>10</width>
                 <height>17</height>
                </size>
               </property>
@@ -711,7 +718,7 @@
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>20</width>
+                <width>10</width>
                 <height>17</height>
                </size>
               </property>
@@ -726,6 +733,9 @@
               <horstretch>0</horstretch>
               <verstretch>1</verstretch>
              </sizepolicy>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
             </property>
             <property name="selectionMode">
              <enum>QAbstractItemView::NoSelection</enum>
@@ -780,7 +790,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>1</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="craftOptions">
                 <property name="sizePolicy">
@@ -995,11 +1005,22 @@
               <widget class="QLineEdit" name="recipeGroupInput"/>
              </item>
              <item row="2" column="0" colspan="2">
-              <widget class="QPushButton" name="craftGenBtn">
-               <property name="text">
-                <string>Generate</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QPushButton" name="pushButton">
+                 <property name="text">
+                  <string>Import</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="ExportBtn">
+                 <property name="text">
+                  <string>Export</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>

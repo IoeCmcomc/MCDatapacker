@@ -15,6 +15,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QPalette>
 
 
 VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
@@ -46,8 +47,10 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     connect(ui->cookTimeInput, QOverload<int>::of(&QSpinBox::valueChanged), this, &VisualRecipeEditorDock::onRecipeChanged);
     connect(ui->recipeGroupInput, &QLineEdit::textChanged, this, &VisualRecipeEditorDock::onRecipeChanged);
 
-    setupTabBar();
+    setupCustomTab();
     setupItemList();
+
+    //ui->ftw->setTabBar(ui->customTabBar);
 }
 
 VisualRecipeEditorDock::~VisualRecipeEditorDock()
@@ -55,11 +58,13 @@ VisualRecipeEditorDock::~VisualRecipeEditorDock()
     delete ui;
 }
 
-void VisualRecipeEditorDock::setupTabBar() {
+void VisualRecipeEditorDock::setupCustomTab() {
+    //Add tabs
     ui->customTabBar->addTab(tr("Crafting"));
     ui->customTabBar->addTab(tr("Smelting"));
     ui->customTabBar->addTab(tr("Stonecutter"));
 
+    //Make tab bar overlay top pixel of tab frame
     ui->customTabWidgetLayout->removeWidget(ui->customTabBar);
     ui->customTabWidgetLayout->removeWidget(ui->customTabFrame);
     ui->customTabWidgetLayout->addWidget(ui->customTabBar, 0, 0, Qt::AlignTop);
@@ -67,6 +72,9 @@ void VisualRecipeEditorDock::setupTabBar() {
     ui->customTabBar->raise();
     ui->customTabBar->setExpanding(false);
     //ui->customTabBar->setMovable(true);
+
+//    QStyleOptionTabWidgetFrame *style = new QStyleOptionTabWidgetFrame();
+//    ui->customTabFrame->setStyle(style);
 }
 
 void VisualRecipeEditorDock::setupItemList() {

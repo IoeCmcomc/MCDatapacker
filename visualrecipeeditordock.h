@@ -30,7 +30,7 @@ private:
     int lastStackIndex = 0;
 
     void setupItemList();
-    void setupTabBar();
+    void setupCustomTab();
     QJsonObject genCraftingJson(QJsonObject root);
     QJsonObject genSmeltingJson(QJsonObject root);
     QJsonObject genStonecuttingJson(QJsonObject root);
