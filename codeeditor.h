@@ -20,13 +20,10 @@ public:
         QString string;
         QString link;
     };
-    QTextCursor lastTextCursor;
-    QTextCursor mouseTextCursor;
-    QTextCursor lastMouseTextCursor;
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
-    void setFileName(QString fileName);
+    void setCurFile(QString filepath);
     CurrentNamespacedID getCurrentNamespacedID();
 
 protected:
@@ -46,11 +43,14 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
-    QString fileName;
-    QString prevFileName;
+    QString curFile;
+    QString prevCurFile;
     QStringList keyModifiers;
     JsonHighlighter *jsonHighlighter;
     MCfunctionHighlighter *mcfunctionHighlighter;
+    QTextCursor lastTextCursor;
+    QTextCursor mouseTextCursor;
+    QTextCursor lastMouseTextCursor;
 
     void highlightCurrLineSelection();
     void followCurrentNamespacedID();

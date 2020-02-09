@@ -6,7 +6,7 @@
 
 class MCRInvItem : public QLabel
 {
-    Q_OBJECT
+    //Q_OBJECT
 
 public:
     MCRInvItem(QWidget *parent = nullptr, QString id ="");

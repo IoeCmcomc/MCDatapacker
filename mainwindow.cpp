@@ -13,11 +13,16 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QUiLoader>
-
+#include <QSettings>
+#include <QScreen>
+#include <QGuiApplication>
+#include <QSaveFile>
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
+    //setAttribute(Qt::WA_DeleteOnClose, false);
 
     QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoFont.setPointSize(11);
@@ -25,17 +30,122 @@ MainWindow::MainWindow(QWidget *parent)
     ui->codeEditor->setFont(monoFont);
     ui->codeEditor->setFocus();
 
-    connect(ui->actionNewDatapack, &QAction::triggered, this, &MainWindow::onActionNewDatapack);
-    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onActionOpen);
+    connect(ui->actionNewDatapack, &QAction::triggered, this, &MainWindow::newDatapack);
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
     connect(ui->actionOpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
-    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
-    connect(ui->actionExit, &QAction::triggered, this, &QApplication::quit);
+    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
+    //connect(ui->actionExit, &QAction::triggered, this, &QApplication::quit);
+    connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
+
+    readSettings();
+
+    connect(ui->codeEditor->document(), &QTextDocument::contentsChanged,
+            this, &MainWindow::documentWasModified);
+
+    #ifndef QT_NO_SESSIONMANAGER
+        QGuiApplication::setFallbackSessionManagementEnabled(false);
+        connect(qApp, &QGuiApplication::commitDataRequest,
+                this, &MainWindow::commitData);
+    #endif
+
+    setCurrentFile(QString());
+    setUnifiedTitleAndToolBarOnMac(true);
 
     VisualRecipeEditorDock *visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 }
 
-void MainWindow::onActionNewDatapack() {
+void MainWindow::open() {
+    if (maybeSave()) {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "");
+        if (!fileName.isEmpty())
+            openFile(fileName);
+    }
+}
+
+bool MainWindow::save() {
+    if (curFile.isEmpty()) {
+        return saveFile(QFileDialog::getSaveFileName(this, tr("Save File"), ""));
+    } else {
+        return saveFile(curFile);
+    }
+}
+
+void MainWindow::documentWasModified() {
+
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    qDebug() << "closeEvent";
+    if (maybeSave()) {
+        writeSettings();
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
+
+void MainWindow::readSettings() {
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    //restoreGeometry(geometry);
+    settings.beginGroup("geometry");
+    QSize geomertySize = settings.value("size", QSize(600, 600)).toSize();
+    if(geomertySize.isEmpty())
+        adjustSize();
+    else
+        resize(geomertySize);
+
+    QRect availableGeometry = QGuiApplication::primaryScreen()->availableGeometry();
+
+    move(settings.value("pos",
+                        QPoint((availableGeometry.width() - width()) / 2,
+                               (availableGeometry.height() - height()) / 2))
+            .toPoint());
+
+    if(settings.value("isMaximized", true).toBool())
+        showMaximized();
+
+    settings.endGroup();
+}
+
+void MainWindow::writeSettings() {
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    //settings.setValue("geometry", saveGeometry());
+    settings.beginGroup("geometry");
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
+    settings.setValue("isMaximized", isMaximized());
+    settings.endGroup();
+}
+
+bool MainWindow::maybeSave() {
+    if (!ui->codeEditor->document()->isModified())
+        return true;
+    const QMessageBox::StandardButton ret
+        = QMessageBox::warning(this, tr("Unsaved changes"),
+                               tr("The document has been modified.\n"
+                                  "Do you want to save your changes?"),
+                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    switch (ret) {
+    case QMessageBox::Save:
+        return save();
+    case QMessageBox::Cancel:
+        return false;
+    default:
+        break;
+    }
+    return true;
+}
+
+
+QString MainWindow::getCurDir() {
+    return this->curDir;
+}
+
+void MainWindow::commitData(QSessionManager &) {
+}
+
+void MainWindow::newDatapack() {
     NewDatapackDialog *dialog = new NewDatapackDialog(this);
     int dialogCode = dialog->exec();
     if(dialogCode == 1) {
@@ -74,10 +184,8 @@ void MainWindow::onActionNewDatapack() {
         dir.mkpath(dirPath+"/data");
         QString namesp = dialog->getName()
                 .toLower()
-                .replace(" ", "_")
-                .replace("/", "_")
-                .replace(".", "_")
-                .replace(":", "_");
+                .replace(" ", "_").replace("/", "_")
+                .replace(".", "_").replace(":", "_");
         dir.mkpath(dirPath+"/data/"+namesp);
 
         ui->datapackTreeView->load(dirPath);
@@ -86,21 +194,24 @@ void MainWindow::onActionNewDatapack() {
     //qDebug() << dialog->getFormat() << dialog->getDesc() << dialog->getDirPath();
 }
 
-void MainWindow::onActionOpen() {
-    this->openFile(QFileDialog::getOpenFileName(this, tr("Open File"), ""));
-}
-
-void MainWindow::openFile(QString filename) {
-    if (filename.isEmpty() || this->fileName == filename)
+void MainWindow::openFile(const QString &filepath) {
+    if (filepath.isEmpty() || this->curFile == filepath)
         return;
     else {
-        QFile file(filename);
+        QFile file(filepath);
         if(!file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0, "error", file.errorString());
+            QMessageBox::warning(this, tr("Application"),
+                                 tr("Cannot read file %1:\n%2.")
+                                 .arg(QDir::toNativeSeparators(filepath), file.errorString()));
         } else {
             QTextStream in(&file);
 
             in.setCodec("UTF-8");
+
+
+            #ifndef QT_NO_CURSOR
+                QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+            #endif
 
             int c = 0;
             QString content;
@@ -110,29 +221,54 @@ void MainWindow::openFile(QString filename) {
                 ++c;
             }
             ui->codeEditor->setPlainText(content);
-            this->fileName = filename;
-            ui->codeEditor->setFileName(filename);
+            setCurrentFile(filepath);
+
+            #ifndef QT_NO_CURSOR
+                QGuiApplication::restoreOverrideCursor();
+            #endif
+
+            emit fileOpened(QFileInfo(filepath).completeSuffix());
         }
     file.close();
-    emit fileOpened(QFileInfo(fileName).completeSuffix());
     }
 }
 
-void MainWindow::saveFile() {
-    if(this->fileName.isEmpty()) {
-        this->fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "");
+bool MainWindow::saveFile(const QString &filepath) {
+    QString errorMessage;
+
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    QSaveFile file(filepath);
+    if (file.open(QFile::WriteOnly | QFile::Text)) {
+        QTextStream out(&file);
+        out << ui->codeEditor->toPlainText();
+        if (!file.commit()) {
+            errorMessage = tr("Cannot write file %1:\n%2.")
+                           .arg(QDir::toNativeSeparators(filepath), file.errorString());
+        }
+    } else {
+        errorMessage = tr("Cannot open file %1 for writing:\n%2.")
+                       .arg(QDir::toNativeSeparators(filepath), file.errorString());
+    }
+    QGuiApplication::restoreOverrideCursor();
+
+    if (!errorMessage.isEmpty()) {
+        QMessageBox::warning(this, tr("Application"), errorMessage);
+        return false;
     }
 
-    QFile file(this->fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::information(this, tr("Unable to open file"),
-            file.errorString());
-        return;
-    }
-    QTextStream out(&file);
-    out.setCodec("UTF-8");
-    out << ui->codeEditor->toPlainText();
-    file.close();
+    setCurrentFile(filepath);
+    return true;
+}
+
+void MainWindow::setCurrentFile(const QString &filepath) {
+    this->curFile = filepath;
+    ui->codeEditor->setCurFile(filepath);
+    setWindowModified(false);
+}
+
+QString MainWindow::strippedName(const QString &fullFileName)
+{
+    return QFileInfo(fullFileName).fileName();
 }
 
 void MainWindow::openFolder() {
@@ -189,7 +325,7 @@ void MainWindow::openFolder() {
                         qDebug()<< pack["pack_format"].toDouble();
 
                         ui->datapackTreeView->load(dir);
-                        this->dirName = dir;
+                        this->curDir = dir;
                     }
                 }
             }

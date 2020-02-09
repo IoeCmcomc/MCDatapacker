@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSessionManager>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,22 +15,39 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QString fileName = QStringLiteral("None");
-    QString dirName = QStringLiteral("None");
-    void openFile(QString filename);
+    void openFile(const QString &filepath);
     void setCodeEditorText(QString text);
+    QString getCurDir();
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 signals:
     void fileOpened(QString fileExt);;
 
 private slots:
-    void onActionOpen();
-    void onActionNewDatapack();
+    void open();
+    void newDatapack();
     void openFolder();
-    void saveFile();
+    bool save();
+    void documentWasModified();
+
+#ifndef QT_NO_SESSIONMANAGER
+    void commitData(QSessionManager &);
+#endif
 
 private:
     Ui::MainWindow *ui;
+
+    void readSettings();
+    void writeSettings();
+    bool maybeSave();
+    bool saveFile(const QString &filepath);
+    void setCurrentFile(const QString &filepath);
+    QString strippedName(const QString &fullFilepath);
+
+    QString curFile = QStringLiteral("None");
+    QString curDir = QStringLiteral("None");
 };
 
 #endif // MAINWINDOW_H

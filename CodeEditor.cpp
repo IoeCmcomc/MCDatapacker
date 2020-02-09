@@ -91,9 +91,9 @@ void CodeEditor::onCursorPositionChanged() {
     setExtraSelections(extraSelections);
 }
 
-void CodeEditor::setFileName(QString fileName) {
-    this->fileName = fileName;
-    QFileInfo info = QFileInfo(fileName);
+void CodeEditor::setCurFile(QString filepath) {
+    this->curFile = filepath;
+    QFileInfo info = QFileInfo(filepath);
     qDebug() << info;
     qDebug() << info.completeSuffix();
     const QString jsonExts = "json mcmeta";
@@ -182,8 +182,7 @@ void CodeEditor::followCurrentNamespacedID() {
 
     QString fileExt;
     if(!str.isEmpty()) {
-        //QString dirname = qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent()->parent())->dirName;
-        QString dirname = qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->dirName;
+        QString dirname = qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->getCurDir();
         //qDebug() << "dirname: " << dirname;
         if(dirname.isEmpty()) return;
 
@@ -204,7 +203,7 @@ void CodeEditor::followCurrentNamespacedID() {
 
         if(!path.isEmpty() && !fileExt.isEmpty()) {
             path += fileExt;
-            this->prevFileName = path;
+            this->prevCurFile = path;
             /*
             qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->openFile(path);
             qobject_cast<DatapackTreeView*>(
