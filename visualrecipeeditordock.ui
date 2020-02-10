@@ -1007,16 +1007,16 @@
              <item row="2" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QPushButton" name="pushButton">
+                <widget class="QPushButton" name="readRecipeBtn">
                  <property name="text">
-                  <string>Import</string>
+                  <string>Read</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="ExportBtn">
+                <widget class="QPushButton" name="writeRecipeBtn">
                  <property name="text">
-                  <string>Export</string>
+                  <string>Write</string>
                  </property>
                 </widget>
                </item>

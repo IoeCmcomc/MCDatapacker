@@ -16,8 +16,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void openFile(const QString &filepath);
-    void setCodeEditorText(QString text);
     QString getCurDir();
+
+    void setCodeEditorText(const QString &text);
+    QString getCodeEditorText();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

@@ -43,6 +43,7 @@ void MCRInvSlot::setBackground(QString color) {
 
 void MCRInvSlot::setItem(MCRInvItem *item, bool emitSignal) {
     if(item != nullptr) {
+        if(item->namespacedID.isEmpty()) return;
         removeItem();
         this->item = item;
         layout()->addWidget(item);

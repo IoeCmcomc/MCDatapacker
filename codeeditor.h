@@ -23,6 +23,7 @@ public:
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
+
     void setCurFile(QString filepath);
     CurrentNamespacedID getCurrentNamespacedID();
 

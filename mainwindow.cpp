@@ -199,7 +199,7 @@ void MainWindow::openFile(const QString &filepath) {
         return;
     else {
         QFile file(filepath);
-        if(!file.open(QIODevice::ReadOnly)) {
+        if(!file.open(QFile::ReadOnly | QFile::Text)) {
             QMessageBox::warning(this, tr("Application"),
                                  tr("Cannot read file %1:\n%2.")
                                  .arg(QDir::toNativeSeparators(filepath), file.errorString()));
@@ -207,7 +207,6 @@ void MainWindow::openFile(const QString &filepath) {
             QTextStream in(&file);
 
             in.setCodec("UTF-8");
-
 
             #ifndef QT_NO_CURSOR
                 QGuiApplication::setOverrideCursor(Qt::WaitCursor);
@@ -294,11 +293,10 @@ void MainWindow::openFolder() {
                 QString json_string;
                 json_string = in.readAll();
                 file.close();
-                QByteArray json_bytes = json_string.toLocal8Bit();
 
-                auto json_doc = QJsonDocument::fromJson(json_bytes);
+                QJsonDocument json_doc = QJsonDocument::fromJson(json_string.toUtf8());
 
-                qDebug() << json_doc;
+                //qDebug() << json_doc;
 
                 if(json_doc.isNull()){
                     QMessageBox::information(0, "error", "Failed to create JSON doc.");
@@ -336,8 +334,12 @@ void MainWindow::openFolder() {
     }
 }
 
-void MainWindow::setCodeEditorText(QString text) {
+void MainWindow::setCodeEditorText(const QString &text) {
     ui->codeEditor->setPlainText(text);
+}
+
+QString MainWindow::getCodeEditorText() {
+    return ui->codeEditor->toPlainText();
 }
 
 MainWindow::~MainWindow()

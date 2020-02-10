@@ -18,14 +18,17 @@ public:
     explicit VisualRecipeEditorDock(QWidget *parent = nullptr);
     ~VisualRecipeEditorDock();
 
+    void writeRecipe();
+    void readRecipe();
+
 private slots:
     void onRecipeTabChanged(int index);
-    void onRecipeChanged();
+    //void onRecipeChanged(); // Unused
 
 private:
     Ui::VisualRecipeEditorDock *ui;
 
-    QVector<MCRInvSlot*> CraftingSlots;
+    QVector<MCRInvSlot*> craftingSlots;
     int lastTabIndex = 0;
     int lastStackIndex = 0;
 
@@ -34,6 +37,9 @@ private:
     QJsonObject genCraftingJson(QJsonObject root);
     QJsonObject genSmeltingJson(QJsonObject root);
     QJsonObject genStonecuttingJson(QJsonObject root);
+    void readCraftingJson(const QJsonObject &root);
+    void readSmeltingJson(const QJsonObject &root);
+    void readStonecuttingJson(const QJsonObject &root);
 
 };
 

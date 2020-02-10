@@ -12,6 +12,10 @@ MCRInvItem::MCRInvItem(QWidget *parent, QString id) : QLabel(parent)
 
     QString iconpath;
     QPixmap iconpix;
+
+    if(id.startsWith(QStringLiteral("minecraft:")))
+        id.remove(0, 10);
+
     if(id == "debug_stick") {
         iconpath = ":minecraft/texture/item/stick.png";
         iconpix = QPixmap(iconpath);
