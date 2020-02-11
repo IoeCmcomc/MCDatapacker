@@ -145,7 +145,8 @@ MCRInvItem::MCRInvItem(QWidget *parent, QString id) : QLabel(parent)
     setAlignment(Qt::AlignCenter);
     setAttribute(Qt::WA_DeleteOnClose);
     if(itemList().contains(id)) {
-        setToolTip(itemList().value(id));
+        setName(itemList().value(id));
+        setToolTip(name);
     } else {
         setToolTip("Unknown item: "+id);
     }
@@ -160,6 +161,14 @@ MCRInvItem::MCRInvItem(QWidget *parent, QString id) : QLabel(parent)
 
 void MCRInvItem::setupItem() {
 
+}
+
+QString MCRInvItem::getName() {
+    return this->name;
+}
+
+void MCRInvItem::setName(const QString &name) {
+    this-> name = name;
 }
 
 QMap<QString, QString> MCRInvItem::itemList() {

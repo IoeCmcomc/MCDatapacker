@@ -22,8 +22,16 @@ private slots:
     void onDoubleClicked(const QModelIndex &index);
     void onCustomContextMenu(const QPoint &point);
     void contextMenuOnNewFolder();
+    void contextMenuOnNewAdv();
     void contextMenuOnNewFunct();
+    void contextMenuOnNewLoot();
+    void contextMenuOnNewPred();
     void contextMenuOnNewRecipe();
+    void contextMenuOnNewStruct();
+    void contextMenuOnNewBlocksTag();
+    void contextMenuOnNewEntityTag();
+    void contextMenuOnNewFunctsTag();
+    void contextMenuOnNewItemsTag();
     void contextMenuOnNewFile();
     void contextMenuOnOpen();
     void contextMenuOnRename();

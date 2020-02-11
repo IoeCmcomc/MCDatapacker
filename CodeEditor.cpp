@@ -94,12 +94,12 @@ void CodeEditor::onCursorPositionChanged() {
 void CodeEditor::setCurFile(QString filepath) {
     this->curFile = filepath;
     QFileInfo info = QFileInfo(filepath);
-    qDebug() << info;
-    qDebug() << info.completeSuffix();
+    //qDebug() << info;
+    //qDebug() << info.completeSuffix();
     const QString jsonExts = "json mcmeta";
 
-    qDebug() << jsonExts;
-    qDebug() << jsonExts.contains(info.completeSuffix());
+    //qDebug() << jsonExts;
+    //qDebug() << jsonExts.contains(info.completeSuffix());
 
     jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
     mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");

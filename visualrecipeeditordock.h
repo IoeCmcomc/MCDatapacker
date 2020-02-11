@@ -34,6 +34,7 @@ private:
 
     void setupItemList();
     void setupCustomTab();
+    void onItemListSearch(const QString &input);
     QJsonObject genCraftingJson(QJsonObject root);
     QJsonObject genSmeltingJson(QJsonObject root);
     QJsonObject genStonecuttingJson(QJsonObject root);

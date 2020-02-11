@@ -26,33 +26,6 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     qDebug() << path;
     QFileInfo finfo = dirModel.fileInfo(index);
 
-    if(path != "pack.mcmeta") {
-        QMenu *newMenu = new QMenu(tr("New"), this); //"New" menu
-
-        QAction *newMenuNewFolder = new QAction(tr("Folder"), this);
-        if(path == "data")
-            newMenuNewFolder->setText(tr("Namespace"));
-        connect(newMenuNewFolder, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFolder);
-        newMenu->addAction(newMenuNewFolder);
-
-        if(path != "data") {
-            newMenu->addSeparator();
-
-            QAction *newMenuNewFunct = new QAction(tr("Function"), this);
-            connect(newMenuNewFunct, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFunct);
-            newMenu->addAction(newMenuNewFunct);
-
-            QAction *newMenuNewRecipe = new QAction(tr("Recipe"), this);
-            connect(newMenuNewRecipe, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewRecipe);
-            newMenu->addAction(newMenuNewRecipe);
-
-            QAction *newMenuNewFile = new QAction(tr("File"), this);
-            connect(newMenuNewFile, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFile);
-            newMenu->addAction(newMenuNewFile);
-        }
-        cMenu->addMenu(newMenu);
-    }
-
     if(finfo.isFile()) {
         QAction *cMenuActionOpen = new QAction(tr("Open"), this);
         cMenuActionOpen->setShortcuts(QKeySequence::Open);
@@ -68,6 +41,73 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         QAction *cMenuActionDelete = new QAction(tr("Delete"), this);
         connect(cMenuActionDelete, &QAction::triggered, this, &DatapackTreeView::contextMenuOnDelete);
         cMenu->addAction(cMenuActionDelete);
+    }
+
+    if(path != "pack.mcmeta") {
+        cMenu->addSeparator();
+        QMenu *newMenu = new QMenu(tr("New"), this); //"New" menu
+
+        QAction *newMenuNewFolder = new QAction(tr("Folder"), this);
+        if(path == "data")
+            newMenuNewFolder->setText(tr("Namespace"));
+        connect(newMenuNewFolder, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFolder);
+        newMenu->addAction(newMenuNewFolder);
+
+        if(path != "data") {
+            newMenu->addSeparator();
+
+            QAction *newMenuNewAdv = new QAction(tr("Advancement"), this);
+            connect(newMenuNewAdv, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewAdv);
+            newMenu->addAction(newMenuNewAdv);
+
+            QAction *newMenuNewFunct = new QAction(tr("Function"), this);
+            connect(newMenuNewFunct, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFunct);
+            newMenu->addAction(newMenuNewFunct);
+
+            QAction *newMenuNewLoot = new QAction(tr("Loot table"), this);
+            connect(newMenuNewLoot, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewLoot);
+            newMenu->addAction(newMenuNewLoot);
+
+            QAction *newMenuNewPred = new QAction(tr("Predicate"), this);
+            connect(newMenuNewPred, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewPred);
+            newMenu->addAction(newMenuNewPred);
+
+            QAction *newMenuNewRecipe = new QAction(tr("Recipe"), this);
+            connect(newMenuNewRecipe, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewRecipe);
+            newMenu->addAction(newMenuNewRecipe);
+
+            QAction *newMenuNewStruct = new QAction(tr("Structure"), this);
+            newMenuNewStruct->setDisabled(true);
+            connect(newMenuNewStruct, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewStruct);
+            newMenu->addAction(newMenuNewStruct);
+
+            QMenu *tagMenu = new QMenu(tr("Tag"), this); //"Tag" menu
+
+            QAction *newBlockTag = new QAction(tr("Blocks"), this);
+            connect(newBlockTag, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewBlocksTag);
+            tagMenu->addAction(newBlockTag);
+
+            QAction *newEntityTag = new QAction(tr("Entity types"), this);
+            connect(newEntityTag, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewEntityTag);
+            tagMenu->addAction(newEntityTag);
+
+            QAction *newFunctTag = new QAction(tr("Functions"), this);
+            connect(newFunctTag, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFunctsTag);
+            tagMenu->addAction(newFunctTag);
+
+            QAction *newItemTag = new QAction(tr("Items"), this);
+            connect(newItemTag, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewItemsTag);
+            tagMenu->addAction(newItemTag);
+
+            newMenu->addMenu(tagMenu);
+
+            newMenu->addSeparator();
+
+            QAction *newMenuNewFile = new QAction(tr("File"), this);
+            connect(newMenuNewFile, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFile);
+            newMenu->addAction(newMenuNewFile);
+        }
+        cMenu->addMenu(newMenu);
     }
 
     return cMenu;
@@ -171,12 +211,14 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index, QString name, QStri
 
         QDir tmpDir;
         if(!catDir.isEmpty()) {
-            tmpDir= QDir(dirPath+"/data/"+relNamespace(finfo.filePath()));
+            QString pathWithNspace = dirPath+"/data/"+relNamespace(finfo.filePath());
+            tmpDir= QDir(pathWithNspace);
             if(!tmpDir.exists())
                 return QModelIndex();
 
-            if(!tmpDir.exists(catDir))
-                tmpDir.mkdir(catDir);
+            pathWithNspace += '/' + catDir;
+            if(!QFileInfo::exists(pathWithNspace))
+                tmpDir.mkpath(pathWithNspace);
             tmpDir.cd(catDir);
         }
 
@@ -196,6 +238,15 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index, QString name, QStri
     }
 }
 
+void DatapackTreeView::contextMenuOnNewAdv() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "advancement_"+randStr()+".json", "advancements");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
 void DatapackTreeView::contextMenuOnNewFunct() {
     //QModelIndex selected = getSelected();
     QModelIndex selected = indexAt(cMenuPos);
@@ -206,10 +257,74 @@ void DatapackTreeView::contextMenuOnNewFunct() {
     }
 }
 
+void DatapackTreeView::contextMenuOnNewLoot() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "loot_table_"+randStr()+".json", "loot_tables");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewPred() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "predicate_"+randStr()+".json", "predicates");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
 void DatapackTreeView::contextMenuOnNewRecipe() {
     //QModelIndex selected = getSelected();
     QModelIndex selected = indexAt(cMenuPos);
     QModelIndex index = makeNewFile(selected, "recipe_"+randStr()+".json", "recipes");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewStruct() {
+    //QModelIndex selected = getSelected();
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "structure_"+randStr()+".nbt", "structures");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewBlocksTag() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "tag_"+randStr()+".json", "tags/blocks");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewEntityTag() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "tag_"+randStr()+".json", "tags/entity_types");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewFunctsTag() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "tag_"+randStr()+".json", "tags/functions");
+    if(index.isValid()) {
+        onDoubleClicked(index);
+        edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewItemsTag() {
+    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex index = makeNewFile(selected, "tag_"+randStr()+".json", "tags/items");
     if(index.isValid()) {
         onDoubleClicked(index);
         edit(index);

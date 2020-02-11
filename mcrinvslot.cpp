@@ -63,7 +63,7 @@ MCRInvItem* MCRInvSlot::getItem() {
     return this->item;
 }
 
-QString MCRInvSlot::getCurrentID() {
+QString MCRInvSlot::itemNamespacedID() {
     return (item != nullptr) ? item->namespacedID : "";
 }
 

@@ -49,7 +49,6 @@ MainWindow::MainWindow(QWidget *parent)
     #endif
 
     setCurrentFile(QString());
-    setUnifiedTitleAndToolBarOnMac(true);
 
     VisualRecipeEditorDock *visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
@@ -65,14 +64,18 @@ void MainWindow::open() {
 
 bool MainWindow::save() {
     if (curFile.isEmpty()) {
-        return saveFile(QFileDialog::getSaveFileName(this, tr("Save File"), ""));
+        QString filepath = QFileDialog::getSaveFileName(this, tr("Save File"), "");
+        if(!filepath.isEmpty())
+            return saveFile(filepath);
+        else
+            return false;
     } else {
         return saveFile(curFile);
     }
 }
 
 void MainWindow::documentWasModified() {
-
+    setWindowModified(ui->codeEditor->document()->isModified());
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -96,7 +99,6 @@ void MainWindow::readSettings() {
         resize(geomertySize);
 
     QRect availableGeometry = QGuiApplication::primaryScreen()->availableGeometry();
-
     move(settings.value("pos",
                         QPoint((availableGeometry.width() - width()) / 2,
                                (availableGeometry.height() - height()) / 2))
@@ -145,10 +147,40 @@ QString MainWindow::getCurDir() {
 void MainWindow::commitData(QSessionManager &) {
 }
 
+void MainWindow::setCurrentFile(const QString &filepath) {
+    this->curFile = filepath;
+    ui->codeEditor->setCurFile(filepath);
+
+    updateWindowTitle();
+    qDebug() << "setWindowModified";
+    setWindowModified(false);
+}
+
+QString MainWindow::strippedName(const QString &fullFileName)
+{
+    return QFileInfo(fullFileName).fileName();
+}
+
+void MainWindow::updateWindowTitle() {
+    QStringList title;
+    if(!curFile.isEmpty())
+        title.push_back(strippedName(curFile) + "[*]");
+    if(!curDir.isEmpty())
+        title.push_back("[" + strippedName(curDir) + "]");
+    title.push_back(QCoreApplication::applicationName());
+    setWindowTitle(title.join(QStringLiteral(" - ")));
+}
+
 void MainWindow::newDatapack() {
     NewDatapackDialog *dialog = new NewDatapackDialog(this);
     int dialogCode = dialog->exec();
     if(dialogCode == 1) {
+        if (maybeSave()) {
+            ui->codeEditor->clear();
+            setCurrentFile(QString());
+        } else {
+            return;
+        }
         QString dirPath = dialog->getDirPath() + "/" + dialog->getName();
         QDir dir(dirPath);
         if(!dir.exists()) {
@@ -259,17 +291,6 @@ bool MainWindow::saveFile(const QString &filepath) {
     return true;
 }
 
-void MainWindow::setCurrentFile(const QString &filepath) {
-    this->curFile = filepath;
-    ui->codeEditor->setCurFile(filepath);
-    setWindowModified(false);
-}
-
-QString MainWindow::strippedName(const QString &fullFileName)
-{
-    return QFileInfo(fullFileName).fileName();
-}
-
 void MainWindow::openFolder() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
@@ -323,7 +344,9 @@ void MainWindow::openFolder() {
                         qDebug()<< pack["pack_format"].toDouble();
 
                         ui->datapackTreeView->load(dir);
+                        ui->codeEditor->clear();
                         this->curDir = dir;
+                        setCurrentFile("");
                     }
                 }
             }

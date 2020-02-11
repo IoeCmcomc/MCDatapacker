@@ -13,9 +13,13 @@ public:
     static QMap<QString, QString> itemList();
 
     QString namespacedID = "";
+    QString getName();
+    void setName(const QString &name);
 
 private:
     void setupItem();
+
+    QString name;
 };
 
 #endif // MCRINVITEM_H

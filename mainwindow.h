@@ -47,9 +47,10 @@ private:
     bool saveFile(const QString &filepath);
     void setCurrentFile(const QString &filepath);
     QString strippedName(const QString &fullFilepath);
+    void updateWindowTitle();
 
-    QString curFile = QStringLiteral("None");
-    QString curDir = QStringLiteral("None");
+    QString curFile = QString();
+    QString curDir = QString();
 };
 
 #endif // MAINWINDOW_H

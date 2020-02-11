@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>702</height>
+    <height>559</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -759,6 +759,9 @@
              <number>-1</number>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="itemListSearchBox"/>
           </item>
           <item>
            <widget class="QGroupBox" name="recipeOptions">

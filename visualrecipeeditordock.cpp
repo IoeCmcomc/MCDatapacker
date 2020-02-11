@@ -46,8 +46,8 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     connect(ui->recipeGroupInput, &QLineEdit::textChanged, this, &VisualRecipeEditorDock::onRecipeChanged);
     */
 
+    connect(ui->itemListSearchBox, &QLineEdit::textChanged, this, &VisualRecipeEditorDock::onItemListSearch);
     connect(ui->cookTimeCheck, &QCheckBox::stateChanged, [this](int i){ ui->cookTimeInput->setDisabled(2-i); });
-
     connect(ui->writeRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::readRecipe);
 
@@ -114,6 +114,29 @@ void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
         ui->stackedRecipeWidget->setCurrentIndex(2);
         ui->stackedOptions->setCurrentIndex(2);
     }
+}
+
+void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
+    #ifndef QT_NO_CURSOR
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    #endif
+
+    for(int i = 0; i < ui->itemList->count(); ++i)
+    {
+        QListWidgetItem *item = ui->itemList->item(i);
+        MCRInvSlot *invSlot = qobject_cast<MCRInvSlot*>(ui->itemList->itemWidget(item));
+        MCRInvItem *invItem = invSlot->getItem();
+
+        if(invItem->getName().contains(input)
+                || invItem->namespacedID.contains(input))
+            item->setHidden(false);
+        else
+            item->setHidden(true);
+    }
+
+    #ifndef QT_NO_CURSOR
+        QGuiApplication::restoreOverrideCursor();
+    #endif
 }
 
 void VisualRecipeEditorDock::writeRecipe() {
@@ -226,7 +249,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
     }
 
     QJsonObject result;
-    result.insert(QStringLiteral("item"), ui->outputSlot->getCurrentID());
+    result.insert(QStringLiteral("item"), ui->outputSlot->itemNamespacedID());
     result.insert(QStringLiteral("count"), ui->resultCountInput->value());
     root.insert(QStringLiteral("result"), result);
 
@@ -244,10 +267,10 @@ QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
                 QStringLiteral("minecraft:")+smeltingTypes[index]);
 
     QJsonObject ingredient;
-    ingredient.insert(QStringLiteral("item"), ui->smeltingSlot_0->getCurrentID());
+    ingredient.insert(QStringLiteral("item"), ui->smeltingSlot_0->itemNamespacedID());
     root.insert("ingredient", ingredient);
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->getCurrentID());
+    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
     root.insert(QStringLiteral("experience"), ui->experienceInput->value());
     if(ui->cookTimeCheck->isChecked())
         root.insert(QStringLiteral("cookingtime"), ui->cookTimeInput->value());
@@ -258,10 +281,10 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
     root.insert(QStringLiteral("type"), QStringLiteral("minecraft:stonecutting"));
 
     QJsonObject ingredient;
-    ingredient.insert(QStringLiteral("item"), ui->stonecuttingSlot->getCurrentID());
+    ingredient.insert(QStringLiteral("item"), ui->stonecuttingSlot->itemNamespacedID());
     root.insert(QStringLiteral("ingredient"), ingredient);
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->getCurrentID());
+    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
     root.insert(QStringLiteral("count"), ui->resultCountInput->value());
 
     return root;
