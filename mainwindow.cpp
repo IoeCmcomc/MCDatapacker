@@ -165,6 +165,8 @@ void MainWindow::updateWindowTitle() {
     QStringList title;
     if(!curFile.isEmpty())
         title.push_back(strippedName(curFile) + "[*]");
+    else
+        title.push_back("[*]");
     if(!curDir.isEmpty())
         title.push_back("[" + strippedName(curDir) + "]");
     title.push_back(QCoreApplication::applicationName());

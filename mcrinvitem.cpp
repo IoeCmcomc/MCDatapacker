@@ -168,7 +168,7 @@ QString MCRInvItem::getName() {
 }
 
 void MCRInvItem::setName(const QString &name) {
-    this-> name = name;
+    this->name = name;
 }
 
 QMap<QString, QString> MCRInvItem::itemList() {

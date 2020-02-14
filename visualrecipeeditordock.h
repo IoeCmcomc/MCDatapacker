@@ -4,6 +4,8 @@
 #include "mcrinvslot.h"
 
 #include <QDockWidget>
+#include <QStandardItemModel>
+#include <QListView>
 //#include <QVector>
 
 namespace Ui {
@@ -21,6 +23,10 @@ public:
     void writeRecipe();
     void readRecipe();
 
+protected:
+    void resizeEvent(QResizeEvent *e);
+    bool eventFilter(QObject *pObj, QEvent *pEvent);
+
 private slots:
     void onRecipeTabChanged(int index);
     //void onRecipeChanged(); // Unused
@@ -28,7 +34,9 @@ private slots:
 private:
     Ui::VisualRecipeEditorDock *ui;
 
+    QStandardItemModel *model = new QStandardItemModel();
     QVector<MCRInvSlot*> craftingSlots;
+    bool isResizing = false;
     int lastTabIndex = 0;
     int lastStackIndex = 0;
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>559</height>
+    <height>702</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -449,6 +449,9 @@
                     <property name="acceptDrops">
                      <bool>true</bool>
                     </property>
+                    <property name="autoFillBackground">
+                     <bool>false</bool>
+                    </property>
                     <property name="frameShape">
                      <enum>QFrame::StyledPanel</enum>
                     </property>
@@ -727,7 +730,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QListWidget" name="itemList">
+           <widget class="QListView" name="itemList">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -736,6 +739,15 @@
             </property>
             <property name="autoFillBackground">
              <bool>false</bool>
+            </property>
+            <property name="editTriggers">
+             <set>QAbstractItemView::EditKeyPressed</set>
+            </property>
+            <property name="showDropIndicator" stdset="0">
+             <bool>false</bool>
+            </property>
+            <property name="defaultDropAction">
+             <enum>Qt::IgnoreAction</enum>
             </property>
             <property name="selectionMode">
              <enum>QAbstractItemView::NoSelection</enum>
@@ -747,7 +759,7 @@
              <enum>QListView::Adjust</enum>
             </property>
             <property name="layoutMode">
-             <enum>QListView::Batched</enum>
+             <enum>QListView::SinglePass</enum>
             </property>
             <property name="spacing">
              <number>0</number>
@@ -755,8 +767,11 @@
             <property name="viewMode">
              <enum>QListView::IconMode</enum>
             </property>
-            <property name="currentRow">
-             <number>-1</number>
+            <property name="uniformItemSizes">
+             <bool>true</bool>
+            </property>
+            <property name="batchSize">
+             <number>100</number>
             </property>
            </widget>
           </item>

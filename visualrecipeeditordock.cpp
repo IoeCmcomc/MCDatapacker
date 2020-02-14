@@ -3,19 +3,18 @@
 
 #include "mainwindow.h"
 
-#include "mcrinvslot.h"
 #include "mcrinvitem.h"
 
 #include <QDebug>
 #include <QMap>
 #include <QStringLiteral>
 #include <QLabel>
-#include <QListWidgetItem>
 #include <QVector>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMessageBox>
+#include <QMouseEvent>
 
 VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     QDockWidget(parent),
@@ -31,30 +30,15 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
                     });
 
     connect(ui->customTabBar, &QTabBar::currentChanged, this, &VisualRecipeEditorDock::onRecipeTabChanged);
-    /* //Unused
-    connect(ui->outputSlot, &MCRInvSlot::itemChanged, this, &VisualRecipeEditorDock::onRecipeChanged);
-    foreach(MCRInvSlot *slot, this->CraftingSlots) {
-        connect(slot, SIGNAL(itemChanged()), this, SLOT(onRecipeChanged()));
-    }
-    connect(ui->smeltingSlot_0, &MCRInvSlot::itemChanged, this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->resultCountInput, QOverload<int>::of(&QSpinBox::valueChanged), this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->craftTypeInput, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->smeltBlockInput, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->experienceInput, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->cookTimeCheck, &QCheckBox::stateChanged, this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->cookTimeInput, QOverload<int>::of(&QSpinBox::valueChanged), this, &VisualRecipeEditorDock::onRecipeChanged);
-    connect(ui->recipeGroupInput, &QLineEdit::textChanged, this, &VisualRecipeEditorDock::onRecipeChanged);
-    */
-
     connect(ui->itemListSearchBox, &QLineEdit::textChanged, this, &VisualRecipeEditorDock::onItemListSearch);
     connect(ui->cookTimeCheck, &QCheckBox::stateChanged, [this](int i){ ui->cookTimeInput->setDisabled(2-i); });
     connect(ui->writeRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::readRecipe);
 
+    qApp->installEventFilter(this);
     setupCustomTab();
     setupItemList();
 
-    //ui->ftw->setTabBar(ui->customTabBar);
 }
 
 VisualRecipeEditorDock::~VisualRecipeEditorDock()
@@ -76,30 +60,78 @@ void VisualRecipeEditorDock::setupCustomTab() {
     ui->customTabBar->raise();
     ui->customTabBar->setExpanding(false);
     //ui->customTabBar->setMovable(true);
-
-//    QStyleOptionTabWidgetFrame *style = new QStyleOptionTabWidgetFrame();
-//    ui->customTabFrame->setStyle(style);
 }
 
 void VisualRecipeEditorDock::setupItemList() {
 
-    MCRInvSlot *invSlot = new MCRInvSlot(this, new MCRInvItem(this, "test_spawn_egg"));
-    invSlot->isCreative = true;
-    QListWidgetItem *litem = new QListWidgetItem(ui->itemList);
-    litem->setSizeHint(invSlot->sizeHint());
-    ui->itemList->addItem(litem);
-    ui->itemList->setItemWidget(litem, invSlot);
+    model->setParent(ui->itemList);
+    ui->itemList->setModel(model);
 
+    int c = 0;
     for(auto key : MCRInvItem::itemList().keys())
     {
+        //if(c > 10) break;
+        ++c;
         MCRInvSlot *invSlot = new MCRInvSlot(this, new MCRInvItem(this, key));
+        invSlot->setAutoFillBackground(true);
         invSlot->isCreative = true;
-        //connect(invSlot, SIGNAL(itemChanged()), this, SLOT(onRecipeChanged()));
-        QListWidgetItem *litem = new QListWidgetItem(ui->itemList);
-        litem->setSizeHint(invSlot->sizeHint());
-        ui->itemList->addItem(litem);
-        ui->itemList->setItemWidget(litem, invSlot);
+        //MCRInvSlots.push_back(invSlot);
+        QStandardItem *item = new QStandardItem();
+        //item->setText(QString::number(model->rowCount()));
+        item->setSizeHint(invSlot->sizeHint());
+        //proxyModel->appendMCRSlot(invSlot);
+        model->appendRow(item);
+        ui->itemList->setIndexWidget(item->index(), invSlot);
     }
+}
+
+void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
+    #ifndef QT_NO_CURSOR
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    #endif
+
+    int c = 0;
+    for(int i = 0; i < model->rowCount(); ++i) {
+        QModelIndex index = model->index(i, 0);
+        MCRInvSlot *MCRSlot = qobject_cast<MCRInvSlot*>(ui->itemList->indexWidget(index));
+
+        if(MCRSlot->itemName().toLower().contains(input.toLower())
+                || MCRSlot->itemNamespacedID().contains(input.toLower())) {
+            ++c;
+            if(ui->itemList->isRowHidden(i))
+                ui->itemList->setRowHidden(i, false);
+        } else {
+            if(!ui->itemList->isRowHidden(i))
+                ui->itemList->setRowHidden(i, true);
+        }
+    }
+
+    #ifndef QT_NO_CURSOR
+        QGuiApplication::restoreOverrideCursor();
+    #endif
+//    auto bs = (c+1) / 10;
+//    qDebug() << bs;
+//    ui->itemList->setBatchSize(bs);
+}
+
+void VisualRecipeEditorDock::resizeEvent(QResizeEvent *e) {
+    if(!isResizing) {
+        ui->itemList->setLayoutMode(QListView::Batched);
+        isResizing = true;
+    }
+    QDockWidget::resizeEvent(e);
+}
+
+bool VisualRecipeEditorDock::eventFilter(QObject* pObj, QEvent* pEvent) {
+    if ((pEvent->type() == QEvent::MouseButtonRelease) || (pEvent->type() == QEvent::NonClientAreaMouseButtonRelease)) {
+        QMouseEvent* pMouseEvent = dynamic_cast<QMouseEvent*>(pEvent);
+        if ((pMouseEvent->button() == Qt::MouseButton::LeftButton) && isResizing) {
+            //qDebug() << "End of resizeEvent";
+            ui->itemList->setLayoutMode(QListView::SinglePass);
+            isResizing = false;
+        }
+    }
+    return QObject::eventFilter(pObj, pEvent);
 }
 
 void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
@@ -116,29 +148,6 @@ void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
     }
 }
 
-void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
-    #ifndef QT_NO_CURSOR
-        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    #endif
-
-    for(int i = 0; i < ui->itemList->count(); ++i)
-    {
-        QListWidgetItem *item = ui->itemList->item(i);
-        MCRInvSlot *invSlot = qobject_cast<MCRInvSlot*>(ui->itemList->itemWidget(item));
-        MCRInvItem *invItem = invSlot->getItem();
-
-        if(invItem->getName().contains(input)
-                || invItem->namespacedID.contains(input))
-            item->setHidden(false);
-        else
-            item->setHidden(true);
-    }
-
-    #ifndef QT_NO_CURSOR
-        QGuiApplication::restoreOverrideCursor();
-    #endif
-}
-
 void VisualRecipeEditorDock::writeRecipe() {
     //qDebug() << "writeRecipe";
     int index = ui->customTabBar->currentIndex();
@@ -148,7 +157,6 @@ void VisualRecipeEditorDock::writeRecipe() {
     QJsonDocument jsonDoc;
     if(index == 0) { // Crafting tab
         jsonDoc = QJsonDocument(genCraftingJson(root));
-        //qDebug().noquote() << jsonDoc.toJson();
     } else if(index == 1) { // Smelting tab
         jsonDoc = QJsonDocument(genSmeltingJson(root));
     } else if(index == 2) { // Stonecutting tab

@@ -67,6 +67,10 @@ QString MCRInvSlot::itemNamespacedID() {
     return (item != nullptr) ? item->namespacedID : "";
 }
 
+QString MCRInvSlot::itemName() {
+    return (item != nullptr) ? item->getName() : "";
+}
+
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event)
 {
     //qDebug() << "dragEnterEvent";
