@@ -1,9 +1,9 @@
 #include "visualrecipeeditordock.h"
 #include "ui_visualrecipeeditordock.h"
 
-#include "mainwindow.h"
-
 #include "mcrinvitem.h"
+
+#include "mainwindow.h"
 
 #include <QDebug>
 #include <QMap>
@@ -67,22 +67,35 @@ void VisualRecipeEditorDock::setupItemList() {
     model->setParent(ui->itemList);
     ui->itemList->setModel(model);
 
-    int c = 0;
-    for(auto key : MCRInvItem::itemList().keys())
-    {
-        //if(c > 10) break;
-        ++c;
+    auto MCRItemInfo = MainWindow::getMCRInfo("item");
+    auto MCRBlockInfo = MainWindow::getMCRInfo("block");
+    QMap<QString, QVariant>::const_iterator blockIter = MCRBlockInfo->constBegin();
+    QMap<QString, QVariant>::const_iterator itemIter = MCRItemInfo->constBegin();
+    //int c = 0;
+    while ((blockIter != MCRBlockInfo->constEnd())
+           || (itemIter != MCRItemInfo->constEnd())) {
+        if(blockIter.value().toMap().contains("unobtainable")) {
+            if(blockIter != MCRBlockInfo->constEnd())
+                ++blockIter;
+            else
+                ++itemIter;
+        }
+        auto key = (blockIter != MCRBlockInfo->constEnd())
+                ? blockIter.key() : itemIter.key();
         MCRInvSlot *invSlot = new MCRInvSlot(this, new MCRInvItem(this, key));
         invSlot->setAutoFillBackground(true);
         invSlot->isCreative = true;
-        //MCRInvSlots.push_back(invSlot);
         QStandardItem *item = new QStandardItem();
-        //item->setText(QString::number(model->rowCount()));
         item->setSizeHint(invSlot->sizeHint());
-        //proxyModel->appendMCRSlot(invSlot);
         model->appendRow(item);
         ui->itemList->setIndexWidget(item->index(), invSlot);
+        //++c;
+        if(blockIter != MCRBlockInfo->constEnd())
+            ++blockIter;
+        else
+            ++itemIter;
     }
+    //qDebug() << c;
 }
 
 void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
@@ -90,14 +103,14 @@ void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     #endif
 
-    int c = 0;
+    //int c = 0;
     for(int i = 0; i < model->rowCount(); ++i) {
         QModelIndex index = model->index(i, 0);
         MCRInvSlot *MCRSlot = qobject_cast<MCRInvSlot*>(ui->itemList->indexWidget(index));
 
         if(MCRSlot->itemName().toLower().contains(input.toLower())
                 || MCRSlot->itemNamespacedID().contains(input.toLower())) {
-            ++c;
+            //++c;
             if(ui->itemList->isRowHidden(i))
                 ui->itemList->setRowHidden(i, false);
         } else {

@@ -1,0 +1,2148 @@
+{
+  "version_id": 2225,
+  "version_name": "1.15",
+  "base_version": 1952,
+  "removed": [],
+  "added": {
+    "acacia_button": {
+      "name": "Acacia Button"
+    },
+    "acacia_door": {
+      "name": "Acacia Door"
+    },
+    "acacia_fence_gate": {
+      "name": "Acacia Fence Gate"
+    },
+    "acacia_fence": {
+      "name": "Acacia Fence"
+    },
+    "acacia_leaves": {
+      "name": "Acacia Leaves"
+    },
+    "acacia_log": {
+      "name": "Acacia Log"
+    },
+    "acacia_planks": {
+      "name": "Acacia Planks"
+    },
+    "acacia_pressure_plate": {
+      "name": "Acacia Pressure Plate"
+    },
+    "acacia_sapling": {
+      "name": "Acacia Sapling"
+    },
+    "acacia_sign": {
+      "name": "Acacia Sign"
+    },
+    "acacia_slab": {
+      "name": "Acacia Slab"
+    },
+    "acacia_stairs": {
+      "name": "Acacia Stairs"
+    },
+    "acacia_trapdoor": {
+      "name": "Acacia Trapdoor"
+    },
+    "acacia_wall_sign": {
+      "name": "Acacia Wall Sign",
+      "unobtainable": true
+    },
+    "acacia_wood": {
+      "name": "Acacia Wood"
+    },
+    "activator_rail": {
+      "name": "Activator Rail"
+    },
+    "air": {
+      "name": "Air",
+      "unobtainable": true
+    },
+    "allium": {
+      "name": "Allium"
+    },
+    "andesite": {
+      "name": "Andesite"
+    },
+    "andesite_slab": {
+      "name": "Andesite Slab"
+    },
+    "andesite_stairs": {
+      "name": "Andesite Stairs"
+    },
+    "andesite_wall": {
+      "name": "Andesite Wall"
+    },
+    "anvil": {
+      "name": "Anvil"
+    },
+    "attached_melon_stem": {
+      "name": "Attached Melon Stem",
+      "unobtainable": true
+    },
+    "attached_pumpkin_stem": {
+      "name": "Attached Pumpkin Stem",
+      "unobtainable": true
+    },
+    "azure_bluet": {
+      "name": "Azure Bluet"
+    },
+    "bamboo": {
+      "name": "Bamboo"
+    },
+    "bamboo_sapling": {
+      "name": "Bamboo Sapling",
+      "unobtainable": true
+    },
+    "barrel": {
+      "name": "Barrel"
+    },
+    "barrier": {
+      "name": "Barrier"
+    },
+    "beacon": {
+      "name": "Beacon"
+    },
+    "bedrock": {
+      "name": "Bedrock"
+    },
+    "beehive": {
+      "name": "Beehive"
+    },
+    "bee_nest": {
+      "name": "Bee Nest"
+    },
+    "beetroots": {
+      "name": "Beetroots",
+      "unobtainable": true
+    },
+    "bell": {
+      "name": "Bell"
+    },
+    "birch_button": {
+      "name": "Birch Button"
+    },
+    "birch_door": {
+      "name": "Birch Door"
+    },
+    "birch_fence_gate": {
+      "name": "Birch Fence Gate"
+    },
+    "birch_fence": {
+      "name": "Birch Fence"
+    },
+    "birch_leaves": {
+      "name": "Birch Leaves"
+    },
+    "birch_log": {
+      "name": "Birch Log"
+    },
+    "birch_planks": {
+      "name": "Birch Planks"
+    },
+    "birch_pressure_plate": {
+      "name": "Birch Pressure Plate"
+    },
+    "birch_sapling": {
+      "name": "Birch Sapling"
+    },
+    "birch_sign": {
+      "name": "Birch Sign"
+    },
+    "birch_slab": {
+      "name": "Birch Slab"
+    },
+    "birch_stairs": {
+      "name": "Birch Stairs"
+    },
+    "birch_trapdoor": {
+      "name": "Birch Trapdoor"
+    },
+    "birch_wall_sign": {
+      "name": "Birch Wall Sign",
+      "unobtainable": true
+    },
+    "birch_wood": {
+      "name": "Birch Wood"
+    },
+    "black_banner": {
+      "name": "Black Banner"
+    },
+    "black_bed": {
+      "name": "Black Bed"
+    },
+    "black_carpet": {
+      "name": "Black Carpet"
+    },
+    "black_concrete_powder": {
+      "name": "Black Concrete Powder"
+    },
+    "black_concrete": {
+      "name": "Black Concrete"
+    },
+    "black_glazed_terracotta": {
+      "name": "Black Glazed Terracotta"
+    },
+    "black_shulker_box": {
+      "name": "Black Shulker Box"
+    },
+    "black_stained_glass": {
+      "name": "Black Stained Glass"
+    },
+    "black_stained_glass_pane": {
+      "name": "Black Stained Glass Pane"
+    },
+    "black_terracotta": {
+      "name": "Black Terracotta"
+    },
+    "black_wall_banner": {
+      "name": "Black Wall Banner",
+      "unobtainable": true
+    },
+    "black_wool": {
+      "name": "Black Wool"
+    },
+    "blast_furnace": {
+      "name": "Blast Furnace"
+    },
+    "blue_banner": {
+      "name": "Blue Banner"
+    },
+    "blue_bed": {
+      "name": "Blue Bed"
+    },
+    "blue_carpet": {
+      "name": "Blue Carpet"
+    },
+    "blue_concrete_powder": {
+      "name": "Blue Concrete Powder"
+    },
+    "blue_concrete": {
+      "name": "Blue Concrete"
+    },
+    "blue_glazed_terracotta": {
+      "name": "Blue Glazed Terracotta"
+    },
+    "blue_ice": {
+      "name": "Blue Ice"
+    },
+    "blue_orchid": {
+      "name": "Blue Orchid"
+    },
+    "blue_shulker_box": {
+      "name": "Blue Shulker Box"
+    },
+    "blue_stained_glass": {
+      "name": "Blue Stained Glass"
+    },
+    "blue_stained_glass_pane": {
+      "name": "Blue Stained Glass Pane"
+    },
+    "blue_terracotta": {
+      "name": "Blue Terracotta"
+    },
+    "blue_wall_banner": {
+      "name": "Blue Wall Banner",
+      "unobtainable": true
+    },
+    "blue_wool": {
+      "name": "Blue Wool"
+    },
+    "bone_block": {
+      "name": "Bone Block"
+    },
+    "bookshelf": {
+      "name": "Bookshelf"
+    },
+    "brain_coral": {
+      "name": "Brain Coral"
+    },
+    "brain_coral_block": {
+      "name": "Brain Coral Block"
+    },
+    "brain_coral_fan": {
+      "name": "Brain Coral Fan"
+    },
+    "brain_coral_wall_fan": {
+      "name": "Brain Coral Wall Fan",
+      "unobtainable": true
+    },
+    "brewing_stand": {
+      "name": "Brewing Stand"
+    },
+    "brick_slab": {
+      "name": "Brick Slab"
+    },
+    "brick_stairs": {
+      "name": "Brick Stairs"
+    },
+    "brick_wall": {
+      "name": "Brick Wall"
+    },
+    "bricks": {
+      "name": "Bricks"
+    },
+    "brown_banner": {
+      "name": "Brown Banner"
+    },
+    "brown_bed": {
+      "name": "Brown Bed"
+    },
+    "brown_carpet": {
+      "name": "Brown Carpet"
+    },
+    "brown_concrete_powder": {
+      "name": "Brown Concrete Powder"
+    },
+    "brown_concrete": {
+      "name": "Brown Concrete"
+    },
+    "brown_glazed_terracotta": {
+      "name": "Brown Glazed Terracotta"
+    },
+    "brown_mushroom_block": {
+      "name": "Brown Mushroom Block"
+    },
+    "brown_mushroom": {
+      "name": "Brown Mushroom"
+    },
+    "brown_shulker_box": {
+      "name": "Brown Shulker Box"
+    },
+    "brown_stained_glass": {
+      "name": "Brown Stained Glass"
+    },
+    "brown_stained_glass_pane": {
+      "name": "Brown Stained Glass Pane"
+    },
+    "brown_terracotta": {
+      "name": "Brown Terracotta"
+    },
+    "brown_wall_banner": {
+      "name": "Brown Wall Banner",
+      "unobtainable": true
+    },
+    "brown_wool": {
+      "name": "Brown Wool"
+    },
+    "bubble_column": {
+      "name": "Bubble Column"
+    },
+    "bubble_coral": {
+      "name": "Bubble Coral"
+    },
+    "bubble_coral_block": {
+      "name": "Bubble Coral Block"
+    },
+    "bubble_coral_fan": {
+      "name": "Bubble Coral Fan",
+      "unobtainable": true
+    },
+    "bubble_coral_wall_fan": {
+      "name": "Bubble Coral Wall Fan",
+      "unobtainable": true
+    },
+    "cactus": {
+      "name": "Cactus"
+    },
+    "cake": {
+      "name": "Cake"
+    },
+    "campfire": {
+      "name": "Campfire"
+    },
+    "carrots": {
+      "name": "Carrots",
+      "unobtainable": true
+    },
+    "cartography_table": {
+      "name": "Cartography Table"
+    },
+    "carved_pumpkin": {
+      "name": "Carved Pumpkin"
+    },
+    "cauldron": {
+      "name": "Cauldron"
+    },
+    "cave_air": {
+      "name": "Cave Air",
+      "unobtainable": true
+    },
+    "chain_command_block": {
+      "name": "Chain Command Block"
+    },
+    "chest": {
+      "name": "Chest"
+    },
+    "chipped_anvil": {
+      "name": "Chipped Anvil"
+    },
+    "chiseled_quartz_block": {
+      "name": "Chiseled Quartz Block"
+    },
+    "chiseled_red_sandstone": {
+      "name": "Chiseled Red Sandstone"
+    },
+    "chiseled_sandstone": {
+      "name": "Chiseled Sandstone"
+    },
+    "chiseled_stone_bricks": {
+      "name": "Chiseled Stone Bricks"
+    },
+    "chorus_flower": {
+      "name": "Chorus Flower"
+    },
+    "chorus_plant": {
+      "name": "Chorus Plant"
+    },
+    "clay": {
+      "name": "Clay"
+    },
+    "coal_block": {
+      "name": "Block of Coal"
+    },
+    "coal_ore": {
+      "name": "Coal Ore"
+    },
+    "coarse_dirt": {
+      "name": "Coarse Dirt"
+    },
+    "cobblestone": {
+      "name": "Cobblestone"
+    },
+    "cobblestone_slab": {
+      "name": "Cobblestone Slab"
+    },
+    "cobblestone_stairs": {
+      "name": "Cobblestone Stairs"
+    },
+    "cobblestone_wall": {
+      "name": "Cobblestone Wall"
+    },
+    "cobweb": {
+      "name": "Cobweb"
+    },
+    "cocoa": {
+      "name": "Cocoa"
+    },
+    "command_block": {
+      "name": "Command Block"
+    },
+    "comparator": {
+      "name": "Redstone Comparator"
+    },
+    "composter": {
+      "name": "Composter"
+    },
+    "conduit": {
+      "name": "Conduit"
+    },
+    "cornflower": {
+      "name": "Cornflower"
+    },
+    "cracked_stone_bricks": {
+      "name": "Cracked Stone Bricks"
+    },
+    "crafting_table": {
+      "name": "Crafting Table"
+    },
+    "creeper_head": {
+      "name": "Creeper Head"
+    },
+    "creeper_wall_head": {
+      "name": "Creeper Wall Head",
+      "unobtainable": true
+    },
+    "cut_red_sandstone": {
+      "name": "Cut Red Sandstone"
+    },
+    "cut_red_sandstone_slab": {
+      "name": "Cut Red Sandstone Slab"
+    },
+    "cut_sandstone": {
+      "name": "Cut Sandstone"
+    },
+    "cut_sandstone_slab": {
+      "name": "Cut Sandstone Slab"
+    },
+    "cyan_banner": {
+      "name": "Cyan Banner"
+    },
+    "cyan_bed": {
+      "name": "Cyan Bed"
+    },
+    "cyan_carpet": {
+      "name": "Cyan Carpet"
+    },
+    "cyan_concrete_powder": {
+      "name": "Cyan Concrete Powder"
+    },
+    "cyan_concrete": {
+      "name": "Cyan Concrete"
+    },
+    "cyan_glazed_terracotta": {
+      "name": "Cyan Glazed Terracotta"
+    },
+    "cyan_shulker_box": {
+      "name": "Cyan Shulker Box"
+    },
+    "cyan_stained_glass": {
+      "name": "Cyan Stained Glass"
+    },
+    "cyan_stained_glass_pane": {
+      "name": "Cyan Stained Glass Pane"
+    },
+    "cyan_terracotta": {
+      "name": "Cyan Terracotta"
+    },
+    "cyan_wall_banner": {
+      "name": "Cyan Wall Banner",
+      "unobtainable": true
+    },
+    "cyan_wool": {
+      "name": "Cyan Wool"
+    },
+    "damaged_anvil": {
+      "name": "Damaged Anvil"
+    },
+    "dandelion": {
+      "name": "Dandelion"
+    },
+    "dark_oak_button": {
+      "name": "Dark Oak Button"
+    },
+    "dark_oak_door": {
+      "name": "Dark Oak Door"
+    },
+    "dark_oak_fence_gate": {
+      "name": "Dark Oak Fence Gate"
+    },
+    "dark_oak_fence": {
+      "name": "Dark Oak Fence"
+    },
+    "dark_oak_leaves": {
+      "name": "Dark Oak Leaves"
+    },
+    "dark_oak_log": {
+      "name": "Dark Oak Log"
+    },
+    "dark_oak_planks": {
+      "name": "Dark Oak Planks"
+    },
+    "dark_oak_pressure_plate": {
+      "name": "Dark Oak Pressure Plate"
+    },
+    "dark_oak_sapling": {
+      "name": "Dark Oak Sapling"
+    },
+    "dark_oak_sign": {
+      "name": "Dark Oak Sign"
+    },
+    "dark_oak_slab": {
+      "name": "Dark Oak Slab"
+    },
+    "dark_oak_stairs": {
+      "name": "Dark Oak Stairs"
+    },
+    "dark_oak_trapdoor": {
+      "name": "Dark Oak Trapdoor"
+    },
+    "dark_oak_wall_sign": {
+      "name": "Dark Oak Wall Sign",
+      "unobtainable": true
+    },
+    "dark_oak_wood": {
+      "name": "Dark Oak Wood"
+    },
+    "dark_prismarine": {
+      "name": "Dark Prismarine"
+    },
+    "dark_prismarine_slab": {
+      "name": "Dark Prismarine Slab"
+    },
+    "dark_prismarine_stairs": {
+      "name": "Dark Prismarine Stairs"
+    },
+    "daylight_detector": {
+      "name": "Daylight Detector"
+    },
+    "dead_brain_coral": {
+      "name": "Dead Brain Coral"
+    },
+    "dead_brain_coral_block": {
+      "name": "Dead Brain Coral Block"
+    },
+    "dead_brain_coral_fan": {
+      "name": "Dead Brain Coral Fan",
+      "unobtainable": true
+    },
+    "dead_brain_coral_wall_fan": {
+      "name": "Dead Brain Coral Wall Fan",
+      "unobtainable": true
+    },
+    "dead_bubble_coral": {
+      "name": "Dead Bubble Coral"
+    },
+    "dead_bubble_coral_block": {
+      "name": "Dead Bubble Coral Block"
+    },
+    "dead_bubble_coral_fan": {
+      "name": "Dead Bubble Coral Fan",
+      "unobtainable": true
+    },
+    "dead_bubble_coral_wall_fan": {
+      "name": "Dead Bubble Coral Wall Fan",
+      "unobtainable": true
+    },
+    "dead_bush": {
+      "name": "Dead Bush"
+    },
+    "dead_fire_coral": {
+      "name": "Dead Fire Coral"
+    },
+    "dead_fire_coral_block": {
+      "name": "Dead Fire Coral Block"
+    },
+    "dead_fire_coral_fan": {
+      "name": "Dead Fire Coral Fan",
+      "unobtainable": true
+    },
+    "dead_fire_coral_wall_fan": {
+      "name": "Dead Fire Coral Wall Fan",
+      "unobtainable": true
+    },
+    "dead_horn_coral": {
+      "name": "Dead Horn Coral"
+    },
+    "dead_horn_coral_block": {
+      "name": "Dead Horn Coral Block"
+    },
+    "dead_horn_coral_fan": {
+      "name": "Dead Horn Coral Fan",
+      "unobtainable": true
+    },
+    "dead_horn_coral_wall_fan": {
+      "name": "Dead Horn Coral Wall Fan",
+      "unobtainable": true
+    },
+    "dead_tube_coral": {
+      "name": "Dead Tube Coral"
+    },
+    "dead_tube_coral_block": {
+      "name": "Dead Tube Coral Block"
+    },
+    "dead_tube_coral_fan": {
+      "name": "Dead Tube Coral Fan",
+      "unobtainable": true
+    },
+    "dead_tube_coral_wall_fan": {
+      "name": "Dead Tube Coral Wall Fan",
+      "unobtainable": true
+    },
+    "detector_rail": {
+      "name": "Detector Rail"
+    },
+    "diamond_block": {
+      "name": "Block of Diamond"
+    },
+    "diamond_ore": {
+      "name": "Diamond Ore"
+    },
+    "diorite": {
+      "name": "Diorite"
+    },
+    "diorite_slab": {
+      "name": "Diorite Slab"
+    },
+    "diorite_stairs": {
+      "name": "Diorite Stairs"
+    },
+    "diorite_wall": {
+      "name": "Diorite Wall"
+    },
+    "dirt": {
+      "name": "Dirt"
+    },
+    "dispenser": {
+      "name": "Dispenser"
+    },
+    "dragon_egg": {
+      "name": "Dragon Egg"
+    },
+    "dragon_head": {
+      "name": "Dragon Head"
+    },
+    "dragon_wall_head": {
+      "name": "Dragon Wall Head",
+      "unobtainable": true
+    },
+    "dried_kelp_block": {
+      "name": "Dried Kelp Block"
+    },
+    "dropper": {
+      "name": "Dropper"
+    },
+    "emerald_block": {
+      "name": "Block of Emerald"
+    },
+    "emerald_ore": {
+      "name": "Emerald Ore"
+    },
+    "enchanting_table": {
+      "name": "Enchanting Table"
+    },
+    "end_gateway": {
+      "name": "End Gateway",
+      "unobtainable": true
+    },
+    "end_portal_frame": {
+      "name": "End Portal Frame"
+    },
+    "end_portal": {
+      "name": "End Portal",
+      "unobtainable": true
+    },
+    "end_rod": {
+      "name": "End Rod"
+    },
+    "end_stone": {
+      "name": "End Stone"
+    },
+    "end_stone_brick_slab": {
+      "name": "End Stone Brick Slab"
+    },
+    "end_stone_brick_stairs": {
+      "name": "End Stone Brick Stairs"
+    },
+    "end_stone_brick_wall": {
+      "name": "End Stone Brick Wall"
+    },
+    "end_stone_bricks": {
+      "name": "End Stone Bricks"
+    },
+    "ender_chest": {
+      "name": "Ender Chest"
+    },
+    "farmland": {
+      "name": "Farmland"
+    },
+    "fern": {
+      "name": "Fern"
+    },
+    "fire": {
+      "name": "Fire",
+      "unobtainable": true
+    },
+    "fire_coral": {
+      "name": "Fire Coral"
+    },
+    "fire_coral_block": {
+      "name": "Fire Coral Block"
+    },
+    "fire_coral_fan": {
+      "name": "Fire Coral Fan",
+      "unobtainable": true
+    },
+    "fire_coral_wall_fan": {
+      "name": "Fire Coral Wall Fan",
+      "unobtainable": true
+    },
+    "fletching_table": {
+      "name": "Fletching Table"
+    },
+    "flower_pot": {
+      "name": "Flower Pot"
+    },
+    "frosted_ice": {
+      "name": "Frosted Ice",
+      "unobtainable": true
+    },
+    "furnace": {
+      "name": "Furnace"
+    },
+    "glass": {
+      "name": "Glass"
+    },
+    "glass_pane": {
+      "name": "Glass Pane"
+    },
+    "glowstone": {
+      "name": "Glowstone"
+    },
+    "gold_block": {
+      "name": "Block of Gold"
+    },
+    "gold_ore": {
+      "name": "Gold Ore"
+    },
+    "granite": {
+      "name": "Granite"
+    },
+    "granite_slab": {
+      "name": "Granite Slab"
+    },
+    "granite_stairs": {
+      "name": "Granite Stairs"
+    },
+    "granite_wall": {
+      "name": "Granite Wall"
+    },
+    "grass_block": {
+      "name": "Grass Block"
+    },
+    "grass_path": {
+      "name": "Grass Path"
+    },
+    "grass": {
+      "name": "Grass"
+    },
+    "gravel": {
+      "name": "Gravel"
+    },
+    "gray_banner": {
+      "name": "Gray Banner"
+    },
+    "gray_bed": {
+      "name": "Gray Bed"
+    },
+    "gray_carpet": {
+      "name": "Gray Carpet"
+    },
+    "gray_concrete_powder": {
+      "name": "Gray Concrete Powder"
+    },
+    "gray_concrete": {
+      "name": "Gray Concrete"
+    },
+    "gray_glazed_terracotta": {
+      "name": "Gray Glazed Terracotta"
+    },
+    "gray_shulker_box": {
+      "name": "Gray Shulker Box"
+    },
+    "gray_stained_glass": {
+      "name": "Gray Stained Glass"
+    },
+    "gray_stained_glass_pane": {
+      "name": "Gray Stained Glass Pane"
+    },
+    "gray_terracotta": {
+      "name": "Gray Terracotta"
+    },
+    "gray_wall_banner": {
+      "name": "Gray Wall Banner",
+      "unobtainable": true
+    },
+    "gray_wool": {
+      "name": "Gray Wool"
+    },
+    "green_banner": {
+      "name": "Green Banner"
+    },
+    "green_bed": {
+      "name": "Green Bed"
+    },
+    "green_carpet": {
+      "name": "Green Carpet"
+    },
+    "green_concrete_powder": {
+      "name": "Green Concrete Powder"
+    },
+    "green_concrete": {
+      "name": "Green Concrete"
+    },
+    "green_glazed_terracotta": {
+      "name": "Green Glazed Terracotta"
+    },
+    "green_shulker_box": {
+      "name": "Green Shulker Box"
+    },
+    "green_stained_glass": {
+      "name": "Green Stained Glass"
+    },
+    "green_stained_glass_pane": {
+      "name": "Green Stained Glass Pane"
+    },
+    "green_terracotta": {
+      "name": "Green Terracotta"
+    },
+    "green_wall_banner": {
+      "name": "Green Wall Banner",
+      "unobtainable": true
+    },
+    "green_wool": {
+      "name": "Green Wool"
+    },
+    "grindstone": {
+      "name": "Grindstone"
+    },
+    "hay_block": {
+      "name": "Hay Bale"
+    },
+    "heavy_weighted_pressure_plate": {
+      "name": "Heavy Weighted Pressure Plate"
+    },
+    "honey_block": {
+      "name": "Honey Block"
+    },
+    "honeycomb_block": {
+      "name": "Honeycomb Block"
+    },
+    "hopper": {
+      "name": "Hopper"
+    },
+    "horn_coral": {
+      "name": "Horn Coral"
+    },
+    "horn_coral_block": {
+      "name": "Horn Coral Block"
+    },
+    "horn_coral_fan": {
+      "name": "Horn Coral Fan",
+      "unobtainable": true
+    },
+    "horn_coral_wall_fan": {
+      "name": "Horn Coral Wall Fan",
+      "unobtainable": true
+    },
+    "ice": {
+      "name": "Ice"
+    },
+    "infested_chiseled_stone_bricks": {
+      "name": "Infested Chiseled Stone Bricks"
+    },
+    "infested_cobblestone": {
+      "name": "Infested Cobblestone"
+    },
+    "infested_cracked_stone_bricks": {
+      "name": "Infested Cracked Stone Bricks"
+    },
+    "infested_mossy_stone_bricks": {
+      "name": "Infested Mossy Stone Bricks"
+    },
+    "infested_stone": {
+      "name": "Infested Stone"
+    },
+    "infested_stone_bricks": {
+      "name": "Infested Stone Bricks"
+    },
+    "iron_bars": {
+      "name": "Iron Bars"
+    },
+    "iron_door": {
+      "name": "Iron Door"
+    },
+    "iron_block": {
+      "name": "Block of Iron"
+    },
+    "iron_ore": {
+      "name": "Iron Ore"
+    },
+    "iron_trapdoor": {
+      "name": "Iron Trapdoor"
+    },
+    "jack_o_lantern": {
+      "name": "Jack o'Lantern"
+    },
+    "jigsaw": {
+      "name": "Jigsaw Block"
+    },
+    "jukebox": {
+      "name": "Jukebox"
+    },
+    "jungle_button": {
+      "name": "Jungle Button"
+    },
+    "jungle_door": {
+      "name": "Jungle Door"
+    },
+    "jungle_fence_gate": {
+      "name": "Jungle Fence Gate"
+    },
+    "jungle_fence": {
+      "name": "Jungle Fence"
+    },
+    "jungle_leaves": {
+      "name": "Jungle Leaves"
+    },
+    "jungle_log": {
+      "name": "Jungle Log"
+    },
+    "jungle_planks": {
+      "name": "Jungle Planks"
+    },
+    "jungle_pressure_plate": {
+      "name": "Jungle Pressure Plate"
+    },
+    "jungle_sapling": {
+      "name": "Jungle Sapling"
+    },
+    "jungle_sign": {
+      "name": "Jungle Sign"
+    },
+    "jungle_slab": {
+      "name": "Jungle Slab"
+    },
+    "jungle_stairs": {
+      "name": "Jungle Stairs"
+    },
+    "jungle_trapdoor": {
+      "name": "Jungle Trapdoor"
+    },
+    "jungle_wall_sign": {
+      "name": "Jungle Wall Sign",
+      "unobtainable": true
+    },
+    "jungle_wood": {
+      "name": "Jungle Wood"
+    },
+    "kelp": {
+      "name": "Kelp"
+    },
+    "kelp_plant": {
+      "name": "Kelp Plant",
+      "unobtainable": true
+    },
+    "ladder": {
+      "name": "Ladder"
+    },
+    "lantern": {
+      "name": "Lantern"
+    },
+    "lapis_block": {
+      "name": "Lapis Lazuli Block"
+    },
+    "lapis_ore": {
+      "name": "Lapis Lazuli Ore"
+    },
+    "large_fern": {
+      "name": "Large Fern"
+    },
+    "lava": {
+      "name": "Lava",
+      "unobtainable": true
+    },
+    "lectern": {
+      "name": "Lectern"
+    },
+    "lever": {
+      "name": "Lever"
+    },
+    "light_blue_banner": {
+      "name": "Light Blue Banner"
+    },
+    "light_blue_bed": {
+      "name": "Light Blue Bed"
+    },
+    "light_blue_carpet": {
+      "name": "Light Blue Carpet"
+    },
+    "light_blue_concrete_powder": {
+      "name": "Light Blue Concrete Powder"
+    },
+    "light_blue_concrete": {
+      "name": "Light Blue Concrete"
+    },
+    "light_blue_glazed_terracotta": {
+      "name": "Light Blue Glazed Terracotta"
+    },
+    "light_blue_shulker_box": {
+      "name": "Light Blue Shulker Box"
+    },
+    "light_blue_stained_glass": {
+      "name": "Light Blue Stained Glass"
+    },
+    "light_blue_stained_glass_pane": {
+      "name": "Light Blue Stained Glass Pane"
+    },
+    "light_blue_terracotta": {
+      "name": "Light Blue Terracotta"
+    },
+    "light_blue_wall_banner": {
+      "name": "Light Blue Wall Banner",
+      "unobtainable": true
+    },
+    "light_blue_wool": {
+      "name": "Light Blue Wool"
+    },
+    "light_gray_banner": {
+      "name": "Light Gray Banner"
+    },
+    "light_gray_bed": {
+      "name": "Light Gray Bed"
+    },
+    "light_gray_carpet": {
+      "name": "Light Gray Carpet"
+    },
+    "light_gray_concrete_powder": {
+      "name": "Light Gray Concrete Powder"
+    },
+    "light_gray_concrete": {
+      "name": "Light Gray Concrete"
+    },
+    "light_gray_glazed_terracotta": {
+      "name": "Light Gray Glazed Terracotta"
+    },
+    "light_gray_shulker_box": {
+      "name": "Light Gray Shulker Box"
+    },
+    "light_gray_stained_glass": {
+      "name": "Light Gray Stained Glass"
+    },
+    "light_gray_stained_glass_pane": {
+      "name": "Light Gray Stained Glass Pane"
+    },
+    "light_gray_terracotta": {
+      "name": "Light Gray Terracotta"
+    },
+    "light_gray_wall_banner": {
+      "name": "Light Gray Wall Banner",
+      "unobtainable": true
+    },
+    "light_gray_wool": {
+      "name": "Light Gray Wool"
+    },
+    "light_weighted_pressure_plate": {
+      "name": "Light Weighted Pressure Plate"
+    },
+    "lilac": {
+      "name": "Lilac"
+    },
+    "lily_pad": {
+      "name": "Lily Pad"
+    },
+    "lily_of_the_valley": {
+      "name": "Lily of the Valley"
+    },
+    "lime_banner": {
+      "name": "Lime Banner"
+    },
+    "lime_bed": {
+      "name": "Lime Bed"
+    },
+    "lime_carpet": {
+      "name": "Lime Carpet"
+    },
+    "lime_concrete_powder": {
+      "name": "Lime Concrete Powder"
+    },
+    "lime_concrete": {
+      "name": "Lime Concrete"
+    },
+    "lime_glazed_terracotta": {
+      "name": "Lime Glazed Terracotta"
+    },
+    "lime_shulker_box": {
+      "name": "Lime Shulker Box"
+    },
+    "lime_stained_glass": {
+      "name": "Lime Stained Glass"
+    },
+    "lime_stained_glass_pane": {
+      "name": "Lime Stained Glass Pane"
+    },
+    "lime_terracotta": {
+      "name": "Lime Terracotta"
+    },
+    "lime_wall_banner": {
+      "name": "Lime Wall Banner",
+      "unobtainable": true
+    },
+    "lime_wool": {
+      "name": "Lime Wool"
+    },
+    "loom": {
+      "name": "Loom"
+    },
+    "magenta_banner": {
+      "name": "Magenta Banner"
+    },
+    "magenta_bed": {
+      "name": "Magenta Bed"
+    },
+    "magenta_carpet": {
+      "name": "Magenta Carpet"
+    },
+    "magenta_concrete_powder": {
+      "name": "Magenta Concrete Powder"
+    },
+    "magenta_concrete": {
+      "name": "Magenta Concrete"
+    },
+    "magenta_glazed_terracotta": {
+      "name": "Magenta Glazed Terracotta"
+    },
+    "magenta_shulker_box": {
+      "name": "Magenta Shulker Box"
+    },
+    "magenta_stained_glass": {
+      "name": "Magenta Stained Glass"
+    },
+    "magenta_stained_glass_pane": {
+      "name": "Magenta Stained Glass Pane"
+    },
+    "magenta_terracotta": {
+      "name": "Magenta Terracotta"
+    },
+    "magenta_wall_banner": {
+      "name": "Magenta Wall Banner",
+      "unobtainable": true
+    },
+    "magenta_wool": {
+      "name": "Magenta Wool"
+    },
+    "magma_block": {
+      "name": "Magma Block"
+    },
+    "melon": {
+      "name": "Melon"
+    },
+    "melon_stem": {
+      "name": "Melon Stem",
+      "unobtainable": true
+    },
+    "mossy_cobblestone": {
+      "name": "Mossy Cobblestone"
+    },
+    "mossy_cobblestone_slab": {
+      "name": "Mossy Cobblestone Slab"
+    },
+    "mossy_cobblestone_stairs": {
+      "name": "Mossy Cobblestone Stairs"
+    },
+    "mossy_cobblestone_wall": {
+      "name": "Mossy Cobblestone Wall"
+    },
+    "mossy_stone_brick_slab": {
+      "name": "Mossy Stone Brick Slab"
+    },
+    "mossy_stone_brick_stairs": {
+      "name": "Mossy Stone Brick Stairs"
+    },
+    "mossy_stone_brick_wall": {
+      "name": "Mossy Stone Brick Wall"
+    },
+    "mossy_stone_bricks": {
+      "name": "Mossy Stone Bricks"
+    },
+    "moving_piston": {
+      "name": "Moving Piston",
+      "unobtainable": true
+    },
+    "mushroom_stem": {
+      "name": "Mushroom Stem"
+    },
+    "mycelium": {
+      "name": "Mycelium"
+    },
+    "nether_brick_fence": {
+      "name": "Nether Brick Fence"
+    },
+    "nether_brick_slab": {
+      "name": "Nether Brick Slab"
+    },
+    "nether_brick_stairs": {
+      "name": "Nether Brick Stairs"
+    },
+    "nether_brick_wall": {
+      "name": "Nether Brick Wall"
+    },
+    "nether_bricks": {
+      "name": "Nether Bricks"
+    },
+    "nether_portal": {
+      "name": "Nether Portal",
+      "unobtainable": true
+    },
+    "nether_quartz_ore": {
+      "name": "Nether Quartz Ore"
+    },
+    "nether_wart_block": {
+      "name": "Nether Wart Block"
+    },
+    "nether_wart": {
+      "name": "Nether Wart"
+    },
+    "netherrack": {
+      "name": "Netherrack"
+    },
+    "note_block": {
+      "name": "Note Block"
+    },
+    "oak_button": {
+      "name": "Oak Button"
+    },
+    "oak_door": {
+      "name": "Oak Door"
+    },
+    "oak_fence_gate": {
+      "name": "Oak Fence Gate"
+    },
+    "oak_fence": {
+      "name": "Oak Fence"
+    },
+    "oak_leaves": {
+      "name": "Oak Leaves"
+    },
+    "oak_log": {
+      "name": "Oak Log"
+    },
+    "oak_planks": {
+      "name": "Oak Planks"
+    },
+    "oak_pressure_plate": {
+      "name": "Oak Pressure Plate"
+    },
+    "oak_sapling": {
+      "name": "Oak Sapling"
+    },
+    "oak_sign": {
+      "name": "Oak Sign"
+    },
+    "oak_slab": {
+      "name": "Oak Slab"
+    },
+    "oak_stairs": {
+      "name": "Oak Stairs"
+    },
+    "oak_trapdoor": {
+      "name": "Oak Trapdoor"
+    },
+    "oak_wall_sign": {
+      "name": "Oak Wall Sign",
+      "unobtainable": true
+    },
+    "oak_wood": {
+      "name": "Oak Wood"
+    },
+    "observer": {
+      "name": "Observer"
+    },
+    "obsidian": {
+      "name": "Obsidian"
+    },
+    "orange_banner": {
+      "name": "Orange Banner"
+    },
+    "orange_bed": {
+      "name": "Orange Bed"
+    },
+    "orange_carpet": {
+      "name": "Orange Carpet"
+    },
+    "orange_concrete_powder": {
+      "name": "Orange Concrete Powder"
+    },
+    "orange_concrete": {
+      "name": "Orange Concrete"
+    },
+    "orange_glazed_terracotta": {
+      "name": "Orange Glazed Terracotta"
+    },
+    "orange_shulker_box": {
+      "name": "Orange Shulker Box"
+    },
+    "orange_stained_glass": {
+      "name": "Orange Stained Glass"
+    },
+    "orange_stained_glass_pane": {
+      "name": "Orange Stained Glass Pane"
+    },
+    "orange_terracotta": {
+      "name": "Orange Terracotta"
+    },
+    "orange_tulip": {
+      "name": "Orange Tulip"
+    },
+    "orange_wall_banner": {
+      "name": "Orange Wall Banner",
+      "unobtainable": true
+    },
+    "orange_wool": {
+      "name": "Orange Wool"
+    },
+    "oxeye_daisy": {
+      "name": "Oxeye Daisy"
+    },
+    "packed_ice": {
+      "name": "Packed Ice"
+    },
+    "peony": {
+      "name": "Peony"
+    },
+    "petrified_oak_slab": {
+      "name": "Petrified Oak Slab"
+    },
+    "pink_banner": {
+      "name": "Pink Banner"
+    },
+    "pink_bed": {
+      "name": "Pink Bed"
+    },
+    "pink_carpet": {
+      "name": "Pink Carpet"
+    },
+    "pink_concrete_powder": {
+      "name": "Pink Concrete Powder"
+    },
+    "pink_concrete": {
+      "name": "Pink Concrete"
+    },
+    "pink_glazed_terracotta": {
+      "name": "Pink Glazed Terracotta"
+    },
+    "pink_shulker_box": {
+      "name": "Pink Shulker Box"
+    },
+    "pink_stained_glass": {
+      "name": "Pink Stained Glass"
+    },
+    "pink_stained_glass_pane": {
+      "name": "Pink Stained Glass Pane"
+    },
+    "pink_terracotta": {
+      "name": "Pink Terracotta"
+    },
+    "pink_tulip": {
+      "name": "Pink Tulip"
+    },
+    "pink_wall_banner": {
+      "name": "Pink Wall Banner",
+      "unobtainable": true
+    },
+    "pink_wool": {
+      "name": "Pink Wool"
+    },
+    "piston_head": {
+      "name": "Piston Head",
+      "unobtainable": true
+    },
+    "piston": {
+      "name": "Piston"
+    },
+    "player_head": {
+      "name": "Player Head"
+    },
+    "player_wall_head": {
+      "name": "Player Wall Head",
+      "unobtainable": true
+    },
+    "podzol": {
+      "name": "Podzol"
+    },
+    "polished_andesite": {
+      "name": "Polished Andesite"
+    },
+    "polished_andesite_slab": {
+      "name": "Polished Andesite Slab"
+    },
+    "polished_andesite_stairs": {
+      "name": "Polished Andesite Stairs"
+    },
+    "polished_diorite": {
+      "name": "Polished Diorite"
+    },
+    "polished_diorite_slab": {
+      "name": "Polished Diorite Slab"
+    },
+    "polished_diorite_stairs": {
+      "name": "Polished Diorite Stairs"
+    },
+    "polished_granite": {
+      "name": "Polished Granite"
+    },
+    "polished_granite_slab": {
+      "name": "Polished Granite Slab"
+    },
+    "polished_granite_stairs": {
+      "name": "Polished Granite Stairs"
+    },
+    "poppy": {
+      "name": "Poppy"
+    },
+    "potatoes": {
+      "name": "Potatoes",
+      "unobtainable": true
+    },
+    "potted_acacia_sapling": {
+      "name": "Potted Acacia Sapling",
+      "unobtainable": true
+    },
+    "potted_allium": {
+      "name": "Potted Allium",
+      "unobtainable": true
+    },
+    "potted_azure_bluet": {
+      "name": "Potted Azure Bluet",
+      "unobtainable": true
+    },
+    "potted_bamboo": {
+      "name": "Potted Bamboo",
+      "unobtainable": true
+    },
+    "potted_birch_sapling": {
+      "name": "Potted Birch Sapling",
+      "unobtainable": true
+    },
+    "potted_blue_orchid": {
+      "name": "Potted Blue Orchid",
+      "unobtainable": true
+    },
+    "potted_brown_mushroom": {
+      "name": "Potted Brown Mushroom",
+      "unobtainable": true
+    },
+    "potted_cactus": {
+      "name": "Potted Cactus",
+      "unobtainable": true
+    },
+    "potted_cornflower": {
+      "name": "Potted Cornflower",
+      "unobtainable": true
+    },
+    "potted_dandelion": {
+      "name": "Potted Dandelion",
+      "unobtainable": true
+    },
+    "potted_dark_oak_sapling": {
+      "name": "Potted Dark Oak Sapling",
+      "unobtainable": true
+    },
+    "potted_dead_bush": {
+      "name": "Potted Dead Bush",
+      "unobtainable": true
+    },
+    "potted_fern": {
+      "name": "Potted Fern",
+      "unobtainable": true
+    },
+    "potted_jungle_sapling": {
+      "name": "Potted Jungle Sapling",
+      "unobtainable": true
+    },
+    "potted_lily_of_the_valley": {
+      "name": "Potted Lily of the Valley",
+      "unobtainable": true
+    },
+    "potted_oak_sapling": {
+      "name": "Potted Oak Sapling",
+      "unobtainable": true
+    },
+    "potted_orange_tulip": {
+      "name": "Potted Orange Tulip",
+      "unobtainable": true
+    },
+    "potted_oxeye_daisy": {
+      "name": "Potted Oxeye Daisy",
+      "unobtainable": true
+    },
+    "potted_pink_tulip": {
+      "name": "Potted Pink Tulip",
+      "unobtainable": true
+    },
+    "potted_poppy": {
+      "name": "Potted Poppy",
+      "unobtainable": true
+    },
+    "potted_red_mushroom": {
+      "name": "Potted Red Mushroom",
+      "unobtainable": true
+    },
+    "potted_red_tulip": {
+      "name": "Potted Red Tulip",
+      "unobtainable": true
+    },
+    "potted_spruce_sapling": {
+      "name": "Potted Spruce Sapling",
+      "unobtainable": true
+    },
+    "potted_white_tulip": {
+      "name": "Potted White Tulip",
+      "unobtainable": true
+    },
+    "potted_wither_rose": {
+      "name": "Potted Wither Rose",
+      "unobtainable": true
+    },
+    "powered_rail": {
+      "name": "Powered Rail"
+    },
+    "prismarine": {
+      "name": "Prismarine"
+    },
+    "prismarine_brick_slab": {
+      "name": "Prismarine Brick Slab"
+    },
+    "prismarine_brick_stairs": {
+      "name": "Prismarine Brick Stairs"
+    },
+    "prismarine_bricks": {
+      "name": "Prismarine Bricks"
+    },
+    "prismarine_slab": {
+      "name": "Prismarine Slab"
+    },
+    "prismarine_stairs": {
+      "name": "Prismarine Stairs"
+    },
+    "prismarine_wall": {
+      "name": "Prismarine Wall"
+    },
+    "pumpkin": {
+      "name": "Pumpkin"
+    },
+    "pumpkin_stem": {
+      "name": "Pumpkin Stem",
+      "unobtainable": true
+    },
+    "purple_banner": {
+      "name": "Purple Banner"
+    },
+    "purple_bed": {
+      "name": "Purple Bed"
+    },
+    "purple_carpet": {
+      "name": "Purple Carpet"
+    },
+    "purple_concrete_powder": {
+      "name": "Purple Concrete Powder"
+    },
+    "purple_concrete": {
+      "name": "Purple Concrete"
+    },
+    "purple_glazed_terracotta": {
+      "name": "Purple Glazed Terracotta"
+    },
+    "purple_shulker_box": {
+      "name": "Purple Shulker Box"
+    },
+    "purple_stained_glass": {
+      "name": "Purple Stained Glass"
+    },
+    "purple_stained_glass_pane": {
+      "name": "Purple Stained Glass Pane"
+    },
+    "purple_terracotta": {
+      "name": "Purple Terracotta"
+    },
+    "purple_wall_banner": {
+      "name": "Purple Wall Banner",
+      "unobtainable": true
+    },
+    "purple_wool": {
+      "name": "Purple Wool"
+    },
+    "purpur_block": {
+      "name": "Purpur Block"
+    },
+    "purpur_pillar": {
+      "name": "Purpur Pillar"
+    },
+    "purpur_slab": {
+      "name": "Purpur Slab"
+    },
+    "purpur_stairs": {
+      "name": "Purpur Stairs"
+    },
+    "quartz_block": {
+      "name": "Block of Quartz"
+    },
+    "quartz_pillar": {
+      "name": "Quartz Pillar"
+    },
+    "quartz_slab": {
+      "name": "Quartz Slab"
+    },
+    "quartz_stairs": {
+      "name": "Quartz Stairs"
+    },
+    "rail": {
+      "name": "Rail"
+    },
+    "red_banner": {
+      "name": "Red Banner"
+    },
+    "red_bed": {
+      "name": "Red Bed"
+    },
+    "red_carpet": {
+      "name": "Red Carpet"
+    },
+    "red_concrete_powder": {
+      "name": "Red Concrete Powder"
+    },
+    "red_concrete": {
+      "name": "Red Concrete"
+    },
+    "red_glazed_terracotta": {
+      "name": "Red Glazed Terracotta"
+    },
+    "red_mushroom_block": {
+      "name": "Red Mushroom Block"
+    },
+    "red_mushroom": {
+      "name": "Red Mushroom"
+    },
+    "red_nether_brick_slab": {
+      "name": "Red Nether Brick Slab"
+    },
+    "red_nether_brick_stairs": {
+      "name": "Red Nether Brick Stairs"
+    },
+    "red_nether_brick_wall": {
+      "name": "Red Nether Brick Wall"
+    },
+    "red_nether_bricks": {
+      "name": "Red Nether Bricks"
+    },
+    "red_sand": {
+      "name": "Red Sand"
+    },
+    "red_sandstone": {
+      "name": "Red Sandstone"
+    },
+    "red_sandstone_slab": {
+      "name": "Red Sandstone Slab"
+    },
+    "red_sandstone_stairs": {
+      "name": "Red Sandstone Stairs"
+    },
+    "red_sandstone_wall": {
+      "name": "Red Sandstone Wall"
+    },
+    "red_shulker_box": {
+      "name": "Red Shulker Box"
+    },
+    "red_stained_glass": {
+      "name": "Red Stained Glass"
+    },
+    "red_stained_glass_pane": {
+      "name": "Red Stained Glass Pane"
+    },
+    "red_terracotta": {
+      "name": "Red Terracotta"
+    },
+    "red_tulip": {
+      "name": "Red Tulip"
+    },
+    "red_wall_banner": {
+      "name": "Red Wall Banner",
+      "unobtainable": true
+    },
+    "red_wool": {
+      "name": "Red Wool"
+    },
+    "redstone_block": {
+      "name": "Block of Redstone"
+    },
+    "redstone_lamp": {
+      "name": "Redstone Lamp"
+    },
+    "redstone_ore": {
+      "name": "Redstone Ore"
+    },
+    "redstone_torch": {
+      "name": "Redstone Torch"
+    },
+    "redstone_wall_torch": {
+      "name": "Redstone Wall Torch",
+      "unobtainable": true
+    },
+    "redstone_wire": {
+      "name": "Redstone Dust",
+      "unobtainable": true
+    },
+    "repeater": {
+      "name": "Redstone Repeater"
+    },
+    "repeating_command_block": {
+      "name": "Repeating Command Block"
+    },
+    "rose_bush": {
+      "name": "Rose Bush"
+    },
+    "sand": {
+      "name": "Sand"
+    },
+    "sandstone": {
+      "name": "Sandstone"
+    },
+    "sandstone_slab": {
+      "name": "Sandstone Slab"
+    },
+    "sandstone_stairs": {
+      "name": "Sandstone Stairs"
+    },
+    "sandstone_wall": {
+      "name": "Sandstone Wall"
+    },
+    "scaffolding": {
+      "name": "Scaffolding"
+    },
+    "sea_lantern": {
+      "name": "Sea Lantern"
+    },
+    "sea_pickle": {
+      "name": "Sea Pickle"
+    },
+    "seagrass": {
+      "name": "Seagrass"
+    },
+    "shulker_box": {
+      "name": "Shulker Box"
+    },
+    "skeleton_skull": {
+      "name": "Skeleton Skull"
+    },
+    "skeleton_wall_skull": {
+      "name": "Skeleton Wall Skull",
+      "unobtainable": true
+    },
+    "slime_block": {
+      "name": "Slime Block"
+    },
+    "smithing_table": {
+      "name": "Smithing Table"
+    },
+    "smoker": {
+      "name": "Smoker"
+    },
+    "smooth_quartz": {
+      "name": "Smooth Quartz"
+    },
+    "smooth_quartz_slab": {
+      "name": "Smooth Quartz Slab"
+    },
+    "smooth_quartz_stairs": {
+      "name": "Smooth Quartz Stairs"
+    },
+    "smooth_red_sandstone": {
+      "name": "Smooth Red Sandstone"
+    },
+    "smooth_red_sandstone_slab": {
+      "name": "Smooth Red Sandstone Slab"
+    },
+    "smooth_red_sandstone_stairs": {
+      "name": "Smooth Red Sandstone Stairs"
+    },
+    "smooth_sandstone": {
+      "name": "Smooth Sandstone"
+    },
+    "smooth_sandstone_slab": {
+      "name": "Smooth Sandstone Slab"
+    },
+    "smooth_sandstone_stairs": {
+      "name": "Smooth Sandstone Stairs"
+    },
+    "smooth_stone": {
+      "name": "Smooth Stone"
+    },
+    "smooth_stone_slab": {
+      "name": "Smooth Stone Slab"
+    },
+    "snow_block": {
+      "name": "Snow Block"
+    },
+    "snow": {
+      "name": "Snow"
+    },
+    "soul_sand": {
+      "name": "Soul Sand"
+    },
+    "spawner": {
+      "name": "Spawner"
+    },
+    "sponge": {
+      "name": "Sponge"
+    },
+    "spruce_button": {
+      "name": "Spruce Button"
+    },
+    "spruce_door": {
+      "name": "Spruce Door"
+    },
+    "spruce_fence_gate": {
+      "name": "Spruce Fence Gate"
+    },
+    "spruce_fence": {
+      "name": "Spruce Fence"
+    },
+    "spruce_leaves": {
+      "name": "Spruce Leaves"
+    },
+    "spruce_log": {
+      "name": "Spruce Log"
+    },
+    "spruce_planks": {
+      "name": "Spruce Planks"
+    },
+    "spruce_pressure_plate": {
+      "name": "Spruce Pressure Plate"
+    },
+    "spruce_sapling": {
+      "name": "Spruce Sapling"
+    },
+    "spruce_sign": {
+      "name": "Spruce Sign"
+    },
+    "spruce_slab": {
+      "name": "Spruce Slab"
+    },
+    "spruce_stairs": {
+      "name": "Spruce Stairs"
+    },
+    "spruce_trapdoor": {
+      "name": "Spruce Trapdoor"
+    },
+    "spruce_wall_sign": {
+      "name": "Spruce Wall Sign",
+      "unobtainable": true
+    },
+    "spruce_wood": {
+      "name": "Spruce Wood"
+    },
+    "sticky_piston": {
+      "name": "Sticky Piston"
+    },
+    "stone": {
+      "name": "Stone"
+    },
+    "stone_brick_slab": {
+      "name": "Stone Brick Slab"
+    },
+    "stone_brick_stairs": {
+      "name": "Stone Brick Stairs"
+    },
+    "stone_brick_wall": {
+      "name": "Stone Brick Wall"
+    },
+    "stone_bricks": {
+      "name": "Stone Bricks"
+    },
+    "stone_button": {
+      "name": "Stone Button"
+    },
+    "stone_pressure_plate": {
+      "name": "Stone Pressure Plate"
+    },
+    "stone_slab": {
+      "name": "Stone Slab"
+    },
+    "stone_stairs": {
+      "name": "Stone Stairs"
+    },
+    "stonecutter": {
+      "name": "Stonecutter"
+    },
+    "stripped_acacia_log": {
+      "name": "Stripped Acacia Log"
+    },
+    "stripped_acacia_wood": {
+      "name": "Stripped Acacia Wood"
+    },
+    "stripped_birch_log": {
+      "name": "Stripped Birch Log"
+    },
+    "stripped_birch_wood": {
+      "name": "Stripped Birch Wood"
+    },
+    "stripped_dark_oak_log": {
+      "name": "Stripped Dark Oak Log"
+    },
+    "stripped_dark_oak_wood": {
+      "name": "Stripped Dark Oak Wood"
+    },
+    "stripped_jungle_log": {
+      "name": "Stripped Jungle Log"
+    },
+    "stripped_jungle_wood": {
+      "name": "Stripped Jungle Wood"
+    },
+    "stripped_oak_log": {
+      "name": "Stripped Oak Log"
+    },
+    "stripped_oak_wood": {
+      "name": "Stripped Oak Wood"
+    },
+    "stripped_spruce_log": {
+      "name": "Stripped Spruce Log"
+    },
+    "stripped_spruce_wood": {
+      "name": "Stripped Spruce Wood"
+    },
+    "structure_block": {
+      "name": "Structure Block"
+    },
+    "structure_void": {
+      "name": "Structure Void"
+    },
+    "sugar_cane": {
+      "name": "Sugar Cane"
+    },
+    "sunflower": {
+      "name": "Sunflower"
+    },
+    "sweet_berry_bush": {
+      "name": "Sweet Berry Bush",
+      "unobtainable": true
+    },
+    "tnt": {
+      "name": "TNT"
+    },
+    "tall_grass": {
+      "name": "Tall Grass"
+    },
+    "tall_seagrass": {
+      "name": "Tall Seagrass",
+      "unobtainable": true
+    },
+    "terracotta": {
+      "name": "Terracotta"
+    },
+    "torch": {
+      "name": "Torch"
+    },
+    "trapped_chest": {
+      "name": "Trapped Chest"
+    },
+    "tripwire_hook": {
+      "name": "Tripwire Hook"
+    },
+    "tripwire": {
+      "name": "Tripwire",
+      "unobtainable": true
+    },
+    "tube_coral": {
+      "name": "Tube Coral"
+    },
+    "tube_coral_block": {
+      "name": "Tube Coral Block"
+    },
+    "tube_coral_fan": {
+      "name": "Tube Coral Fan",
+      "unobtainable": true
+    },
+    "tube_coral_wall_fan": {
+      "name": "Tube Coral Wall Fan",
+      "unobtainable": true
+    },
+    "turtle_egg": {
+      "name": "Turtle Egg"
+    },
+    "vine": {
+      "name": "Vines"
+    },
+    "void_air": {
+      "name": "Void Air",
+      "unobtainable": true
+    },
+    "wall_torch": {
+      "name": "Wall Torch",
+      "unobtainable": true
+    },
+    "water": {
+      "name": "Water",
+      "unobtainable": true
+    },
+    "wet_sponge": {
+      "name": "Wet Sponge"
+    },
+    "wheat": {
+      "name": "Wheat",
+      "unobtainable": true
+    },
+    "white_banner": {
+      "name": "White Banner"
+    },
+    "white_bed": {
+      "name": "White Bed"
+    },
+    "white_carpet": {
+      "name": "White Carpet"
+    },
+    "white_concrete_powder": {
+      "name": "White Concrete Powder"
+    },
+    "white_concrete": {
+      "name": "White Concrete"
+    },
+    "white_glazed_terracotta": {
+      "name": "White Glazed Terracotta"
+    },
+    "white_shulker_box": {
+      "name": "White Shulker Box"
+    },
+    "white_stained_glass": {
+      "name": "White Stained Glass"
+    },
+    "white_stained_glass_pane": {
+      "name": "White Stained Glass Pane"
+    },
+    "white_terracotta": {
+      "name": "White Terracotta"
+    },
+    "white_tulip": {
+      "name": "White Tulip"
+    },
+    "white_wall_banner": {
+      "name": "White Wall Banner",
+      "unobtainable": true
+    },
+    "white_wool": {
+      "name": "White Wool"
+    },
+    "wither_rose": {
+      "name": "Wither Rose"
+    },
+    "wither_skeleton_skull": {
+      "name": "Wither Skeleton Skull"
+    },
+    "wither_skeleton_wall_skull": {
+      "name": "Wither Skeleton Wall Skull",
+      "unobtainable": true
+    },
+    "yellow_banner": {
+      "name": "Yellow Banner"
+    },
+    "yellow_bed": {
+      "name": "Yellow Bed"
+    },
+    "yellow_carpet": {
+      "name": "Yellow Carpet"
+    },
+    "yellow_concrete_powder": {
+      "name": "Yellow Concrete Powder"
+    },
+    "yellow_concrete": {
+      "name": "Yellow Concrete"
+    },
+    "yellow_glazed_terracotta": {
+      "name": "Yellow Glazed Terracotta"
+    },
+    "yellow_shulker_box": {
+      "name": "Yellow Shulker Box"
+    },
+    "yellow_stained_glass": {
+      "name": "Yellow Stained Glass"
+    },
+    "yellow_stained_glass_pane": {
+      "name": "Yellow Stained Glass Pane"
+    },
+    "yellow_terracotta": {
+      "name": "Yellow Terracotta"
+    },
+    "yellow_wall_banner": {
+      "name": "Yellow Wall Banner",
+      "unobtainable": true
+    },
+    "yellow_wool": {
+      "name": "Yellow Wool"
+    },
+    "zombie_head": {
+      "name": "Zombie Head"
+    },
+    "zombie_wall_head": {
+      "name": "Zombie Wall Head",
+      "unobtainable": true
+    }
+  }
+}

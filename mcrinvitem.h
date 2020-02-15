@@ -17,9 +17,9 @@ public:
     void setName(const QString &name);
 
 private:
-    void setupItem();
-
     QString name;
+
+    void setupItem();
 };
 
 #endif // MCRINVITEM_H

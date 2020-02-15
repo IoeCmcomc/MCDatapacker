@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSessionManager>
+#include <QMap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,11 +16,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
     void openFile(const QString &filepath);
     QString getCurDir();
-
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
+    static QMap<QString, QVariant> *getMCRInfo(const QString &type);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -41,6 +43,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    QString curFile = QString();
+    QString curDir = QString();
+    static QMap<QString, QMap<QString, QVariant>* > *MCRInfoMaps;
+
     void readSettings();
     void writeSettings();
     bool maybeSave();
@@ -48,9 +54,8 @@ private:
     void setCurrentFile(const QString &filepath);
     QString strippedName(const QString &fullFilepath);
     void updateWindowTitle();
-
-    QString curFile = QString();
-    QString curDir = QString();
+    static QMap<QString, QVariant> *readMCRInfo(const int &dataVersion,
+                     const QString &type = "block", const int depth = 0);
 };
 
 #endif // MAINWINDOW_H

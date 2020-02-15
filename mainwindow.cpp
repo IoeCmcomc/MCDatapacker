@@ -17,12 +17,16 @@
 #include <QScreen>
 #include <QGuiApplication>
 #include <QSaveFile>
+#include <QFileInfo>
+
+QMap<QString, QMap<QString, QVariant>* > *MainWindow::MCRInfoMaps = new QMap<QString, QMap<QString, QVariant>* >();
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    //setAttribute(Qt::WA_DeleteOnClose, false);
+    MainWindow::MCRInfoMaps->insert("block", MainWindow::readMCRInfo(2225, "block"));
+    MainWindow::MCRInfoMaps->insert("item", MainWindow::readMCRInfo(2225, "item"));
 
     QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoFont.setPointSize(11);
@@ -34,13 +38,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
     connect(ui->actionOpenFolder, &QAction::triggered, this, &MainWindow::openFolder);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
-    //connect(ui->actionExit, &QAction::triggered, this, &QApplication::quit);
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
-
-    readSettings();
-
     connect(ui->codeEditor->document(), &QTextDocument::contentsChanged,
             this, &MainWindow::documentWasModified);
+
+    readSettings();
 
     #ifndef QT_NO_SESSIONMANAGER
         QGuiApplication::setFallbackSessionManagementEnabled(false);
@@ -52,6 +54,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     VisualRecipeEditorDock *visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
+
+    /*
+    int c = 0;
+    for(auto k : MainWindow::getMCRInfo("item")->keys()) {
+        qDebug() << k;
+        if(c > 10) break;
+        ++c;
+    }
+    qDebug() << MainWindow::getMCRInfo("item")->contains("acacia_boat");
+    qDebug() << MainWindow::getMCRInfo("item")->value("acacia_boat");
+    */
 }
 
 void MainWindow::open() {
@@ -165,12 +178,55 @@ void MainWindow::updateWindowTitle() {
     QStringList title;
     if(!curFile.isEmpty())
         title.push_back(strippedName(curFile) + "[*]");
-    else
-        title.push_back("[*]");
     if(!curDir.isEmpty())
         title.push_back("[" + strippedName(curDir) + "]");
     title.push_back(QCoreApplication::applicationName());
     setWindowTitle(title.join(QStringLiteral(" - ")));
+}
+
+QMap<QString, QVariant> *MainWindow::readMCRInfo(const int &dataVersion,
+                                                const QString &type,
+                                                const int depth) {
+    QMap<QString, QVariant> *retMap = new QMap<QString, QVariant>();
+
+    QFileInfo finfo = QFileInfo(":minecraft/info/"+type+"/"+QString::number(dataVersion)+".json");
+    if(!(finfo.exists() && finfo.isFile())) {
+        //qDebug() << "File not exists. Return empty.";
+        return retMap;
+    }
+    QFile inFile(finfo.filePath());
+    inFile.open(QIODevice::ReadOnly|QIODevice::Text);
+    QByteArray data = inFile.readAll();
+    inFile.close();
+
+    QJsonParseError errorPtr;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &errorPtr);
+    if (doc.isNull()) {
+        //qDebug() << "Parse failed" << errorPtr.error;
+        return retMap;
+    }
+    QJsonObject root = doc.object();
+    if(root.isEmpty()) {
+        //qDebug() << "Root is empty. Return empty";
+        return retMap;
+    }
+
+    if(root["version_id"].toInt() != dataVersion) return retMap;
+    if(root.contains("base_version")) {
+        auto baseVer = root["base_version"].toInt();
+        //qDebug() << "Go to base version" << baseVer;
+        QMap<QString, QVariant> *tmpMap = readMCRInfo(baseVer, type, depth+1);
+        if(!tmpMap->isEmpty())
+            retMap->unite(*tmpMap);
+    }
+    QMap<QString, QVariant> *tmpMap2 = new QMap<QString, QVariant>(root["added"].toVariant().toMap());
+    if(!tmpMap2->isEmpty())
+        retMap->unite(*tmpMap2);
+    return retMap;
+}
+
+QMap<QString, QVariant> *MainWindow::getMCRInfo(const QString &type) {
+    return MainWindow::MCRInfoMaps->value(type, new QMap<QString, QVariant>());
 }
 
 void MainWindow::newDatapack() {
