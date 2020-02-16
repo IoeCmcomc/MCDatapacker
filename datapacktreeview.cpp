@@ -203,7 +203,8 @@ void DatapackTreeView::contextMenuOnNewFolder() {
     }
 }
 
-QModelIndex DatapackTreeView::makeNewFile(QModelIndex index, QString name, QString catDir) {
+QModelIndex DatapackTreeView::makeNewFile(QModelIndex index, QString name,
+                                          QString catDir) {
     if(index.isValid()) {
         QFileInfo finfo = dirModel.fileInfo(index);
         if (finfo.exists() && finfo.isFile())

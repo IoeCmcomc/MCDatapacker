@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "visualrecipeeditordock.h"
 #include "newdatapackdialog.h"
 
 #include <QDebug>
@@ -19,6 +18,7 @@
 #include <QSaveFile>
 #include <QFileInfo>
 
+MainWindow::MCRFileType MainWindow::curFileType = Text;
 QMap<QString, QMap<QString, QVariant>* > *MainWindow::MCRInfoMaps = new QMap<QString, QMap<QString, QVariant>* >();
 
 MainWindow::MainWindow(QWidget *parent)
@@ -50,10 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
                 this, &MainWindow::commitData);
     #endif
 
-    setCurrentFile(QString());
-
-    VisualRecipeEditorDock *visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
+    visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
+
+    setCurrentFile(QString());
 
     /*
     int c = 0;
@@ -88,6 +88,7 @@ bool MainWindow::save() {
 }
 
 void MainWindow::documentWasModified() {
+    //qDebug() << "documentWasModified";
     setWindowModified(ui->codeEditor->document()->isModified());
 }
 
@@ -157,16 +158,47 @@ QString MainWindow::getCurDir() {
     return this->curDir;
 }
 
+bool MainWindow::isPathRelativeTo(const QString &path, const QString &catDir) {
+    auto tmpDir = curDir + "/data/";
+    if(!path.startsWith(tmpDir)) return false;
+    return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
+}
+
+bool MainWindow::isPathRelativeTo(const QString &path, const QString &dir,
+                                  const QString &catDir) {
+    auto tmpDir = dir + "/data/";
+    if(!path.startsWith(tmpDir)) return false;
+    return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
+}
+
 void MainWindow::commitData(QSessionManager &) {
 }
 
 void MainWindow::setCurrentFile(const QString &filepath) {
     this->curFile = filepath;
-    ui->codeEditor->setCurFile(filepath);
 
     updateWindowTitle();
-    qDebug() << "setWindowModified";
+    ui->codeEditor->document()->setModified(false);
     setWindowModified(false);
+
+    QFileInfo info = QFileInfo(filepath);
+    const QString jsonExts = "json mcmeta";
+
+    if(info.completeSuffix() == "mcfunction") {
+        MainWindow::curFileType = Function;
+    } else if(jsonExts.contains(info.completeSuffix())) {
+        if(isPathRelativeTo(curFile, "recipes")) {
+            MainWindow::curFileType = Recipe;
+        } else {
+            MainWindow::curFileType = JsonText;
+        }
+    } else {
+        MainWindow::curFileType = Text;
+    }
+
+    ui->codeEditor->setCurFile(filepath);
+
+    visualRecipeEditorDock->setVisible(MainWindow::curFileType == Recipe);
 }
 
 QString MainWindow::strippedName(const QString &fullFileName)
@@ -350,14 +382,16 @@ bool MainWindow::saveFile(const QString &filepath) {
 }
 
 void MainWindow::openFolder() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString dir;
+    if (maybeSave())
+        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    else
+        return;
 
     qDebug() << dir;
-
     if(dir.isEmpty()) return;
 
     QString pack_mcmeta = dir + "/pack.mcmeta";
-
     qDebug() << QFile::exists(pack_mcmeta);
 
     if(QFile::exists(pack_mcmeta)) {

@@ -1,4 +1,5 @@
 #include "codeeditor.h"
+
 #include "linenumberarea.h"
 #include "jsonhighlighter.h"
 #include "mainwindow.h"
@@ -55,7 +56,6 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
 
     //if(e->buttons() == Qt::LeftButton) {}
     QTextCursor cursor = cursorForPosition(e->pos());
-    //cursor.setPosition(this->document()->documentLayout()->hitTest( QPointF( e->x(), e->y() ), Qt::ExactHit ));
     this->mouseTextCursor = cursor;
 
     if(cursor.blockNumber() != this->lastMouseTextCursor.blockNumber())
@@ -94,15 +94,13 @@ void CodeEditor::onCursorPositionChanged() {
 void CodeEditor::setCurFile(QString filepath) {
     this->curFile = filepath;
     QFileInfo info = QFileInfo(filepath);
-    //qDebug() << info;
-    //qDebug() << info.completeSuffix();
     const QString jsonExts = "json mcmeta";
 
-    //qDebug() << jsonExts;
-    //qDebug() << jsonExts.contains(info.completeSuffix());
+//    jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
+//    mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
 
     jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
-    mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
+    mcfunctionHighlighter->setEnabled(MainWindow::curFileType == MainWindow::Function);
 }
 
 int CodeEditor::lineNumberAreaWidth()

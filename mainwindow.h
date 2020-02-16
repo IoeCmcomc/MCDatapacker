@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "visualrecipeeditordock.h"
+
 #include <QMainWindow>
 #include <QSessionManager>
 #include <QMap>
@@ -17,11 +19,26 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    enum MCRFileType {
+        Advancement,
+        Function,
+        LootTable,
+        Predicate,
+        Recipe,
+        Structures,
+        BlockTag, EntityTypeTag, FiludTag, FunctionTag, ItemTag,
+        JsonText,
+        Text
+    };
+    static MCRFileType curFileType;
+
     void openFile(const QString &filepath);
     QString getCurDir();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
     static QMap<QString, QVariant> *getMCRInfo(const QString &type);
+    static bool isPathRelativeTo(const QString &path, const QString &dir,
+                     const QString &catDir);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -46,6 +63,7 @@ private:
     QString curFile = QString();
     QString curDir = QString();
     static QMap<QString, QMap<QString, QVariant>* > *MCRInfoMaps;
+    VisualRecipeEditorDock *visualRecipeEditorDock;
 
     void readSettings();
     void writeSettings();
@@ -56,6 +74,7 @@ private:
     void updateWindowTitle();
     static QMap<QString, QVariant> *readMCRInfo(const int &dataVersion,
                      const QString &type = "block", const int depth = 0);
+    bool isPathRelativeTo(const QString &path, const QString &catDir);
 };
 
 #endif // MAINWINDOW_H
