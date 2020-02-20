@@ -20,8 +20,8 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent)
 }
 
 QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
-
-    QMenu *cMenu = new QMenu(this); //Right click context menu
+    //Right click context menu
+    QMenu *cMenu = new QMenu(this);
     QString path = relPath(dirModel.filePath(index));
     qDebug() << path;
     QFileInfo finfo = dirModel.fileInfo(index);
@@ -81,7 +81,8 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             connect(newMenuNewStruct, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewStruct);
             newMenu->addAction(newMenuNewStruct);
 
-            QMenu *tagMenu = new QMenu(tr("Tag"), this); //"Tag" menu
+            //"Tag" menu
+            QMenu *tagMenu = new QMenu(tr("Tag"), this);
 
             QAction *newBlockTag = new QAction(tr("Blocks"), this);
             connect(newBlockTag, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewBlocksTag);

@@ -25,8 +25,8 @@ public:
         LootTable,
         Predicate,
         Recipe,
-        Structures,
-        BlockTag, EntityTypeTag, FiludTag, FunctionTag, ItemTag,
+        Structure,
+        BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag,
         JsonText,
         Text
     };
@@ -72,8 +72,8 @@ private:
     void setCurrentFile(const QString &filepath);
     QString strippedName(const QString &fullFilepath);
     void updateWindowTitle();
-    static QMap<QString, QVariant> *readMCRInfo(const int &dataVersion,
-                     const QString &type = "block", const int depth = 0);
+    static QMap<QString, QVariant> *readMCRInfo(const QString &type = "block",
+                                                const int depth = 0);
     bool isPathRelativeTo(const QString &path, const QString &catDir);
 };
 

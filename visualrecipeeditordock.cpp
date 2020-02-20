@@ -50,7 +50,7 @@ void VisualRecipeEditorDock::setupCustomTab() {
     //Add tabs
     ui->customTabBar->addTab(tr("Crafting"));
     ui->customTabBar->addTab(tr("Smelting"));
-    ui->customTabBar->addTab(tr("Stonecutter"));
+    ui->customTabBar->addTab(tr("Stonecutting"));
 
     //Make tab bar overlay top pixel of tab frame
     ui->customTabWidgetLayout->removeWidget(ui->customTabBar);
@@ -318,18 +318,15 @@ void VisualRecipeEditorDock::readRecipe() {
     QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
 
     if(json_doc.isNull()){
-        QMessageBox::information(0, "error", "Failed to create JSON doc.");
         return;
     }
     if(!json_doc.isObject()){
-        QMessageBox::information(0, "error", "JSON is not an object.");
         return;
     }
 
     QJsonObject root = json_doc.object();
 
     if(root.isEmpty()){
-        QMessageBox::information(0, "error", "JSON object is empty.");
         return;
     }
 

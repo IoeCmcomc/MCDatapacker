@@ -47,7 +47,7 @@ FORMS += \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \
-    MinecraftDatapackMaker_en_US.ts
+    MinecraftDatapackMaker_vi_VN.ts
 
 QT += uitools
 

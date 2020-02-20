@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    MainWindow::MCRInfoMaps->insert("block", MainWindow::readMCRInfo(2225, "block"));
-    MainWindow::MCRInfoMaps->insert("item", MainWindow::readMCRInfo(2225, "item"));
+    MainWindow::MCRInfoMaps->insert("block", MainWindow::readMCRInfo("blocks"));
+    MainWindow::MCRInfoMaps->insert("item", MainWindow::readMCRInfo("items"));
 
     QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoFont.setPointSize(11);
@@ -54,22 +54,11 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 
     setCurrentFile(QString());
-
-    /*
-    int c = 0;
-    for(auto k : MainWindow::getMCRInfo("item")->keys()) {
-        qDebug() << k;
-        if(c > 10) break;
-        ++c;
-    }
-    qDebug() << MainWindow::getMCRInfo("item")->contains("acacia_boat");
-    qDebug() << MainWindow::getMCRInfo("item")->value("acacia_boat");
-    */
 }
 
 void MainWindow::open() {
     if (maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "");
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open file"), "");
         if (!fileName.isEmpty())
             openFile(fileName);
     }
@@ -185,16 +174,34 @@ void MainWindow::setCurrentFile(const QString &filepath) {
     const QString jsonExts = "json mcmeta";
 
     if(info.completeSuffix() == "mcfunction") {
-        MainWindow::curFileType = Function;
-    } else if(jsonExts.contains(info.completeSuffix())) {
-        if(isPathRelativeTo(curFile, "recipes")) {
-            MainWindow::curFileType = Recipe;
+            MainWindow::curFileType = Function;
+        } else if(info.completeSuffix() == "nbt") {
+            MainWindow::curFileType = Structure;
+        } else if(jsonExts.contains(info.completeSuffix())) {
+            if(isPathRelativeTo(curFile, "advancements")) {
+                MainWindow::curFileType = Advancement;
+            } else if(isPathRelativeTo(curFile, "loot_tables")) {
+                MainWindow::curFileType = LootTable;
+            } else if(isPathRelativeTo(curFile, "predicates")) {
+                MainWindow::curFileType = Predicate;
+            } else if(isPathRelativeTo(curFile, "recipes")) {
+                MainWindow::curFileType = Recipe;
+            } else if(isPathRelativeTo(curFile, "tags/blocks")) {
+                MainWindow::curFileType = BlockTag;
+            } else if(isPathRelativeTo(curFile, "tags/entity_types")) {
+                MainWindow::curFileType = EntityTypeTag;
+            } else if(isPathRelativeTo(curFile, "tags/fluids")) {
+                MainWindow::curFileType = FluidTag;
+            } else if(isPathRelativeTo(curFile, "tags/functions")) {
+                MainWindow::curFileType = FunctionTag;
+            } else if(isPathRelativeTo(curFile, "tags/items")) {
+                MainWindow::curFileType = ItemTag;
+            } else {
+                MainWindow::curFileType = JsonText;
+            }
         } else {
-            MainWindow::curFileType = JsonText;
+            MainWindow::curFileType = Text;
         }
-    } else {
-        MainWindow::curFileType = Text;
-    }
 
     ui->codeEditor->setCurFile(filepath);
 
@@ -216,12 +223,11 @@ void MainWindow::updateWindowTitle() {
     setWindowTitle(title.join(QStringLiteral(" - ")));
 }
 
-QMap<QString, QVariant> *MainWindow::readMCRInfo(const int &dataVersion,
-                                                const QString &type,
+QMap<QString, QVariant> *MainWindow::readMCRInfo(const QString &type,
                                                 const int depth) {
     QMap<QString, QVariant> *retMap = new QMap<QString, QVariant>();
 
-    QFileInfo finfo = QFileInfo(":minecraft/info/"+type+"/"+QString::number(dataVersion)+".json");
+    QFileInfo finfo = QFileInfo(":minecraft/info/"+type+".json");
     if(!(finfo.exists() && finfo.isFile())) {
         //qDebug() << "File not exists. Return empty.";
         return retMap;
@@ -243,14 +249,6 @@ QMap<QString, QVariant> *MainWindow::readMCRInfo(const int &dataVersion,
         return retMap;
     }
 
-    if(root["version_id"].toInt() != dataVersion) return retMap;
-    if(root.contains("base_version")) {
-        auto baseVer = root["base_version"].toInt();
-        //qDebug() << "Go to base version" << baseVer;
-        QMap<QString, QVariant> *tmpMap = readMCRInfo(baseVer, type, depth+1);
-        if(!tmpMap->isEmpty())
-            retMap->unite(*tmpMap);
-    }
     QMap<QString, QVariant> *tmpMap2 = new QMap<QString, QVariant>(root["added"].toVariant().toMap());
     if(!tmpMap2->isEmpty())
         retMap->unite(*tmpMap2);
@@ -278,8 +276,8 @@ void MainWindow::newDatapack() {
         } else if(!dir.isEmpty()) {
             if(QMessageBox::warning
                     (this,
-                     "Directory not empty",
-                     "The directory is not empty. Do you want to delete this directory?",
+                     tr("Directory not empty"),
+                     tr("The directory is not empty. Do you want to delete this directory?"),
                      QMessageBox::Yes | QMessageBox::No,
                      QMessageBox::No)
                     == QMessageBox::No) {
@@ -313,7 +311,7 @@ void MainWindow::newDatapack() {
         ui->datapackTreeView->load(dirPath);
     }
     qDebug() << dialogCode;
-    //qDebug() << dialog->getFormat() << dialog->getDesc() << dialog->getDirPath();
+    delete dialog;
 }
 
 void MainWindow::openFile(const QString &filepath) {
@@ -384,7 +382,7 @@ bool MainWindow::saveFile(const QString &filepath) {
 void MainWindow::openFolder() {
     QString dir;
     if (maybeSave())
-        dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        dir = QFileDialog::getExistingDirectory(this, tr("Open datapack folder"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     else
         return;
 
@@ -444,7 +442,7 @@ void MainWindow::openFolder() {
             }
         }
     } else {
-        QMessageBox::information(0, "error", "Invaild datapack folder");
+        QMessageBox::information(0, tr("Error"), tr("Invaild datapack folder"));
         return;
     }
 }

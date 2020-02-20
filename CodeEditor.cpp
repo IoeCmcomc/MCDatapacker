@@ -13,7 +13,6 @@
 #include <QFileInfo>
 #include <QStringLiteral>
 #include <QApplication>
-#include <QDir>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {

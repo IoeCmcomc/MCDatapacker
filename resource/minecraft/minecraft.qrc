@@ -1077,7 +1077,8 @@
         <file>texture/item/white_tulip.png</file>
         <file>texture/item/wither_rose.png</file>
         <file>texture/item/yellow_stained_glass_pane.png</file>
-        <file>info/block/2225.json</file>
-        <file>info/item/2225.json</file>
+        <file>info/blocks.json</file>
+        <file>info/items.json</file>
+        <file>texture/item/azure_bluet.png</file>
     </qresource>
 </RCC>
