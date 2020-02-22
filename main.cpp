@@ -27,13 +27,15 @@ int main(int argc, char *argv[])
     //parser.addPositionalArgument("file", "The file to open.");
     parser.process(a);
 
+    /*
     QTranslator qtTranslator;
-    qDebug() << qtTranslator.load(QLocale::system(), QStringLiteral("qtbase_"));
+    qtTranslator.load(QLocale::system(), QStringLiteral("qtbase_"));
     a.installTranslator(&qtTranslator);
+    */
 
-    QTranslator translator;
-    qDebug() << translator.load("translations/MinecraftDatapackMaker_" + QLocale::system().name());
-    a.installTranslator(&translator);
+//    QTranslator translator;
+//    translator.load("translations/MinecraftDatapackMaker_" + QLocale::system().name());
+//    a.installTranslator(&translator);
 
     MainWindow w;
     //w.resize(250, 150);
@@ -41,7 +43,7 @@ int main(int argc, char *argv[])
     w.show();
     //w.showMaximized();
     //qDebug() << "Exitting application...";
-    qDebug() << QLocale::system().name() << QDir::currentPath();
+    qDebug() << QLocale::system().name();
 
     return a.exec();
 }

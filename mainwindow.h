@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QSessionManager>
 #include <QMap>
+#include <QTranslator>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,14 +36,17 @@ public:
 
     void openFile(const QString &filepath);
     QString getCurDir();
+    QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
     static QMap<QString, QVariant> *getMCRInfo(const QString &type);
     static bool isPathRelativeTo(const QString &path, const QString &dir,
                      const QString &catDir);
+    void readPrefSettings(QSettings &settings);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    void changeEvent(QEvent* event) override;
 
 signals:
     void fileOpened(QString fileExt);;
@@ -51,6 +56,7 @@ private slots:
     void newDatapack();
     void openFolder();
     bool save();
+    void pref_settings();
     void documentWasModified();
 
 #ifndef QT_NO_SESSIONMANAGER
@@ -64,6 +70,10 @@ private:
     QString curDir = QString();
     static QMap<QString, QMap<QString, QVariant>* > *MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
+    QLocale curLocale;
+
+    QTranslator m_translator; // contains the translations for this application
+    QTranslator m_translatorQt; // contains the translations for qt
 
     void readSettings();
     void writeSettings();
@@ -75,6 +85,9 @@ private:
     static QMap<QString, QVariant> *readMCRInfo(const QString &type = "block",
                                                 const int depth = 0);
     bool isPathRelativeTo(const QString &path, const QString &catDir);
+    void loadLanguage(const QString& rLanguage, bool atStartup = false);
+    void switchTranslator(QTranslator& translator, const QString& filename);
+
 };
 
 #endif // MAINWINDOW_H

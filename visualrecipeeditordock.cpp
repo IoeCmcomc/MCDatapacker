@@ -127,6 +127,15 @@ void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
 //    ui->itemList->setBatchSize(bs);
 }
 
+void VisualRecipeEditorDock::retranslate() {
+    ui->retranslateUi(this);
+
+    ui->customTabBar->setTabText(0, tr("Crafting"));
+    ui->customTabBar->setTabText(1, tr("Smelting"));
+    ui->customTabBar->setTabText(2, tr("Stonecutting"));
+
+}
+
 void VisualRecipeEditorDock::resizeEvent(QResizeEvent *e) {
     if(!isResizing) {
         ui->itemList->setLayoutMode(QListView::Batched);

@@ -29,7 +29,7 @@ NewDatapackDialog::~NewDatapackDialog()
 }
 
 void NewDatapackDialog::browse() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open folder"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose folder to create new datapack"), "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if(!dir.isEmpty())
         ui->locationInput->setText(dir);
 }

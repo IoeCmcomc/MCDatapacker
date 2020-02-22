@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "newdatapackdialog.h"
+#include "settingsdialog.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
     connect(ui->codeEditor->document(), &QTextDocument::contentsChanged,
             this, &MainWindow::documentWasModified);
+    connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::pref_settings);
 
     readSettings();
 
@@ -50,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
                 this, &MainWindow::commitData);
     #endif
 
-    visualRecipeEditorDock =  new VisualRecipeEditorDock(this);
+    visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 
     setCurrentFile(QString());
@@ -76,6 +78,11 @@ bool MainWindow::save() {
     }
 }
 
+void MainWindow::pref_settings() {
+    SettingsDialog dialog(this);
+    dialog.exec();
+}
+
 void MainWindow::documentWasModified() {
     //qDebug() << "documentWasModified";
     setWindowModified(ui->codeEditor->document()->isModified());
@@ -92,8 +99,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::readSettings() {
-    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-    //restoreGeometry(geometry);
+    QSettings settings;
     settings.beginGroup("geometry");
     QSize geomertySize = settings.value("size", QSize(600, 600)).toSize();
     if(geomertySize.isEmpty())
@@ -109,13 +115,20 @@ void MainWindow::readSettings() {
 
     if(settings.value("isMaximized", true).toBool())
         showMaximized();
+    settings.endGroup();
 
+    readPrefSettings(settings);
+}
+
+void MainWindow::readPrefSettings(QSettings &settings) {
+    settings.beginGroup("general");
+    qDebug() << settings.value("locale", "").toString();
+    loadLanguage(settings.value("locale", "").toString(), true);
     settings.endGroup();
 }
 
 void MainWindow::writeSettings() {
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-    //settings.setValue("geometry", saveGeometry());
     settings.beginGroup("geometry");
     settings.setValue("size", size());
     settings.setValue("pos", pos());
@@ -147,6 +160,10 @@ QString MainWindow::getCurDir() {
     return this->curDir;
 }
 
+QString MainWindow::getCurLocale() {
+    return this->curLocale.name();
+}
+
 bool MainWindow::isPathRelativeTo(const QString &path, const QString &catDir) {
     auto tmpDir = curDir + "/data/";
     if(!path.startsWith(tmpDir)) return false;
@@ -158,6 +175,55 @@ bool MainWindow::isPathRelativeTo(const QString &path, const QString &dir,
     auto tmpDir = dir + "/data/";
     if(!path.startsWith(tmpDir)) return false;
     return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
+}
+
+void MainWindow::loadLanguage(const QString& rLanguage, bool atStartup) {
+    if((curLocale.name() != rLanguage) || atStartup) {
+    curLocale = QLocale(rLanguage);
+    QLocale::setDefault(curLocale);
+    qDebug() << QLocale::system();
+    QString transfile;
+    if(rLanguage.isEmpty())
+        transfile = QString("MinecraftDatapackMaker_%1.qm").arg(QLocale::system().name());
+    else
+        transfile = QString("MinecraftDatapackMaker_%1.qm").arg(rLanguage);
+    switchTranslator(m_translator, transfile);
+    switchTranslator(m_translatorQt, QString("qt_%1.qm").arg(rLanguage));
+    }
+}
+
+void MainWindow::switchTranslator(QTranslator& translator, const QString& filename) {
+    qApp->removeTranslator(&translator);
+
+    QString path = QApplication::applicationDirPath() + "/translations/";
+    if(translator.load(path + filename))
+        qApp->installTranslator(&translator);
+}
+
+
+void MainWindow::changeEvent(QEvent* event) {
+    if(0 != event) {
+        switch(event->type()) {
+            // this event is send if a translator is loaded
+        case QEvent::LanguageChange: {
+            qDebug() << "QEvent::LanguageChange";
+            ui->retranslateUi(this);
+            if(visualRecipeEditorDock)
+                visualRecipeEditorDock->retranslate();
+        }
+            break;
+        // this event is send, if the system, language changes
+        case QEvent::LocaleChange: {
+            qDebug() << "QEvent::LocaleChange";
+            QString locale = QLocale::system().name();
+            loadLanguage(locale);
+        }
+        break;
+        default:
+            {}
+        }
+    }
+    QMainWindow::changeEvent(event);
 }
 
 void MainWindow::commitData(QSessionManager &) {
@@ -274,10 +340,9 @@ void MainWindow::newDatapack() {
         if(!dir.exists()) {
             dir.mkpath(dirPath);
         } else if(!dir.isEmpty()) {
-            if(QMessageBox::warning
-                    (this,
-                     tr("Directory not empty"),
-                     tr("The directory is not empty. Do you want to delete this directory?"),
+            if(QMessageBox::warning (this, tr("Folder not empty"),
+                     tr("The folder is not empty.\n"
+                    "Do you want to recreate this folder?"),
                      QMessageBox::Yes | QMessageBox::No,
                      QMessageBox::No)
                     == QMessageBox::No) {
@@ -320,7 +385,7 @@ void MainWindow::openFile(const QString &filepath) {
     else {
         QFile file(filepath);
         if(!file.open(QFile::ReadOnly | QFile::Text)) {
-            QMessageBox::warning(this, tr("Application"),
+            QMessageBox::warning(this, tr("Error"),
                                  tr("Cannot read file %1:\n%2.")
                                  .arg(QDir::toNativeSeparators(filepath), file.errorString()));
         } else {
@@ -371,7 +436,7 @@ bool MainWindow::saveFile(const QString &filepath) {
     QGuiApplication::restoreOverrideCursor();
 
     if (!errorMessage.isEmpty()) {
-        QMessageBox::warning(this, tr("Application"), errorMessage);
+        QMessageBox::warning(this, tr("Error"), errorMessage);
         return false;
     }
 
@@ -398,7 +463,7 @@ void MainWindow::openFolder() {
         else {
             QFile file(pack_mcmeta);
             if(!file.open(QIODevice::ReadOnly)) {
-                QMessageBox::information(0, "error", file.errorString());
+                QMessageBox::information(0, tr("Error"), file.errorString());
             } else {
                 QTextStream in(&file);
                 QString json_string;
@@ -410,18 +475,18 @@ void MainWindow::openFolder() {
                 //qDebug() << json_doc;
 
                 if(json_doc.isNull()){
-                    QMessageBox::information(0, "error", "Failed to create JSON doc.");
+                    QMessageBox::information(0, "pack.mcmeta error", tr("Failed to parse the pack.mcmeta file."));
                     return;
                 }
                 if(!json_doc.isObject()){
-                    QMessageBox::information(0, "error", "JSON is not an object.");
+                    QMessageBox::information(0, "pack.mcmeta error", tr("The pack.mcmeta file is not a JSON object."));
                     return;
                 }
 
                 QJsonObject json_obj = json_doc.object();
 
                 if(json_obj.isEmpty()){
-                    QMessageBox::information(0, "error", "JSON object is empty.");
+                    QMessageBox::information(0, "pack.mcmeta error", tr("The pack.mcmeta file's contents is empty."));
                     return;
                 }
 
@@ -442,7 +507,7 @@ void MainWindow::openFolder() {
             }
         }
     } else {
-        QMessageBox::information(0, tr("Error"), tr("Invaild datapack folder"));
+        QMessageBox::warning(0, tr("Error"), tr("Invaild datapack folder"));
         return;
     }
 }

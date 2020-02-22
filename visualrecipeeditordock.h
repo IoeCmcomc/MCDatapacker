@@ -22,6 +22,7 @@ public:
 
     void writeRecipe();
     void readRecipe();
+    void retranslate();
 
 protected:
     void resizeEvent(QResizeEvent *e);
