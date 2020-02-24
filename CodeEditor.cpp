@@ -13,6 +13,7 @@
 #include <QFileInfo>
 #include <QStringLiteral>
 #include <QApplication>
+#include <QMimeData>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -73,12 +74,57 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
     QPlainTextEdit::mousePressEvent(e);
 }
 
+void CodeEditor::dropEvent(QDropEvent *e) {
+    QString nspacedID;
+    if(e->mimeData()->hasFormat("text/uri-list")) {
+        auto filepath = e->mimeData()->urls().at(0).toLocalFile();
+        auto datapath = qobject_cast<MainWindow*>(window())->getCurDir() + "/data/";
+        if(filepath.startsWith(datapath)) {
+            auto finfo = QFileInfo(filepath);
+            filepath = finfo.dir().path() + '/' +finfo.completeBaseName();
+            filepath.remove(0, datapath.length());
+            if(filepath.split('/').count() >= 3) {
+                nspacedID = filepath.section('/', 0, 0)
+                                 + ':' + filepath.section('/', 2);
+            }
+        }
+    } else if(e->mimeData()->hasFormat("application/x-mcrinvitem" )
+               && e->mimeData()->hasText()) {
+//        QByteArray itemData = e->mimeData()->data("application/x-mcrinvitem");
+//        QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+
+//        QPoint offset;
+//        QString id;
+//        dataStream >> offset >> id;
+//        nspacedID = id;
+    nspacedID = "minecraft:" + e->mimeData()->text();
+    }
+    if(!nspacedID.isEmpty()) {
+        QTextCursor cursor = cursorForPosition(e->pos());
+        cursor.beginEditBlock();
+        cursor.insertText(nspacedID);
+        cursor.endEditBlock();
+        setTextCursor(cursor);
+
+        QMimeData *mimeData = new QMimeData();
+        mimeData->setText("");
+        QDropEvent *dummyEvent
+            = new QDropEvent(e->posF(), e->possibleActions(),
+                             mimeData, e->mouseButtons(),
+                             e->keyboardModifiers());
+
+        QPlainTextEdit::dropEvent(dummyEvent);
+        return;
+    }
+    QPlainTextEdit::dropEvent(e);
+}
+
 void CodeEditor::onCursorPositionChanged() {
     QList<QTextEdit::ExtraSelection> extraSelections;
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::yellow).lighter(180);
+        QColor lineColor = QColor(237, 236, 223, 127);
 
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
@@ -153,16 +199,16 @@ CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
     while(!isStartofString && cursorRelPos >= 0) {
         currChar = lineText[cursorRelPos];
         //qDebug() << "current character: " << currChar;
-        QRegularExpression regex = QRegularExpression(QStringLiteral("[0-9a-z-_.:/]"));
+        QRegularExpression regex = QRegularExpression(QStringLiteral("[#0-9a-z-_.:/]"));
         QRegularExpressionMatch match = regex.match(currChar);
         isStartofString = !match.hasMatch();
         //qDebug() << "is start of string: " << isStartofString;
         if(!isStartofString && cursorRelPos >= 0) --cursorRelPos;
     }
     //qDebug() << "startIndex: " << cursorRelPos;
-    int startIndex = (qMax(cursorRelPos + 1, 0));
+    int startIndex = qMax(cursorRelPos + 1, 0);
     QString str = lineText.mid(startIndex);
-    QRegularExpression namespacedIDRegex = QRegularExpression(QStringLiteral("^\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
+    QRegularExpression namespacedIDRegex = QRegularExpression(QStringLiteral("^#?\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
     //qDebug() << str;
     CurrentNamespacedID currNamespacedID;
     currNamespacedID.startingIndex = startIndex;
@@ -174,19 +220,27 @@ CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
 
 void CodeEditor::followCurrentNamespacedID() {
     QString str = getCurrentNamespacedID().string;
-    //qDebug() << "under cursor string: " << str;
-    QString path;
-
-    QString fileExt;
+    qDebug() << str;
     if(!str.isEmpty()) {
-        QString dirname = qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->getCurDir();
-        //qDebug() << "dirname: " << dirname;
+        QString dirname = qobject_cast<MainWindow*>(this->window())->getCurDir();
         if(dirname.isEmpty()) return;
 
-        QStringList dirList = QDir(dirname + "/data/" + str.split(":")[0]).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+        QDir dir;
+        qDebug() << str.startsWith('#');
+        if(str.startsWith('#')) {
+            dir = QDir(dirname + "/data/" + str.remove(0, 1)
+                                                .section(":", 0, 0) + "/tags");
+        } else {
+            dir = QDir(dirname + "/data/" + str.section(":", 0, 0));
+        }
+        if(!dir.exists()) return;
+
+        QStringList dirList = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+        QString path;
+        QString fileExt;
         for(const auto& dirType: dirList) {
             //qDebug() << "dirType: " << dirType;
-            path = dirname + "/data/" + str.split(":")[0] + "/" + dirType + "/" + str.split(":")[1];
+            path = dir.path() + "/" + dirType + "/" + str.section(":", 1, 1);
             if(dirType == "functions" && QFile::exists(path+".mcfunction")) {
                 fileExt = ".mcfunction";
                 break;
@@ -197,16 +251,9 @@ void CodeEditor::followCurrentNamespacedID() {
         }
 
         //qDebug() << "final path: " << path;
-
         if(!path.isEmpty() && !fileExt.isEmpty()) {
             path += fileExt;
             this->prevCurFile = path;
-            /*
-            qobject_cast<MainWindow*>(this->parent()->parent()->parent()->parent())->openFile(path);
-            qobject_cast<DatapackTreeView*>(
-                        qobject_cast<QSplitter*>(this->parent()->parent())->widget(0)
-                    )->selectFromPath(path);
-                    */
             qobject_cast<DatapackTreeView*>(
                         qobject_cast<QSplitter*>(this->parent()->parent())->widget(0)
                     )->openFromPath(path);

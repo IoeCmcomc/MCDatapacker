@@ -64,7 +64,7 @@ void JsonHighlighter::highlightBlock(const QString &text)
 }
 
 void JsonHighlighter::setEnabled(bool state) {
-    qDebug() << "JsonHighlighter::setEnabled : " << state;
+    //qDebug() << "JsonHighlighter::setEnabled : " << state;
     this->enabled = state;
 
     setDocument(state ? doc : 0);

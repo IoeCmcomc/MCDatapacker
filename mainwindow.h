@@ -8,6 +8,8 @@
 #include <QMap>
 #include <QTranslator>
 #include <QSettings>
+#include <QFileSystemWatcher>
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,7 +36,7 @@ public:
     };
     static MCRFileType curFileType;
 
-    void openFile(const QString &filepath);
+    void openFile(const QString &filepath, bool reload = false);
     QString getCurDir();
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
@@ -58,6 +60,7 @@ private slots:
     bool save();
     void pref_settings();
     void documentWasModified();
+    void onSystemWatcherFileChanged(const QString &filepath);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
@@ -71,9 +74,10 @@ private:
     static QMap<QString, QMap<QString, QVariant>* > *MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
     QLocale curLocale;
-
-    QTranslator m_translator; // contains the translations for this application
-    QTranslator m_translatorQt; // contains the translations for qt
+    QFileSystemWatcher fileWatcher;
+    QTranslator m_translator;
+    QTranslator m_translatorQt;
+    QMessageBox *uniqueMessageNox = nullptr;
 
     void readSettings();
     void writeSettings();

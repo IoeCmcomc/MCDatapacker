@@ -380,7 +380,7 @@ void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {
         if (finfo.exists() && finfo.isFile()) {
             //qDebug() << "Open from tree";
             setCurrentIndex(index);
-            qobject_cast<MainWindow*>(this->parent()->parent()->parent())->openFile(finfo.absoluteFilePath());
+            qobject_cast<MainWindow*>(this->window())->openFile(finfo.absoluteFilePath());
         }
     }
 }

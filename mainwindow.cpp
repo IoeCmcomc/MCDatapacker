@@ -9,7 +9,6 @@
 #include <QFile>
 #include <QIODevice>
 #include <QTextStream>
-#include <QMessageBox>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QUiLoader>
@@ -18,6 +17,7 @@
 #include <QGuiApplication>
 #include <QSaveFile>
 #include <QFileInfo>
+#include <QAbstractButton>
 
 MainWindow::MCRFileType MainWindow::curFileType = Text;
 QMap<QString, QMap<QString, QVariant>* > *MainWindow::MCRInfoMaps = new QMap<QString, QMap<QString, QVariant>* >();
@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->codeEditor->document(), &QTextDocument::contentsChanged,
             this, &MainWindow::documentWasModified);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::pref_settings);
+    connect(&fileWatcher, &QFileSystemWatcher::fileChanged, this, &MainWindow::onSystemWatcherFileChanged);
 
     readSettings();
 
@@ -88,6 +89,35 @@ void MainWindow::documentWasModified() {
     setWindowModified(ui->codeEditor->document()->isModified());
 }
 
+void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
+    qDebug() << "onSystemWatcherFileChanged";
+    if((filepath != curFile)) return;
+
+    auto reloadExternChanges = QSettings().value("general/reloadExternChanges", 0);
+    if(reloadExternChanges == 1) {
+        if(uniqueMessageNox != nullptr) return;
+        uniqueMessageNox = new QMessageBox(this);
+        uniqueMessageNox->setIcon(QMessageBox::Question);
+        uniqueMessageNox->setWindowTitle(tr("Reload file"));
+        uniqueMessageNox->setText(tr("The file %1 has been changed exernally.")
+                                      .arg(QDir::toNativeSeparators(filepath)));
+        uniqueMessageNox->setInformativeText(tr("Do you want to reload this file?"));
+        uniqueMessageNox->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        uniqueMessageNox->setDefaultButton(QMessageBox::Yes);
+        uniqueMessageNox->exec();
+        auto userDecision = uniqueMessageNox->result();
+        delete uniqueMessageNox;
+        uniqueMessageNox = nullptr;
+        reloadExternChanges = (userDecision == QMessageBox::Yes) ? 0 : 2;
+    }
+
+    if(reloadExternChanges == 0) {
+        if(!ui->codeEditor->document()->isModified()) {
+            openFile(filepath, true);
+        }
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent *event) {
     qDebug() << "closeEvent";
     if (maybeSave()) {
@@ -124,6 +154,7 @@ void MainWindow::readPrefSettings(QSettings &settings) {
     settings.beginGroup("general");
     qDebug() << settings.value("locale", "").toString();
     loadLanguage(settings.value("locale", "").toString(), true);
+
     settings.endGroup();
 }
 
@@ -269,6 +300,9 @@ void MainWindow::setCurrentFile(const QString &filepath) {
             MainWindow::curFileType = Text;
         }
 
+    fileWatcher.removePath(curFile);
+    fileWatcher.addPath(curFile);
+
     ui->codeEditor->setCurFile(filepath);
 
     visualRecipeEditorDock->setVisible(MainWindow::curFileType == Recipe);
@@ -340,7 +374,7 @@ void MainWindow::newDatapack() {
         if(!dir.exists()) {
             dir.mkpath(dirPath);
         } else if(!dir.isEmpty()) {
-            if(QMessageBox::warning (this, tr("Folder not empty"),
+            if(QMessageBox::question(this, tr("Folder not empty"),
                      tr("The folder is not empty.\n"
                     "Do you want to recreate this folder?"),
                      QMessageBox::Yes | QMessageBox::No,
@@ -379,8 +413,8 @@ void MainWindow::newDatapack() {
     delete dialog;
 }
 
-void MainWindow::openFile(const QString &filepath) {
-    if (filepath.isEmpty() || this->curFile == filepath)
+void MainWindow::openFile(const QString &filepath, bool reload) {
+    if (filepath.isEmpty() || (this->curFile == filepath && (!reload)))
         return;
     else {
         QFile file(filepath);
@@ -390,7 +424,6 @@ void MainWindow::openFile(const QString &filepath) {
                                  .arg(QDir::toNativeSeparators(filepath), file.errorString()));
         } else {
             QTextStream in(&file);
-
             in.setCodec("UTF-8");
 
             #ifndef QT_NO_CURSOR
@@ -424,7 +457,8 @@ bool MainWindow::saveFile(const QString &filepath) {
     QSaveFile file(filepath);
     if (file.open(QFile::WriteOnly | QFile::Text)) {
         QTextStream out(&file);
-        out << ui->codeEditor->toPlainText();
+        out.setCodec("UTF-8");
+        out << ui->codeEditor->toPlainText().toUtf8();
         if (!file.commit()) {
             errorMessage = tr("Cannot write file %1:\n%2.")
                            .arg(QDir::toNativeSeparators(filepath), file.errorString());
@@ -463,7 +497,7 @@ void MainWindow::openFolder() {
         else {
             QFile file(pack_mcmeta);
             if(!file.open(QIODevice::ReadOnly)) {
-                QMessageBox::information(0, tr("Error"), file.errorString());
+                QMessageBox::information(this, tr("Error"), file.errorString());
             } else {
                 QTextStream in(&file);
                 QString json_string;
@@ -475,18 +509,18 @@ void MainWindow::openFolder() {
                 //qDebug() << json_doc;
 
                 if(json_doc.isNull()){
-                    QMessageBox::information(0, "pack.mcmeta error", tr("Failed to parse the pack.mcmeta file."));
+                    QMessageBox::information(this, "pack.mcmeta error", tr("Failed to parse the pack.mcmeta file."));
                     return;
                 }
                 if(!json_doc.isObject()){
-                    QMessageBox::information(0, "pack.mcmeta error", tr("The pack.mcmeta file is not a JSON object."));
+                    QMessageBox::information(this, "pack.mcmeta error", tr("The pack.mcmeta file is not a JSON object."));
                     return;
                 }
 
                 QJsonObject json_obj = json_doc.object();
 
                 if(json_obj.isEmpty()){
-                    QMessageBox::information(0, "pack.mcmeta error", tr("The pack.mcmeta file's contents is empty."));
+                    QMessageBox::information(this, "pack.mcmeta error", tr("The pack.mcmeta file's contents is empty."));
                     return;
                 }
 
@@ -501,13 +535,17 @@ void MainWindow::openFolder() {
                         ui->datapackTreeView->load(dir);
                         ui->codeEditor->clear();
                         this->curDir = dir;
+
+                        this->fileWatcher.removePath(curDir);
+                        this->fileWatcher.removePath(curFile);
+                        this->fileWatcher.addPath(curDir);
                         setCurrentFile("");
                     }
                 }
             }
         }
     } else {
-        QMessageBox::warning(0, tr("Error"), tr("Invaild datapack folder"));
+        QMessageBox::warning(this, tr("Error"), tr("Invaild datapack folder"));
         return;
     }
 }

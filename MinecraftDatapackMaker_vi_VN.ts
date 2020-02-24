@@ -167,90 +167,105 @@
         <translation>Thiết đặt...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="63"/>
+        <location filename="mainwindow.cpp" line="64"/>
         <source>Open file</source>
         <translation>Mở tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="71"/>
+        <location filename="mainwindow.cpp" line="72"/>
         <source>Save File</source>
         <translation>Lưu tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="143"/>
+        <location filename="mainwindow.cpp" line="101"/>
+        <source>Reload file</source>
+        <translation>Tải lại tệp</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="102"/>
+        <source>The file %1 has been changed exernally.</source>
+        <translation>Tệp %1 đã được thay đổi từ bên ngoài.</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="104"/>
+        <source>Do you want to reload this file?</source>
+        <translation>Bạn có muốn tải lại tệp này không?</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="174"/>
         <source>Unsaved changes</source>
         <translation>Thay đổi chưa lưu</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="144"/>
+        <location filename="mainwindow.cpp" line="175"/>
         <source>The document has been modified.
 Do you want to save your changes?</source>
         <translation>Tài liệu này đã được chỉnh sửa.
 Bạn có muốn lưu các thay đổi không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="389"/>
+        <location filename="mainwindow.cpp" line="423"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>Không thể đọc tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="429"/>
+        <location filename="mainwindow.cpp" line="463"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="433"/>
+        <location filename="mainwindow.cpp" line="467"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="450"/>
+        <location filename="mainwindow.cpp" line="484"/>
         <source>Open datapack folder</source>
         <translation>Mở thư mục gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="388"/>
-        <location filename="mainwindow.cpp" line="439"/>
-        <location filename="mainwindow.cpp" line="466"/>
-        <location filename="mainwindow.cpp" line="510"/>
+        <location filename="mainwindow.cpp" line="422"/>
+        <location filename="mainwindow.cpp" line="473"/>
+        <location filename="mainwindow.cpp" line="500"/>
+        <location filename="mainwindow.cpp" line="548"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="343"/>
+        <location filename="mainwindow.cpp" line="377"/>
         <source>Folder not empty</source>
         <translation>Thư mục không rỗng</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="344"/>
+        <location filename="mainwindow.cpp" line="378"/>
         <source>The folder is not empty.
 Do you want to recreate this folder?</source>
         <translation>Thư mục này không trống.
 Bạn có muốn tạo lại thư mục này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="478"/>
+        <location filename="mainwindow.cpp" line="512"/>
         <source>Failed to parse the pack.mcmeta file.</source>
         <translation>Không thể phân tích cú pháp của tệp pack.mcmeta.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="482"/>
+        <location filename="mainwindow.cpp" line="516"/>
         <source>The pack.mcmeta file is not a JSON object.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="489"/>
+        <location filename="mainwindow.cpp" line="523"/>
         <source>The pack.mcmeta file&apos;s contents is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="510"/>
+        <location filename="mainwindow.cpp" line="548"/>
         <source>Invaild datapack folder</source>
         <translation>Thư mục gói dữ liệu không hợp lệ</translation>
     </message>
@@ -310,7 +325,7 @@ Bạn có muốn tạo lại thư mục này không?</translation>
     <message>
         <location filename="newdatapackdialog.cpp" line="32"/>
         <source>Choose folder to create new datapack</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn thư mục để tạo gói dữ liệu mới</translation>
     </message>
 </context>
 <context>
@@ -318,22 +333,42 @@ Bạn có muốn tạo lại thư mục này không?</translation>
     <message>
         <location filename="settingsdialog.ui" line="14"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Thiết đặt</translation>
     </message>
     <message>
         <location filename="settingsdialog.ui" line="24"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Chung</translation>
     </message>
     <message>
-        <location filename="settingsdialog.ui" line="30"/>
+        <location filename="settingsdialog.ui" line="35"/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ngôn ngữ</translation>
     </message>
     <message>
-        <location filename="settingsdialog.cpp" line="31"/>
+        <location filename="settingsdialog.ui" line="49"/>
+        <source>Reload externally changed files:</source>
+        <translation>Tải lại các tệp thay đổi bên ngoài:</translation>
+    </message>
+    <message>
+        <location filename="settingsdialog.ui" line="57"/>
+        <source>Always</source>
+        <translation>Luôn luôn</translation>
+    </message>
+    <message>
+        <location filename="settingsdialog.ui" line="62"/>
+        <source>Always ask</source>
+        <translation>Luôn hỏi</translation>
+    </message>
+    <message>
+        <location filename="settingsdialog.ui" line="67"/>
+        <source>Never</source>
+        <translation>Không bao giờ</translation>
+    </message>
+    <message>
+        <location filename="settingsdialog.cpp" line="35"/>
         <source>&lt;Default&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Mặc định&gt;</translation>
     </message>
 </context>
 <context>
@@ -401,7 +436,7 @@ Bạn có muốn tạo lại thư mục này không?</translation>
     <message>
         <location filename="visualrecipeeditordock.ui" line="949"/>
         <source> point</source>
-        <translation>điểm</translation>
+        <translation> điểm</translation>
     </message>
     <message>
         <location filename="visualrecipeeditordock.ui" line="977"/>
@@ -411,7 +446,7 @@ Bạn có muốn tạo lại thư mục này không?</translation>
     <message>
         <location filename="visualrecipeeditordock.ui" line="993"/>
         <source> tick</source>
-        <translation>tíc</translation>
+        <translation> tíc</translation>
     </message>
     <message>
         <location filename="visualrecipeeditordock.ui" line="1018"/>

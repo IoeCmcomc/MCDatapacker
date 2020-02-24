@@ -74,7 +74,7 @@ QString MCRInvSlot::itemName() {
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event)
 {
     //qDebug() << "dragEnterEvent";
-    if (event->mimeData()->hasFormat("application/x-dnditemdata")) {
+    if (event->mimeData()->hasFormat("application/x-mcrinvitem")) {
         MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
@@ -95,7 +95,7 @@ void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event)
 void MCRInvSlot::dragMoveEvent(QDragMoveEvent *event)
 {
     //qDebug() << "dragMoveEvent";
-    if (event->mimeData()->hasFormat("application/x-dnditemdata")) {
+    if (event->mimeData()->hasFormat("application/x-mcrinvitem")) {
         MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
@@ -116,16 +116,18 @@ void MCRInvSlot::dragMoveEvent(QDragMoveEvent *event)
 void MCRInvSlot::dropEvent(QDropEvent *event)
 {
     //qDebug() << "dropEvent" << isCreative;
-    if (event->mimeData()->hasFormat("application/x-dnditemdata")) {
+    if (event->mimeData()->hasFormat("application/x-mcrinvitem")
+        && event->mimeData()->hasText()) {
         MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
         if(!isCreative) {
-            QByteArray itemData = event->mimeData()->data("application/x-dnditemdata");
-            QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+//            QByteArray itemData = event->mimeData()->data("application/x-mcrinvitem");
+//            QDataStream dataStream(&itemData, QIODevice::ReadOnly);
 
-            QPoint offset;
+//            QPoint offset;
             QString id;
-            dataStream >> offset
-                       >> id;
+//            dataStream >> offset
+//                       >> id;
+            id = event->mimeData()->text();
 
             QString itemID;
             if(this->item) itemID = this->item->namespacedID;
@@ -171,7 +173,8 @@ void MCRInvSlot::mousePressEvent(QMouseEvent *event)
                << item->namespacedID;
 
     QMimeData *mimeData = new QMimeData;
-    mimeData->setData("application/x-dnditemdata", itemData);
+    mimeData->setData("application/x-mcrinvitem", itemData);
+    mimeData->setText(item->namespacedID);
 
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);

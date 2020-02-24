@@ -29,12 +29,10 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
-    //void keyPressEvent(QKeyEvent *event) override;
-    //void focusInEvent(QFocusEvent *e) override;
-    //void keyReleaseEvent(QKeyEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
     void wheelEvent(QWheelEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
+    void dropEvent(QDropEvent *e) override;
 
 
 private slots:
