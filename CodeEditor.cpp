@@ -2,9 +2,9 @@
 
 #include "linenumberarea.h"
 #include "jsonhighlighter.h"
+#include "datapacktreeview.h"
 #include "mainwindow.h"
-
-#include <ui_mainwindow.h>
+#include "globalhelpers.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -12,8 +12,10 @@
 #include <QTextCursor>
 #include <QFileInfo>
 #include <QStringLiteral>
+#include <QSplitter>
 #include <QApplication>
 #include <QMimeData>
+#include <QDir>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -78,16 +80,9 @@ void CodeEditor::dropEvent(QDropEvent *e) {
     QString nspacedID;
     if(e->mimeData()->hasFormat("text/uri-list")) {
         auto filepath = e->mimeData()->urls().at(0).toLocalFile();
-        auto datapath = qobject_cast<MainWindow*>(window())->getCurDir() + "/data/";
-        if(filepath.startsWith(datapath)) {
-            auto finfo = QFileInfo(filepath);
-            filepath = finfo.dir().path() + '/' +finfo.completeBaseName();
-            filepath.remove(0, datapath.length());
-            if(filepath.split('/').count() >= 3) {
-                nspacedID = filepath.section('/', 0, 0)
-                                 + ':' + filepath.section('/', 2);
-            }
-        }
+        auto dirpath = qobject_cast<MainWindow*>(window())->getCurDir();
+        nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
+
     } else if(e->mimeData()->hasFormat("application/x-mcrinvitem" )
                && e->mimeData()->hasText()) {
 //        QByteArray itemData = e->mimeData()->data("application/x-mcrinvitem");

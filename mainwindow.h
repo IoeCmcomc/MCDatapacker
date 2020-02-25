@@ -24,15 +24,15 @@ public:
     ~MainWindow();
 
     enum MCRFileType {
-        Advancement,
+        Text,
         Function,
+        Structure,
+        JsonText,
+        Advancement,
         LootTable,
         Predicate,
         Recipe,
-        Structure,
-        BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag,
-        JsonText,
-        Text
+        BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag
     };
     static MCRFileType curFileType;
 
@@ -42,9 +42,8 @@ public:
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
     static QMap<QString, QVariant> *getMCRInfo(const QString &type);
-    static bool isPathRelativeTo(const QString &path, const QString &dir,
-                     const QString &catDir);
     void readPrefSettings(QSettings &settings);
+    void setCurrentFile(const QString &filepath);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -83,7 +82,7 @@ private:
     void writeSettings();
     bool maybeSave();
     bool saveFile(const QString &filepath);
-    void setCurrentFile(const QString &filepath);
+    //void setCurrentFile(const QString &filepath);
     QString strippedName(const QString &fullFilepath);
     void updateWindowTitle();
     static QMap<QString, QVariant> *readMCRInfo(const QString &type = "block",

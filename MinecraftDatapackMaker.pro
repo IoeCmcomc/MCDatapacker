@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     codeeditor.cpp \
     datapacktreeview.cpp \
+    globalhelpers.cpp \
     jsonhighlighter.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 HEADERS += \
     codeeditor.h \
     datapacktreeview.h \
+    globalhelpers.h \
     jsonhighlighter.h \
     linenumberarea.h \
     mainwindow.h \

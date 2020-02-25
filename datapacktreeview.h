@@ -20,19 +20,11 @@ protected:
 
 private slots:
     void onDoubleClicked(const QModelIndex &index);
+    void onFileRenamed(const QString &path, const QString &oldName,
+                       const QString &newName);
     void onCustomContextMenu(const QPoint &point);
     void contextMenuOnNewFolder();
-    void contextMenuOnNewAdv();
-    void contextMenuOnNewFunct();
-    void contextMenuOnNewLoot();
-    void contextMenuOnNewPred();
-    void contextMenuOnNewRecipe();
-    void contextMenuOnNewStruct();
-    void contextMenuOnNewBlocksTag();
-    void contextMenuOnNewEntityTag();
-    void contextMenuOnNewFunctsTag();
-    void contextMenuOnNewItemsTag();
-    void contextMenuOnNewFile();
+    void contextMenuOnNew(const QString &name, const QString &catDir = "");
     void contextMenuOnOpen();
     void contextMenuOnRename();
     void contextMenuOnDelete();
@@ -42,11 +34,12 @@ private:
     QString dirPath;
     QPoint cMenuPos;
     QMenu *mkContextMenu(QModelIndex index);
-    QModelIndex makeNewFile(QModelIndex index, QString name, QString catDir = "");
+    QModelIndex makeNewFile(QModelIndex index, const QString &name,
+                            const QString &catDir = "", const QString &nspace = "");
     QModelIndex getSelected();
-    QString randStr(int length);
-    QString relPath(QString path);
-    QString relNamespace(QString path);
+    bool isStringInTagFile(const QString &filepath, const QString &str);
+    void contextMenuModifyTagFile(const QString &filepath, const QString &str,
+                                  bool added = true);
 };
 
 #endif // DATAPACKTREEVIEW_H

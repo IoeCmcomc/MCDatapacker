@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("Minecraft Datapack Maker");
-    QCoreApplication::setApplicationVersion("beta-0.1.1");
+    QCoreApplication::setApplicationVersion("beta-0.2.1");
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
@@ -43,7 +43,6 @@ int main(int argc, char *argv[])
     w.show();
     //w.showMaximized();
     //qDebug() << "Exitting application...";
-    qDebug() << QLocale::system().name();
 
     return a.exec();
 }

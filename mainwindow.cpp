@@ -3,6 +3,7 @@
 
 #include "newdatapackdialog.h"
 #include "settingsdialog.h"
+#include "globalhelpers.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -90,7 +91,7 @@ void MainWindow::documentWasModified() {
 }
 
 void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
-    qDebug() << "onSystemWatcherFileChanged";
+    //qDebug() << "onSystemWatcherFileChanged";
     if((filepath != curFile)) return;
 
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges", 0);
@@ -119,7 +120,7 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    qDebug() << "closeEvent";
+    //qDebug() << "closeEvent";
     if (maybeSave()) {
         writeSettings();
         event->accept();
@@ -195,18 +196,7 @@ QString MainWindow::getCurLocale() {
     return this->curLocale.name();
 }
 
-bool MainWindow::isPathRelativeTo(const QString &path, const QString &catDir) {
-    auto tmpDir = curDir + "/data/";
-    if(!path.startsWith(tmpDir)) return false;
-    return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
-}
 
-bool MainWindow::isPathRelativeTo(const QString &path, const QString &dir,
-                                  const QString &catDir) {
-    auto tmpDir = dir + "/data/";
-    if(!path.startsWith(tmpDir)) return false;
-    return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
-}
 
 void MainWindow::loadLanguage(const QString& rLanguage, bool atStartup) {
     if((curLocale.name() != rLanguage) || atStartup) {
@@ -267,41 +257,12 @@ void MainWindow::setCurrentFile(const QString &filepath) {
     ui->codeEditor->document()->setModified(false);
     setWindowModified(false);
 
-    QFileInfo info = QFileInfo(filepath);
-    const QString jsonExts = "json mcmeta";
+    curFileType = GlobalHelpers::toMCRFileType(curDir, filepath);
 
-    if(info.completeSuffix() == "mcfunction") {
-            MainWindow::curFileType = Function;
-        } else if(info.completeSuffix() == "nbt") {
-            MainWindow::curFileType = Structure;
-        } else if(jsonExts.contains(info.completeSuffix())) {
-            if(isPathRelativeTo(curFile, "advancements")) {
-                MainWindow::curFileType = Advancement;
-            } else if(isPathRelativeTo(curFile, "loot_tables")) {
-                MainWindow::curFileType = LootTable;
-            } else if(isPathRelativeTo(curFile, "predicates")) {
-                MainWindow::curFileType = Predicate;
-            } else if(isPathRelativeTo(curFile, "recipes")) {
-                MainWindow::curFileType = Recipe;
-            } else if(isPathRelativeTo(curFile, "tags/blocks")) {
-                MainWindow::curFileType = BlockTag;
-            } else if(isPathRelativeTo(curFile, "tags/entity_types")) {
-                MainWindow::curFileType = EntityTypeTag;
-            } else if(isPathRelativeTo(curFile, "tags/fluids")) {
-                MainWindow::curFileType = FluidTag;
-            } else if(isPathRelativeTo(curFile, "tags/functions")) {
-                MainWindow::curFileType = FunctionTag;
-            } else if(isPathRelativeTo(curFile, "tags/items")) {
-                MainWindow::curFileType = ItemTag;
-            } else {
-                MainWindow::curFileType = JsonText;
-            }
-        } else {
-            MainWindow::curFileType = Text;
-        }
-
-    fileWatcher.removePath(curFile);
-    fileWatcher.addPath(curFile);
+    if(!curFile.isEmpty()) {
+        fileWatcher.removePath(curFile);
+        fileWatcher.addPath(curFile);
+    }
 
     ui->codeEditor->setCurFile(filepath);
 
@@ -414,6 +375,7 @@ void MainWindow::newDatapack() {
 }
 
 void MainWindow::openFile(const QString &filepath, bool reload) {
+    //qDebug() << "openFile";
     if (filepath.isEmpty() || (this->curFile == filepath && (!reload)))
         return;
     else {
@@ -536,9 +498,10 @@ void MainWindow::openFolder() {
                         ui->codeEditor->clear();
                         this->curDir = dir;
 
-                        this->fileWatcher.removePath(curDir);
-                        this->fileWatcher.removePath(curFile);
-                        this->fileWatcher.addPath(curDir);
+                        if(!curDir.isEmpty()) {
+                            this->fileWatcher.removePath(curDir);
+                            this->fileWatcher.addPath(curDir);
+                        }
                         setCurrentFile("");
                     }
                 }
