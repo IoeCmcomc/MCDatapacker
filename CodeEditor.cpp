@@ -215,7 +215,7 @@ CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
 
 void CodeEditor::followCurrentNamespacedID() {
     QString str = getCurrentNamespacedID().string;
-    qDebug() << str;
+    //qDebug() << str;
     if(!str.isEmpty()) {
         QString dirname = qobject_cast<MainWindow*>(this->window())->getCurDir();
         if(dirname.isEmpty()) return;

@@ -205,9 +205,9 @@ void MainWindow::loadLanguage(const QString& rLanguage, bool atStartup) {
     qDebug() << QLocale::system();
     QString transfile;
     if(rLanguage.isEmpty())
-        transfile = QString("MinecraftDatapackMaker_%1.qm").arg(QLocale::system().name());
+        transfile = QString("MCDatapacker_%1.qm").arg(QLocale::system().name());
     else
-        transfile = QString("MinecraftDatapackMaker_%1.qm").arg(rLanguage);
+        transfile = QString("MCDatapacker_%1.qm").arg(rLanguage);
     switchTranslator(m_translator, transfile);
     switchTranslator(m_translatorQt, QString("qt_%1.qm").arg(rLanguage));
     }

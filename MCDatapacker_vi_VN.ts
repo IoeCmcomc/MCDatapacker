@@ -4,92 +4,107 @@
 <context>
     <name>DatapackTreeView</name>
     <message>
-        <location filename="datapacktreeview.cpp" line="30"/>
+        <location filename="datapacktreeview.cpp" line="39"/>
         <source>Open</source>
         <translation>Mở</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="37"/>
+        <location filename="datapacktreeview.cpp" line="46"/>
+        <source>Run this function when loaded</source>
+        <translation>Chạy hàm này khi nạp</translation>
+    </message>
+    <message>
+        <location filename="datapacktreeview.cpp" line="57"/>
+        <source>Run this function every tick</source>
+        <translation>Chạy hàm này mỗi tíc</translation>
+    </message>
+    <message>
+        <location filename="datapacktreeview.cpp" line="70"/>
         <source>Rename</source>
         <translation>Đổi tên</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="41"/>
+        <location filename="datapacktreeview.cpp" line="74"/>
         <source>Delete</source>
         <translation>Xoá</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="48"/>
+        <location filename="datapacktreeview.cpp" line="81"/>
         <source>New</source>
         <translation>Mới</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="50"/>
+        <location filename="datapacktreeview.cpp" line="83"/>
         <source>Folder</source>
         <translation>Thư mục</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="52"/>
+        <location filename="datapacktreeview.cpp" line="85"/>
         <source>Namespace</source>
         <translation>Không gian tên</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="59"/>
+        <location filename="datapacktreeview.cpp" line="92"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="63"/>
+        <location filename="datapacktreeview.cpp" line="99"/>
         <source>Function</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="67"/>
+        <location filename="datapacktreeview.cpp" line="106"/>
         <source>Loot table</source>
         <translation>Bảng lợi phẩm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="71"/>
+        <location filename="datapacktreeview.cpp" line="113"/>
         <source>Predicate</source>
         <translation>Xác lập</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="75"/>
+        <location filename="datapacktreeview.cpp" line="120"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="79"/>
+        <location filename="datapacktreeview.cpp" line="127"/>
         <source>Structure</source>
         <translation>Cấu trúc</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="85"/>
+        <location filename="datapacktreeview.cpp" line="136"/>
         <source>Tag</source>
         <translation>Nhãn</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="87"/>
+        <location filename="datapacktreeview.cpp" line="138"/>
         <source>Blocks</source>
         <translation>Khối</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="91"/>
+        <location filename="datapacktreeview.cpp" line="145"/>
         <source>Entity types</source>
         <translation>Loại thực thể</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="95"/>
+        <location filename="datapacktreeview.cpp" line="152"/>
+        <source>Fluids</source>
+        <translation>Chất lỏng</translation>
+    </message>
+    <message>
+        <location filename="datapacktreeview.cpp" line="159"/>
         <source>Functions</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="99"/>
+        <location filename="datapacktreeview.cpp" line="166"/>
         <source>Items</source>
         <translation>Vật phẩm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="107"/>
+        <location filename="datapacktreeview.cpp" line="177"/>
         <source>File</source>
         <translation>Tệp</translation>
     </message>
@@ -143,129 +158,124 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="183"/>
-        <source>Esc</source>
-        <translation></translation>
+        <source>Shift+Esc</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="188"/>
+        <location filename="mainwindow.ui" line="191"/>
         <source>New datapack</source>
         <translation>Gói dữ liệu mới</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="191"/>
+        <location filename="mainwindow.ui" line="194"/>
         <source>Ctrl+Shift+N</source>
         <translation></translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="199"/>
-        <source>Test 1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.ui" line="207"/>
         <source>Settings...</source>
         <translation>Thiết đặt...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="64"/>
+        <location filename="mainwindow.cpp" line="65"/>
         <source>Open file</source>
         <translation>Mở tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="72"/>
+        <location filename="mainwindow.cpp" line="73"/>
         <source>Save File</source>
         <translation>Lưu tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="101"/>
+        <location filename="mainwindow.cpp" line="102"/>
         <source>Reload file</source>
         <translation>Tải lại tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="102"/>
+        <location filename="mainwindow.cpp" line="103"/>
         <source>The file %1 has been changed exernally.</source>
         <translation>Tệp %1 đã được thay đổi từ bên ngoài.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="104"/>
+        <location filename="mainwindow.cpp" line="105"/>
         <source>Do you want to reload this file?</source>
         <translation>Bạn có muốn tải lại tệp này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="174"/>
+        <location filename="mainwindow.cpp" line="175"/>
         <source>Unsaved changes</source>
         <translation>Thay đổi chưa lưu</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="175"/>
+        <location filename="mainwindow.cpp" line="176"/>
         <source>The document has been modified.
 Do you want to save your changes?</source>
         <translation>Tài liệu này đã được chỉnh sửa.
 Bạn có muốn lưu các thay đổi không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="423"/>
+        <location filename="mainwindow.cpp" line="385"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>Không thể đọc tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="463"/>
+        <location filename="mainwindow.cpp" line="425"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="467"/>
+        <location filename="mainwindow.cpp" line="429"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="484"/>
+        <location filename="mainwindow.cpp" line="446"/>
         <source>Open datapack folder</source>
         <translation>Mở thư mục gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="422"/>
-        <location filename="mainwindow.cpp" line="473"/>
-        <location filename="mainwindow.cpp" line="500"/>
-        <location filename="mainwindow.cpp" line="548"/>
+        <location filename="mainwindow.cpp" line="384"/>
+        <location filename="mainwindow.cpp" line="435"/>
+        <location filename="mainwindow.cpp" line="462"/>
+        <location filename="mainwindow.cpp" line="511"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="377"/>
+        <location filename="mainwindow.cpp" line="338"/>
         <source>Folder not empty</source>
         <translation>Thư mục không rỗng</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="378"/>
+        <location filename="mainwindow.cpp" line="339"/>
         <source>The folder is not empty.
 Do you want to recreate this folder?</source>
         <translation>Thư mục này không trống.
 Bạn có muốn tạo lại thư mục này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="512"/>
+        <location filename="mainwindow.cpp" line="474"/>
         <source>Failed to parse the pack.mcmeta file.</source>
         <translation>Không thể phân tích cú pháp của tệp pack.mcmeta.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="516"/>
+        <location filename="mainwindow.cpp" line="478"/>
         <source>The pack.mcmeta file is not a JSON object.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="523"/>
+        <location filename="mainwindow.cpp" line="485"/>
         <source>The pack.mcmeta file&apos;s contents is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="548"/>
+        <location filename="mainwindow.cpp" line="511"/>
         <source>Invaild datapack folder</source>
         <translation>Thư mục gói dữ liệu không hợp lệ</translation>
     </message>

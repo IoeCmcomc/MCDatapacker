@@ -1,1 +1,1 @@
-# MinecraftDatapackMaker
+# MCDatapacker

@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     //a.setStyle("macintosh");
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
-    QCoreApplication::setApplicationName("Minecraft Datapack Maker");
+    QCoreApplication::setApplicationName("MCDatapacker");
     QCoreApplication::setApplicationVersion("beta-0.2.1");
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
@@ -26,16 +26,6 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     //parser.addPositionalArgument("file", "The file to open.");
     parser.process(a);
-
-    /*
-    QTranslator qtTranslator;
-    qtTranslator.load(QLocale::system(), QStringLiteral("qtbase_"));
-    a.installTranslator(&qtTranslator);
-    */
-
-//    QTranslator translator;
-//    translator.load("translations/MinecraftDatapackMaker_" + QLocale::system().name());
-//    a.installTranslator(&translator);
 
     MainWindow w;
     //w.resize(250, 150);
