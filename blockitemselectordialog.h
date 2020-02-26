@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 
 namespace Ui {
 class BlockItemSelectorDialog;
@@ -26,6 +27,7 @@ protected slots:
 private:
     Ui::BlockItemSelectorDialog *ui;
     QStandardItemModel *model = new QStandardItemModel();
+    QSortFilterProxyModel filterModel;
     QPushButton *selectButton;
 
     void setupTreeView();

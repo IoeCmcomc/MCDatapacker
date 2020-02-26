@@ -202,7 +202,7 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton && (!isDragged)
         && this->rect().contains(event->pos())) {
         // Clicked properly
-        BlockItemSelectorDialog dialog;
+        BlockItemSelectorDialog dialog(this);
         if(dialog.exec()) {
             setItem(new MCRInvItem(this, dialog.getSelectedID()));
         }

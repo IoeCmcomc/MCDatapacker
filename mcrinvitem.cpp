@@ -141,6 +141,17 @@ MCRInvItem::MCRInvItem(QWidget *parent, QString id) : QLabel(parent)
         }
     }
     iconpix = iconpix.scaled(32, 32, Qt::KeepAspectRatio);
+    if(iconpix.size() != QSize(32, 32)) {
+        QPixmap centeredPix(32, 32);
+        centeredPix.fill(Qt::transparent);
+        {
+            QPainter painter(&centeredPix);
+            painter.drawPixmap(
+                (32 - iconpix.width()) / 2, 32 - iconpix.height(), iconpix);
+            painter.end();
+        }
+        iconpix = centeredPix;
+    }
     //qDebug() << iconpix;
     setPixmap(iconpix);
     setAlignment(Qt::AlignCenter);

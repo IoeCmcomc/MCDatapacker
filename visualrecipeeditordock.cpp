@@ -33,6 +33,10 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     connect(ui->cookTimeCheck, &QCheckBox::stateChanged, [this](int i){ ui->cookTimeInput->setDisabled(2-i); });
     connect(ui->writeRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::readRecipe);
+    connect(this, &QDockWidget::topLevelChanged, [=](bool floating) {
+        qDebug() << floating;
+        adjustSize();
+    });
 
     setupCustomTab();
 
