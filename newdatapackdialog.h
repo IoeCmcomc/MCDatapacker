@@ -2,6 +2,7 @@
 #define NEWDATAPACKDIALOG_H
 
 #include <QDialog>
+#include <QPushButton>
 
 namespace Ui {
 class NewDatapackDialog;
@@ -26,6 +27,7 @@ public slots:
 
 private:
     Ui::NewDatapackDialog *ui;
+    QPushButton *createButton;
 };
 
 #endif // NEWDATAPACKDIALOG_H

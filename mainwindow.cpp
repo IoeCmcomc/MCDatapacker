@@ -369,8 +369,8 @@ void MainWindow::newDatapack() {
         dir.mkpath(dirPath+"/data/"+namesp);
 
         ui->datapackTreeView->load(dirPath);
+        setCurrentFile("");
     }
-    qDebug() << dialogCode;
     delete dialog;
 }
 
@@ -381,7 +381,7 @@ void MainWindow::openFile(const QString &filepath, bool reload) {
     else {
         QFile file(filepath);
         if(!file.open(QFile::ReadOnly | QFile::Text)) {
-            QMessageBox::warning(this, tr("Error"),
+            QMessageBox::information(this, tr("Error"),
                                  tr("Cannot read file %1:\n%2.")
                                  .arg(QDir::toNativeSeparators(filepath), file.errorString()));
         } else {
@@ -432,7 +432,7 @@ bool MainWindow::saveFile(const QString &filepath) {
     QGuiApplication::restoreOverrideCursor();
 
     if (!errorMessage.isEmpty()) {
-        QMessageBox::warning(this, tr("Error"), errorMessage);
+        QMessageBox::information(this, tr("Error"), errorMessage);
         return false;
     }
 
@@ -491,9 +491,6 @@ void MainWindow::openFolder() {
                 if(json_map.contains("pack")) {
                     QVariantMap pack = json_map["pack"].toMap();
                     if(pack.contains("description") && pack.contains("pack_format")) {
-                        qDebug()<< pack["description"].toString();
-                        qDebug()<< pack["pack_format"].toDouble();
-
                         ui->datapackTreeView->load(dir);
                         ui->codeEditor->clear();
                         this->curDir = dir;
@@ -508,7 +505,7 @@ void MainWindow::openFolder() {
             }
         }
     } else {
-        QMessageBox::warning(this, tr("Error"), tr("Invaild datapack folder"));
+        QMessageBox::information(this, tr("Error"), tr("Invaild datapack folder."));
         return;
     }
 }

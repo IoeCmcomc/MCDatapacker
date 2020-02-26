@@ -36,14 +36,15 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     QFileInfo finfo = dirModel.fileInfo(index);
 
     if(finfo.isFile()) {
-        QAction *cMenuActionOpen = new QAction(tr("Open"), this);
+        QAction *cMenuActionOpen = new QAction(tr("Open"), cMenu);
         cMenuActionOpen->setShortcuts(QKeySequence::Open);
         connect(cMenuActionOpen, &QAction::triggered, this, &DatapackTreeView::contextMenuOnOpen);
         cMenu->addAction(cMenuActionOpen);
     }
 
     if(toMCRFileType(dirPath, finfo.filePath()) == MainWindow::Function) {
-        QAction *cMenuActionInLoadDotJson = new QAction(tr("Run this function when loaded"), this);
+        QAction *cMenuActionInLoadDotJson
+            = new QAction(tr("Run this function when loaded"), cMenu);
         cMenuActionInLoadDotJson->setCheckable(true);
         cMenuActionInLoadDotJson->setChecked(isStringInTagFile
                               (dirPath+"/data/minecraft/tags/functions/load.json",
@@ -54,7 +55,8 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
                  toNamespacedID(dirPath, finfo.filePath()), checked); });
         cMenu->addAction(cMenuActionInLoadDotJson);
 
-        QAction *cMenuActionInTickDotJson = new QAction(tr("Run this function every tick"), this);
+        QAction *cMenuActionInTickDotJson
+            = new QAction(tr("Run this function every tick"), cMenu);
         cMenuActionInTickDotJson->setCheckable(true);
         cMenuActionInTickDotJson->setChecked(isStringInTagFile
                                              (dirPath+"/data/minecraft/tags/functions/tick.json",
@@ -67,20 +69,20 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     }
 
     if(path != "data" && path != "pack.mcmeta") {
-        QAction *cMenuActionRename = new QAction(tr("Rename"), this);
+        QAction *cMenuActionRename = new QAction(tr("Rename"), cMenu);
         connect(cMenuActionRename, &QAction::triggered, this, &DatapackTreeView::contextMenuOnRename);
         cMenu->addAction(cMenuActionRename);
 
-        QAction *cMenuActionDelete = new QAction(tr("Delete"), this);
+        QAction *cMenuActionDelete = new QAction(tr("Delete"), cMenu);
         connect(cMenuActionDelete, &QAction::triggered, this, &DatapackTreeView::contextMenuOnDelete);
         cMenu->addAction(cMenuActionDelete);
     }
 
     if(path != "pack.mcmeta") {
         cMenu->addSeparator();
-        QMenu *newMenu = new QMenu(tr("New"), this); //"New" menu
+        QMenu *newMenu = new QMenu(tr("New"), cMenu); //"New" menu
 
-        QAction *newMenuNewFolder = new QAction(tr("Folder"), this);
+        QAction *newMenuNewFolder = new QAction(tr("Folder"), newMenu);
         if(path == "data")
             newMenuNewFolder->setText(tr("Namespace"));
         connect(newMenuNewFolder, &QAction::triggered, this, &DatapackTreeView::contextMenuOnNewFolder);
@@ -89,42 +91,42 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         if(path != "data") {
             newMenu->addSeparator();
 
-            QAction *newMenuNewAdv = new QAction(tr("Advancement"), this);
+            QAction *newMenuNewAdv = new QAction(tr("Advancement"), newMenu);
             connect(newMenuNewAdv, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("advancement_"+randStr()+".json", "advancements");
             });
             newMenu->addAction(newMenuNewAdv);
 
-            QAction *newMenuNewFunct = new QAction(tr("Function"), this);
+            QAction *newMenuNewFunct = new QAction(tr("Function"), newMenu);
             connect(newMenuNewFunct, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("function_"+randStr()+".mcfunction", "functions");
             });
             newMenu->addAction(newMenuNewFunct);
 
-            QAction *newMenuNewLoot = new QAction(tr("Loot table"), this);
+            QAction *newMenuNewLoot = new QAction(tr("Loot table"), newMenu);
             connect(newMenuNewLoot, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("loot_table_"+randStr()+".json", "loot_tables");
             });
             newMenu->addAction(newMenuNewLoot);
 
-            QAction *newMenuNewPred = new QAction(tr("Predicate"), this);
+            QAction *newMenuNewPred = new QAction(tr("Predicate"), newMenu);
             connect(newMenuNewPred, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("predicate_"+randStr()+".json", "predicates");
             });
             newMenu->addAction(newMenuNewPred);
 
-            QAction *newMenuNewRecipe = new QAction(tr("Recipe"), this);
+            QAction *newMenuNewRecipe = new QAction(tr("Recipe"), newMenu);
             connect(newMenuNewRecipe, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("recipe_"+randStr()+".json", "recipess");
             });
             newMenu->addAction(newMenuNewRecipe);
 
-            QAction *newMenuNewStruct = new QAction(tr("Structure"), this);
+            QAction *newMenuNewStruct = new QAction(tr("Structure"), newMenu);
             newMenuNewStruct->setDisabled(true);
             connect(newMenuNewStruct, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
@@ -133,37 +135,37 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             newMenu->addAction(newMenuNewStruct);
 
             //"Tag" menu
-            QMenu *tagMenu = new QMenu(tr("Tag"), this);
+            QMenu *tagMenu = new QMenu(tr("Tag"), newMenu);
 
-            QAction *newBlockTag = new QAction(tr("Blocks"), this);
+            QAction *newBlockTag = new QAction(tr("Blocks"), tagMenu);
             connect(newBlockTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("tag_"+randStr()+".json", "tags/blocks");
             });
             tagMenu->addAction(newBlockTag);
 
-            QAction *newEntityTag = new QAction(tr("Entity types"), this);
+            QAction *newEntityTag = new QAction(tr("Entity types"), tagMenu);
             connect(newEntityTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("tag_"+randStr()+".json", "tags/entity_types");
             });
             tagMenu->addAction(newEntityTag);
 
-            QAction *newFluidTag = new QAction(tr("Fluids"), this);
+            QAction *newFluidTag = new QAction(tr("Fluids"), tagMenu);
             connect(newFluidTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("tag_"+randStr()+".json", "tags/fluids");
             });
             tagMenu->addAction(newFluidTag);
 
-            QAction *newFunctTag = new QAction(tr("Functions"), this);
+            QAction *newFunctTag = new QAction(tr("Functions"), tagMenu);
             connect(newFunctTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("tag_"+randStr()+".json", "tags/functions");
             });
             tagMenu->addAction(newFunctTag);
 
-            QAction *newItemTag = new QAction(tr("Items"), this);
+            QAction *newItemTag = new QAction(tr("Items"), tagMenu);
             connect(newItemTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
                     ("tag_"+randStr()+".json", "tags/items");
@@ -174,7 +176,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
             newMenu->addSeparator();
 
-            QAction *newMenuNewFile = new QAction(tr("File"), this);
+            QAction *newMenuNewFile = new QAction(tr("File"), tagMenu);
             connect(newMenuNewFile, &QAction::triggered, [this]() {
                 this->contextMenuOnNew("file"+randStr()+".text");
             });
@@ -206,6 +208,10 @@ void DatapackTreeView::load(const QString &dir) {
 
 
 void DatapackTreeView::dragEnterEvent(QDragEnterEvent *event) {
+    if(dirPath.isEmpty() || event->mimeData()->urls().isEmpty()) {
+        QTreeView::dragEnterEvent(event);
+        return;
+    }
     QModelIndex draggedIndex = dirModel.index(
                 event->mimeData()->urls().at(0).toLocalFile()
                 );

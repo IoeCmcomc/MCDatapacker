@@ -24,10 +24,6 @@ public:
     void readRecipe();
     void retranslate();
 
-protected:
-    void resizeEvent(QResizeEvent *e);
-    bool eventFilter(QObject *pObj, QEvent *pEvent);
-
 private slots:
     void onRecipeTabChanged(int index);
     //void onRecipeChanged(); // Unused
@@ -35,15 +31,12 @@ private slots:
 private:
     Ui::VisualRecipeEditorDock *ui;
 
-    QStandardItemModel *model = new QStandardItemModel();
     QVector<MCRInvSlot*> craftingSlots;
     bool isResizing = false;
     int lastTabIndex = 0;
     int lastStackIndex = 0;
 
-    void setupItemList();
     void setupCustomTab();
-    void onItemListSearch(const QString &input);
     QJsonObject genCraftingJson(QJsonObject root);
     QJsonObject genSmeltingJson(QJsonObject root);
     QJsonObject genStonecuttingJson(QJsonObject root);

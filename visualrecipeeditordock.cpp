@@ -30,14 +30,11 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
                     });
 
     connect(ui->customTabBar, &QTabBar::currentChanged, this, &VisualRecipeEditorDock::onRecipeTabChanged);
-    connect(ui->itemListSearchBox, &QLineEdit::textChanged, this, &VisualRecipeEditorDock::onItemListSearch);
     connect(ui->cookTimeCheck, &QCheckBox::stateChanged, [this](int i){ ui->cookTimeInput->setDisabled(2-i); });
     connect(ui->writeRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this, &VisualRecipeEditorDock::readRecipe);
 
-    qApp->installEventFilter(this);
     setupCustomTab();
-    setupItemList();
 
 }
 
@@ -62,71 +59,6 @@ void VisualRecipeEditorDock::setupCustomTab() {
     //ui->customTabBar->setMovable(true);
 }
 
-void VisualRecipeEditorDock::setupItemList() {
-
-    model->setParent(ui->itemList);
-    ui->itemList->setModel(model);
-
-    auto MCRItemInfo = MainWindow::getMCRInfo("item");
-    auto MCRBlockInfo = MainWindow::getMCRInfo("block");
-    QMap<QString, QVariant>::const_iterator blockIter = MCRBlockInfo->constBegin();
-    QMap<QString, QVariant>::const_iterator itemIter = MCRItemInfo->constBegin();
-    //int c = 0;
-    while ((blockIter != MCRBlockInfo->constEnd())
-           || (itemIter != MCRItemInfo->constEnd())) {
-        if(blockIter.value().toMap().contains("unobtainable")) {
-            if(blockIter != MCRBlockInfo->constEnd())
-                ++blockIter;
-            else
-                ++itemIter;
-        }
-        auto key = (blockIter != MCRBlockInfo->constEnd())
-                ? blockIter.key() : itemIter.key();
-        MCRInvSlot *invSlot = new MCRInvSlot(this, new MCRInvItem(this, key));
-        invSlot->setAutoFillBackground(true);
-        invSlot->isCreative = true;
-        QStandardItem *item = new QStandardItem();
-        item->setSizeHint(invSlot->sizeHint());
-        model->appendRow(item);
-        ui->itemList->setIndexWidget(item->index(), invSlot);
-        //++c;
-        if(blockIter != MCRBlockInfo->constEnd())
-            ++blockIter;
-        else
-            ++itemIter;
-    }
-    //qDebug() << c;
-}
-
-void VisualRecipeEditorDock::onItemListSearch(const QString &input) {
-    #ifndef QT_NO_CURSOR
-        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    #endif
-
-    //int c = 0;
-    for(int i = 0; i < model->rowCount(); ++i) {
-        QModelIndex index = model->index(i, 0);
-        MCRInvSlot *MCRSlot = qobject_cast<MCRInvSlot*>(ui->itemList->indexWidget(index));
-
-        if(MCRSlot->itemName().toLower().contains(input.toLower())
-                || MCRSlot->itemNamespacedID().contains(input.toLower())) {
-            //++c;
-            if(ui->itemList->isRowHidden(i))
-                ui->itemList->setRowHidden(i, false);
-        } else {
-            if(!ui->itemList->isRowHidden(i))
-                ui->itemList->setRowHidden(i, true);
-        }
-    }
-
-    #ifndef QT_NO_CURSOR
-        QGuiApplication::restoreOverrideCursor();
-    #endif
-//    auto bs = (c+1) / 10;
-//    qDebug() << bs;
-//    ui->itemList->setBatchSize(bs);
-}
-
 void VisualRecipeEditorDock::retranslate() {
     ui->retranslateUi(this);
 
@@ -136,44 +68,14 @@ void VisualRecipeEditorDock::retranslate() {
 
 }
 
-void VisualRecipeEditorDock::resizeEvent(QResizeEvent *e) {
-    if(!isResizing) {
-        ui->itemList->setLayoutMode(QListView::Batched);
-        isResizing = true;
-    }
-    QDockWidget::resizeEvent(e);
-}
-
-bool VisualRecipeEditorDock::eventFilter(QObject* pObj, QEvent* pEvent) {
-    if ((pEvent->type() == QEvent::MouseButtonRelease) || (pEvent->type() == QEvent::NonClientAreaMouseButtonRelease)) {
-        QMouseEvent* pMouseEvent = dynamic_cast<QMouseEvent*>(pEvent);
-        if ((pMouseEvent->button() == Qt::MouseButton::LeftButton) && isResizing) {
-            //qDebug() << "End of resizeEvent";
-            ui->itemList->setLayoutMode(QListView::SinglePass);
-            isResizing = false;
-        }
-    }
-    return QObject::eventFilter(pObj, pEvent);
-}
-
 void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
-    //qDebug() << "onRecipeTabChanged";
-    if(index == 0) {
-        ui->stackedRecipeWidget->setCurrentIndex(0);
-        ui->stackedOptions->setCurrentIndex(0);
-    } else if(index == 1) {
-        ui->stackedRecipeWidget->setCurrentIndex(1);
-        ui->stackedOptions->setCurrentIndex(1);
-    } else if(index == 2) {
-        ui->stackedRecipeWidget->setCurrentIndex(2);
-        ui->stackedOptions->setCurrentIndex(2);
-    }
+    Q_ASSERT(index >= 0 && index < 3);
+    ui->stackedRecipeWidget->setCurrentIndex(index);
+    ui->stackedOptions->setCurrentIndex(index);
 }
 
 void VisualRecipeEditorDock::writeRecipe() {
-    //qDebug() << "writeRecipe";
     int index = ui->customTabBar->currentIndex();
-    //qDebug() << "Tab index:" << index;
     QJsonObject root;
     root.insert("group", ui->recipeGroupInput->text());
     QJsonDocument jsonDoc;
@@ -198,7 +100,6 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         QString patternStr;
         QString patternChars = "123456789";
         int pattCharIdx = -1;
-        //qDebug() << CraftingSlots.count();
         for(int i = 0; i < 9; ++i) {
             MCRInvItem *item = this->craftingSlots[i]->getItem();
             if(!!item) {
@@ -321,23 +222,16 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
 }
 
 void VisualRecipeEditorDock::readRecipe() {
-    qDebug() << "readRecipe";
     QString input = qobject_cast<MainWindow*>(parent())->getCodeEditorText();
 
     QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
 
-    if(json_doc.isNull()){
+    if(json_doc.isNull() || (!json_doc.isObject()))
         return;
-    }
-    if(!json_doc.isObject()){
-        return;
-    }
 
     QJsonObject root = json_doc.object();
-
-    if(root.isEmpty()){
+    if(root.isEmpty())
         return;
-    }
 
     if(root.contains(QStringLiteral("group")))
         ui->recipeGroupInput->setText(root[QStringLiteral("group")].toString());
@@ -381,7 +275,6 @@ void VisualRecipeEditorDock::readRecipe() {
 }
 
 void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
-    qDebug() << "readCraftingJson";
     QString type= root[QStringLiteral("type")].toString();
     if(type.endsWith(QStringLiteral("crafting_shaped"))) {
         if(!root.contains(QStringLiteral("pattern"))) return;
@@ -457,7 +350,7 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
         QStringLiteral("smelting"), QStringLiteral("blasting"),
         QStringLiteral("smoking"), QStringLiteral("campfire_cooking")
     };
-    qDebug() << smeltingTypes->indexOf(type);
+    //qDebug() << smeltingTypes->indexOf(type);
     for(int i = 0; i < smeltingTypes->length(); ++i) {
         if(type.endsWith(smeltingTypes[i])) {
             ui->smeltBlockInput->setCurrentIndex(i);

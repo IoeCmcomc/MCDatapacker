@@ -16,6 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    blockitemselectordialog.cpp \
     codeeditor.cpp \
     datapacktreeview.cpp \
     globalhelpers.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
     visualrecipeeditordock.cpp
 
 HEADERS += \
+    blockitemselectordialog.h \
     codeeditor.h \
     datapacktreeview.h \
     globalhelpers.h \
@@ -46,6 +48,7 @@ HEADERS += \
     visualrecipeeditordock.h
 
 FORMS += \
+    blockitemselectordialog.ui \
     mainwindow.ui \
     newdatapackdialog.ui \
     settingsdialog.ui \

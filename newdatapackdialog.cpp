@@ -20,6 +20,10 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
     connect(ui->descInput, &QLineEdit::textChanged, this, &NewDatapackDialog::checkOK);
     connect(ui->locationInput, &QLineEdit::textChanged, this, &NewDatapackDialog::checkOK);
 
+    createButton = new QPushButton(tr("Create"), this);
+    ui->dialogBox->addButton(createButton, QDialogButtonBox::ActionRole);
+    connect(createButton, &QAbstractButton::clicked, this, &QDialog::accept);
+
     checkOK();
 }
 
@@ -36,9 +40,9 @@ void NewDatapackDialog::browse() {
 
 void NewDatapackDialog::checkOK() {
     if(getName().isEmpty() || getDirPath().isEmpty())
-        ui->dialogBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+        createButton->setEnabled(false);
     else
-        ui->dialogBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+        createButton->setEnabled(true);
 }
 
 QString NewDatapackDialog::getDesc() {

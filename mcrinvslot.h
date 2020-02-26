@@ -5,7 +5,6 @@
 
 #include <QFrame>
 #include <QLabel>
-#include <QGridLayout>
 
 class MCRInvSlot : public QFrame
 {
@@ -24,17 +23,27 @@ public:
 
     bool isCreative = false;
 
+signals:
+    void itemChanged();
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
-signals:
-    void itemChanged();
+protected slots:
+    void onCustomContextMenu(const QPoint &point);
+    //void onClicked();
 
 private:
     MCRInvItem *item = nullptr;
+    QPoint mousePressPos;
+    bool isDragged = false;
+
+    void startDrag(QMouseEvent *event);
 };
 
 #endif // MCRInvSlot_H
