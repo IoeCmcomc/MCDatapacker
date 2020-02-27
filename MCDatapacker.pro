@@ -26,6 +26,7 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     mcrinvitem.cpp \
     mcrinvslot.cpp \
+    mcritemsortfilterproxymodel.cpp \
     newdatapackdialog.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
     mcrinvslot.h \
+    mcritemsortfilterproxymodel.h \
     newdatapackdialog.h \
     settingsdialog.h \
     stackedwidget.h \

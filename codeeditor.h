@@ -15,8 +15,8 @@ class CodeEditor : public QPlainTextEdit
 public:
     CodeEditor(QWidget *parent = nullptr);
     struct CurrentNamespacedID {
-        int startingIndex;
-        int blockNumber;
+        int     startingIndex;
+        int     blockNumber;
         QString string;
         QString link;
     };

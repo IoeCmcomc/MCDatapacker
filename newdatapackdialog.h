@@ -5,7 +5,7 @@
 #include <QPushButton>
 
 namespace Ui {
-class NewDatapackDialog;
+    class NewDatapackDialog;
 }
 
 class NewDatapackDialog : public QDialog

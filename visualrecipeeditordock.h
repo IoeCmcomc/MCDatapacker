@@ -9,7 +9,7 @@
 //#include <QVector>
 
 namespace Ui {
-class VisualRecipeEditorDock;
+    class VisualRecipeEditorDock;
 }
 
 class VisualRecipeEditorDock : public QDockWidget
@@ -32,8 +32,8 @@ private:
     Ui::VisualRecipeEditorDock *ui;
 
     QVector<MCRInvSlot*> craftingSlots;
-    bool isResizing = false;
-    int lastTabIndex = 0;
+    bool isResizing    = false;
+    int lastTabIndex   = 0;
     int lastStackIndex = 0;
 
     void setupCustomTab();
@@ -43,7 +43,6 @@ private:
     void readCraftingJson(const QJsonObject &root);
     void readSmeltingJson(const QJsonObject &root);
     void readStonecuttingJson(const QJsonObject &root);
-
 };
 
 #endif // VISUALRECIPEEDITORDOCK_H

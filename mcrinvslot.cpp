@@ -13,8 +13,7 @@
 #include <QMenu>
 #include <QAction>
 
-MCRInvSlot::MCRInvSlot(QWidget *parent, MCRInvItem *item) : QFrame(parent)
-{
+MCRInvSlot::MCRInvSlot(QWidget *parent, MCRInvItem *item) : QFrame(parent) {
     setAcceptDrops(true);
     setMinimumSize(36, 36);
     setBackground();
@@ -32,14 +31,14 @@ MCRInvSlot::MCRInvSlot(QWidget *parent, MCRInvItem *item) : QFrame(parent)
 }
 
 void MCRInvSlot::setBackground(QString color) {
-    if(color.isEmpty()) {
+    if (color.isEmpty()) {
         setFrameShape(QFrame::StyledPanel);
         setFrameShadow(QFrame::Sunken);
         setLineWidth(2);
     } else {
         setStyleSheet(
             ".MCRInvSlot {"
-            "   background: "+color+";"
+            "   background: " + color + ";"
             "   border: 2px solid;"
             "   border-color: #373737 #FFF #FFF #373737;"
             "}"
@@ -50,12 +49,13 @@ void MCRInvSlot::setBackground(QString color) {
 }
 
 void MCRInvSlot::setItem(MCRInvItem *item, bool emitSignal) {
-    if(item != nullptr) {
-        if(item->namespacedID.isEmpty()) return;
+    if (item != nullptr) {
+        if (item->getNamespacedID().isEmpty()) return;
+
         removeItem();
         this->item = item;
         layout()->addWidget(item);
-        if(emitSignal) emit itemChanged();
+        if (emitSignal) emit itemChanged();
     }
 }
 
@@ -64,7 +64,7 @@ void MCRInvSlot::removeItem(bool emitSignal) {
     layout()->removeWidget(this->item);
     delete this->item;
     this->item = nullptr;
-    if(emitSignal) emit itemChanged();
+    if (emitSignal) emit itemChanged();
 }
 
 MCRInvItem* MCRInvSlot::getItem() {
@@ -72,7 +72,7 @@ MCRInvItem* MCRInvSlot::getItem() {
 }
 
 QString MCRInvSlot::itemNamespacedID() {
-    return (item != nullptr) ? item->namespacedID : "";
+    return (item != nullptr) ? item->getNamespacedID() : "";
 }
 
 QString MCRInvSlot::itemName() {
@@ -81,18 +81,27 @@ QString MCRInvSlot::itemName() {
 
 void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
     QMenu *cMenu = new QMenu(this);
-    if(item != nullptr) {
+
+    if (item != nullptr) {
         QAction *removeAction = new QAction(tr("Remove"), cMenu);
-        connect(removeAction, &QAction::triggered, [=]() {
+        connect(removeAction, &QAction::triggered, [ = ]() {
             removeItem(true);
         });
         cMenu->addAction(removeAction);
     }
 
-    if(!cMenu->isEmpty()) {
+    if (!cMenu->isEmpty()) {
         cMenu->exec(this->mapToGlobal(point));
     }
     delete cMenu;
+}
+
+bool MCRInvSlot::getIsCreative() const {
+    return isCreative;
+}
+
+void MCRInvSlot::setIsCreative(bool value) {
+    isCreative = value;
 }
 
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
@@ -101,7 +110,7 @@ void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
             event->accept();
-        } else if(event->source() != this) {
+        } else if (event->source() != this) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
         } else {
@@ -120,7 +129,7 @@ void MCRInvSlot::dragMoveEvent(QDragMoveEvent *event) {
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
             event->accept();
-        } else if(event->source() != this) {
+        } else if (event->source() != this) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
         } else {
@@ -137,7 +146,7 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
     if (event->mimeData()->hasFormat("application/x-mcrinvitem")
         && event->mimeData()->hasText()) {
         MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
-        if(!isCreative) {
+        if (!isCreative) {
 //            QByteArray itemData = event->mimeData()->data("application/x-mcrinvitem");
 //            QDataStream dataStream(&itemData, QIODevice::ReadOnly);
 
@@ -148,10 +157,10 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
             id = event->mimeData()->text();
 
             QString itemID;
-            if(this->item) itemID = this->item->namespacedID;
-            if(itemID != id) {
+            if (this->item) itemID = this->item->getNamespacedID();
+            if (itemID != id) {
                 if ((event->source() != this) && (!itemID.isEmpty())
-                                              && (!source->isCreative)) {
+                    && (!source->isCreative)) {
                     MCRInvItem *swapItem = new MCRInvItem(this, itemID);
                     source->setItem(swapItem);
                 }
@@ -160,11 +169,12 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
             }
         }
 
-        if (source->isCreative || (event->keyboardModifiers() & Qt::ControlModifier)) {
+        if (source->isCreative ||
+            (event->keyboardModifiers() & Qt::ControlModifier)) {
             event->setDropAction(Qt::CopyAction);
             emit itemChanged();
             event->accept();
-        } else if(event->source() != this) {
+        } else if (event->source() != this) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
         } else {
@@ -191,6 +201,7 @@ void MCRInvSlot::mousePressEvent(QMouseEvent *event) {
 void MCRInvSlot::mouseMoveEvent(QMouseEvent *event) {
     if (!(event->buttons() & Qt::LeftButton))
         return;
+
     if ((event->pos() - mousePressPos).manhattanLength()
         < QApplication::startDragDistance())
         return;
@@ -203,7 +214,7 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
         && this->rect().contains(event->pos())) {
         // Clicked properly
         BlockItemSelectorDialog dialog(this);
-        if(dialog.exec()) {
+        if (dialog.exec()) {
             setItem(new MCRInvItem(this, dialog.getSelectedID()));
         }
     }
@@ -212,43 +223,46 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void MCRInvSlot::startDrag(QMouseEvent *event) {
-    if (!this->item || this->item->namespacedID.isEmpty())
+    if (!this->item || this->item->getNamespacedID().isEmpty())
         return;
 
-    QPoint offset(event->pos() - this->item->pos());
-    QByteArray itemData;
+    QPoint      offset(event->pos() - this->item->pos());
+    QByteArray  itemData;
     QDataStream dataStream(&itemData, QIODevice::WriteOnly);
     dataStream << offset
-               << item->namespacedID;
+               << item->getNamespacedID();
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("application/x-mcrinvitem", itemData);
-    mimeData->setText(item->namespacedID);
+    mimeData->setText(item->getNamespacedID());
 
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->setPixmap(*this->item->pixmap());
     drag->setHotSpot(offset);
 
-    if(!(isCreative || (qApp->keyboardModifiers() & Qt::ControlModifier))) {
+    if (!(isCreative || (qApp->keyboardModifiers() & Qt::ControlModifier))) {
         this->item->hide();
     }
 
     MCRInvItem *before = this->item;
 
-    int dragActions= drag->exec(Qt::CopyAction | Qt::MoveAction | Qt::IgnoreAction, Qt::IgnoreAction);
+    int dragActions = drag->exec(
+        Qt::CopyAction | Qt::MoveAction | Qt::IgnoreAction,
+        Qt::IgnoreAction);
     isDragged = true;
-    if(dragActions == Qt::CopyAction) {
+    if (dragActions == Qt::CopyAction) {
         //qDebug() << "Dragged and dropped for copying (Qt::CopyAction)";
     } else if (dragActions == Qt::IgnoreAction) {
         //qDebug() << "Dragged and dropped for ignoring (Qt::IgnoreAction)";
         this->item->show();
-    } else if(dragActions == Qt::MoveAction) {
+    } else if (dragActions == Qt::MoveAction) {
         //qDebug() << "Dragged and dropped for moving (Qt::MoveAction)";
-        if(this->item == before) {
+        if (this->item == before) {
             removeItem(true);
         } else {
             emit itemChanged();
         }
-    } else {}
+    } else {
+    }
 }

@@ -8,7 +8,8 @@
 class MCfunctionHighlighter : public QSyntaxHighlighter
 {
 public:
-    MCfunctionHighlighter(QTextDocument *parent = 0, QObject *parentObj = nullptr);
+    MCfunctionHighlighter(QTextDocument *parent    = 0,
+                          QObject       *parentObj = nullptr);
     void setEnabled(bool state);
 
 protected:
@@ -17,10 +18,9 @@ protected:
 private:
     void setupRules();
 
-    struct HighlightingRule
-    {
+    struct HighlightingRule {
         QRegularExpression pattern;
-        QTextCharFormat format;
+        QTextCharFormat    format;
     };
     QVector<HighlightingRule> highlightingRules;
 
@@ -33,7 +33,7 @@ private:
     QTextCharFormat quotationFormat;
     QTextCharFormat commentFormat;
 
-    bool enabled = false;
+    bool enabled       = false;
     QTextDocument *doc = nullptr;
     QObject *parentObj;
 };

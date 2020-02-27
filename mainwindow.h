@@ -69,7 +69,7 @@ private:
     Ui::MainWindow *ui;
 
     QString curFile = QString();
-    QString curDir = QString();
+    QString curDir  = QString();
     static QMap<QString, QMap<QString, QVariant>* > *MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
     QLocale curLocale;
@@ -85,12 +85,11 @@ private:
     //void setCurrentFile(const QString &filepath);
     QString strippedName(const QString &fullFilepath);
     void updateWindowTitle();
-    static QMap<QString, QVariant> *readMCRInfo(const QString &type = "block",
-                                                const int depth = 0);
+    static QMap<QString, QVariant> *readMCRInfo(const QString &type  = "block",
+                                                const int      depth = 0);
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);
     void switchTranslator(QTranslator& translator, const QString& filename);
-
 };
 
 #endif // MAINWINDOW_H

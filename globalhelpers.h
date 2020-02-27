@@ -8,7 +8,7 @@
 namespace GlobalHelpers {
     void someTest();
     bool isPathRelativeTo(const QString &dirpath, const QString &path,
-                                 const QString &catDir);
+                          const QString &catDir);
     QString randStr(int length = 5);
     QString relPath(const QString &dirpath, QString path);
     QString relNamespace(const QString &dirpath, QString path);

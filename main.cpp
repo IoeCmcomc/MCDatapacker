@@ -7,8 +7,7 @@
 #include <QDebug>
 #include <QDir>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     //Q_INIT_RESOURCE(application);
 
     qDebug() << "Starting application...";

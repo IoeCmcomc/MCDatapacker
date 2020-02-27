@@ -3,10 +3,10 @@
 
 #include <QDebug>
 
-MCfunctionHighlighter::MCfunctionHighlighter(QTextDocument *parent, QObject *parentObj)
-    : QSyntaxHighlighter(parent)
-{
-    this->doc = parent;
+MCfunctionHighlighter::MCfunctionHighlighter(QTextDocument *parent,
+                                             QObject *parentObj)
+    : QSyntaxHighlighter(parent) {
+    this->doc       = parent;
     this->parentObj = parentObj;
     setupRules();
 }
@@ -17,62 +17,83 @@ void MCfunctionHighlighter::setupRules() {
     keywordFormat.setForeground(Qt::blue);
     keywordFormat.setFontWeight(QFont::Bold);
     const QString keywordPatterns[] = {
-        QStringLiteral("\\badvancement\\b"), QStringLiteral("\\bban\\b"),
-        QStringLiteral("\\bban-ip\\b"), QStringLiteral("\\bbanlist\\b"),
-        QStringLiteral("\\bbossbar\\b"), QStringLiteral("\\bclear\\b"),
-        QStringLiteral("\\bclone\\b"), QStringLiteral("\\bdata\\b"),
-        QStringLiteral("\\bdatapack\\b"), QStringLiteral("\\bdebug\\b"),
+        QStringLiteral("\\badvancement\\b"),     QStringLiteral("\\bban\\b"),
+        QStringLiteral("\\bban-ip\\b"),
+        QStringLiteral("\\bbanlist\\b"),
+        QStringLiteral("\\bbossbar\\b"),         QStringLiteral("\\bclear\\b"),
+        QStringLiteral("\\bclone\\b"),           QStringLiteral("\\bdata\\b"),
+        QStringLiteral("\\bdatapack\\b"),        QStringLiteral("\\bdebug\\b"),
         QStringLiteral("\\bdefaultgamemode\\b"), QStringLiteral("\\bdeop\\b"),
-        QStringLiteral("\\bdifficulty\\b"), QStringLiteral("\\beffect\\b"),
-        QStringLiteral("\\bechant\\b"), QStringLiteral("\\bexecute\\b"),
-        QStringLiteral("\\bexperience\\b"), QStringLiteral("\\bfill\\b"),
-        QStringLiteral("\\bforceload\\b"), QStringLiteral("\\bfunction\\b"),
-        QStringLiteral("\\bgamemode\\b"), QStringLiteral("\\bgamerule\\b"),
-        QStringLiteral("\\bgive\\b"), QStringLiteral("\\bhelp\\b"),
-        QStringLiteral("\\bkick\\b"), QStringLiteral("\\bkill\\b"),
-        QStringLiteral("\\blist\\b"), QStringLiteral("\\blocate\\b"),
-        QStringLiteral("\\bloot\\b"), QStringLiteral("\\bme\\b"),
-        QStringLiteral("\\bmsg\\b"), QStringLiteral("\\bop\\b"),
-        QStringLiteral("\\bpardon\\b"), QStringLiteral("\\bparticle\\b"),
-        QStringLiteral("\\blpaysound\\b"), QStringLiteral("\\bpublish\\b"),
-        QStringLiteral("\\brecipe\\b"), QStringLiteral("\\breload\\b"),
-        QStringLiteral("\\breplaceitem\\b"), QStringLiteral("\\bsave-all\\b"),
-        QStringLiteral("\\bsave-off\\b"), QStringLiteral("\\bsave-on\\b"),
-        QStringLiteral("\\bsay\\b"), QStringLiteral("\\bschedule\\b"),
-        QStringLiteral("\\bscoreboard\\b"), QStringLiteral("\\bseed\\b"),
-        QStringLiteral("\\bsetblock\\b"), QStringLiteral("\\bsetidletimeout\\b"),
-        QStringLiteral("\\bsetworldspawn\\b"), QStringLiteral("\\bspawnpoint\\b"),
-        QStringLiteral("\\bspectate\\b"), QStringLiteral("\\bspreadplayer\\b"),
-        QStringLiteral("\\bstop\\b"), QStringLiteral("\\bstopsound\\b"),
-        QStringLiteral("\\bsummon\\b"), QStringLiteral("\\btag\\b"),
-        QStringLiteral("\\bteam\\b"), QStringLiteral("\\bban\\b"),
-        QStringLiteral("\\bteleport\\b"), QStringLiteral("\\bteammsg\\b"),
-        QStringLiteral("\\btell\\b"), QStringLiteral("\\btellraw\\b"),
-        QStringLiteral("\\btime\\b"), QStringLiteral("\\btitle\\b"),
-        QStringLiteral("\\btp\\b"), QStringLiteral("\\btrigger\\b"),
-        QStringLiteral("\\bw\\b"), QStringLiteral("\\bweather\\b"),
-        QStringLiteral("\\bwhitelist\\b"), QStringLiteral("\\bworldborder\\b"),
+        QStringLiteral("\\bdifficulty\\b"),      QStringLiteral("\\beffect\\b"),
+        QStringLiteral("\\bechant\\b"),
+        QStringLiteral("\\bexecute\\b"),
+        QStringLiteral("\\bexperience\\b"),      QStringLiteral("\\bfill\\b"),
+        QStringLiteral("\\bforceload\\b"),
+        QStringLiteral("\\bfunction\\b"),
+        QStringLiteral("\\bgamemode\\b"),
+        QStringLiteral("\\bgamerule\\b"),
+        QStringLiteral("\\bgive\\b"),            QStringLiteral("\\bhelp\\b"),
+        QStringLiteral("\\bkick\\b"),            QStringLiteral("\\bkill\\b"),
+        QStringLiteral("\\blist\\b"),            QStringLiteral("\\blocate\\b"),
+        QStringLiteral("\\bloot\\b"),            QStringLiteral("\\bme\\b"),
+        QStringLiteral("\\bmsg\\b"),             QStringLiteral("\\bop\\b"),
+        QStringLiteral("\\bpardon\\b"),
+        QStringLiteral("\\bparticle\\b"),
+        QStringLiteral("\\blpaysound\\b"),
+        QStringLiteral("\\bpublish\\b"),
+        QStringLiteral("\\brecipe\\b"),          QStringLiteral("\\breload\\b"),
+        QStringLiteral("\\breplaceitem\\b"),
+        QStringLiteral("\\bsave-all\\b"),
+        QStringLiteral("\\bsave-off\\b"),
+        QStringLiteral("\\bsave-on\\b"),
+        QStringLiteral("\\bsay\\b"),
+        QStringLiteral("\\bschedule\\b"),
+        QStringLiteral("\\bscoreboard\\b"),      QStringLiteral("\\bseed\\b"),
+        QStringLiteral("\\bsetblock\\b"),        QStringLiteral(
+            "\\bsetidletimeout\\b"),
+        QStringLiteral("\\bsetworldspawn\\b"),   QStringLiteral(
+            "\\bspawnpoint\\b"),
+        QStringLiteral("\\bspectate\\b"),        QStringLiteral(
+            "\\bspreadplayer\\b"),
+        QStringLiteral("\\bstop\\b"),            QStringLiteral(
+            "\\bstopsound\\b"),
+        QStringLiteral("\\bsummon\\b"),          QStringLiteral("\\btag\\b"),
+        QStringLiteral("\\bteam\\b"),            QStringLiteral("\\bban\\b"),
+        QStringLiteral("\\bteleport\\b"),
+        QStringLiteral("\\bteammsg\\b"),
+        QStringLiteral("\\btell\\b"),
+        QStringLiteral("\\btellraw\\b"),
+        QStringLiteral("\\btime\\b"),            QStringLiteral("\\btitle\\b"),
+        QStringLiteral("\\btp\\b"),
+        QStringLiteral("\\btrigger\\b"),
+        QStringLiteral("\\bw\\b"),
+        QStringLiteral("\\bweather\\b"),
+        QStringLiteral("\\bwhitelist\\b"),       QStringLiteral(
+            "\\bworldborder\\b"),
         QStringLiteral("\\bxp\\b")
     };
     for (const QString &pattern : keywordPatterns) {
         rule.pattern = QRegularExpression(pattern);
-        rule.format = keywordFormat;
+        rule.format  = keywordFormat;
         highlightingRules.append(rule);
     }
 
     numberFormat.setForeground(QColor(220, 150, 30));
-    rule.pattern = QRegularExpression(QStringLiteral("(?<!\\w)-?\\d+(?:\\.\\d+)?[bBsSlLfFdD]?(?!\\w)"));
+    rule.pattern =
+        QRegularExpression(QStringLiteral(
+                               "(?<!\\w)-?\\d+(?:\\.\\d+)?[bBsSlLfFdD]?(?!\\w)"));
     rule.format = numberFormat;
     highlightingRules.append(rule);
 
     posFormat.setForeground(QColor("hotpink").darker(100));
     rule.pattern = QRegularExpression(QStringLiteral("[~^]?-?\\d+(?:\\s|$)"));
-    rule.format = posFormat;
+    rule.format  = posFormat;
     highlightingRules.append(rule);
 
     namespacedIDFormat.setForeground(QColor(116, 195, 101));
     namespacedIDFormat.setFontItalic(true);
-    rule.pattern = QRegularExpression(QStringLiteral("\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
+    rule.pattern =
+        QRegularExpression(QStringLiteral("\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
     rule.format = namespacedIDFormat;
     highlightingRules.append(rule);
 
@@ -1298,52 +1319,58 @@ void MCfunctionHighlighter::setupRules() {
         //QStringLiteral("totem_of_undying\\b"),
         QStringLiteral("underwater\\b"),
         //QStringLiteral("witch\\b"),
-
     };
     for (const QString &pattern : minecraftNamespacedIDPatterns) {
         rule.pattern = QRegularExpression("\\b(?:minecraft:)?" + pattern);
-        rule.format = minecraftNamespacedIDFormat;
+        rule.format  = minecraftNamespacedIDFormat;
         highlightingRules.append(rule);
     }
 
     quotationFormat.setForeground(QColor(170, 0, 0));
-    rule.pattern = QRegularExpression(QStringLiteral("\"[^\"\\\\]*(\\\\.[^\"\\\\]*)*\""));
+    rule.pattern =
+        QRegularExpression(QStringLiteral("\"[^\"\\\\]*(\\\\.[^\"\\\\]*)*\""));
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
     commentFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegularExpression(QStringLiteral("#.*"));
-    rule.format = commentFormat;
+    rule.format  = commentFormat;
     highlightingRules.append(rule);
 }
 
-void MCfunctionHighlighter::highlightBlock(const QString &text)
-{
+void MCfunctionHighlighter::highlightBlock(const QString &text) {
     //qDebug() << "highlightBlock. Enabled: " << this->enabled;
-    if(this->enabled) {
+    if (this->enabled) {
         CodeEditor *codeEditor = qobject_cast<CodeEditor*>(this->parentObj);
         //qDebug() << codeEditor;
-        CodeEditor::CurrentNamespacedID currNamespacedID = codeEditor->getCurrentNamespacedID();
+        CodeEditor::CurrentNamespacedID currNamespacedID =
+            codeEditor->getCurrentNamespacedID();
 
         //for (HighlightingRule rule : highlightingRules) {
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
-            QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
+            QRegularExpressionMatchIterator matchIterator =
+                rule.pattern.globalMatch(text);
             while (matchIterator.hasNext()) {
                 QRegularExpressionMatch match = matchIterator.next();
-                if(rule.format == namespacedIDFormat) {
+                if (rule.format == namespacedIDFormat) {
                     QTextCharFormat fmt = rule.format;
                     //qDebug() << match.capturedStart() << " " << currNamespacedID.startingIndex;
                     //qDebug() << match.captured() << " " << currNamespacedID.string;
-                    if(match.capturedStart() == currNamespacedID.startingIndex
-                            && match.captured() == currNamespacedID.string
-                            && currentBlock().blockNumber() == currNamespacedID.blockNumber) {
+                    if (match.capturedStart() == currNamespacedID.startingIndex
+                        && match.captured() == currNamespacedID.string
+                        && currentBlock().blockNumber() ==
+                        currNamespacedID.blockNumber) {
                         fmt.setFontUnderline(true);
-                        setFormat(match.capturedStart(), match.capturedLength(), fmt);
+                        setFormat(match.capturedStart(),
+                                  match.capturedLength(),
+                                  fmt);
                         continue;
                         //qDebug() << "Didn't continued";
                     }
                 }
-                setFormat(match.capturedStart(), match.capturedLength(), rule.format);
+                setFormat(match.capturedStart(),
+                          match.capturedLength(),
+                          rule.format);
             }
         }
     }

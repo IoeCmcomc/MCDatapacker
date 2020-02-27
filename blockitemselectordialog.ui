@@ -9,22 +9,60 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>391</height>
+    <width>602</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Block/Item selector</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="searchLineEdit">
-     <property name="placeholderText">
-      <string>stone</string>
-     </property>
-    </widget>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Search:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="searchLineEdit">
+       <property name="placeholderText">
+        <string>stone</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Filter by</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="filterByBlockCheck">
+       <property name="text">
+        <string>Block</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="filterByItemCheck">
+       <property name="text">
+        <string>Item</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0">
     <widget class="QListView" name="listView">
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -58,7 +96,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -68,13 +106,6 @@
      </property>
      <property name="centerButtons">
       <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Search:</string>
      </property>
     </widget>
    </item>

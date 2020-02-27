@@ -14,14 +14,14 @@ public:
     explicit MCRInvSlot(QWidget *parent = nullptr, MCRInvItem *item = nullptr);
 
     void setItem(MCRInvItem *item, bool emitSignal = false);
-    void removeItem(bool emitSignal = false);
+    void removeItem(bool emitSignal                = false);
     MCRInvItem* getItem();
+    bool getIsCreative() const;
+    void setIsCreative(bool value);
     QString itemNamespacedID();
     QString itemName();
 
     void setBackground(QString color = "#8B8B8B");
-
-    bool isCreative = false;
 
 signals:
     void itemChanged();
@@ -40,6 +40,7 @@ protected slots:
 
 private:
     MCRInvItem *item = nullptr;
+    bool isCreative  = false;
     QPoint mousePressPos;
     bool isDragged = false;
 

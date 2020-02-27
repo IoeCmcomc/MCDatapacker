@@ -34,8 +34,10 @@ private:
     QString dirPath;
     QPoint cMenuPos;
     QMenu *mkContextMenu(QModelIndex index);
-    QModelIndex makeNewFile(QModelIndex index, const QString &name,
-                            const QString &catDir = "", const QString &nspace = "");
+    QModelIndex makeNewFile(QModelIndex    index,
+                            const QString &name,
+                            const QString &catDir = "",
+                            const QString &nspace = "");
     QModelIndex getSelected();
     bool isStringInTagFile(const QString &filepath, const QString &str);
     void contextMenuModifyTagFile(const QString &filepath, const QString &str,

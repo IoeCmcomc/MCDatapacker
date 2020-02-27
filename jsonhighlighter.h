@@ -17,10 +17,9 @@ protected:
 private:
     void setupRules();
 
-    struct HighlightingRule
-    {
+    struct HighlightingRule {
         QRegularExpression pattern;
-        QTextCharFormat format;
+        QTextCharFormat    format;
     };
     QVector<HighlightingRule> highlightingRules;
 
@@ -30,7 +29,7 @@ private:
     QTextCharFormat rBracketFormat;
     QTextCharFormat quotationFormat;
 
-    bool enabled = false;
+    bool enabled       = false;
     QTextDocument *doc = nullptr;
     QObject *parentObj;
 };

@@ -17,16 +17,23 @@
 #include <QMimeData>
 #include <QDir>
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
-{
-    lineNumberArea = new LineNumberArea(this);
-
-    jsonHighlighter = new JsonHighlighter(this->document());
+CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
+    lineNumberArea        = new LineNumberArea(this);
+    jsonHighlighter       = new JsonHighlighter(this->document());
     mcfunctionHighlighter = new MCfunctionHighlighter(this->document(), this);
 
-    connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
-    connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
-    connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::onCursorPositionChanged);
+    connect(this,
+            &CodeEditor::blockCountChanged,
+            this,
+            &CodeEditor::updateLineNumberAreaWidth);
+    connect(this,
+            &CodeEditor::updateRequest,
+            this,
+            &CodeEditor::updateLineNumberArea);
+    connect(this,
+            &CodeEditor::cursorPositionChanged,
+            this,
+            &CodeEditor::onCursorPositionChanged);
 
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
@@ -45,12 +52,12 @@ void CodeEditor::wheelEvent(QWheelEvent *e) {
     QPlainTextEdit::wheelEvent(e);
 }
 
-void CodeEditor::resizeEvent(QResizeEvent *e)
-{
+void CodeEditor::resizeEvent(QResizeEvent *e) {
     QPlainTextEdit::resizeEvent(e);
 
     QRect cr = contentsRect();
-    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(),
+                                      lineNumberAreaWidth(), cr.height()));
 }
 
 void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
@@ -60,16 +67,19 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
     QTextCursor cursor = cursorForPosition(e->pos());
     this->mouseTextCursor = cursor;
 
-    if(cursor.blockNumber() != this->lastMouseTextCursor.blockNumber())
-        this->mcfunctionHighlighter->rehighlightBlock(this->document()->findBlockByNumber(this->lastMouseTextCursor.blockNumber()));
-    this->mcfunctionHighlighter->rehighlightBlock(this->document()->findBlockByNumber(cursor.blockNumber()));
+    if (cursor.blockNumber() != this->lastMouseTextCursor.blockNumber())
+        this->mcfunctionHighlighter->rehighlightBlock(
+            this->document()->findBlockByNumber(this->lastMouseTextCursor.
+                                                blockNumber()));
+    this->mcfunctionHighlighter->rehighlightBlock(
+        this->document()->findBlockByNumber(cursor.blockNumber()));
 
     this->lastMouseTextCursor = cursorForPosition(e->pos());
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
     //qDebug() << "Mouse press event";
-    if(QGuiApplication::keyboardModifiers() & Qt::ControlModifier
+    if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier
         && e->modifiers() & Qt::ControlModifier) {
         followCurrentNamespacedID();
     }
@@ -78,12 +88,12 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
 
 void CodeEditor::dropEvent(QDropEvent *e) {
     QString nspacedID;
-    if(e->mimeData()->hasFormat("text/uri-list")) {
-        auto filepath = e->mimeData()->urls().at(0).toLocalFile();
-        auto dirpath = qobject_cast<MainWindow*>(window())->getCurDir();
-        nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
 
-    } else if(e->mimeData()->hasFormat("application/x-mcrinvitem" )
+    if (e->mimeData()->hasFormat("text/uri-list")) {
+        auto filepath = e->mimeData()->urls().at(0).toLocalFile();
+        auto dirpath  = qobject_cast<MainWindow*>(window())->getCurDir();
+        nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
+    } else if (e->mimeData()->hasFormat("application/x-mcrinvitem")
                && e->mimeData()->hasText()) {
 //        QByteArray itemData = e->mimeData()->data("application/x-mcrinvitem");
 //        QDataStream dataStream(&itemData, QIODevice::ReadOnly);
@@ -92,9 +102,9 @@ void CodeEditor::dropEvent(QDropEvent *e) {
 //        QString id;
 //        dataStream >> offset >> id;
 //        nspacedID = id;
-    nspacedID = "minecraft:" + e->mimeData()->text();
+        nspacedID = "minecraft:" + e->mimeData()->text();
     }
-    if(!nspacedID.isEmpty()) {
+    if (!nspacedID.isEmpty()) {
         QTextCursor cursor = cursorForPosition(e->pos());
         cursor.beginEditBlock();
         cursor.insertText(nspacedID);
@@ -116,6 +126,7 @@ void CodeEditor::dropEvent(QDropEvent *e) {
 
 void CodeEditor::onCursorPositionChanged() {
     QList<QTextEdit::ExtraSelection> extraSelections;
+
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
@@ -133,20 +144,21 @@ void CodeEditor::onCursorPositionChanged() {
 
 void CodeEditor::setCurFile(QString filepath) {
     this->curFile = filepath;
-    QFileInfo info = QFileInfo(filepath);
+    QFileInfo     info     = QFileInfo(filepath);
     const QString jsonExts = "json mcmeta";
 
 //    jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
 //    mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
 
     jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
-    mcfunctionHighlighter->setEnabled(MainWindow::curFileType == MainWindow::Function);
+    mcfunctionHighlighter->setEnabled(
+        MainWindow::curFileType == MainWindow::Function);
 }
 
-int CodeEditor::lineNumberAreaWidth()
-{
+int CodeEditor::lineNumberAreaWidth() {
     int digits = 1;
-    int max = qMax(1, blockCount());
+    int max    = qMax(1, blockCount());
+
     while (max >= 10) {
         max /= 10;
         ++digits;
@@ -157,17 +169,18 @@ int CodeEditor::lineNumberAreaWidth()
     return space;
 }
 
-void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
-{
+void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */) {
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
-{
+void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
     if (dy)
         lineNumberArea->scroll(0, dy);
     else
-        lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
+        lineNumberArea->update(0,
+                               rect.y(),
+                               lineNumberArea->width(),
+                               rect.height());
 
     if (rect.contains(viewport()->rect()))
         updateLineNumberAreaWidth(0);
@@ -180,106 +193,119 @@ CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
     //qDebug() << "cursor block number: " << cursor.blockNumber();
     //qDebug() << "cursor column: " << cursor.columnNumber();
 
-    QTextBlock block = this->document()->findBlockByNumber(cursor.blockNumber());
+    QTextBlock block = this->document()->findBlockByNumber(
+        cursor.blockNumber());
     QString lineText = block.text();
     //qDebug() << lineText;
     int cursorRelPos = cursor.positionInBlock();
 
     QChar currChar = lineText[cursor.columnNumber()];
-    if(QRegularExpression(QStringLiteral("[^0-9a-z-_.:/]")).match(currChar).hasMatch()) {
+
+    if (QRegularExpression(QStringLiteral("[^0-9a-z-_.:/]")).match(currChar).
+        hasMatch()) {
         --cursorRelPos;
     }
 
     bool isStartofString = false;
-    while(!isStartofString && cursorRelPos >= 0) {
+    while (!isStartofString && cursorRelPos >= 0) {
         currChar = lineText[cursorRelPos];
         //qDebug() << "current character: " << currChar;
-        QRegularExpression regex = QRegularExpression(QStringLiteral("[#0-9a-z-_.:/]"));
+        QRegularExpression regex =
+            QRegularExpression(QStringLiteral("[#0-9a-z-_.:/]"));
         QRegularExpressionMatch match = regex.match(currChar);
         isStartofString = !match.hasMatch();
         //qDebug() << "is start of string: " << isStartofString;
-        if(!isStartofString && cursorRelPos >= 0) --cursorRelPos;
+        if (!isStartofString && cursorRelPos >= 0) --cursorRelPos;
     }
     //qDebug() << "startIndex: " << cursorRelPos;
-    int startIndex = qMax(cursorRelPos + 1, 0);
-    QString str = lineText.mid(startIndex);
-    QRegularExpression namespacedIDRegex = QRegularExpression(QStringLiteral("^#?\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
+    int                startIndex        = qMax(cursorRelPos + 1, 0);
+    QString            str               = lineText.mid(startIndex);
+    QRegularExpression namespacedIDRegex =
+        QRegularExpression(QStringLiteral("^#?\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
     //qDebug() << str;
     CurrentNamespacedID currNamespacedID;
     currNamespacedID.startingIndex = startIndex;
-    currNamespacedID.blockNumber = cursor.blockNumber();
-    currNamespacedID.string = namespacedIDRegex.match(str).captured();
+    currNamespacedID.blockNumber   = cursor.blockNumber();
+    currNamespacedID.string        = namespacedIDRegex.match(str).captured();
 
     return currNamespacedID;
 }
 
 void CodeEditor::followCurrentNamespacedID() {
     QString str = getCurrentNamespacedID().string;
+
     //qDebug() << str;
-    if(!str.isEmpty()) {
-        QString dirname = qobject_cast<MainWindow*>(this->window())->getCurDir();
-        if(dirname.isEmpty()) return;
+    if (!str.isEmpty()) {
+        QString dirname =
+            qobject_cast<MainWindow*>(this->window())->getCurDir();
+        if (dirname.isEmpty()) return;
 
         QDir dir;
         qDebug() << str.startsWith('#');
-        if(str.startsWith('#')) {
+        if (str.startsWith('#')) {
             dir = QDir(dirname + "/data/" + str.remove(0, 1)
-                                                .section(":", 0, 0) + "/tags");
+                       .section(":", 0, 0) + "/tags");
         } else {
             dir = QDir(dirname + "/data/" + str.section(":", 0, 0));
         }
-        if(!dir.exists()) return;
+        if (!dir.exists()) return;
 
-        QStringList dirList = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+        QStringList dirList =
+            dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
         QString path;
         QString fileExt;
-        for(const auto& dirType: dirList) {
+        for (const auto& dirType: dirList) {
             //qDebug() << "dirType: " << dirType;
             path = dir.path() + "/" + dirType + "/" + str.section(":", 1, 1);
-            if(dirType == "functions" && QFile::exists(path+".mcfunction")) {
+            if (dirType == "functions" && QFile::exists(path + ".mcfunction")) {
                 fileExt = ".mcfunction";
                 break;
-            } else if (QFile::exists(path+".json")) {
+            } else if (QFile::exists(path + ".json")) {
                 fileExt = ".json";
                 break;
             }
         }
 
         //qDebug() << "final path: " << path;
-        if(!path.isEmpty() && !fileExt.isEmpty()) {
-            path += fileExt;
+        if (!path.isEmpty() && !fileExt.isEmpty()) {
+            path             += fileExt;
             this->prevCurFile = path;
             qobject_cast<DatapackTreeView*>(
-                        qobject_cast<QSplitter*>(this->parent()->parent())->widget(0)
-                    )->openFromPath(path);
+                qobject_cast<QSplitter*>(this->parent()->parent())->widget(0))
+            ->openFromPath(path);
         }
     }
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
-{
+void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     QPainter painter(lineNumberArea);
+
     painter.fillRect(event->rect(), QColor(210, 210, 210));
     //painter.setPen(QColor(240, 240, 240));
     //painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
-    QTextBlock block = firstVisibleBlock();
-    int blockNumber = block.blockNumber();
-    int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
+    QTextBlock block       = firstVisibleBlock();
+    int        blockNumber = block.blockNumber();
+    int        top         =
+        qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
-            if(blockNumber == this->textCursor().blockNumber()) {
+            if (blockNumber == this->textCursor().blockNumber()) {
                 painter.setPen(QColor(40, 40, 40));
             } else {
                 painter.setPen(Qt::darkGray);
             }
-            painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
-                             Qt::AlignRight, number);
+            painter.drawText(0,
+                             top,
+                             lineNumberArea->width(),
+                             fontMetrics().height(),
+                             Qt::AlignRight,
+                             number);
         }
 
-        block = block.next();
-        top = bottom;
+        block  = block.next();
+        top    = bottom;
         bottom = top + qRound(blockBoundingRect(block).height());
         ++blockNumber;
     }

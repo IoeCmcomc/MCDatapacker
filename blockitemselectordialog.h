@@ -4,10 +4,10 @@
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QPushButton>
-#include <QSortFilterProxyModel>
+#include "mcritemsortfilterproxymodel.h"
 
 namespace Ui {
-class BlockItemSelectorDialog;
+    class BlockItemSelectorDialog;
 }
 
 class BlockItemSelectorDialog : public QDialog
@@ -21,13 +21,12 @@ public:
     QString getSelectedID();
 
 protected slots:
-    void onListViewSearch(const QString &input);
     void checkOK();
 
 private:
     Ui::BlockItemSelectorDialog *ui;
-    QStandardItemModel *model = new QStandardItemModel();
-    QSortFilterProxyModel filterModel;
+    QStandardItemModel *model = new QStandardItemModel(this);
+    MCRItemSortFilterProxyModel filterModel;
     QPushButton *selectButton;
 
     void setupTreeView();
