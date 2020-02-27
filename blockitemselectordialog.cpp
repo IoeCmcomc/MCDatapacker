@@ -12,21 +12,23 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent) :
     ui(new Ui::BlockItemSelectorDialog) {
     ui->setupUi(this);
 
-    setStyleSheet(
-        "#listView {"
-        "   background-color: #8B8B8B;"
-        "}"
-        "#listView::item {"
-        "   border: 2px solid;"
-        "   border-color: #373737 #FFF #FFF #373737;"
-        "}"
-        "#listView::item:hover {"
-        "   background-color: rgba(255, 255, 255, .4);"
-        "}"
-        "#listView::item:selected {"
-        "   border: 2px solid white;"
-        "}"
-        );
+    /*
+       setStyleSheet(
+       "#listView {"
+       "   background-color: #8B8B8B;"
+       "}"
+       "#listView::item {"
+       "   border: 2px solid;"
+       "   border-color: #373737 #FFF #FFF #373737;"
+       "}"
+       "#listView::item:hover {"
+       "   background-color: rgba(255, 255, 255, .4);"
+       "}"
+       "#listView::item:selected {"
+       "   border: 2px solid white;"
+       "}"
+       );
+     */
 
     filterModel.setParent(ui->listView);
     setupTreeView();
@@ -60,7 +62,7 @@ void BlockItemSelectorDialog::setupTreeView() {
     model->setParent(ui->listView);
     filterModel.setSourceModel(model);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
-    //ui->listView->setModel(model);
+    /*ui->listView->setModel(model); */
     ui->listView->setModel(&filterModel);
 
     auto MCRItemInfo =
@@ -71,7 +73,7 @@ void BlockItemSelectorDialog::setupTreeView() {
          QVariant>::const_iterator blockIter = MCRBlockInfo->constBegin();
     QMap<QString,
          QVariant>::const_iterator itemIter = MCRItemInfo->constBegin();
-    //int c = 0;
+    /*int c = 0; */
     while ((blockIter != MCRBlockInfo->constEnd())
            || (itemIter != MCRItemInfo->constEnd())) {
         if (blockIter.value().toMap().contains("unobtainable")) {
@@ -85,7 +87,7 @@ void BlockItemSelectorDialog::setupTreeView() {
                        ? blockIter.key() : itemIter.key();
         MCRInvItem *invItem = new MCRInvItem(ui->listView, key);
         invItem->hide();
-        //invItem->setAttribute(Qt::WA_DeleteOnClose);
+        /*invItem->setAttribute(Qt::WA_DeleteOnClose); */
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(*invItem->pixmap()));
         item->setSizeHint(QSize(32 + (3 * 2), 32 + (3 * 2)));
@@ -94,7 +96,7 @@ void BlockItemSelectorDialog::setupTreeView() {
         item->setData(vari, Qt::UserRole + 1);
         item->setToolTip(invItem->getName());
         model->appendRow(item);
-        //++c;
+        /*++c; */
         if (blockIter != MCRBlockInfo->constEnd())
             ++blockIter;
         else
@@ -117,7 +119,6 @@ QString BlockItemSelectorDialog::getSelectedID() {
 }
 
 void BlockItemSelectorDialog::checkOK() {
-    qDebug() << getSelectedID();
     if (getSelectedID().isEmpty())
         selectButton->setEnabled(false);
     else

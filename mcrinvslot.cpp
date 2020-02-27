@@ -16,7 +16,7 @@
 MCRInvSlot::MCRInvSlot(QWidget *parent, MCRInvItem *item) : QFrame(parent) {
     setAcceptDrops(true);
     setMinimumSize(36, 36);
-    setBackground();
+/*    setBackground(); */
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
@@ -60,7 +60,7 @@ void MCRInvSlot::setItem(MCRInvItem *item, bool emitSignal) {
 }
 
 void MCRInvSlot::removeItem(bool emitSignal) {
-    //if(layout()->isEmpty() || layout()->count() == 0) return;
+    /*if(layout()->isEmpty() || layout()->count() == 0) return; */
     layout()->removeWidget(this->item);
     delete this->item;
     this->item = nullptr;
@@ -102,6 +102,41 @@ bool MCRInvSlot::getIsCreative() const {
 
 void MCRInvSlot::setIsCreative(bool value) {
     isCreative = value;
+}
+
+void MCRInvSlot::mousePressEvent(QMouseEvent *event) {
+    if (event->buttons() ^ event->button()) {
+        QFrame::mousePressEvent(event);
+        return;
+    }
+
+    if (event->button() == Qt::LeftButton)
+        mousePressPos = event->pos();
+    QFrame::mousePressEvent(event);
+}
+
+void MCRInvSlot::mouseMoveEvent(QMouseEvent *event) {
+    if (!(event->buttons() & Qt::LeftButton))
+        return;
+
+    if ((event->pos() - mousePressPos).manhattanLength()
+        < QApplication::startDragDistance())
+        return;
+
+    startDrag(event);
+}
+
+void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton && (!isDragged)
+        && this->rect().contains(event->pos())) {
+        /* Clicked properly */
+        BlockItemSelectorDialog dialog(this);
+        if (dialog.exec()) {
+            setItem(new MCRInvItem(this, dialog.getSelectedID()));
+        }
+    }
+    isDragged = false;
+    QFrame::mouseReleaseEvent(event);
 }
 
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
@@ -147,13 +182,17 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
         && event->mimeData()->hasText()) {
         MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
         if (!isCreative) {
-//            QByteArray itemData = event->mimeData()->data("application/x-mcrinvitem");
-//            QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+/*
+              QByteArray itemData = event->mimeData()->data("application/x-mcrinvitem");
+              QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+ */
 
-//            QPoint offset;
+/*            QPoint offset; */
             QString id;
-//            dataStream >> offset
-//                       >> id;
+/*
+              dataStream >> offset
+                         >> id;
+ */
             id = event->mimeData()->text();
 
             QString itemID;
@@ -187,41 +226,6 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
     }
 }
 
-void MCRInvSlot::mousePressEvent(QMouseEvent *event) {
-    if (event->buttons() ^ event->button()) {
-        QFrame::mousePressEvent(event);
-        return;
-    }
-
-    if (event->button() == Qt::LeftButton)
-        mousePressPos = event->pos();
-    QFrame::mousePressEvent(event);
-}
-
-void MCRInvSlot::mouseMoveEvent(QMouseEvent *event) {
-    if (!(event->buttons() & Qt::LeftButton))
-        return;
-
-    if ((event->pos() - mousePressPos).manhattanLength()
-        < QApplication::startDragDistance())
-        return;
-
-    startDrag(event);
-}
-
-void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton && (!isDragged)
-        && this->rect().contains(event->pos())) {
-        // Clicked properly
-        BlockItemSelectorDialog dialog(this);
-        if (dialog.exec()) {
-            setItem(new MCRInvItem(this, dialog.getSelectedID()));
-        }
-    }
-    isDragged = false;
-    QFrame::mouseReleaseEvent(event);
-}
-
 void MCRInvSlot::startDrag(QMouseEvent *event) {
     if (!this->item || this->item->getNamespacedID().isEmpty())
         return;
@@ -252,12 +256,12 @@ void MCRInvSlot::startDrag(QMouseEvent *event) {
         Qt::IgnoreAction);
     isDragged = true;
     if (dragActions == Qt::CopyAction) {
-        //qDebug() << "Dragged and dropped for copying (Qt::CopyAction)";
+        /*qDebug() << "Dragged and dropped for copying (Qt::CopyAction)"; */
     } else if (dragActions == Qt::IgnoreAction) {
-        //qDebug() << "Dragged and dropped for ignoring (Qt::IgnoreAction)";
+        /*qDebug() << "Dragged and dropped for ignoring (Qt::IgnoreAction)"; */
         this->item->show();
     } else if (dragActions == Qt::MoveAction) {
-        //qDebug() << "Dragged and dropped for moving (Qt::MoveAction)";
+        /*qDebug() << "Dragged and dropped for moving (Qt::MoveAction)"; */
         if (this->item == before) {
             removeItem(true);
         } else {
