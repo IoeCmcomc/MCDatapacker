@@ -25,11 +25,11 @@ protected slots:
 
 private:
     Ui::BlockItemSelectorDialog *ui;
-    QStandardItemModel *model = new QStandardItemModel(this);
+    QStandardItemModel model;
     MCRItemSortFilterProxyModel filterModel;
     QPushButton *selectButton;
 
     void setupTreeView();
 };
 
-#endif // BLOCKITEMSELECTORDIALOG_H
+#endif /* BLOCKITEMSELECTORDIALOG_H */

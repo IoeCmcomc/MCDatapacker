@@ -11,11 +11,12 @@ class MCRInvSlot : public QFrame
     Q_OBJECT
 
 public:
-    explicit MCRInvSlot(QWidget *parent = nullptr, MCRInvItem *item = nullptr);
+    explicit MCRInvSlot(QWidget *parent = nullptr,
+                        MCRInvItem item = MCRInvItem());
 
-    void setItem(MCRInvItem *item, bool emitSignal = false);
-    void removeItem(bool emitSignal                = false);
-    MCRInvItem* getItem();
+    void setItem(MCRInvItem item, bool emitSignal = false);
+    void removeItem(bool emitSignal               = false);
+    MCRInvItem getItem() const;
     bool getIsCreative() const;
     void setIsCreative(bool value);
     QString itemNamespacedID();
@@ -33,18 +34,22 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 protected slots:
     void onCustomContextMenu(const QPoint &point);
-    //void onClicked();
+    /*void onClicked(); */
 
 private:
-    MCRInvItem *item = nullptr;
-    bool isCreative  = false;
+    MCRInvItem item;
+    bool isCreative = false;
     QPoint mousePressPos;
-    bool isDragged = false;
+    bool isDragged  = false;
+    bool itemHidden = false;
 
     void startDrag(QMouseEvent *event);
+    void hideItem();
+    void showItem();
 };
 
-#endif // MCRInvSlot_H
+#endif /* MCRInvSlot_H */

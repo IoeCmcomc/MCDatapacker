@@ -42,12 +42,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 void CodeEditor::wheelEvent(QWheelEvent *e) {
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         int delta = e->delta() / 120 * 2;
-        //qDebug() << e->delta() << " " << delta;
+        /*qDebug() << e->delta() << " " << delta; */
         QFont font = this->font();
         font.setPointSize(font.pointSize() + delta);
         this->setFont(font);
     }
-    //this->mcfunctionHighlighter->rehighlight();
+    /*this->mcfunctionHighlighter->rehighlight(); */
 
     QPlainTextEdit::wheelEvent(e);
 }
@@ -63,7 +63,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e) {
 void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
     QPlainTextEdit::mouseMoveEvent(e);
 
-    //if(e->buttons() == Qt::LeftButton) {}
+    /*if(e->buttons() == Qt::LeftButton) {} */
     QTextCursor cursor = cursorForPosition(e->pos());
     this->mouseTextCursor = cursor;
 
@@ -78,7 +78,7 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
-    //qDebug() << "Mouse press event";
+    /*qDebug() << "Mouse press event"; */
     if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier
         && e->modifiers() & Qt::ControlModifier) {
         followCurrentNamespacedID();
@@ -95,13 +95,17 @@ void CodeEditor::dropEvent(QDropEvent *e) {
         nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
     } else if (e->mimeData()->hasFormat("application/x-mcrinvitem")
                && e->mimeData()->hasText()) {
-//        QByteArray itemData = e->mimeData()->data("application/x-mcrinvitem");
-//        QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+/*
+          QByteArray itemData = e->mimeData()->data("application/x-mcrinvitem");
+          QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+ */
 
-//        QPoint offset;
-//        QString id;
-//        dataStream >> offset >> id;
-//        nspacedID = id;
+/*
+          QPoint offset;
+          QString id;
+          dataStream >> offset >> id;
+          nspacedID = id;
+ */
         nspacedID = "minecraft:" + e->mimeData()->text();
     }
     if (!nspacedID.isEmpty()) {
@@ -119,6 +123,7 @@ void CodeEditor::dropEvent(QDropEvent *e) {
                              e->keyboardModifiers());
 
         QPlainTextEdit::dropEvent(dummyEvent);
+        delete mimeData;
         return;
     }
     QPlainTextEdit::dropEvent(e);
@@ -147,8 +152,10 @@ void CodeEditor::setCurFile(QString filepath) {
     QFileInfo     info     = QFileInfo(filepath);
     const QString jsonExts = "json mcmeta";
 
-//    jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
-//    mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
+/*
+      jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
+      mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
+ */
 
     jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
     mcfunctionHighlighter->setEnabled(
@@ -188,15 +195,17 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
 
 CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
     QTextCursor cursor = this->mouseTextCursor;
-    //qDebug() << "cursor pos: " << cursor.position();
-    //qDebug() << "cursor pos in block: " << cursor.positionInBlock();
-    //qDebug() << "cursor block number: " << cursor.blockNumber();
-    //qDebug() << "cursor column: " << cursor.columnNumber();
+    /*
+       qDebug() << "cursor pos: " << cursor.position();
+       qDebug() << "cursor pos in block: " << cursor.positionInBlock();
+       qDebug() << "cursor block number: " << cursor.blockNumber();
+       qDebug() << "cursor column: " << cursor.columnNumber();
+     */
 
     QTextBlock block = this->document()->findBlockByNumber(
         cursor.blockNumber());
     QString lineText = block.text();
-    //qDebug() << lineText;
+    /*qDebug() << lineText; */
     int cursorRelPos = cursor.positionInBlock();
 
     QChar currChar = lineText[cursor.columnNumber()];
@@ -209,20 +218,20 @@ CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
     bool isStartofString = false;
     while (!isStartofString && cursorRelPos >= 0) {
         currChar = lineText[cursorRelPos];
-        //qDebug() << "current character: " << currChar;
+        /*qDebug() << "current character: " << currChar; */
         QRegularExpression regex =
             QRegularExpression(QStringLiteral("[#0-9a-z-_.:/]"));
         QRegularExpressionMatch match = regex.match(currChar);
         isStartofString = !match.hasMatch();
-        //qDebug() << "is start of string: " << isStartofString;
+        /*qDebug() << "is start of string: " << isStartofString; */
         if (!isStartofString && cursorRelPos >= 0) --cursorRelPos;
     }
-    //qDebug() << "startIndex: " << cursorRelPos;
+    /*qDebug() << "startIndex: " << cursorRelPos; */
     int                startIndex        = qMax(cursorRelPos + 1, 0);
     QString            str               = lineText.mid(startIndex);
     QRegularExpression namespacedIDRegex =
         QRegularExpression(QStringLiteral("^#?\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
-    //qDebug() << str;
+    /*qDebug() << str; */
     CurrentNamespacedID currNamespacedID;
     currNamespacedID.startingIndex = startIndex;
     currNamespacedID.blockNumber   = cursor.blockNumber();
@@ -234,7 +243,7 @@ CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
 void CodeEditor::followCurrentNamespacedID() {
     QString str = getCurrentNamespacedID().string;
 
-    //qDebug() << str;
+    /*qDebug() << str; */
     if (!str.isEmpty()) {
         QString dirname =
             qobject_cast<MainWindow*>(this->window())->getCurDir();
@@ -255,7 +264,7 @@ void CodeEditor::followCurrentNamespacedID() {
         QString path;
         QString fileExt;
         for (const auto& dirType: dirList) {
-            //qDebug() << "dirType: " << dirType;
+            /*qDebug() << "dirType: " << dirType; */
             path = dir.path() + "/" + dirType + "/" + str.section(":", 1, 1);
             if (dirType == "functions" && QFile::exists(path + ".mcfunction")) {
                 fileExt = ".mcfunction";
@@ -266,7 +275,7 @@ void CodeEditor::followCurrentNamespacedID() {
             }
         }
 
-        //qDebug() << "final path: " << path;
+        /*qDebug() << "final path: " << path; */
         if (!path.isEmpty() && !fileExt.isEmpty()) {
             path             += fileExt;
             this->prevCurFile = path;
@@ -281,8 +290,10 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     QPainter painter(lineNumberArea);
 
     painter.fillRect(event->rect(), QColor(210, 210, 210));
-    //painter.setPen(QColor(240, 240, 240));
-    //painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
+    /*
+       painter.setPen(QColor(240, 240, 240));
+       painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
+     */
     QTextBlock block       = firstVisibleBlock();
     int        blockNumber = block.blockNumber();
     int        top         =

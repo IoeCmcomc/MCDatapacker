@@ -10,26 +10,26 @@ bool MCRItemSortFilterProxyModel::filterAcceptsRow(int sourceRow,
                                                    const QModelIndex &sourceParent)
 const {
     QModelIndex index   = sourceModel()->index(sourceRow, 0, sourceParent);
-    auto        invItem = sourceModel()->data(index,
+    MCRInvItem  invItem = sourceModel()->data(index,
                                               Qt::UserRole +
-                                              1).value<MCRInvItem*>();
+                                              1).value<MCRInvItem>();;
 
-    if (invItem->getHasBlockForm()) {
+    if (invItem.getHasBlockForm()) {
         if (getFilterByBlock()) {
-            // cont
+            /* cont */
         } else {
             return false;
         }
     } else {
         if (getFilterByItem()) {
-            // cont
+            /* cont */
         } else {
             return false;
         }
     }
 
-    return invItem->getNamespacedID().contains(filterRegularExpression()) ||
-           invItem->getName().toLower().contains(filterRegularExpression());
+    return invItem.getNamespacedID().contains(filterRegularExpression()) ||
+           invItem.getName().toLower().contains(filterRegularExpression());
 }
 
 bool MCRItemSortFilterProxyModel::getFilterByItem() const {

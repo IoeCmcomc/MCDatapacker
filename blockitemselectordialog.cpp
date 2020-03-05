@@ -31,6 +31,7 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent) :
      */
 
     filterModel.setParent(ui->listView);
+    model.setParent(this);
     setupTreeView();
     connect(ui->searchLineEdit, &QLineEdit::textChanged,
             [ = ](const QString &input) {
@@ -59,15 +60,15 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent) :
 }
 
 void BlockItemSelectorDialog::setupTreeView() {
-    model->setParent(ui->listView);
-    filterModel.setSourceModel(model);
+    model.setParent(ui->listView);
+    filterModel.setSourceModel(&model);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     /*ui->listView->setModel(model); */
     ui->listView->setModel(&filterModel);
 
-    auto MCRItemInfo =
+    QMap<QString, QVariant> *MCRItemInfo =
         MainWindow::getMCRInfo("item");
-    auto MCRBlockInfo =
+    QMap<QString, QVariant> *MCRBlockInfo =
         MainWindow::getMCRInfo("block");
     QMap<QString,
          QVariant>::const_iterator blockIter = MCRBlockInfo->constBegin();
@@ -85,17 +86,15 @@ void BlockItemSelectorDialog::setupTreeView() {
         }
         auto key = (blockIter != MCRBlockInfo->constEnd())
                        ? blockIter.key() : itemIter.key();
-        MCRInvItem *invItem = new MCRInvItem(ui->listView, key);
-        invItem->hide();
-        /*invItem->setAttribute(Qt::WA_DeleteOnClose); */
+        MCRInvItem     invItem(key, ui->listView);
         QStandardItem *item = new QStandardItem();
-        item->setIcon(QIcon(*invItem->pixmap()));
+        item->setIcon(QIcon(invItem.getPixmap()));
         item->setSizeHint(QSize(32 + (3 * 2), 32 + (3 * 2)));
         QVariant vari;
         vari.setValue(invItem);
         item->setData(vari, Qt::UserRole + 1);
-        item->setToolTip(invItem->getName());
-        model->appendRow(item);
+        item->setToolTip(invItem.getName());
+        model.appendRow(item);
         /*++c; */
         if (blockIter != MCRBlockInfo->constEnd())
             ++blockIter;
@@ -111,11 +110,14 @@ BlockItemSelectorDialog::~BlockItemSelectorDialog() {
 QString BlockItemSelectorDialog::getSelectedID() {
     auto indexes = ui->listView->selectionModel()->selectedIndexes();
 
+    ui->listView->setParent(this);
+
     if (indexes.isEmpty()) return "";
 
-    auto *item    = model->itemFromIndex(filterModel.mapToSource(indexes[0]));
-    auto *invItem = item->data(Qt::UserRole + 1).value<MCRInvItem*>();
-    return invItem->getNamespacedID();
+    QStandardItem *item =
+        model.itemFromIndex(filterModel.mapToSource(indexes[0]));
+    MCRInvItem invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
+    return invItem.getNamespacedID();
 }
 
 void BlockItemSelectorDialog::checkOK() {
