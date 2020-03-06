@@ -93,20 +93,10 @@ void CodeEditor::dropEvent(QDropEvent *e) {
         auto filepath = e->mimeData()->urls().at(0).toLocalFile();
         auto dirpath  = qobject_cast<MainWindow*>(window())->getCurDir();
         nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
-    } else if (e->mimeData()->hasFormat("application/x-mcrinvitem")
-               && e->mimeData()->hasText()) {
-/*
-          QByteArray itemData = e->mimeData()->data("application/x-mcrinvitem");
-          QDataStream dataStream(&itemData, QIODevice::ReadOnly);
- */
-
-/*
-          QPoint offset;
-          QString id;
-          dataStream >> offset >> id;
-          nspacedID = id;
- */
-        nspacedID = "minecraft:" + e->mimeData()->text();
+    } else if (e->mimeData()->hasText()) {
+        nspacedID = e->mimeData()->text();
+        if (!nspacedID.contains(':'))
+            nspacedID = QStringLiteral("minecraft:") + nspacedID;
     }
     if (!nspacedID.isEmpty()) {
         QTextCursor cursor = cursorForPosition(e->pos());

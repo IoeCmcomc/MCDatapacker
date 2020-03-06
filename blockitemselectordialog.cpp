@@ -63,30 +63,29 @@ void BlockItemSelectorDialog::setupTreeView() {
     model.setParent(ui->listView);
     filterModel.setSourceModel(&model);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
-    /*ui->listView->setModel(model); */
     ui->listView->setModel(&filterModel);
 
-    QMap<QString, QVariant> *MCRItemInfo =
+    QMap<QString, QVariant> MCRItemInfo =
         MainWindow::getMCRInfo("item");
-    QMap<QString, QVariant> *MCRBlockInfo =
+    QMap<QString, QVariant> MCRBlockInfo =
         MainWindow::getMCRInfo("block");
     QMap<QString,
-         QVariant>::const_iterator blockIter = MCRBlockInfo->constBegin();
+         QVariant>::const_iterator blockIter = MCRBlockInfo.constBegin();
     QMap<QString,
-         QVariant>::const_iterator itemIter = MCRItemInfo->constBegin();
+         QVariant>::const_iterator itemIter = MCRItemInfo.constBegin();
     /*int c = 0; */
-    while ((blockIter != MCRBlockInfo->constEnd())
-           || (itemIter != MCRItemInfo->constEnd())) {
+    while ((blockIter != MCRBlockInfo.constEnd())
+           || (itemIter != MCRItemInfo.constEnd())) {
         if (blockIter.value().toMap().contains("unobtainable")) {
-            if (blockIter != MCRBlockInfo->constEnd())
+            if (blockIter != MCRBlockInfo.constEnd())
                 ++blockIter;
             else
                 ++itemIter;
             continue;
         }
-        auto key = (blockIter != MCRBlockInfo->constEnd())
+        auto key = (blockIter != MCRBlockInfo.constEnd())
                        ? blockIter.key() : itemIter.key();
-        MCRInvItem     invItem(key, ui->listView);
+        MCRInvItem     invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         item->setSizeHint(QSize(32 + (3 * 2), 32 + (3 * 2)));
@@ -96,7 +95,7 @@ void BlockItemSelectorDialog::setupTreeView() {
         item->setToolTip(invItem.getName());
         model.appendRow(item);
         /*++c; */
-        if (blockIter != MCRBlockInfo->constEnd())
+        if (blockIter != MCRBlockInfo.constEnd())
             ++blockIter;
         else
             ++itemIter;

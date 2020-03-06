@@ -21,7 +21,7 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
 
     connect(this, SIGNAL(doubleClicked(QModelIndex)), this,
             SLOT(onDoubleClicked(QModelIndex)));
-    //connect(this, &QTreeView::clicked, this, &DatapackTreeView::onDoubleClicked);
+    /*connect(this, &QTreeView::clicked, this, &DatapackTreeView::onDoubleClicked); */
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &DatapackTreeView::customContextMenuRequested, this,
@@ -33,7 +33,7 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
 }
 
 QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
-    //Right click context menu
+    /*Right click context menu */
     QMenu    *cMenu = new QMenu(this);
     QString   path  = relPath(dirPath, dirModel.filePath(index));
     QFileInfo finfo = dirModel.fileInfo(index);
@@ -100,7 +100,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
     if (path != "pack.mcmeta") {
         cMenu->addSeparator();
-        QMenu *newMenu = new QMenu(tr("New"), cMenu); //"New" menu
+        QMenu *newMenu = new QMenu(tr("New"), cMenu); /*"New" menu */
 
         QAction *newMenuNewFolder = new QAction(tr("Folder"), newMenu);
         if (path == "data")
@@ -157,7 +157,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             });
             newMenu->addAction(newMenuNewStruct);
 
-            //"Tag" menu
+            /*"Tag" menu */
             QMenu *tagMenu = new QMenu(tr("Tag"), newMenu);
 
             QAction *newBlockTag = new QAction(tr("Blocks"), tagMenu);
@@ -217,7 +217,7 @@ QModelIndex DatapackTreeView::getSelected() {
 }
 
 void DatapackTreeView::load(const QString &dir) {
-    //dirModel.setRootPath(dir);
+    /*dirModel.setRootPath(dir); */
     dirModel.setRootPath("");
     setModel(&dirModel);
 
@@ -264,9 +264,9 @@ void DatapackTreeView::onCustomContextMenu(const QPoint &point) {
 void DatapackTreeView::onFileRenamed(const QString &path,
                                      const QString &oldName,
                                      const QString &newName) {
-    qDebug() << path << oldName << newName;
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
+
     if (toMCRFileType(dirPath, oldpath) != MainWindow::Function) return;
 
     if (isStringInTagFile(dirPath + "/data/minecraft/tags/functions/load.json",
@@ -286,7 +286,7 @@ void DatapackTreeView::onFileRenamed(const QString &path,
 }
 
 void DatapackTreeView::contextMenuOnNewFolder() {
-    //QModelIndex selected = getSelected();
+    /*QModelIndex selected = getSelected(); */
     QModelIndex selected = indexAt(cMenuPos);
 
     if (selected.isValid()) {
@@ -330,7 +330,6 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
             newPath = finfo.filePath() + "/" + name;
         else
             newPath = tmpDir.path() + "/" + name;
-        qDebug() << newPath;
         QFile newFile(newPath);
         newFile.open(QIODevice::NewOnly);
         newFile.close();
@@ -347,21 +346,21 @@ void DatapackTreeView::contextMenuOnNew(const QString &name,
     QModelIndex index    = makeNewFile(selected, name, catDir);
 
     if (index.isValid()) {
-        //onDoubleClicked(index);
+        /*onDoubleClicked(index); */
         setCurrentIndex(index);
         edit(index);
     }
 }
 
 void DatapackTreeView::contextMenuOnOpen() {
-    //QModelIndex selected = getSelected();
+    /*QModelIndex selected = getSelected(); */
     QModelIndex selected = indexAt(cMenuPos);
 
     if (selected.isValid()) {
         const QFileInfo finfo = dirModel.fileInfo(selected);
-        //qDebug() << finfo;
+        /*qDebug() << finfo; */
         if (finfo.exists() && finfo.isFile()) {
-            //qDebug() << "Open from tree (right click)";
+            /*qDebug() << "Open from tree (right click)"; */
             qobject_cast<MainWindow*>(this->window())->openFile(
                 finfo.absoluteFilePath());
         }
@@ -389,7 +388,10 @@ bool DatapackTreeView::isStringInTagFile(const QString &filepath,
 void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
                                                 const QString &str,
                                                 bool added) {
+    QString errorMessage;
+
     if (!QFileInfo(filepath).exists()) {
+        QDir().mkpath(QFileInfo(filepath).dir().path());
         QSaveFile newFile(filepath);
         if (newFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QJsonArray values;
@@ -399,8 +401,21 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
             QTextStream out(&newFile);
             out.setCodec("UTF-8");
             out << QJsonDocument(root).toJson();
+
+            if (!newFile.commit()) {
+                errorMessage = tr("Cannot write file %1:\n%2.")
+                               .arg(QDir::toNativeSeparators(filepath),
+                                    newFile.errorString());
+            }
+        }  else{
+            errorMessage = tr("Cannot open file %1 for writing:\n%2.")
+                           .arg(QDir::toNativeSeparators(filepath),
+                                newFile.errorString());
         }
-        newFile.commit();
+
+        if (!errorMessage.isEmpty()) {
+            QMessageBox::information(this, tr("Error"), errorMessage);
+        }
     }
 
     QFile file(filepath);
@@ -409,7 +424,6 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
         QJsonObject   root = doc.object();
         if (!root.isEmpty()) {
             if (root.contains("values") && root.value("values").isArray()) {
-                //auto values = root.value("values").toArray();
                 auto values = root.value("values").toVariant().toStringList();
                 if ((!values.contains(str)) && added) {
                     values.push_back(str);
@@ -428,7 +442,7 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
 }
 
 void DatapackTreeView::contextMenuOnRename() {
-    //QModelIndex selected = getSelected();
+    /*QModelIndex selected = getSelected(); */
     QModelIndex selected = indexAt(cMenuPos);
 
     if (selected.isValid()) {
@@ -437,7 +451,7 @@ void DatapackTreeView::contextMenuOnRename() {
 }
 
 void DatapackTreeView::contextMenuOnDelete() {
-    //QModelIndex selected = getSelected();
+    /*QModelIndex selected = getSelected(); */
     QModelIndex selected = indexAt(cMenuPos);
 
     if (selected.isValid()) {
@@ -462,12 +476,12 @@ void DatapackTreeView::contextMenuOnDelete() {
 }
 
 void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {
-    //qDebug() << "index.isValid: " << index.isValid();
+    /*qDebug() << "index.isValid: " << index.isValid(); */
 
     if (index.isValid()) {
         const QFileInfo finfo = dirModel.fileInfo(index);
         if (finfo.exists() && finfo.isFile()) {
-            //qDebug() << "Open from tree";
+            /*qDebug() << "Open from tree"; */
             setCurrentIndex(index);
             qobject_cast<MainWindow*>(this->window())->openFile(
                 finfo.absoluteFilePath());

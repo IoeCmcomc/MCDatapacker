@@ -10,11 +10,12 @@ class MCRInvItem
 {
 public:
     MCRInvItem(void);
-    MCRInvItem(QString id, QObject *parent = nullptr);
+    MCRInvItem(QString id);
     MCRInvItem(const MCRInvItem &other);
     ~MCRInvItem();
     MCRInvItem &operator=(const MCRInvItem &other);
     bool operator==(const MCRInvItem &other);
+    bool operator!=(const MCRInvItem &other);
 
     QString getName() const;
     void setName(const QString &name);

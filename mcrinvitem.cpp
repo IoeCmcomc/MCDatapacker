@@ -6,7 +6,7 @@
 #include <QPainter>
 #include <QGraphicsColorizeEffect>
 
-MCRInvItem::MCRInvItem(QString id, QObject *parent) {
+MCRInvItem::MCRInvItem(QString id) {
     /*qDebug() << "Calling normal constructor" << this; */
     qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
 
@@ -199,24 +199,22 @@ void MCRInvItem::setupItem(QString id) {
         centeredPix.fill(Qt::transparent);
         {
             QPainter painter(&centeredPix);
-            painter.drawPixmap(
-                (32 - iconpix.width()) / 2, 32 - iconpix.height(), iconpix);
+            painter.drawPixmap((32 - iconpix.width()) / 2,
+                               (32 - iconpix.height()) / 2, iconpix);
             painter.end();
         }
         iconpix = centeredPix;
     }
     setPixmap(iconpix);
 
-    QMap<QString, QVariant> *MCRItemInfo = MainWindow::getMCRInfo(QStringLiteral(
-                                                                      "item"));
-    QMap<QString, QVariant> *MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral(
-                                                                       "block"));
-    if (MCRItemInfo->contains(id)) {
-        setName(MCRItemInfo->value(id).toMap().value(QStringLiteral(
-                                                         "name")).toString());
+    auto MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
+    auto MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+    if (MCRItemInfo.contains(id)) {
+        setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
+                                                        "name")).toString());
         setHasBlockForm(false);
-    } else if (MCRBlockInfo->contains(id)) {
-        auto blockMap = MCRBlockInfo->value(id).toMap();
+    } else if (MCRBlockInfo.contains(id)) {
+        auto blockMap = MCRBlockInfo.value(id).toMap();
         if (!blockMap.contains(QStringLiteral("unobtainable")))
             setName(blockMap.value(QStringLiteral("name")).toString());
         setHasBlockForm(true);
@@ -260,6 +258,10 @@ bool MCRInvItem::operator==(const MCRInvItem &other) {
     return r;
 }
 
+bool MCRInvItem::operator!=(const MCRInvItem &other) {
+    return !(*this == other);
+}
+
 QString MCRInvItem::getName() const {
     return this->name;
 }
@@ -273,7 +275,7 @@ QString MCRInvItem::getNamespacedID() const {
 }
 
 void MCRInvItem::setNamespacedID(const QString &id) {
-    /*qDebug() << "setNamespacedID" << id; */
+/*    qDebug() << "setNamespacedID" << id; */
     if (id.isEmpty()) {
         qWarning() << "Can't set a empty namespacedID to MCRInvItem";
         return;
@@ -281,11 +283,15 @@ void MCRInvItem::setNamespacedID(const QString &id) {
 
     setEmpty(id.isEmpty());
     this->namespacedID = id;
-    if (id.startsWith('#')) {
+
+    if (id.startsWith("#")) {
         QPixmap iconpix(32, 32);
         iconpix.fill(Qt::transparent);
         {
             QPainter painter(&iconpix);
+            QFont    font = painter.font();
+            font.setPixelSize(32);
+            painter.setFont(font);
             painter.drawText(QRect(0, 0, 32, 32),
                              Qt::AlignCenter,
                              QStringLiteral("#"));
@@ -293,7 +299,9 @@ void MCRInvItem::setNamespacedID(const QString &id) {
         }
         setPixmap(iconpix);
         setName("Item tag: " + id.midRef(1));
+        isTag = true;
     } else {
+        isTag = false;
         setupItem(id);
     }
 }

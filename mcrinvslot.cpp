@@ -1,6 +1,8 @@
 #include "mcrinvslot.h"
 
 #include "blockitemselectordialog.h"
+#include "mainwindow.h"
+#include "globalhelpers.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -93,6 +95,14 @@ void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
     delete cMenu;
 }
 
+bool MCRInvSlot::getAcceptTag() const {
+    return acceptTag;
+}
+
+void MCRInvSlot::setAcceptTag(bool value) {
+    acceptTag = value;
+}
+
 bool MCRInvSlot::getIsCreative() const {
     return isCreative;
 }
@@ -129,8 +139,7 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
         /* Clicked properly */
         BlockItemSelectorDialog dialog(this);
         if (dialog.exec()) {
-            removeItem();
-            setItem(MCRInvItem(dialog.getSelectedID(), this));
+            setItem(MCRInvItem(dialog.getSelectedID()));
         }
     }
     isDragged = false;
@@ -142,8 +151,13 @@ void MCRInvSlot::paintEvent(QPaintEvent *event) {
     QFrame::paintEvent(event);
 
     QPainter painter(this);
-    if ((!item.isEmpty()) && (!item.getPixmap().isNull()) && (!itemHidden))
-        painter.drawPixmap(this->rect(), item.getPixmap());
+    if ((!item.isEmpty()) && (!item.getPixmap().isNull()) && (!itemHidden)) {
+        auto pixmap = item.getPixmap();
+        painter.drawPixmap((width() - pixmap.width()) / 2,
+                           (height() - pixmap.height()) / 2,
+                           pixmap);
+    }
+    painter.end();
 }
 
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
@@ -159,7 +173,8 @@ void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
             event->setDropAction(Qt::IgnoreAction);
             event->ignore();
         }
-    } else if (event->mimeData()->hasText()) {
+    } else if (event->mimeData()->hasText() ||
+               event->mimeData()->hasFormat("text/uri-list")) {
         event->setDropAction(Qt::CopyAction);
         event->accept();
     } else {
@@ -193,53 +208,65 @@ void MCRInvSlot::dragMoveEvent(QDragMoveEvent *event) {
 void MCRInvSlot::dropEvent(QDropEvent *event) {
     if (!isCreative) {
         if (event->mimeData()->hasFormat("application/x-mcrinvitem")) {
-            MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
-
-            QByteArray itemData = event->mimeData()->data(
+            MCRInvSlot *source   = qobject_cast<MCRInvSlot*>(event->source());
+            QByteArray  itemData = event->mimeData()->data(
                 "application/x-mcrinvitem");
             QDataStream dataStream(&itemData, QIODevice::ReadOnly);
 
             QVariant vari;
-
             dataStream >> vari;
-
             MCRInvItem dropInvItem = vari.value<MCRInvItem>();
 
-            if (!item.isEmpty()) {
-                if ((event->source() != this) && (!source->isCreative)) {
-                    /*source->setItem(item); */
-                    MCRInvItem swapItem(item.getNamespacedID(), this);
-                    source->setItem(swapItem);
+            if ((item != dropInvItem)
+                && ((getAcceptTag() && source->getAcceptTag())
+                    || !(item.getIsTag() || dropInvItem.getIsTag()))) {
+                if (!item.isEmpty()) {
+                    if ((event->source() != this) && (!source->isCreative)) {
+                        /*source->setItem(item); */
+                        MCRInvItem swapItem(item.getNamespacedID());
+                        source->setItem(swapItem);
+                    }
+                }
+                setItem(dropInvItem, true);
+
+                if (source->isCreative ||
+                    (event->keyboardModifiers() & Qt::ControlModifier)) {
+                    event->setDropAction(Qt::CopyAction);
+                    event->accept();
+                    return;
+                } else if (event->source() != this) {
+                    event->setDropAction(Qt::MoveAction);
+                    event->accept();
                 }
             }
-            if (!(item == dropInvItem)) {
-                setItem(dropInvItem, true);
-            }
+        } else if (event->mimeData()->hasFormat("text/uri-list")) {
+            auto    filepath = event->mimeData()->urls().at(0).toLocalFile();
+            auto    dirpath  = qobject_cast<MainWindow*>(window())->getCurDir();
+            QString id       = GlobalHelpers::toNamespacedID(dirpath, filepath);
 
-            if (source->isCreative ||
-                (event->keyboardModifiers() & Qt::ControlModifier)) {
-                event->setDropAction(Qt::CopyAction);
-                emit itemChanged();
-                event->accept();
-            } else if (event->source() != this) {
-                event->setDropAction(Qt::MoveAction);
-                event->accept();
-            } else {
-                event->setDropAction(Qt::IgnoreAction);
-                event->ignore();
-                delete &dropInvItem;
+            if (!id.isEmpty()) {
+                MCRInvItem newItem(id);
+                if (acceptTag || (!newItem.getIsTag())) {
+                    setItem(newItem, true);
+
+                    event->setDropAction(Qt::CopyAction);
+                    event->accept();
+                }
             }
         } else if (event->mimeData()->hasText()) {
             QString id = event->mimeData()->text();
             if (!id.isEmpty()) {
-                MCRInvItem newItem(id, this);
-                setItem(newItem, true);
+                MCRInvItem newItem(id);
+                if (acceptTag || (!newItem.getIsTag())) {
+                    setItem(newItem, true);
 
-                event->setDropAction(Qt::CopyAction);
-                emit itemChanged();
-                event->accept();
+                    event->setDropAction(Qt::CopyAction);
+                    event->accept();
+                }
             }
         }
+    }
+    if (event->isAccepted()) {
         update();
     } else {
         event->setDropAction(Qt::IgnoreAction);

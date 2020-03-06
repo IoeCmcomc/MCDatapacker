@@ -93,13 +93,13 @@ bool GlobalHelpers::isPathRelativeTo(const QString &dirpath,
 QString GlobalHelpers::toNamespacedID(const QString &dirpath,
                                       QString filepath) {
     auto    datapath = dirpath + "/data/";
-    QString r        = "";
+    QString r;
 
     if (filepath.startsWith(datapath)) {
         auto finfo = QFileInfo(filepath);
         filepath = finfo.dir().path() + '/' + finfo.completeBaseName();
         filepath.remove(0, datapath.length());
-        if (isPathRelativeTo(dirpath, filepath, "tags")) {
+        if (isPathRelativeTo(dirpath, finfo.filePath(), "tags")) {
             if (filepath.split('/').count() >= 4)
                 r = "#" + filepath.section('/', 0, 0)
                     + ':' + filepath.section('/', 3);

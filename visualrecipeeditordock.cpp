@@ -21,6 +21,8 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     ui(new Ui::VisualRecipeEditorDock) {
     ui->setupUi(this);
 
+    ui->outputSlot->setAcceptTag(false);
+
     this->craftingSlots = QVector<MCRInvSlot*>({ ui->craftingSlot_1,
                                                  ui->craftingSlot_2,
                                                  ui->craftingSlot_3,
@@ -173,9 +175,14 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
 
         QJsonObject key;
         for (auto str : keys.toStdMap()) {
+            auto itemID = str.first;
+            if (!itemID.contains(':'))
+                itemID = QStringLiteral("minecraft:") + itemID;
             QJsonObject keyItem;
-            keyItem.insert(QStringLiteral("item"),
-                           QStringLiteral("minecraft:") + str.first);
+            if (MCRInvItem(itemID).getIsTag())
+                keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
+            else
+                keyItem.insert(QStringLiteral("item"), itemID);
             key.insert(str.second, keyItem);
         }
         root.insert(QStringLiteral("key"), key);
@@ -214,9 +221,14 @@ QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
     root.insert(QStringLiteral("type"),
                 QStringLiteral("minecraft:") + smeltingTypes[index]);
 
+    auto itemID = ui->smeltingSlot_0->itemNamespacedID();
+    if (!itemID.contains(':'))
+        itemID = QStringLiteral("minecraft:") + itemID;
     QJsonObject ingredient;
-    ingredient.insert(QStringLiteral("item"),
-                      ui->smeltingSlot_0->itemNamespacedID());
+    if (MCRInvItem(itemID).getIsTag())
+        ingredient.insert(QStringLiteral("tag"), itemID.remove(0, 1));
+    else
+        ingredient.insert(QStringLiteral("item"), itemID);
     root.insert("ingredient", ingredient);
 
     root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
@@ -230,9 +242,14 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
     root.insert(QStringLiteral("type"),
                 QStringLiteral("minecraft:stonecutting"));
 
+    auto itemID = ui->stonecuttingSlot->itemNamespacedID();
+    if (!itemID.contains(':'))
+        itemID = QStringLiteral("minecraft:") + itemID;
     QJsonObject ingredient;
-    ingredient.insert(QStringLiteral("item"),
-                      ui->stonecuttingSlot->itemNamespacedID());
+    if (MCRInvItem(itemID).getIsTag())
+        ingredient.insert(QStringLiteral("tag"), itemID.remove(0, 1));
+    else
+        ingredient.insert(QStringLiteral("item"), itemID);
     root.insert(QStringLiteral("ingredient"), ingredient);
 
     root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
@@ -321,21 +338,26 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
         QJsonObject keys = root[QStringLiteral("key")].toObject();
         for (int i = 0; i < 9; ++i) {
             QString key = QString(patternStr[i]);
-            QString id;
             if (key == ' ') {
-                id = "";
+                craftingSlots[i]->removeItem();
             } else {
                 if (!keys.contains(key)) continue;
                 QJsonObject keyObj = keys[key].toObject();
-                if (!keyObj.contains(QStringLiteral("item"))) return;
 
-                id = keyObj[QStringLiteral("item")].toString();
-            }
-            if (!id.isEmpty()) {
-                MCRInvItem item(id, this);
-                craftingSlots[i]->setItem(item);
-            } else {
-                craftingSlots[i]->removeItem();
+                QString itemID;
+                if (keyObj.contains(QStringLiteral("item"))) {
+                    itemID = keyObj[QStringLiteral("item")].toString();
+                } else if (keyObj.contains(QStringLiteral("tag"))) {
+                    itemID = '#' + keyObj[QStringLiteral("tag")].toString();
+                } else {
+                    return;
+                }
+
+                if (!itemID.isEmpty()) {
+                    craftingSlots[i]->setItem(MCRInvItem(itemID));
+                } else {
+                    craftingSlots[i]->removeItem();
+                }
             }
         }
     } else if (type.endsWith(QStringLiteral("crafting_shapeless"))) {
@@ -349,13 +371,20 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
                 craftingSlots[i]->removeItem();
             } else {
                 QJsonObject ingredient = ingredients[i].toObject();
-                if (!ingredient.contains(QStringLiteral("item"))) return;
+                QString     itemID;
+                if (ingredient.contains(QStringLiteral("item"))) {
+                    itemID = ingredient[QStringLiteral("item")].toString();
+                } else if (ingredient.contains(QStringLiteral("tag"))) {
+                    itemID = '#' + ingredient[QStringLiteral("tag")].toString();
+                } else {
+                    return;
+                }
 
-                QString itemID = ingredient[QStringLiteral("item")].toString();
-                if (!itemID.isEmpty())
-                    craftingSlots[i]->setItem(MCRInvItem(itemID, this));
-                else
+                if (!itemID.isEmpty()) {
+                    craftingSlots[i]->setItem(MCRInvItem(itemID));
+                } else {
                     craftingSlots[i]->removeItem();
+                }
             }
         }
     }
@@ -367,7 +396,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
 
     QString itemID = result[QStringLiteral("item")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID, this));
+        ui->outputSlot->setItem(MCRInvItem(itemID));
     else
         ui->outputSlot->removeItem();
     if (result.contains(QStringLiteral("count")))
@@ -392,18 +421,24 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
     if (!root.contains(QStringLiteral("ingredient"))) return;
 
     QJsonObject ingredient = root[QStringLiteral("ingredient")].toObject();
-    if (!ingredient.contains(QStringLiteral("item"))) return;
+    QString     itemID;
+    if (ingredient.contains(QStringLiteral("item"))) {
+        itemID = ingredient[QStringLiteral("item")].toString();
+    } else if (ingredient.contains(QStringLiteral("tag"))) {
+        itemID = '#' + ingredient[QStringLiteral("tag")].toString();
+    } else {
+        return;
+    }
 
-    QString itemID = ingredient[QStringLiteral("item")].toString();
     if (!itemID.isEmpty())
-        ui->smeltingSlot_0->setItem(MCRInvItem(itemID, this));
+        ui->smeltingSlot_0->setItem(MCRInvItem(itemID));
     else
         ui->smeltingSlot_0->removeItem();
     if (!root.contains(QStringLiteral("result"))) return;
 
     itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID, this));
+        ui->outputSlot->setItem(MCRInvItem(itemID));
     else
         ui->outputSlot->removeItem();
 
@@ -425,18 +460,24 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
     if (!root.contains(QStringLiteral("ingredient"))) return;
 
     QJsonObject ingredient = root[QStringLiteral("ingredient")].toObject();
-    if (!ingredient.contains(QStringLiteral("item"))) return;
+    QString     itemID;
+    if (ingredient.contains(QStringLiteral("item"))) {
+        itemID = ingredient[QStringLiteral("item")].toString();
+    } else if (ingredient.contains(QStringLiteral("tag"))) {
+        itemID = '#' + ingredient[QStringLiteral("tag")].toString();
+    } else {
+        return;
+    }
 
-    QString itemID = ingredient[QStringLiteral("item")].toString();
     if (!itemID.isEmpty())
-        ui->stonecuttingSlot->setItem(MCRInvItem(itemID, this));
+        ui->stonecuttingSlot->setItem(MCRInvItem(itemID));
     else
         ui->stonecuttingSlot->removeItem();
     if (!root.contains(QStringLiteral("result"))) return;
 
     itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID, this));
+        ui->outputSlot->setItem(MCRInvItem(itemID));
     else
         ui->outputSlot->removeItem();
 

@@ -41,7 +41,7 @@ public:
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
-    static QMap<QString, QVariant> *getMCRInfo(const QString &type);
+    static QMap<QString, QVariant> &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
     void setCurrentFile(const QString &filepath);
 
@@ -50,7 +50,7 @@ protected:
     void changeEvent(QEvent* event) override;
 
 signals:
-    void fileOpened(QString fileExt);;
+    void fileOpened(QString fileExt);
 
 private slots:
     void open();
@@ -70,7 +70,7 @@ private:
 
     QString curFile = QString();
     QString curDir  = QString();
-    static QMap<QString, QMap<QString, QVariant>* > *MCRInfoMaps;
+    static QMap<QString, QMap<QString, QVariant> > MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
     QLocale curLocale;
     QFileSystemWatcher fileWatcher;
@@ -82,14 +82,14 @@ private:
     void writeSettings();
     bool maybeSave();
     bool saveFile(const QString &filepath);
-    //void setCurrentFile(const QString &filepath);
+    /*void setCurrentFile(const QString &filepath); */
     QString strippedName(const QString &fullFilepath);
     void updateWindowTitle();
-    static QMap<QString, QVariant> *readMCRInfo(const QString &type  = "block",
-                                                const int      depth = 0);
+    static QMap<QString, QVariant> readMCRInfo(const QString &type = "block",
+                                               const int depth     = 0);
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);
     void switchTranslator(QTranslator& translator, const QString& filename);
 };
 
-#endif // MAINWINDOW_H
+#endif /* MAINWINDOW_H */

@@ -24,6 +24,9 @@ public:
 
     void setBackground(QString color = "#8B8B8B");
 
+    bool getAcceptTag() const;
+    void setAcceptTag(bool value);
+
 signals:
     void itemChanged();
 
@@ -46,6 +49,7 @@ private:
     QPoint mousePressPos;
     bool isDragged  = false;
     bool itemHidden = false;
+    bool acceptTag  = true;
 
     void startDrag(QMouseEvent *event);
     void hideItem();

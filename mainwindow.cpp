@@ -20,18 +20,19 @@
 #include <QFileInfo>
 #include <QAbstractButton>
 
-MainWindow::MCRFileType MainWindow::curFileType = Text;
-QMap<QString, QMap<QString,
-                   QVariant>* > *MainWindow::MCRInfoMaps = new QMap<QString,
-                                                                    QMap<QString,
-                                                                         QVariant>* >();
+MainWindow::MCRFileType                 MainWindow::curFileType = Text;
+QMap<QString, QMap<QString, QVariant> > MainWindow::MCRInfoMaps;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    MainWindow::MCRInfoMaps->insert("block", MainWindow::readMCRInfo("blocks"));
-    MainWindow::MCRInfoMaps->insert("item", MainWindow::readMCRInfo("items"));
+    MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
+                                   MainWindow::readMCRInfo(QStringLiteral(
+                                                               "blocks")));
+    MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
+                                   MainWindow::readMCRInfo(QStringLiteral(
+                                                               "items")));
 
     QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoFont.setPointSize(11);
@@ -77,9 +78,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::open() {
     if (maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this,
-                                                        tr("Open file"),
-                                                        "");
+        QString fileName
+            = QFileDialog::getOpenFileName(this, tr("Open file"), "");
         if (!fileName.isEmpty())
             openFile(fileName);
     }
@@ -87,9 +87,8 @@ void MainWindow::open() {
 
 bool MainWindow::save() {
     if (curFile.isEmpty()) {
-        QString filepath = QFileDialog::getSaveFileName(this,
-                                                        tr("Save File"),
-                                                        "");
+        QString filepath
+            = QFileDialog::getSaveFileName(this, tr("Save File"), "");
         if (!filepath.isEmpty())
             return saveFile(filepath);
         else
@@ -106,12 +105,12 @@ void MainWindow::pref_settings() {
 }
 
 void MainWindow::documentWasModified() {
-    //qDebug() << "documentWasModified";
+    /*qDebug() << "documentWasModified"; */
     setWindowModified(ui->codeEditor->document()->isModified());
 }
 
 void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
-    //qDebug() << "onSystemWatcherFileChanged";
+    /*qDebug() << "onSystemWatcherFileChanged"; */
     if ((filepath != curFile)) return;
 
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
@@ -144,7 +143,7 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    //qDebug() << "closeEvent";
+    /*qDebug() << "closeEvent"; */
     if (maybeSave()) {
         writeSettings();
         event->accept();
@@ -258,7 +257,7 @@ void MainWindow::switchTranslator(QTranslator& translator,
 void MainWindow::changeEvent(QEvent* event) {
     if (0 != event) {
         switch (event->type()) {
-        // this event is send if a translator is loaded
+        /* this event is send if a translator is loaded */
         case QEvent::LanguageChange: {
             qDebug() << "QEvent::LanguageChange";
             ui->retranslateUi(this);
@@ -267,7 +266,7 @@ void MainWindow::changeEvent(QEvent* event) {
         }
         break;
 
-        // this event is send, if the system, language changes
+        /* this event is send, if the system, language changes */
         case QEvent::LocaleChange: {
             qDebug() << "QEvent::LocaleChange";
             QString locale = QLocale::system().name();
@@ -313,20 +312,22 @@ void MainWindow::updateWindowTitle() {
 
     if (!curFile.isEmpty())
         title.push_back(strippedName(curFile) + "[*]");
+    else
+        title.push_back(QStringLiteral("Untitled") + "[*]");
     if (!curDir.isEmpty())
         title.push_back("[" + strippedName(curDir) + "]");
     title.push_back(QCoreApplication::applicationName());
     setWindowTitle(title.join(QStringLiteral(" - ")));
 }
 
-QMap<QString, QVariant> *MainWindow::readMCRInfo(const QString &type,
-                                                 const int depth) {
-    QMap<QString, QVariant> *retMap = new QMap<QString, QVariant>();
+QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
+                                                const int depth) {
+    QMap<QString, QVariant> retMap;
 
     QFileInfo finfo = QFileInfo(":minecraft/info/" + type + ".json");
 
     if (!(finfo.exists() && finfo.isFile())) {
-        //qDebug() << "File not exists. Return empty.";
+        /*qDebug() << "File not exists. Return empty."; */
         return retMap;
     }
     QFile inFile(finfo.filePath());
@@ -337,24 +338,23 @@ QMap<QString, QVariant> *MainWindow::readMCRInfo(const QString &type,
     QJsonParseError errorPtr;
     QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
-        //qDebug() << "Parse failed" << errorPtr.error;
+        /*qDebug() << "Parse failed" << errorPtr.error; */
         return retMap;
     }
     QJsonObject root = doc.object();
     if (root.isEmpty()) {
-        //qDebug() << "Root is empty. Return empty";
+        /*qDebug() << "Root is empty. Return empty"; */
         return retMap;
     }
 
-    QMap<QString, QVariant> *tmpMap2 = new QMap<QString, QVariant>(
-        root["added"].toVariant().toMap());
-    if (!tmpMap2->isEmpty())
-        retMap->unite(*tmpMap2);
+    QMap<QString, QVariant> tmpMap2 = root["added"].toVariant().toMap();
+    if (!tmpMap2.isEmpty())
+        retMap.unite(tmpMap2);
     return retMap;
 }
 
-QMap<QString, QVariant> *MainWindow::getMCRInfo(const QString &type) {
-    return MainWindow::MCRInfoMaps->value(type, new QMap<QString, QVariant>());
+QMap<QString, QVariant> &MainWindow::getMCRInfo(const QString &type) {
+    return MainWindow::MCRInfoMaps[type];
 }
 
 void MainWindow::newDatapack() {
@@ -413,7 +413,7 @@ void MainWindow::newDatapack() {
 }
 
 void MainWindow::openFile(const QString &filepath, bool reload) {
-    //qDebug() << "openFile";
+    /*qDebug() << "openFile"; */
     if (filepath.isEmpty() || (this->curFile == filepath && (!reload)))
         return;
     else {
@@ -494,11 +494,9 @@ void MainWindow::openFolder() {
     else
         return;
 
-    qDebug() << dir;
     if (dir.isEmpty()) return;
 
     QString pack_mcmeta = dir + "/pack.mcmeta";
-    qDebug() << QFile::exists(pack_mcmeta);
 
     if (QFile::exists(pack_mcmeta)) {
         if (pack_mcmeta.isEmpty())
@@ -516,7 +514,7 @@ void MainWindow::openFolder() {
                 QJsonDocument json_doc = QJsonDocument::fromJson(
                     json_string.toUtf8());
 
-                //qDebug() << json_doc;
+                /*qDebug() << json_doc; */
 
                 if (json_doc.isNull()) {
                     QMessageBox::information(this,
