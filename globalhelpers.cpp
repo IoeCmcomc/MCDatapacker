@@ -12,6 +12,9 @@ void GlobalHelpers::someTest() {
 
 MainWindow::MCRFileType GlobalHelpers::toMCRFileType(const QString &dirpath,
                                                      const QString &filepath) {
+    if (filepath.isEmpty())
+        return MainWindow::Text;
+
     QFileInfo     info     = QFileInfo(filepath);
     const QString jsonExts = "json mcmeta";
 

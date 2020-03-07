@@ -33,6 +33,7 @@ protected:
     void wheelEvent(QWheelEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
     void dropEvent(QDropEvent *e) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;
 
 
 private slots:
@@ -56,4 +57,4 @@ private:
 };
 
 
-#endif // CODEEDITOR_H
+#endif /* CODEEDITOR_H */

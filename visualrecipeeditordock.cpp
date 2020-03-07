@@ -50,7 +50,6 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
             this,
             &VisualRecipeEditorDock::readRecipe);
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
-        qDebug() << floating;
         adjustSize();
     });
 
@@ -333,9 +332,12 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
         QString patternStr;
         for (auto row : pattern)
             patternStr += row.toString().leftJustified(3, ' ');
+        patternStr = patternStr.leftJustified(9, ' ');
+
         if (!root.contains(QStringLiteral("key"))) return;
 
         QJsonObject keys = root[QStringLiteral("key")].toObject();
+
         for (int i = 0; i < 9; ++i) {
             QString key = QString(patternStr[i]);
             if (key == ' ') {
@@ -371,7 +373,8 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
                 craftingSlots[i]->removeItem();
             } else {
                 QJsonObject ingredient = ingredients[i].toObject();
-                QString     itemID;
+                /*qDebug() << i << ingredient; */
+                QString itemID;
                 if (ingredient.contains(QStringLiteral("item"))) {
                     itemID = ingredient[QStringLiteral("item")].toString();
                 } else if (ingredient.contains(QStringLiteral("tag"))) {
@@ -456,7 +459,7 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
 }
 
 void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
-    qDebug() << "readStonecuttingJson";
+    /*qDebug() << "readStonecuttingJson"; */
     if (!root.contains(QStringLiteral("ingredient"))) return;
 
     QJsonObject ingredient = root[QStringLiteral("ingredient")].toObject();

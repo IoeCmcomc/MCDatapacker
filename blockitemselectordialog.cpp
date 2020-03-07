@@ -65,15 +65,14 @@ void BlockItemSelectorDialog::setupTreeView() {
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->listView->setModel(&filterModel);
 
-    QMap<QString, QVariant> MCRItemInfo =
-        MainWindow::getMCRInfo("item");
-    QMap<QString, QVariant> MCRBlockInfo =
-        MainWindow::getMCRInfo("block");
+    auto MCRItemInfo  = MainWindow::getMCRInfo("item");
+    auto MCRBlockInfo = MainWindow::getMCRInfo("block");
+
     QMap<QString,
          QVariant>::const_iterator blockIter = MCRBlockInfo.constBegin();
     QMap<QString,
          QVariant>::const_iterator itemIter = MCRItemInfo.constBegin();
-    /*int c = 0; */
+    int                            c        = 0;
     while ((blockIter != MCRBlockInfo.constEnd())
            || (itemIter != MCRItemInfo.constEnd())) {
         if (blockIter.value().toMap().contains("unobtainable")) {
@@ -94,7 +93,7 @@ void BlockItemSelectorDialog::setupTreeView() {
         item->setData(vari, Qt::UserRole + 1);
         item->setToolTip(invItem.getName());
         model.appendRow(item);
-        /*++c; */
+        ++c;
         if (blockIter != MCRBlockInfo.constEnd())
             ++blockIter;
         else

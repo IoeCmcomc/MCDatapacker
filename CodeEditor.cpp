@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QMimeData>
 #include <QDir>
+#include <QJsonDocument>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     lineNumberArea        = new LineNumberArea(this);
@@ -117,6 +118,42 @@ void CodeEditor::dropEvent(QDropEvent *e) {
         return;
     }
     QPlainTextEdit::dropEvent(e);
+}
+
+void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
+    QMenu *menu = createStandardContextMenu(e->pos());
+
+    QAction *sep1Action = new QAction("More", menu);
+
+    sep1Action->setSeparator(true);
+    menu->addAction(sep1Action);
+
+    QAction *formatAction = new QAction(tr("Format"), menu);
+    auto     dirpath      = qobject_cast<MainWindow*>(window())->getCurDir();
+    auto     fileType     = GlobalHelpers::toMCRFileType(dirpath, curFile);
+
+    qDebug() << MainWindow::JsonText << fileType << MainWindow::ItemTag;
+
+    formatAction->setDisabled(!((MainWindow::JsonText <= fileType) &&
+                                (fileType <= MainWindow::ItemTag)));
+    if (formatAction->isEnabled()) {
+        connect(formatAction, &QAction::triggered, [ = ]() {
+            QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
+            if (doc.isNull()) return;
+
+            QTextCursor cursor = cursorForPosition(e->pos());
+            cursor.beginEditBlock();
+            cursor.select(QTextCursor::Document);
+            cursor.insertText(doc.toJson(QJsonDocument::Indented));
+            cursor.endEditBlock();
+            setTextCursor(cursor);
+        });
+    }
+    menu->addAction(formatAction);
+
+    /*... */
+    menu->exec(e->globalPos());
+    delete menu;
 }
 
 void CodeEditor::onCursorPositionChanged() {

@@ -1080,6 +1080,6 @@
         <file>info/blocks.json</file>
         <file>info/items.json</file>
         <file>texture/item/azure_bluet.png</file>
-        <file>info/tags/blocks.txt</file>
+        <file>info/tags/blocks.json</file>
     </qresource>
 </RCC>

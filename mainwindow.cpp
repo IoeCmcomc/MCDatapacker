@@ -33,6 +33,11 @@ MainWindow::MainWindow(QWidget *parent)
     MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
                                    MainWindow::readMCRInfo(QStringLiteral(
                                                                "items")));
+    MainWindow::MCRInfoMaps.insert(QStringLiteral("blockTag"),
+                                   MainWindow::readMCRInfo(QStringLiteral(
+                                                               "tags/blocks")));
+
+    qDebug() << MainWindow::getMCRInfo("blockTag").count();
 
     QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoFont.setPointSize(11);
@@ -347,7 +352,11 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
         return retMap;
     }
 
-    QMap<QString, QVariant> tmpMap2 = root["added"].toVariant().toMap();
+    QMap<QString, QVariant> tmpMap2;
+    if (root.contains("added"))
+        tmpMap2 = root["added"].toVariant().toMap();
+    else
+        tmpMap2 = root.toVariantMap();
     if (!tmpMap2.isEmpty())
         retMap.unite(tmpMap2);
     return retMap;
@@ -568,7 +577,14 @@ void MainWindow::openFolder() {
 }
 
 void MainWindow::setCodeEditorText(const QString &text) {
-    ui->codeEditor->setPlainText(text);
+    /*ui->codeEditor->setPlainText(text); */
+    QTextCursor cursor = ui->codeEditor->textCursor();
+
+    cursor.beginEditBlock();
+    cursor.select(QTextCursor::Document);
+    cursor.insertText(text);
+    cursor.endEditBlock();
+    ui->codeEditor->setTextCursor(cursor);
 }
 
 QString MainWindow::getCodeEditorText() {
