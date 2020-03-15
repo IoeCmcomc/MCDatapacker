@@ -26,10 +26,12 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     mcrinvitem.cpp \
     mcrinvslot.cpp \
+    mcrinvsloteditor.cpp \
     mcritemsortfilterproxymodel.cpp \
     newdatapackdialog.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
+    tagselectordialog.cpp \
     visualrecipeeditordock.cpp
 
 HEADERS += \
@@ -43,17 +45,21 @@ HEADERS += \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
     mcrinvslot.h \
+    mcrinvsloteditor.h \
     mcritemsortfilterproxymodel.h \
     newdatapackdialog.h \
     settingsdialog.h \
     stackedwidget.h \
+    tagselectordialog.h \
     visualrecipeeditordock.h
 
 FORMS += \
     blockitemselectordialog.ui \
     mainwindow.ui \
+    mcrinvsloteditor.ui \
     newdatapackdialog.ui \
     settingsdialog.ui \
+    tagselectordialog.ui \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \

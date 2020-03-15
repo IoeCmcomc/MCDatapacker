@@ -15,7 +15,12 @@ public:
     ~MCRInvItem();
     MCRInvItem &operator=(const MCRInvItem &other);
     bool operator==(const MCRInvItem &other);
+    bool operator==(const MCRInvItem &other) const;
+
     bool operator!=(const MCRInvItem &other);
+    bool operator!=(const MCRInvItem &other) const;
+
+    bool operator<(const MCRInvItem &other) const;
 
     QString getName() const;
     void setName(const QString &name);
@@ -35,8 +40,10 @@ public:
 
     bool isEmpty() const;
 
-    friend QDataStream &operator<<(QDataStream &out, const MCRInvItem &obj);
-    friend QDataStream &operator>>(QDataStream &in, MCRInvItem &obj);
+    /*
+       friend QDataStream &operator<<(QDataStream &out, const MCRInvItem &obj);
+       friend QDataStream &operator>>(QDataStream &in, MCRInvItem &obj);
+     */
 
 private:
     QString name;
@@ -56,5 +63,6 @@ Q_DECLARE_METATYPE(MCRInvItem*);
 QDataStream &operator<<(QDataStream &out, const MCRInvItem &obj);
 QDataStream &operator>>(QDataStream &in, MCRInvItem &obj);
 
+QDebug operator<<(QDebug debug, const MCRInvItem &item);
 
 #endif /* MCRINVITEM_H */

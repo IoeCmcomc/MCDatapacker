@@ -44,6 +44,8 @@ public:
     static QMap<QString, QVariant> &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
     void setCurrentFile(const QString &filepath);
+    static QMap<QString, QVariant> readMCRInfo(const QString &type = "block",
+                                               const int depth     = 0);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -85,8 +87,7 @@ private:
     /*void setCurrentFile(const QString &filepath); */
     QString strippedName(const QString &fullFilepath);
     void updateWindowTitle();
-    static QMap<QString, QVariant> readMCRInfo(const QString &type = "block",
-                                               const int depth     = 0);
+
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);
     void switchTranslator(QTranslator& translator, const QString& filename);

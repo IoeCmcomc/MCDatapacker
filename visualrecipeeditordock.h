@@ -6,7 +6,7 @@
 #include <QDockWidget>
 #include <QStandardItemModel>
 #include <QListView>
-//#include <QVector>
+/*#include <QVector> */
 
 namespace Ui {
     class VisualRecipeEditorDock;
@@ -26,7 +26,7 @@ public:
 
 private slots:
     void onRecipeTabChanged(int index);
-    //void onRecipeChanged(); // Unused
+    /*void onRecipeChanged(); // Unused */
 
 private:
     Ui::VisualRecipeEditorDock *ui;
@@ -45,4 +45,7 @@ private:
     void readStonecuttingJson(const QJsonObject &root);
 };
 
-#endif // VISUALRECIPEEDITORDOCK_H
+QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items);
+QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal);
+
+#endif /* VISUALRECIPEEDITORDOCK_H */

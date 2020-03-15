@@ -14,18 +14,29 @@ public:
     explicit MCRInvSlot(QWidget *parent = nullptr,
                         MCRInvItem item = MCRInvItem());
 
-    void setItem(MCRInvItem item, bool emitSignal = false);
-    void removeItem(bool emitSignal               = false);
-    MCRInvItem getItem() const;
+    void setItem(const QVector<MCRInvItem> &items, bool emitSignal    = false);
+    void setItem(MCRInvItem item, bool emitSignal                     = false);
+    void appendItem(MCRInvItem item, bool emitSignal                  = false);
+    void insertItem(const int index, MCRInvItem item, bool emitSignal = false);
+    void removeItem(const int index);
+    int removeItem(const MCRInvItem item);
+    void clearItems(bool emitSignal     = false);
+    MCRInvItem &getItem(const int index = 0);
+    QVector<MCRInvItem> &getItems();
+
     bool getIsCreative() const;
     void setIsCreative(bool value);
-    QString itemNamespacedID();
-    QString itemName();
+
+    QString itemNamespacedID(const int index = 0);
+    QString itemName(const int index         = 0);
 
     void setBackground(QString color = "#8B8B8B");
 
     bool getAcceptTag() const;
     void setAcceptTag(bool value);
+
+    bool getAcceptMultiItems() const;
+    void setAcceptMultiItems(bool value);
 
 signals:
     void itemChanged();
@@ -44,16 +55,18 @@ protected slots:
     /*void onClicked(); */
 
 private:
-    MCRInvItem item;
+    QVector<MCRInvItem> items;
     bool isCreative = false;
     QPoint mousePressPos;
-    bool isDragged  = false;
-    bool itemHidden = false;
-    bool acceptTag  = true;
+    bool isDragged        = false;
+    bool itemHidden       = false;
+    bool acceptTag        = true;
+    bool acceptMultiItems = true;
 
     void startDrag(QMouseEvent *event);
     void hideItem();
     void showItem();
+    QString toolTipText();
 };
 
 #endif /* MCRInvSlot_H */

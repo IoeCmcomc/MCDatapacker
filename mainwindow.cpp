@@ -33,9 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
                                    MainWindow::readMCRInfo(QStringLiteral(
                                                                "items")));
-    MainWindow::MCRInfoMaps.insert(QStringLiteral("blockTag"),
-                                   MainWindow::readMCRInfo(QStringLiteral(
-                                                               "tags/blocks")));
 
     qDebug() << MainWindow::getMCRInfo("blockTag").count();
 

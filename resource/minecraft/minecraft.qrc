@@ -1081,5 +1081,8 @@
         <file>info/items.json</file>
         <file>texture/item/azure_bluet.png</file>
         <file>info/tags/blocks.json</file>
+        <file>info/tags/entity_types.json</file>
+        <file>info/tags/fluids.json</file>
+        <file>info/tags/items.json</file>
     </qresource>
 </RCC>

@@ -22,6 +22,7 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     ui->setupUi(this);
 
     ui->outputSlot->setAcceptTag(false);
+    ui->outputSlot->setAcceptMultiItems(false);
 
     this->craftingSlots = QVector<MCRInvSlot*>({ ui->craftingSlot_1,
                                                  ui->craftingSlot_2,
@@ -114,18 +115,19 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         root.insert(QStringLiteral("type"),
                     QStringLiteral("minecraft:crafting_shaped"));
 
-        QMap<QString, QString> keys;
-        QString                patternStr;
-        QString                patternChars = "123456789";
-        int                    pattCharIdx  = -1;
+        QMap< QVector<MCRInvItem>, QString> keys;
+        QString                             patternStr;
+        QString                             patternChars = "123456789";
+        int                                 pattCharIdx  = -1;
         for (int i = 0; i < 9; ++i) {
-            MCRInvItem item = this->craftingSlots[i]->getItem();
-            if (!item.isEmpty()) {
-                if (!keys.contains(item.getNamespacedID())) {
+            auto items = this->craftingSlots[i]->getItems();
+            if (!items.isEmpty()) {
+                if (!keys.contains(items)) {
                     ++pattCharIdx;
-                    keys[item.getNamespacedID()] = patternChars[pattCharIdx];
+                    keys.count();
+                    keys.insert(items, QString(patternChars[pattCharIdx]));
                 }
-                patternStr += keys[item.getNamespacedID()];
+                patternStr += keys.value(items);
             } else {
                 patternStr += QStringLiteral(" ");
             }
@@ -174,15 +176,8 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
 
         QJsonObject key;
         for (auto str : keys.toStdMap()) {
-            auto itemID = str.first;
-            if (!itemID.contains(':'))
-                itemID = QStringLiteral("minecraft:") + itemID;
-            QJsonObject keyItem;
-            if (MCRInvItem(itemID).getIsTag())
-                keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
-            else
-                keyItem.insert(QStringLiteral("item"), itemID);
-            key.insert(str.second, keyItem);
+            auto items = str.first;
+            key.insert(str.second, ingredientsToJson(items));
         }
         root.insert(QStringLiteral("key"), key);
     } else { /* Shapeless crafting */
@@ -191,12 +186,11 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
 
         QJsonArray ingredients;
         for (int i = 0; i < 9; ++i) {
-            MCRInvItem MCRitem = this->craftingSlots[i]->getItem();
-            if (!MCRitem.isEmpty()) {
-                QJsonObject item;
-                item.insert(QStringLiteral("item"), MCRitem.getNamespacedID());
-                ingredients.push_back(item);
-            }
+            auto items      = this->craftingSlots[i]->getItems();
+            auto ingredient = ingredientsToJson(items);
+            qDebug() << ingredient << ingredient.isNull();
+            if (!ingredient.isNull())
+                ingredients.push_back(ingredient);
         }
         root.insert(QStringLiteral("ingredients"), ingredients);
     }
@@ -220,15 +214,8 @@ QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
     root.insert(QStringLiteral("type"),
                 QStringLiteral("minecraft:") + smeltingTypes[index]);
 
-    auto itemID = ui->smeltingSlot_0->itemNamespacedID();
-    if (!itemID.contains(':'))
-        itemID = QStringLiteral("minecraft:") + itemID;
-    QJsonObject ingredient;
-    if (MCRInvItem(itemID).getIsTag())
-        ingredient.insert(QStringLiteral("tag"), itemID.remove(0, 1));
-    else
-        ingredient.insert(QStringLiteral("item"), itemID);
-    root.insert("ingredient", ingredient);
+    auto items = ui->smeltingSlot_0->getItems();
+    root.insert("ingredient", ingredientsToJson(items));
 
     root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
     root.insert(QStringLiteral("experience"), ui->experienceInput->value());
@@ -241,20 +228,37 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
     root.insert(QStringLiteral("type"),
                 QStringLiteral("minecraft:stonecutting"));
 
-    auto itemID = ui->stonecuttingSlot->itemNamespacedID();
-    if (!itemID.contains(':'))
-        itemID = QStringLiteral("minecraft:") + itemID;
-    QJsonObject ingredient;
-    if (MCRInvItem(itemID).getIsTag())
-        ingredient.insert(QStringLiteral("tag"), itemID.remove(0, 1));
-    else
-        ingredient.insert(QStringLiteral("item"), itemID);
-    root.insert(QStringLiteral("ingredient"), ingredient);
+    auto items = ui->stonecuttingSlot->getItems();
+    root.insert(QStringLiteral("ingredient"), ingredientsToJson(items));
 
     root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
     root.insert(QStringLiteral("count"), ui->resultCountInput->value());
 
     return root;
+}
+
+QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items) {
+    QJsonArray keyItems;
+
+    for (auto item : items) {
+        auto itemID = item.getNamespacedID();
+        if (!itemID.contains(':'))
+            itemID = QStringLiteral("minecraft:") + itemID;
+        QJsonObject keyItem;
+        if (item.getIsTag())
+            keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
+        else
+            keyItem.insert(QStringLiteral("item"), itemID);
+        keyItems.push_back(keyItem);
+    }
+    qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems;
+    if (keyItems.isEmpty()) {
+        return QJsonValue();
+    } else if (keyItems.count() == 1) {
+        return QJsonValue(keyItems.at(0));
+    } else {
+        return QJsonValue(keyItems);
+    }
 }
 
 void VisualRecipeEditorDock::readRecipe() {
@@ -341,25 +345,12 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
         for (int i = 0; i < 9; ++i) {
             QString key = QString(patternStr[i]);
             if (key == ' ') {
-                craftingSlots[i]->removeItem();
+                craftingSlots[i]->clearItems();
             } else {
                 if (!keys.contains(key)) continue;
-                QJsonObject keyObj = keys[key].toObject();
+                QJsonValue keyVal = keys[key];
 
-                QString itemID;
-                if (keyObj.contains(QStringLiteral("item"))) {
-                    itemID = keyObj[QStringLiteral("item")].toString();
-                } else if (keyObj.contains(QStringLiteral("tag"))) {
-                    itemID = '#' + keyObj[QStringLiteral("tag")].toString();
-                } else {
-                    return;
-                }
-
-                if (!itemID.isEmpty()) {
-                    craftingSlots[i]->setItem(MCRInvItem(itemID));
-                } else {
-                    craftingSlots[i]->removeItem();
-                }
+                craftingSlots[i]->setItem(JsonToIngredients(keyVal));
             }
         }
     } else if (type.endsWith(QStringLiteral("crafting_shapeless"))) {
@@ -370,24 +361,10 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
 
         for (int i = 0; i < 9; ++i) {
             if (i >= ingredients.count()) {
-                craftingSlots[i]->removeItem();
+                craftingSlots[i]->clearItems();
             } else {
-                QJsonObject ingredient = ingredients[i].toObject();
-                /*qDebug() << i << ingredient; */
-                QString itemID;
-                if (ingredient.contains(QStringLiteral("item"))) {
-                    itemID = ingredient[QStringLiteral("item")].toString();
-                } else if (ingredient.contains(QStringLiteral("tag"))) {
-                    itemID = '#' + ingredient[QStringLiteral("tag")].toString();
-                } else {
-                    return;
-                }
-
-                if (!itemID.isEmpty()) {
-                    craftingSlots[i]->setItem(MCRInvItem(itemID));
-                } else {
-                    craftingSlots[i]->removeItem();
-                }
+                QJsonValue ingredient = ingredients[i];
+                craftingSlots[i]->setItem(JsonToIngredients(ingredient));
             }
         }
     }
@@ -401,7 +378,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(MCRInvItem(itemID));
     else
-        ui->outputSlot->removeItem();
+        ui->outputSlot->clearItems();
     if (result.contains(QStringLiteral("count")))
         ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt());
 }
@@ -423,27 +400,16 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
 
     if (!root.contains(QStringLiteral("ingredient"))) return;
 
-    QJsonObject ingredient = root[QStringLiteral("ingredient")].toObject();
-    QString     itemID;
-    if (ingredient.contains(QStringLiteral("item"))) {
-        itemID = ingredient[QStringLiteral("item")].toString();
-    } else if (ingredient.contains(QStringLiteral("tag"))) {
-        itemID = '#' + ingredient[QStringLiteral("tag")].toString();
-    } else {
-        return;
-    }
+    QJsonValue ingredient = root[QStringLiteral("ingredient")];
 
-    if (!itemID.isEmpty())
-        ui->smeltingSlot_0->setItem(MCRInvItem(itemID));
-    else
-        ui->smeltingSlot_0->removeItem();
+    ui->smeltingSlot_0->setItem(JsonToIngredients(ingredient));
     if (!root.contains(QStringLiteral("result"))) return;
 
-    itemID = root[QStringLiteral("result")].toString();
+    QString itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(MCRInvItem(itemID));
     else
-        ui->outputSlot->removeItem();
+        ui->outputSlot->clearItems();
 
     if (!root.contains(QStringLiteral("experience"))) return;
 
@@ -462,29 +428,51 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
     /*qDebug() << "readStonecuttingJson"; */
     if (!root.contains(QStringLiteral("ingredient"))) return;
 
-    QJsonObject ingredient = root[QStringLiteral("ingredient")].toObject();
-    QString     itemID;
-    if (ingredient.contains(QStringLiteral("item"))) {
-        itemID = ingredient[QStringLiteral("item")].toString();
-    } else if (ingredient.contains(QStringLiteral("tag"))) {
-        itemID = '#' + ingredient[QStringLiteral("tag")].toString();
-    } else {
-        return;
-    }
+    QJsonValue ingredient = root[QStringLiteral("ingredient")];
+    ui->stonecuttingSlot->setItem(JsonToIngredients(ingredient));
 
-    if (!itemID.isEmpty())
-        ui->stonecuttingSlot->setItem(MCRInvItem(itemID));
-    else
-        ui->stonecuttingSlot->removeItem();
     if (!root.contains(QStringLiteral("result"))) return;
 
-    itemID = root[QStringLiteral("result")].toString();
+    QString itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(MCRInvItem(itemID));
     else
-        ui->outputSlot->removeItem();
+        ui->outputSlot->clearItems();
 
     if (!root.contains(QStringLiteral("count"))) return;
 
     ui->resultCountInput->setValue(root[QStringLiteral("count")].toInt());
+}
+
+QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal) {
+    QJsonArray keyArray;
+
+    if (keyVal.isObject()) {
+        keyArray.push_back(keyVal);
+    } else {
+        keyArray = keyVal.toArray();
+    }
+/*    qDebug() << keyVal << keyArray; */
+
+    QVector<MCRInvItem> items;
+    for (QJsonValueRef key : keyArray) {
+        QJsonObject keyJson = key.toObject();
+        QString     itemID;
+
+        if (keyJson.contains(QStringLiteral("item"))) {
+            itemID = keyJson[QStringLiteral("item")].toString();
+        } else if (keyJson.contains(QStringLiteral("tag"))) {
+            itemID = '#' +
+                     keyJson[QStringLiteral("tag")].toString();
+        } else {
+            qWarning() <<
+                "JsonToIngredients: JSON ingredient has no 'item' nor 'tag' key.";
+        }
+        /*qDebug() << keyJson << keyJson.contains("item") << itemID; */
+        if (!itemID.isEmpty() &&
+            (!items.contains(MCRInvItem(itemID)))) {
+            items.push_back(MCRInvItem(itemID));
+        }
+    }
+    return items;
 }

@@ -258,8 +258,26 @@ bool MCRInvItem::operator==(const MCRInvItem &other) {
     return r;
 }
 
+bool MCRInvItem::operator==(const MCRInvItem &other) const {
+    auto r = (getNamespacedID() == other.getNamespacedID());
+
+    r = r && (getName() == other.getName());
+    return r;
+}
+
 bool MCRInvItem::operator!=(const MCRInvItem &other) {
     return !(*this == other);
+}
+
+bool MCRInvItem::operator!=(const MCRInvItem &other) const {
+    return !(*this == other);
+}
+
+bool MCRInvItem::operator<(const MCRInvItem &other) const {
+    if (getNamespacedID() == other.getNamespacedID())
+        return getName() < other.getName();
+    else
+        return getNamespacedID() < other.getNamespacedID();
 }
 
 QString MCRInvItem::getName() const {
@@ -337,7 +355,6 @@ QString MCRInvItem::toolTip() {
 }
 
 QDataStream &operator<<(QDataStream &out, const MCRInvItem &obj) {
-    /*qDebug() << "QDataStream <<" << obj.getNamespacedID() << obj.getName(); */
     out << obj.getNamespacedID() << obj.getName();
     return out;
 }
@@ -348,6 +365,19 @@ QDataStream &operator>>(QDataStream &in, MCRInvItem &obj) {
     in >> namespacedID >> name;
     obj.setNamespacedID(namespacedID);
     obj.setName(name);
-    /*qDebug() << "QDataStream >>" << namespacedID << obj.getNamespacedID(); */
     return in;
+}
+
+QDebug operator<<(QDebug debug, const MCRInvItem &item) {
+    QDebugStateSaver saver(debug);
+
+    debug.nospace() << "MCRInvItem(";
+    if (!item.isEmpty()) {
+        debug.nospace() << item.getNamespacedID();
+        if (!item.getName().isEmpty())
+            debug.nospace() << ", " << item.getName();
+    }
+    debug.nospace() << ")";
+
+    return debug;
 }
