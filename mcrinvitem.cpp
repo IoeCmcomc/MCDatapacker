@@ -4,10 +4,11 @@
 #include "mainwindow.h"
 
 #include <QPainter>
+#include <QApplication>
 #include <QGraphicsColorizeEffect>
 
 MCRInvItem::MCRInvItem(QString id) {
-    /*qDebug() << "Calling normal constructor" << this; */
+/*    qDebug() << "Calling normal constructor" << this; */
     qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
 
     setEmpty(id.isEmpty());
@@ -23,7 +24,7 @@ MCRInvItem::MCRInvItem() {
 }
 
 MCRInvItem::MCRInvItem(const MCRInvItem &other) {
-    /*qDebug() << "Calling copy constructor" << this; */
+/*    qDebug() << "Calling copy constructor" << this; */
     qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
 
     setEmpty(other.isEmpty());
@@ -237,7 +238,7 @@ void MCRInvItem::setEmpty(const bool &value) {
 }
 
 MCRInvItem &MCRInvItem::operator=(const MCRInvItem &other) {
-    /*qDebug() << "Calling operator ="; */
+/*    qDebug() << "Calling operator ="; */
 
     if (&other == this)
         return *this;
@@ -289,18 +290,18 @@ void MCRInvItem::setName(const QString &name) {
 }
 
 QString MCRInvItem::getNamespacedID() const {
+/*    qDebug() << "getNamespacedID" << namespacedID; */
     return namespacedID;
 }
 
 void MCRInvItem::setNamespacedID(const QString &id) {
 /*    qDebug() << "setNamespacedID" << id; */
     if (id.isEmpty()) {
-        qWarning() << "Can't set a empty namespacedID to MCRInvItem";
+        qWarning() << "Can't set namespacedID to en empty MCRInvItem";
         return;
     }
 
     setEmpty(id.isEmpty());
-    this->namespacedID = id;
 
     if (id.startsWith("#")) {
         QPixmap iconpix(32, 32);
@@ -316,11 +317,21 @@ void MCRInvItem::setNamespacedID(const QString &id) {
             painter.end();
         }
         setPixmap(iconpix);
-        setName("Item tag: " + id.midRef(1));
+        auto idNoTag = id.mid(1);
+        if (!idNoTag.contains(QStringLiteral(":")))
+            this->namespacedID = QStringLiteral("#minecraft:") + idNoTag;
+        else
+            this->namespacedID = QStringLiteral("#") + idNoTag;
+        setName(QCoreApplication::translate("MCRInvItem",
+                                            "Item tag: ") + id.midRef(1));
         isTag = true;
     } else {
         isTag = false;
         setupItem(id);
+        if (!id.contains(":"))
+            this->namespacedID = QStringLiteral("minecraft:") + id;
+        else
+            this->namespacedID = id;
     }
 }
 
@@ -346,11 +357,12 @@ void MCRInvItem::setPixmap(const QPixmap &value) {
 
 QString MCRInvItem::toolTip() {
     if (isEmpty()) {
-        return "Empty item";
+        return QCoreApplication::translate("MCRInvItem", "Empty item");
     } else if (!name.isEmpty()) {
         return name;
     } else {
-        return "Unknown item: " + namespacedID;
+        return QCoreApplication::translate("MCRInvItem",
+                                           "Unknown item: ") + namespacedID;
     }
 }
 

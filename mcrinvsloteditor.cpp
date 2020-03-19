@@ -24,13 +24,14 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent, QPoint pos) :
 
     if (slot->getAcceptTag()) {
         QMenu *newBtnMenu = new QMenu(ui->newButton);
-        newBtnMenu->addAction("Item...", this, &MCRInvSlotEditor::onNewItem);
-        newBtnMenu->addAction("Item tag...",
+        newBtnMenu->addAction(tr("Item..."), this,
+                              &MCRInvSlotEditor::onNewItem);
+        newBtnMenu->addAction(tr("Item tag..."),
                               this,
                               &MCRInvSlotEditor::onNewItemTag);
         ui->newButton->setMenu(newBtnMenu);
     } else {
-        ui->newButton->setText("New item...");
+        ui->newButton->setText(tr("New item..."));
         auto connection = connect(ui->newButton,
                                   &QPushButton::clicked,
                                   this,
@@ -88,11 +89,12 @@ void MCRInvSlotEditor::onNewItem() {
 
     if (dialog.exec()) {
         auto invItem = MCRInvItem(dialog.getSelectedID());
-        if (!slot->getItems().contains(invItem))
+        if (!slot->getItems().contains(invItem)) {
             slot->appendItem(invItem);
-        if (!slot->getItems().contains(invItem)) return;
+            if (!slot->getItems().contains(invItem)) return;
 
-        appendItem(invItem);
+            appendItem(invItem);
+        }
     }
     show();
 }
@@ -102,11 +104,12 @@ void MCRInvSlotEditor::onNewItemTag() {
 
     if (dialog.exec()) {
         auto invItem = MCRInvItem(dialog.getSelectedID());
-        if (!slot->getItems().contains(invItem) && slot->getAcceptTag())
+        if ((!slot->getItems().contains(invItem)) && slot->getAcceptTag()) {
             slot->appendItem(invItem);
-        if (!slot->getItems().contains(invItem)) return;
+            if (!slot->getItems().contains(invItem)) return;
 
-        appendItem(invItem);
+            appendItem(invItem);
+        }
     }
     show();
 }

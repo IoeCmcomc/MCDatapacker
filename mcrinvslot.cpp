@@ -51,7 +51,8 @@ void MCRInvSlot::setBackground(QString color) {
             "}"
             ".MCRInvSlot:hover {"
             "   background-color: hsla(0,0%,100%,.4);"
-            "}");
+            "}"
+            );
     }
 }
 
@@ -95,18 +96,29 @@ void MCRInvSlot::removeItem(const int index) {
 }
 
 QString MCRInvSlot::toolTipText() {
+    QString ret;
+
     if (items.count() > 1) {
         QStringList itemNames;
+        int         c = 0;
         for (auto item : items) {
             itemNames.push_back(item.getName());
+            if (c > 5) {
+                itemNames.push_back(tr("..."));
+                break;
+            }
+            ++c;
         }
-        return QString(tr("%1 items: ") +
-                       itemNames.join(QStringLiteral(", "))).arg(items.count());
+        ret = QString(tr("%1 items: ") +
+                      itemNames.join(QStringLiteral(", "))).arg(items.count());
     } else if (items.count() == 1) {
-        return itemName();
+        ret = itemName();
+        if (!getItem().getIsTag())
+            ret += QString("<br><code>%1</code>").arg(itemNamespacedID());
     } else {
         return QString();
     }
+    return ret;
 }
 
 int MCRInvSlot::removeItem(const MCRInvItem item) {

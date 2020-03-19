@@ -88,9 +88,11 @@ QString TagSelectorDialog::getSelectedID() {
     auto internalID = getInternalSelectedID();
     auto id         = internalID;
 
-    if (!internalID.contains(':'))
-        id = "minecraft:" + id;
-    return '#' + id;
+/*
+      if (!internalID.contains(':'))
+          id = "minecraft:" + id;
+ */
+    return QStringLiteral("#") + id;
 }
 
 void TagSelectorDialog::checkOK() {

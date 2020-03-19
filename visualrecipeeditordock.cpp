@@ -95,7 +95,8 @@ void VisualRecipeEditorDock::writeRecipe() {
     int         index = ui->customTabBar->currentIndex();
     QJsonObject root;
 
-    root.insert("group", ui->recipeGroupInput->text());
+    if (!ui->recipeGroupInput->text().isEmpty())
+        root.insert("group", ui->recipeGroupInput->text());
     QJsonDocument jsonDoc;
     if (index == 0) {        /* Crafting tab */
         jsonDoc = QJsonDocument(genCraftingJson(root));
@@ -188,7 +189,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         for (int i = 0; i < 9; ++i) {
             auto items      = this->craftingSlots[i]->getItems();
             auto ingredient = ingredientsToJson(items);
-            qDebug() << ingredient << ingredient.isNull();
+            /*qDebug() << ingredient << ingredient.isNull(); */
             if (!ingredient.isNull())
                 ingredients.push_back(ingredient);
         }
@@ -242,8 +243,10 @@ QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items) {
 
     for (auto item : items) {
         auto itemID = item.getNamespacedID();
-        if (!itemID.contains(':'))
-            itemID = QStringLiteral("minecraft:") + itemID;
+/*
+          if (!itemID.contains(':'))
+              itemID = QStringLiteral("minecraft:") + itemID;
+ */
         QJsonObject keyItem;
         if (item.getIsTag())
             keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
@@ -251,7 +254,7 @@ QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items) {
             keyItem.insert(QStringLiteral("item"), itemID);
         keyItems.push_back(keyItem);
     }
-    qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems;
+    /*qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems; */
     if (keyItems.isEmpty()) {
         return QJsonValue();
     } else if (keyItems.count() == 1) {
