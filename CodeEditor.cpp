@@ -92,7 +92,7 @@ void CodeEditor::dropEvent(QDropEvent *e) {
 
     if (e->mimeData()->hasFormat("text/uri-list")) {
         auto filepath = e->mimeData()->urls().at(0).toLocalFile();
-        auto dirpath  = qobject_cast<MainWindow*>(window())->getCurDir();
+        auto dirpath  = MainWindow::getCurDir();
         nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
     } else if (e->mimeData()->hasText()) {
         nspacedID = e->mimeData()->text();
@@ -129,7 +129,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     menu->addAction(sep1Action);
 
     QAction *formatAction = new QAction(tr("Format"), menu);
-    auto     dirpath      = qobject_cast<MainWindow*>(window())->getCurDir();
+    auto     dirpath      = MainWindow::getCurDir();
     auto     fileType     = GlobalHelpers::toMCRFileType(dirpath, curFile);
 
     qDebug() << MainWindow::JsonText << fileType << MainWindow::ItemTag;
@@ -273,7 +273,7 @@ void CodeEditor::followCurrentNamespacedID() {
     /*qDebug() << str; */
     if (!str.isEmpty()) {
         QString dirname =
-            qobject_cast<MainWindow*>(this->window())->getCurDir();
+            MainWindow::getCurDir();
         if (dirname.isEmpty()) return;
 
         QDir dir;

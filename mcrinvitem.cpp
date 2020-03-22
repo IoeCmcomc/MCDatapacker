@@ -355,11 +355,15 @@ void MCRInvItem::setPixmap(const QPixmap &value) {
     pixmap = value;
 }
 
-QString MCRInvItem::toolTip() {
+QString MCRInvItem::toolTip() const {
     if (isEmpty()) {
         return QCoreApplication::translate("MCRInvItem", "Empty item");
     } else if (!name.isEmpty()) {
-        return name;
+        if (getIsTag())
+            return name;
+        else
+            return name + "<br>" + QString("<br><code>%1</code>").arg(
+                namespacedID);
     } else {
         return QCoreApplication::translate("MCRInvItem",
                                            "Unknown item: ") + namespacedID;

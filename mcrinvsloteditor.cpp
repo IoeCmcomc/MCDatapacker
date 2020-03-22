@@ -1,24 +1,27 @@
 #include "mcrinvsloteditor.h"
 #include "ui_mcrinvsloteditor.h"
 
+#include "mcrinvslot.h"
 #include "blockitemselectordialog.h"
 #include "tagselectordialog.h"
+#include "mainwindow.h"
+#include "globalhelpers.h"
 
 #include <QStandardItem>
 #include <QPushButton>
 #include <QMenu>
 #include <QWidgetAction>
 #include <QScreen>
-/*#include <QItemSelectionModel> */
 #include <QMouseEvent>
+#include <QMimeData>
 
-MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent, QPoint pos) :
+MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     QFrame(parent),
     ui(new Ui::MCRInvSlotEditor) {
-    /*qDebug() << "MCRInvSlotEditor::MCRInvSlotEditor"; */
+/*    qDebug() << "MCRInvSlotEditor::MCRInvSlotEditor"; */
     ui->setupUi(this);
-    this->slot = parent;
-    this->pos  = pos;
+    this->slot    = parent;
+    this->initPos = QCursor::pos();
 
     setWindowFlags(Qt::Popup);
 
@@ -52,10 +55,19 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent, QPoint pos) :
             this,
             &MCRInvSlotEditor::onRemoveItem);
 
+    checkRemove();
+}
+
+MCRInvSlotEditor::~MCRInvSlotEditor() {
+/*    qDebug() << this << "is going to be deleted."; */
+    delete ui;
+}
+
+void MCRInvSlotEditor::show() {
     adjustSize();
 
     auto   scrSize  = qApp->screens()[0]->size();
-    QPoint newPoint = mapToGlobal(pos);
+    QPoint newPoint = initPos;
 
     if ((newPoint.x() + width()) > scrSize.width())
         newPoint.rx() = scrSize.width() - width();
@@ -66,20 +78,16 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent, QPoint pos) :
     newPoint.ry() = qMax(newPoint.y(), 0);
 
     move(newPoint);
-    checkRemove();
-}
 
-MCRInvSlotEditor::~MCRInvSlotEditor() {
-/*    qDebug() << this << "is going to be deleted."; */
-    delete ui;
+    QFrame::show();
 }
 
 void MCRInvSlotEditor::mousePressEvent(QMouseEvent *event) {
-    /*qDebug() << "mousePressEvent" << event; */
+/*    qDebug() << "mousePressEvent" << event; */
     if ((!rect().contains(event->pos()))
-        || (event->button() != Qt::LeftButton)) {
-        deleteLater();
+        || (event->buttons() ^ Qt::LeftButton)) {
         slot->update();
+        deleteLater();
     }
     QFrame::mousePressEvent(event);
 }
@@ -145,6 +153,6 @@ void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {
     QVariant vari;
     vari.setValue(invItem);
     item->setData(vari, Qt::UserRole + 1);
-    item->setToolTip(invItem.getName());
+    item->setToolTip(invItem.toolTip());
     model.appendRow(item);
 }

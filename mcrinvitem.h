@@ -36,7 +36,7 @@ public:
     QPixmap getPixmap() const;
     void setPixmap(const QPixmap &value);
 
-    QString toolTip();
+    QString toolTip() const;
 
     bool isEmpty() const;
 

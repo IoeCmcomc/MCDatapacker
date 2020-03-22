@@ -91,7 +91,7 @@ void BlockItemSelectorDialog::setupTreeView() {
         QVariant vari;
         vari.setValue(invItem);
         item->setData(vari, Qt::UserRole + 1);
-        item->setToolTip(invItem.getName());
+        item->setToolTip(invItem.toolTip());
         model.appendRow(item);
         ++c;
         if (blockIter != MCRBlockInfo.constEnd())

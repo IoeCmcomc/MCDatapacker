@@ -5,6 +5,8 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QBasicTimer>
+#include <QTimerEvent>
 
 class MCRInvSlot : public QFrame
 {
@@ -14,13 +16,13 @@ public:
     explicit MCRInvSlot(QWidget *parent = nullptr,
                         MCRInvItem item = MCRInvItem());
 
-    void setItem(const QVector<MCRInvItem> &items, bool emitSignal    = false);
-    void setItem(MCRInvItem item, bool emitSignal                     = false);
-    void appendItem(MCRInvItem item, bool emitSignal                  = false);
-    void insertItem(const int index, MCRInvItem item, bool emitSignal = false);
+    void setItem(const QVector<MCRInvItem> &items);
+    void setItem(MCRInvItem item);
+    void appendItem(MCRInvItem item);
+    void insertItem(const int index, MCRInvItem item);
     void removeItem(const int index);
     int removeItem(const MCRInvItem item);
-    void clearItems(bool emitSignal     = false);
+    void clearItems();
     MCRInvItem &getItem(const int index = 0);
     QVector<MCRInvItem> &getItems();
 
@@ -49,19 +51,22 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
 
 protected slots:
     void onCustomContextMenu(const QPoint &point);
-    /*void onClicked(); */
+    void onItemChanged();
 
 private:
     QVector<MCRInvItem> items;
-    bool isCreative = false;
     QPoint mousePressPos;
+    QBasicTimer timer;
+    bool isCreative       = false;
     bool isDragged        = false;
     bool itemHidden       = false;
     bool acceptTag        = true;
     bool acceptMultiItems = true;
+    int curItemIndex      = -1;
 
     void startDrag(QMouseEvent *event);
     void hideItem();

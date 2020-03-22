@@ -22,6 +22,7 @@
 
 MainWindow::MCRFileType                 MainWindow::curFileType = Text;
 QMap<QString, QMap<QString, QVariant> > MainWindow::MCRInfoMaps;
+QString                                 MainWindow::curDir;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -158,21 +159,23 @@ void MainWindow::readSettings() {
     QSettings settings;
 
     settings.beginGroup("geometry");
-    QSize geomertySize = settings.value("size", QSize(600, 600)).toSize();
-    if (geomertySize.isEmpty())
-        adjustSize();
-    else
-        resize(geomertySize);
 
-    QRect availableGeometry =
-        QGuiApplication::primaryScreen()->availableGeometry();
-    move(settings.value("pos",
-                        QPoint((availableGeometry.width() - width()) / 2,
-                               (availableGeometry.height() - height()) / 2))
-         .toPoint());
-
-    if (settings.value("isMaximized", true).toBool())
+    if (settings.value("isMaximized", true).toBool()) {
         showMaximized();
+    } else {
+        QSize geomertySize = settings.value("size", QSize(600, 600)).toSize();
+        if (geomertySize.isEmpty())
+            adjustSize();
+        else
+            resize(geomertySize);
+
+        QRect availableGeometry =
+            QGuiApplication::primaryScreen()->availableGeometry();
+        move(settings.value("pos",
+                            QPoint((availableGeometry.width() - width()) / 2,
+                                   (availableGeometry.height() - height()) / 2))
+             .toPoint());
+    }
     settings.endGroup();
 
     readPrefSettings(settings);
@@ -191,9 +194,11 @@ void MainWindow::writeSettings() {
                        QCoreApplication::applicationName());
 
     settings.beginGroup("geometry");
-    settings.setValue("size", size());
-    settings.setValue("pos", pos());
     settings.setValue("isMaximized", isMaximized());
+    if (!isMaximized()) {
+        settings.setValue("size", size());
+        settings.setValue("pos", pos());
+    }
     settings.endGroup();
 }
 
@@ -223,7 +228,8 @@ bool MainWindow::maybeSave() {
 
 
 QString MainWindow::getCurDir() {
-    return this->curDir;
+/*    return this->curDir; */
+    return MainWindow::curDir;
 }
 
 QString MainWindow::getCurLocale() {

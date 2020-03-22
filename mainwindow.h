@@ -37,7 +37,7 @@ public:
     static MCRFileType curFileType;
 
     void openFile(const QString &filepath, bool reload = false);
-    QString getCurDir();
+    static QString getCurDir();
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
@@ -70,8 +70,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QString curFile = QString();
-    QString curDir  = QString();
+    QString curFile;
+    static QString curDir;
     static QMap<QString, QMap<QString, QVariant> > MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
     QLocale curLocale;

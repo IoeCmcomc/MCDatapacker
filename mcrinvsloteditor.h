@@ -1,10 +1,11 @@
 #ifndef MCRINVSLOTEDITOR_H
 #define MCRINVSLOTEDITOR_H
 
-#include <mcrinvitem.h>
-#include <mcrinvslot.h>
+#include "mcrinvitem.h"
+#include "mcrinvslot.h"
 
 #include <QWidget>
+#include <QFrame>
 #include <QVector>
 #include <QStandardItemModel>
 
@@ -17,11 +18,10 @@ class MCRInvSlotEditor : public QFrame
     Q_OBJECT
 
 public:
-    explicit MCRInvSlotEditor(MCRInvSlot *parent = nullptr,
-                              QPoint pos         = QPoint());
+    explicit MCRInvSlotEditor(MCRInvSlot *parent = nullptr);
     ~MCRInvSlotEditor();
 
-    QPoint pos;
+    void show();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -36,6 +36,7 @@ private:
     Ui::MCRInvSlotEditor *ui;
     MCRInvSlot *slot = nullptr;
     QStandardItemModel model;
+    QPoint initPos;
 
     void appendItem(const MCRInvItem &invItem);
 };
