@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>245</width>
-    <height>238</height>
+    <width>470</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -51,6 +51,9 @@
         </property>
         <property name="dragDropMode">
          <enum>QAbstractItemView::NoDragDrop</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
         <property name="movement">
          <enum>QListView::Static</enum>

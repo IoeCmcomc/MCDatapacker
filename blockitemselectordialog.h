@@ -1,6 +1,8 @@
 #ifndef BLOCKITEMSELECTORDIALOG_H
 #define BLOCKITEMSELECTORDIALOG_H
 
+#include "mcrinvitem.h"
+
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QPushButton>
@@ -19,6 +21,11 @@ public:
     ~BlockItemSelectorDialog();
 
     QString getSelectedID();
+    QVector<MCRInvItem> getSelectedItems();
+
+
+    bool getAllowMultiItems() const;
+    void setAllowMultiItems(bool value);
 
 protected slots:
     void checkOK();
@@ -28,6 +35,7 @@ private:
     QStandardItemModel model;
     MCRItemSortFilterProxyModel filterModel;
     QPushButton *selectButton;
+    bool allowMultiItems = true;
 
     void setupTreeView();
 };

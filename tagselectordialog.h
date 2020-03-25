@@ -1,6 +1,8 @@
 #ifndef TAGSELECTORDIALOG_H
 #define TAGSELECTORDIALOG_H
 
+#include "mainwindow.h"
+
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
@@ -15,7 +17,8 @@ class TagSelectorDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TagSelectorDialog(QWidget *parent = nullptr);
+    explicit TagSelectorDialog(QWidget *parent              = nullptr,
+                               MainWindow::MCRFileType type = MainWindow::ItemTag);
     ~TagSelectorDialog();
 
     QString getSelectedID();
@@ -31,7 +34,7 @@ private:
     QPushButton *selectButton;
     QMap<QString, QVariant> MCRTagInfo;
 
-    void setupTagTreeView();
+    void setupTagTreeView(MainWindow::MCRFileType type);
     QString getInternalSelectedID();
 };
 

@@ -19,6 +19,7 @@ public:
     void setItem(const QVector<MCRInvItem> &items);
     void setItem(MCRInvItem item);
     void appendItem(MCRInvItem item);
+    void appendItems(const QVector<MCRInvItem> &items);
     void insertItem(const int index, MCRInvItem item);
     void removeItem(const int index);
     int removeItem(const MCRInvItem item);

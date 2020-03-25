@@ -1,7 +1,6 @@
 #include "blockitemselectordialog.h"
 #include "ui_blockitemselectordialog.h"
 
-#include "mcrinvitem.h"
 #include "mainwindow.h"
 
 #include <QDebug>
@@ -118,9 +117,36 @@ QString BlockItemSelectorDialog::getSelectedID() {
     return invItem.getNamespacedID();
 }
 
+QVector<MCRInvItem> BlockItemSelectorDialog::getSelectedItems() {
+    QVector<MCRInvItem> items;
+
+    auto indexes = ui->listView->selectionModel()->selectedIndexes();
+
+    if (indexes.isEmpty()) return items;
+
+    for (auto index : indexes) {
+        QStandardItem *item =
+            model.itemFromIndex(filterModel.mapToSource(index));
+        MCRInvItem invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
+        if (items.contains(invItem)) continue;
+        items.push_back(invItem);
+    }
+    return items;
+}
+
 void BlockItemSelectorDialog::checkOK() {
     if (getSelectedID().isEmpty())
         selectButton->setEnabled(false);
     else
         selectButton->setEnabled(true);
+}
+
+bool BlockItemSelectorDialog::getAllowMultiItems() const {
+    return allowMultiItems;
+}
+
+void BlockItemSelectorDialog::setAllowMultiItems(bool value) {
+    allowMultiItems = value;
+    if (!allowMultiItems)
+        ui->listView->setSelectionMode(QListView::SingleSelection);
 }

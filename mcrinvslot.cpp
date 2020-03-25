@@ -66,10 +66,15 @@ void MCRInvSlot::setItem(MCRInvItem item) {
 }
 
 void MCRInvSlot::appendItem(MCRInvItem item) {
+    /*qDebug() << "slot appendItem" << item << items.contains(item); */
     if (items.contains(item)) return;
 
     items.push_back(item);
     emit itemChanged();
+}
+
+void MCRInvSlot::appendItems(const QVector<MCRInvItem> &items) {
+    this->items.append(items);
 }
 
 void MCRInvSlot::insertItem(const int index, MCRInvItem item) {
@@ -160,7 +165,7 @@ void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
         QAction *seclectTagAction = new QAction(tr("Select tag..."), cMenu);
         seclectTagAction->setEnabled(getAcceptTag());
         connect(seclectTagAction, &QAction::triggered, [ = ]() {
-            TagSelectorDialog dialog(this);
+            TagSelectorDialog dialog(this, MainWindow::ItemTag);
             if (dialog.exec()) {
                 setItem(MCRInvItem(dialog.getSelectedID()));
             }
@@ -241,8 +246,10 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
         switch (event->button()) {
         case Qt::LeftButton: {
             BlockItemSelectorDialog dialog(this);
+            qDebug() << acceptMultiItems;
+            dialog.setAllowMultiItems(acceptMultiItems);
             if (dialog.exec()) {
-                setItem(MCRInvItem(dialog.getSelectedID()));
+                setItem(dialog.getSelectedItems());
             }
             break;
         }

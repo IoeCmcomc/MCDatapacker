@@ -2,12 +2,12 @@
 #include "ui_tagselectordialog.h"
 
 #include "mcrinvitem.h"
-#include "mainwindow.h"
 
 #include <QDebug>
 #include <QElapsedTimer>
 
-TagSelectorDialog::TagSelectorDialog(QWidget *parent) :
+TagSelectorDialog::TagSelectorDialog(QWidget *parent,
+                                     MainWindow::MCRFileType type) :
     QDialog(parent),
     ui(new Ui::TagSelectorDialog) {
     ui->setupUi(this);
@@ -17,7 +17,7 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent) :
 
     filterModel.setParent(ui->tagListView);
     model.setParent(this);
-    setupTagTreeView();
+    setupTagTreeView(type);
     connect(ui->tagFilterBox, &QLineEdit::textChanged,
             [ = ](const QString &input) {
         filterModel.setFilterRegularExpression(input);
@@ -49,7 +49,8 @@ TagSelectorDialog::~TagSelectorDialog() {
     delete ui;
 }
 
-void TagSelectorDialog::setupTagTreeView() {
+void TagSelectorDialog::setupTagTreeView(
+    MainWindow::MCRFileType type = MainWindow::ItemTag) {
     model.setParent(ui->tagListView);
     filterModel.setSourceModel(&model);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -57,7 +58,34 @@ void TagSelectorDialog::setupTagTreeView() {
     ui->tagListView->setModel(&filterModel);
 
     /*auto MCRTagInfo = MainWindow::getMCRInfo("blockTag"); */
-    MCRTagInfo = MainWindow::readMCRInfo(QStringLiteral("tags/items"));
+
+    QString tagStr = QStringLiteral("tags/");
+    switch (type) {
+    case MainWindow::BlockTag:
+        tagStr += "blocks";
+        break;
+
+    case MainWindow::EntityTypeTag:
+        tagStr += "entity_types";
+        break;
+
+    case MainWindow::FluidTag:
+        tagStr += "fluids";
+        break;
+
+    case MainWindow::FunctionTag:
+        tagStr += "functions";
+        break;
+
+    case MainWindow::ItemTag:
+        tagStr += "items";
+        break;
+
+    default:
+        break;
+    }
+
+    MCRTagInfo = MainWindow::readMCRInfo(tagStr);
 
     QMap<QString,
          QVariant>::const_iterator tagIter = MCRTagInfo.constBegin();
@@ -74,8 +102,6 @@ void TagSelectorDialog::setupTagTreeView() {
 QString TagSelectorDialog::getInternalSelectedID() {
     auto indexes = ui->tagListView->selectionModel()->selectedIndexes();
 
-    /*    ui->tagListView->setParent(this); */
-
     if (indexes.isEmpty()) return "";
 
     QStandardItem *item =
@@ -88,10 +114,6 @@ QString TagSelectorDialog::getSelectedID() {
     auto internalID = getInternalSelectedID();
     auto id         = internalID;
 
-/*
-      if (!internalID.contains(':'))
-          id = "minecraft:" + id;
- */
     return QStringLiteral("#") + id;
 }
 

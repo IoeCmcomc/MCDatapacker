@@ -45,6 +45,8 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
         appendItem(invItem);
     }
     ui->listView->setModel(&model);
+    ui->groupBox->setTitle(tr("Items") +
+                           QString(" (%1)").arg(model.rowCount()));
 
     connect(ui->listView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
@@ -65,6 +67,8 @@ MCRInvSlotEditor::~MCRInvSlotEditor() {
 
 void MCRInvSlotEditor::show() {
     adjustSize();
+    resize(width() * qMin((model.rowCount() / 8) + 1, 3),
+           height() * qMin((model.rowCount() / 32) + 1, 3));
 
     auto   scrSize  = qApp->screens()[0]->size();
     QPoint newPoint = initPos;
@@ -96,19 +100,22 @@ void MCRInvSlotEditor::onNewItem() {
     BlockItemSelectorDialog dialog(this);
 
     if (dialog.exec()) {
-        auto invItem = MCRInvItem(dialog.getSelectedID());
-        if (!slot->getItems().contains(invItem)) {
-            slot->appendItem(invItem);
-            if (!slot->getItems().contains(invItem)) return;
-
-            appendItem(invItem);
+        auto newItems = dialog.getSelectedItems();
+        for (auto newItem : newItems) {
+            /*qDebug() << newItem << slot->getItems().contains(newItem); */
+            if (!slot->getItems().contains(newItem)) {
+                slot->appendItem(newItem);
+                appendItem(newItem);
+            }
         }
     }
+    ui->groupBox->setTitle(tr("Items") +
+                           QString(" (%1)").arg(model.rowCount()));
     show();
 }
 
 void MCRInvSlotEditor::onNewItemTag() {
-    TagSelectorDialog dialog(this);
+    TagSelectorDialog dialog(this, MainWindow::ItemTag);
 
     if (dialog.exec()) {
         auto invItem = MCRInvItem(dialog.getSelectedID());
@@ -119,6 +126,8 @@ void MCRInvSlotEditor::onNewItemTag() {
             appendItem(invItem);
         }
     }
+    ui->groupBox->setTitle(tr("Items") +
+                           QString(" (%1)").arg(model.rowCount()));
     show();
 }
 
@@ -133,16 +142,26 @@ void MCRInvSlotEditor::onRemoveItem() {
 
     if (indexes.isEmpty()) return;
 
-    QStandardItem *item    = model.itemFromIndex(indexes[0]);
-    auto           i       = model.indexFromItem(item).row();
-    MCRInvItem     invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
+    std::sort(indexes.begin(), indexes.end(),
+              [](const QModelIndex& a, const QModelIndex& b)->bool {
+        return a.row() > b.row();
+    }); /* sort from bottom to top */
 
-    if (!slot->getItems().contains(invItem)) return;
+    for (auto index : indexes) {
+        auto           i       = index.row();
+        QStandardItem *item    = model.itemFromIndex(index);
+        MCRInvItem     invItem =
+            item->data(Qt::UserRole + 1).value<MCRInvItem>();
 
-    slot->removeItem(invItem);
-    if (slot->getItems().contains(invItem)) return;
+        if (!slot->getItems().contains(invItem)) continue;
+        slot->removeItem(invItem);
+        if (slot->getItems().contains(invItem)) continue;
+        model.removeRow(i);
+    }
 
-    model.removeRow(i);
+    show();
+    ui->groupBox->setTitle(tr("Items") +
+                           QString(" (%1)").arg(model.rowCount()));
 }
 
 void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {
@@ -155,4 +174,6 @@ void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {
     item->setData(vari, Qt::UserRole + 1);
     item->setToolTip(invItem.toolTip());
     model.appendRow(item);
+
+    /*qDebug() << item << invItem << model.rowCount(); */
 }
