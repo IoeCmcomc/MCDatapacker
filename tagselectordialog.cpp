@@ -2,9 +2,13 @@
 #include "ui_tagselectordialog.h"
 
 #include "mcrinvitem.h"
+#include "globalhelpers.h"
+#include "mainwindow.h"
 
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QDir>
+#include <QFileInfo>
 
 TagSelectorDialog::TagSelectorDialog(QWidget *parent,
                                      MainWindow::MCRFileType type) :
@@ -85,6 +89,28 @@ void TagSelectorDialog::setupTagTreeView(
         break;
     }
 
+    QString dataPath = MainWindow::getCurDir() + QStringLiteral("/data/");
+    QDir    dir(dataPath);
+    auto    nspaceDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    for (auto nspaceDir : nspaceDirs) {
+        auto    nspace  = nspaceDir.section('.', 0, 0);
+        QString tagPath = dataPath + nspace + '/' +
+                          tagStr;
+        QDir tagDir(tagPath);
+        if (tagDir.exists() && (!tagDir.isEmpty())) {
+            auto tagNames =
+                tagDir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+            for (auto tagName : tagNames) {
+                tagName = tagName.section('.', 0, 0);
+
+                QStandardItem *item = new QStandardItem();
+                item->setText(nspace + ":" + tagName);
+                model.appendRow(item);
+            }
+        }
+    }
+
     MCRTagInfo = MainWindow::readMCRInfo(tagStr);
 
     QMap<QString,
@@ -92,7 +118,7 @@ void TagSelectorDialog::setupTagTreeView(
     int                            c       = 0;
     while ((tagIter != MCRTagInfo.constEnd())) {
         QStandardItem *item = new QStandardItem();
-        item->setText(tagIter.key());
+        item->setText("minecraft:" + tagIter.key());
         model.appendRow(item);
         ++c;
         ++tagIter;
@@ -128,6 +154,8 @@ void TagSelectorDialog::showDetails() {
     auto id = getInternalSelectedID();
 
     if (!id.isEmpty()) {
+        if (id.startsWith("minecraft:"))
+            id.remove(0, 10);
         if (MCRTagInfo.contains(id)) {
             auto details = MCRTagInfo[id].toString();
             ui->tagDetailsLabel->setText(details);
