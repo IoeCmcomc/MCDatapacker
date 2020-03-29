@@ -19,8 +19,10 @@ SOURCES += \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
     datapacktreeview.cpp \
+    extendednumericinput.cpp \
     globalhelpers.cpp \
     jsonhighlighter.cpp \
+    loottableeditordock.cpp \
     main.cpp \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
@@ -38,9 +40,11 @@ HEADERS += \
     blockitemselectordialog.h \
     codeeditor.h \
     datapacktreeview.h \
+    extendednumericinput.h \
     globalhelpers.h \
     jsonhighlighter.h \
     linenumberarea.h \
+    loottableeditordock.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
@@ -55,6 +59,8 @@ HEADERS += \
 
 FORMS += \
     blockitemselectordialog.ui \
+    extendednumericinput.ui \
+    loottableeditordock.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \
     newdatapackdialog.ui \

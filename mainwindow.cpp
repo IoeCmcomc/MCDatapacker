@@ -76,6 +76,9 @@ MainWindow::MainWindow(QWidget *parent)
     visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 
+    lootTableEditorDock = new LootTableEditorDock(this);
+    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
+
     setCurrentFile(QString());
 }
 

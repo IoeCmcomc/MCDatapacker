@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "visualrecipeeditordock.h"
+#include "loottableeditordock.h"
 
 #include <QMainWindow>
 #include <QSessionManager>
@@ -79,6 +80,7 @@ private:
     QTranslator m_translator;
     QTranslator m_translatorQt;
     QMessageBox *uniqueMessageNox = nullptr;
+    LootTableEditorDock *lootTableEditorDock;
 
     void readSettings();
     void writeSettings();

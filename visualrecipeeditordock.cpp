@@ -35,19 +35,16 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
                                                  ui->craftingSlot_9
                                                });
 
-    connect(ui->customTabBar,
-            &QTabBar::currentChanged,
+    connect(ui->customTabBar, &QTabBar::currentChanged,
             this,
             &VisualRecipeEditorDock::onRecipeTabChanged);
     connect(ui->cookTimeCheck, &QCheckBox::stateChanged, [this](int i) {
         ui->cookTimeInput->setDisabled(2 - i);
     });
-    connect(ui->writeRecipeBtn,
-            &QPushButton::clicked,
+    connect(ui->writeRecipeBtn, &QPushButton::clicked,
             this,
             &VisualRecipeEditorDock::writeRecipe);
-    connect(ui->readRecipeBtn,
-            &QPushButton::clicked,
+    connect(ui->readRecipeBtn, &QPushButton::clicked,
             this,
             &VisualRecipeEditorDock::readRecipe);
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
