@@ -1077,9 +1077,11 @@
         <file>texture/item/white_tulip.png</file>
         <file>texture/item/wither_rose.png</file>
         <file>texture/item/yellow_stained_glass_pane.png</file>
-        <file>info/blocks.json</file>
-        <file>info/items.json</file>
         <file>texture/item/azure_bluet.png</file>
+        <file>info/biomes.json</file>
+        <file>info/blocks.json</file>
+        <file>info/enchantments.json</file>
+        <file>info/items.json</file>
         <file>info/tags/blocks.json</file>
         <file>info/tags/entity_types.json</file>
         <file>info/tags/fluids.json</file>

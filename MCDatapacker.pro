@@ -19,6 +19,7 @@ SOURCES += \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
     datapacktreeview.cpp \
+    extendednumericdelegate.cpp \
     extendednumericinput.cpp \
     globalhelpers.cpp \
     jsonhighlighter.cpp \
@@ -30,7 +31,9 @@ SOURCES += \
     mcrinvslot.cpp \
     mcrinvsloteditor.cpp \
     mcritemsortfilterproxymodel.cpp \
+    mcrpredcondition.cpp \
     newdatapackdialog.cpp \
+    predicatedock.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
     tagselectordialog.cpp \
@@ -40,6 +43,7 @@ HEADERS += \
     blockitemselectordialog.h \
     codeeditor.h \
     datapacktreeview.h \
+    extendednumericdelegate.h \
     extendednumericinput.h \
     globalhelpers.h \
     jsonhighlighter.h \
@@ -51,7 +55,9 @@ HEADERS += \
     mcrinvslot.h \
     mcrinvsloteditor.h \
     mcritemsortfilterproxymodel.h \
+    mcrpredcondition.h \
     newdatapackdialog.h \
+    predicatedock.h \
     settingsdialog.h \
     stackedwidget.h \
     tagselectordialog.h \
@@ -63,7 +69,9 @@ FORMS += \
     loottableeditordock.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \
+    mcrpredcondition.ui \
     newdatapackdialog.ui \
+    predicatedock.ui \
     settingsdialog.ui \
     tagselectordialog.ui \
     visualrecipeeditordock.ui

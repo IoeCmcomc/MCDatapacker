@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>339</width>
-    <height>40</height>
+    <width>318</width>
+    <height>22</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,10 +16,19 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
+  </property>
   <property name="lineWidth">
    <number>0</number>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
    <property name="topMargin">
     <number>0</number>
    </property>
@@ -42,60 +51,116 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="single">
       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item row="0" column="0">
-        <widget class="QSpinBox" name="spinBox"/>
+        <widget class="QSpinBox" name="spinBox">
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="range">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_3">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="minLabel">
          <property name="text">
           <string>from</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QSpinBox" name="minSpinBox"/>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="minSpinBox">
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+        </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="label_2">
+       <item row="0" column="2">
+        <widget class="QLabel" name="maxLabel">
          <property name="text">
           <string>to</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QSpinBox" name="maxSpinBox"/>
+       <item row="0" column="3">
+        <widget class="QSpinBox" name="maxSpinBox">
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+         <property name="value">
+          <number>2</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="biomimal">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label_8">
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QLabel" name="numLabel">
          <property name="text">
           <string>Number of tries:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QSpinBox" name="numSpinBox"/>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="numSpinBox">
+         <property name="maximum">
+          <number>999999999</number>
+         </property>
+         <property name="value">
+          <number>10</number>
+         </property>
+        </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="label_9">
+       <item row="0" column="2">
+        <widget class="QLabel" name="probLabel">
          <property name="text">
           <string>Probability:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QDoubleSpinBox" name="probSpinBox"/>
+       <item row="0" column="3">
+        <widget class="QDoubleSpinBox" name="probSpinBox">
+         <property name="value">
+          <double>0.500000000000000</double>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

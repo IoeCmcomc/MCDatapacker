@@ -3,6 +3,7 @@
 
 #include "visualrecipeeditordock.h"
 #include "loottableeditordock.h"
+#include "predicatedock.h"
 
 #include <QMainWindow>
 #include <QSessionManager>
@@ -45,7 +46,7 @@ public:
     static QMap<QString, QVariant> &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
     void setCurrentFile(const QString &filepath);
-    static QMap<QString, QVariant> readMCRInfo(const QString &type = "block",
+    static QMap<QString, QVariant> readMCRInfo(const QString &type = "blocks",
                                                const int depth     = 0);
 
 protected:
@@ -79,8 +80,9 @@ private:
     QFileSystemWatcher fileWatcher;
     QTranslator m_translator;
     QTranslator m_translatorQt;
-    QMessageBox *uniqueMessageNox = nullptr;
-    LootTableEditorDock *lootTableEditorDock;
+    QMessageBox *uniqueMessageBox            = nullptr;
+    LootTableEditorDock *lootTableEditorDock = nullptr;
+    PredicateDock *predicateDock             = nullptr;
 
     void readSettings();
     void writeSettings();

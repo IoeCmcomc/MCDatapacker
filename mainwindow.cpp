@@ -76,8 +76,13 @@ MainWindow::MainWindow(QWidget *parent)
     visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 
-    lootTableEditorDock = new LootTableEditorDock(this);
-    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
+/*
+      lootTableEditorDock = new LootTableEditorDock(this);
+      addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
+ */
+
+    predicateDock = new PredicateDock(this);
+    addDockWidget(Qt::RightDockWidgetArea, predicateDock);
 
     setCurrentFile(QString());
 }
@@ -122,22 +127,22 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
                                                  0);
     if (reloadExternChanges == 1) {
-        if (uniqueMessageNox != nullptr) return;
+        if (uniqueMessageBox != nullptr) return;
 
-        uniqueMessageNox = new QMessageBox(this);
-        uniqueMessageNox->setIcon(QMessageBox::Question);
-        uniqueMessageNox->setWindowTitle(tr("Reload file"));
-        uniqueMessageNox->setText(tr("The file %1 has been changed exernally.")
+        uniqueMessageBox = new QMessageBox(this);
+        uniqueMessageBox->setIcon(QMessageBox::Question);
+        uniqueMessageBox->setWindowTitle(tr("Reload file"));
+        uniqueMessageBox->setText(tr("The file %1 has been changed exernally.")
                                   .arg(QDir::toNativeSeparators(filepath)));
-        uniqueMessageNox->setInformativeText(tr(
+        uniqueMessageBox->setInformativeText(tr(
                                                  "Do you want to reload this file?"));
-        uniqueMessageNox->setStandardButtons(QMessageBox::Yes |
+        uniqueMessageBox->setStandardButtons(QMessageBox::Yes |
                                              QMessageBox::No);
-        uniqueMessageNox->setDefaultButton(QMessageBox::Yes);
-        uniqueMessageNox->exec();
-        auto userDecision = uniqueMessageNox->result();
-        delete uniqueMessageNox;
-        uniqueMessageNox    = nullptr;
+        uniqueMessageBox->setDefaultButton(QMessageBox::Yes);
+        uniqueMessageBox->exec();
+        auto userDecision = uniqueMessageBox->result();
+        delete uniqueMessageBox;
+        uniqueMessageBox    = nullptr;
         reloadExternChanges = (userDecision == QMessageBox::Yes) ? 0 : 2;
     }
 
@@ -338,7 +343,7 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     QFileInfo finfo = QFileInfo(":minecraft/info/" + type + ".json");
 
     if (!(finfo.exists() && finfo.isFile())) {
-        /*qDebug() << "File not exists. Return empty."; */
+        qWarning() << "File not exists:" << finfo.path() << "Return empty.";
         return retMap;
     }
     QFile inFile(finfo.filePath());
@@ -349,12 +354,12 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     QJsonParseError errorPtr;
     QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
-        /*qDebug() << "Parse failed" << errorPtr.error; */
+        qWarning() << "Parse failed" << errorPtr.error;
         return retMap;
     }
     QJsonObject root = doc.object();
     if (root.isEmpty()) {
-        /*qDebug() << "Root is empty. Return empty"; */
+        qDebug() << "Root is empty. Return empty";
         return retMap;
     }
 
