@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
+#include <QJsonObject>
 
 namespace Ui {
     class MCRPredCondition;
@@ -43,6 +44,7 @@ private:
     const QString deleteableToolTip = "Right click this row to delete.";
     QVBoxLayout nestedCondLayout;
     QVBoxLayout invertedCondLayout;
+    QJsonObject matchTool_itemProp;
 
     void initBlockStatesPage();
     void initEntityScoresPage();

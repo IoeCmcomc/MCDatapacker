@@ -22,6 +22,7 @@ SOURCES += \
     extendednumericdelegate.cpp \
     extendednumericinput.cpp \
     globalhelpers.cpp \
+    itemconditiondialog.cpp \
     jsonhighlighter.cpp \
     loottableeditordock.cpp \
     main.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     extendednumericdelegate.h \
     extendednumericinput.h \
     globalhelpers.h \
+    itemconditiondialog.h \
     jsonhighlighter.h \
     linenumberarea.h \
     loottableeditordock.h \
@@ -66,6 +68,7 @@ HEADERS += \
 FORMS += \
     blockitemselectordialog.ui \
     extendednumericinput.ui \
+    itemconditiondialog.ui \
     loottableeditordock.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \

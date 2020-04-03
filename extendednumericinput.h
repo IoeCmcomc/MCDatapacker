@@ -18,9 +18,9 @@ public:
     ~ExtendedNumericInput();
 
     enum Type {
-        Exact    = 1,
-        Range    = 2,
-        Biomimal = 4
+        Exact   = 1,
+        Range   = 2,
+        Biomial = 4
     };
     Q_DECLARE_FLAGS(Types, Type)
 
@@ -38,6 +38,11 @@ public:
     void setMinimum(const int value);
     int getMaximum() const;
     void setMaximum(const int value);
+
+    void setExactMinimum(const int &min);
+    void setExactMaximum(const int &max);
+    void setRangeMinimum(const int &min);
+    void setRangeMaximum(const int &max);
 
     void interpretText();
 

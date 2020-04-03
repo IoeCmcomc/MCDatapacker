@@ -11,7 +11,7 @@ ExtendedNumericInput::ExtendedNumericInput(QWidget *parent) :
     ui(new Ui::ExtendedNumericInput) {
     ui->setupUi(this);
 
-    setTypes(Exact | Range | Biomimal);
+    setTypes(Exact | Range | Biomial);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
             this, &ExtendedNumericInput::onMinMaxEdited);
@@ -53,6 +53,8 @@ void ExtendedNumericInput::onMinMaxEdited() {
         auto tmp = ui->minSpinBox->value();
         ui->minSpinBox->setValue(ui->maxSpinBox->value());
         ui->maxSpinBox->setValue(tmp);
+    } else if (ui->minSpinBox->value() == ui->maxSpinBox->value()) {
+        setExactly(ui->minSpinBox->value());
     }
 }
 
@@ -93,7 +95,7 @@ QJsonValue ExtendedNumericInput::toJson() {
         break;
     }
 
-    case 2: { /*Biomimal */
+    case 2: { /*Biomial */
         QJsonObject rolls;
         rolls.insert(QStringLiteral("type"),
                      QStringLiteral("minecraft:binomial"));
@@ -116,7 +118,7 @@ void ExtendedNumericInput::setTypes(const ExtendedNumericInput::Types &value) {
     types = value;
     /*qDebug() << value; */
     setMenu();
-    /*qDebug() << types.testFlag(Exact) << types.testFlag(Range) << types.testFlag(Biomimal); */
+    /*qDebug() << types.testFlag(Exact) << types.testFlag(Range) << types.testFlag(Biomial); */
     if (!types.testFlag(Exact)) {
         ui->stackedWidget->setCurrentIndex(1);
         if (!types.testFlag(Range))
@@ -135,8 +137,8 @@ void ExtendedNumericInput::setMenu() {
         typeMenu.addAction(tr("Range"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(1);
         });
-    if (types.testFlag(Biomimal))
-        typeMenu.addAction(tr("Biomimal"), this, [ = ]() {
+    if (types.testFlag(Biomial))
+        typeMenu.addAction(tr("Biomial"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(2);
         });
     ui->inputTypeButton->setMenu(&typeMenu);
@@ -149,7 +151,7 @@ ExtendedNumericInput::Type ExtendedNumericInput::getCurrentType() const {
 
 void ExtendedNumericInput::setCurrentType(const Type &value) {
     currentType = value;
-    const QVector<Type> typeVec = { Exact, Range, Biomimal };
+    const QVector<Type> typeVec = { Exact, Range, Biomial };
     ui->stackedWidget->setCurrentIndex(typeVec.indexOf(value));
 }
 
@@ -180,6 +182,24 @@ void ExtendedNumericInput::setMaximum(const int value) {
     ui->maxSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
+}
+
+void ExtendedNumericInput::setExactMinimum(const int &min) {
+    ui->spinBox->setMinimum(min);
+}
+
+void ExtendedNumericInput::setExactMaximum(const int &max) {
+    ui->spinBox->setMaximum(max);
+}
+
+void ExtendedNumericInput::setRangeMinimum(const int &min) {
+    ui->minSpinBox->setMinimum(min);
+    ui->maxSpinBox->setMinimum(min);
+}
+
+void ExtendedNumericInput::setRangeMaximum(const int &max) {
+    ui->minSpinBox->setMaximum(max);
+    ui->maxSpinBox->setMaximum(max);
 }
 
 void ExtendedNumericInput::interpretText() {

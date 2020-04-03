@@ -1086,5 +1086,38 @@
         <file>info/tags/entity_types.json</file>
         <file>info/tags/fluids.json</file>
         <file>info/tags/items.json</file>
+        <file>info/effects.json</file>
+        <file>texture/effect/absorption.png</file>
+        <file>texture/effect/bad_omen.png</file>
+        <file>texture/effect/blindness.png</file>
+        <file>texture/effect/conduit_power.png</file>
+        <file>texture/effect/dolphins_grace.png</file>
+        <file>texture/effect/fire_resistance.png</file>
+        <file>texture/effect/glowing.png</file>
+        <file>texture/effect/haste.png</file>
+        <file>texture/effect/health_boost.png</file>
+        <file>texture/effect/hero_of_the_village.png</file>
+        <file>texture/effect/hunger.png</file>
+        <file>texture/effect/instant_damage.png</file>
+        <file>texture/effect/instant_health.png</file>
+        <file>texture/effect/invisibility.png</file>
+        <file>texture/effect/jump_boost.png</file>
+        <file>texture/effect/levitation.png</file>
+        <file>texture/effect/luck.png</file>
+        <file>texture/effect/mining_fatigue.png</file>
+        <file>texture/effect/nausea.png</file>
+        <file>texture/effect/night_vision.png</file>
+        <file>texture/effect/poison.png</file>
+        <file>texture/effect/regeneration.png</file>
+        <file>texture/effect/resistance.png</file>
+        <file>texture/effect/saturation.png</file>
+        <file>texture/effect/slow_falling.png</file>
+        <file>texture/effect/slowness.png</file>
+        <file>texture/effect/speed.png</file>
+        <file>texture/effect/strength.png</file>
+        <file>texture/effect/unluck.png</file>
+        <file>texture/effect/water_breathing.png</file>
+        <file>texture/effect/weakness.png</file>
+        <file>texture/effect/wither.png</file>
     </qresource>
 </RCC>

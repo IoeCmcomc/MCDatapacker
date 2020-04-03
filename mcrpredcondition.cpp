@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "mcrinvitem.h"
 #include "extendednumericdelegate.h"
+#include "itemconditiondialog.h"
 
 #include <QContextMenuEvent>
 #include <QDialog>
@@ -18,6 +19,7 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     connect(ui->deleteButton, &QPushButton::clicked, [this]() {
         deleteLater();
     });
+
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MCRPredCondition::onTypeChanged);
@@ -26,6 +28,13 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     initEntityScoresPage();
     initInvertedCondPage();
     initNestedCondPage();
+    connect(ui->matchTool_propBtn, &QPushButton::clicked, [ = ]() {
+        ItemConditionDialog dialog(this);
+        dialog.fromJson(matchTool_itemProp);
+        if (dialog.exec()) {
+            matchTool_itemProp = dialog.toJson();
+        }
+    });
     initRandChancePage();
     initTableBonusPage();
     initToolEnchantPage();
@@ -206,7 +215,7 @@ void MCRPredCondition::initEntityScoresPage() {
 }
 
 void MCRPredCondition::initInvertedCondPage() {
-    ui->inverted_condAreaInner->setLayout(&nestedCondLayout);
+    ui->inverted_condAreaInner->setLayout(&invertedCondLayout);
 }
 
 void MCRPredCondition::initNestedCondPage() {

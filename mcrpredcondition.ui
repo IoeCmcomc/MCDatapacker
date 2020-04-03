@@ -131,7 +131,7 @@
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>8</number>
      </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QFormLayout" name="formLayout">
@@ -207,7 +207,7 @@
        <item>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <widget class="QCheckBox" name="checkBox">
+          <widget class="QCheckBox" name="damage_explosionCheck">
            <property name="text">
             <string>Explosion</string>
            </property>
@@ -297,7 +297,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="widget">
+     <widget class="QWidget" name="entity">
       <layout class="QFormLayout" name="formLayout_3">
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
@@ -652,7 +652,7 @@
      <widget class="QWidget" name="match_tool">
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <widget class="QPushButton" name="pushButton_8">
+        <widget class="QPushButton" name="matchTool_propBtn">
          <property name="text">
           <string>Item properties...</string>
          </property>

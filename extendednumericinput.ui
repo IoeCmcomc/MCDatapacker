@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>318</width>
+    <width>307</width>
     <height>22</height>
    </rect>
   </property>
@@ -51,7 +51,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="single">
       <layout class="QGridLayout" name="gridLayout_3">
@@ -66,6 +66,15 @@
        </property>
        <item row="0" column="0">
         <widget class="QSpinBox" name="spinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
          <property name="maximum">
           <number>999999999</number>
          </property>
@@ -93,6 +102,15 @@
        </item>
        <item row="0" column="1">
         <widget class="QSpinBox" name="minSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
          <property name="maximum">
           <number>999999999</number>
          </property>
@@ -110,6 +128,15 @@
        </item>
        <item row="0" column="3">
         <widget class="QSpinBox" name="maxSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimum">
+          <number>0</number>
+         </property>
          <property name="maximum">
           <number>999999999</number>
          </property>
@@ -120,7 +147,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="biomimal">
+     <widget class="QWidget" name="biomial">
       <layout class="QGridLayout" name="gridLayout">
        <property name="topMargin">
         <number>0</number>
@@ -133,13 +160,22 @@
        </property>
        <item row="0" column="0">
         <widget class="QLabel" name="numLabel">
+         <property name="toolTip">
+          <string>Number of tries</string>
+         </property>
          <property name="text">
-          <string>Number of tries:</string>
+          <string>Tries:</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
         <widget class="QSpinBox" name="numSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximum">
           <number>999999999</number>
          </property>
@@ -157,6 +193,12 @@
        </item>
        <item row="0" column="3">
         <widget class="QDoubleSpinBox" name="probSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="value">
           <double>0.500000000000000</double>
          </property>
