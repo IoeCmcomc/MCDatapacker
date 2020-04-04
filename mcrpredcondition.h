@@ -1,6 +1,8 @@
 #ifndef MCRPREDCONDITION_H
 #define MCRPREDCONDITION_H
 
+#include "vieweventfilter.h"
+
 #include <QFrame>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
@@ -21,9 +23,6 @@ public:
     bool getIsModular() const;
     void setIsModular(bool value);
 
-protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
-
 protected slots:
     void blockStates_onAdded();
     void entityScores_onAdded();
@@ -36,15 +35,17 @@ private:
     Ui::MCRPredCondition *ui;
     bool isModular = true;
     QStandardItemModel blocksModel;
-    QStandardItemModel blockStateModel;
+    QStandardItemModel blockStatesModel;
     QStandardItemModel entityScoresModel;
     QStandardItemModel enchantmentsModel;
     QStandardItemModel tableBonusModel;
     QStandardItemModel toolEnchantModel;
-    const QString deleteableToolTip = "Right click this row to delete.";
+    const QString deletiveToolTip = "Right click this row to delete.";
     QVBoxLayout nestedCondLayout;
     QVBoxLayout invertedCondLayout;
     QJsonObject matchTool_itemProp;
+    QJsonObject location_locatProp;
+    ViewEventFilter viewFilter;
 
     void initBlockStatesPage();
     void initEntityScoresPage();

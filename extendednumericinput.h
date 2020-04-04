@@ -43,6 +43,8 @@ public:
     void setExactMaximum(const int &max);
     void setRangeMinimum(const int &min);
     void setRangeMaximum(const int &max);
+    void setGeneralMinimum(const int &min);
+    void setGeneralMaximum(const int &max);
 
     void interpretText();
 

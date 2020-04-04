@@ -29,11 +29,16 @@ public:
     ExtendedNumericInput::Types getExNumInputTypes() const;
     void setExNumInputTypes(const ExtendedNumericInput::Types &value);
 
+    void setExNumInputGeneralMin(int value);
+    void setExNumInputGeneralMax(int value);
+
 private slots:
     void commitAndCloseEditor();
 
 private:
     ExtendedNumericInput::Types ExNumInputTypes;
+    int ExNumInputGeneralMin = -999999999;
+    int ExNumInputGeneralMax = 999999999;
 };
 
 #endif /* EXTENDEDNUMERICDELEGATE_H */

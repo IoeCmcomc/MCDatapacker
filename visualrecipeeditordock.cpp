@@ -38,8 +38,8 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this,
             &VisualRecipeEditorDock::onRecipeTabChanged);
-    connect(ui->cookTimeCheck, &QCheckBox::stateChanged, [this](int i) {
-        ui->cookTimeInput->setDisabled(2 - i);
+    connect(ui->cookTimeCheck, &QCheckBox::toggled, [this](bool checked) {
+        ui->cookTimeInput->setEnabled(checked);
     });
     connect(ui->writeRecipeBtn, &QPushButton::clicked,
             this,

@@ -17,10 +17,10 @@
    <property name="verticalSpacing">
     <number>3</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="0" column="2">
+    <widget class="QPushButton" name="deleteButton">
      <property name="text">
-      <string>Condition:</string>
+      <string>Delete</string>
      </property>
     </widget>
    </item>
@@ -121,17 +121,17 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="deleteButton">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Delete</string>
+      <string>Condition:</string>
      </property>
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>8</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QFormLayout" name="formLayout">
@@ -203,8 +203,8 @@
       </layout>
      </widget>
      <widget class="QWidget" name="damage_source_properties">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
+      <layout class="QFormLayout" name="formLayout_6">
+       <item row="0" column="0" colspan="2">
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
           <widget class="QCheckBox" name="damage_explosionCheck">
@@ -250,7 +250,7 @@
          </item>
         </layout>
        </item>
-       <item>
+       <item row="1" column="0" colspan="2">
         <layout class="QFormLayout" name="formLayout_2">
          <item row="0" column="0">
           <widget class="QLabel" name="label_5">
@@ -281,19 +281,6 @@
           </widget>
          </item>
         </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>182</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -448,32 +435,19 @@
       </layout>
      </widget>
      <widget class="QWidget" name="killed_by_player">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
+      <layout class="QFormLayout" name="formLayout_8">
+       <item row="0" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_7">
          <property name="text">
           <string>Inverted</string>
          </property>
         </widget>
        </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="location_check">
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
+      <layout class="QFormLayout" name="formLayout_9">
+       <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>Offsets</string>
@@ -533,25 +507,12 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_7">
+       <item row="1" column="0" colspan="2">
+        <widget class="QPushButton" name="location_propBtn">
          <property name="text">
           <string>Location properties...</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -650,31 +611,65 @@
       </layout>
      </widget>
      <widget class="QWidget" name="match_tool">
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
+      <layout class="QFormLayout" name="formLayout_10">
+       <item row="0" column="0" colspan="2">
         <widget class="QPushButton" name="matchTool_propBtn">
          <property name="text">
           <string>Item properties...</string>
          </property>
         </widget>
        </item>
-       <item>
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>309</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="random_chance">
       <layout class="QGridLayout" name="gridLayout_6">
+       <item row="2" column="2" rowspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="randChance_lootingLabel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Looting multiplier:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="randChance_lootingInput">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="randChance_lootingCheck">
+         <property name="text">
+          <string>With looting</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" rowspan="2">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0" colspan="3">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
@@ -734,53 +729,6 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1" rowspan="2">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2" rowspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="randChance_lootingLabel">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Looting multiplier:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="randChance_lootingInput">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="randChance_lootingCheck">
-         <property name="text">
-          <string>With looting</string>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0" colspan="3">
         <spacer name="verticalSpacer_5">
          <property name="orientation">
@@ -797,7 +745,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="reference">
-      <layout class="QGridLayout" name="gridLayout_7">
+      <layout class="QFormLayout" name="formLayout_11">
        <item row="0" column="0">
         <widget class="QLabel" name="label_16">
          <property name="text">
@@ -820,19 +768,6 @@
           <enum>QComboBox::InsertAtTop</enum>
          </property>
         </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <spacer name="verticalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>438</width>
-           <height>315</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -975,19 +910,6 @@
           <number>999999999</number>
          </property>
         </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <spacer name="verticalSpacer_8">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>438</width>
-           <height>289</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

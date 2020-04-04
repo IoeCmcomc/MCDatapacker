@@ -5,8 +5,8 @@
 #include "mcrinvitem.h"
 #include "extendednumericdelegate.h"
 #include "itemconditiondialog.h"
+#include "locationconditiondialog.h"
 
-#include <QContextMenuEvent>
 #include <QDialog>
 #include <QDoubleSpinBox>
 
@@ -35,6 +35,14 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
             matchTool_itemProp = dialog.toJson();
         }
     });
+    connect(ui->location_propBtn, &QPushButton::clicked, [ = ]() {
+        LocationConditionDialog dialog(this);
+        dialog.fromJson(location_locatProp);
+        if (dialog.exec()) {
+            location_locatProp = dialog.toJson();
+            qDebug() << location_locatProp;
+        }
+    });
     initRandChancePage();
     initTableBonusPage();
     initToolEnchantPage();
@@ -53,27 +61,6 @@ void MCRPredCondition::setIsModular(bool value) {
     ui->deleteButton->setVisible(isModular);
     setFrameShape((isModular) ? QFrame::StyledPanel : QFrame::NoFrame);
     setFrameShadow((isModular) ? QFrame::Raised : QFrame::Plain);
-}
-
-bool MCRPredCondition::eventFilter(QObject *obj, QEvent *event) {
-    /*qDebug() << event->type() << event; */
-    if (event->type() == QEvent::ContextMenu) {
-        /*auto *abstractView = qobject_cast<QTableView*>(obj); */
-        auto *abstractView = qobject_cast<QAbstractItemView*>(obj);
-        if (abstractView != nullptr) {
-            auto *model     = abstractView->model();
-            auto *menuEvent = static_cast<QContextMenuEvent*>(event);
-            auto  finalPos  = abstractView->viewport()->
-                              mapFromGlobal(abstractView->
-                                            mapToGlobal(menuEvent->pos()));
-            auto index = abstractView->indexAt(finalPos);
-            if (index.isValid()) {
-                model->removeRow(index.row());
-                return true;
-            }
-        }
-    }
-    return QObject::eventFilter(obj, event);
 }
 
 void MCRPredCondition::onTypeChanged(const int &i) {
@@ -97,12 +84,12 @@ void MCRPredCondition::blockStates_onAdded() {
 
     QStandardItem *stateItem = new QStandardItem(
         ui->blockState_stateEdit->text());
-    stateItem->setToolTip(deleteableToolTip);
+    stateItem->setToolTip(deletiveToolTip);
     QStandardItem *valueItem = new QStandardItem(
         ui->blockState_valueEdit->text());
-    valueItem->setToolTip(deleteableToolTip);
+    valueItem->setToolTip(deletiveToolTip);
 
-    blockStateModel.appendRow({ stateItem, valueItem });
+    blockStatesModel.appendRow({ stateItem, valueItem });
 }
 
 void MCRPredCondition::entityScores_onAdded() {
@@ -111,11 +98,11 @@ void MCRPredCondition::entityScores_onAdded() {
 
     QStandardItem *objItem = new QStandardItem(
         ui->entityScores_objectiveEdit->text());
-    objItem->setToolTip(deleteableToolTip);
+    objItem->setToolTip(deletiveToolTip);
     QStandardItem *valueItem = new QStandardItem();
     auto           json      = ui->entityScores_valueInput->toJson();
     valueItem->setData(json, Qt::DisplayRole);
-    valueItem->setToolTip(deleteableToolTip);
+    valueItem->setToolTip(deletiveToolTip);
     entityScoresModel.appendRow({ objItem, valueItem });
 }
 
@@ -131,7 +118,7 @@ void MCRPredCondition::tableBonus_onAdded() {
 
     chanceItem->setData(ui->tableBonus_chanceSpinBox->value(),
                         Qt::DisplayRole);
-    chanceItem->setToolTip(deleteableToolTip);
+    chanceItem->setToolTip(deletiveToolTip);
     tableBonusModel.appendRow(chanceItem);
 }
 
@@ -147,11 +134,11 @@ void MCRPredCondition::toolEnchant_onAdded() {
     QStandardItem *enchantItem = new QStandardItem(enchantmentText);
     enchantItem->setData(ui->toolEnchant_enchantCombo->currentData());
     enchantItem->setEditable(false);
-    enchantItem->setToolTip(deleteableToolTip);
+    enchantItem->setToolTip(deletiveToolTip);
     QStandardItem *levelsItem = new QStandardItem();
     auto           json       = ui->toolEnchant_levelsInput->toJson();
     levelsItem->setData(json, Qt::DisplayRole);
-    levelsItem->setToolTip(deleteableToolTip);
+    levelsItem->setToolTip(deletiveToolTip);
     toolEnchantModel.appendRow({ enchantItem, levelsItem });
 }
 
@@ -180,11 +167,11 @@ void MCRPredCondition::initBlockStatesPage() {
     QStandardItem *valuesItem = new QStandardItem("Value");
     valuesItem->setToolTip("A value of the state.");
 
-    blockStateModel.setHorizontalHeaderItem(0, stateItem);
-    blockStateModel.setHorizontalHeaderItem(1, valuesItem);
+    blockStatesModel.setHorizontalHeaderItem(0, stateItem);
+    blockStatesModel.setHorizontalHeaderItem(1, valuesItem);
 
-    ui->blockState_listView->setModel(&blockStateModel);
-    ui->blockState_listView->installEventFilter(this);
+    ui->blockState_listView->setModel(&blockStatesModel);
+    ui->blockState_listView->installEventFilter(&viewFilter);
 
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,
@@ -204,7 +191,7 @@ void MCRPredCondition::initEntityScoresPage() {
     entityScoresModel.setHorizontalHeaderItem(1, valuesItem);
 
     ui->entityScores_listView->setModel(&entityScoresModel);
-    ui->entityScores_listView->installEventFilter(this);
+    ui->entityScores_listView->installEventFilter(&viewFilter);
     auto *delegate = new ExtendedNumericDelegate();
     delegate->setExNumInputTypes(ExtendedNumericInput::Exact
                                  | ExtendedNumericInput::Range);
@@ -236,7 +223,7 @@ void MCRPredCondition::initRandChancePage() {
         ui->randChance_slider->setValue(qRound(value * 100));
     });
     connect(ui->randChance_lootingCheck,
-            &QCheckBox::stateChanged, [ = ](bool checked) {
+            &QCheckBox::toggled, [ = ](bool checked) {
         ui->randChance_lootingLabel->setEnabled(checked);
         ui->randChance_lootingInput->setEnabled(checked);
     });
@@ -258,7 +245,7 @@ void MCRPredCondition::initTableBonusPage() {
     ui->toolEnchant_enchantCombo->setModel(&enchantmentsModel);
 
     ui->tableBonus_listView->setModel(&tableBonusModel);
-    ui->tableBonus_listView->installEventFilter(this);
+    ui->tableBonus_listView->installEventFilter(&viewFilter);
 
     connect(ui->tableBonus_chanceSlider,
             &QSlider::valueChanged, [ = ](int value) {
@@ -285,7 +272,7 @@ void MCRPredCondition::initToolEnchantPage() {
     toolEnchantModel.setHorizontalHeaderItem(1, levelsItem);
 
     ui->toolEnchant_listView->setModel(&toolEnchantModel);
-    ui->toolEnchant_listView->installEventFilter(this);
+    ui->toolEnchant_listView->installEventFilter(&viewFilter);
     auto *delegate = new ExtendedNumericDelegate();
     delegate->setExNumInputTypes(ExtendedNumericInput::Range);
     ui->toolEnchant_listView->setItemDelegate(delegate);

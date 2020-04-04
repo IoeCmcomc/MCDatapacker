@@ -1084,7 +1084,6 @@
         <file>info/items.json</file>
         <file>info/tags/blocks.json</file>
         <file>info/tags/entity_types.json</file>
-        <file>info/tags/fluids.json</file>
         <file>info/tags/items.json</file>
         <file>info/effects.json</file>
         <file>texture/effect/absorption.png</file>
@@ -1119,5 +1118,8 @@
         <file>texture/effect/water_breathing.png</file>
         <file>texture/effect/weakness.png</file>
         <file>texture/effect/wither.png</file>
+        <file>info/dimensions.json</file>
+        <file>info/features.json</file>
+        <file>info/fluids.json</file>
     </qresource>
 </RCC>

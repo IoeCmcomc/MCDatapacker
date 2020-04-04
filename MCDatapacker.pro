@@ -24,6 +24,7 @@ SOURCES += \
     globalhelpers.cpp \
     itemconditiondialog.cpp \
     jsonhighlighter.cpp \
+    locationconditiondialog.cpp \
     loottableeditordock.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -38,6 +39,7 @@ SOURCES += \
     settingsdialog.cpp \
     stackedwidget.cpp \
     tagselectordialog.cpp \
+    vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
 HEADERS += \
@@ -50,6 +52,7 @@ HEADERS += \
     itemconditiondialog.h \
     jsonhighlighter.h \
     linenumberarea.h \
+    locationconditiondialog.h \
     loottableeditordock.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
@@ -63,12 +66,14 @@ HEADERS += \
     settingsdialog.h \
     stackedwidget.h \
     tagselectordialog.h \
+    vieweventfilter.h \
     visualrecipeeditordock.h
 
 FORMS += \
     blockitemselectordialog.ui \
     extendednumericinput.ui \
     itemconditiondialog.ui \
+    locationconditiondialog.ui \
     loottableeditordock.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \

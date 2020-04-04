@@ -56,6 +56,9 @@ QWidget *ExtendedNumericDelegate::createEditor(QWidget *parent,
         auto *editor = new ExtendedNumericInput(parent);
         editor->setAutoFillBackground(true);
         editor->setTypes(ExNumInputTypes);
+        editor->setGeneralMinimum(ExNumInputGeneralMin);
+        editor->setGeneralMaximum(ExNumInputGeneralMax);
+
         connect(editor, &ExtendedNumericInput::editingFinished,
                 this, &ExtendedNumericDelegate::commitAndCloseEditor);
         return editor;
@@ -97,6 +100,14 @@ void ExtendedNumericDelegate::commitAndCloseEditor() {
     auto *editor = qobject_cast<ExtendedNumericInput*>(sender());
     emit  commitData(editor);
     emit  closeEditor(editor);
+}
+
+void ExtendedNumericDelegate::setExNumInputGeneralMax(int value) {
+    ExNumInputGeneralMax = value;
+}
+
+void ExtendedNumericDelegate::setExNumInputGeneralMin(int value) {
+    ExNumInputGeneralMin = value;
 }
 
 ExtendedNumericInput::Types ExtendedNumericDelegate::getExNumInputTypes() const

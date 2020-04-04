@@ -51,7 +51,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="single">
       <layout class="QGridLayout" name="gridLayout_3">
@@ -73,7 +73,7 @@
           </sizepolicy>
          </property>
          <property name="minimum">
-          <number>0</number>
+          <number>-999999999</number>
          </property>
          <property name="maximum">
           <number>999999999</number>
@@ -109,7 +109,7 @@
           </sizepolicy>
          </property>
          <property name="minimum">
-          <number>0</number>
+          <number>-999999999</number>
          </property>
          <property name="maximum">
           <number>999999999</number>
@@ -135,7 +135,7 @@
           </sizepolicy>
          </property>
          <property name="minimum">
-          <number>0</number>
+          <number>-999999999</number>
          </property>
          <property name="maximum">
           <number>999999999</number>

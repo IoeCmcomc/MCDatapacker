@@ -14,6 +14,9 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
+    ui->rollsInput->setGeneralMinimum(0);
+    ui->bonusRollsInput->setGeneralMinimum(0);
+
     ui->pollListView->setModel(&model);
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
@@ -28,8 +31,8 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     connect(ui->pollListView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
             this, &LootTableEditorDock::onPollSelectionChanged);
-    connect(ui->bonusRollsCheck, &QCheckBox::stateChanged, [this](int i) {
-        ui->bonusRollsInput->setDisabled(2 - i);
+    connect(ui->bonusRollsCheck, &QCheckBox::toggled, [this](bool checked) {
+        ui->bonusRollsInput->setEnabled(checked);
     });
 
     checkPolls();

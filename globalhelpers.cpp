@@ -114,3 +114,27 @@ QString GlobalHelpers::toNamespacedID(const QString &dirpath,
     }
     return r;
 }
+
+QVariant GlobalHelpers::strToVariant(const QString &str) {
+    bool isInt;
+    auto intValue = str.toInt(&isInt);
+
+    if (isInt) {
+        return intValue;
+    } else {
+        if (str == QStringLiteral("true") || str == QStringLiteral("false")) {
+            return str == QStringLiteral("true");
+        } else {
+            return str;
+        }
+    }
+}
+
+QString GlobalHelpers::variantToStr(const QVariant &vari) {
+    if (vari.type() == QVariant::Bool)
+        return vari.toBool() ? QStringLiteral("true") : QStringLiteral("false");
+    else if (vari.type() == QVariant::Int)
+        return vari.toString();
+    else
+        return vari.toString();
+}

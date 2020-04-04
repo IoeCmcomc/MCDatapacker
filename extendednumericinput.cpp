@@ -202,6 +202,16 @@ void ExtendedNumericInput::setRangeMaximum(const int &max) {
     ui->maxSpinBox->setMaximum(max);
 }
 
+void ExtendedNumericInput::setGeneralMinimum(const int &min) {
+    setExactMinimum(min);
+    setRangeMinimum(min);
+}
+
+void ExtendedNumericInput::setGeneralMaximum(const int &max) {
+    setExactMaximum(max);
+    setRangeMaximum(max);
+}
+
 void ExtendedNumericInput::interpretText() {
     ui->spinBox->interpretText();
     ui->minSpinBox->interpretText();

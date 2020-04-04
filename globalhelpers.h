@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 
 #include <QString>
+#include <QVariant>
 
 namespace GlobalHelpers {
     void someTest();
@@ -15,6 +16,8 @@ namespace GlobalHelpers {
     MainWindow::MCRFileType toMCRFileType(const QString &dirpath,
                                           const QString &filepath);
     QString toNamespacedID(const QString &dirpath, QString filepath);
+    QVariant strToVariant(const QString &str);
+    QString variantToStr(const QVariant &vari);
 }
 
-#endif // GLOBALHELPERS_H
+#endif /* GLOBALHELPERS_H */
