@@ -61,28 +61,26 @@ void TagSelectorDialog::setupTagTreeView(
     filterModel.setFilterRole(Qt::DisplayRole);
     ui->tagListView->setModel(&filterModel);
 
-    /*auto MCRTagInfo = MainWindow::getMCRInfo("blockTag"); */
-
-    QString tagStr = QStringLiteral("tags/");
+    QString tagStr = QStringLiteral("tag/");
     switch (type) {
     case MainWindow::BlockTag:
-        tagStr += "blocks";
+        tagStr += "block";
         break;
 
     case MainWindow::EntityTypeTag:
-        tagStr += "entity_types";
+        tagStr += "entity_type";
         break;
 
     case MainWindow::FluidTag:
-        tagStr += "fluids";
+        tagStr += "fluid";
         break;
 
     case MainWindow::FunctionTag:
-        tagStr += "functions";
+        tagStr += "function";
         break;
 
     case MainWindow::ItemTag:
-        tagStr += "items";
+        tagStr += "item";
         break;
 
     default:

@@ -47,6 +47,7 @@ public:
     void setGeneralMaximum(const int &max);
 
     void interpretText();
+    void retranslate();
 
 signals:
     void editingFinished();

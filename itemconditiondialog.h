@@ -1,11 +1,9 @@
 #ifndef ITEMCONDITIONDIALOG_H
 #define ITEMCONDITIONDIALOG_H
 
-#include "vieweventfilter.h"
+#include "basecondition.h"
 
 #include <QDialog>
-#include <QStandardItemModel>
-#include <QTableView>
 #include <QJsonObject>
 #include <QJsonArray>
 
@@ -13,7 +11,7 @@ namespace Ui {
     class ItemConditionDialog;
 }
 
-class ItemConditionDialog : public QDialog
+class ItemConditionDialog : public QDialog, public BaseCondition
 {
     Q_OBJECT
 
@@ -39,6 +37,7 @@ private:
     const QString deletiveToolTip = "Right click this row to delete.";
     ViewEventFilter viewFilter;
 
+    using BaseCondition::initModelView;
     void initModelView(QStandardItemModel &model, QTableView *tableView);
     void tableFromJson(const QJsonArray &jsonArr, QStandardItemModel &model);
 };

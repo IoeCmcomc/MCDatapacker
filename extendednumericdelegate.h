@@ -37,7 +37,7 @@ private slots:
 
 private:
     ExtendedNumericInput::Types ExNumInputTypes;
-    int ExNumInputGeneralMin = -999999999;
+    int ExNumInputGeneralMin = 0;
     int ExNumInputGeneralMax = 999999999;
 };
 

@@ -1,7 +1,7 @@
 #ifndef MCRPREDCONDITION_H
 #define MCRPREDCONDITION_H
 
-#include "vieweventfilter.h"
+#include "basecondition.h"
 
 #include <QFrame>
 #include <QStandardItemModel>
@@ -12,7 +12,7 @@ namespace Ui {
     class MCRPredCondition;
 }
 
-class MCRPredCondition : public QFrame
+class MCRPredCondition : public QFrame, public BaseCondition
 {
     Q_OBJECT
 
@@ -40,12 +40,10 @@ private:
     QStandardItemModel enchantmentsModel;
     QStandardItemModel tableBonusModel;
     QStandardItemModel toolEnchantModel;
-    const QString deletiveToolTip = "Right click this row to delete.";
     QVBoxLayout nestedCondLayout;
     QVBoxLayout invertedCondLayout;
     QJsonObject matchTool_itemProp;
     QJsonObject location_locatProp;
-    ViewEventFilter viewFilter;
 
     void initBlockStatesPage();
     void initEntityScoresPage();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>419</height>
+    <height>415</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -131,33 +131,30 @@
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>6</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="block_state_property">
-      <layout class="QFormLayout" name="formLayout">
+      <layout class="QGridLayout" name="gridLayout_7">
        <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Block:</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Block:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="blockState_blockCombo"/>
+         </item>
+        </layout>
        </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="blockState_blockCombo"/>
-       </item>
-       <item row="1" column="0" colspan="2">
+       <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Block states</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Value:</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
@@ -167,6 +164,13 @@
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="blockState_stateEdit"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Value:</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="3">
            <widget class="QLineEdit" name="blockState_valueEdit"/>
@@ -322,7 +326,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="entity_scores">
-      <layout class="QFormLayout" name="formLayout_4">
+      <layout class="QGridLayout" name="gridLayout_11">
        <item row="0" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
@@ -355,8 +359,35 @@
           <string>Scores</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Objective:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Value:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="ExtendedNumericInput" name="entityScores_valueInput">
+            <property name="minimumSize">
+             <size>
+              <width>125</width>
+              <height>20</height>
+             </size>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="0" colspan="2">
            <widget class="QTableView" name="entityScores_listView">
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::AdjustToContents</enum>
+            </property>
             <property name="alternatingRowColors">
              <bool>true</bool>
             </property>
@@ -371,39 +402,15 @@
             </attribute>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="ExtendedNumericInput" name="entityScores_valueInput">
-            <property name="minimumSize">
-             <size>
-              <width>125</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Value:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="entityScores_objectiveEdit"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Objective:</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0" colspan="2">
            <widget class="QPushButton" name="entityScores_addBtn">
             <property name="text">
              <string>Add</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="entityScores_objectiveEdit"/>
           </item>
          </layout>
         </widget>
@@ -425,8 +432,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>434</width>
-            <height>342</height>
+            <width>570</width>
+            <height>544</height>
            </rect>
           </property>
          </widget>
@@ -594,8 +601,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>452</width>
-            <height>326</height>
+            <width>588</width>
+            <height>528</height>
            </rect>
           </property>
          </widget>

@@ -30,10 +30,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                    MainWindow::readMCRInfo(QStringLiteral(
-                                                               "blocks")));
+                                                               "block")));
     MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
                                    MainWindow::readMCRInfo(QStringLiteral(
-                                                               "items")));
+                                                               "item")));
 
     qDebug() << MainWindow::getMCRInfo("blockTag").count();
 

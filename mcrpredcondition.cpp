@@ -71,7 +71,7 @@ void MCRPredCondition::onTypeChanged(const int &i) {
             MCRPredCondition *cond = new MCRPredCondition(
                 ui->nested_condAreaInner);
 
-            cond->setMinimumHeight(470);
+            cond->setMinimumHeight(300);
             invertedCondLayout.addWidget(cond, 0);
         }
     }
@@ -109,7 +109,7 @@ void MCRPredCondition::entityScores_onAdded() {
 void MCRPredCondition::nested_onAdded() {
     MCRPredCondition *cond = new MCRPredCondition(ui->nested_condAreaInner);
 
-    cond->setMinimumHeight(470);
+    cond->setMinimumHeight(300);
     nestedCondLayout.addWidget(cond, 0);
 }
 
@@ -167,12 +167,8 @@ void MCRPredCondition::initBlockStatesPage() {
     QStandardItem *valuesItem = new QStandardItem("Value");
     valuesItem->setToolTip("A value of the state.");
 
-    blockStatesModel.setHorizontalHeaderItem(0, stateItem);
-    blockStatesModel.setHorizontalHeaderItem(1, valuesItem);
-
-    ui->blockState_listView->setModel(&blockStatesModel);
-    ui->blockState_listView->installEventFilter(&viewFilter);
-
+    initModelView(blockStatesModel, ui->blockState_listView,
+                  { stateItem, valuesItem });
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,
             this, &MCRPredCondition::blockStates_onAdded);
@@ -187,15 +183,12 @@ void MCRPredCondition::initEntityScoresPage() {
     QStandardItem *valuesItem = new QStandardItem("Score");
     valuesItem->setToolTip("A value of the objective.");
 
-    entityScoresModel.setHorizontalHeaderItem(0, objItem);
-    entityScoresModel.setHorizontalHeaderItem(1, valuesItem);
-
-    ui->entityScores_listView->setModel(&entityScoresModel);
-    ui->entityScores_listView->installEventFilter(&viewFilter);
     auto *delegate = new ExtendedNumericDelegate();
     delegate->setExNumInputTypes(ExtendedNumericInput::Exact
                                  | ExtendedNumericInput::Range);
-    ui->entityScores_listView->setItemDelegate(delegate);
+
+    initModelView(entityScoresModel, ui->entityScores_listView,
+                  { objItem, valuesItem }, delegate);
 
     connect(ui->entityScores_addBtn, &QPushButton::clicked,
             this, &MCRPredCondition::entityScores_onAdded);
@@ -230,18 +223,8 @@ void MCRPredCondition::initRandChancePage() {
 }
 
 void MCRPredCondition::initTableBonusPage() {
-    auto enchantmentsInfo = MainWindow::readMCRInfo("enchantments");
-
-    for (auto key : enchantmentsInfo.keys()) {
-        QStandardItem *item = new QStandardItem();
-        auto           map  = enchantmentsInfo.value(key).toMap();
-        item->setText(map.value("name").toString());
-        item->setData(key);
-        item->setToolTip(map.value("summary").toString());
-
-        enchantmentsModel.appendRow(item);
-    }
-    ui->tableBonus_enchantCombo->setModel(&enchantmentsModel);
+    initComboModelView("enchantment", enchantmentsModel,
+                       ui->tableBonus_enchantCombo);
     ui->toolEnchant_enchantCombo->setModel(&enchantmentsModel);
 
     ui->tableBonus_listView->setModel(&tableBonusModel);
@@ -268,14 +251,11 @@ void MCRPredCondition::initToolEnchantPage() {
     QStandardItem *levelsItem = new QStandardItem("Levels");
     levelsItem->setToolTip("The minimun and maximun levels of the enchantment.");
 
-    toolEnchantModel.setHorizontalHeaderItem(0, enchantItem);
-    toolEnchantModel.setHorizontalHeaderItem(1, levelsItem);
-
-    ui->toolEnchant_listView->setModel(&toolEnchantModel);
-    ui->toolEnchant_listView->installEventFilter(&viewFilter);
     auto *delegate = new ExtendedNumericDelegate();
     delegate->setExNumInputTypes(ExtendedNumericInput::Range);
-    ui->toolEnchant_listView->setItemDelegate(delegate);
+
+    initModelView(toolEnchantModel, ui->toolEnchant_listView,
+                  { enchantItem, levelsItem }, delegate);
 
     connect(ui->toolEnchant_addBtn, &QPushButton::clicked,
             this, &MCRPredCondition::toolEnchant_onAdded);

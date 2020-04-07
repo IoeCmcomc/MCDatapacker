@@ -46,7 +46,7 @@ public:
     static QMap<QString, QVariant> &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
     void setCurrentFile(const QString &filepath);
-    static QMap<QString, QVariant> readMCRInfo(const QString &type = "blocks",
+    static QMap<QString, QVariant> readMCRInfo(const QString &type = "block",
                                                const int depth     = 0);
 
 protected:

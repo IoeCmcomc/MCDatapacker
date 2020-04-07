@@ -37,7 +37,6 @@ void ExtendedNumericInput::resizeEvent(QResizeEvent *event) {
 void ExtendedNumericInput::mouseReleaseEvent(QMouseEvent *event) {
     auto cursorWidget = qApp->widgetAt(mapToGlobal(event->pos()));
 
-    /*qDebug() << "cursorWidget:" << cursorWidget; */
     if (cursorWidget != nullptr
         && qobject_cast<QAbstractSpinBox*>(cursorWidget) == nullptr
         && qobject_cast<QToolButton*>(cursorWidget) == nullptr) {
@@ -116,9 +115,7 @@ ExtendedNumericInput::Types ExtendedNumericInput::getTypes() const {
 
 void ExtendedNumericInput::setTypes(const ExtendedNumericInput::Types &value) {
     types = value;
-    /*qDebug() << value; */
     setMenu();
-    /*qDebug() << types.testFlag(Exact) << types.testFlag(Range) << types.testFlag(Biomial); */
     if (!types.testFlag(Exact)) {
         ui->stackedWidget->setCurrentIndex(1);
         if (!types.testFlag(Range))
@@ -218,4 +215,8 @@ void ExtendedNumericInput::interpretText() {
     ui->maxSpinBox->interpretText();
     ui->numSpinBox->interpretText();
     ui->probSpinBox->interpretText();
+}
+
+void ExtendedNumericInput::retranslate() {
+    ui->retranslateUi(this);
 }

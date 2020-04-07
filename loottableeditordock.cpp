@@ -14,9 +14,6 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
-    ui->rollsInput->setGeneralMinimum(0);
-    ui->bonusRollsInput->setGeneralMinimum(0);
-
     ui->pollListView->setModel(&model);
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,

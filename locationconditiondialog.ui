@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>582</width>
-    <height>593</height>
+    <width>689</width>
+    <height>543</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
        <property name="checkable">
         <bool>true</bool>
        </property>
-       <layout class="QFormLayout" name="formLayout_3">
+       <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
@@ -91,6 +91,9 @@
         </item>
         <item row="7" column="0" colspan="2">
          <widget class="QTableView" name="blockStatesView">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
@@ -119,7 +122,7 @@
        <property name="checkable">
         <bool>true</bool>
        </property>
-       <layout class="QFormLayout" name="formLayout_4">
+       <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
@@ -176,6 +179,9 @@
         </item>
         <item row="6" column="0" colspan="2">
          <widget class="QTableView" name="fluidStatesView">
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
+          </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>

@@ -2,18 +2,16 @@
 #define LOCATIONCONDITIONDIALOG_H
 
 #include "extendednumericinput.h"
-#include "vieweventfilter.h"
+#include "basecondition.h"
 
-#include <QComboBox>
 #include <QDialog>
-#include <QStandardItemModel>
 #include <QVariant>
 
 namespace Ui {
     class LocationConditionDialog;
 }
 
-class LocationConditionDialog : public QDialog
+class LocationConditionDialog : public QDialog, public BaseCondition
 {
     Q_OBJECT
 
@@ -37,19 +35,10 @@ private:
     QStandardItemModel blockStatesModel;
     QStandardItemModel fluidsModel;
     QStandardItemModel fluidStatesModel;
-    const QString deletiveToolTip = "Right click this row to delete.";
-    ViewEventFilter viewFilter;
 
-    void initNumericInput(ExtendedNumericInput *input, const int &min,
-                          const int &max);
-    void initComboModelView(const QString &infoType,
-                            QStandardItemModel &model, QComboBox *combo,
-                            bool optional = true);
     void initBlockGroup();
     void initFluidGroup();
-
-    void setupComboFrom(QComboBox *combo, const QVariant &vari,
-                        int role = Qt:: UserRole + 1);
+    void setupTableFromJson(QStandardItemModel &model, const QJsonObject &json);
 };
 
 #endif /* LOCATIONCONDITIONDIALOG_H */

@@ -8,7 +8,7 @@
 #include <QJsonArray>
 
 LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent), BaseCondition(),
     ui(new Ui::LocationConditionDialog) {
     ui->setupUi(this);
 
@@ -16,17 +16,19 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
                            | ExtendedNumericInput::Range;
 
     ui->xInput->setTypes(typeFlags);
+    ui->xInput->setGeneralMinimum(-999999999);
     ui->yInput->setTypes(typeFlags);
+    ui->yInput->setGeneralMinimum(-999999999);
     ui->zInput->setTypes(typeFlags);
+    ui->zInput->setGeneralMinimum(-999999999);
     ui->lightInput->setTypes(typeFlags);
-    ui->lightInput->setGeneralMinimum(0);
     ui->lightInput->setGeneralMaximum(15);
 
-    initComboModelView("biomes", biomesModel, ui->biomeCombo);
-    initComboModelView("dimensions", dimensionsModel, ui->dimensionCombo);
+    initComboModelView("biome", biomesModel, ui->biomeCombo);
+    initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
 
     featuresModel.appendRow(new QStandardItem(tr("(not selected)")));
-    auto info = MainWindow::readMCRInfo("features");
+    auto info = MainWindow::readMCRInfo("feature");
     for (auto key : info.keys()) {
         QStandardItem *item = new QStandardItem();
         item->setText(info.value(key).toString());
@@ -161,43 +163,36 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
             if (block.contains("nbt"))
                 ui->blockNBTEdit->setText(block["nbt"].toString());
 
-            if (block.contains("state")) {
-                QJsonObject state = block["state"].toObject();
-                for (auto key : state.keys()) {
-                    QStandardItem *stateItem = new QStandardItem();
-                    stateItem->setText(key);
-                    stateItem->setToolTip(deletiveToolTip);
-                    QStandardItem *valueItem = new QStandardItem();
-                    valueItem->setText(
-                        GlobalHelpers::variantToStr(state[key].toVariant()));
-                    valueItem->setToolTip(deletiveToolTip);
-                    blockStatesModel.appendRow({ stateItem, valueItem });
-                }
-            }
+            setupTableFromJson(blockStatesModel, block);
         }
     }
 
     ui->fluidGroup->setChecked(value.contains("fluid"));
     if (value.contains("fluid")) {
-        QJsonObject block = value["fluid"].toObject();
-        if (block.contains("fluid")) {
-            setupComboFrom(ui->blockCombo, block["fluid"].toVariant());
-            if (block.contains("tag"))
-                ui->blockTagEdit->setText(block["tag"].toString());
+        QJsonObject fluid = value["fluid"].toObject();
+        if (fluid.contains("fluid")) {
+            setupComboFrom(ui->blockCombo, fluid["fluid"].toVariant());
+            if (fluid.contains("tag"))
+                ui->blockTagEdit->setText(fluid["tag"].toString());
 
-            if (block.contains("state")) {
-                QJsonObject state = block["state"].toObject();
-                for (auto key : state.keys()) {
-                    QStandardItem *stateItem = new QStandardItem();
-                    stateItem->setText(key);
-                    stateItem->setToolTip(deletiveToolTip);
-                    QStandardItem *valueItem = new QStandardItem();
-                    valueItem->setText(
-                        GlobalHelpers::variantToStr(state[key].toVariant()));
-                    valueItem->setToolTip(deletiveToolTip);
-                    fluidStatesModel.appendRow({ stateItem, valueItem });
-                }
-            }
+            setupTableFromJson(blockStatesModel, fluid);
+        }
+    }
+}
+
+void LocationConditionDialog::setupTableFromJson(QStandardItemModel &model,
+                                                 const QJsonObject &json) {
+    if (json.contains("state")) {
+        QJsonObject state = json["state"].toObject();
+        for (auto key : state.keys()) {
+            QStandardItem *stateItem = new QStandardItem();
+            stateItem->setText(key);
+            stateItem->setToolTip(deletiveToolTip);
+            QStandardItem *valueItem = new QStandardItem();
+            valueItem->setText(
+                GlobalHelpers::variantToStr(state[key].toVariant()));
+            valueItem->setToolTip(deletiveToolTip);
+            model.appendRow({ stateItem, valueItem });
         }
     }
 }
@@ -230,31 +225,6 @@ void LocationConditionDialog::onAddedFluidState() {
     valueItem->setToolTip(deletiveToolTip);
 
     fluidStatesModel.appendRow({ stateItem, valueItem });
-}
-
-void LocationConditionDialog::initNumericInput(ExtendedNumericInput *input,
-                                               const int &min,
-                                               const int &max) {
-    input->setExactMinimum(min);
-    input->setExactMaximum(max);
-    input->setRangeMinimum(min);
-    input->setRangeMaximum(max);
-}
-
-void LocationConditionDialog::initComboModelView(const QString &infoType,
-                                                 QStandardItemModel &model,
-                                                 QComboBox *combo,
-                                                 bool optinal) {
-    if (optinal)
-        model.appendRow(new QStandardItem(tr("(not selected)")));
-    auto info = MainWindow::readMCRInfo(infoType);
-    for (auto key : info.keys()) {
-        QStandardItem *item = new QStandardItem();
-        item->setText(info.value(key).toString());
-        item->setData("minecraft:" + key);
-        model.appendRow(item);
-    }
-    combo->setModel(&model);
 }
 
 void LocationConditionDialog::initBlockGroup() {
@@ -296,7 +266,7 @@ void LocationConditionDialog::initBlockGroup() {
 void LocationConditionDialog::initFluidGroup() {
     ui->fluidGroup->setChecked(false);
 
-    initComboModelView("fluids", fluidsModel, ui->fluidCombo, false);
+    initComboModelView("fluid", fluidsModel, ui->fluidCombo, false);
 
     QStandardItem *stateItem = new QStandardItem("State");
     stateItem->setToolTip("An state of the block.");
@@ -311,17 +281,4 @@ void LocationConditionDialog::initFluidGroup() {
 
     connect(ui->addFluidStateBtn, &QPushButton::clicked,
             this, &LocationConditionDialog::onAddedFluidState);
-}
-
-void LocationConditionDialog::setupComboFrom(QComboBox *combo,
-                                             const QVariant &vari,
-                                             int role) {
-    auto *model = qobject_cast<QStandardItemModel*>(combo->model());
-
-    for (int i = 0; i < model->rowCount(); ++i) {
-        if (model->item(i, 0)->data(role) == vari) {
-            combo->setCurrentIndex(i);
-            return;
-        }
-    }
 }

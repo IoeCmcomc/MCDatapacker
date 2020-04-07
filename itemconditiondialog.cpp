@@ -6,44 +6,21 @@
 #include "mcrinvslot.h"
 
 ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent), BaseCondition(),
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
 
     auto typeFlags = ExtendedNumericInput::Exact
                      | ExtendedNumericInput::Range;
     ui->countInput->setTypes(typeFlags);
-    ui->countInput->setGeneralMinimum(0);
     ui->durabilityInput->setTypes(typeFlags);
-    ui->durabilityInput->setGeneralMinimum(0);
     ui->enchant_levelInput->setTypes(typeFlags);
-    ui->enchant_levelInput->setGeneralMinimum(0);
     ui->stored_levelInput->setTypes(typeFlags);
-    ui->stored_levelInput->setGeneralMinimum(0);
     ui->itemSlot->setAcceptTag(false);
     ui->itemSlot->setAcceptMultiItems(false);
 
-    potionsModel.appendRow(new QStandardItem(tr("(not selected)")));
-    auto effectsInfo = MainWindow::readMCRInfo("effects");
-    for (auto key : effectsInfo.keys()) {
-        QStandardItem *item = new QStandardItem();
-        item->setText(effectsInfo.value(key).toString());
-        item->setIcon(QIcon(":minecraft/texture/effect/" + key + ".png"));
-        item->setData("minecraft:" + key);
-        potionsModel.appendRow(item);
-    }
-    ui->potionCombo->setModel(&potionsModel);
-
-    auto enchantmentsInfo = MainWindow::readMCRInfo("enchantments");
-    for (auto key : enchantmentsInfo.keys()) {
-        QStandardItem *item = new QStandardItem();
-        auto           map  = enchantmentsInfo.value(key).toMap();
-        item->setText(map.value("name").toString());
-        item->setData("minecraft:" + key);
-        item->setToolTip(map.value("summary").toString());
-        enchantmentsModel.appendRow(item);
-    }
-    ui->enchant_combo->setModel(&enchantmentsModel);
+    initComboModelView("effect", potionsModel, ui->potionCombo);
+    initComboModelView("enchantment", enchantmentsModel, ui->enchant_combo);
     ui->stored_combo->setModel(&enchantmentsModel);
 
     initModelView(itemEnchantModel, ui->enchant_listView);
@@ -124,13 +101,7 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains("tag"))
         ui->itemTagEdit->setText(value["tag"].toString());
     if (value.contains("potion")) {
-        auto potionId = value["potion"].toString();
-        for (int i = 0; i < potionsModel.rowCount(); ++i) {
-            if (potionsModel.item(i, 0)->data().toString() == potionId) {
-                ui->potionCombo->setCurrentIndex(i);
-                break;
-            }
-        }
+        setupComboFrom(ui->potionCombo, value["potion"]);
     }
 
     if (value.contains("enchantments")) {
@@ -198,16 +169,13 @@ void ItemConditionDialog::initModelView(QStandardItemModel &model,
     QStandardItem *levelsItem = new QStandardItem("Levels");
     levelsItem->setToolTip("The levels of the enchantment.");
 
-    model.setHorizontalHeaderItem(0, enchantItem);
-    model.setHorizontalHeaderItem(1, levelsItem);
-
-    tableView->setModel(&model);
-    tableView->installEventFilter(&viewFilter);
     auto *delegate = new ExtendedNumericDelegate();
     delegate->setExNumInputTypes(ExtendedNumericInput::Exact
                                  | ExtendedNumericInput::Range);
     delegate->setExNumInputGeneralMin(0);
-    tableView->setItemDelegate(delegate);
+
+    BaseCondition::initModelView(model, tableView, { enchantItem, levelsItem },
+                                 delegate);
 }
 
 void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,

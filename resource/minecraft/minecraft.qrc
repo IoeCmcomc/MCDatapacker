@@ -1078,14 +1078,6 @@
         <file>texture/item/wither_rose.png</file>
         <file>texture/item/yellow_stained_glass_pane.png</file>
         <file>texture/item/azure_bluet.png</file>
-        <file>info/biomes.json</file>
-        <file>info/blocks.json</file>
-        <file>info/enchantments.json</file>
-        <file>info/items.json</file>
-        <file>info/tags/blocks.json</file>
-        <file>info/tags/entity_types.json</file>
-        <file>info/tags/items.json</file>
-        <file>info/effects.json</file>
         <file>texture/effect/absorption.png</file>
         <file>texture/effect/bad_omen.png</file>
         <file>texture/effect/blindness.png</file>
@@ -1118,8 +1110,92 @@
         <file>texture/effect/water_breathing.png</file>
         <file>texture/effect/weakness.png</file>
         <file>texture/effect/wither.png</file>
-        <file>info/dimensions.json</file>
-        <file>info/features.json</file>
-        <file>info/fluids.json</file>
+        <file>info/biome.json</file>
+        <file>info/block.json</file>
+        <file>info/dimension.json</file>
+        <file>info/effect.json</file>
+        <file>info/enchantment.json</file>
+        <file>info/feature.json</file>
+        <file>info/fluid.json</file>
+        <file>info/item.json</file>
+        <file>info/tag/block.json</file>
+        <file>info/tag/entity_type.json</file>
+        <file>info/tag/fluid.json</file>
+        <file>info/tag/item.json</file>
+        <file>texture/biome/badlands.png</file>
+        <file>texture/biome/badlands_plateau.png</file>
+        <file>texture/biome/bamboo_jungle.png</file>
+        <file>texture/biome/bamboo_jungle_hills.png</file>
+        <file>texture/biome/beach.png</file>
+        <file>texture/biome/birch_forest.png</file>
+        <file>texture/biome/birch_forest_hills.png</file>
+        <file>texture/biome/cold_ocean.png</file>
+        <file>texture/biome/dark_forest.png</file>
+        <file>texture/biome/dark_forest_hills.png</file>
+        <file>texture/biome/deep_cold_ocean.png</file>
+        <file>texture/biome/deep_frozen_ocean.png</file>
+        <file>texture/biome/deep_lukewarm_ocean.png</file>
+        <file>texture/biome/deep_ocean.png</file>
+        <file>texture/biome/deep_warm_ocean.png</file>
+        <file>texture/biome/desert.png</file>
+        <file>texture/biome/desert_hills.png</file>
+        <file>texture/biome/desert_lakes.png</file>
+        <file>texture/biome/end_barrens.png</file>
+        <file>texture/biome/end_highlands.png</file>
+        <file>texture/biome/end_midlands.png</file>
+        <file>texture/biome/eroded_badlands.png</file>
+        <file>texture/biome/flower_forest.png</file>
+        <file>texture/biome/forest.png</file>
+        <file>texture/biome/frozen_ocean.png</file>
+        <file>texture/biome/frozen_river.png</file>
+        <file>texture/biome/gravelly_mountains.png</file>
+        <file>texture/biome/giant_spruce_taiga.png</file>
+        <file>texture/biome/giant_spruce_taiga_hills.png</file>
+        <file>texture/biome/giant_tree_taiga.png</file>
+        <file>texture/biome/giant_tree_taiga_hills.png</file>
+        <file>texture/biome/ice_spikes.png</file>
+        <file>texture/biome/jungle.png</file>
+        <file>texture/biome/jungle_edge.png</file>
+        <file>texture/biome/jungle_hills.png</file>
+        <file>texture/biome/lukewarm_ocean.png</file>
+        <file>texture/biome/modified_badlands_plateau.png</file>
+        <file>texture/biome/modified_gravelly_mountains.png</file>
+        <file>texture/biome/modified_jungle.png</file>
+        <file>texture/biome/modified_jungle_edge.png</file>
+        <file>texture/biome/modified_wooded_badlands_plateau.png</file>
+        <file>texture/biome/mountain_edge.png</file>
+        <file>texture/biome/mountains.png</file>
+        <file>texture/biome/mushroom_field_shore.png</file>
+        <file>texture/biome/mushroom_fields.png</file>
+        <file>texture/biome/nether.png</file>
+        <file>texture/biome/ocean.png</file>
+        <file>texture/biome/plains.png</file>
+        <file>texture/biome/river.png</file>
+        <file>texture/biome/savanna.png</file>
+        <file>texture/biome/savanna_plateau.png</file>
+        <file>texture/biome/shattered_savanna.png</file>
+        <file>texture/biome/shattered_savanna_plateau.png</file>
+        <file>texture/biome/small_end_islands.png</file>
+        <file>texture/biome/snowy_beach.png</file>
+        <file>texture/biome/snowy_mountains.png</file>
+        <file>texture/biome/snowy_taiga.png</file>
+        <file>texture/biome/snowy_taiga_hills.png</file>
+        <file>texture/biome/snowy_taiga_mountains.png</file>
+        <file>texture/biome/snowy_tundra.png</file>
+        <file>texture/biome/stone_shore.png</file>
+        <file>texture/biome/sunflower_plains.png</file>
+        <file>texture/biome/swamp.png</file>
+        <file>texture/biome/swamp_hills.png</file>
+        <file>texture/biome/taiga.png</file>
+        <file>texture/biome/taiga_hills.png</file>
+        <file>texture/biome/taiga_mountains.png</file>
+        <file>texture/biome/tall_birch_forest.png</file>
+        <file>texture/biome/tall_birch_hills.png</file>
+        <file>texture/biome/the_end.png</file>
+        <file>texture/biome/the_void.png</file>
+        <file>texture/biome/warm_ocean.png</file>
+        <file>texture/biome/wooded_badlands_plateau.png</file>
+        <file>texture/biome/wooded_hills.png</file>
+        <file>texture/biome/wooded_mountains.png</file>
     </qresource>
 </RCC>
