@@ -6,6 +6,7 @@
 #include "extendednumericdelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
+#include "entityconditiondialog.h"
 
 #include <QDialog>
 #include <QDoubleSpinBox>
@@ -25,6 +26,7 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
             this, &MCRPredCondition::onTypeChanged);
 
     initBlockStatesPage();
+    ui->damageSrc_entityPropBtn->setDialogType(DDBType::EntityCond);
     initEntityScoresPage();
     initInvertedCondPage();
     initNestedCondPage();
@@ -40,7 +42,6 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
         dialog.fromJson(location_locatProp);
         if (dialog.exec()) {
             location_locatProp = dialog.toJson();
-            qDebug() << location_locatProp;
         }
     });
     initRandChancePage();

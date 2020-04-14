@@ -20,6 +20,8 @@ SOURCES += \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
     datapacktreeview.cpp \
+    dialogdatabutton.cpp \
+    entityconditiondialog.cpp \
     extendednumericdelegate.cpp \
     extendednumericinput.cpp \
     globalhelpers.cpp \
@@ -40,6 +42,7 @@ SOURCES += \
     settingsdialog.cpp \
     stackedwidget.cpp \
     tagselectordialog.cpp \
+    truefalsebox.cpp \
     vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
@@ -48,6 +51,8 @@ HEADERS += \
     blockitemselectordialog.h \
     codeeditor.h \
     datapacktreeview.h \
+    dialogdatabutton.h \
+    entityconditiondialog.h \
     extendednumericdelegate.h \
     extendednumericinput.h \
     globalhelpers.h \
@@ -68,11 +73,14 @@ HEADERS += \
     settingsdialog.h \
     stackedwidget.h \
     tagselectordialog.h \
+    truefalsebox.h \
     vieweventfilter.h \
     visualrecipeeditordock.h
 
 FORMS += \
     blockitemselectordialog.ui \
+    dialogdatabutton.ui \
+    entityconditiondialog.ui \
     extendednumericinput.ui \
     itemconditiondialog.ui \
     locationconditiondialog.ui \
@@ -97,4 +105,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
+    resource/app/app.qrc \
     resource/minecraft/minecraft.qrc

@@ -12,14 +12,12 @@ void BaseCondition::initModelView(QStandardItemModel &model,
                                   QTableView *tableView,
                                   std::initializer_list<QStandardItem *> headers,
                                   QAbstractItemDelegate *delegate) {
+    tableView->setModel(&model);
     int i = 0;
-
     for (auto header : headers) {
         model.setHorizontalHeaderItem(i, header);
         ++i;
     }
-
-    tableView->setModel(&model);
     tableView->installEventFilter(&viewFilter);
     if (delegate != nullptr)
         tableView->setItemDelegate(delegate);
@@ -37,7 +35,8 @@ void BaseCondition::initComboModelView(const QString &infoType,
         QStandardItem *item = new QStandardItem();
         if (info.value(key).toMap().contains("name"))
             item->setText(info.value(key).toMap()["name"].toString());
-        else if (info.value(key).canConvert(QVariant::String))
+        else if (info.value(key).canConvert(QVariant::String)
+                 && !info.value(key).isNull())
             item->setText(info.value(key).toString());
         else
             item->setText(key);
@@ -47,7 +46,9 @@ void BaseCondition::initComboModelView(const QString &infoType,
         /*qDebug() << iconPath << icon; */
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
-        item->setData("minecraft:" + key);
+        if (!key.contains(":"))
+            key = "minecraft:" + key;
+        item->setData(key);
         model.appendRow(item);
     }
     combo->setModel(&model);
@@ -64,3 +65,5 @@ void BaseCondition::setupComboFrom(QComboBox *combo, const QVariant &vari,
         }
     }
 }
+
+

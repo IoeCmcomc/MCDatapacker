@@ -1197,5 +1197,7 @@
         <file>texture/biome/wooded_badlands_plateau.png</file>
         <file>texture/biome/wooded_hills.png</file>
         <file>texture/biome/wooded_mountains.png</file>
+        <file>info/entity.json</file>
+        <file>info/stat_type.json</file>
     </qresource>
 </RCC>

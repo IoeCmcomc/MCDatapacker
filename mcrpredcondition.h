@@ -42,6 +42,7 @@ private:
     QStandardItemModel toolEnchantModel;
     QVBoxLayout nestedCondLayout;
     QVBoxLayout invertedCondLayout;
+    QJsonObject damageSrc_entityProp;
     QJsonObject matchTool_itemProp;
     QJsonObject location_locatProp;
 

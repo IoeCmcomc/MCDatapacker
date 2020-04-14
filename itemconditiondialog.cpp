@@ -84,6 +84,7 @@ QJsonObject ItemConditionDialog::toJson() const {
 }
 
 void ItemConditionDialog::fromJson(const QJsonObject &value) {
+    /*qDebug() << "ItemConditionDialog::fromJson" << value; */
     if (value.isEmpty())
         return;
 
@@ -183,15 +184,14 @@ void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,
     for (auto enchantment : jsonArr) {
         auto enchantObj = enchantment.toObject();
         if (enchantObj.isEmpty()) continue;
-        if (!enchantObj.contains("enchantment")
-            || !enchantObj.contains("levels")) {
+        if (!enchantObj.contains("enchantment")) {
             continue;
         }
         auto enchantId = enchantObj["enchantment"].toString();
         if (!enchantId.contains(":"))
             enchantId = "minecraft:" + enchantId;
-        auto indexes = model.match(
-            model.index(0, 0), Qt::UserRole + 1, enchantId);
+        auto indexes = enchantmentsModel.match(
+            enchantmentsModel.index(0, 0), Qt::UserRole + 1, enchantId);
         if (indexes.isEmpty()) continue;
         QStandardItem *enchantItem = new QStandardItem();
         enchantItem->setData(enchantId);

@@ -121,6 +121,14 @@ void ExtendedNumericInput::setTypes(const ExtendedNumericInput::Types &value) {
         if (!types.testFlag(Range))
             ui->stackedWidget->setCurrentIndex(2);
     }
+    int iCount = 0;
+
+    auto lValue = value;
+    while (lValue != 0) {
+        lValue = lValue & (lValue - 1);
+        iCount++;
+    }
+    ui->inputTypeButton->setHidden(iCount == 1);
 }
 
 void ExtendedNumericInput::setMenu() {

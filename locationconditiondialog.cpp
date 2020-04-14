@@ -146,9 +146,9 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains("biome"))
         setupComboFrom(ui->biomeCombo, value["biome"]);
     if (value.contains("dimension"))
-        setupComboFrom(ui->biomeCombo, value["biome"]);
+        setupComboFrom(ui->dimensionCombo, value["dimension"]);
     if (value.contains("feature"))
-        setupComboFrom(ui->biomeCombo, value["biome"]);
+        setupComboFrom(ui->featureCombo, value["feature"]);
     ui->lightCheck->setChecked(value.contains("light"));
     if (value.contains("light"))
         ui->lightInput->fromJson(value["x"]);

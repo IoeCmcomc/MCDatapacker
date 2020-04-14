@@ -7,6 +7,9 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QComboBox>
+#include <QPushButton>
+#include <QJsonObject>
+#include <QDebug>
 
 class BaseCondition
 {

@@ -73,6 +73,9 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::commitData);
     #endif
 
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/icon");
+    qDebug() << QIcon::fallbackSearchPaths();
+
     visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 
