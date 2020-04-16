@@ -17,10 +17,10 @@
    <property name="verticalSpacing">
     <number>3</number>
    </property>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="deleteButton">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Delete</string>
+      <string>Condition:</string>
      </property>
     </widget>
    </item>
@@ -121,35 +121,31 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="0" column="2">
+    <widget class="QPushButton" name="deleteButton">
      <property name="text">
-      <string>Condition:</string>
+      <string>Delete</string>
      </property>
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QGridLayout" name="gridLayout_7">
        <item row="0" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Block:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="blockState_blockCombo"/>
-         </item>
-        </layout>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Block:</string>
+         </property>
+        </widget>
        </item>
-       <item row="1" column="0">
+       <item row="0" column="1">
+        <widget class="QComboBox" name="blockState_blockCombo"/>
+       </item>
+       <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Block states</string>
@@ -211,42 +207,42 @@
        <item row="0" column="0" colspan="2">
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <widget class="QCheckBox" name="damageSrc_explosionCheck">
+          <widget class="TrueFalseBox" name="damageSrc_explosionCheck">
            <property name="text">
             <string>Explosion</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QCheckBox" name="checkBox_2">
+          <widget class="TrueFalseBox" name="checkBox_2">
            <property name="text">
             <string>Projectile</string>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QCheckBox" name="checkBox_3">
+          <widget class="TrueFalseBox" name="checkBox_3">
            <property name="text">
             <string>Fire</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QCheckBox" name="checkBox_4">
+          <widget class="TrueFalseBox" name="checkBox_4">
            <property name="text">
             <string>Lightning</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QCheckBox" name="checkBox_5">
+          <widget class="TrueFalseBox" name="checkBox_5">
            <property name="text">
             <string>Starvation</string>
            </property>
           </widget>
          </item>
          <item row="1" column="2">
-          <widget class="QCheckBox" name="checkBox_6">
+          <widget class="TrueFalseBox" name="checkBox_6">
            <property name="text">
             <string>Bypasses armor</string>
            </property>
@@ -270,15 +266,18 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QPushButton" name="damageSrc_directPropBtn">
+         <item row="0" column="1">
+          <widget class="DialogDataButton" name="damageSrc_entityPropBtn">
            <property name="text">
             <string>Entity properties...</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="DialogDataButton" name="damageSrc_entityPropBtn">
+         <item row="1" column="1">
+          <widget class="DialogDataButton" name="damageSrc_directPropBtn">
            <property name="text">
             <string>Entity properties...</string>
            </property>
@@ -292,7 +291,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="entity">
-      <layout class="QFormLayout" name="formLayout_3">
+      <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
@@ -320,9 +319,12 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
-        <widget class="QPushButton" name="pushButton_5">
+        <widget class="DialogDataButton" name="entity_propBtn">
          <property name="text">
           <string>Entity properties...</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -377,7 +379,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="ExtendedNumericInput" name="entityScores_valueInput">
+           <widget class="NumericInput" name="entityScores_valueInput">
             <property name="minimumSize">
              <size>
               <width>125</width>
@@ -435,8 +437,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>58</width>
-            <height>16</height>
+            <width>434</width>
+            <height>338</height>
            </rect>
           </property>
          </widget>
@@ -471,12 +473,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox">
+           <widget class="OptionalSpinBox" name="spinBox">
             <property name="minimum">
              <number>-999999999</number>
             </property>
             <property name="maximum">
              <number>999999999</number>
+            </property>
+            <property name="value">
+             <number>0</number>
             </property>
            </widget>
           </item>
@@ -488,7 +493,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox_2">
+           <widget class="OptionalSpinBox" name="spinBox_2">
             <property name="minimum">
              <number>-999999999</number>
             </property>
@@ -505,7 +510,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox_3">
+           <widget class="OptionalSpinBox" name="spinBox_3">
             <property name="minimum">
              <number>-999999999</number>
             </property>
@@ -518,9 +523,12 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
-        <widget class="QPushButton" name="location_propBtn">
+        <widget class="DialogDataButton" name="location_propBtn">
          <property name="text">
           <string>Location properties...</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -604,8 +612,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>76</width>
-            <height>16</height>
+            <width>452</width>
+            <height>322</height>
            </rect>
           </property>
          </widget>
@@ -623,9 +631,12 @@
      <widget class="QWidget" name="match_tool">
       <layout class="QFormLayout" name="formLayout_10">
        <item row="0" column="0" colspan="2">
-        <widget class="QPushButton" name="matchTool_propBtn">
+        <widget class="DialogDataButton" name="matchTool_propBtn">
          <property name="text">
           <string>Item properties...</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -898,7 +909,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="ExtendedNumericInput" name="time_valueInput">
+        <widget class="NumericInput" name="time_valueInput">
          <property name="minimumSize">
           <size>
            <width>150</width>
@@ -916,6 +927,9 @@
        </item>
        <item row="1" column="1">
         <widget class="QSpinBox" name="time_periodSpinBox">
+         <property name="specialValueText">
+          <string>-</string>
+         </property>
          <property name="maximum">
           <number>999999999</number>
          </property>
@@ -950,7 +964,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="ExtendedNumericInput" name="toolEnchant_levelsInput">
+        <widget class="NumericInput" name="toolEnchant_levelsInput">
          <property name="minimumSize">
           <size>
            <width>125</width>
@@ -987,14 +1001,14 @@
      <widget class="QWidget" name="weather_check">
       <layout class="QFormLayout" name="formLayout_7">
        <item row="0" column="0">
-        <widget class="QCheckBox" name="checkBox_9">
+        <widget class="TrueFalseBox" name="checkBox_9">
          <property name="text">
           <string>Raining</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QCheckBox" name="checkBox_10">
+        <widget class="TrueFalseBox" name="checkBox_10">
          <property name="text">
           <string>Thundering</string>
          </property>
@@ -1008,15 +1022,25 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ExtendedNumericInput</class>
+   <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">extendednumericinput.h</header>
+   <header location="global">NumericInput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>DialogDataButton</class>
    <extends>QLabel</extends>
    <header location="global">dialogdatabutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>OptionalSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header location="global">optionalspinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

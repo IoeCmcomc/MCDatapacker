@@ -44,6 +44,7 @@ void DialogDataButton::onClicked() {
         dialog.fromJson(data);
         if (dialog.exec())
             setData(dialog.toJson());
+        break;
     }
 
     case EntityCond:
@@ -64,10 +65,12 @@ void DialogDataButton::checkSecondary() {
 }
 
 QJsonObject DialogDataButton::getData() const {
+    qDebug() << "getData" << objectName() << data;
     return data;
 }
 
 void DialogDataButton::setData(const QJsonObject &value) {
+    qDebug() << "setData" << objectName() << value;
     data = value;
     checkSecondary();
 }

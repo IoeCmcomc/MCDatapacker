@@ -1,5 +1,5 @@
-#ifndef EXTENDEDNUMERICINPUT_H
-#define EXTENDEDNUMERICINPUT_H
+#ifndef NUMERICINPUT_H
+#define NUMERICINPUT_H
 
 #include <QFrame>
 #include <QMenu>
@@ -9,13 +9,13 @@ namespace Ui {
     class ExtendedNumericInput;
 }
 
-class ExtendedNumericInput : public QFrame
+class NumericInput : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit ExtendedNumericInput(QWidget *parent = nullptr);
-    ~ExtendedNumericInput();
+    explicit NumericInput(QWidget *parent = nullptr);
+    ~NumericInput();
 
     enum Type {
         Exact   = 1,
@@ -46,6 +46,8 @@ public:
     void setGeneralMinimum(const int &min);
     void setGeneralMaximum(const int &max);
 
+    bool isCurrentlyUnset() const;
+
     void interpretText();
     void retranslate();
 
@@ -69,6 +71,6 @@ private:
     void swapMinMax();
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(ExtendedNumericInput::Types)
+Q_DECLARE_OPERATORS_FOR_FLAGS(NumericInput::Types)
 
-#endif /* EXTENDEDNUMERICINPUT_H */
+#endif /* NUMERICINPUT_H */

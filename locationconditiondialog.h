@@ -1,7 +1,7 @@
 #ifndef LOCATIONCONDITIONDIALOG_H
 #define LOCATIONCONDITIONDIALOG_H
 
-#include "extendednumericinput.h"
+#include "numericinput.h"
 #include "basecondition.h"
 
 #include <QDialog>

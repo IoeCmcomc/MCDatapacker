@@ -39,11 +39,16 @@ void MCRInvSlot::setBackground(QString color) {
         setFrameShadow(QFrame::Sunken);
         setLineWidth(2);
     } else {
+        auto disabledColor = palette().color(QPalette::Disabled,
+                                             QPalette::Window);
         setStyleSheet(
             ".MCRInvSlot {"
             "   background: " + color + ";"
             "   border: 2px solid;"
             "   border-color: #373737 #FFF #FFF #373737;"
+            "}"
+            ".MCRInvSlot:disabled {"
+            "background: " + disabledColor.name() + ";"
             "}"
             ".MCRInvSlot:hover {"
             "   background-color: hsla(0,0%,100%,.4);"

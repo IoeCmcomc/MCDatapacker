@@ -6,7 +6,6 @@
 #include <QFrame>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
-#include <QJsonObject>
 
 namespace Ui {
     class MCRPredCondition;

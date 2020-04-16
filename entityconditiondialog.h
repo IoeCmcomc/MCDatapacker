@@ -4,7 +4,6 @@
 #include "basecondition.h"
 
 #include <QDialog>
-#include <QJsonObject>
 
 namespace Ui {
     class EntityConditionDialog;

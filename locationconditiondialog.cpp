@@ -12,8 +12,8 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     ui(new Ui::LocationConditionDialog) {
     ui->setupUi(this);
 
-    const auto typeFlags = ExtendedNumericInput::Exact
-                           | ExtendedNumericInput::Range;
+    const auto typeFlags = NumericInput::Exact
+                           | NumericInput::Range;
 
     ui->xInput->setTypes(typeFlags);
     ui->xInput->setGeneralMinimum(-999999999);
@@ -28,7 +28,7 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
 
     featuresModel.appendRow(new QStandardItem(tr("(not selected)")));
-    auto info = MainWindow::readMCRInfo("feature");
+    auto info = MainWindow::readMCRInfo(QStringLiteral("feature"));
     for (auto key : info.keys()) {
         QStandardItem *item = new QStandardItem();
         item->setText(info.value(key).toString());
@@ -39,19 +39,6 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
 
     initBlockGroup();
     initFluidGroup();
-
-    connect(ui->xCheck, &QCheckBox::toggled, [ = ](bool checked) {
-        ui->xInput->setEnabled(checked);
-    });
-    connect(ui->yCheck, &QCheckBox::toggled, [ = ](bool checked) {
-        ui->yInput->setEnabled(checked);
-    });
-    connect(ui->zCheck, &QCheckBox::toggled, [ = ](bool checked) {
-        ui->zInput->setEnabled(checked);
-    });
-    connect(ui->lightCheck, &QCheckBox::toggled, [ = ](bool checked) {
-        ui->lightInput->setEnabled(checked);
-    });
 
     adjustSize();
 }
@@ -64,36 +51,37 @@ QJsonObject LocationConditionDialog::toJson() const {
     QJsonObject root;
     QJsonObject position;
 
-    if (ui->xCheck->isChecked())
-        position.insert("x", ui->xInput->toJson());
-    if (ui->yCheck->isChecked())
-        position.insert("y", ui->yInput->toJson());
-    if (ui->zCheck->isChecked())
-        position.insert("z", ui->zInput->toJson());
+    if (!ui->xInput->isCurrentlyUnset())
+        position.insert(QStringLiteral("x"), ui->xInput->toJson());
+    if (!ui->yInput->isCurrentlyUnset())
+        position.insert(QStringLiteral("y"), ui->yInput->toJson());
+    if (!ui->zInput->isCurrentlyUnset())
+        position.insert(QStringLiteral("z"), ui->zInput->toJson());
     if (!position.isEmpty())
-        root.insert("position", position);
+        root.insert(QStringLiteral("position"), position);
 
     if (ui->biomeCombo->currentIndex() != 0)
-        root.insert("biome", ui->biomeCombo->currentData(
+        root.insert(QStringLiteral("biome"), ui->biomeCombo->currentData(
                         Qt::UserRole + 1).toString());
     if (ui->dimensionCombo->currentIndex() != 0)
-        root.insert("dimension", ui->dimensionCombo->currentData(
+        root.insert(QStringLiteral("dimension"),
+                    ui->dimensionCombo->currentData(
                         Qt::UserRole + 1).toString());
     if (ui->featureCombo->currentIndex() != 0)
-        root.insert("feature", ui->featureCombo->currentData(
+        root.insert(QStringLiteral("feature"), ui->featureCombo->currentData(
                         Qt::UserRole + 1).toString());
-    if (ui->lightCheck->isChecked())
-        root.insert("light", ui->lightInput->toJson());
+    if (!ui->lightInput->isCurrentlyUnset())
+        root.insert(QStringLiteral("light"), ui->lightInput->toJson());
 
     if (ui->blockGroup->isChecked()) {
         QJsonObject block;
         auto        invItem =
             ui->blockCombo->currentData(Qt::UserRole + 1).value<MCRInvItem>();
-        block.insert("block", invItem.getNamespacedID());
+        block.insert(QStringLiteral("block"), invItem.getNamespacedID());
         if (!ui->blockTagEdit->text().isEmpty())
-            block.insert("tag", ui->blockTagEdit->text());
+            block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
         if (!ui->blockNBTEdit->text().isEmpty())
-            block.insert("nbt", ui->blockNBTEdit->text());
+            block.insert(QStringLiteral("nbt"), ui->blockNBTEdit->text());
         QJsonObject blockStates;
         for (auto row = 0; row < blockStatesModel.rowCount(); ++row) {
             QString state = blockStatesModel.item(row, 0)->text();
@@ -103,16 +91,16 @@ QJsonObject LocationConditionDialog::toJson() const {
                                GlobalHelpers::strToVariant(value).toJsonValue());
         }
         if (!blockStates.isEmpty())
-            block.insert("state", blockStates);
-        root.insert("block", block);
+            block.insert(QStringLiteral("state"), blockStates);
+        root.insert(QStringLiteral("block"), block);
     }
 
     if (ui->fluidGroup->isChecked()) {
         QJsonObject fluid;
-        fluid.insert("fluid",
+        fluid.insert(QStringLiteral("fluid"),
                      ui->fluidCombo->currentData(Qt::UserRole + 1).toString());
         if (!ui->fluidTagEdit->text().isEmpty())
-            fluid.insert("tag", ui->fluidTagEdit->text());
+            fluid.insert(QStringLiteral("tag"), ui->fluidTagEdit->text());
         QJsonObject fluidStates;
         for (auto row = 0; row < fluidStatesModel.rowCount(); ++row) {
             QString state = fluidStatesModel.item(row, 0)->text();
@@ -122,58 +110,59 @@ QJsonObject LocationConditionDialog::toJson() const {
                                GlobalHelpers::strToVariant(value).toJsonValue());
         }
         if (!fluidStates.isEmpty())
-            fluid.insert("state", fluidStates);
-        root.insert("fluid", fluid);
+            fluid.insert(QStringLiteral("state"), fluidStates);
+        root.insert(QStringLiteral("fluid"), fluid);
     }
 
     return root;
 }
 
 void LocationConditionDialog::fromJson(const QJsonObject &value) {
-    if (value.contains("position")) {
-        QJsonObject position = value["position"].toObject();
-        ui->xCheck->setChecked(position.contains("x"));
-        if (position.contains("x"))
-            ui->xInput->fromJson(position["x"]);
-        ui->yCheck->setChecked(position.contains("y"));
-        if (position.contains("y"))
-            ui->yInput->fromJson(position["y"]);
-        ui->zCheck->setChecked(position.contains("z"));
-        if (position.contains("z"))
-            ui->zInput->fromJson(position["z"]);
+    if (value.contains(QStringLiteral("position"))) {
+        QJsonObject position = value[QStringLiteral("position")].toObject();
+        if (position.contains(QStringLiteral("x")))
+            ui->xInput->fromJson(position[QStringLiteral("x")]);
+        if (position.contains(QStringLiteral("y")))
+            ui->yInput->fromJson(position[QStringLiteral("y")]);
+        if (position.contains(QStringLiteral("z")))
+            ui->zInput->fromJson(position[QStringLiteral("z")]);
     }
 
-    if (value.contains("biome"))
-        setupComboFrom(ui->biomeCombo, value["biome"]);
-    if (value.contains("dimension"))
-        setupComboFrom(ui->dimensionCombo, value["dimension"]);
-    if (value.contains("feature"))
-        setupComboFrom(ui->featureCombo, value["feature"]);
-    ui->lightCheck->setChecked(value.contains("light"));
-    if (value.contains("light"))
-        ui->lightInput->fromJson(value["x"]);
+    if (value.contains(QStringLiteral("biome")))
+        setupComboFrom(ui->biomeCombo, value[QStringLiteral("biome")]);
+    if (value.contains(QStringLiteral("dimension")))
+        setupComboFrom(ui->dimensionCombo, value[QStringLiteral("dimension")]);
+    if (value.contains(QStringLiteral("feature")))
+        setupComboFrom(ui->featureCombo, value[QStringLiteral("feature")]);
+    if (value.contains(QStringLiteral("light")))
+        ui->lightInput->fromJson(value[QStringLiteral("light")]);
 
-    ui->blockGroup->setChecked(value.contains("block"));
-    if (value.contains("block")) {
-        QJsonObject block = value["block"].toObject();
-        if (block.contains("block")) {
-            setupComboFrom(ui->blockCombo, block["block"].toVariant());
-            if (block.contains("tag"))
-                ui->blockTagEdit->setText(block["tag"].toString());
-            if (block.contains("nbt"))
-                ui->blockNBTEdit->setText(block["nbt"].toString());
+    ui->blockGroup->setChecked(value.contains(QStringLiteral("block")));
+    if (value.contains(QStringLiteral("block"))) {
+        QJsonObject block = value[QStringLiteral("block")].toObject();
+        if (block.contains(QStringLiteral("block"))) {
+            setupComboFrom(ui->blockCombo,
+                           block[QStringLiteral("block")].toVariant());
+            if (block.contains(QStringLiteral("tag")))
+                ui->blockTagEdit->setText(block[QStringLiteral(
+                                                    "tag")].toString());
+            if (block.contains(QStringLiteral("nbt")))
+                ui->blockNBTEdit->setText(block[QStringLiteral(
+                                                    "nbt")].toString());
 
             setupTableFromJson(blockStatesModel, block);
         }
     }
 
-    ui->fluidGroup->setChecked(value.contains("fluid"));
-    if (value.contains("fluid")) {
-        QJsonObject fluid = value["fluid"].toObject();
-        if (fluid.contains("fluid")) {
-            setupComboFrom(ui->blockCombo, fluid["fluid"].toVariant());
-            if (fluid.contains("tag"))
-                ui->blockTagEdit->setText(fluid["tag"].toString());
+    ui->fluidGroup->setChecked(value.contains(QStringLiteral("fluid")));
+    if (value.contains(QStringLiteral("fluid"))) {
+        QJsonObject fluid = value[QStringLiteral("fluid")].toObject();
+        if (fluid.contains(QStringLiteral("fluid"))) {
+            setupComboFrom(ui->blockCombo,
+                           fluid[QStringLiteral("fluid")].toVariant());
+            if (fluid.contains(QStringLiteral("tag")))
+                ui->blockTagEdit->setText(fluid[QStringLiteral(
+                                                    "tag")].toString());
 
             setupTableFromJson(blockStatesModel, fluid);
         }
@@ -182,8 +171,8 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
 
 void LocationConditionDialog::setupTableFromJson(QStandardItemModel &model,
                                                  const QJsonObject &json) {
-    if (json.contains("state")) {
-        QJsonObject state = json["state"].toObject();
+    if (json.contains(QStringLiteral("state"))) {
+        QJsonObject state = json[QStringLiteral("state")].toObject();
         for (auto key : state.keys()) {
             QStandardItem *stateItem = new QStandardItem();
             stateItem->setText(key);
@@ -230,7 +219,7 @@ void LocationConditionDialog::onAddedFluidState() {
 void LocationConditionDialog::initBlockGroup() {
     ui->blockGroup->setChecked(false);
 
-    auto blocksInfo = MainWindow::getMCRInfo("block");
+    auto blocksInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
     for (auto key : blocksInfo.keys()) {
         MCRInvItem     invItem(key);
         QStandardItem *item = new QStandardItem();
@@ -248,10 +237,10 @@ void LocationConditionDialog::initBlockGroup() {
     }
     ui->blockCombo->setModel(&blocksModel);
 
-    QStandardItem *stateItem = new QStandardItem("State");
-    stateItem->setToolTip("An state of the block.");
-    QStandardItem *valuesItem = new QStandardItem("Value");
-    valuesItem->setToolTip("A value of the state.");
+    QStandardItem *stateItem = new QStandardItem(tr("State"));
+    stateItem->setToolTip(tr("An state of the block."));
+    QStandardItem *valuesItem = new QStandardItem(tr("Value"));
+    valuesItem->setToolTip(tr("A value of the state."));
 
     blockStatesModel.setHorizontalHeaderItem(0, stateItem);
     blockStatesModel.setHorizontalHeaderItem(1, valuesItem);
@@ -266,12 +255,15 @@ void LocationConditionDialog::initBlockGroup() {
 void LocationConditionDialog::initFluidGroup() {
     ui->fluidGroup->setChecked(false);
 
-    initComboModelView("fluid", fluidsModel, ui->fluidCombo, false);
+    initComboModelView(QStringLiteral("fluid"),
+                       fluidsModel,
+                       ui->fluidCombo,
+                       false);
 
-    QStandardItem *stateItem = new QStandardItem("State");
-    stateItem->setToolTip("An state of the block.");
-    QStandardItem *valuesItem = new QStandardItem("Value");
-    valuesItem->setToolTip("A value of the state.");
+    QStandardItem *stateItem = new QStandardItem(tr("State"));
+    stateItem->setToolTip(tr("An state of the block."));
+    QStandardItem *valuesItem = new QStandardItem(tr("Value"));
+    valuesItem->setToolTip(tr("A value of the state."));
 
     fluidStatesModel.setHorizontalHeaderItem(0, stateItem);
     fluidStatesModel.setHorizontalHeaderItem(1, valuesItem);

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>680</width>
     <height>680</height>
    </rect>
   </property>
@@ -54,7 +54,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>622</width>
+        <width>662</width>
         <height>514</height>
        </rect>
       </property>
@@ -78,103 +78,106 @@
           <string>Distance</string>
          </property>
          <layout class="QFormLayout" name="formLayout">
+          <property name="labelAlignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <item row="0" column="1">
+           <widget class="NumericInput" name="absDistanceInput">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="NumericInput" name="horizDistanceInput">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="NumericInput" name="xDistanceInput">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="NumericInput" name="yDistanceInput">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="NumericInput" name="zDistanceInput">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
-           <widget class="QCheckBox" name="absDistanceCheck">
+           <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Absolute:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="ExtendedNumericInput" name="absDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
-           <widget class="QCheckBox" name="horizDistanceCheck">
+           <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Horizontal</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="ExtendedNumericInput" name="horizDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
-           <widget class="QCheckBox" name="xDistanceCheck">
+           <widget class="QLabel" name="label_6">
             <property name="text">
              <string>X:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="ExtendedNumericInput" name="xDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="0">
-           <widget class="QCheckBox" name="yDistanceCheck">
+           <widget class="QLabel" name="label_7">
             <property name="text">
              <string>Y:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="ExtendedNumericInput" name="yDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="0">
-           <widget class="QCheckBox" name="zDistanceCheck">
+           <widget class="QLabel" name="label_8">
             <property name="text">
              <string>Z:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="ExtendedNumericInput" name="zDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>22</height>
-             </size>
             </property>
            </widget>
           </item>
@@ -360,7 +363,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>622</width>
+        <width>662</width>
         <height>514</height>
        </rect>
       </property>
@@ -376,7 +379,7 @@
         </widget>
        </item>
        <item row="4" column="1" colspan="2">
-        <widget class="ExtendedNumericInput" name="effectDuraInput">
+        <widget class="NumericInput" name="effectDuraInput">
          <property name="minimumSize">
           <size>
            <width>130</width>
@@ -396,7 +399,7 @@
         </widget>
        </item>
        <item row="3" column="1" colspan="2">
-        <widget class="ExtendedNumericInput" name="effectAmpInput">
+        <widget class="NumericInput" name="effectAmpInput">
          <property name="minimumSize">
           <size>
            <width>130</width>
@@ -459,7 +462,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>622</width>
+        <width>662</width>
         <height>514</height>
        </rect>
       </property>
@@ -529,7 +532,7 @@
           </widget>
          </item>
          <item>
-          <widget class="ExtendedNumericInput" name="playerLevelInput">
+          <widget class="NumericInput" name="playerLevelInput">
            <property name="minimumSize">
             <size>
              <width>130</width>
@@ -717,15 +720,12 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="ExtendedNumericInput" name="statValueInput">
+             <widget class="NumericInput" name="statValueInput">
               <property name="minimumSize">
                <size>
                 <width>130</width>
                 <height>22</height>
                </size>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
               </property>
              </widget>
             </item>
@@ -765,9 +765,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ExtendedNumericInput</class>
+   <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">extendednumericinput.h</header>
+   <header location="global">NumericInput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

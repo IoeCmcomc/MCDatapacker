@@ -1,7 +1,7 @@
 #ifndef DIALOGDATABUTTON_H
 #define DIALOGDATABUTTON_H
 
-#include "itemconditiondialog.h";
+#include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
 #include "entityconditiondialog.h"
 

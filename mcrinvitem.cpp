@@ -178,7 +178,7 @@ void MCRInvItem::setupItem(QString id) {
  */
 
     if (!iconpix) {
-        qWarning() << "unknown ID: " + id;
+        /*qWarning() << "unknown ID: " + id; */
         iconpix = QPixmap(16, 16);
         iconpix.fill(QStringLiteral("#FF00DC"));
         {

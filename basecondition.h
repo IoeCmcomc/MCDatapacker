@@ -1,7 +1,7 @@
 #ifndef BASECONDITION_H
 #define BASECONDITION_H
 
-#include "extendednumericinput.h"
+#include "numericinput.h"
 #include "vieweventfilter.h"
 
 #include <QStandardItemModel>

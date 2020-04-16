@@ -1,4 +1,4 @@
-#include "extendednumericinput.h"
+#include "numericinput.h"
 #include "ui_extendednumericinput.h"
 
 #include <QJsonObject>
@@ -6,7 +6,7 @@
 #include <QVector>
 #include <QResizeEvent>
 
-ExtendedNumericInput::ExtendedNumericInput(QWidget *parent) :
+NumericInput::NumericInput(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::ExtendedNumericInput) {
     ui->setupUi(this);
@@ -14,16 +14,16 @@ ExtendedNumericInput::ExtendedNumericInput(QWidget *parent) :
     setTypes(Exact | Range | Biomial);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
-            this, &ExtendedNumericInput::onMinMaxEdited);
+            this, &NumericInput::onMinMaxEdited);
     connect(ui->maxSpinBox, &QSpinBox::editingFinished,
-            this, &ExtendedNumericInput::onMinMaxEdited);
+            this, &NumericInput::onMinMaxEdited);
 }
 
-ExtendedNumericInput::~ExtendedNumericInput() {
+NumericInput::~NumericInput() {
     delete ui;
 }
 
-void ExtendedNumericInput::resizeEvent(QResizeEvent *event) {
+void NumericInput::resizeEvent(QResizeEvent *event) {
     int eventWidth = event->size().width();
 
     ui->minLabel->setHidden(eventWidth < 200);
@@ -34,7 +34,7 @@ void ExtendedNumericInput::resizeEvent(QResizeEvent *event) {
     QFrame::resizeEvent(event);
 }
 
-void ExtendedNumericInput::mouseReleaseEvent(QMouseEvent *event) {
+void NumericInput::mouseReleaseEvent(QMouseEvent *event) {
     auto cursorWidget = qApp->widgetAt(mapToGlobal(event->pos()));
 
     if (cursorWidget != nullptr
@@ -47,17 +47,21 @@ void ExtendedNumericInput::mouseReleaseEvent(QMouseEvent *event) {
     QFrame::mouseReleaseEvent(event);
 }
 
-void ExtendedNumericInput::onMinMaxEdited() {
+void NumericInput::onMinMaxEdited() {
     if (ui->minSpinBox->value() > ui->maxSpinBox->value()) {
-        auto tmp = ui->minSpinBox->value();
-        ui->minSpinBox->setValue(ui->maxSpinBox->value());
-        ui->maxSpinBox->setValue(tmp);
+        if (!(ui->minSpinBox->isUnset() || ui->maxSpinBox->isUnset())) {
+            auto tmp = ui->minSpinBox->value();
+            ui->minSpinBox->setValue(ui->maxSpinBox->value());
+            ui->maxSpinBox->setValue(tmp);
+        }
     } else if (ui->minSpinBox->value() == ui->maxSpinBox->value()) {
         setExactly(ui->minSpinBox->value());
+        if (ui->minSpinBox->isUnset())
+            ui->spinBox->unset();
     }
 }
 
-void ExtendedNumericInput::fromJson(const QJsonValue &value) {
+void NumericInput::fromJson(const QJsonValue &value) {
     if (value.isDouble()) {
         ui->spinBox->setValue(value.toInt());
         ui->stackedWidget->setCurrentIndex(0);
@@ -65,42 +69,53 @@ void ExtendedNumericInput::fromJson(const QJsonValue &value) {
         auto obj  = value.toObject();
         auto type = obj[QStringLiteral("type")].toString();
         if (type == QStringLiteral("minecraft:binomial")) {
-            ui->numSpinBox->setValue(obj.value(QStringLiteral("n")).toInt());
-            ui->probSpinBox->setValue(obj.value(QStringLiteral("p")).toInt());
+            if (obj.contains(QStringLiteral("n")))
+                ui->numSpinBox->setValue(obj.value(QStringLiteral("n")).toInt());
+            if (obj.contains(QStringLiteral("p")))
+                ui->probSpinBox->setValue(obj.value(QStringLiteral("p")).toInt());
             ui->stackedWidget->setCurrentIndex(2);
-        } else if (obj.contains(QStringLiteral("min")) &&
-                   obj.contains(QStringLiteral("max"))) {
-            ui->minSpinBox->setValue(obj.value(QStringLiteral("min")).toInt());
-            ui->maxSpinBox->setValue(obj.value(QStringLiteral("max")).toInt());
-            ui->stackedWidget->setCurrentIndex(1);
+        } else {
+            if (obj.contains(QStringLiteral("min")))
+                setMinimum(obj.value(QStringLiteral("min")).toInt());
+            else
+                ui->minSpinBox->unset();
+            if (obj.contains(QStringLiteral("max")))
+                setMaximum(obj.value(QStringLiteral("max")).toInt());
+            else
+                ui->maxSpinBox->unset();
         }
     }
 }
 
-QJsonValue ExtendedNumericInput::toJson() {
+QJsonValue NumericInput::toJson() {
     QJsonValue value;
 
     switch (ui->stackedWidget->currentIndex()) {
     case 0: { /* Exactly */
-        value = ui->spinBox->value();
+        value =
+            (ui->spinBox->isUnset()) ? QJsonValue() : ui->spinBox->value();
         break;
     }
 
     case 1: { /* Range */
-        QJsonObject rolls;
-        rolls.insert(QStringLiteral("min"), ui->minSpinBox->value());
-        rolls.insert(QStringLiteral("max"), ui->maxSpinBox->value());
-        value = rolls;
+        QJsonObject root;
+        qDebug() << ui->minSpinBox->isUnset() <<
+            ui->maxSpinBox->isUnset();
+        if (!ui->minSpinBox->isUnset())
+            root.insert(QStringLiteral("min"), ui->minSpinBox->value());
+        if (!ui->maxSpinBox->isUnset())
+            root.insert(QStringLiteral("max"), ui->maxSpinBox->value());
+        value = root;
         break;
     }
 
     case 2: { /*Biomial */
-        QJsonObject rolls;
-        rolls.insert(QStringLiteral("type"),
-                     QStringLiteral("minecraft:binomial"));
-        rolls.insert(QStringLiteral("n"), ui->numSpinBox->value());
-        rolls.insert(QStringLiteral("p"), ui->probSpinBox->value());
-        value = rolls;
+        QJsonObject root;
+        root.insert(QStringLiteral("type"),
+                    QStringLiteral("minecraft:binomial"));
+        root.insert(QStringLiteral("n"), ui->numSpinBox->value());
+        root.insert(QStringLiteral("p"), ui->probSpinBox->value());
+        value = root;
         break;
     }
 
@@ -109,11 +124,11 @@ QJsonValue ExtendedNumericInput::toJson() {
     return value;
 }
 
-ExtendedNumericInput::Types ExtendedNumericInput::getTypes() const {
+NumericInput::Types NumericInput::getTypes() const {
     return types;
 }
 
-void ExtendedNumericInput::setTypes(const ExtendedNumericInput::Types &value) {
+void NumericInput::setTypes(const NumericInput::Types &value) {
     types = value;
     setMenu();
     if (!types.testFlag(Exact)) {
@@ -131,7 +146,7 @@ void ExtendedNumericInput::setTypes(const ExtendedNumericInput::Types &value) {
     ui->inputTypeButton->setHidden(iCount == 1);
 }
 
-void ExtendedNumericInput::setMenu() {
+void NumericInput::setMenu() {
     typeMenu.clear();
 
     if (types.testFlag(Exact))
@@ -150,74 +165,90 @@ void ExtendedNumericInput::setMenu() {
     ui->inputTypeButton->setPopupMode(QToolButton::InstantPopup);
 }
 
-ExtendedNumericInput::Type ExtendedNumericInput::getCurrentType() const {
+NumericInput::Type NumericInput::getCurrentType() const {
     return currentType;
 }
 
-void ExtendedNumericInput::setCurrentType(const Type &value) {
+void NumericInput::setCurrentType(const Type &value) {
     currentType = value;
     const QVector<Type> typeVec = { Exact, Range, Biomial };
     ui->stackedWidget->setCurrentIndex(typeVec.indexOf(value));
 }
 
-int ExtendedNumericInput::getExactly() const {
+int NumericInput::getExactly() const {
     return ui->spinBox->value();
 }
 
-void ExtendedNumericInput::setExactly(const int value) {
+void NumericInput::setExactly(const int value) {
     ui->spinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-int ExtendedNumericInput::getMinimum() const {
+int NumericInput::getMinimum() const {
     return ui->minSpinBox->value();
 }
 
-void ExtendedNumericInput::setMinimum(const int value) {
+void NumericInput::setMinimum(const int value) {
     ui->minSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
 }
 
-int ExtendedNumericInput::getMaximum() const {
+int NumericInput::getMaximum() const {
     return ui->maxSpinBox->value();
 }
 
-void ExtendedNumericInput::setMaximum(const int value) {
+void NumericInput::setMaximum(const int value) {
     ui->maxSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
 }
 
-void ExtendedNumericInput::setExactMinimum(const int &min) {
+void NumericInput::setExactMinimum(const int &min) {
     ui->spinBox->setMinimum(min);
 }
 
-void ExtendedNumericInput::setExactMaximum(const int &max) {
+void NumericInput::setExactMaximum(const int &max) {
     ui->spinBox->setMaximum(max);
 }
 
-void ExtendedNumericInput::setRangeMinimum(const int &min) {
+void NumericInput::setRangeMinimum(const int &min) {
     ui->minSpinBox->setMinimum(min);
     ui->maxSpinBox->setMinimum(min);
 }
 
-void ExtendedNumericInput::setRangeMaximum(const int &max) {
+void NumericInput::setRangeMaximum(const int &max) {
     ui->minSpinBox->setMaximum(max);
     ui->maxSpinBox->setMaximum(max);
 }
 
-void ExtendedNumericInput::setGeneralMinimum(const int &min) {
+void NumericInput::setGeneralMinimum(const int &min) {
     setExactMinimum(min);
     setRangeMinimum(min);
 }
 
-void ExtendedNumericInput::setGeneralMaximum(const int &max) {
+void NumericInput::setGeneralMaximum(const int &max) {
     setExactMaximum(max);
     setRangeMaximum(max);
 }
 
-void ExtendedNumericInput::interpretText() {
+bool NumericInput::isCurrentlyUnset() const {
+    switch (ui->stackedWidget->currentIndex()) {
+    case 0: /* Exactly */
+        return ui->spinBox->isUnset();
+
+    case 1: /* Range */
+        return (ui->minSpinBox->isUnset() && ui->maxSpinBox->isUnset());
+
+    case 2: /*Biomial */
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+void NumericInput::interpretText() {
     ui->spinBox->interpretText();
     ui->minSpinBox->interpretText();
     ui->maxSpinBox->interpretText();
@@ -225,6 +256,6 @@ void ExtendedNumericInput::interpretText() {
     ui->probSpinBox->interpretText();
 }
 
-void ExtendedNumericInput::retranslate() {
+void NumericInput::retranslate() {
     ui->retranslateUi(this);
 }

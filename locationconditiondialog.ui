@@ -210,18 +210,8 @@
       <string>Position</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="xCheck">
-        <property name="text">
-         <string>X:</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
-       <widget class="ExtendedNumericInput" name="xInput">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
+       <widget class="NumericInput" name="xInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -236,55 +226,56 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="yCheck">
+      <item row="1" column="1">
+       <widget class="NumericInput" name="yInput">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="NumericInput" name="zInput">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>22</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_11">
         <property name="text">
          <string>X:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="ExtendedNumericInput" name="yInput">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>22</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="zCheck">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_14">
         <property name="text">
          <string>Y:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="ExtendedNumericInput" name="zInput">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>22</height>
-         </size>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Z:</string>
         </property>
        </widget>
       </item>
@@ -334,10 +325,7 @@
       <widget class="QComboBox" name="featureCombo"/>
      </item>
      <item row="3" column="1">
-      <widget class="ExtendedNumericInput" name="lightInput">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
+      <widget class="NumericInput" name="lightInput">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -353,7 +341,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QCheckBox" name="lightCheck">
+      <widget class="QLabel" name="label_16">
        <property name="text">
         <string>Light:</string>
        </property>
@@ -365,9 +353,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ExtendedNumericInput</class>
+   <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">extendednumericinput.h</header>
+   <header location="global">NumericInput.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

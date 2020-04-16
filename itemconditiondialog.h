@@ -4,7 +4,6 @@
 #include "basecondition.h"
 
 #include <QDialog>
-#include <QJsonObject>
 #include <QJsonArray>
 
 namespace Ui {
@@ -25,7 +24,6 @@ public:
 protected slots:
     void onAddedEnchant();
     void onAddedStoredEnchant();
-    void checkOK();
 
 private:
     Ui::ItemConditionDialog *ui;
@@ -34,8 +32,6 @@ private:
     QStandardItemModel enchantmentsModel;
     QStandardItemModel itemEnchantModel;
     QStandardItemModel storedEnchantModel;
-    const QString deletiveToolTip = "Right click this row to delete.";
-    ViewEventFilter viewFilter;
 
     using BaseCondition::initModelView;
     void initModelView(QStandardItemModel &model, QTableView *tableView);

@@ -1,7 +1,7 @@
 #include "entityconditiondialog.h"
 #include "ui_entityconditiondialog.h"
 
-#include "extendednumericdelegate.h"
+#include "extendeddelegate.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -10,8 +10,8 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
     ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
-    auto typeFlag = ExtendedNumericInput::Exact
-                    | ExtendedNumericInput::Range;
+    auto typeFlag = NumericInput::Exact
+                    | NumericInput::Range;
     ui->absDistanceInput->setTypes(typeFlag);
     ui->horizDistanceInput->setTypes(typeFlag);
     ui->xDistanceInput->setTypes(typeFlag);
@@ -28,9 +28,17 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     ui->yDistanceInput->setGeneralMinimum(-999999999);
     ui->zDistanceInput->setGeneralMinimum(-999999999);
 
-    initComboModelView("entity", entityModel, ui->entityTypeCombo);
-    initComboModelView("effect", effectModel, ui->effectCombo, false);
-    initComboModelView("stat_type", statTypeModel, ui->statTypeCombo, false);
+    initComboModelView(QStringLiteral("entity"),
+                       entityModel,
+                       ui->entityTypeCombo);
+    initComboModelView(QStringLiteral("effect"),
+                       effectModel,
+                       ui->effectCombo,
+                       false);
+    initComboModelView(QStringLiteral("stat_type"),
+                       statTypeModel,
+                       ui->statTypeCombo,
+                       false);
 
     ui->headPropBtn->setDialogType(DDBType::ItemCond);
     ui->chestPropBtn->setDialogType(DDBType::ItemCond);
@@ -49,16 +57,6 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
             &EntityConditionDialog::onEntityTypeChanged);
-    connect(ui->absDistanceCheck, &QCheckBox::toggled,
-            ui->absDistanceInput, &ExtendedNumericInput::setEnabled);
-    connect(ui->horizDistanceCheck, &QCheckBox::toggled,
-            ui->horizDistanceInput, &ExtendedNumericInput::setEnabled);
-    connect(ui->xDistanceCheck, &QCheckBox::toggled,
-            ui->xDistanceInput, &ExtendedNumericInput::setEnabled);
-    connect(ui->yDistanceCheck, &QCheckBox::toggled,
-            ui->yDistanceInput, &ExtendedNumericInput::setEnabled);
-    connect(ui->zDistanceCheck, &QCheckBox::toggled,
-            ui->zDistanceInput, &ExtendedNumericInput::setEnabled);
 }
 
 EntityConditionDialog::~EntityConditionDialog() {
@@ -69,50 +67,57 @@ QJsonObject EntityConditionDialog::toJson() const {
     QJsonObject root;
 
     if (ui->entityTypeCombo->currentIndex() != 0)
-        root.insert("type", ui->entityTypeCombo->currentData(
+        root.insert(QStringLiteral("type"), ui->entityTypeCombo->currentData(
                         Qt::UserRole + 1).toJsonValue());
     if (!ui->teamEdit->text().isEmpty())
-        root.insert("team", ui->teamEdit->text());
+        root.insert(QStringLiteral("team"), ui->teamEdit->text());
     if (!ui->NBTEdit->text().isEmpty())
-        root.insert("nbt", ui->NBTEdit->text());
+        root.insert(QStringLiteral("nbt"), ui->NBTEdit->text());
     QJsonObject distance;
-    if (ui->absDistanceCheck->isChecked())
-        distance.insert("absolute", ui->absDistanceInput->toJson());
-    if (ui->horizDistanceCheck->isChecked())
-        distance.insert("horizontal", ui->horizDistanceInput->toJson());
-    if (ui->xDistanceCheck->isChecked())
-        distance.insert("x", ui->xDistanceInput->toJson());
-    if (ui->yDistanceCheck->isChecked())
-        distance.insert("y", ui->yDistanceInput->toJson());
-    if (ui->zDistanceCheck->isChecked())
-        distance.insert("z", ui->zDistanceInput->toJson());
+    if (!ui->absDistanceInput->isCurrentlyUnset())
+        distance.insert(QStringLiteral("absolute"),
+                        ui->absDistanceInput->toJson());
+    if (!ui->horizDistanceInput->isCurrentlyUnset())
+        distance.insert(QStringLiteral("horizontal"),
+                        ui->horizDistanceInput->toJson());
+    if (!ui->xDistanceInput->isCurrentlyUnset())
+        distance.insert(QStringLiteral("x"), ui->xDistanceInput->toJson());
+    if (!ui->yDistanceInput->isCurrentlyUnset())
+        distance.insert(QStringLiteral("y"), ui->yDistanceInput->toJson());
+    if (!ui->zDistanceInput->isCurrentlyUnset())
+        distance.insert(QStringLiteral("z"), ui->zDistanceInput->toJson());
     if (!distance.isEmpty())
-        root.insert("distance", distance);
+        root.insert(QStringLiteral("distance"), distance);
     QJsonObject flags;
-    ui->onFireCheck->insertToJsonObject(flags, "is_on_fire");
-    ui->isSprintingCheck->insertToJsonObject(flags, "is_sprinting");
-    ui->isSneakingCheck->insertToJsonObject(flags, "is_sneaking");
-    ui->isSwimmingCheck->insertToJsonObject(flags, "is_swimming");
+    ui->onFireCheck->insertToJsonObject(flags, QStringLiteral("is_on_fire"));
+    ui->isSprintingCheck->insertToJsonObject(flags,
+                                             QStringLiteral("is_sprinting"));
+    ui->isSneakingCheck->insertToJsonObject(flags,
+                                            QStringLiteral("is_sneaking"));
+    ui->isSwimmingCheck->insertToJsonObject(flags,
+                                            QStringLiteral("is_swimming"));
     ui->isBabyCheck->insertToJsonObject(flags, "is_baby");
     if (!flags.isEmpty())
-        root.insert("flags", flags);
+        root.insert(QStringLiteral("flags"), flags);
     QJsonObject equipment;
     if (!ui->mainhandPropBtn->getData().isEmpty())
-        equipment.insert("mainhand", ui->mainhandPropBtn->getData());
+        equipment.insert(QStringLiteral("mainhand"),
+                         ui->mainhandPropBtn->getData());
     if (!ui->offhandPropBtn->getData().isEmpty())
-        equipment.insert("offhand", ui->offhandPropBtn->getData());
+        equipment.insert(QStringLiteral("offhand"),
+                         ui->offhandPropBtn->getData());
     if (!ui->headPropBtn->getData().isEmpty())
-        equipment.insert("head", ui->headPropBtn->getData());
+        equipment.insert(QStringLiteral("head"), ui->headPropBtn->getData());
     if (!ui->chestPropBtn->getData().isEmpty())
-        equipment.insert("chest", ui->chestPropBtn->getData());
+        equipment.insert(QStringLiteral("chest"), ui->chestPropBtn->getData());
     if (!ui->legsPropBtn->getData().isEmpty())
-        equipment.insert("legs", ui->legsPropBtn->getData());
+        equipment.insert(QStringLiteral("legs"), ui->legsPropBtn->getData());
     if (!ui->feetPropBtn->getData().isEmpty())
-        equipment.insert("feet", ui->feetPropBtn->getData()); ;
+        equipment.insert(QStringLiteral("feet"), ui->feetPropBtn->getData()); ;
     if (!equipment.isEmpty())
-        root.insert("equipment", equipment);
+        root.insert(QStringLiteral("equipment"), equipment);
     if (!ui->locatPropBtn->getData().isEmpty())
-        root.insert("lovation", ui->locatPropBtn->getData());
+        root.insert(QStringLiteral("location"), ui->locatPropBtn->getData());
 
     QJsonObject effects;
     for (int i = 0; i < entityEffectModel.rowCount(); ++i) {
@@ -127,22 +132,25 @@ QJsonObject EntityConditionDialog::toJson() const {
         auto visible =
             entityEffectModel.item(i, 4)->data(Qt::DisplayRole).toBool();
         effects.insert(effect,
-                       QJsonObject({ { "amplifier", amplifier },
-                                       { "duration", duration },
-                                       { "ambient", ambient },
-                                       { "visible", visible } }));
+                       QJsonObject({ { QStringLiteral("amplifier"), amplifier },
+                                       { QStringLiteral("duration"), duration },
+                                       { QStringLiteral("ambient"), ambient },
+                                       { QStringLiteral("visible"),
+                                         visible } }));
     }
     if (!effects.isEmpty())
-        root.insert("effects", effects);
+        root.insert(QStringLiteral("effects"), effects);
 
     if ((ui->entityTypeCombo->currentIndex() == 0)
         || (ui->entityTypeCombo->currentData(Qt::UserRole + 1).toString() ==
             QStringLiteral("minecraft:player"))) {
         QJsonObject player;
         if (ui->gameModeCombo->currentIndex() != 0)
-            player.insert("gamemode",
+            player.insert(QStringLiteral("gamemode"),
                           ui->gameModeCombo->currentText().toLower());
-        player.insert("level", ui->playerLevelInput->toJson());
+        if (!ui->playerLevelInput->isCurrentlyUnset())
+            player.insert(QStringLiteral("level"),
+                          ui->playerLevelInput->toJson());
 
         QJsonObject advancements;
         for (int i = 0; i < playerAdvanmModel.rowCount(); ++i) {
@@ -153,7 +161,7 @@ QJsonObject EntityConditionDialog::toJson() const {
             advancements.insert(advanm, granted);
         }
         if (!advancements.isEmpty())
-            player.insert("advancements", advancements);
+            player.insert(QStringLiteral("advancements"), advancements);
 
         QJsonObject recipes;
         for (int i = 0; i < playerRecipeModel.rowCount(); ++i) {
@@ -164,7 +172,7 @@ QJsonObject EntityConditionDialog::toJson() const {
             recipes.insert(recipe, granted);
         }
         if (!recipes.isEmpty())
-            player.insert("recipes", recipes);
+            player.insert(QStringLiteral("recipes"), recipes);
 
         QJsonArray stats;
         for (int i = 0; i < playerStatModel.rowCount(); ++i) {
@@ -174,14 +182,15 @@ QJsonObject EntityConditionDialog::toJson() const {
                 playerStatModel.item(i, 1)->data(Qt::DisplayRole).toString();
             auto value =
                 playerStatModel.item(i, 2)->data(Qt::DisplayRole).toJsonValue();
-            stats.push_back(QJsonObject({ { "type", type },
-                                            { "stat", stat },
-                                            { "value", value } }));
+            stats.push_back(QJsonObject({ { QStringLiteral("type"), type },
+                                            { QStringLiteral("stat"), stat },
+                                            { QStringLiteral(
+                                                  "value"), value } }));
         }
         if (!stats.isEmpty())
-            player.insert("stats", stats);
+            player.insert(QStringLiteral("stats"), stats);
         if (!player.isEmpty())
-            root.insert("player", player);
+            root.insert(QStringLiteral("player"), player);
     }
     ;
 
@@ -189,60 +198,66 @@ QJsonObject EntityConditionDialog::toJson() const {
 }
 
 void EntityConditionDialog::fromJson(const QJsonObject &value) {
-    if (value.contains("type"))
-        setupComboFrom(ui->entityTypeCombo, value["type"]);
-    if (value.contains("team"))
-        ui->teamEdit->setText(value["team"].toString());
-    if (value.contains("nbt"))
-        ui->NBTEdit->setText(value["nbt"].toString());
-    if (value.contains("distance")) {
-        auto distance = value["distance"].toObject();
-        ui->absDistanceCheck->setChecked(distance.contains("absolute"));
-        if (distance.contains("absolute"))
-            ui->absDistanceInput->fromJson(distance["absolute"]);
-        ui->horizDistanceCheck->setChecked(distance.contains("horizontal"));
-        if (distance.contains("horizontal"))
-            ui->horizDistanceInput->fromJson(distance["horizontal"]);
-        ui->xDistanceCheck->setChecked(distance.contains("x"));
-        if (distance.contains("x"))
-            ui->xDistanceInput->fromJson(distance["x"]);
-        ui->yDistanceCheck->setChecked(distance.contains("y"));
-        if (distance.contains("y"))
-            ui->yDistanceInput->fromJson(distance["y"]);
-        ui->zDistanceCheck->setChecked(distance.contains("z"));
-        if (distance.contains("z"))
-            ui->zDistanceInput->fromJson(distance["z"]);
+    if (value.contains(QStringLiteral("type")))
+        setupComboFrom(ui->entityTypeCombo, value[QStringLiteral("type")]);
+    if (value.contains(QStringLiteral("team")))
+        ui->teamEdit->setText(value[QStringLiteral("team")].toString());
+    if (value.contains(QStringLiteral("nbt")))
+        ui->NBTEdit->setText(value[QStringLiteral("nbt")].toString());
+    if (value.contains(QStringLiteral("distance"))) {
+        auto distance = value[QStringLiteral("distance")].toObject();
+        if (distance.contains(QStringLiteral("absolute")))
+            ui->absDistanceInput->fromJson(distance[QStringLiteral("absolute")]);
+        if (distance.contains(QStringLiteral("horizontal")))
+            ui->horizDistanceInput->fromJson(distance[QStringLiteral(
+                                                          "horizontal")]);
+        if (distance.contains(QStringLiteral("x")))
+            ui->xDistanceInput->fromJson(distance[QStringLiteral("x")]);
+        if (distance.contains(QStringLiteral("y")))
+            ui->yDistanceInput->fromJson(distance[QStringLiteral("y")]);
+        if (distance.contains(QStringLiteral("z")))
+            ui->zDistanceInput->fromJson(distance[QStringLiteral("z")]);
     }
-    if (value.contains("flags")) {
-        auto flags = value["flags"].toObject();
-        ui->onFireCheck->setupFromJsonObject(flags, "is_on_fire");
-        ui->isSprintingCheck->setupFromJsonObject(flags, "is_sprinting");
-        ui->isSneakingCheck->setupFromJsonObject(flags, "is_sneaking");
-        ui->isSwimmingCheck->setupFromJsonObject(flags, "is_swimming");
-        ui->isBabyCheck->setupFromJsonObject(flags, "is_baby");
+    if (value.contains(QStringLiteral("flags"))) {
+        auto flags = value[QStringLiteral("flags")].toObject();
+        ui->onFireCheck->setupFromJsonObject(flags,
+                                             QStringLiteral("is_on_fire"));
+        ui->isSprintingCheck->setupFromJsonObject(flags,
+                                                  QStringLiteral("is_sprinting"));
+        ui->isSneakingCheck->setupFromJsonObject(flags,
+                                                 QStringLiteral("is_sneaking"));
+        ui->isSwimmingCheck->setupFromJsonObject(flags,
+                                                 QStringLiteral("is_swimming"));
+        ui->isBabyCheck->setupFromJsonObject(flags, QStringLiteral("is_baby"));
     }
-    if (value.contains("equipment")) {
-        auto equipment = value["equipment"].toObject();
-        if (equipment.contains("mainhand"))
-            ui->mainhandPropBtn->setData(equipment["mainhand"].toObject());
-        if (equipment.contains("offhand"))
-            ui->offhandPropBtn->setData(equipment["offhand"].toObject());
-        if (equipment.contains("head"))
-            ui->headPropBtn->setData(equipment["head"].toObject());
-        if (equipment.contains("chest"))
-            ui->chestPropBtn->setData(equipment["chest"].toObject());
-        if (equipment.contains("legs"))
-            ui->legsPropBtn->setData(equipment["legs"].toObject());
-        if (equipment.contains("feet"))
-            ui->feetPropBtn->setData(equipment["feet"].toObject());
+    if (value.contains(QStringLiteral("equipment"))) {
+        auto equipment = value[QStringLiteral("equipment")].toObject();
+        if (equipment.contains(QStringLiteral("mainhand")))
+            ui->mainhandPropBtn->setData(equipment[QStringLiteral(
+                                                       "mainhand")].toObject());
+        if (equipment.contains(QStringLiteral("offhand")))
+            ui->offhandPropBtn->setData(equipment[QStringLiteral(
+                                                      "offhand")].toObject());
+        if (equipment.contains(QStringLiteral("head")))
+            ui->headPropBtn->setData(equipment[QStringLiteral(
+                                                   "head")].toObject());
+        if (equipment.contains(QStringLiteral("chest")))
+            ui->chestPropBtn->setData(equipment[QStringLiteral(
+                                                    "chest")].toObject());
+        if (equipment.contains(QStringLiteral("legs")))
+            ui->legsPropBtn->setData(equipment[QStringLiteral(
+                                                   "legs")].toObject());
+        if (equipment.contains(QStringLiteral("feet")))
+            ui->feetPropBtn->setData(equipment[QStringLiteral(
+                                                   "feet")].toObject());
     }
-    if (value.contains("location"))
-        ui->locatPropBtn->setData(value["location"].toObject());
-    if (value.contains("effects")) {
-        auto effects = value["effects"].toObject();
+    if (value.contains(QStringLiteral("location")))
+        ui->locatPropBtn->setData(value[QStringLiteral("location")].toObject());
+    if (value.contains(QStringLiteral("effects"))) {
+        auto effects = value[QStringLiteral("effects")].toObject();
         for (auto effectID : effects.keys()) {
-            if (!effectID.contains(":"))
-                effectID = "minecraft:" + effectID;
+            if (!effectID.contains(QStringLiteral(":")))
+                effectID = QStringLiteral("minecraft:") + effectID;
             auto indexes = effectModel.match(
                 effectModel.index(0, 0), Qt::UserRole + 1, effectID);
             if (indexes.isEmpty()) continue;
@@ -275,30 +290,32 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
         }
     }
     onEntityTypeChanged();
-    if (value.contains("player")) {
-        auto player = value["player"].toObject();
+    if (value.contains(QStringLiteral("player"))) {
+        auto player = value[QStringLiteral("player")].toObject();
         if (player.contains("gamemode")) {
-            auto gamemode = player["gamemode"].toString();
+            auto gamemode = player[QStringLiteral("gamemode")].toString();
             gamemode[0].toUpper();
             setupComboFrom(ui->gameModeCombo, gamemode);
         }
-        if (player.contains("level"))
-            ui->playerLevelInput->fromJson(player["level"]);
-        if (player.contains("advancements"))
-            setupGrantedTableFromJson(player["advancements"].toObject(),
+        if (player.contains(QStringLiteral("level")))
+            ui->playerLevelInput->fromJson(player[QStringLiteral("level")]);
+        if (player.contains(QStringLiteral("advancements")))
+            setupGrantedTableFromJson(player[QStringLiteral(
+                                                 "advancements")].toObject(),
                                       playerAdvanmModel);
-        if (player.contains("recipes"))
-            setupGrantedTableFromJson(player["recipes"].toObject(),
+        if (player.contains(QStringLiteral("recipes")))
+            setupGrantedTableFromJson(player[QStringLiteral(
+                                                 "recipes")].toObject(),
                                       playerRecipeModel);
-        if (player.contains("stats")) {
-            auto stats = player["stats"].toArray();
+        if (player.contains(QStringLiteral("stats"))) {
+            auto stats = player[QStringLiteral("stats")].toArray();
             for (auto stat : stats) {
                 QJsonObject statObj = stat.toObject();
                 if (statObj.isEmpty())
                     continue;
-                QString statType = statObj["type"].toString();
-                if (!statType.contains(":"))
-                    statType = "minecraft:" + statType;
+                QString statType = statObj[QStringLiteral("type")].toString();
+                if (!statType.contains(QStringLiteral(":")))
+                    statType = QStringLiteral("minecraft:") + statType;
                 auto indexes = statTypeModel.match(
                     statTypeModel.index(0, 0), Qt::UserRole + 1, statType);
                 if (indexes.isEmpty()) continue;
@@ -308,10 +325,11 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                 typeItem->setEditable(false);
                 typeItem->setToolTip(deletiveToolTip);
                 QStandardItem *statItem = new QStandardItem();
-                statItem->setText(statObj["stat"].toString());
+                statItem->setText(statObj[QStringLiteral("stat")].toString());
                 statItem->setToolTip(deletiveToolTip);
                 QStandardItem *valueItem = new QStandardItem();
-                valueItem->setData(statObj.value("value"), Qt::DisplayRole);
+                valueItem->setData(statObj.value(QStringLiteral("value")),
+                                   Qt::DisplayRole);
                 valueItem->setToolTip(deletiveToolTip);
 
                 playerStatModel.appendRow({ typeItem, statItem, valueItem });
@@ -422,16 +440,16 @@ void EntityConditionDialog::onEntityTypeChanged() {
 }
 
 void EntityConditionDialog::initEffectsPage() {
-    QStandardItem *effectItem    = new QStandardItem("Effect");
-    QStandardItem *amplifierItem = new QStandardItem("Amplifier");
-    QStandardItem *durationItem  = new QStandardItem("Duration");
-    QStandardItem *ambientItem   = new QStandardItem("Ambient");
-    QStandardItem *visibleItem   = new QStandardItem("Is visible");
+    QStandardItem *effectItem    = new QStandardItem(tr("Effect"));
+    QStandardItem *amplifierItem = new QStandardItem(tr("Amplifier"));
+    QStandardItem *durationItem  = new QStandardItem(tr("Duration"));
+    QStandardItem *ambientItem   = new QStandardItem(tr("Ambient"));
+    QStandardItem *visibleItem   = new QStandardItem(tr("Is visible"));
 
-    ExtendedNumericDelegate *delegate = new ExtendedNumericDelegate(this);
+    ExtendedDelegate *delegate = new ExtendedDelegate(this);
 
-    delegate->setExNumInputTypes(ExtendedNumericInput::Exact
-                                 | ExtendedNumericInput::Range);
+    delegate->setExNumInputTypes(NumericInput::Exact
+                                 | NumericInput::Range);
     delegate->setExNumInputGeneralMin(1);
 
     initModelView(entityEffectModel, ui->effectTableView,
@@ -446,8 +464,8 @@ void EntityConditionDialog::initEffectsPage() {
 }
 
 void EntityConditionDialog::initPlayerAdv() {
-    QStandardItem *advItem     = new QStandardItem("Advancement");
-    QStandardItem *grantedItem = new QStandardItem("Is granted");
+    QStandardItem *advItem     = new QStandardItem(tr("Advancement"));
+    QStandardItem *grantedItem = new QStandardItem(tr("Is granted"));
 
     initModelView(playerAdvanmModel, ui->advanmTableView,
                   { advItem, grantedItem });
@@ -457,8 +475,8 @@ void EntityConditionDialog::initPlayerAdv() {
 }
 
 void EntityConditionDialog::initPlayerRecipe() {
-    QStandardItem *recipeItem  = new QStandardItem("Recipe");
-    QStandardItem *grantedItem = new QStandardItem("Is granted");
+    QStandardItem *recipeItem  = new QStandardItem(tr("Recipe"));
+    QStandardItem *grantedItem = new QStandardItem(tr("Is granted"));
 
     initModelView(playerRecipeModel, ui->recipeTableView,
                   { recipeItem, grantedItem });
@@ -468,14 +486,14 @@ void EntityConditionDialog::initPlayerRecipe() {
 }
 
 void EntityConditionDialog::initPlayerStat() {
-    QStandardItem *typeItem  = new QStandardItem("Type");
-    QStandardItem *statItem  = new QStandardItem("Stat");
-    QStandardItem *valueItem = new QStandardItem("Value");
+    QStandardItem *typeItem  = new QStandardItem(tr("Type"));
+    QStandardItem *statItem  = new QStandardItem(tr("Stat"));
+    QStandardItem *valueItem = new QStandardItem(tr("Value"));
 
-    ExtendedNumericDelegate *delegate = new ExtendedNumericDelegate(this);
+    ExtendedDelegate *delegate = new ExtendedDelegate(this);
 
-    delegate->setExNumInputTypes(ExtendedNumericInput::Exact
-                                 | ExtendedNumericInput::Range);
+    delegate->setExNumInputTypes(NumericInput::Exact
+                                 | NumericInput::Range);
 
     initModelView(playerStatModel, ui->statsTableView,
                   { typeItem, statItem, valueItem }, delegate);

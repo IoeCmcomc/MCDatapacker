@@ -1,15 +1,15 @@
 #ifndef EXTENDEDNUMERICDELEGATE_H
 #define EXTENDEDNUMERICDELEGATE_H
 
-#include "extendednumericinput.h"
+#include "numericinput.h"
 
 #include <QStyledItemDelegate>
 
-class ExtendedNumericDelegate : public QStyledItemDelegate
+class ExtendedDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    ExtendedNumericDelegate(QObject *parent = nullptr);
+    ExtendedDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
@@ -26,8 +26,8 @@ public:
                               const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
 
-    ExtendedNumericInput::Types getExNumInputTypes() const;
-    void setExNumInputTypes(const ExtendedNumericInput::Types &value);
+    NumericInput::Types getExNumInputTypes() const;
+    void setExNumInputTypes(const NumericInput::Types &value);
 
     void setExNumInputGeneralMin(int value);
     void setExNumInputGeneralMax(int value);
@@ -36,9 +36,9 @@ private slots:
     void commitAndCloseEditor();
 
 private:
-    ExtendedNumericInput::Types ExNumInputTypes;
-    int ExNumInputGeneralMin = 0;
-    int ExNumInputGeneralMax = 999999999;
+    NumericInput::Types ExNumInputTypes;
+    int NumInputGeneralMin = 0;
+    int NumInputGeneralMax = INT_MAX;
 };
 
 #endif /* EXTENDEDNUMERICDELEGATE_H */

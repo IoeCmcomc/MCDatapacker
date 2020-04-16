@@ -22,8 +22,7 @@ SOURCES += \
     datapacktreeview.cpp \
     dialogdatabutton.cpp \
     entityconditiondialog.cpp \
-    extendednumericdelegate.cpp \
-    extendednumericinput.cpp \
+    extendeddelegate.cpp \
     globalhelpers.cpp \
     itemconditiondialog.cpp \
     jsonhighlighter.cpp \
@@ -38,6 +37,8 @@ SOURCES += \
     mcritemsortfilterproxymodel.cpp \
     mcrpredcondition.cpp \
     newdatapackdialog.cpp \
+    numericinput.cpp \
+    optionalspinbox.cpp \
     predicatedock.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
@@ -53,8 +54,7 @@ HEADERS += \
     datapacktreeview.h \
     dialogdatabutton.h \
     entityconditiondialog.h \
-    extendednumericdelegate.h \
-    extendednumericinput.h \
+    extendeddelegate.h \
     globalhelpers.h \
     itemconditiondialog.h \
     jsonhighlighter.h \
@@ -69,6 +69,8 @@ HEADERS += \
     mcritemsortfilterproxymodel.h \
     mcrpredcondition.h \
     newdatapackdialog.h \
+    numericinput.h \
+    optionalspinbox.h \
     predicatedock.h \
     settingsdialog.h \
     stackedwidget.h \
@@ -81,7 +83,6 @@ FORMS += \
     blockitemselectordialog.ui \
     dialogdatabutton.ui \
     entityconditiondialog.ui \
-    extendednumericinput.ui \
     itemconditiondialog.ui \
     locationconditiondialog.ui \
     loottableeditordock.ui \
@@ -89,6 +90,7 @@ FORMS += \
     mcrinvsloteditor.ui \
     mcrpredcondition.ui \
     newdatapackdialog.ui \
+    numericinput.ui \
     predicatedock.ui \
     settingsdialog.ui \
     tagselectordialog.ui \

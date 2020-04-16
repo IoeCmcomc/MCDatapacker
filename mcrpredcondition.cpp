@@ -3,7 +3,7 @@
 
 #include "mainwindow.h"
 #include "mcrinvitem.h"
-#include "extendednumericdelegate.h"
+#include "extendeddelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
 #include "entityconditiondialog.h"
@@ -27,23 +27,13 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
 
     initBlockStatesPage();
     ui->damageSrc_entityPropBtn->setDialogType(DDBType::EntityCond);
+    ui->damageSrc_directPropBtn->setDialogType(DDBType::EntityCond);
+    ui->entity_propBtn->setDialogType(DDBType::EntityCond);
     initEntityScoresPage();
     initInvertedCondPage();
     initNestedCondPage();
-    connect(ui->matchTool_propBtn, &QPushButton::clicked, [ = ]() {
-        ItemConditionDialog dialog(this);
-        dialog.fromJson(matchTool_itemProp);
-        if (dialog.exec()) {
-            matchTool_itemProp = dialog.toJson();
-        }
-    });
-    connect(ui->location_propBtn, &QPushButton::clicked, [ = ]() {
-        LocationConditionDialog dialog(this);
-        dialog.fromJson(location_locatProp);
-        if (dialog.exec()) {
-            location_locatProp = dialog.toJson();
-        }
-    });
+    ui->matchTool_propBtn->setDialogType(DDBType::ItemCond);
+    ui->location_propBtn->setDialogType(DDBType::LocationCond);
     initRandChancePage();
     initTableBonusPage();
     initToolEnchantPage();
@@ -177,16 +167,16 @@ void MCRPredCondition::initBlockStatesPage() {
 
 void MCRPredCondition::initEntityScoresPage() {
     ui->entityScores_valueInput->setTypes(
-        ExtendedNumericInput::Exact | ExtendedNumericInput::Range);
+        NumericInput::Exact | NumericInput::Range);
 
     QStandardItem *objItem = new QStandardItem("Objective");
     objItem->setToolTip("An score objective of the entity.");
     QStandardItem *valuesItem = new QStandardItem("Score");
     valuesItem->setToolTip("A value of the objective.");
 
-    auto *delegate = new ExtendedNumericDelegate();
-    delegate->setExNumInputTypes(ExtendedNumericInput::Exact
-                                 | ExtendedNumericInput::Range);
+    auto *delegate = new ExtendedDelegate();
+    delegate->setExNumInputTypes(NumericInput::Exact
+                                 | NumericInput::Range);
 
     initModelView(entityScoresModel, ui->entityScores_listView,
                   { objItem, valuesItem }, delegate);
@@ -245,15 +235,15 @@ void MCRPredCondition::initTableBonusPage() {
 }
 
 void MCRPredCondition::initToolEnchantPage() {
-    ui->toolEnchant_levelsInput->setTypes(ExtendedNumericInput::Range);
+    ui->toolEnchant_levelsInput->setTypes(NumericInput::Range);
 
     QStandardItem *enchantItem = new QStandardItem("Enchantment");
     enchantItem->setToolTip("An enchantment of the tool.");
     QStandardItem *levelsItem = new QStandardItem("Levels");
     levelsItem->setToolTip("The minimun and maximun levels of the enchantment.");
 
-    auto *delegate = new ExtendedNumericDelegate();
-    delegate->setExNumInputTypes(ExtendedNumericInput::Range);
+    auto *delegate = new ExtendedDelegate();
+    delegate->setExNumInputTypes(NumericInput::Range);
 
     initModelView(toolEnchantModel, ui->toolEnchant_listView,
                   { enchantItem, levelsItem }, delegate);
