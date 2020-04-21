@@ -87,26 +87,15 @@ void TagSelectorDialog::setupTagTreeView(
         break;
     }
 
-    QString dataPath = MainWindow::getCurDir() + QStringLiteral("/data/");
-    QDir    dir(dataPath);
-    auto    nspaceDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    auto tagStrSplited = tagStr.split('/');
+    for (auto &tagStrSub : tagStrSplited)
+        tagStrSub += 's';
+    auto tagDir = tagStrSplited.join('/');
 
-    for (auto nspaceDir : nspaceDirs) {
-        auto    nspace  = nspaceDir.section('.', 0, 0);
-        QString tagPath = dataPath + nspace + '/' +
-                          tagStr;
-        QDir tagDir(tagPath);
-        if (tagDir.exists() && (!tagDir.isEmpty())) {
-            auto tagNames =
-                tagDir.entryList(QDir::Files | QDir::NoDotAndDotDot);
-            for (auto tagName : tagNames) {
-                tagName = tagName.section('.', 0, 0);
-
-                QStandardItem *item = new QStandardItem();
-                item->setText(nspace + ":" + tagName);
-                model.appendRow(item);
-            }
-        }
+    auto fileIDList =
+        GlobalHelpers::fileIDList(MainWindow::getCurDir(), tagDir);
+    for (auto id : fileIDList) {
+        model.appendRow(new QStandardItem(id));
     }
 
     MCRTagInfo = MainWindow::readMCRInfo(tagStr);

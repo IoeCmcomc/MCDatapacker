@@ -4,7 +4,7 @@
 #include <QDockWidget>
 
 namespace Ui {
-class PredicateDock;
+    class PredicateDock;
 }
 
 class PredicateDock : public QDockWidget
@@ -15,8 +15,12 @@ public:
     explicit PredicateDock(QWidget *parent = nullptr);
     ~PredicateDock();
 
+protected slots:
+    void onReadBtn();
+    void onWriteBtn();
+
 private:
     Ui::PredicateDock *ui;
 };
 
-#endif // PREDICATEDOCK_H
+#endif /* PREDICATEDOCK_H */

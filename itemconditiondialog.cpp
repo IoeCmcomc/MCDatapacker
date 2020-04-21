@@ -55,7 +55,7 @@ QJsonObject ItemConditionDialog::toJson() const {
     }
     if (!ui->countInput->isCurrentlyUnset())
         root.insert(QStringLiteral("count"), ui->countInput->toJson());
-    if (ui->durabilityInput->getExactly() != 0)
+    if (!ui->durabilityInput->isCurrentlyUnset())
         root.insert(QStringLiteral("durability"),
                     ui->durabilityInput->toJson());
     if (!ui->NBTEdit->text().isEmpty())
@@ -127,8 +127,10 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
 }
 
 void ItemConditionDialog::onAddedEnchant() {
-    if (ui->enchant_levelInput->getMinimum() == 0
-        || ui->enchant_levelInput->getMaximum() == 0) {
+    if ((ui->enchant_levelInput->getMinimum() == 0 &&
+         !ui->enchant_levelInput->isCurrentlyUnset())
+        || (ui->enchant_levelInput->getMaximum() == 0 &&
+            !ui->enchant_levelInput->isCurrentlyUnset())) {
         return;
     }
     QString enchantmentText = ui->enchant_combo->currentText();
@@ -147,8 +149,10 @@ void ItemConditionDialog::onAddedEnchant() {
 }
 
 void ItemConditionDialog::onAddedStoredEnchant() {
-    if (ui->stored_levelInput->getMinimum() == 0
-        || ui->stored_levelInput->getMaximum() == 0) {
+    if ((ui->stored_levelInput->getMinimum() == 0 &&
+         !ui->stored_levelInput->isCurrentlyUnset())
+        || (ui->stored_levelInput->getMaximum() == 0 &&
+            !ui->stored_levelInput->isCurrentlyUnset())) {
         return;
     }
     QString enchantmentText = ui->stored_combo->currentText();

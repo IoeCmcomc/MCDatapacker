@@ -18,6 +18,8 @@ namespace GlobalHelpers {
     QString toNamespacedID(const QString &dirpath, QString filepath);
     QVariant strToVariant(const QString &str);
     QString variantToStr(const QVariant &vari);
+    QVector<QString> fileIDList(const QString &dirpath, const QString &catDir,
+                                const QString &nspace = "");
 }
 
 #endif /* GLOBALHELPERS_H */

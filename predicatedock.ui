@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>299</height>
+    <width>508</width>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,25 +15,27 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
-    <item row="0" column="0">
+    <item row="1" column="0" colspan="2">
      <widget class="MCRPredCondition" name="condition">
       <property name="minimumSize">
        <size>
-        <width>200</width>
-        <height>200</height>
+        <width>350</width>
+        <height>350</height>
        </size>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="readBtn">
+      <property name="text">
+       <string>Read</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QPushButton" name="writeBtn">
+      <property name="text">
+       <string>Write</string>
       </property>
      </widget>
     </item>

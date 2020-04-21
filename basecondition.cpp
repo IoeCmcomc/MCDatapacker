@@ -4,8 +4,14 @@
 
 #include <QApplication>
 
-/*BaseCondition::BaseCondition(QWidget *parent) : QWidget(parent) { */
 BaseCondition::BaseCondition() {
+}
+
+QJsonObject BaseCondition::toJson() const {
+    return QJsonObject();
+}
+
+void BaseCondition::fromJson(const QJsonObject &value) {
 }
 
 void BaseCondition::initModelView(QStandardItemModel &model,

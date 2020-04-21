@@ -3,6 +3,7 @@
 
 #include "numericinput.h"
 #include "basecondition.h"
+#include "mcrpredcondition.h"
 
 #include <QDialog>
 #include <QVariant>
@@ -14,13 +15,14 @@ namespace Ui {
 class LocationConditionDialog : public QDialog, public BaseCondition
 {
     Q_OBJECT
+    friend class MCRPredCondition;
 
 public:
     explicit LocationConditionDialog(QWidget *parent = nullptr);
     ~LocationConditionDialog();
 
-    QJsonObject toJson() const;
-    void fromJson(const QJsonObject &value);
+    QJsonObject toJson() const override;
+    void fromJson(const QJsonObject &value) override;
 
 protected slots:
     void onAddedBlockState();
@@ -39,6 +41,7 @@ private:
     void initBlockGroup();
     void initFluidGroup();
     void setupTableFromJson(QStandardItemModel &model, const QJsonObject &json);
+    static QJsonObject jsonFromTable(const QStandardItemModel &model);
 };
 
 #endif /* LOCATIONCONDITIONDIALOG_H */

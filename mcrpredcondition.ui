@@ -10,8 +10,14 @@
     <height>415</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>350</width>
+    <height>350</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>Frame</string>
+   <string>Condition</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="verticalSpacing">
@@ -213,38 +219,45 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="TrueFalseBox" name="checkBox_2">
-           <property name="text">
-            <string>Projectile</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="TrueFalseBox" name="checkBox_3">
-           <property name="text">
-            <string>Fire</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
-          <widget class="TrueFalseBox" name="checkBox_4">
+          <widget class="TrueFalseBox" name="damageSrc_lightningCheck">
            <property name="text">
             <string>Lightning</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="TrueFalseBox" name="checkBox_5">
+         <item row="0" column="2">
+          <widget class="TrueFalseBox" name="damageSrc_fireCheck">
            <property name="text">
-            <string>Starvation</string>
+            <string>Fire</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="TrueFalseBox" name="damageSrc_projectileCheck">
+           <property name="text">
+            <string>Projectile</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="TrueFalseBox" name="damageSrc_magicCheck">
+           <property name="text">
+            <string>Magic</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="TrueFalseBox" name="damageSrc_bypassArmorCheck">
+           <property name="text">
+            <string>Bypasses armor</string>
            </property>
           </widget>
          </item>
          <item row="1" column="2">
-          <widget class="TrueFalseBox" name="checkBox_6">
+          <widget class="TrueFalseBox" name="damageSrc_starvationCheck">
            <property name="text">
-            <string>Bypasses armor</string>
+            <string>Starvation</string>
            </property>
           </widget>
          </item>
@@ -300,7 +313,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="entity_typeCombo">
          <item>
           <property name="text">
            <string>This (itself)</string>
@@ -432,14 +445,20 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="inverted_condAreaInner">
+         <widget class="QLabel" name="inverted_condAreaInner">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>434</width>
-            <height>338</height>
+            <width>58</width>
+            <height>16</height>
            </rect>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignHCenter|Qt::AlignTop</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
          </widget>
         </widget>
@@ -449,7 +468,7 @@
      <widget class="QWidget" name="killed_by_player">
       <layout class="QFormLayout" name="formLayout_8">
        <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="checkBox_7">
+        <widget class="QCheckBox" name="playerKill_invertedCheck">
          <property name="text">
           <string>Inverted</string>
          </property>
@@ -473,7 +492,7 @@
            </widget>
           </item>
           <item>
-           <widget class="OptionalSpinBox" name="spinBox">
+           <widget class="OptionalSpinBox" name="location_xOffset">
             <property name="minimum">
              <number>-999999999</number>
             </property>
@@ -493,7 +512,7 @@
            </widget>
           </item>
           <item>
-           <widget class="OptionalSpinBox" name="spinBox_2">
+           <widget class="OptionalSpinBox" name="location_yOffset">
             <property name="minimum">
              <number>-999999999</number>
             </property>
@@ -510,7 +529,7 @@
            </widget>
           </item>
           <item>
-           <widget class="OptionalSpinBox" name="spinBox_3">
+           <widget class="OptionalSpinBox" name="location_zOffset">
             <property name="minimum">
              <number>-999999999</number>
             </property>
@@ -612,8 +631,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>452</width>
-            <height>322</height>
+            <width>76</width>
+            <height>16</height>
            </rect>
           </property>
          </widget>
@@ -935,6 +954,19 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="label_23">
+         <property name="text">
+          <string>If present, time gets modulo-divided by this period (for example, if set to 24000, value operates on a time period of days).</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tool_enchantment">
@@ -1001,14 +1033,14 @@
      <widget class="QWidget" name="weather_check">
       <layout class="QFormLayout" name="formLayout_7">
        <item row="0" column="0">
-        <widget class="TrueFalseBox" name="checkBox_9">
+        <widget class="TrueFalseBox" name="weather_rainingCheck">
          <property name="text">
           <string>Raining</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="TrueFalseBox" name="checkBox_10">
+        <widget class="TrueFalseBox" name="weather_thunderCheck">
          <property name="text">
           <string>Thundering</string>
          </property>

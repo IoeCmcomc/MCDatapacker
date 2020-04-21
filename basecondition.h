@@ -7,14 +7,15 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QComboBox>
-#include <QPushButton>
-#include <QJsonObject>
 #include <QDebug>
 
 class BaseCondition
 {
 public:
     explicit BaseCondition();
+
+    virtual QJsonObject toJson() const;
+    virtual void fromJson(const QJsonObject &value);
 
 protected:
     const QString deletiveToolTip = "Right click this row to delete.";

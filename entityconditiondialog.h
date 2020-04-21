@@ -17,8 +17,8 @@ public:
     explicit EntityConditionDialog(QWidget *parent = nullptr);
     ~EntityConditionDialog();
 
-    QJsonObject toJson() const;
-    void fromJson(const QJsonObject &value);
+    QJsonObject toJson() const override;
+    void fromJson(const QJsonObject &value) override;
 
 private slots:
     void onAddedEntityEffect();

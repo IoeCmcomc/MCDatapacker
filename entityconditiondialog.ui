@@ -83,9 +83,6 @@
           </property>
           <item row="0" column="1">
            <widget class="NumericInput" name="absDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -96,9 +93,6 @@
           </item>
           <item row="1" column="1">
            <widget class="NumericInput" name="horizDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -109,9 +103,6 @@
           </item>
           <item row="2" column="1">
            <widget class="NumericInput" name="xDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -122,9 +113,6 @@
           </item>
           <item row="3" column="1">
            <widget class="NumericInput" name="yDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -135,9 +123,6 @@
           </item>
           <item row="4" column="1">
            <widget class="NumericInput" name="zDistanceInput">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="minimumSize">
              <size>
               <width>130</width>

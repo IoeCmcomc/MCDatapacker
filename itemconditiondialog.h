@@ -18,8 +18,8 @@ public:
     explicit ItemConditionDialog(QWidget *parent = nullptr);
     ~ItemConditionDialog();
 
-    QJsonObject toJson() const;
-    void fromJson(const QJsonObject &value);
+    QJsonObject toJson() const override;
+    void fromJson(const QJsonObject &value) override;
 
 protected slots:
     void onAddedEnchant();

@@ -36,11 +36,14 @@ void ExtendedDelegate::paint(QPainter *painter,
                 newOption.text = QString("n: %1; p: %2").arg(num).arg(prob);
             } else {
                 QString min = (obj.contains(QStringLiteral("min")))
-                              ? obj.value(QStringLiteral("min")).toString()
+                              ? QString::number(
+                    obj.value(QStringLiteral("min")).toInt())
                               : QStringLiteral("");
                 QString max = (obj.contains(QStringLiteral("max")))
-                                  ? obj.value(QStringLiteral("max")).toString()
+                                  ? QString::number(
+                    obj.value(QStringLiteral("max")).toInt())
                                   : QStringLiteral("");
+                qDebug() << "delegate::paint" << min << max;
                 newOption.text = QString("%1..%2").arg(min).arg(max);
             }
         }

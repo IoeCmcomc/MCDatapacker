@@ -26,16 +26,19 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
 
     initComboModelView("biome", biomesModel, ui->biomeCombo);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
+    initComboModelView("feature", featuresModel, ui->featureCombo);
 
-    featuresModel.appendRow(new QStandardItem(tr("(not selected)")));
-    auto info = MainWindow::readMCRInfo(QStringLiteral("feature"));
-    for (auto key : info.keys()) {
-        QStandardItem *item = new QStandardItem();
-        item->setText(info.value(key).toString());
-        item->setData(key);
-        featuresModel.appendRow(item);
-    }
-    ui->featureCombo->setModel(&featuresModel);
+/*
+      featuresModel.appendRow(new QStandardItem(tr("(not selected)")));
+      auto info = MainWindow::readMCRInfo(QStringLiteral("feature"));
+      for (auto key : info.keys()) {
+          QStandardItem *item = new QStandardItem();
+          item->setText(info.value(key).toString());
+          item->setData(key);
+          featuresModel.appendRow(item);
+      }
+      ui->featureCombo->setModel(&featuresModel);
+ */
 
     initBlockGroup();
     initFluidGroup();
@@ -82,14 +85,7 @@ QJsonObject LocationConditionDialog::toJson() const {
             block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
         if (!ui->blockNBTEdit->text().isEmpty())
             block.insert(QStringLiteral("nbt"), ui->blockNBTEdit->text());
-        QJsonObject blockStates;
-        for (auto row = 0; row < blockStatesModel.rowCount(); ++row) {
-            QString state = blockStatesModel.item(row, 0)->text();
-            auto    value =
-                blockStatesModel.item(row, 1)->data(Qt::DisplayRole).toString();
-            blockStates.insert(state,
-                               GlobalHelpers::strToVariant(value).toJsonValue());
-        }
+        QJsonObject blockStates = jsonFromTable(blockStatesModel);
         if (!blockStates.isEmpty())
             block.insert(QStringLiteral("state"), blockStates);
         root.insert(QStringLiteral("block"), block);
@@ -101,14 +97,7 @@ QJsonObject LocationConditionDialog::toJson() const {
                      ui->fluidCombo->currentData(Qt::UserRole + 1).toString());
         if (!ui->fluidTagEdit->text().isEmpty())
             fluid.insert(QStringLiteral("tag"), ui->fluidTagEdit->text());
-        QJsonObject fluidStates;
-        for (auto row = 0; row < fluidStatesModel.rowCount(); ++row) {
-            QString state = fluidStatesModel.item(row, 0)->text();
-            auto    value =
-                fluidStatesModel.item(row, 1)->data(Qt::DisplayRole).toString();
-            fluidStates.insert(state,
-                               GlobalHelpers::strToVariant(value).toJsonValue());
-        }
+        QJsonObject fluidStates = jsonFromTable(fluidStatesModel);;
         if (!fluidStates.isEmpty())
             fluid.insert(QStringLiteral("state"), fluidStates);
         root.insert(QStringLiteral("fluid"), fluid);
@@ -184,6 +173,20 @@ void LocationConditionDialog::setupTableFromJson(QStandardItemModel &model,
             model.appendRow({ stateItem, valueItem });
         }
     }
+}
+
+QJsonObject LocationConditionDialog::jsonFromTable(
+    const QStandardItemModel &model) {
+    QJsonObject states;
+
+    for (auto row = 0; row < model.rowCount(); ++row) {
+        QString state = model.item(row, 0)->text();
+        auto    value =
+            model.item(row, 1)->data(Qt::DisplayRole).toString();
+        states.insert(state,
+                      GlobalHelpers::strToVariant(value).toJsonValue());
+    }
+    return states;
 }
 
 void LocationConditionDialog::onAddedBlockState() {

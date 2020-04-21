@@ -138,3 +138,47 @@ QString GlobalHelpers::variantToStr(const QVariant &vari) {
     else
         return vari.toString();
 }
+
+QVector<QString> GlobalHelpers::fileIDList(const QString &dirpath,
+                                           const QString &catDir,
+                                           const QString &nspace) {
+    QVector<QString> IDList;
+    QString          dataPath = dirpath + QStringLiteral("/data/");
+
+    auto appendIDToList = [&](const QString &nspace)->void {
+                              /*qDebug() << "appendIDToList"; */
+                              QString tagPath = dataPath + nspace + '/' +
+                                                catDir;
+                              QDir IDDir(tagPath);
+
+                              /*qDebug() << tagPath << IDDir.exists(); */
+
+                              if (IDDir.exists() && (!IDDir.isEmpty())) {
+                                  auto names =
+                                      IDDir.entryList(
+                                          QDir::Files | QDir::NoDotAndDotDot);
+                                  for (auto name : names) {
+                                      /*qDebug() << name; */
+                                      name = name.section('.', 0, 0);
+                                      IDList.push_back(nspace + ":" + name);
+                                  }
+                              }
+
+                              /*qDebug() << "end" << IDList; */
+                          };
+
+    if (nspace.isEmpty()) {
+        QDir dir(dataPath);
+        auto nspaceDirs = dir.entryList(
+            QDir::Dirs | QDir::NoDotAndDotDot);
+        /*qDebug() << nspaceDirs; */
+        for (auto nspaceDir : nspaceDirs) {
+            auto nspace = nspaceDir.section('.', 0, 0);
+            appendIDToList(nspace);
+        }
+    } else {
+        appendIDToList(nspace);
+    }
+    /*qDebug() << IDList; */
+    return IDList;
+}

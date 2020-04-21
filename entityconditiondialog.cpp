@@ -339,8 +339,8 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
 }
 
 void EntityConditionDialog::onAddedEntityEffect() {
-    if ((ui->effectAmpInput->getExactly() == 0)
-        | (ui->effectDuraInput->getExactly() == 0))
+    if ((ui->effectAmpInput->isCurrentlyUnset())
+        | (ui->effectDuraInput->isCurrentlyUnset()))
         return;
 
     QString effectText = ui->effectCombo->currentText();
@@ -400,7 +400,7 @@ void EntityConditionDialog::onAddedPlayerRecipe() {
 
 void EntityConditionDialog::onAddedPlayerStat() {
     if (ui->statEdit->text().isEmpty()
-        | (ui->statValueInput->getExactly() == 0))
+        | (ui->statValueInput->isCurrentlyUnset()))
         return;
 
     QStandardItem *typeItem =
@@ -444,7 +444,7 @@ void EntityConditionDialog::initEffectsPage() {
     QStandardItem *amplifierItem = new QStandardItem(tr("Amplifier"));
     QStandardItem *durationItem  = new QStandardItem(tr("Duration"));
     QStandardItem *ambientItem   = new QStandardItem(tr("Ambient"));
-    QStandardItem *visibleItem   = new QStandardItem(tr("Is visible"));
+    QStandardItem *visibleItem   = new QStandardItem(tr("Visible"));
 
     ExtendedDelegate *delegate = new ExtendedDelegate(this);
 

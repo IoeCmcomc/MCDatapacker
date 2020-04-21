@@ -468,7 +468,7 @@ void MainWindow::openFile(const QString &filepath, bool reload) {
             QGuiApplication::restoreOverrideCursor();
             #endif
 
-            emit fileOpened(QFileInfo(filepath).completeSuffix());
+            emit curFileChanged(filepath);
         }
         file.close();
     }
@@ -579,6 +579,7 @@ void MainWindow::openFolder() {
                             this->fileWatcher.addPath(curDir);
                         }
                         setCurrentFile("");
+                        emit curDirChanged(dir);
                     }
                 }
             }

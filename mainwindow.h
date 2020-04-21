@@ -54,7 +54,8 @@ protected:
     void changeEvent(QEvent* event) override;
 
 signals:
-    void fileOpened(QString fileExt);
+    void curFileChanged(const QString filepath);
+    void curDirChanged(const QString dirpath);
 
 private slots:
     void open();

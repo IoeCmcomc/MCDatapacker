@@ -6,6 +6,7 @@
 #include <QFrame>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
+#include <QFileSystemWatcher>
 
 namespace Ui {
     class MCRPredCondition;
@@ -22,28 +23,43 @@ public:
     bool getIsModular() const;
     void setIsModular(bool value);
 
+    QJsonObject toJson() const override;
+    void fromJson(const QJsonObject &value) override;
+
+    void setDepth(int value);
+
 protected slots:
     void blockStates_onAdded();
     void entityScores_onAdded();
     void nested_onAdded();
+    void setupRefCombo();
     void tableBonus_onAdded();
     void toolEnchant_onAdded();
     void onTypeChanged(const int &i);
+    void onCurDirChanged(const QString &path);
 
 private:
     Ui::MCRPredCondition *ui;
     bool isModular = true;
+    int depth      = 0;
     QStandardItemModel blocksModel;
     QStandardItemModel blockStatesModel;
     QStandardItemModel entityScoresModel;
     QStandardItemModel enchantmentsModel;
+    QStandardItemModel condRefsModel;
     QStandardItemModel tableBonusModel;
     QStandardItemModel toolEnchantModel;
     QVBoxLayout nestedCondLayout;
     QVBoxLayout invertedCondLayout;
-    QJsonObject damageSrc_entityProp;
-    QJsonObject matchTool_itemProp;
-    QJsonObject location_locatProp;
+    const QStringList condTypes =
+    { "block_state_property", "damage_source_properties", "entity_properties",
+      "entity_scores",        "inverted",                 "killed_by_player",
+      "location_check",       "alternative",              "match_tool",
+      "random_chance",        "reference",                "survives_explosion ",
+      "table_bonus",          "time_check",               "tool_enchantment",
+      "weather_check" };
+    const QStringList entityTargets = { "this", "killer", "killer_player" };
+    QFileSystemWatcher predRefWatcher;
 
     void initBlockStatesPage();
     void initEntityScoresPage();
@@ -52,6 +68,9 @@ private:
     void initRandChancePage();
     void initTableBonusPage();
     void initToolEnchantPage();
+
+    void addInvertCondition(QJsonObject &json) const;
+    void simplifyCondition(QVariantMap &condMap, int depth = 0) const;
 };
 
 #endif /* MCRPREDCONDITION_H */
