@@ -24,9 +24,14 @@ public:
     void setIsModular(bool value);
 
     QJsonObject toJson() const override;
-    void fromJson(const QJsonObject &value) override;
+    inline void fromJson(const QJsonObject &value) override {
+        fromJson(value, false);
+    };
+    void fromJson(const QJsonObject &root, bool redirected);
 
     void setDepth(int value);
+
+    void resetAll();
 
 protected slots:
     void blockStates_onAdded();
@@ -55,11 +60,14 @@ private:
     { "block_state_property", "damage_source_properties", "entity_properties",
       "entity_scores",        "inverted",                 "killed_by_player",
       "location_check",       "alternative",              "match_tool",
-      "random_chance",        "reference",                "survives_explosion ",
+      "random_chance",        "reference",                "survives_explosion",
       "table_bonus",          "time_check",               "tool_enchantment",
       "weather_check" };
     const QStringList entityTargets = { "this", "killer", "killer_player" };
     QFileSystemWatcher predRefWatcher;
+
+    void reset(int index);
+    void clearModelExceptHeaders(QStandardItemModel &model);
 
     void initBlockStatesPage();
     void initEntityScoresPage();

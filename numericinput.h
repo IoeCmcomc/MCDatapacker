@@ -47,6 +47,7 @@ public:
     void setGeneralMaximum(const int &max);
 
     bool isCurrentlyUnset() const;
+    void unset() const;
 
     void interpretText();
     void retranslate();

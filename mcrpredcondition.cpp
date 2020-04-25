@@ -267,7 +267,277 @@ QJsonObject MCRPredCondition::toJson() const {
     return root;
 }
 
-void MCRPredCondition::fromJson(const QJsonObject &value) {
+void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
+    if (!root.contains("condition"))
+        return;
+
+    auto valueMap = root.toVariantMap();
+    simplifyCondition(valueMap);
+    auto value = QJsonObject::fromVariantMap(valueMap);
+
+    QString condType = value["condition"].toString();
+    if (condType.startsWith("minecraft:"))
+        condType.remove(0, 10);
+
+    bool isRandChanceWithLoot = false;
+    if (condType.endsWith("random_chance_with_looting")) {
+        condType             = "random_chance";
+        isRandChanceWithLoot = true;
+    }
+
+    int condIndex = condTypes.indexOf(condType);
+    ui->conditionTypeCombo->setCurrentIndex(condIndex);
+    reset(condIndex);
+    switch (condIndex) {
+    case 0: { /*Block states */
+        if (value.contains("block"))
+            setupComboFrom(ui->blockState_blockCombo, QVariant::fromValue
+                               (MCRInvItem(value["block"].toString())));
+        if (value.contains("properties")) {
+            QJsonObject states = value["properties"].toObject();
+            LocationConditionDialog::setupTableFromJson(blockStatesModel,
+                                                        states);
+        }
+
+        break;
+    }
+
+    case 1: { /*Damage sources */
+        if (value.contains("predicate")) {
+            QJsonObject pred = value["predicate"].toObject();
+            ui->damageSrc_explosionCheck->setupFromJsonObject(pred,
+                                                              "is_explosion");
+            ui->damageSrc_projectileCheck->setupFromJsonObject(pred,
+                                                               "is_projectile");
+            ui->damageSrc_fireCheck->setupFromJsonObject(pred, "is_fire");
+            ui->damageSrc_lightningCheck->setupFromJsonObject(pred,
+                                                              "is_lightning");
+            ui->damageSrc_magicCheck->setupFromJsonObject(pred, "is_magic");
+            ui->damageSrc_starvationCheck->setupFromJsonObject(pred,
+                                                               "bypasses_magic");
+            ui->damageSrc_bypassArmorCheck->setupFromJsonObject(pred,
+                                                                "bypasses_invulnerability");
+
+            if (pred.contains("source_entity"))
+                ui->damageSrc_entityPropBtn->setData(
+                    pred["source_entity"].toObject());
+            if (pred.contains("direct_entity"))
+                ui->damageSrc_directPropBtn->setData(
+                    pred["direct_entity"].toObject());
+        }
+        break;
+    }
+
+    case 2: { /*Entity properites */
+        if (value.contains("entity"))
+            ui->entity_typeCombo->setCurrentIndex
+                (entityTargets.indexOf(value["entity"].toString()));
+
+        if (value.contains("predicate"))
+            ui->entity_propBtn->setData(value["predicate"].toObject());
+        break;
+    }
+
+    case 3: { /*Entity scores */
+        if (value.contains("entity"))
+            ui->entityScores_typeCombo->setCurrentIndex
+                (entityTargets.indexOf(value["entity"].toString()));
+        if (value.contains("scores")) {
+            QJsonObject scores = value["scores"].toObject();
+            for (auto objective : scores.keys()) {
+                QStandardItem *objectiveItem = new QStandardItem(objective);
+                objectiveItem->setToolTip(deletiveToolTip);
+                QStandardItem *valueItem = new QStandardItem();
+                valueItem->setData(scores[objective].toVariant(),
+                                   Qt::DisplayRole);
+                valueItem->setToolTip(deletiveToolTip);
+                entityScoresModel.appendRow({ objectiveItem, valueItem });
+            }
+        }
+        break;
+    }
+
+    case 4: { /*Inverted */
+        if (value.contains("term")) {
+            QJsonObject term = value["term"].toObject();
+            if (!term.contains("condition"))
+                return;
+
+            if (term["condition"].toString().endsWith("alternative")) {
+                fromJson(term, true);
+            } else {
+                MCRPredCondition *cond =
+                    ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
+                if (cond == nullptr) {
+                    cond = new MCRPredCondition(ui->nested_condAreaInner);
+                    cond->setMinimumHeight(300);
+                    invertedCondLayout.addWidget(cond, 0);
+                }
+                cond->fromJson(term);
+            }
+        }
+        break;
+    }
+
+    case 5: { /*Killed by player */
+        if (value.contains("inverse"))
+            ui->playerKill_invertedCheck->setChecked(value["inverse"].toBool());
+        break;
+    }
+
+    case 6: { /*Location */
+        if (value.contains("offsetX"))
+            ui->location_xOffset->setValue(value["offsetX"].toInt());
+        if (value.contains("offsetY"))
+            ui->location_yOffset->setValue(value["offsetY"].toInt());
+        if (value.contains("offsetZ"))
+            ui->location_zOffset->setValue(value["offsetZ"].toInt());
+        if (value.contains("predicate"))
+            ui->location_propBtn->setData(value["predicate"].toObject());
+        break;
+    }
+
+    case 7: { /*Nested conditions */
+        if (value.contains("terms")) {
+            QJsonArray terms            = value["terms"].toArray();
+            bool       areTermsInverted = true;
+            for (auto termRef : terms) {
+                QJsonObject term = termRef.toObject();
+                if (!(term.contains("condition")
+                      && term["condition"].toString().endsWith("inverted")))
+                    areTermsInverted = false;
+            }
+            qDebug() << "areTermsInverted" << areTermsInverted;
+
+            for (auto termRef : terms) {
+                QJsonObject term = termRef.toObject();
+
+                if (!term.contains("condition"))
+                    continue;
+                if (areTermsInverted) {
+                    auto sub = term["term"].toObject();
+                    if (!sub.isEmpty())
+                        term = sub;
+                }
+
+                MCRPredCondition *cond = new MCRPredCondition(
+                    ui->nested_condAreaInner);
+                cond->setMinimumHeight(300);
+                nestedCondLayout.addWidget(cond, 0);
+                cond->fromJson(term);
+            }
+
+            if (redirected) {
+                if (areTermsInverted) {
+                    ui->nested_andRadio->setChecked(true);
+                    ui->nested_invertedCheck->setChecked(false);
+                } else {
+                    ui->nested_orRadio->setChecked(true);
+                    ui->nested_invertedCheck->setChecked(true);
+                }
+            } else {
+                if (areTermsInverted) {
+                    ui->nested_andRadio->setChecked(true);
+                    ui->nested_invertedCheck->setChecked(true);
+                } else {
+                    ui->nested_orRadio->setChecked(true);
+                    ui->nested_invertedCheck->setChecked(false);
+                }
+            }
+        }
+        break;
+    }
+
+    case 8: { /*Match tool */
+        if (value.contains("predicate"))
+            ui->matchTool_propBtn->setData(value["predicate"].toObject());
+        break;
+    }
+
+    case 9: { /*Random chance (with looting) */
+        if (value.contains("chance"))
+            ui->randChance_spinBox->setValue(value["chance"].toDouble());
+        ui->randChance_lootingCheck->setChecked(isRandChanceWithLoot);
+        if (isRandChanceWithLoot && value.contains("looting_multiplier"))
+            ui->randChance_lootingInput->setValue(
+                value["looting_multiplier"].toDouble());
+        break;
+    }
+
+    case 10: {/*Reference */
+        if (value.contains("name"))
+            ui->ref_nameCombo->setCurrentText(value["name"].toString());
+        break;
+    }
+
+    case 11: {/*Survives Explosion */
+        break;
+    }
+
+    case 12: {/*Table bonus */
+        if (value.contains("enchantment"))
+            setupComboFrom(ui->tableBonus_enchantCombo,
+                           value["enchantment"].toString());
+        if (value.contains("chances")) {
+            QJsonArray chances = value["chances"].toArray();
+            for (auto chanceRef : chances) {
+                QStandardItem *chanceItem = new QStandardItem();
+                chanceItem->setData(chanceRef.toDouble(), Qt::DisplayRole);
+                chanceItem->setToolTip(deletiveToolTip);
+                tableBonusModel.appendRow(chanceItem);
+            }
+        }
+        break;
+    }
+
+    case 13: {/*Time */
+        if (value.contains("value"))
+            ui->time_valueInput->fromJson(value["value"]);
+        if (value.contains("period") && value["period"].toInt() > 0)
+            ui->time_periodSpinBox->setValue(value["period"].toInt());
+        break;
+    }
+
+    case 14: {/*Tool enchantment */
+        if (value.contains("enchantments")) {
+            QJsonArray enchantments = value["enchantments"].toArray();
+            for (auto enchantment : enchantments) {
+                auto enchantObj = enchantment.toObject();
+                if (enchantObj.isEmpty()) continue;
+                if (!enchantObj.contains(QStringLiteral("enchantment"))) {
+                    continue;
+                }
+                auto enchantId =
+                    enchantObj[QStringLiteral("enchantment")].toString();
+                if (!enchantId.contains(QStringLiteral(":")))
+                    enchantId = QStringLiteral("minecraft:") + enchantId;
+                auto indexes = enchantmentsModel.match(
+                    enchantmentsModel.index(0, 0), Qt::UserRole + 1, enchantId);
+                if (indexes.isEmpty()) continue;
+                QStandardItem *enchantItem = new QStandardItem();
+                enchantItem->setData(enchantId);
+                enchantItem->setText(indexes[0].data(Qt::DisplayRole).toString());
+                enchantItem->setEditable(false);
+                enchantItem->setToolTip(deletiveToolTip);
+                QStandardItem *levelsItem = new QStandardItem();
+                levelsItem->setData(enchantObj.value(QStringLiteral("levels")),
+                                    Qt::DisplayRole);
+                levelsItem->setToolTip(deletiveToolTip);
+                toolEnchantModel.appendRow({ enchantItem, levelsItem });
+            }
+        }
+        break;
+    }
+
+    case 15: {/*Weather */
+        ui->weather_rainingCheck->setupFromJsonObject(value, "raining");
+        ui->weather_thunderCheck->setupFromJsonObject(value, "thundering");
+        break;
+    }
+
+    default:
+        break;
+    }
 }
 
 void MCRPredCondition::onTypeChanged(const int &i) {
@@ -296,8 +566,142 @@ void MCRPredCondition::onCurDirChanged(const QString &path) {
     setupRefCombo();
 }
 
+void MCRPredCondition::reset(int index) {
+    switch (index) {
+    case 0: { /*Block states */
+        ui->blockState_blockCombo->setCurrentIndex(0);
+        clearModelExceptHeaders(blockStatesModel);
+        break;
+    }
+
+    case 1: { /*Damage sources */
+        ui->damageSrc_explosionCheck->unset();
+        ui->damageSrc_projectileCheck->unset();
+        ui->damageSrc_fireCheck->unset();
+        ui->damageSrc_lightningCheck->unset();
+        ui->damageSrc_magicCheck->unset();
+        ui->damageSrc_starvationCheck->unset();
+        ui->damageSrc_bypassArmorCheck->unset();
+
+        ui->damageSrc_entityPropBtn->reset();
+        ui->damageSrc_directPropBtn->reset();
+        break;
+    }
+
+    case 2: { /*Entity properites */
+        ui->entity_typeCombo->setCurrentIndex(0);
+        ui->entity_propBtn->reset();
+        break;
+    }
+
+    case 3: { /*Entity scores */
+        ui->entityScores_typeCombo->setCurrentIndex(0);
+        clearModelExceptHeaders(entityScoresModel);
+        break;
+    }
+
+    case 4: { /*Inverted */
+        auto *cond =
+            ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
+        if (cond != nullptr)
+            /*cond->deleteLater(); */
+            delete cond;
+        break;
+    }
+
+    case 5: { /*Killed by player */
+        ui->playerKill_invertedCheck->setChecked(false);
+        break;
+    }
+
+    case 6: { /*Location */
+        ui->location_xOffset->unset();
+        ui->location_yOffset->unset();
+        ui->location_zOffset->unset();
+
+        ui->location_propBtn->reset();
+        break;
+    }
+
+    case 7: { /*Nested conditions */
+        auto nestedCondWids =
+            ui->nested_condAreaInner->findChildren<MCRPredCondition*>(
+                QString(),
+                Qt::FindDirectChildrenOnly);
+        for (auto child : nestedCondWids) {
+            child->deleteLater();
+            /*delete child; */
+        }
+        break;
+    }
+
+    case 8: { /*Match tool */
+        ui->matchTool_propBtn->reset();
+        break;
+    }
+
+    case 9: { /*Random chance (with looting) */
+        ui->randChance_spinBox->setValue(0);
+        ui->randChance_lootingCheck->setChecked(false);
+        ui->randChance_lootingInput->setValue(1);
+        break;
+    }
+
+    case 10: {/*Reference */
+        ui->ref_nameCombo->setCurrentText("");
+        break;
+    }
+
+    case 11: {/*Survives Explosion */
+        break;
+    }
+
+    case 12: {/*Table bonus */
+        ui->tableBonus_enchantCombo->setCurrentIndex(0);
+        clearModelExceptHeaders(tableBonusModel);
+        break;
+    }
+
+    case 13: {/*Time */
+        ui->time_valueInput->unset();
+        ui->time_periodSpinBox->setValue(0);
+        break;
+    }
+
+    case 14: {/*Tool enchantment */
+        clearModelExceptHeaders(toolEnchantModel);
+        break;
+    }
+
+    case 15: {/*Weather */
+        ui->weather_rainingCheck->unset();
+        ui->weather_thunderCheck->unset();
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+void MCRPredCondition::clearModelExceptHeaders(QStandardItemModel &model) {
+    QVector<QStandardItem*> headers;
+
+    for (int i = 0; i < model.columnCount(); ++i) {
+        headers << model.takeHorizontalHeaderItem(i);
+    }
+    model.clear();
+    for (int i = 0; i < headers.count(); ++i)
+        model.setHorizontalHeaderItem(i, headers[i]);
+}
+
 void MCRPredCondition::setDepth(int value) {
     depth = value;
+}
+
+void MCRPredCondition::resetAll() {
+    for (int i = 0; i < ui->stackedWidget->count(); ++i)
+        reset(i);
 }
 
 void MCRPredCondition::blockStates_onAdded() {
@@ -399,10 +803,8 @@ void MCRPredCondition::initBlockStatesPage() {
     }
     ui->blockState_blockCombo->setModel(&blocksModel);
 
-    QStandardItem *stateItem = new QStandardItem("State");
-    stateItem->setToolTip("An state of the block.");
+    QStandardItem *stateItem  = new QStandardItem("State");
     QStandardItem *valuesItem = new QStandardItem("Value");
-    valuesItem->setToolTip("A value of the state.");
 
     initModelView(blockStatesModel, ui->blockState_listView,
                   { stateItem, valuesItem });
@@ -488,7 +890,7 @@ void MCRPredCondition::initToolEnchantPage() {
     levelsItem->setToolTip("The minimun and maximun levels of the enchantment.");
 
     auto *delegate = new ExtendedDelegate();
-    delegate->setExNumInputTypes(NumericInput::Range);
+    delegate->setExNumInputTypes(NumericInput::Exact | NumericInput::Range);
 
     initModelView(toolEnchantModel, ui->toolEnchant_listView,
                   { enchantItem, levelsItem }, delegate);

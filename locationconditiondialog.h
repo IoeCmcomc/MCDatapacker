@@ -40,7 +40,8 @@ private:
 
     void initBlockGroup();
     void initFluidGroup();
-    void setupTableFromJson(QStandardItemModel &model, const QJsonObject &json);
+    static void setupTableFromJson(QStandardItemModel &model,
+                                   const QJsonObject &json);
     static QJsonObject jsonFromTable(const QStandardItemModel &model);
 };
 

@@ -248,6 +248,12 @@ bool NumericInput::isCurrentlyUnset() const {
     }
 }
 
+void NumericInput::unset() const {
+    ui->spinBox->unset();
+    ui->minSpinBox->unset();
+    ui->maxSpinBox->unset();
+}
+
 void NumericInput::interpretText() {
     ui->spinBox->interpretText();
     ui->minSpinBox->interpretText();

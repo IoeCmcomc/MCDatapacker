@@ -43,7 +43,6 @@ void ExtendedDelegate::paint(QPainter *painter,
                                   ? QString::number(
                     obj.value(QStringLiteral("max")).toInt())
                                   : QStringLiteral("");
-                qDebug() << "delegate::paint" << min << max;
                 newOption.text = QString("%1..%2").arg(min).arg(max);
             }
         }
@@ -97,7 +96,7 @@ void ExtendedDelegate::setModelData(QWidget *editor,
 
 void ExtendedDelegate::updateEditorGeometry(QWidget *editor,
                                             const QStyleOptionViewItem &option,
-                                            const QModelIndex &index)
+                                            [[maybe_unused]] const QModelIndex &index)
 const {
     editor->setGeometry(option.rect);
 }

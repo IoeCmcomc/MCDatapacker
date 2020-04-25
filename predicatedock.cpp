@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 
+#include <QDebug>
 #include <QJsonDocument>
 
 PredicateDock::PredicateDock(QWidget *parent) :
@@ -12,6 +13,8 @@ PredicateDock::PredicateDock(QWidget *parent) :
 
     ui->condition->setIsModular(false);
 
+    connect(ui->readBtn, &QPushButton::clicked,
+            this, &PredicateDock::onReadBtn);
     connect(ui->writeBtn, &QPushButton::clicked,
             this, &PredicateDock::onWriteBtn);
 }
@@ -21,6 +24,18 @@ PredicateDock::~PredicateDock() {
 }
 
 void PredicateDock::onReadBtn() {
+    qDebug() << "onReadBtn" << objectName();
+    QString input =
+        qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+    QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
+
+    if (json_doc.isNull() || (!json_doc.isObject()))
+        return;
+
+    QJsonObject root = json_doc.object();
+    if (!root.isEmpty()) {
+        ui->condition->fromJson(root);
+    }
 }
 
 void PredicateDock::onWriteBtn() {

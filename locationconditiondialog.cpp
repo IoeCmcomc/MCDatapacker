@@ -28,18 +28,6 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
     initComboModelView("feature", featuresModel, ui->featureCombo);
 
-/*
-      featuresModel.appendRow(new QStandardItem(tr("(not selected)")));
-      auto info = MainWindow::readMCRInfo(QStringLiteral("feature"));
-      for (auto key : info.keys()) {
-          QStandardItem *item = new QStandardItem();
-          item->setText(info.value(key).toString());
-          item->setData(key);
-          featuresModel.appendRow(item);
-      }
-      ui->featureCombo->setModel(&featuresModel);
- */
-
     initBlockGroup();
     initFluidGroup();
 
@@ -130,8 +118,8 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("block"))) {
         QJsonObject block = value[QStringLiteral("block")].toObject();
         if (block.contains(QStringLiteral("block"))) {
-            setupComboFrom(ui->blockCombo,
-                           block[QStringLiteral("block")].toVariant());
+            auto invItem(block[QStringLiteral("block")].toString());
+            setupComboFrom(ui->blockCombo, QVariant::fromValue(invItem));
             if (block.contains(QStringLiteral("tag")))
                 ui->blockTagEdit->setText(block[QStringLiteral(
                                                     "tag")].toString());
@@ -139,7 +127,10 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
                 ui->blockNBTEdit->setText(block[QStringLiteral(
                                                     "nbt")].toString());
 
-            setupTableFromJson(blockStatesModel, block);
+            if (block.contains(QStringLiteral("state"))) {
+                QJsonObject state = block[QStringLiteral("state")].toObject();
+                setupTableFromJson(blockStatesModel, state);
+            }
         }
     }
 
@@ -147,31 +138,33 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("fluid"))) {
         QJsonObject fluid = value[QStringLiteral("fluid")].toObject();
         if (fluid.contains(QStringLiteral("fluid"))) {
-            setupComboFrom(ui->blockCombo,
-                           fluid[QStringLiteral("fluid")].toVariant());
+            auto invItem(fluid[QStringLiteral("fluid")].toString());
+            setupComboFrom(ui->fluidCombo, QVariant::fromValue(invItem));
             if (fluid.contains(QStringLiteral("tag")))
                 ui->blockTagEdit->setText(fluid[QStringLiteral(
                                                     "tag")].toString());
 
-            setupTableFromJson(blockStatesModel, fluid);
+            if (fluid.contains(QStringLiteral("state"))) {
+                QJsonObject state = fluid[QStringLiteral("state")].toObject();
+                setupTableFromJson(fluidStatesModel, state);
+            }
         }
     }
 }
 
 void LocationConditionDialog::setupTableFromJson(QStandardItemModel &model,
                                                  const QJsonObject &json) {
-    if (json.contains(QStringLiteral("state"))) {
-        QJsonObject state = json[QStringLiteral("state")].toObject();
-        for (auto key : state.keys()) {
-            QStandardItem *stateItem = new QStandardItem();
-            stateItem->setText(key);
-            stateItem->setToolTip(deletiveToolTip);
-            QStandardItem *valueItem = new QStandardItem();
-            valueItem->setText(
-                GlobalHelpers::variantToStr(state[key].toVariant()));
-            valueItem->setToolTip(deletiveToolTip);
-            model.appendRow({ stateItem, valueItem });
-        }
+    const QString deletiveToolTip = tr("Right click this row to delete.");
+
+    for (auto key : json.keys()) {
+        QStandardItem *stateItem = new QStandardItem();
+        stateItem->setText(key);
+        stateItem->setToolTip(deletiveToolTip);
+        QStandardItem *valueItem = new QStandardItem();
+        valueItem->setText(
+            GlobalHelpers::variantToStr(json[key].toVariant()));
+        valueItem->setToolTip(deletiveToolTip);
+        model.appendRow({ stateItem, valueItem });
     }
 }
 

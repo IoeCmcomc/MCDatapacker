@@ -33,9 +33,11 @@ public:
     QJsonObject getData() const;
     void setData(const QJsonObject &value);
 
+public slots:
+    void reset();
+
 protected slots:
     void onClicked();
-    void onSecondaryClicked();
 
 private:
     Ui::DialogDataButton *ui;

@@ -10,8 +10,10 @@ class TrueFalseBox : public QCheckBox
 public:
     TrueFalseBox(QWidget *parent = nullptr);
 
+    void unset();
+
     void insertToJsonObject(QJsonObject &obj, const QString &key);
-    void setupFromJsonObject(QJsonObject &obj, const QString &key);
+    void setupFromJsonObject(const QJsonObject &obj, const QString &key);
 
 protected:
     void nextCheckState() override;

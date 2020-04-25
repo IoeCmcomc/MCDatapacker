@@ -18,7 +18,8 @@ public:
     virtual void fromJson(const QJsonObject &value);
 
 protected:
-    const QString deletiveToolTip = "Right click this row to delete.";
+    const QString deletiveToolTip = QT_TRANSLATE_NOOP("toolTip",
+                                                      "Right click this row to delete.");
     ViewEventFilter viewFilter;
 
     virtual void initModelView(QStandardItemModel &model, QTableView *tableView,

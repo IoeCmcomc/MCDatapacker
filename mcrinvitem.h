@@ -13,6 +13,9 @@ public:
     MCRInvItem(QString id);
     MCRInvItem(const MCRInvItem &other);
     ~MCRInvItem();
+
+    void init();
+
     MCRInvItem &operator=(const MCRInvItem &other);
     bool operator==(const MCRInvItem &other);
     bool operator==(const MCRInvItem &other) const;
@@ -58,9 +61,10 @@ private:
 };
 
 Q_DECLARE_METATYPE(MCRInvItem);
-Q_DECLARE_METATYPE(MCRInvItem*);
+Q_DECLARE_OPAQUE_POINTER(MCRInvItem*)
+/*Q_DECLARE_METATYPE(MCRInvItem*); */
 
-QDataStream &operator<<(QDataStream &out, const MCRInvItem &obj);
+QDataStream & operator<<(QDataStream & out, const MCRInvItem &obj);
 QDataStream &operator>>(QDataStream &in, MCRInvItem &obj);
 
 QDebug operator<<(QDebug debug, const MCRInvItem &item);

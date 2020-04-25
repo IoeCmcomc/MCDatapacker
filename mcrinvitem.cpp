@@ -9,8 +9,7 @@
 
 MCRInvItem::MCRInvItem(QString id) {
 /*    qDebug() << "Calling normal constructor" << this; */
-    qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
-
+    init();
     setEmpty(id.isEmpty());
     if (!isEmpty()) {
         setNamespacedID(id);
@@ -19,14 +18,13 @@ MCRInvItem::MCRInvItem(QString id) {
 
 MCRInvItem::MCRInvItem() {
     /*qDebug() << "Calling void constructor" << this; */
-    qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
+    init();
     setEmpty(true);
 }
 
 MCRInvItem::MCRInvItem(const MCRInvItem &other) {
 /*    qDebug() << "Calling copy constructor" << this; */
-    qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
-
+    init();
     setEmpty(other.isEmpty());
     if (!isEmpty()) {
         setNamespacedID(other.getNamespacedID());
@@ -36,6 +34,14 @@ MCRInvItem::MCRInvItem(const MCRInvItem &other) {
 
 MCRInvItem::~MCRInvItem() {
     /*qDebug() << this << "is going to be deleted."; */
+}
+
+void MCRInvItem::init() {
+    qRegisterMetaType<MCRInvItem>();
+    if (!QMetaType::hasRegisteredDebugStreamOperator<MCRInvItem>())
+        qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
+    if (!QMetaType::hasRegisteredComparators<MCRInvItem>())
+        QMetaType::registerComparators<MCRInvItem>();
 }
 
 void MCRInvItem::setupItem(QString id) {

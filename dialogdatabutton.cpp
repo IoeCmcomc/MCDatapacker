@@ -14,7 +14,7 @@ DialogDataButton::DialogDataButton(QWidget *parent) :
     connect(ui->button, &QPushButton::clicked,
             this, &DialogDataButton::onClicked);
     connect(ui->secondButton, &QToolButton::clicked,
-            this, &DialogDataButton::onSecondaryClicked);
+            this, &DialogDataButton::reset);
     checkSecondary();
 }
 
@@ -56,7 +56,7 @@ void DialogDataButton::onClicked() {
     }
 }
 
-void DialogDataButton::onSecondaryClicked() {
+void DialogDataButton::reset() {
     setData(QJsonObject());
 }
 
@@ -65,12 +65,12 @@ void DialogDataButton::checkSecondary() {
 }
 
 QJsonObject DialogDataButton::getData() const {
-    qDebug() << "getData" << objectName() << data;
+    /*qDebug() << "getData" << objectName() << data; */
     return data;
 }
 
 void DialogDataButton::setData(const QJsonObject &value) {
-    qDebug() << "setData" << objectName() << value;
+    /*qDebug() << "setData" << objectName() << value; */
     data = value;
     checkSecondary();
 }
