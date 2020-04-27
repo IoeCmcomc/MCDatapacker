@@ -1,5 +1,5 @@
 #include "numericinput.h"
-#include "ui_extendednumericinput.h"
+#include "ui_numericinput.h"
 
 #include <QJsonObject>
 #include <QDebug>
@@ -8,7 +8,7 @@
 
 NumericInput::NumericInput(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::ExtendedNumericInput) {
+    ui(new Ui::NumericInput) {
     ui->setupUi(this);
 
     setTypes(Exact | Range | Binomial);

@@ -6,7 +6,7 @@
 #include <QJsonValue>
 
 namespace Ui {
-    class ExtendedNumericInput;
+    class NumericInput;
 }
 
 class NumericInput : public QFrame
@@ -63,7 +63,7 @@ private slots:
     void onMinMaxEdited();
 
 private:
-    Ui::ExtendedNumericInput *ui;
+    Ui::NumericInput *ui;
     QMenu typeMenu;
     Types types;
     Type currentType;
