@@ -24,6 +24,9 @@ public:
     void readRecipe();
     void retranslate();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void onRecipeTabChanged(int index);
     /*void onRecipeChanged(); // Unused */

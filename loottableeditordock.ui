@@ -107,7 +107,7 @@
        </widget>
       </item>
       <item row="0" column="1" colspan="2">
-       <widget class="QListView" name="pollListView">
+       <widget class="QListView" name="poolListView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -135,9 +135,9 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QToolButton" name="addPollButton">
+       <widget class="QToolButton" name="addPoolButton">
         <property name="toolTip">
-         <string>Add poll</string>
+         <string>Add pool</string>
         </property>
         <property name="text">
          <string>+</string>
@@ -147,7 +147,7 @@
      </layout>
     </item>
     <item row="2" column="0" colspan="4">
-     <widget class="QTabWidget" name="pollEditor">
+     <widget class="QTabWidget" name="poolEditor">
       <property name="tabPosition">
        <enum>QTabWidget::South</enum>
       </property>
@@ -293,7 +293,7 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">NumericInput.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

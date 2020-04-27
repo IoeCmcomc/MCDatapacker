@@ -25,8 +25,7 @@ public:
     void fromJson(const QJsonObject &value) override;
 
 protected slots:
-    void onAddedBlockState();
-    void onAddedFluidState();
+    void onAddedState();
 
 private:
     Ui::LocationConditionDialog *ui;
@@ -34,15 +33,14 @@ private:
     QStandardItemModel dimensionsModel;
     QStandardItemModel featuresModel;
     QStandardItemModel blocksModel;
-    QStandardItemModel blockStatesModel;
     QStandardItemModel fluidsModel;
-    QStandardItemModel fluidStatesModel;
 
     void initBlockGroup();
     void initFluidGroup();
-    static void setupTableFromJson(QStandardItemModel &model,
-                                   const QJsonObject &json);
-    static QJsonObject jsonFromTable(const QStandardItemModel &model);
+
+    static void setupStateTableFromJson(QTableWidget *table,
+                                        const QJsonObject &json);
+    static QJsonObject jsonFromStateTable(const QTableWidget *table);
 };
 
 #endif /* LOCATIONCONDITIONDIALOG_H */

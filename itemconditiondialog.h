@@ -30,12 +30,9 @@ private:
     QStandardItemModel itemsModel;
     QStandardItemModel potionsModel;
     QStandardItemModel enchantmentsModel;
-    QStandardItemModel itemEnchantModel;
-    QStandardItemModel storedEnchantModel;
 
-    using BaseCondition::initModelView;
-    void initModelView(QStandardItemModel &model, QTableView *tableView);
-    void tableFromJson(const QJsonArray &jsonArr, QStandardItemModel &model);
+    void initTable(QTableWidget *table);
+    void tableFromJson(const QJsonArray &jsonArr, QTableWidget *table);
 };
 
 #endif /* ITEMCONDITIONDIALOG_H */

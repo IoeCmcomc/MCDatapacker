@@ -35,12 +35,13 @@ void BaseCondition::initComboModelView(const QString &infoType,
     if (optinal)
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
-                                              "(not selected)")));
+                                              "(not set)")));
     auto info = MainWindow::readMCRInfo(infoType);
     for (auto key : info.keys()) {
         QStandardItem *item = new QStandardItem();
-        if (info.value(key).toMap().contains("name"))
-            item->setText(info.value(key).toMap()["name"].toString());
+        if (info.value(key).toMap().contains(QStringLiteral("name")))
+            item->setText(info.value(key).toMap()[QStringLiteral(
+                                                      "name")].toString());
         else if (info.value(key).canConvert(QVariant::String)
                  && !info.value(key).isNull())
             item->setText(info.value(key).toString());
@@ -49,11 +50,10 @@ void BaseCondition::initComboModelView(const QString &infoType,
         auto iconPath =
             QString(":minecraft/texture/%1/%2.png").arg(infoType, key);
         auto icon = QIcon(iconPath);
-        /*qDebug() << iconPath << icon; */
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
-        if (!key.contains(":"))
-            key = "minecraft:" + key;
+        if (!key.contains(QStringLiteral(":")))
+            key = QStringLiteral("minecraft:") + key;
         item->setData(key);
         model.appendRow(item);
     }
@@ -70,6 +70,17 @@ void BaseCondition::setupComboFrom(QComboBox *combo, const QVariant &vari,
             return;
         }
     }
+    combo->setCurrentIndex(0);
 }
 
-
+void BaseCondition::appendRowToTableWidget(QTableWidget *table,
+                                           std::initializer_list<QTableWidgetItem *> items)
+{
+    table->insertRow(table->rowCount());
+    int       i   = 0;
+    const int row = table->rowCount() - 1;
+    for (auto item : items) {
+        table->setItem(row, i, item);
+        ++i;
+    }
+}

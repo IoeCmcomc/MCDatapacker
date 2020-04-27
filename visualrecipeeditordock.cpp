@@ -24,16 +24,12 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     ui->outputSlot->setAcceptTag(false);
     ui->outputSlot->setAcceptMultiItems(false);
 
-    this->craftingSlots = QVector<MCRInvSlot*>({ ui->craftingSlot_1,
-                                                 ui->craftingSlot_2,
-                                                 ui->craftingSlot_3,
-                                                 ui->craftingSlot_4,
-                                                 ui->craftingSlot_5,
-                                                 ui->craftingSlot_6,
-                                                 ui->craftingSlot_7,
-                                                 ui->craftingSlot_8,
-                                                 ui->craftingSlot_9
-                                               });
+    this->craftingSlots =
+        QVector<MCRInvSlot*>({ ui->craftingSlot_1, ui->craftingSlot_2,
+                               ui->craftingSlot_3, ui->craftingSlot_4,
+                               ui->craftingSlot_5, ui->craftingSlot_6,
+                               ui->craftingSlot_7, ui->craftingSlot_8,
+                               ui->craftingSlot_9 });
 
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this,
@@ -80,6 +76,12 @@ void VisualRecipeEditorDock::retranslate() {
     ui->customTabBar->setTabText(0, tr("Crafting"));
     ui->customTabBar->setTabText(1, tr("Smelting"));
     ui->customTabBar->setTabText(2, tr("Stonecutting"));
+}
+
+void VisualRecipeEditorDock::changeEvent(QEvent *event) {
+    QDockWidget::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange)
+        retranslate();
 }
 
 void VisualRecipeEditorDock::onRecipeTabChanged(int index) {

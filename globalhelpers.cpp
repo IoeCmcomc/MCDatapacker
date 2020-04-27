@@ -18,7 +18,7 @@ MainWindow::MCRFileType GlobalHelpers::toMCRFileType(const QString &dirpath,
     QFileInfo     info     = QFileInfo(filepath);
     const QString jsonExts = "json mcmeta";
 
-    if (info.completeSuffix() == "mcfunction") {
+    if (info.suffix() == "mcfunction") {
         return MainWindow::Function;
     } else if (info.completeSuffix() == "nbt") {
         return MainWindow::Structure;

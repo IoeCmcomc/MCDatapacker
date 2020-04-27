@@ -21,23 +21,23 @@ public:
     void writeJson();
 
 protected slots:
-    void onAddPoll();
-    void onDeletePoll();
-    void onPollSelectionChanged();
-    void checkPolls();
+    void onAddPool();
+    void onDeletePool();
+    void onPoolSelectionChanged();
+    void checkPools();
 
 private:
     Ui::LootTableEditorDock *ui;
     QStandardItemModel model;
-    QModelIndex curPollIndex;
-    bool pollDeleted = false;
+    QModelIndex curPoolIndex;
+    bool poolDeleted = false;
     QModelIndex indexBeforeDelete;
 
 
-    void clearPollEditor();
-    void getSelectedPoll();
-    QJsonObject writePollJson();
-    void readPollJson(const QJsonObject &root);
+    void clearPoolEditor();
+    void getSelectedPool();
+    QJsonObject writePoolJson();
+    void readPoolJson(const QJsonObject &root);
 };
 
 #endif /* LOOTTABLEEDITORDOCK_H */

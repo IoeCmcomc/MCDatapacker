@@ -46,8 +46,8 @@ public:
     static QMap<QString, QVariant> &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
     void setCurrentFile(const QString &filepath);
-    static QMap<QString, QVariant> readMCRInfo(const QString &type = "block",
-                                               const int depth     = 0);
+    static QVariantMap readMCRInfo(const QString &type = "block",
+                                   const int depth     = 0);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -75,7 +75,7 @@ private:
 
     QString curFile;
     static QString curDir;
-    static QMap<QString, QMap<QString, QVariant> > MCRInfoMaps;
+    static QMap<QString, QVariantMap> MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
     QLocale curLocale;
     QFileSystemWatcher fileWatcher;

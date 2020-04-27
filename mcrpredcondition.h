@@ -33,6 +33,9 @@ public:
 
     void resetAll();
 
+protected:
+    void changeEvent(QEvent *) override;
+
 protected slots:
     void blockStates_onAdded();
     void entityScores_onAdded();
@@ -48,12 +51,9 @@ private:
     bool isModular = true;
     int depth      = 0;
     QStandardItemModel blocksModel;
-    QStandardItemModel blockStatesModel;
-    QStandardItemModel entityScoresModel;
     QStandardItemModel enchantmentsModel;
     QStandardItemModel condRefsModel;
     QStandardItemModel tableBonusModel;
-    QStandardItemModel toolEnchantModel;
     QVBoxLayout nestedCondLayout;
     QVBoxLayout invertedCondLayout;
     const QStringList condTypes =

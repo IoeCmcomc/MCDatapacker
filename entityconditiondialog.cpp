@@ -28,17 +28,12 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     ui->yDistanceInput->setGeneralMinimum(-999999999);
     ui->zDistanceInput->setGeneralMinimum(-999999999);
 
-    initComboModelView(QStringLiteral("entity"),
-                       entityModel,
+    initComboModelView(QStringLiteral("entity"), entityModel,
                        ui->entityTypeCombo);
-    initComboModelView(QStringLiteral("effect"),
-                       effectModel,
-                       ui->effectCombo,
-                       false);
-    initComboModelView(QStringLiteral("stat_type"),
-                       statTypeModel,
-                       ui->statTypeCombo,
-                       false);
+    initComboModelView(QStringLiteral("effect"), effectModel,
+                       ui->effectCombo, false);
+    initComboModelView(QStringLiteral("stat_type"), statTypeModel,
+                       ui->statTypeCombo, false);
 
     ui->headPropBtn->setDialogType(DDBType::ItemCond);
     ui->chestPropBtn->setDialogType(DDBType::ItemCond);
@@ -55,8 +50,7 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
 
     connect(ui->entityTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
-            this,
-            &EntityConditionDialog::onEntityTypeChanged);
+            this, &EntityConditionDialog::onEntityTypeChanged);
 }
 
 EntityConditionDialog::~EntityConditionDialog() {
@@ -265,24 +259,19 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
             effectItem->setData(effectID);
             effectItem->setText(indexes[0].data(Qt::DisplayRole).toString());
             effectItem->setEditable(false);
-            effectItem->setToolTip(deletiveToolTip);
             QJsonObject    effect        = effects[effectID].toObject();
             QStandardItem *amplifierItem = new QStandardItem();
             amplifierItem->setData(effect["amplifier"].toVariant(),
                                    Qt::DisplayRole);
-            amplifierItem->setToolTip(deletiveToolTip);
             QStandardItem *durationItem = new QStandardItem();
             durationItem->setData(effect["duration"].toVariant(),
                                   Qt::DisplayRole);
-            durationItem->setToolTip(deletiveToolTip);
             QStandardItem *ambientItem = new QStandardItem();
             ambientItem->setData(effect["ambient"].toBool(),
                                  Qt::DisplayRole);
-            ambientItem->setToolTip(deletiveToolTip);
             QStandardItem *visibleItem = new QStandardItem();
             visibleItem->setData(effect["visible"].toBool(),
                                  Qt::DisplayRole);
-            visibleItem->setToolTip(deletiveToolTip);
 
             entityEffectModel.appendRow({ effectItem, amplifierItem,
                                           durationItem,
@@ -323,14 +312,11 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                 typeItem->setData(statType);
                 typeItem->setText(statType);
                 typeItem->setEditable(false);
-                typeItem->setToolTip(deletiveToolTip);
                 QStandardItem *statItem = new QStandardItem();
                 statItem->setText(statObj[QStringLiteral("stat")].toString());
-                statItem->setToolTip(deletiveToolTip);
                 QStandardItem *valueItem = new QStandardItem();
                 valueItem->setData(statObj.value(QStringLiteral("value")),
                                    Qt::DisplayRole);
-                valueItem->setToolTip(deletiveToolTip);
 
                 playerStatModel.appendRow({ typeItem, statItem, valueItem });
             }
@@ -350,19 +336,14 @@ void EntityConditionDialog::onAddedEntityEffect() {
     QStandardItem *effectItem = new QStandardItem(effectText);
     effectItem->setData(ui->effectCombo->currentData(Qt::UserRole + 1));
     effectItem->setEditable(false);
-    effectItem->setToolTip(deletiveToolTip);
     QStandardItem *amplifierItem = new QStandardItem();
     amplifierItem->setData(ui->effectAmpInput->toJson(), Qt::DisplayRole);
-    amplifierItem->setToolTip(deletiveToolTip);
     QStandardItem *durationItem = new QStandardItem();
     durationItem->setData(ui->effectDuraInput->toJson(), Qt::DisplayRole);
-    durationItem->setToolTip(deletiveToolTip);
     QStandardItem *ambientItem = new QStandardItem();
     ambientItem->setData(ui->effectAmbientCheck->isChecked(), Qt::DisplayRole);
-    ambientItem->setToolTip(deletiveToolTip);
     QStandardItem *visibleItem = new QStandardItem();
     visibleItem->setData(ui->effectVisibleCheck->isChecked(), Qt::DisplayRole);
-    visibleItem->setToolTip(deletiveToolTip);
 
     entityEffectModel.appendRow({ effectItem, amplifierItem, durationItem,
                                   ambientItem, visibleItem });
@@ -374,11 +355,9 @@ void EntityConditionDialog::onAddedPlayerAdv() {
     if (!playerAdvanmModel.findItems(advText).isEmpty())
         return;
 
-    QStandardItem *advItem = new QStandardItem(advText);
-    advItem->setToolTip(deletiveToolTip);
+    QStandardItem *advItem  = new QStandardItem(advText);
     QStandardItem *boolItem = new QStandardItem();
     boolItem->setData(ui->advanmCheck->isChecked(), Qt::DisplayRole);
-    boolItem->setToolTip(deletiveToolTip);
 
     playerAdvanmModel.appendRow({ advItem, boolItem });
 }
@@ -390,10 +369,8 @@ void EntityConditionDialog::onAddedPlayerRecipe() {
         return;
 
     QStandardItem *recipeItem = new QStandardItem(recipeText);
-    recipeItem->setToolTip(deletiveToolTip);
-    QStandardItem *boolItem = new QStandardItem();
+    QStandardItem *boolItem   = new QStandardItem();
     boolItem->setData(ui->recipeCheck->isChecked(), Qt::DisplayRole);
-    boolItem->setToolTip(deletiveToolTip);
 
     playerRecipeModel.appendRow({ recipeItem, boolItem });
 }
@@ -407,13 +384,10 @@ void EntityConditionDialog::onAddedPlayerStat() {
         new QStandardItem(ui->statTypeCombo->currentText());
     typeItem->setData(ui->statTypeCombo->currentData(Qt::UserRole + 1));
     typeItem->setEditable(false);
-    typeItem->setToolTip(deletiveToolTip);
     QStandardItem *statItem = new QStandardItem();
     statItem->setText(ui->statEdit->text());
-    statItem->setToolTip(deletiveToolTip);
     QStandardItem *valueItem = new QStandardItem();
     valueItem->setData(ui->statValueInput->toJson(), Qt::DisplayRole);
-    valueItem->setToolTip(deletiveToolTip);
 
     playerStatModel.appendRow({ typeItem, statItem, valueItem });
 }
@@ -465,7 +439,7 @@ void EntityConditionDialog::initEffectsPage() {
 
 void EntityConditionDialog::initPlayerAdv() {
     QStandardItem *advItem     = new QStandardItem(tr("Advancement"));
-    QStandardItem *grantedItem = new QStandardItem(tr("Is granted"));
+    QStandardItem *grantedItem = new QStandardItem(tr("Granted"));
 
     initModelView(playerAdvanmModel, ui->advanmTableView,
                   { advItem, grantedItem });
@@ -476,7 +450,7 @@ void EntityConditionDialog::initPlayerAdv() {
 
 void EntityConditionDialog::initPlayerRecipe() {
     QStandardItem *recipeItem  = new QStandardItem(tr("Recipe"));
-    QStandardItem *grantedItem = new QStandardItem(tr("Is granted"));
+    QStandardItem *grantedItem = new QStandardItem(tr("Granted"));
 
     initModelView(playerRecipeModel, ui->recipeTableView,
                   { recipeItem, grantedItem });
@@ -507,10 +481,8 @@ void EntityConditionDialog::setupGrantedTableFromJson(const QJsonObject &json,
 {
     for (auto name : json.keys()) {
         QStandardItem *nameItem = new QStandardItem(name);
-        nameItem->setToolTip(deletiveToolTip);
         QStandardItem *boolItem = new QStandardItem();
         boolItem->setData(json[name].toBool());
-        boolItem->setToolTip(deletiveToolTip);
 
         model.appendRow({ nameItem, boolItem });
     }

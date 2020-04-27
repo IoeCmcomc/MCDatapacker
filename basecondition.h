@@ -7,6 +7,7 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QComboBox>
+#include <QTableWidget>
 #include <QDebug>
 
 class BaseCondition
@@ -30,6 +31,9 @@ protected:
                                     bool optional = true);
     virtual void setupComboFrom(QComboBox *combo, const QVariant &vari,
                                 int role = Qt:: UserRole + 1);
+
+    static void appendRowToTableWidget(QTableWidget *table,
+                                       std::initializer_list<QTableWidgetItem *> items);
 };
 
 #endif /* BASECONDITION_H */

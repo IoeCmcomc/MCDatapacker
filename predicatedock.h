@@ -15,6 +15,9 @@ public:
     explicit PredicateDock(QWidget *parent = nullptr);
     ~PredicateDock();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 protected slots:
     void onReadBtn();
     void onWriteBtn();

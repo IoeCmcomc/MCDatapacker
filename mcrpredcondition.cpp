@@ -27,7 +27,7 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
             this, &MCRPredCondition::onTypeChanged);
     MainWindow *mainWin;
     for (auto wid : qApp->topLevelWidgets()) {
-        if (wid->objectName() == "MainWindow") {
+        if (wid->objectName() == QStringLiteral("MainWindow")) {
             mainWin = qobject_cast<MainWindow*>(wid);
             break;
         }
@@ -73,8 +73,7 @@ void MCRPredCondition::setIsModular(bool value) {
 QJsonObject MCRPredCondition::toJson() const {
     QJsonObject root;
 
-    root.insert("condition",
-                "minecraft:" +
+    root.insert("condition", "minecraft:" +
                 condTypes[ui->conditionTypeCombo->currentIndex()]);
 
     switch (ui->conditionTypeCombo->currentIndex()) {
@@ -84,8 +83,8 @@ QJsonObject MCRPredCondition::toJson() const {
                 Qt::UserRole + 1).value<MCRInvItem>();
             root.insert("block", invItem.getNamespacedID());
         }
-        QJsonObject states = LocationConditionDialog::jsonFromTable(
-            blockStatesModel);
+        QJsonObject states = LocationConditionDialog::jsonFromStateTable(
+            ui->blockState_table);
         if (!states.isEmpty())
             root.insert("properties", states);
         break;
@@ -127,9 +126,9 @@ QJsonObject MCRPredCondition::toJson() const {
         root.insert("entity",
                     entityTargets[ui->entityScores_typeCombo->currentIndex()]);
         QJsonObject scores;
-        for (auto row = 0; row < entityScoresModel.rowCount(); ++row) {
-            auto objective = entityScoresModel.item(row, 0)->text();
-            auto value     = entityScoresModel.item(row, 1)->
+        for (auto row = 0; row < ui->entityScores_table->rowCount(); ++row) {
+            auto objective = ui->entityScores_table->item(row, 0)->text();
+            auto value     = ui->entityScores_table->item(row, 1)->
                              data(Qt::DisplayRole).toJsonValue();
             scores.insert(objective, value);
         }
@@ -242,15 +241,16 @@ QJsonObject MCRPredCondition::toJson() const {
 
     case 14: {/*Tool enchantment */
         QJsonArray enchantments;
-        for (int i = 0; i < toolEnchantModel.rowCount(); ++i) {
+        for (int i = 0; i < ui->toolEnchant_table->rowCount(); ++i) {
             auto id =
-                toolEnchantModel.item(i, 0)->data(Qt::UserRole + 1).toString();
-            auto levels = toolEnchantModel.item(i, 1)->
+                ui->toolEnchant_table->item(i,
+                                            0)->data(Qt::UserRole +
+                                                     1).toString();
+            auto levels = ui->toolEnchant_table->item(i, 1)->
                           data(Qt::DisplayRole).toJsonValue();
-            enchantments.push_back(QJsonObject({ { QStringLiteral("enchantment"),
-                                                   id },
-                                                   { QStringLiteral("levels"),
-                                                     levels } }));
+            enchantments.push_back(
+                QJsonObject({ { QStringLiteral("enchantment"), id },
+                                { QStringLiteral("levels"), levels } }));
         }
         if (!enchantments.isEmpty())
             root.insert("enchantments", enchantments);
@@ -295,8 +295,9 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                                (MCRInvItem(value["block"].toString())));
         if (value.contains("properties")) {
             QJsonObject states = value["properties"].toObject();
-            LocationConditionDialog::setupTableFromJson(blockStatesModel,
-                                                        states);
+            LocationConditionDialog::setupStateTableFromJson(
+                ui->blockState_table,
+                states);
         }
 
         break;
@@ -345,13 +346,13 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         if (value.contains("scores")) {
             QJsonObject scores = value["scores"].toObject();
             for (auto objective : scores.keys()) {
-                QStandardItem *objectiveItem = new QStandardItem(objective);
-                objectiveItem->setToolTip(deletiveToolTip);
-                QStandardItem *valueItem = new QStandardItem();
-                valueItem->setData(scores[objective].toVariant(),
-                                   Qt::DisplayRole);
-                valueItem->setToolTip(deletiveToolTip);
-                entityScoresModel.appendRow({ objectiveItem, valueItem });
+                QTableWidgetItem *objectiveItem =
+                    new QTableWidgetItem(objective);
+                QTableWidgetItem *valueItem = new QTableWidgetItem();
+                valueItem->setData(Qt::DisplayRole,
+                                   scores[objective].toVariant());
+                appendRowToTableWidget(ui->entityScores_table,
+                                       { objectiveItem, valueItem });
             }
         }
         break;
@@ -470,7 +471,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 11: {/*Survives Explosion */
+    case 11: {/*Survives explosion */
         break;
     }
 
@@ -483,7 +484,6 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
             for (auto chanceRef : chances) {
                 QStandardItem *chanceItem = new QStandardItem();
                 chanceItem->setData(chanceRef.toDouble(), Qt::DisplayRole);
-                chanceItem->setToolTip(deletiveToolTip);
                 tableBonusModel.appendRow(chanceItem);
             }
         }
@@ -514,16 +514,16 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                 auto indexes = enchantmentsModel.match(
                     enchantmentsModel.index(0, 0), Qt::UserRole + 1, enchantId);
                 if (indexes.isEmpty()) continue;
-                QStandardItem *enchantItem = new QStandardItem();
-                enchantItem->setData(enchantId);
+                QTableWidgetItem *enchantItem = new QTableWidgetItem();
+                enchantItem->setData(Qt::UserRole + 1, enchantId);
                 enchantItem->setText(indexes[0].data(Qt::DisplayRole).toString());
-                enchantItem->setEditable(false);
-                enchantItem->setToolTip(deletiveToolTip);
-                QStandardItem *levelsItem = new QStandardItem();
-                levelsItem->setData(enchantObj.value(QStringLiteral("levels")),
-                                    Qt::DisplayRole);
-                levelsItem->setToolTip(deletiveToolTip);
-                toolEnchantModel.appendRow({ enchantItem, levelsItem });
+                enchantItem->setFlags(enchantItem->flags() &
+                                      ~Qt::ItemIsEditable);
+                QTableWidgetItem *levelsItem = new QTableWidgetItem();
+                levelsItem->setData(Qt::DisplayRole,
+                                    enchantObj.value(QStringLiteral("levels")));
+                appendRowToTableWidget(ui->toolEnchant_table,
+                                       { enchantItem, levelsItem });
             }
         }
         break;
@@ -545,15 +545,16 @@ void MCRPredCondition::onTypeChanged(const int &i) {
 
     if ((ui->stackedWidget->currentWidget() == ui->inverted) &&
         invertedCondLayout.isEmpty()) {
-        if (depth < 10) {
+        if (depth < 1) {
             MCRPredCondition *cond = new MCRPredCondition(
                 ui->nested_condAreaInner);
             cond->setDepth(depth + 1);
-            cond->setMinimumHeight(350);
+            cond->sizeHint().rheight() = minimumHeight();
+            /*cond->setIsModular(false); */
             invertedCondLayout.addWidget(cond, 0);
         } else {
             ui->inverted_condAreaInner->setText(
-                "Inverting an inverted condition is uesless.");
+                tr("Inverting an inverted condition is very silly."));
         }
     }
 }
@@ -570,7 +571,7 @@ void MCRPredCondition::reset(int index) {
     switch (index) {
     case 0: { /*Block states */
         ui->blockState_blockCombo->setCurrentIndex(0);
-        clearModelExceptHeaders(blockStatesModel);
+        ui->blockState_table->setRowCount(0);
         break;
     }
 
@@ -596,7 +597,7 @@ void MCRPredCondition::reset(int index) {
 
     case 3: { /*Entity scores */
         ui->entityScores_typeCombo->setCurrentIndex(0);
-        clearModelExceptHeaders(entityScoresModel);
+        ui->entityScores_table->setRowCount(0);
         break;
     }
 
@@ -669,7 +670,7 @@ void MCRPredCondition::reset(int index) {
     }
 
     case 14: {/*Tool enchantment */
-        clearModelExceptHeaders(toolEnchantModel);
+        ui->toolEnchant_table->setRowCount(0);
         break;
     }
 
@@ -704,39 +705,45 @@ void MCRPredCondition::resetAll() {
         reset(i);
 }
 
+void MCRPredCondition::changeEvent(QEvent *event) {
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        if (!ui->inverted_condAreaInner->text().isEmpty())
+            ui->inverted_condAreaInner->setText(
+                tr("Inverting an inverted condition is very silly."));
+    }
+}
+
 void MCRPredCondition::blockStates_onAdded() {
     if (ui->blockState_stateEdit->text().isEmpty()
         || ui->blockState_valueEdit->text().isEmpty())
         return;
 
-    QStandardItem *stateItem = new QStandardItem(
+    QTableWidgetItem *stateItem = new QTableWidgetItem(
         ui->blockState_stateEdit->text());
-    stateItem->setToolTip(deletiveToolTip);
-    QStandardItem *valueItem = new QStandardItem(
+    QTableWidgetItem *valueItem = new QTableWidgetItem(
         ui->blockState_valueEdit->text());
-    valueItem->setToolTip(deletiveToolTip);
 
-    blockStatesModel.appendRow({ stateItem, valueItem });
+    appendRowToTableWidget(ui->blockState_table, { stateItem, valueItem });
 }
 
 void MCRPredCondition::entityScores_onAdded() {
     if (ui->entityScores_objectiveEdit->text().isEmpty())
         return;
 
-    QStandardItem *objItem = new QStandardItem(
+    QTableWidgetItem *objItem = new QTableWidgetItem(
         ui->entityScores_objectiveEdit->text());
-    objItem->setToolTip(deletiveToolTip);
-    QStandardItem *valueItem = new QStandardItem();
-    auto           json      = ui->entityScores_valueInput->toJson();
-    valueItem->setData(json, Qt::DisplayRole);
-    valueItem->setToolTip(deletiveToolTip);
-    entityScoresModel.appendRow({ objItem, valueItem });
+    QTableWidgetItem *valueItem = new QTableWidgetItem();
+    auto              json      = ui->entityScores_valueInput->toJson();
+    valueItem->setData(Qt::DisplayRole, json);
+    appendRowToTableWidget(ui->entityScores_table, { objItem, valueItem });
 }
 
 void MCRPredCondition::nested_onAdded() {
     MCRPredCondition *cond = new MCRPredCondition(ui->nested_condAreaInner);
 
-    cond->setMinimumHeight(300);
+    cond->sizeHint().rheight() = minimumHeight();
     nestedCondLayout.addWidget(cond, 0);
 }
 
@@ -757,7 +764,6 @@ void MCRPredCondition::tableBonus_onAdded() {
 
     chanceItem->setData(ui->tableBonus_chanceSpinBox->value(),
                         Qt::DisplayRole);
-    chanceItem->setToolTip(deletiveToolTip);
     tableBonusModel.appendRow(chanceItem);
 }
 
@@ -767,25 +773,23 @@ void MCRPredCondition::toolEnchant_onAdded() {
         return;
     }
     QString enchantmentText = ui->toolEnchant_enchantCombo->currentText();
-    if (!toolEnchantModel.findItems(enchantmentText).isEmpty())
+    if (!ui->toolEnchant_table->findItems(enchantmentText, 0).isEmpty())
         return;
 
-    QStandardItem *enchantItem = new QStandardItem(enchantmentText);
-    enchantItem->setData(ui->toolEnchant_enchantCombo->currentData(Qt::UserRole
-                                                                   + 1));
-    enchantItem->setEditable(false);
-    enchantItem->setToolTip(deletiveToolTip);
-    QStandardItem *levelsItem = new QStandardItem();
-    auto           json       = ui->toolEnchant_levelsInput->toJson();
-    levelsItem->setData(json, Qt::DisplayRole);
-    levelsItem->setToolTip(deletiveToolTip);
-    toolEnchantModel.appendRow({ enchantItem, levelsItem });
+    QTableWidgetItem *enchantItem = new QTableWidgetItem(enchantmentText);
+    enchantItem->setData(Qt::UserRole + 1, ui->toolEnchant_enchantCombo->
+                         currentData(Qt::UserRole + 1));
+    enchantItem->setFlags(enchantItem->flags() & ~Qt::ItemIsEditable);
+    QTableWidgetItem *levelsItem = new QTableWidgetItem();
+    auto              json       = ui->toolEnchant_levelsInput->toJson();
+    levelsItem->setData(Qt::DisplayRole, json);
+    appendRowToTableWidget(ui->toolEnchant_table, { enchantItem, levelsItem });
 }
 
 void MCRPredCondition::initBlockStatesPage() {
     auto blocksInfo = MainWindow::getMCRInfo("block");
 
-    blocksModel.appendRow(new QStandardItem(tr("(not selected)")));
+    blocksModel.appendRow(new QStandardItem(tr("(not set)")));
     for (auto key : blocksInfo.keys()) {
         MCRInvItem     invItem(key);
         QStandardItem *item = new QStandardItem();
@@ -802,12 +806,7 @@ void MCRPredCondition::initBlockStatesPage() {
         blocksModel.appendRow(item);
     }
     ui->blockState_blockCombo->setModel(&blocksModel);
-
-    QStandardItem *stateItem  = new QStandardItem("State");
-    QStandardItem *valuesItem = new QStandardItem("Value");
-
-    initModelView(blockStatesModel, ui->blockState_listView,
-                  { stateItem, valuesItem });
+    ui->blockState_table->installEventFilter(&viewFilter);
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,
             this, &MCRPredCondition::blockStates_onAdded);
@@ -817,17 +816,12 @@ void MCRPredCondition::initEntityScoresPage() {
     ui->entityScores_valueInput->setTypes(
         NumericInput::Exact | NumericInput::Range);
 
-    QStandardItem *objItem = new QStandardItem("Objective");
-    objItem->setToolTip("An score objective of the entity.");
-    QStandardItem *valuesItem = new QStandardItem("Score");
-    valuesItem->setToolTip("A value of the objective.");
-
     auto *delegate = new ExtendedDelegate();
     delegate->setExNumInputTypes(NumericInput::Exact
                                  | NumericInput::Range);
 
-    initModelView(entityScoresModel, ui->entityScores_listView,
-                  { objItem, valuesItem }, delegate);
+    ui->entityScores_table->setItemDelegate(delegate);
+    ui->entityScores_table->installEventFilter(new ViewEventFilter(this));
 
     connect(ui->entityScores_addBtn, &QPushButton::clicked,
             this, &MCRPredCondition::entityScores_onAdded);
@@ -884,16 +878,10 @@ void MCRPredCondition::initTableBonusPage() {
 void MCRPredCondition::initToolEnchantPage() {
     ui->toolEnchant_levelsInput->setTypes(NumericInput::Range);
 
-    QStandardItem *enchantItem = new QStandardItem("Enchantment");
-    enchantItem->setToolTip("An enchantment of the tool.");
-    QStandardItem *levelsItem = new QStandardItem("Levels");
-    levelsItem->setToolTip("The minimun and maximun levels of the enchantment.");
-
     auto *delegate = new ExtendedDelegate();
     delegate->setExNumInputTypes(NumericInput::Exact | NumericInput::Range);
-
-    initModelView(toolEnchantModel, ui->toolEnchant_listView,
-                  { enchantItem, levelsItem }, delegate);
+    ui->toolEnchant_table->setItemDelegate(delegate);
+    ui->toolEnchant_table->installEventFilter(&viewFilter);
 
     connect(ui->toolEnchant_addBtn, &QPushButton::clicked,
             this, &MCRPredCondition::toolEnchant_onAdded);
@@ -920,10 +908,6 @@ void MCRPredCondition::simplifyCondition(QVariantMap &condMap,
                 sub["condition"].toString();
                 if (sub["condition"].toString().endsWith("inverted")) {
                     auto subTerm = sub["term"].toMap();
-/*
-                      condMap.clear();
-                      condMap.unite(subTerm);
- */
                     condMap = subTerm;
                     simplifyCondition(condMap, depth + 2);
                 } else if (sub["condition"].toString().endsWith("alternative"))

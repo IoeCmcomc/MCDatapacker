@@ -14,25 +14,25 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
-    ui->pollListView->setModel(&model);
+    ui->poolListView->setModel(&model);
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
             this,
             &LootTableEditorDock::writeJson);
-    connect(ui->addPollButton,
+    connect(ui->addPoolButton,
             &QToolButton::clicked,
-            this, &LootTableEditorDock::onAddPoll);
+            this, &LootTableEditorDock::onAddPool);
     connect(ui->deletePoolButton,
             &QToolButton::clicked,
-            this, &LootTableEditorDock::onDeletePoll);
-    connect(ui->pollListView->selectionModel(),
+            this, &LootTableEditorDock::onDeletePool);
+    connect(ui->poolListView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
-            this, &LootTableEditorDock::onPollSelectionChanged);
+            this, &LootTableEditorDock::onPoolSelectionChanged);
     connect(ui->bonusRollsCheck, &QCheckBox::toggled, [this](bool checked) {
         ui->bonusRollsInput->setEnabled(checked);
     });
 
-    checkPolls();
+    checkPools();
 }
 
 LootTableEditorDock::~LootTableEditorDock() {
@@ -40,7 +40,7 @@ LootTableEditorDock::~LootTableEditorDock() {
 }
 
 void LootTableEditorDock::writeJson() {
-    onPollSelectionChanged();
+    onPoolSelectionChanged();
 
     QJsonObject   root;
     const QString types[] = {
@@ -54,44 +54,44 @@ void LootTableEditorDock::writeJson() {
     root.insert("type", "minecraft:" +
                 types[ui->lootTableTypeCombo->currentIndex()]);
 
-    QJsonArray polls;
+    QJsonArray pools;
     for (int i = 0; i < model.rowCount(); ++i) {
         auto index    = model.index(i, 0);
-        auto pollJson =
+        auto poolJson =
             model.data(index, Qt::UserRole + 1).value<QJsonObject>();
-        polls.push_back(pollJson);
+        pools.push_back(poolJson);
     }
-    root.insert("polls", polls);
+    root.insert("pools", pools);
 
     qobject_cast<MainWindow*>(parent())->
     setCodeEditorText(QJsonDocument(root).toJson());
 }
 
-void LootTableEditorDock::onAddPoll() {
+void LootTableEditorDock::onAddPool() {
     QStandardItem *item =
         new QStandardItem(QString("#%1").arg(model.rowCount() + 1));
 
-    onPollSelectionChanged();
-    item->setData(writePollJson());
+    onPoolSelectionChanged();
+    item->setData(writePoolJson());
     model.appendRow(item);
 
     auto index = model.indexFromItem(item);
-    ui->pollListView->selectionModel()->
+    ui->poolListView->selectionModel()->
     setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
-    ui->pollListView->selectionModel()->
+    ui->poolListView->selectionModel()->
     select(index, QItemSelectionModel::ClearAndSelect);
 }
 
-void LootTableEditorDock::onDeletePoll() {
-    auto indexes = ui->pollListView->selectionModel()->selectedIndexes();
+void LootTableEditorDock::onDeletePool() {
+    auto indexes = ui->poolListView->selectionModel()->selectedIndexes();
 
     if (!indexes.isEmpty()) {
         auto index = indexes[0];
-        pollDeleted       = true;
+        poolDeleted       = true;
         indexBeforeDelete = index;
         model.removeRow(index.row());
 
-        onPollSelectionChanged();
+        onPoolSelectionChanged();
 
         for (int i = 0; i < model.rowCount(); ++i) {
             model.item(i)->setText(QString("#%1").arg(i + 1));
@@ -99,48 +99,48 @@ void LootTableEditorDock::onDeletePoll() {
     }
 }
 
-void LootTableEditorDock::onPollSelectionChanged() {
-    /*qDebug() << "onPollSelectionChanged"; */
-    checkPolls();
-    auto indexes = ui->pollListView->selectionModel()->selectedIndexes();
+void LootTableEditorDock::onPoolSelectionChanged() {
+    /*qDebug() << "onPoolSelectionChanged"; */
+    checkPools();
+    auto indexes = ui->poolListView->selectionModel()->selectedIndexes();
     /*qDebug() << indexes; */
     QModelIndex index;
     if (!indexes.isEmpty()) {
-        if (curPollIndex.isValid()) {
-            auto moveOutJson = writePollJson();
-            model.itemFromIndex(curPollIndex)->setData(moveOutJson);
+        if (curPoolIndex.isValid()) {
+            auto moveOutJson = writePoolJson();
+            model.itemFromIndex(curPoolIndex)->setData(moveOutJson);
             /*qDebug() << "move out:" << moveOutJson; */
         }
         index = indexes[0];
     }
-    /*qDebug() << pollDeleted << index.row() << indexBeforeDelete.row() << */
+    /*qDebug() << poolDeleted << index.row() << indexBeforeDelete.row() << */
     model.rowCount();
-    if (pollDeleted && (index.row() < model.rowCount()) &&
+    if (poolDeleted && (index.row() < model.rowCount()) &&
         (index.row() > indexBeforeDelete.row())) {
         /*index       = index.siblingAtRow(index.row() - 1); */
-        pollDeleted = false;
+        poolDeleted = false;
     }
 
-    curPollIndex = QModelIndex();
+    curPoolIndex = QModelIndex();
     if (index.isValid()) {
         auto moveInJson =
             model.itemFromIndex(index)->data().value<QJsonObject>();
-        readPollJson(moveInJson);
+        readPoolJson(moveInJson);
         /*qDebug() << "In:" << moveInJson; */
-        curPollIndex = index;
+        curPoolIndex = index;
     }
 
-    /*qDebug() << "curIndex" << index.row() << curPollIndex.row(); */
+    /*qDebug() << "curIndex" << index.row() << curPoolIndex.row(); */
 }
 
-void LootTableEditorDock::checkPolls() {
-    auto indexes = ui->pollListView->selectionModel()->selectedIndexes();
+void LootTableEditorDock::checkPools() {
+    auto indexes = ui->poolListView->selectionModel()->selectedIndexes();
 
     ui->deletePoolButton->setDisabled(indexes.isEmpty());
-    ui->pollEditor->setDisabled(indexes.isEmpty());
+    ui->poolEditor->setDisabled(indexes.isEmpty());
 }
 
-QJsonObject LootTableEditorDock::writePollJson() {
+QJsonObject LootTableEditorDock::writePoolJson() {
     QJsonObject root;
 
     if (ui->bonusRollsCheck->isChecked())
@@ -149,7 +149,7 @@ QJsonObject LootTableEditorDock::writePollJson() {
     return root;
 }
 
-void LootTableEditorDock::readPollJson(const QJsonObject &root) {
+void LootTableEditorDock::readPoolJson(const QJsonObject &root) {
     ui->rollsInput->fromJson(root.value("rolls"));
     ui->bonusRollsCheck->setChecked(root.contains("bonus_rolls"));
     if (root.contains("bonus_rolls"))

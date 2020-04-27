@@ -20,9 +20,9 @@
 #include <QFileInfo>
 #include <QAbstractButton>
 
-MainWindow::MCRFileType                 MainWindow::curFileType = Text;
-QMap<QString, QMap<QString, QVariant> > MainWindow::MCRInfoMaps;
-QString                                 MainWindow::curDir;
+MainWindow::MCRFileType     MainWindow::curFileType = Text;
+QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
+QString                     MainWindow::curDir;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -79,10 +79,8 @@ MainWindow::MainWindow(QWidget *parent)
     visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
 
-/*
-      lootTableEditorDock = new LootTableEditorDock(this);
-      addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
- */
+    lootTableEditorDock = new LootTableEditorDock(this);
+    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
 
     predicateDock = new PredicateDock(this);
     addDockWidget(Qt::RightDockWidgetArea, predicateDock);
@@ -280,21 +278,19 @@ void MainWindow::changeEvent(QEvent* event) {
         case QEvent::LanguageChange: {
             qDebug() << "QEvent::LanguageChange";
             ui->retranslateUi(this);
-            if (visualRecipeEditorDock)
-                visualRecipeEditorDock->retranslate();
+            break;
         }
-        break;
 
         /* this event is send, if the system, language changes */
         case QEvent::LocaleChange: {
             qDebug() << "QEvent::LocaleChange";
             QString locale = QLocale::system().name();
             loadLanguage(locale);
+            break;
         }
-        break;
 
         default:
-        {}
+            break;
         }
     }
     QMainWindow::changeEvent(event);
@@ -317,9 +313,11 @@ void MainWindow::setCurrentFile(const QString &filepath) {
         fileWatcher.addPath(curFile);
     }
 
-    ui->codeEditor->setCurFile(filepath);
-
     visualRecipeEditorDock->setVisible(MainWindow::curFileType == Recipe);
+    predicateDock->setVisible(MainWindow::curFileType == Predicate);
+    lootTableEditorDock->setVisible(MainWindow::curFileType == LootTable);
+
+    emit curFileChanged(filepath);
 }
 
 QString MainWindow::strippedName(const QString &fullFileName) {
@@ -340,7 +338,8 @@ void MainWindow::updateWindowTitle() {
 }
 
 QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
-                                                const int depth) {
+                                                [[maybe_unused]] const int depth)
+{
     QMap<QString, QVariant> retMap;
 
     QFileInfo finfo = QFileInfo(":minecraft/info/" + type + ".json");
@@ -376,7 +375,7 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     return retMap;
 }
 
-QMap<QString, QVariant> &MainWindow::getMCRInfo(const QString &type) {
+QVariantMap &MainWindow::getMCRInfo(const QString &type) {
     return MainWindow::MCRInfoMaps[type];
 }
 
@@ -467,8 +466,6 @@ void MainWindow::openFile(const QString &filepath, bool reload) {
             #ifndef QT_NO_CURSOR
             QGuiApplication::restoreOverrideCursor();
             #endif
-
-            emit curFileChanged(filepath);
         }
         file.close();
     }

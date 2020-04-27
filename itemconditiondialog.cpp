@@ -20,11 +20,14 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui->itemSlot->setAcceptMultiItems(false);
 
     initComboModelView("effect", potionsModel, ui->potionCombo);
-    initComboModelView("enchantment", enchantmentsModel, ui->enchant_combo);
+    initComboModelView("enchantment",
+                       enchantmentsModel,
+                       ui->enchant_combo,
+                       false);
     ui->stored_combo->setModel(&enchantmentsModel);
 
-    initModelView(itemEnchantModel, ui->enchant_listView);
-    initModelView(storedEnchantModel, ui->stored_listView);
+    initTable(ui->enchant_table);
+    initTable(ui->stored_table);
 
     connect(ui->itemRadio, &QRadioButton::toggled,
             ui->itemSlot, &MCRInvSlot::setEnabled);
@@ -65,10 +68,10 @@ QJsonObject ItemConditionDialog::toJson() const {
                         Qt::UserRole + 1).toString());
 
     QJsonArray enchantments;
-    for (auto row = 0; row < itemEnchantModel.rowCount(); ++row) {
+    for (auto row = 0; row < ui->enchant_table->rowCount(); ++row) {
         auto id =
-            itemEnchantModel.item(row, 0)->data().toString();
-        auto levels = itemEnchantModel.item(row, 1)->
+            ui->enchant_table->item(row, 0)->data(Qt::UserRole + 1).toString();
+        auto levels = ui->enchant_table->item(row, 1)->
                       data(Qt::DisplayRole).toJsonValue();
         enchantments.push_back(QJsonObject({ { QStringLiteral("enchantment"),
                                                id },
@@ -79,15 +82,14 @@ QJsonObject ItemConditionDialog::toJson() const {
         root.insert(QStringLiteral("enchantments"), enchantments);
 
     QJsonArray stored_enchantments;
-    for (auto row = 0; row < storedEnchantModel.rowCount(); ++row) {
+    for (auto row = 0; row < ui->stored_table->rowCount(); ++row) {
         auto id =
-            storedEnchantModel.item(row, 0)->data().toString();
-        auto levels = storedEnchantModel.item(row, 1)->
+            ui->stored_table->item(row, 0)->data(Qt::UserRole + 1).toString();
+        auto levels = ui->stored_table->item(row, 1)->
                       data(Qt::DisplayRole).toJsonValue();
-        stored_enchantments.push_back(QJsonObject({ { QStringLiteral(
-                                                          "enchantment"), id },
-                                                      { QStringLiteral("levels"),
-                                                        levels } }));
+        stored_enchantments.push_back
+            (QJsonObject({ { QStringLiteral("enchantment"), id },
+                             { QStringLiteral("levels"), levels } }));
     }
     if (!stored_enchantments.isEmpty())
         root.insert(QStringLiteral("stored_enchantments"), stored_enchantments);
@@ -117,12 +119,12 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
 
     if (value.contains(QStringLiteral("enchantments"))) {
         tableFromJson(value[QStringLiteral("enchantments")].toArray(),
-                      itemEnchantModel);
+                      ui->enchant_table);
     }
 
     if (value.contains(QStringLiteral("stored_enchantments"))) {
         tableFromJson(value[QStringLiteral("stored_enchantments")].toArray(),
-                      storedEnchantModel);
+                      ui->stored_table);
     }
 }
 
@@ -134,18 +136,18 @@ void ItemConditionDialog::onAddedEnchant() {
         return;
     }
     QString enchantmentText = ui->enchant_combo->currentText();
-    if (!itemEnchantModel.findItems(enchantmentText).isEmpty())
+    if (!ui->enchant_table->findItems(enchantmentText, 0).isEmpty())
         return;
 
-    QStandardItem *enchantItem = new QStandardItem(enchantmentText);
-    enchantItem->setData(ui->enchant_combo->currentData(Qt::UserRole + 1));
-    enchantItem->setEditable(false);
-    enchantItem->setToolTip(deletiveToolTip);
-    QStandardItem *levelsItem = new QStandardItem();
-    auto           json       = ui->enchant_levelInput->toJson();
-    levelsItem->setData(json, Qt::DisplayRole);
-    levelsItem->setToolTip(deletiveToolTip);
-    itemEnchantModel.appendRow({ enchantItem, levelsItem });
+    QTableWidgetItem *enchantItem = new QTableWidgetItem(enchantmentText);
+    enchantItem->setData(Qt::UserRole + 1,
+                         ui->enchant_combo->currentData(Qt::UserRole + 1));
+    enchantItem->setFlags(enchantItem->flags() & ~(Qt::ItemIsEditable));
+
+    QTableWidgetItem *levelsItem = new QTableWidgetItem();
+    auto              json       = ui->enchant_levelInput->toJson();
+    levelsItem->setData(Qt::DisplayRole, json);
+    appendRowToTableWidget(ui->enchant_table, { enchantItem, levelsItem });
 }
 
 void ItemConditionDialog::onAddedStoredEnchant() {
@@ -156,39 +158,32 @@ void ItemConditionDialog::onAddedStoredEnchant() {
         return;
     }
     QString enchantmentText = ui->stored_combo->currentText();
-    if (!storedEnchantModel.findItems(enchantmentText).isEmpty())
+    if (!ui->stored_table->findItems(enchantmentText, 0).isEmpty())
         return;
 
-    QStandardItem *enchantItem = new QStandardItem(enchantmentText);
-    enchantItem->setData(ui->stored_combo->currentData(Qt::UserRole + 1));
-    enchantItem->setEditable(false);
-    enchantItem->setToolTip(deletiveToolTip);
-    QStandardItem *levelsItem = new QStandardItem();
-    auto           json       = ui->stored_levelInput->toJson();
-    levelsItem->setData(json, Qt::DisplayRole);
-    levelsItem->setToolTip(deletiveToolTip);
-    storedEnchantModel.appendRow({ enchantItem, levelsItem });
+    QTableWidgetItem *enchantItem = new QTableWidgetItem(enchantmentText);
+    enchantItem->setData(Qt::UserRole + 1,
+                         ui->stored_combo->currentData(Qt::UserRole + 1));
+    enchantItem->setFlags(enchantItem->flags() & ~(Qt::ItemIsEditable));
+
+    QTableWidgetItem *levelsItem = new QTableWidgetItem();
+    auto              json       = ui->stored_levelInput->toJson();
+    levelsItem->setData(Qt::DisplayRole, json);
+    appendRowToTableWidget(ui->stored_table, { enchantItem, levelsItem });
 }
 
-void ItemConditionDialog::initModelView(QStandardItemModel &model,
-                                        QTableView *tableView) {
-    QStandardItem *enchantItem = new QStandardItem(tr("Enchantment"));
-
-    enchantItem->setToolTip(tr("An enchantment of the tool."));
-    QStandardItem *levelsItem = new QStandardItem(tr("Levels"));
-    levelsItem->setToolTip(tr("The levels of the enchantment."));
-
+void ItemConditionDialog::initTable(QTableWidget *table) {
     auto *delegate = new ExtendedDelegate();
+
     delegate->setExNumInputTypes(NumericInput::Exact
                                  | NumericInput::Range);
     delegate->setExNumInputGeneralMin(0);
-
-    BaseCondition::initModelView(model, tableView, { enchantItem, levelsItem },
-                                 delegate);
+    table->setItemDelegate(delegate);
+    table->installEventFilter(new ViewEventFilter(this));
 }
 
 void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,
-                                        QStandardItemModel &model) {
+                                        QTableWidget *table) {
     for (auto enchantment : jsonArr) {
         auto enchantObj = enchantment.toObject();
         if (enchantObj.isEmpty()) continue;
@@ -201,15 +196,16 @@ void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,
         auto indexes = enchantmentsModel.match(
             enchantmentsModel.index(0, 0), Qt::UserRole + 1, enchantId);
         if (indexes.isEmpty()) continue;
-        QStandardItem *enchantItem = new QStandardItem();
-        enchantItem->setData(enchantId);
+
+        QTableWidgetItem *enchantItem = new QTableWidgetItem();
+        enchantItem->setData(Qt::UserRole + 1, enchantId);
         enchantItem->setText(indexes[0].data(Qt::DisplayRole).toString());
-        enchantItem->setEditable(false);
-        enchantItem->setToolTip(deletiveToolTip);
-        QStandardItem *levelsItem = new QStandardItem();
-        levelsItem->setData(enchantObj.value(QStringLiteral("levels")),
-                            Qt::DisplayRole);
-        levelsItem->setToolTip(deletiveToolTip);
-        model.appendRow({ enchantItem, levelsItem });
+        enchantItem->setFlags(enchantItem->flags() & ~(Qt::ItemIsEditable));
+
+        QTableWidgetItem *levelsItem = new QTableWidgetItem();
+        auto              json       = ui->stored_levelInput->toJson();
+        levelsItem->setData(Qt::DisplayRole,
+                            enchantObj.value(QStringLiteral("levels")));
+        appendRowToTableWidget(table, { enchantItem, levelsItem });
     }
 }

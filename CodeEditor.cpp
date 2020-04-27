@@ -23,18 +23,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     jsonHighlighter       = new JsonHighlighter(this->document());
     mcfunctionHighlighter = new MCfunctionHighlighter(this->document(), this);
 
-    connect(this,
-            &CodeEditor::blockCountChanged,
-            this,
-            &CodeEditor::updateLineNumberAreaWidth);
-    connect(this,
-            &CodeEditor::updateRequest,
-            this,
-            &CodeEditor::updateLineNumberArea);
-    connect(this,
-            &CodeEditor::cursorPositionChanged,
-            this,
-            &CodeEditor::onCursorPositionChanged);
+    connect(this, &CodeEditor::blockCountChanged,
+            this, &CodeEditor::updateLineNumberAreaWidth);
+    connect(this, &CodeEditor::updateRequest,
+            this, &CodeEditor::updateLineNumberArea);
+    connect(this, &CodeEditor::cursorPositionChanged,
+            this, &CodeEditor::onCursorPositionChanged);
+    connect(qobject_cast<MainWindow*>(window()), &MainWindow::curFileChanged,
+            this, &CodeEditor::setCurFile);
 
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();

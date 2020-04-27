@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Entity condition</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -39,6 +39,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <item>
+      <property name="text">
+       <string>(not set)</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="1" column="0" colspan="4">
@@ -281,7 +286,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Flags</string>
+          <string comment="Boolean indicator">Flags</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -402,6 +407,9 @@
        </item>
        <item row="7" column="0" colspan="3">
         <widget class="QTableView" name="effectTableView">
+         <property name="toolTip">
+          <string>Right click a row to delete it.</string>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
@@ -468,7 +476,7 @@
           <widget class="QComboBox" name="gameModeCombo">
            <item>
             <property name="text">
-             <string>(not selected)</string>
+             <string>(not set)</string>
             </property>
            </item>
            <item>
@@ -555,7 +563,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_24">
             <property name="text">
-             <string>ID;</string>
+             <string>ID:</string>
             </property>
            </widget>
           </item>
@@ -578,6 +586,12 @@
           </item>
           <item row="3" column="0" colspan="3">
            <widget class="QTableView" name="advanmTableView">
+            <property name="cursor" stdset="0">
+             <cursorShape>WhatsThisCursor</cursorShape>
+            </property>
+            <property name="toolTip">
+             <string>Right click a row to delete it.</string>
+            </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
@@ -639,6 +653,9 @@
           </item>
           <item row="3" column="0" colspan="3">
            <widget class="QTableView" name="recipeTableView">
+            <property name="toolTip">
+             <string>Right click a row to delete it.</string>
+            </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
@@ -725,6 +742,9 @@
           </item>
           <item>
            <widget class="QTableView" name="statsTableView">
+            <property name="toolTip">
+             <string>Right click a row to delete it.</string>
+            </property>
             <property name="alternatingRowColors">
              <bool>true</bool>
             </property>
@@ -752,7 +772,7 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">NumericInput.h</header>
+   <header location="global">numericinput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

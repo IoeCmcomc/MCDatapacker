@@ -17,10 +17,23 @@ PredicateDock::PredicateDock(QWidget *parent) :
             this, &PredicateDock::onReadBtn);
     connect(ui->writeBtn, &QPushButton::clicked,
             this, &PredicateDock::onWriteBtn);
+    connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
+        adjustSize();
+        if (floating) {
+            resize(minimumWidth(), height());
+        }
+    });
 }
 
 PredicateDock::~PredicateDock() {
     delete ui;
+}
+
+void PredicateDock::changeEvent(QEvent *event) {
+    QDockWidget::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+    }
 }
 
 void PredicateDock::onReadBtn() {

@@ -11,7 +11,7 @@ NumericInput::NumericInput(QWidget *parent) :
     ui(new Ui::ExtendedNumericInput) {
     ui->setupUi(this);
 
-    setTypes(Exact | Range | Biomial);
+    setTypes(Exact | Range | Binomial);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
             this, &NumericInput::onMinMaxEdited);
@@ -109,7 +109,7 @@ QJsonValue NumericInput::toJson() {
         break;
     }
 
-    case 2: { /*Biomial */
+    case 2: { /*Binomial */
         QJsonObject root;
         root.insert(QStringLiteral("type"),
                     QStringLiteral("minecraft:binomial"));
@@ -157,8 +157,8 @@ void NumericInput::setMenu() {
         typeMenu.addAction(tr("Range"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(1);
         });
-    if (types.testFlag(Biomial))
-        typeMenu.addAction(tr("Biomial"), this, [ = ]() {
+    if (types.testFlag(Binomial))
+        typeMenu.addAction(tr("Binomial"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(2);
         });
     ui->inputTypeButton->setMenu(&typeMenu);
@@ -171,7 +171,7 @@ NumericInput::Type NumericInput::getCurrentType() const {
 
 void NumericInput::setCurrentType(const Type &value) {
     currentType = value;
-    const QVector<Type> typeVec = { Exact, Range, Biomial };
+    const QVector<Type> typeVec = { Exact, Range, Binomial };
     ui->stackedWidget->setCurrentIndex(typeVec.indexOf(value));
 }
 
@@ -240,7 +240,7 @@ bool NumericInput::isCurrentlyUnset() const {
     case 1: /* Range */
         return (ui->minSpinBox->isUnset() && ui->maxSpinBox->isUnset());
 
-    case 2: /*Biomial */
+    case 2: /*Binomial */
         return true;
 
     default:

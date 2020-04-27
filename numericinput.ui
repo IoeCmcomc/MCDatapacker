@@ -141,7 +141,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="biomial">
+     <widget class="QWidget" name="binomial">
       <layout class="QGridLayout" name="gridLayout">
        <property name="topMargin">
         <number>0</number>

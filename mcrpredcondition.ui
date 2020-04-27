@@ -6,22 +6,37 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
-    <height>415</height>
+    <width>480</width>
+    <height>400</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>1</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>350</width>
-    <height>350</height>
+    <width>400</width>
+    <height>400</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Condition</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="verticalSpacing">
-    <number>3</number>
+   <property name="leftMargin">
+    <number>8</number>
+   </property>
+   <property name="topMargin">
+    <number>8</number>
+   </property>
+   <property name="rightMargin">
+    <number>8</number>
+   </property>
+   <property name="bottomMargin">
+    <number>8</number>
    </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
@@ -141,6 +156,18 @@
      </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QGridLayout" name="gridLayout_7">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -149,7 +176,13 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="blockState_blockCombo"/>
+        <widget class="QComboBox" name="blockState_blockCombo">
+         <item>
+          <property name="text">
+           <string>(not set)</string>
+          </property>
+         </item>
+        </widget>
        </item>
        <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox">
@@ -185,7 +218,10 @@
            </widget>
           </item>
           <item row="1" column="0" colspan="5">
-           <widget class="QTableView" name="blockState_listView">
+           <widget class="QTableWidget" name="blockState_table">
+            <property name="toolTip">
+             <string>Right click a row to delete it.</string>
+            </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
@@ -195,12 +231,22 @@
             <property name="selectionMode">
              <enum>QAbstractItemView::SingleSelection</enum>
             </property>
-            <attribute name="horizontalHeaderCascadingSectionResizes">
-             <bool>true</bool>
+            <attribute name="horizontalHeaderDefaultSectionSize">
+             <number>125</number>
             </attribute>
             <attribute name="horizontalHeaderStretchLastSection">
              <bool>true</bool>
             </attribute>
+            <column>
+             <property name="text">
+              <string>State</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </column>
            </widget>
           </item>
          </layout>
@@ -210,6 +256,18 @@
      </widget>
      <widget class="QWidget" name="damage_source_properties">
       <layout class="QFormLayout" name="formLayout_6">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0" colspan="2">
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
@@ -305,6 +363,18 @@
      </widget>
      <widget class="QWidget" name="entity">
       <layout class="QFormLayout" name="formLayout">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
@@ -345,6 +415,18 @@
      </widget>
      <widget class="QWidget" name="entity_scores">
       <layout class="QGridLayout" name="gridLayout_11">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
@@ -401,8 +483,21 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QPushButton" name="entityScores_addBtn">
+            <property name="text">
+             <string>Add score</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="entityScores_objectiveEdit"/>
+          </item>
           <item row="3" column="0" colspan="2">
-           <widget class="QTableView" name="entityScores_listView">
+           <widget class="QTableWidget" name="entityScores_table">
+            <property name="toolTip">
+             <string>Right click a row to delete it.</string>
+            </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>
@@ -412,23 +507,20 @@
             <property name="selectionMode">
              <enum>QAbstractItemView::SingleSelection</enum>
             </property>
-            <attribute name="horizontalHeaderCascadingSectionResizes">
-             <bool>true</bool>
-            </attribute>
             <attribute name="horizontalHeaderStretchLastSection">
              <bool>true</bool>
             </attribute>
+            <column>
+             <property name="text">
+              <string>Objective</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </column>
            </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QPushButton" name="entityScores_addBtn">
-            <property name="text">
-             <string>Add</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="entityScores_objectiveEdit"/>
           </item>
          </layout>
         </widget>
@@ -437,6 +529,18 @@
      </widget>
      <widget class="QWidget" name="inverted">
       <layout class="QGridLayout" name="gridLayout_5">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QScrollArea" name="inverted_condArea">
          <property name="sizeAdjustPolicy">
@@ -450,8 +554,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>58</width>
-            <height>16</height>
+            <width>456</width>
+            <height>333</height>
            </rect>
           </property>
           <property name="alignment">
@@ -467,6 +571,18 @@
      </widget>
      <widget class="QWidget" name="killed_by_player">
       <layout class="QFormLayout" name="formLayout_8">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="QCheckBox" name="playerKill_invertedCheck">
          <property name="text">
@@ -478,6 +594,18 @@
      </widget>
      <widget class="QWidget" name="location_check">
       <layout class="QFormLayout" name="formLayout_9">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
@@ -556,16 +684,16 @@
      <widget class="QWidget" name="nested">
       <layout class="QGridLayout" name="gridLayout_10">
        <property name="leftMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="topMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>2</number>
        </property>
        <item row="0" column="1">
         <widget class="QRadioButton" name="nested_orRadio">
@@ -607,7 +735,7 @@
        <item row="0" column="6">
         <widget class="QPushButton" name="nested_addBtn">
          <property name="text">
-          <string>Add condition</string>
+          <string>Add</string>
          </property>
         </widget>
        </item>
@@ -631,8 +759,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>76</width>
-            <height>16</height>
+            <width>456</width>
+            <height>299</height>
            </rect>
           </property>
          </widget>
@@ -649,6 +777,18 @@
      </widget>
      <widget class="QWidget" name="match_tool">
       <layout class="QFormLayout" name="formLayout_10">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="DialogDataButton" name="matchTool_propBtn">
          <property name="text">
@@ -663,6 +803,18 @@
      </widget>
      <widget class="QWidget" name="random_chance">
       <layout class="QGridLayout" name="gridLayout_6">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="2" column="2" rowspan="2">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -786,6 +938,18 @@
      </widget>
      <widget class="QWidget" name="reference">
       <layout class="QFormLayout" name="formLayout_11">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_16">
          <property name="text">
@@ -814,6 +978,18 @@
      <widget class="QWidget" name="survives_explosion"/>
      <widget class="QWidget" name="table_bonus">
       <layout class="QGridLayout" name="gridLayout_8">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_17">
          <property name="text">
@@ -899,6 +1075,9 @@
        </item>
        <item row="3" column="0" colspan="2">
         <widget class="QListView" name="tableBonus_listView">
+         <property name="toolTip">
+          <string>Right click a row to delete it.</string>
+         </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
@@ -920,6 +1099,18 @@
      </widget>
      <widget class="QWidget" name="time_check">
       <layout class="QFormLayout" name="formLayout_5">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_19">
          <property name="text">
@@ -971,6 +1162,18 @@
      </widget>
      <widget class="QWidget" name="tool_enchantment">
       <layout class="QGridLayout" name="gridLayout_9">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_21">
          <property name="text">
@@ -1013,25 +1216,50 @@
         </widget>
        </item>
        <item row="3" column="0" colspan="2">
-        <widget class="QTableView" name="toolEnchant_listView">
+        <widget class="QTableWidget" name="toolEnchant_table">
+         <property name="toolTip">
+          <string>Right click a row to delete it.</string>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::SingleSelection</enum>
          </property>
-         <attribute name="horizontalHeaderCascadingSectionResizes">
-          <bool>true</bool>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>150</number>
          </attribute>
          <attribute name="horizontalHeaderStretchLastSection">
           <bool>true</bool>
          </attribute>
+         <column>
+          <property name="text">
+           <string>Enchantment</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="weather_check">
       <layout class="QFormLayout" name="formLayout_7">
+       <property name="leftMargin">
+        <number>2</number>
+       </property>
+       <property name="topMargin">
+        <number>2</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>2</number>
+       </property>
        <item row="0" column="0">
         <widget class="TrueFalseBox" name="weather_rainingCheck">
          <property name="text">
@@ -1056,7 +1284,7 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">NumericInput.h</header>
+   <header location="global">numericinput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
