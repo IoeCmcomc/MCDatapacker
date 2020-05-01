@@ -28,6 +28,7 @@ SOURCES += \
     jsonhighlighter.cpp \
     locationconditiondialog.cpp \
     loottableeditordock.cpp \
+    loottableentry.cpp \
     main.cpp \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
     linenumberarea.h \
     locationconditiondialog.h \
     loottableeditordock.h \
+    loottableentry.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
@@ -86,6 +88,7 @@ FORMS += \
     itemconditiondialog.ui \
     locationconditiondialog.ui \
     loottableeditordock.ui \
+    loottableentry.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \
     mcrpredcondition.ui \

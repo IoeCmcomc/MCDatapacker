@@ -2,6 +2,8 @@
 #include "ui_loottableeditordock.h"
 
 #include "mainwindow.h"
+#include "mcrpredcondition.h"
+#include "loottableentry.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -15,24 +17,30 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     ui->setupUi(this);
 
     ui->poolListView->setModel(&model);
+    ui->conditionsContainer->setLayout(&conditionsLayout);
+    ui->entriesContainer->setLayout(&entriesLayout);
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
-            this,
-            &LootTableEditorDock::writeJson);
-    connect(ui->addPoolButton,
-            &QToolButton::clicked,
+            this, &LootTableEditorDock::writeJson);
+    connect(ui->addPoolButton, &QToolButton::clicked,
             this, &LootTableEditorDock::onAddPool);
-    connect(ui->deletePoolButton,
-            &QToolButton::clicked,
+
+    connect(ui->deletePoolButton, &QToolButton::clicked,
             this, &LootTableEditorDock::onDeletePool);
     connect(ui->poolListView->selectionModel(),
-            &QItemSelectionModel::selectionChanged,
-            this, &LootTableEditorDock::onPoolSelectionChanged);
-    connect(ui->bonusRollsCheck, &QCheckBox::toggled, [this](bool checked) {
+            &QItemSelectionModel::currentChanged,
+            this, &LootTableEditorDock::onCurrentPoolChanged);
+    connect(ui->luckBasedCheck, &QCheckBox::toggled, [this](bool checked) {
+        ui->bonusRollsLabel->setEnabled(checked);
         ui->bonusRollsInput->setEnabled(checked);
     });
+    connect(ui->addCondButton, &QPushButton::clicked,
+            this, &LootTableEditorDock::onAddCondition);
+    connect(ui->addEntryButton, &QPushButton::clicked,
+            this, &LootTableEditorDock::onAddEntry);
 
     checkPools();
+    onAddPool();
 }
 
 LootTableEditorDock::~LootTableEditorDock() {
@@ -40,16 +48,9 @@ LootTableEditorDock::~LootTableEditorDock() {
 }
 
 void LootTableEditorDock::writeJson() {
-    onPoolSelectionChanged();
+    ui->poolListView->clearSelection();
 
-    QJsonObject   root;
-    const QString types[] = {
-        QStringLiteral("empty"),              QStringLiteral("entity"),
-        QStringLiteral("block"),              QStringLiteral("chest"),
-        QStringLiteral("fishing"),            QStringLiteral("gift"),
-        QStringLiteral("advancement_reward"),
-        QStringLiteral("generic")
-    };
+    QJsonObject root;
 
     root.insert("type", "minecraft:" +
                 types[ui->lootTableTypeCombo->currentIndex()]);
@@ -68,90 +69,91 @@ void LootTableEditorDock::writeJson() {
 }
 
 void LootTableEditorDock::onAddPool() {
+    qDebug() << "onAddPool";
     QStandardItem *item =
         new QStandardItem(QString("#%1").arg(model.rowCount() + 1));
-
-    onPoolSelectionChanged();
     item->setData(writePoolJson());
     model.appendRow(item);
 
     auto index = model.indexFromItem(item);
-    ui->poolListView->selectionModel()->
-    setCurrentIndex(index, QItemSelectionModel::SelectCurrent);
-    ui->poolListView->selectionModel()->
-    select(index, QItemSelectionModel::ClearAndSelect);
+    ui->poolListView->setCurrentIndex(index);
+    checkPools();
 }
 
 void LootTableEditorDock::onDeletePool() {
-    auto indexes = ui->poolListView->selectionModel()->selectedIndexes();
+    auto curIndex = ui->poolListView->currentIndex();
 
-    if (!indexes.isEmpty()) {
-        auto index = indexes[0];
-        poolDeleted       = true;
-        indexBeforeDelete = index;
-        model.removeRow(index.row());
+    /*qDebug() << "onDeletePool" << curIndex; */
 
-        onPoolSelectionChanged();
+    if (curIndex.isValid()) {
+        /*ui->poolListView->clearSelection(); */
+        model.removeRow(curIndex.row());
 
         for (int i = 0; i < model.rowCount(); ++i) {
             model.item(i)->setText(QString("#%1").arg(i + 1));
         }
+        checkPools();
     }
 }
 
-void LootTableEditorDock::onPoolSelectionChanged() {
-    /*qDebug() << "onPoolSelectionChanged"; */
-    checkPools();
-    auto indexes = ui->poolListView->selectionModel()->selectedIndexes();
-    /*qDebug() << indexes; */
-    QModelIndex index;
-    if (!indexes.isEmpty()) {
-        if (curPoolIndex.isValid()) {
-            auto moveOutJson = writePoolJson();
-            model.itemFromIndex(curPoolIndex)->setData(moveOutJson);
-            /*qDebug() << "move out:" << moveOutJson; */
-        }
-        index = indexes[0];
+void LootTableEditorDock::onCurrentPoolChanged(const QModelIndex &current,
+                                               const QModelIndex &previous) {
+    /*qDebug() << "onCurrentPoolChanged" << current << previous; */
+    if (previous.isValid()) {
+        auto moveOutJson = writePoolJson();
+        model.itemFromIndex(previous)->setData(moveOutJson);
     }
-    /*qDebug() << poolDeleted << index.row() << indexBeforeDelete.row() << */
-    model.rowCount();
-    if (poolDeleted && (index.row() < model.rowCount()) &&
-        (index.row() > indexBeforeDelete.row())) {
-        /*index       = index.siblingAtRow(index.row() - 1); */
-        poolDeleted = false;
-    }
-
-    curPoolIndex = QModelIndex();
-    if (index.isValid()) {
+    if (current.isValid()) {
         auto moveInJson =
-            model.itemFromIndex(index)->data().value<QJsonObject>();
+            model.itemFromIndex(current)->data().value<QJsonObject>();
         readPoolJson(moveInJson);
-        /*qDebug() << "In:" << moveInJson; */
-        curPoolIndex = index;
     }
-
-    /*qDebug() << "curIndex" << index.row() << curPoolIndex.row(); */
 }
 
 void LootTableEditorDock::checkPools() {
-    auto indexes = ui->poolListView->selectionModel()->selectedIndexes();
+    auto curIndex = ui->poolListView->currentIndex();
 
-    ui->deletePoolButton->setDisabled(indexes.isEmpty());
-    ui->poolEditor->setDisabled(indexes.isEmpty());
+    /*qDebug() << "checkPools" << curIndex; */
+
+    ui->deletePoolButton->setEnabled(curIndex.isValid());
+    ui->poolEditor->setEnabled(curIndex.isValid());
+}
+
+void LootTableEditorDock::reset() {
+    ui->luckBasedCheck->setChecked(false);
+    ui->rollsInput->unset();
+    ui->bonusRollsInput->unset();
+}
+
+void LootTableEditorDock::onAddCondition() {
+    MCRPredCondition *cond = new MCRPredCondition(ui->conditionsContainer);
+
+    cond->sizeHint().rheight() = cond->minimumHeight();
+    conditionsLayout.addWidget(cond, 0);
+}
+
+void LootTableEditorDock::onAddEntry() {
+    LootTableEntry *entry = new LootTableEntry(ui->entriesContainer);
+
+    /*entry->sizeHint().rheight() = entry->minimumHeight(); */
+    entriesLayout.addWidget(entry, 0);
 }
 
 QJsonObject LootTableEditorDock::writePoolJson() {
     QJsonObject root;
 
-    if (ui->bonusRollsCheck->isChecked())
+    if (!ui->bonusRollsInput->isCurrentlyUnset()
+        && ui->bonusRollsInput->isVisible()) {
         root.insert("bonus_rolls", ui->bonusRollsInput->toJson());
+    }
     root.insert("rolls", ui->rollsInput->toJson());
     return root;
 }
 
 void LootTableEditorDock::readPoolJson(const QJsonObject &root) {
+    reset();
     ui->rollsInput->fromJson(root.value("rolls"));
-    ui->bonusRollsCheck->setChecked(root.contains("bonus_rolls"));
+    ui->luckBasedCheck->setChecked(root.contains("bonus_rolls"));
     if (root.contains("bonus_rolls"))
         ui->bonusRollsInput->fromJson(root.value("bonus_rolls"));
 }

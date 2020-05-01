@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 #include <QJsonObject>
 #include <QModelIndex>
+#include <QHBoxLayout>
 
 namespace Ui {
     class LootTableEditorDock;
@@ -23,16 +24,28 @@ public:
 protected slots:
     void onAddPool();
     void onDeletePool();
-    void onPoolSelectionChanged();
+    void onCurrentPoolChanged(const QModelIndex &current,
+                              const QModelIndex &previous);
+    void onAddCondition();
+    void onAddEntry();
+
     void checkPools();
+    void reset();
 
 private:
     Ui::LootTableEditorDock *ui;
+    const QStringList types = {
+        QStringLiteral("empty"),              QStringLiteral("entity"),
+        QStringLiteral("block"),              QStringLiteral("chest"),
+        QStringLiteral("fishing"),            QStringLiteral("gift"),
+        QStringLiteral("advancement_reward"), QStringLiteral("generic")
+    };
     QStandardItemModel model;
-    QModelIndex curPoolIndex;
     bool poolDeleted = false;
     QModelIndex indexBeforeDelete;
-
+    QHBoxLayout conditionsLayout;
+    QHBoxLayout functionsLayout;
+    QHBoxLayout entriesLayout;
 
     void clearPoolEditor();
     void getSelectedPool();

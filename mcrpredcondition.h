@@ -4,7 +4,6 @@
 #include "basecondition.h"
 
 #include <QFrame>
-#include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <QFileSystemWatcher>
 

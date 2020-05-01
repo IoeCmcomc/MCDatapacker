@@ -315,7 +315,7 @@ void MainWindow::setCurrentFile(const QString &filepath) {
 
     visualRecipeEditorDock->setVisible(MainWindow::curFileType == Recipe);
     predicateDock->setVisible(MainWindow::curFileType == Predicate);
-    lootTableEditorDock->setVisible(MainWindow::curFileType == LootTable);
+    /*lootTableEditorDock->setVisible(MainWindow::curFileType == LootTable); */
 
     emit curFileChanged(filepath);
 }

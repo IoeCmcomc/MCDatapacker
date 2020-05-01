@@ -19,9 +19,8 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
 
     setIsModular(true);
 
-    connect(ui->deleteButton, &QPushButton::clicked, [this]() {
-        deleteLater();
-    });
+    connect(ui->deleteButton, &QPushButton::clicked, this,
+            &QObject::deleteLater);
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MCRPredCondition::onTypeChanged);

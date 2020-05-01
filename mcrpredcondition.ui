@@ -152,7 +152,7 @@
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QGridLayout" name="gridLayout_7">
@@ -554,8 +554,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>456</width>
-            <height>333</height>
+            <width>96</width>
+            <height>26</height>
            </rect>
           </property>
           <property name="alignment">
@@ -759,8 +759,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>456</width>
-            <height>299</height>
+            <width>96</width>
+            <height>26</height>
            </rect>
           </property>
          </widget>
@@ -1284,7 +1284,7 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">NumericInput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
