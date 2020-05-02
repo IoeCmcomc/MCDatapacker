@@ -21,6 +21,9 @@ public:
 
     void writeJson();
 
+signals:
+    void isLuckBasedChanged(bool checked);
+
 protected slots:
     void onAddPool();
     void onDeletePool();

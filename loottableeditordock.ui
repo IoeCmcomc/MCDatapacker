@@ -166,7 +166,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="rollsTab">
        <attribute name="title">
@@ -175,6 +175,9 @@
        <layout class="QFormLayout" name="formLayout_2">
         <item row="0" column="0">
          <widget class="QLabel" name="label">
+          <property name="cursor">
+           <cursorShape>WhatsThisCursor</cursorShape>
+          </property>
           <property name="toolTip">
            <string>The number of times the loot table will pick an item from its pool.</string>
           </property>
@@ -195,6 +198,12 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="bonusRollsLabel">
+          <property name="cursor">
+           <cursorShape>WhatsThisCursor</cursorShape>
+          </property>
+          <property name="toolTip">
+           <string>Bonus rolls from luck.</string>
+          </property>
           <property name="text">
            <string>Bonus rolls:</string>
           </property>

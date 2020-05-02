@@ -33,6 +33,7 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     connect(ui->luckBasedCheck, &QCheckBox::toggled, [this](bool checked) {
         ui->bonusRollsLabel->setEnabled(checked);
         ui->bonusRollsInput->setEnabled(checked);
+        emit isLuckBasedChanged(checked);
     });
     connect(ui->addCondButton, &QPushButton::clicked,
             this, &LootTableEditorDock::onAddCondition);
@@ -49,6 +50,9 @@ LootTableEditorDock::~LootTableEditorDock() {
 
 void LootTableEditorDock::writeJson() {
     ui->poolListView->clearSelection();
+    auto currIndex = ui->poolListView->currentIndex();
+    ui->poolListView->setCurrentIndex(QModelIndex());
+    ui->poolListView->setCurrentIndex(currIndex);
 
     QJsonObject root;
 
@@ -135,6 +139,8 @@ void LootTableEditorDock::onAddCondition() {
 void LootTableEditorDock::onAddEntry() {
     LootTableEntry *entry = new LootTableEntry(ui->entriesContainer);
 
+    entry->setLootTableEditor(this);
+
     /*entry->sizeHint().rheight() = entry->minimumHeight(); */
     entriesLayout.addWidget(entry, 0);
 }
@@ -147,6 +153,18 @@ QJsonObject LootTableEditorDock::writePoolJson() {
         root.insert("bonus_rolls", ui->bonusRollsInput->toJson());
     }
     root.insert("rolls", ui->rollsInput->toJson());
+
+    int childCount = ui->entriesContainer->children().count();
+    if (childCount != 0) {
+        QJsonArray entries;
+        for (auto *child : ui->entriesContainer->children()) {
+            LootTableEntry *childEntry = qobject_cast<LootTableEntry*>(child);
+            if (childEntry != nullptr)
+                entries.push_back(childEntry->toJson());
+        }
+        root.insert("children", entries);
+    }
+
     return root;
 }
 

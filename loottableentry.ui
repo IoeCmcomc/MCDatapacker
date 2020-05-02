@@ -24,10 +24,10 @@
     <string>General</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>Type:</string>
+       <string>Weight:</string>
       </property>
      </widget>
     </item>
@@ -71,17 +71,17 @@
       </item>
      </widget>
     </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Type:</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="2">
      <widget class="Line" name="line_2">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QPushButton" name="deleteButton">
-      <property name="text">
-       <string>Delete</string>
       </property>
      </widget>
     </item>
@@ -92,14 +92,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Weight:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="4">
+    <item row="4" column="0" colspan="4">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -202,8 +195,38 @@
       </widget>
      </widget>
     </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="deleteButton">
+      <property name="text">
+       <string>Delete</string>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="1" colspan="3">
      <widget class="QSpinBox" name="weightSpin">
+      <property name="specialValueText">
+       <string>-</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="qualityLabel">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="toolTip">
+       <string>Bonus weight from luck.</string>
+      </property>
+      <property name="text">
+       <string>Quality:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="3">
+     <widget class="QSpinBox" name="qualitySpin">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="specialValueText">
        <string>-</string>
       </property>
