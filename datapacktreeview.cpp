@@ -14,7 +14,7 @@
 #include <QStringList>
 #include <QSaveFile>
 
-using namespace GlobalHelpers;
+using namespace Glhp;
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);

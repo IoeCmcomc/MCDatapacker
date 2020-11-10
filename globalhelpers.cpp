@@ -4,14 +4,14 @@
 #include <QDir>
 #include <QFileInfo>
 
-using namespace GlobalHelpers;
+using namespace Glhp;
 
-void GlobalHelpers::someTest() {
+void Glhp::someTest() {
     qDebug() << "GlobalHelpers::someTest()";
 }
 
-MainWindow::MCRFileType GlobalHelpers::toMCRFileType(const QString &dirpath,
-                                                     const QString &filepath) {
+MainWindow::MCRFileType Glhp::toMCRFileType(const QString &dirpath,
+                                            const QString &filepath) {
     if (filepath.isEmpty())
         return MainWindow::Text;
 
@@ -49,7 +49,7 @@ MainWindow::MCRFileType GlobalHelpers::toMCRFileType(const QString &dirpath,
     }
 }
 
-QString GlobalHelpers::relPath(const QString &dirpath, QString path) {
+QString Glhp::relPath(const QString &dirpath, QString path) {
     QString dataDir = dirpath + "/";
 
     if (path.startsWith(dataDir)) {
@@ -60,7 +60,7 @@ QString GlobalHelpers::relPath(const QString &dirpath, QString path) {
     return path;
 }
 
-QString GlobalHelpers::relNamespace(const QString &dirpath, QString path) {
+QString Glhp::relNamespace(const QString &dirpath, QString path) {
     QString rp = relPath(dirpath, path);
 
     if (rp.startsWith("data/")) {
@@ -72,7 +72,7 @@ QString GlobalHelpers::relNamespace(const QString &dirpath, QString path) {
     return rp;
 }
 
-QString GlobalHelpers::randStr(int length) {
+QString Glhp::randStr(int length) {
     const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
     QString       r;
 
@@ -83,9 +83,9 @@ QString GlobalHelpers::randStr(int length) {
     return r;
 }
 
-bool GlobalHelpers::isPathRelativeTo(const QString &dirpath,
-                                     const QString &path,
-                                     const QString &catDir) {
+bool Glhp::isPathRelativeTo(const QString &dirpath,
+                            const QString &path,
+                            const QString &catDir) {
     auto tmpDir = dirpath + "/data/";
 
     if (!path.startsWith(tmpDir)) return false;
@@ -93,8 +93,8 @@ bool GlobalHelpers::isPathRelativeTo(const QString &dirpath,
     return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
 }
 
-QString GlobalHelpers::toNamespacedID(const QString &dirpath,
-                                      QString filepath) {
+QString Glhp::toNamespacedID(const QString &dirpath,
+                             QString filepath) {
     auto    datapath = dirpath + "/data/";
     QString r;
 
@@ -115,7 +115,7 @@ QString GlobalHelpers::toNamespacedID(const QString &dirpath,
     return r;
 }
 
-QVariant GlobalHelpers::strToVariant(const QString &str) {
+QVariant Glhp::strToVariant(const QString &str) {
     bool isInt;
     auto intValue = str.toInt(&isInt);
 
@@ -130,7 +130,7 @@ QVariant GlobalHelpers::strToVariant(const QString &str) {
     }
 }
 
-QString GlobalHelpers::variantToStr(const QVariant &vari) {
+QString Glhp::variantToStr(const QVariant &vari) {
     if (vari.type() == QVariant::Bool)
         return vari.toBool() ? QStringLiteral("true") : QStringLiteral("false");
     else if (vari.type() == QVariant::Int)
@@ -139,39 +139,32 @@ QString GlobalHelpers::variantToStr(const QVariant &vari) {
         return vari.toString();
 }
 
-QVector<QString> GlobalHelpers::fileIDList(const QString &dirpath,
-                                           const QString &catDir,
-                                           const QString &nspace) {
+QVector<QString> Glhp::fileIDList(const QString &dirpath,
+                                  const QString &catDir,
+                                  const QString &nspace) {
     QVector<QString> IDList;
     QString          dataPath = dirpath + QStringLiteral("/data/");
 
-    auto appendIDToList = [&](const QString &nspace)->void {
-                              /*qDebug() << "appendIDToList"; */
-                              QString tagPath = dataPath + nspace + '/' +
-                                                catDir;
-                              QDir IDDir(tagPath);
+    auto appendIDToList =
+        [&](const QString &nspace)->void {
+            QString tagPath = dataPath + nspace + '/' + catDir;
+            QDir    IDDir(tagPath);
 
-                              /*qDebug() << tagPath << IDDir.exists(); */
-
-                              if (IDDir.exists() && (!IDDir.isEmpty())) {
-                                  auto names =
-                                      IDDir.entryList(
-                                          QDir::Files | QDir::NoDotAndDotDot);
-                                  for (auto name : names) {
-                                      /*qDebug() << name; */
-                                      name = name.section('.', 0, 0);
-                                      IDList.push_back(nspace + ":" + name);
-                                  }
-                              }
-
-                              /*qDebug() << "end" << IDList; */
-                          };
+            if (IDDir.exists() && (!IDDir.isEmpty())) {
+                auto names =
+                    IDDir.entryList(
+                        QDir::Files | QDir::NoDotAndDotDot);
+                for (auto name : names) {
+                    name = name.section('.', 0, 0);
+                    IDList.push_back(nspace + ":" + name);
+                }
+            }
+        };
 
     if (nspace.isEmpty()) {
         QDir dir(dataPath);
         auto nspaceDirs = dir.entryList(
             QDir::Dirs | QDir::NoDotAndDotDot);
-        /*qDebug() << nspaceDirs; */
         for (auto nspaceDir : nspaceDirs) {
             auto nspace = nspaceDir.section('.', 0, 0);
             appendIDToList(nspace);
@@ -179,6 +172,5 @@ QVector<QString> GlobalHelpers::fileIDList(const QString &dirpath,
     } else {
         appendIDToList(nspace);
     }
-    /*qDebug() << IDList; */
     return IDList;
 }

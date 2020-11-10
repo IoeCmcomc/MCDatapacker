@@ -1199,5 +1199,7 @@
         <file>texture/biome/wooded_mountains.png</file>
         <file>info/entity.json</file>
         <file>info/stat_type.json</file>
+        <file>info/attribute.json</file>
+        <file>info/map_icon.json</file>
     </qresource>
 </RCC>

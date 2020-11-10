@@ -172,7 +172,7 @@ void LocationConditionDialog::setupStateTableFromJson(QTableWidget *table,
         stateItem->setText(key);
         QTableWidgetItem *valueItem = new QTableWidgetItem();
         valueItem->setText(
-            GlobalHelpers::variantToStr(json[key].toVariant()));
+            Glhp::variantToStr(json[key].toVariant()));
         appendRowToTableWidget(table, { stateItem, valueItem });
     }
 }
@@ -186,7 +186,7 @@ QJsonObject LocationConditionDialog::jsonFromStateTable(
         auto    value =
             table->item(row, 1)->data(Qt::DisplayRole).toString();
         states.insert(state,
-                      GlobalHelpers::strToVariant(value).toJsonValue());
+                      Glhp::strToVariant(value).toJsonValue());
     }
     return states;
 }

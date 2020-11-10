@@ -20,37 +20,39 @@ bool isExtendedNumeric(const QModelIndex &index) {
 void ExtendedDelegate::paint(QPainter *painter,
                              const QStyleOptionViewItem &option,
                              const QModelIndex &index) const {
-    if (index.isValid() && isExtendedNumeric(index)) {
-        QJsonValue value = index.data().toJsonValue();
+    if (index.isValid()) {
+        if (isExtendedNumeric(index)) {
+            QJsonValue value = index.data().toJsonValue();
 
-        auto newOption = option;
-        if (value.isDouble()) {
-            int ExactInt = value.toInt();
-            newOption.text = QString::number(ExactInt);
-        } else if (value.isObject()) {
-            auto obj  = value.toObject();
-            auto type = obj[QStringLiteral("type")].toString();
-            if (type == QStringLiteral("minecraft:binomial")) {
-                int    num  = obj.value(QStringLiteral("n")).toInt();
-                double prob = obj.value(QStringLiteral("p")).toInt();
-                newOption.text = QString("n: %1; p: %2").arg(num).arg(prob);
-            } else {
-                QString min = (obj.contains(QStringLiteral("min")))
+            auto newOption = option;
+            if (value.isDouble()) {
+                int ExactInt = value.toInt();
+                newOption.text = QString::number(ExactInt);
+            } else if (value.isObject()) {
+                auto obj  = value.toObject();
+                auto type = obj[QStringLiteral("type")].toString();
+                if (type == QStringLiteral("minecraft:binomial")) {
+                    int    num  = obj.value(QStringLiteral("n")).toInt();
+                    double prob = obj.value(QStringLiteral("p")).toInt();
+                    newOption.text = QString("n: %1; p: %2").arg(num).arg(prob);
+                } else {
+                    QString min = (obj.contains(QStringLiteral("min")))
                               ? QString::number(
-                    obj.value(QStringLiteral("min")).toInt())
+                        obj.value(QStringLiteral("min")).toInt())
                               : QStringLiteral("");
-                QString max = (obj.contains(QStringLiteral("max")))
+                    QString max = (obj.contains(QStringLiteral("max")))
                                   ? QString::number(
-                    obj.value(QStringLiteral("max")).toInt())
+                        obj.value(QStringLiteral("max")).toInt())
                                   : QStringLiteral("");
-                newOption.text = QString("%1..%2").arg(min).arg(max);
+                    newOption.text = QString("%1..%2").arg(min).arg(max);
+                }
             }
-        }
 
-        qApp->style()->drawControl(QStyle::CE_ItemViewItem,
-                                   &newOption, painter, nullptr);
-    } else {
-        QStyledItemDelegate::paint(painter, option, index);
+            qApp->style()->drawControl(QStyle::CE_ItemViewItem,
+                                       &newOption, painter, nullptr);
+        } else {
+            QStyledItemDelegate::paint(painter, option, index);
+        }
     }
 }
 

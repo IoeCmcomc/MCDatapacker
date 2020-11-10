@@ -2,11 +2,12 @@
 #define GLOBALHELPERS_H
 
 #include "mainwindow.h"
+#include "vieweventfilter.h"
 
 #include <QString>
 #include <QVariant>
 
-namespace GlobalHelpers {
+namespace Glhp {
     void someTest();
     bool isPathRelativeTo(const QString &dirpath, const QString &path,
                           const QString &catDir);

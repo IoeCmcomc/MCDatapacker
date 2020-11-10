@@ -136,14 +136,7 @@ void NumericInput::setTypes(const NumericInput::Types &value) {
         if (!types.testFlag(Range))
             ui->stackedWidget->setCurrentIndex(2);
     }
-    int iCount = 0;
-
-    auto lValue = value;
-    while (lValue != 0) {
-        lValue = lValue & (lValue - 1);
-        iCount++;
-    }
-    ui->inputTypeButton->setHidden(iCount == 1);
+    ui->inputTypeButton->setHidden(value != 0 && (value & (value - 1)) == 0);
 }
 
 void NumericInput::setMenu() {

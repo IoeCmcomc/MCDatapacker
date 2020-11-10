@@ -306,7 +306,7 @@ void MainWindow::setCurrentFile(const QString &filepath) {
     ui->codeEditor->document()->setModified(false);
     setWindowModified(false);
 
-    curFileType = GlobalHelpers::toMCRFileType(curDir, filepath);
+    curFileType = Glhp::toMCRFileType(curDir, filepath);
 
     if (!curFile.isEmpty()) {
         fileWatcher.removePath(curFile);

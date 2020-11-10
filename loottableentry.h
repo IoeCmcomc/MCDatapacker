@@ -19,6 +19,8 @@ public:
     void fromJson(const QJsonObject &root);
     QJsonObject toJson() const;
 
+    void resetAll();
+
     void setIsLuckBased(bool value);
 
     void setLootTableEditor(QWidget *value);
@@ -28,17 +30,21 @@ private slots:
     void onLuckBasedChanged(bool checked);
     void onAddCondition();
     void onAddEntry();
+    void onAddFunction();
 
 private:
     Ui::LootTableEntry *ui;
     bool isLuckBased         = false;
     QWidget *lootTableEditor = nullptr;
     QHBoxLayout conditionsLayout;
+    QHBoxLayout functionsLayout;
     QHBoxLayout entriesLayout;
     const QStringList entryTypes =
     { "empty", "item", "loot_table", "tag", "group", "sequence" };
 
     const int ENTRIES_TAB = 3;
+
+    void reset(int index);
 };
 
 #endif /* LOOTTABLEENTRY_H */

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>LootTableFunction</class>
  <widget class="QTabWidget" name="LootTableFunction">
@@ -5,12 +6,1158 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>488</width>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>TabWidget</string>
   </property>
+  <property name="tabPosition">
+   <enum>QTabWidget::South</enum>
+  </property>
+  <property name="currentIndex">
+   <number>0</number>
+  </property>
+  <widget class="QWidget" name="general">
+   <attribute name="title">
+    <string>General</string>
+   </attribute>
+   <layout class="QGridLayout" name="gridLayout_8">
+    <item row="1" column="0" colspan="4">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="Line" name="line_4">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="deleteButton">
+      <property name="text">
+       <string>Delete</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Function:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="functionTypeCombo">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <item>
+       <property name="text">
+        <string>Apply bonus</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy state</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enchant randomly </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enchant with levels</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Exploration map</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Fill player head</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Limit count</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Looting enchant</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set attributes</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set contents</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set count</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set damage</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set loot table</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set lore</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set name</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set stew effect</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy name</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Explosion decay</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Furnace smelt</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="4">
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="apply_bonus">
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Enchantment:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="bonus_enchantCombo"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Formula:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="bonus_formulaCombo">
+          <item>
+           <property name="text">
+            <string>Binomial with bonus count</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Uniform bonus count</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Ore drops</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Multiplier:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="OptionalSpinBox" name="bonus_multiplierSpin"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Extra:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="OptionalSpinBox" name="bonus_extraSpin"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Propability:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="OptionalSpinBox" name="bonus_probSpin"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="copy_nbt">
+       <layout class="QGridLayout" name="gridLayout_9">
+        <item row="1" column="4">
+         <widget class="QLineEdit" name="copyNBT_targetEdit"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Source:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QComboBox" name="copyNBT_opCombo">
+          <item>
+           <property name="text">
+            <string>Append</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Merge</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Replace</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLineEdit" name="copyNBT_sourceEdit"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>from</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_33">
+          <property name="text">
+           <string>to</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QPushButton" name="copyNBT_addBtn">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="6">
+         <widget class="QTableWidget" name="copyNBT_table">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Source</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Operation</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Target</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="5">
+         <widget class="QComboBox" name="copyNBT_entityCombo">
+          <item>
+           <property name="text">
+            <string>This</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer player</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Block entity</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="copy_state">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Block:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="4">
+         <widget class="QComboBox" name="copyState_blockCombo"/>
+        </item>
+        <item row="1" column="0" rowspan="2" colspan="5">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLineEdit" name="copyState_lineEdit"/>
+        </item>
+        <item row="4" column="0" colspan="5">
+         <widget class="QListWidget" name="copyState_list">
+          <property name="toolTip">
+           <string>Right click a row to delete it.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Property:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QPushButton" name="copyState_addBtn">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="enchant_random">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Enchantment:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="enchantRand_enchantCombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="enchantRand_addBtn">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <widget class="QListWidget" name="enchantRand_list">
+          <property name="toolTip">
+           <string>Right click a row to delete it.</string>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="enchant_with_levels">
+       <layout class="QFormLayout" name="formLayout_4">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Levels:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumericInput" name="levelEnchant_levelInput">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>28</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="TrueFalseBox" name="levelEnchant_treasureCheck">
+          <property name="text">
+           <string>Treasure</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="exploration_map">
+       <layout class="QFormLayout" name="formLayout_5">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Destination:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="map_destCombo"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="map_decoCombo"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Decoration:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Zoom:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Search radius:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="map_zoomSpin">
+          <property name="specialValueText">
+           <string>-</string>
+          </property>
+          <property name="value">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="map_radiusSpin">
+          <property name="specialValueText">
+           <string>-</string>
+          </property>
+          <property name="value">
+           <number>50</number>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="TrueFalseBox" name="map_skipExistingCheck">
+          <property name="text">
+           <string>Skip existing chunks</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="fill_player_head">
+       <layout class="QFormLayout" name="formLayout_7">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>Entity:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="fillHead_entityType">
+          <item>
+           <property name="text">
+            <string>This (self)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer player</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="limit_count">
+       <layout class="QFormLayout" name="formLayout_8">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_18">
+          <property name="text">
+           <string>Limit:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumericInput" name="limitCount_limitInput"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="looting_enchant">
+       <layout class="QFormLayout" name="formLayout_9">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>Count:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumericInput" name="lootEnchant_countInput"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_20">
+          <property name="text">
+           <string>Limit:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="lootEnchant_limitSpin">
+          <property name="specialValueText">
+           <string>-</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="value">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_attributes">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_22">
+          <property name="text">
+           <string>Attribute:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="5">
+         <widget class="QTableWidget" name="setAttr_table">
+          <property name="toolTip">
+           <string>Right click a row to delete it.</string>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="horizontalScrollMode">
+           <enum>QAbstractItemView::ScrollPerPixel</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>120</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Attribute</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Operation</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Ammount</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Slot</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>ID</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="4" column="0" rowspan="2">
+         <widget class="QLabel" name="label_23">
+          <property name="text">
+           <string>Ammount:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_21">
+          <property name="text">
+           <string>Name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="2">
+         <widget class="QLineEdit" name="setAttr_IDEdit"/>
+        </item>
+        <item row="5" column="4">
+         <widget class="QPushButton" name="setAttr_addBtn">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="2">
+         <widget class="QLineEdit" name="setAttr_nameEdit"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_24">
+          <property name="text">
+           <string>ID:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1" colspan="3">
+         <widget class="NumericInput" name="setAttr_ammountInput">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>22</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_34">
+          <property name="text">
+           <string>Operation:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" rowspan="4" colspan="2">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Slots</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="setAttr_headCheck">
+             <property name="text">
+              <string>Head</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="setAttr_offhandCheck">
+             <property name="text">
+              <string>Offhand</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="setAttr_mainhandCheck">
+             <property name="text">
+              <string>Mainhand</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QCheckBox" name="setAttr_legsCheck">
+             <property name="text">
+              <string>Legs</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QCheckBox" name="setAttr_feetCheck">
+             <property name="text">
+              <string>Feet</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="setAttr_chestCheck">
+             <property name="text">
+              <string>Chest</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QComboBox" name="setAttr_opCombo">
+          <item>
+           <property name="text">
+            <string>Addition</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Multiply base</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Multiply total</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QComboBox" name="setAttr_attrCombo"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_contents">
+       <layout class="QGridLayout" name="gridLayout_10">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="addEntryButton">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="2">
+         <widget class="QScrollArea" name="entriesArea">
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="entriesContainer">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>363</width>
+             <height>243</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>210</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_count">
+       <layout class="QFormLayout" name="formLayout_10">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_25">
+          <property name="text">
+           <string>Count:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumericInput" name="setCount_countInput"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_damage">
+       <layout class="QFormLayout" name="formLayout_11">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_26">
+          <property name="text">
+           <string>Damage:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumericInput" name="setDamage_damageInput"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_loot_table">
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_35">
+          <property name="text">
+           <string>Name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lootTable_idEdit">
+          <property name="placeholderText">
+           <string>namespace:id</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_36">
+          <property name="text">
+           <string>Seed:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="lootTable_seedSpin">
+          <property name="minimum">
+           <number>-999999999</number>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_lore">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="2">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="TrueFalseBox" name="setLore_replaceCheck">
+          <property name="text">
+           <string>Replace</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>Entity</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="setLore_entityCombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <item>
+           <property name="text">
+            <string>This (self)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer player</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="4">
+         <widget class="RawJsonTextEdit" name="setLore_textEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_name">
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_28">
+          <property name="text">
+           <string>Entity</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="setName_entityCombo">
+          <item>
+           <property name="text">
+            <string>This (self)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer player</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_32">
+          <property name="text">
+           <string>Name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="RawJsonTextEdit" name="setName_textEdit">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_nbt">
+       <layout class="QFormLayout" name="formLayout_12">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string>NBT:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="setNBT_NBTEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="set_stew_effect">
+       <layout class="QGridLayout" name="gridLayout_7">
+        <item row="0" column="3">
+         <widget class="QSpinBox" name="stewEffect_durationSpin"/>
+        </item>
+        <item row="0" column="4">
+         <widget class="QPushButton" name="stewEffect_addBtn">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_31">
+          <property name="text">
+           <string>Duration:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_30">
+          <property name="text">
+           <string>Effect:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="5">
+         <widget class="QTableWidget" name="stewEffect_table">
+          <property name="toolTip">
+           <string>Right click a row to delete it.</string>
+          </property>
+          <property name="statusTip">
+           <string/>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Effect</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Duration</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="stewEffect_effectCombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="empty"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="conditions">
+   <attribute name="title">
+    <string>Conditions</string>
+   </attribute>
+   <layout class="QGridLayout" name="gridLayout_6">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="addCondButton">
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="2">
+     <widget class="QScrollArea" name="conditionsArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="conditionsContainer">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>363</width>
+         <height>286</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>249</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NumericInput</class>
+   <extends>QFrame</extends>
+   <header location="global">numericinput.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>OptionalSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header location="global">optionalspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RawJsonTextEdit</class>
+   <extends>QFrame</extends>
+   <header location="global">rawjsontextedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
 </ui>

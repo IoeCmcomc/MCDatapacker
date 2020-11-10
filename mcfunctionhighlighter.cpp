@@ -103,7 +103,7 @@ void MCfunctionHighlighter::setupRules() {
     minecraftNamespacedIDFormat.setForeground(QColor(80, 200, 120));
     minecraftNamespacedIDFormat.setFontWeight(QFont::Bold);
     const QString minecraftNamespacedIDPatterns[] = {
-        // Blocks
+        /* Blocks */
         QStringLiteral("acacia_button\\b"),
         QStringLiteral("acacia_door\\b"),
         QStringLiteral("acacia_fence_gate\\b"),
@@ -780,12 +780,12 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("yellow_wool\\b"),
         QStringLiteral("zombie_head\\b"),
         QStringLiteral("zombie_wall_head\\b"),
-        // Fluids
+        /* Fluids */
         QStringLiteral("flowing_lava\\b"),
         QStringLiteral("flowing_water\\b"),
         QStringLiteral("lava\\b"),
         QStringLiteral("water\\b"),
-        // Items
+        /* Items */
         QStringLiteral("acacia_boat\\b"),
         QStringLiteral("apple\\b"),
         QStringLiteral("armor_stand\\b"),
@@ -1082,8 +1082,10 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("zombie_pigman_spawn_egg\\b"),
         QStringLiteral("zombie_spawn_egg\\b"),
         QStringLiteral("zombie_villager_spawn_egg\\b"),
-        // Entities
-        /// Mobs
+        /*
+           Entities
+           / Mobs
+         */
         QStringLiteral("blaze\\b"),
         QStringLiteral("cave_spider\\b"),
         QStringLiteral("creeper\\b"),
@@ -1148,7 +1150,7 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("wandering_trader\\b"),
         QStringLiteral("wolf\\b"),
         QStringLiteral("zombie_horse\\b"),
-        /// Miscs
+        /*/ Miscs */
         QStringLiteral("area_effect_cloud\\b"),
         QStringLiteral("armor_stand\\b"),
         QStringLiteral("end_crystal\\b"),
@@ -1158,7 +1160,7 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("leash_knot\\b"),
         QStringLiteral("lightning_bolt\\b"),
         QStringLiteral("painting\\b"),
-        /// Projectiles
+        /*/ Projectiles */
         QStringLiteral("arrow\\b"),
         QStringLiteral("dragon_fireball\\b"),
         QStringLiteral("egg\\b"),
@@ -1175,7 +1177,7 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("spectral_arrow\\b"),
         QStringLiteral("trident\\b"),
         QStringLiteral("wither_skull\\b"),
-        /// Vehicles
+        /*/ Vehicles */
         QStringLiteral("boat\\b"),
         QStringLiteral("chest_minecart\\b"),
         QStringLiteral("command_block_minecart\\b"),
@@ -1184,12 +1186,12 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("minecart\\b"),
         QStringLiteral("spawner_minecart\\b"),
         QStringLiteral("tnt_minecart\\b"),
-        /// Others
+        /*/ Others */
         QStringLiteral("falling_block\\b"),
         QStringLiteral("tnt\\b"),
         QStringLiteral("experience_orb\\b"),
         QStringLiteral("item\\b"),
-        // Effects
+        /* Effects */
         QStringLiteral("absorption\\b"),
         QStringLiteral("bad_omen\\b"),
         QStringLiteral("blindness\\b"),
@@ -1222,7 +1224,7 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("water_breathing\\b"),
         QStringLiteral("weakness\\b"),
         QStringLiteral("wither\\b"),
-        // Enchantments
+        /* Enchantments */
         QStringLiteral("aqua_affinity\\b"),
         QStringLiteral("bane_of_arthropods\\b"),
         QStringLiteral("binding_curse\\b"),
@@ -1260,10 +1262,10 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("thorns\\b"),
         QStringLiteral("unbreaking\\b"),
         QStringLiteral("vanishing_curse\\b"),
-        // Particles
+        /* Particles */
         QStringLiteral("ambient_entity_effect\\b"),
         QStringLiteral("angry_villager\\b"),
-        //QStringLiteral("barrier\\b"),
+        /*QStringLiteral("barrier\\b"), */
         QStringLiteral("block\\b"),
         QStringLiteral("bubble\\b"),
         QStringLiteral("bubble_column_up\\b"),
@@ -1271,11 +1273,11 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("campfire_cosy_smoke\\b"),
         QStringLiteral("campfire_signal_smoke\\b"),
         QStringLiteral("cloud\\b"),
-        //QStringLiteral("composter\\b"),
+        /*QStringLiteral("composter\\b"), */
         QStringLiteral("crit\\b"),
         QStringLiteral("current_down\\b"),
         QStringLiteral("damage_indicator\\b"),
-        //QStringLiteral("dolphin\\b"),
+        /*QStringLiteral("dolphin\\b"), */
         QStringLiteral("dragon_breath\\b"),
         QStringLiteral("dripping_lava\\b"),
         QStringLiteral("dripping_water\\b"),
@@ -1284,7 +1286,7 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("elder_guardian\\b"),
         QStringLiteral("enchant\\b"),
         QStringLiteral("enchanted_hit\\b"),
-        //QStringLiteral("end_rod\\b"),
+        /*QStringLiteral("end_rod\\b"), */
         QStringLiteral("entity_effect\\b"),
         QStringLiteral("explosion\\b"),
         QStringLiteral("explosion_emitter\\b"),
@@ -1298,13 +1300,15 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("happy_villager\\b"),
         QStringLiteral("heart\\b"),
         QStringLiteral("instant_effect\\b"),
-        //QStringLiteral("item\\b"),
+        /*QStringLiteral("item\\b"), */
         QStringLiteral("item_slime\\b"),
         QStringLiteral("item_snowball\\b"),
         QStringLiteral("landing_lava\\b"),
         QStringLiteral("large_smoke\\b"),
-        //QStringLiteral("lava\\b"),
-        //QStringLiteral("mycelium\\b"),
+        /*
+           QStringLiteral("lava\\b"),
+           QStringLiteral("mycelium\\b"),
+         */
         QStringLiteral("nautilus\\b"),
         QStringLiteral("note\\b"),
         QStringLiteral("poof\\b"),
@@ -1316,9 +1320,9 @@ void MCfunctionHighlighter::setupRules() {
         QStringLiteral("splash\\b"),
         QStringLiteral("squid_ink\\b"),
         QStringLiteral("sweep_attack\\b"),
-        //QStringLiteral("totem_of_undying\\b"),
+        /*QStringLiteral("totem_of_undying\\b"), */
         QStringLiteral("underwater\\b"),
-        //QStringLiteral("witch\\b"),
+        /*QStringLiteral("witch\\b"), */
     };
     for (const QString &pattern : minecraftNamespacedIDPatterns) {
         rule.pattern = QRegularExpression("\\b(?:minecraft:)?" + pattern);
@@ -1333,20 +1337,20 @@ void MCfunctionHighlighter::setupRules() {
     highlightingRules.append(rule);
 
     commentFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegularExpression(QStringLiteral("#.*"));
+    rule.pattern = QRegularExpression(QStringLiteral("^#.*"));
     rule.format  = commentFormat;
     highlightingRules.append(rule);
 }
 
 void MCfunctionHighlighter::highlightBlock(const QString &text) {
-    //qDebug() << "highlightBlock. Enabled: " << this->enabled;
+    /*qDebug() << "highlightBlock. Enabled: " << this->enabled; */
     if (this->enabled) {
         CodeEditor *codeEditor = qobject_cast<CodeEditor*>(this->parentObj);
-        //qDebug() << codeEditor;
+        /*qDebug() << codeEditor; */
         CodeEditor::CurrentNamespacedID currNamespacedID =
             codeEditor->getCurrentNamespacedID();
 
-        //for (HighlightingRule rule : highlightingRules) {
+        /*for (HighlightingRule rule : highlightingRules) { */
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
             QRegularExpressionMatchIterator matchIterator =
                 rule.pattern.globalMatch(text);
@@ -1354,8 +1358,10 @@ void MCfunctionHighlighter::highlightBlock(const QString &text) {
                 QRegularExpressionMatch match = matchIterator.next();
                 if (rule.format == namespacedIDFormat) {
                     QTextCharFormat fmt = rule.format;
-                    //qDebug() << match.capturedStart() << " " << currNamespacedID.startingIndex;
-                    //qDebug() << match.captured() << " " << currNamespacedID.string;
+                    /*
+                       qDebug() << match.capturedStart() << " " << currNamespacedID.startingIndex;
+                       qDebug() << match.captured() << " " << currNamespacedID.string;
+                     */
                     if (match.capturedStart() == currNamespacedID.startingIndex
                         && match.captured() == currNamespacedID.string
                         && currentBlock().blockNumber() ==
@@ -1365,7 +1371,7 @@ void MCfunctionHighlighter::highlightBlock(const QString &text) {
                                   match.capturedLength(),
                                   fmt);
                         continue;
-                        //qDebug() << "Didn't continued";
+                        /*qDebug() << "Didn't continued"; */
                     }
                 }
                 setFormat(match.capturedStart(),
@@ -1379,10 +1385,10 @@ void MCfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void MCfunctionHighlighter::setEnabled(bool state) {
-    //qDebug() << "MCfunctionHighlighter::setEnabled : " << state;
+    /*qDebug() << "MCfunctionHighlighter::setEnabled : " << state; */
     this->enabled = state;
 
     setDocument(state ? doc : 0);
 
-    //rehighlight();
+    /*rehighlight(); */
 }

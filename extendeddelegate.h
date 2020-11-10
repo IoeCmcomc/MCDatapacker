@@ -3,6 +3,8 @@
 
 #include "numericinput.h"
 
+#include <QMetaType>
+#include <QStandardItem>
 #include <QStyledItemDelegate>
 
 class ExtendedDelegate : public QStyledItemDelegate

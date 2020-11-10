@@ -428,7 +428,7 @@ void EntityConditionDialog::initEffectsPage() {
 
     initModelView(entityEffectModel, ui->effectTableView,
                   { effectItem, amplifierItem, durationItem, ambientItem,
-                    visibleItem }, delegate);
+                    visibleItem }, viewFilter, delegate);
     ui->effectTableView->setColumnWidth(0, 150);
     ui->effectTableView->setColumnWidth(1, 150);
     ui->effectTableView->setColumnWidth(2, 150);
@@ -442,7 +442,7 @@ void EntityConditionDialog::initPlayerAdv() {
     QStandardItem *grantedItem = new QStandardItem(tr("Granted"));
 
     initModelView(playerAdvanmModel, ui->advanmTableView,
-                  { advItem, grantedItem });
+                  { advItem, grantedItem }, viewFilter);
 
     connect(ui->advanmAddBtn, &QPushButton::clicked,
             this, &EntityConditionDialog::onAddedPlayerAdv);
@@ -453,7 +453,7 @@ void EntityConditionDialog::initPlayerRecipe() {
     QStandardItem *grantedItem = new QStandardItem(tr("Granted"));
 
     initModelView(playerRecipeModel, ui->recipeTableView,
-                  { recipeItem, grantedItem });
+                  { recipeItem, grantedItem }, viewFilter);
 
     connect(ui->recipeAddBtn, &QPushButton::clicked,
             this, &EntityConditionDialog::onAddedPlayerRecipe);
@@ -470,7 +470,7 @@ void EntityConditionDialog::initPlayerStat() {
                                  | NumericInput::Range);
 
     initModelView(playerStatModel, ui->statsTableView,
-                  { typeItem, statItem, valueItem }, delegate);
+                  { typeItem, statItem, valueItem }, viewFilter, delegate);
 
     connect(ui->statAddBtn, &QPushButton::clicked,
             this, &EntityConditionDialog::onAddedPlayerStat);

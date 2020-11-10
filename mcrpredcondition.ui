@@ -152,7 +152,7 @@
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QGridLayout" name="gridLayout_7">
@@ -554,8 +554,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>96</width>
-            <height>26</height>
+            <width>456</width>
+            <height>333</height>
            </rect>
           </property>
           <property name="alignment">
@@ -759,8 +759,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>96</width>
-            <height>26</height>
+            <width>456</width>
+            <height>299</height>
            </rect>
           </property>
          </widget>
@@ -1282,20 +1282,20 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
+  </customwidget>
+  <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">NumericInput.h</header>
+   <header location="global">numericinput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>DialogDataButton</class>
    <extends>QLabel</extends>
    <header location="global">dialogdatabutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>OptionalSpinBox</class>

@@ -89,7 +89,7 @@ void CodeEditor::dropEvent(QDropEvent *e) {
     if (e->mimeData()->hasFormat("text/uri-list")) {
         auto filepath = e->mimeData()->urls().at(0).toLocalFile();
         auto dirpath  = MainWindow::getCurDir();
-        nspacedID = GlobalHelpers::toNamespacedID(dirpath, filepath);
+        nspacedID = Glhp::toNamespacedID(dirpath, filepath);
     } else if (e->mimeData()->hasText()) {
         nspacedID = e->mimeData()->text();
         if (!nspacedID.contains(':'))
@@ -126,7 +126,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 
     QAction *formatAction = new QAction(tr("Format"), menu);
     auto     dirpath      = MainWindow::getCurDir();
-    auto     fileType     = GlobalHelpers::toMCRFileType(dirpath, curFile);
+    auto     fileType     = Glhp::toMCRFileType(dirpath, curFile);
 
     qDebug() << MainWindow::JsonText << fileType << MainWindow::ItemTag;
 

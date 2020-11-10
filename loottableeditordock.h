@@ -30,6 +30,7 @@ protected slots:
     void onCurrentPoolChanged(const QModelIndex &current,
                               const QModelIndex &previous);
     void onAddCondition();
+    void onAddFunction();
     void onAddEntry();
 
     void checkPools();

@@ -29,6 +29,7 @@ SOURCES += \
     locationconditiondialog.cpp \
     loottableeditordock.cpp \
     loottableentry.cpp \
+    loottablefunction.cpp \
     main.cpp \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
@@ -37,10 +38,12 @@ SOURCES += \
     mcrinvsloteditor.cpp \
     mcritemsortfilterproxymodel.cpp \
     mcrpredcondition.cpp \
+    modelfunctions.cpp \
     newdatapackdialog.cpp \
     numericinput.cpp \
     optionalspinbox.cpp \
     predicatedock.cpp \
+    rawjsontextedit.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
     tagselectordialog.cpp \
@@ -63,6 +66,7 @@ HEADERS += \
     locationconditiondialog.h \
     loottableeditordock.h \
     loottableentry.h \
+    loottablefunction.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
@@ -70,10 +74,12 @@ HEADERS += \
     mcrinvsloteditor.h \
     mcritemsortfilterproxymodel.h \
     mcrpredcondition.h \
+    modelfunctions.h \
     newdatapackdialog.h \
     numericinput.h \
     optionalspinbox.h \
     predicatedock.h \
+    rawjsontextedit.h \
     settingsdialog.h \
     stackedwidget.h \
     tagselectordialog.h \
@@ -89,12 +95,14 @@ FORMS += \
     locationconditiondialog.ui \
     loottableeditordock.ui \
     loottableentry.ui \
+    loottablefunction.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \
     mcrpredcondition.ui \
     newdatapackdialog.ui \
     numericinput.ui \
     predicatedock.ui \
+    rawjsontextedit.ui \
     settingsdialog.ui \
     tagselectordialog.ui \
     visualrecipeeditordock.ui

@@ -93,7 +93,7 @@ void TagSelectorDialog::setupTagTreeView(
     auto tagDir = tagStrSplited.join('/');
 
     auto fileIDList =
-        GlobalHelpers::fileIDList(MainWindow::getCurDir(), tagDir);
+        Glhp::fileIDList(MainWindow::getCurDir(), tagDir);
     for (auto id : fileIDList) {
         model.appendRow(new QStandardItem(id));
     }

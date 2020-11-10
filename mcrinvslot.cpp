@@ -408,7 +408,7 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
             auto filepath =
                 event->mimeData()->urls().at(0).toLocalFile();
             auto    dirpath = MainWindow::getCurDir();
-            QString id      = GlobalHelpers::toNamespacedID(dirpath,
+            QString id      = Glhp::toNamespacedID(dirpath,
                                                             filepath);
 
             if (!id.isEmpty()) {

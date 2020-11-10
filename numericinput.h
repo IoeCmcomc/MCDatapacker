@@ -18,9 +18,10 @@ public:
     ~NumericInput();
 
     enum Type {
-        Exact    = 1,
-        Range    = 2,
-        Binomial = 4
+        Exact         = 1,
+        Range         = 2,
+        ExactAndRange = Exact | Range,
+        Binomial      = 4
     };
     Q_DECLARE_FLAGS(Types, Type)
 

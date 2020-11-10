@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "mcrpredcondition.h"
 #include "loottableentry.h"
+#include "loottablefunction.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -18,6 +19,7 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
 
     ui->poolListView->setModel(&model);
     ui->conditionsContainer->setLayout(&conditionsLayout);
+    ui->functionsContainer->setLayout(&functionsLayout);
     ui->entriesContainer->setLayout(&entriesLayout);
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
@@ -37,6 +39,8 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     });
     connect(ui->addCondButton, &QPushButton::clicked,
             this, &LootTableEditorDock::onAddCondition);
+    connect(ui->addFunctBtn, &QPushButton::clicked,
+            this, &LootTableEditorDock::onAddFunction);
     connect(ui->addEntryButton, &QPushButton::clicked,
             this, &LootTableEditorDock::onAddEntry);
 
@@ -136,6 +140,13 @@ void LootTableEditorDock::onAddCondition() {
     conditionsLayout.addWidget(cond, 0);
 }
 
+void LootTableEditorDock::onAddFunction() {
+    LootTableFunction *funct = new LootTableFunction(ui->functionsContainer);
+
+    funct->sizeHint().rheight() = funct->minimumHeight();
+    functionsLayout.addWidget(funct, 0);
+}
+
 void LootTableEditorDock::onAddEntry() {
     LootTableEntry *entry = new LootTableEntry(ui->entriesContainer);
 
@@ -162,7 +173,7 @@ QJsonObject LootTableEditorDock::writePoolJson() {
             if (childEntry != nullptr)
                 entries.push_back(childEntry->toJson());
         }
-        root.insert("children", entries);
+        root.insert("entries", entries);
     }
 
     return root;

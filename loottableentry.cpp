@@ -2,6 +2,7 @@
 #include "ui_loottableentry.h"
 
 #include "mcrpredcondition.h"
+#include "loottablefunction.h"
 #include "loottableeditordock.h"
 
 #include <QDebug>
@@ -14,6 +15,7 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     setTabEnabled(ENTRIES_TAB, false);
 
     ui->conditionsContainer->setLayout(&conditionsLayout);
+    ui->functionsContainer->setLayout(&functionsLayout);
     ui->entriesContainer->setLayout(&entriesLayout);
 
     connect(ui->deleteButton, &QPushButton::clicked, this,
@@ -26,6 +28,8 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     });
     connect(ui->addCondButton, &QPushButton::clicked,
             this, &LootTableEntry::onAddCondition);
+    connect(ui->addFunctButton, &QPushButton::clicked,
+            this, &LootTableEntry::onAddFunction);
     connect(ui->addEntryButton, &QPushButton::clicked,
             this, &LootTableEntry::onAddEntry);
 }
@@ -107,6 +111,18 @@ QJsonObject LootTableEntry::toJson() const {
         root.insert("conditions", conditions);
     }
 
+    childCount = ui->functionsArea->children().count();
+    if (childCount != 0) {
+        QJsonArray functions;
+        for (auto *child : ui->functionsContainer->children()) {
+            LootTableFunction *childFunct = qobject_cast<LootTableFunction*>(
+                child);
+            if (childFunct != nullptr)
+                functions.push_back(childFunct->toJson());
+        }
+        root.insert("functions", functions);
+    }
+
     return root;
 }
 
@@ -160,6 +176,48 @@ void LootTableEntry::onAddCondition() {
     MCRPredCondition *cond = new MCRPredCondition(ui->conditionsContainer);
 
     conditionsLayout.addWidget(cond, 0);
+}
+
+void LootTableEntry::onAddFunction() {
+    LootTableFunction *funct = new LootTableFunction(ui->functionsArea);
+
+    functionsLayout.addWidget(funct, 0);
+}
+
+void LootTableEntry::reset(int index) {
+    switch (index) {
+    case 0:     /*Empty */
+        break;
+
+    case 1:       /*Item */
+    case 2: {     /*Loot table */
+        ui->nameEdit->clear();
+        break;
+    }
+
+    case 3: {    /*Tag */
+        ui->nameEdit->clear();
+        ui->tagExpandCheck->unset();
+        break;
+    }
+
+    case 4: {    /*Group */
+        auto nestedEntryWids =
+            ui->entriesContainer->findChildren<LootTableEntry*>(
+                QString(), Qt::FindDirectChildrenOnly);
+        for (auto child : nestedEntryWids)
+            child->deleteLater();
+        break;
+    }
+
+    case 5: {    /*Dynamic */
+        ui->nameEdit->clear();
+        break;
+    }
+
+    default:
+        break;
+    }
 }
 
 void LootTableEntry::onAddEntry() {
