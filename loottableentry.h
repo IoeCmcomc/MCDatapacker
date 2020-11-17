@@ -40,7 +40,7 @@ private:
     QHBoxLayout functionsLayout;
     QHBoxLayout entriesLayout;
     const QStringList entryTypes =
-    { "empty", "item", "loot_table", "tag", "group", "sequence" };
+    { "empty", "item", "loot_table", "tag", "dynamic" };
 
     const int ENTRIES_TAB = 3;
 

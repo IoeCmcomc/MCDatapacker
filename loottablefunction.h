@@ -20,6 +20,7 @@ public:
     ~LootTableFunction();
 
     QJsonObject toJson() const;
+    void fromJson(const QJsonObject &root);
 
 private slots:
     void onTypeChanged(int index);

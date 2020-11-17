@@ -5,6 +5,7 @@
 #include "mcrpredcondition.h"
 #include "loottableentry.h"
 #include "loottablefunction.h"
+#include "globalhelpers.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -24,6 +25,10 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
             this, &LootTableEditorDock::writeJson);
+    connect(ui->readLootTableBtn, &QPushButton::clicked,
+            this, &LootTableEditorDock::readJson);
+
+
     connect(ui->addPoolButton, &QToolButton::clicked,
             this, &LootTableEditorDock::onAddPool);
 
@@ -53,10 +58,7 @@ LootTableEditorDock::~LootTableEditorDock() {
 }
 
 void LootTableEditorDock::writeJson() {
-    ui->poolListView->clearSelection();
-    auto currIndex = ui->poolListView->currentIndex();
-    ui->poolListView->setCurrentIndex(QModelIndex());
-    ui->poolListView->setCurrentIndex(currIndex);
+    onCurrentPoolChanged(QModelIndex(), ui->poolListView->currentIndex());
 
     QJsonObject root;
 
@@ -76,10 +78,47 @@ void LootTableEditorDock::writeJson() {
     setCodeEditorText(QJsonDocument(root).toJson());
 }
 
+void LootTableEditorDock::readJson() {
+    QString input =
+        qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+    QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
+
+    if (json_doc.isNull() || (!json_doc.isObject()))
+        return;
+
+    QJsonObject root = json_doc.object();
+    if (root.isEmpty() || !root.contains("pools")) {
+        return;
+    }
+
+    QString type = root.value("type").toString();
+    if (type.startsWith("minecraft:"))
+        type.remove(0, 10);
+
+    if (types.indexOf(type) > -1)
+        ui->lootTableTypeCombo->setCurrentIndex(types.indexOf(type));
+
+    model.setRowCount(0);
+    reset();
+
+    QJsonArray pools = root.value("pools").toArray();
+    for (auto poolRef : pools) {
+        QStandardItem *item =
+            new QStandardItem(QString("#%1").arg(model.rowCount() + 1));
+        item->setData(poolRef.toObject());
+        model.appendRow(item);
+    }
+    if (model.rowCount() > 0) {
+        ui->poolListView->setCurrentIndex(model.index(0, 0));
+    }
+    checkPools();
+}
+
 void LootTableEditorDock::onAddPool() {
-    qDebug() << "onAddPool";
+    /*qDebug() << "onAddPool"; */
     QStandardItem *item =
         new QStandardItem(QString("#%1").arg(model.rowCount() + 1));
+
     item->setData(writePoolJson());
     model.appendRow(item);
 
@@ -111,7 +150,7 @@ void LootTableEditorDock::onCurrentPoolChanged(const QModelIndex &current,
         auto moveOutJson = writePoolJson();
         model.itemFromIndex(previous)->setData(moveOutJson);
     }
-    if (current.isValid()) {
+    if (current.isValid() && (current != previous)) {
         auto moveInJson =
             model.itemFromIndex(current)->data().value<QJsonObject>();
         readPoolJson(moveInJson);
@@ -128,9 +167,14 @@ void LootTableEditorDock::checkPools() {
 }
 
 void LootTableEditorDock::reset() {
+    /*qDebug() << "reset"; */
     ui->luckBasedCheck->setChecked(false);
     ui->rollsInput->unset();
     ui->bonusRollsInput->unset();
+
+    Glhp::deleteChildrenIn(ui->conditionsContainer);
+    Glhp::deleteChildrenIn(ui->entriesContainer);
+    Glhp::deleteChildrenIn(ui->functionsContainer);
 }
 
 void LootTableEditorDock::onAddCondition() {
@@ -159,30 +203,59 @@ void LootTableEditorDock::onAddEntry() {
 QJsonObject LootTableEditorDock::writePoolJson() {
     QJsonObject root;
 
+    /*qDebug() << "writePoolJson"; */
+
     if (!ui->bonusRollsInput->isCurrentlyUnset()
         && ui->bonusRollsInput->isVisible()) {
         root.insert("bonus_rolls", ui->bonusRollsInput->toJson());
     }
     root.insert("rolls", ui->rollsInput->toJson());
 
-    int childCount = ui->entriesContainer->children().count();
-    if (childCount != 0) {
-        QJsonArray entries;
-        for (auto *child : ui->entriesContainer->children()) {
-            LootTableEntry *childEntry = qobject_cast<LootTableEntry*>(child);
-            if (childEntry != nullptr)
-                entries.push_back(childEntry->toJson());
-        }
+    auto conditions = Glhp::getJsonFromObjectsFromParent<MCRPredCondition>(
+        ui->conditionsContainer);
+    if (!conditions.isEmpty())
+        root.insert("conditions", conditions);
+
+    auto functions = Glhp::getJsonFromObjectsFromParent<LootTableFunction>(
+        ui->functionsContainer);
+    if (!functions.isEmpty())
+        root.insert("functions", functions);
+
+    auto entries = Glhp::getJsonFromObjectsFromParent<LootTableEntry>(
+        ui->entriesContainer);
+    if (!entries.isEmpty())
         root.insert("entries", entries);
-    }
 
     return root;
 }
 
 void LootTableEditorDock::readPoolJson(const QJsonObject &root) {
+    /*qDebug() << "readPoolJson"; */
+
+    ui->poolListView->setDisabled(true);
+
     reset();
+
     ui->rollsInput->fromJson(root.value("rolls"));
     ui->luckBasedCheck->setChecked(root.contains("bonus_rolls"));
     if (root.contains("bonus_rolls"))
         ui->bonusRollsInput->fromJson(root.value("bonus_rolls"));
+
+    if (root.contains("conditions")) {
+        QJsonArray conditions = root.value("conditions").toArray();
+        Glhp::loadJsonToObjectsToLayout<MCRPredCondition>(conditions,
+                                                          conditionsLayout);
+    }
+    if (root.contains("functions")) {
+        QJsonArray functions = root.value("functions").toArray();
+        Glhp::loadJsonToObjectsToLayout<LootTableFunction>(functions,
+                                                           functionsLayout);
+    }
+    if (root.contains("entries")) {
+        QJsonArray entries = root.value("entries").toArray();
+        Glhp::loadJsonToObjectsToLayout<LootTableEntry>(entries, entriesLayout);
+    }
+
+    ui->poolListView->setEnabled(true);
+    ui->poolListView->setFocus();
 }

@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 
 #include "extendeddelegate.h"
+#include "globalhelpers.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -85,18 +86,6 @@ QJsonObject LootTableFunction::toJson() const {
 
     root.insert("function", "minecraft:" +
                 functTypes[ui->functionTypeCombo->currentIndex()]);
-
-    int childCount = ui->conditionsArea->children().count();
-    if (childCount != 0) {
-        QJsonArray conditions;
-        for (auto *child : ui->entriesContainer->children()) {
-            MCRPredCondition *childCond = qobject_cast<MCRPredCondition*>(
-                child);
-            if (childCond != nullptr)
-                conditions.push_back(childCond->toJson());
-        }
-        root.insert("conditions", conditions);
-    }
 
     switch (ui->functionTypeCombo->currentIndex()) {
     case 0: { /*Apply bonus */
@@ -219,17 +208,10 @@ QJsonObject LootTableFunction::toJson() const {
     }
 
     case 10: {   /* Set contents */
-        childCount = ui->entriesArea->children().count();
-        if (childCount != 0) {
-            QJsonArray entries;
-            for (auto *child : ui->entriesContainer->children()) {
-                LootTableEntry *childEntry = qobject_cast<LootTableEntry*>(
-                    child);
-                if (childEntry != nullptr)
-                    entries.push_back(childEntry->toJson());
-            }
+        auto entries = Glhp::getJsonFromObjectsFromParent<LootTableEntry>(
+            ui->entriesContainer);
+        if (!entries.isEmpty())
             root.insert("entries", entries);
-        }
         break;
     }
 
@@ -296,7 +278,15 @@ QJsonObject LootTableFunction::toJson() const {
     }
     }
 
+    auto conditions = Glhp::getJsonFromObjectsFromParent<MCRPredCondition>(
+        ui->conditionsContainer);
+    if (!conditions.isEmpty())
+        root.insert("entries", conditions);
+
     return root;
+}
+
+void LootTableFunction::fromJson(const QJsonObject &root) {
 }
 
 void LootTableFunction::onTypeChanged(int index) {

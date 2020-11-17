@@ -20,6 +20,7 @@ public:
     ~LootTableEditorDock();
 
     void writeJson();
+    void readJson();
 
 signals:
     void isLuckBasedChanged(bool checked);

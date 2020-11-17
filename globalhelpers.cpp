@@ -174,3 +174,13 @@ QVector<QString> Glhp::fileIDList(const QString &dirpath,
     }
     return IDList;
 }
+
+void Glhp::deleteChildrenIn(QWidget *widget) {
+    /*widget->setUpdatesEnabled(false); */
+    auto children = widget->findChildren<QWidget*>
+                        (QString(), Qt::FindDirectChildrenOnly);
+
+    for (auto child : children)
+        child->deleteLater();
+    /*widget->setUpdatesEnabled(true); */
+}

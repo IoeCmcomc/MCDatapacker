@@ -4,6 +4,9 @@
 #include "mcrpredcondition.h"
 #include "loottablefunction.h"
 #include "loottableeditordock.h"
+#include "mcrinvslot.h"
+#include "mcrinvitem.h"
+#include "globalhelpers.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -32,6 +35,9 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
             this, &LootTableEntry::onAddFunction);
     connect(ui->addEntryButton, &QPushButton::clicked,
             this, &LootTableEntry::onAddEntry);
+
+    ui->itemSlot->setAcceptMultiItems(false);
+    ui->itemSlot->setAcceptTag(false);
 }
 
 LootTableEntry::~LootTableEntry() {
@@ -39,6 +45,89 @@ LootTableEntry::~LootTableEntry() {
 }
 
 void LootTableEntry::fromJson(const QJsonObject &root) {
+    if (!root.contains("type"))
+        return;
+
+    QString type = root.value("type").toString();
+    if (type.startsWith("minecraft:"))
+        type.remove(0, 10);
+
+    int index = entryTypes.indexOf(type);
+    if (index == -1)
+        return;
+
+    if (root.contains("quality")) {
+        ui->qualitySpin->setEnabled(true);
+        ui->qualitySpin->setValue(root.value("quality").toInt());
+    }
+
+    ui->typeCmobo->setCurrentIndex(index);
+    switch (index) {
+    case 0:     /*Empty */
+        break;
+
+    case 1: {      /*Item */
+        if (root.contains("name"))
+            ui->itemSlot->appendItem(MCRInvItem(root.value("name").toString()));
+        break;
+    }
+
+    case 2: {     /*Loot table */
+        if (root.contains("name"))
+            ui->nameEdit->setText(root.value("name").toString());
+        break;
+    }
+
+    case 3: {    /*Tag */
+        if (root.contains("name"))
+            ui->nameEdit->setText(root.value("name").toString());
+        ui->tagExpandCheck->setupFromJsonObject(root, "expand");
+        break;
+    }
+
+
+    case 4: {    /*Dynamic */
+        if (root.contains("name")) {
+            auto name = root.value("name").toString();
+            if (name == QStringLiteral("minecraft:contents")
+                || name == QStringLiteral("minecraft:self")) {
+                ui->nameEdit->setText(name);
+            }
+        }
+        break;
+    }
+
+    default: {     /*Group */
+        if (type == "alternatives") {
+            ui->selectAltRadio->setChecked(true);
+        } else if (type == "group") {
+            ui->selectAllRadio->setChecked(true);
+        } else if (type == "sequence") {
+            ui->selectAltRadio->setChecked(true);
+        } else {
+            break;
+        }
+
+        if (root.contains("children")) {
+            QJsonArray children = root.value("children").toArray();
+            Glhp::loadJsonToObjectsToLayout<LootTableEntry>(children,
+                                                            entriesLayout);
+        }
+
+        break;
+    }
+    }
+
+    if (root.contains("conditions")) {
+        QJsonArray conditions = root.value("conditions").toArray();
+        Glhp::loadJsonToObjectsToLayout<MCRPredCondition>(conditions,
+                                                          conditionsLayout);
+    }
+    if (root.contains("functions")) {
+        QJsonArray functions = root.value("functions").toArray();
+        Glhp::loadJsonToObjectsToLayout<LootTableFunction>(functions,
+                                                           functionsLayout);
+    }
 }
 
 QJsonObject LootTableEntry::toJson() const {
@@ -53,7 +142,12 @@ QJsonObject LootTableEntry::toJson() const {
         case 0: /*Empty */
             break;
 
-        case 1:   /*Item */
+        case 1: {  /*Item */
+            if (ui->itemSlot->getItems().count() == 1)
+                root.insert("name", ui->itemSlot->itemNamespacedID(0));
+            break;
+        }
+
         case 2: { /*Loot table */
             if (!ui->nameEdit->text().isEmpty())
                 root.insert("name", ui->nameEdit->text());
@@ -72,18 +166,11 @@ QJsonObject LootTableEntry::toJson() const {
                 root.insert("type", "minecraft:alternatives");
             else if (ui->selectSeqRadio->isChecked())
                 root.insert("type", "minecraft:sequence");
-            int childCount = ui->entriesContainer->children().count();
-            if (childCount != 0) {
-                QJsonArray children;
-                for (auto *child : ui->entriesContainer->children()) {
-                    LootTableEntry *childEntry = qobject_cast<LootTableEntry*>(
-                        child);
-                    if (childEntry != nullptr)
-                        children.push_back(childEntry->toJson());
-                }
-                root.insert("children", children);
-            }
 
+            auto children = Glhp::getJsonFromObjectsFromParent<
+                LootTableEntry>(ui->entriesContainer);
+            if (!children.isEmpty())
+                root.insert("children", children);
             break;
         }
 
@@ -99,29 +186,15 @@ QJsonObject LootTableEntry::toJson() const {
             break;
         }
 
-    int childCount = ui->conditionsContainer->children().count();
-    if (childCount != 0) {
-        QJsonArray conditions;
-        for (auto *child : ui->conditionsContainer->children()) {
-            MCRPredCondition *childCond = qobject_cast<MCRPredCondition*>(
-                child);
-            if (childCond != nullptr)
-                conditions.push_back(childCond->toJson());
-        }
+    auto conditions = Glhp::getJsonFromObjectsFromParent<MCRPredCondition>(
+        ui->conditionsContainer);
+    if (!conditions.isEmpty())
         root.insert("conditions", conditions);
-    }
 
-    childCount = ui->functionsArea->children().count();
-    if (childCount != 0) {
-        QJsonArray functions;
-        for (auto *child : ui->functionsContainer->children()) {
-            LootTableFunction *childFunct = qobject_cast<LootTableFunction*>(
-                child);
-            if (childFunct != nullptr)
-                functions.push_back(childFunct->toJson());
-        }
+    auto functions = Glhp::getJsonFromObjectsFromParent<LootTableFunction>(
+        ui->functionsContainer);
+    if (!functions.isEmpty())
         root.insert("functions", functions);
-    }
 
     return root;
 }
@@ -189,7 +262,10 @@ void LootTableEntry::reset(int index) {
     case 0:     /*Empty */
         break;
 
-    case 1:       /*Item */
+    case 1: {      /*Item */
+        ui->itemSlot->clearItems();
+    }
+
     case 2: {     /*Loot table */
         ui->nameEdit->clear();
         break;
@@ -202,11 +278,7 @@ void LootTableEntry::reset(int index) {
     }
 
     case 4: {    /*Group */
-        auto nestedEntryWids =
-            ui->entriesContainer->findChildren<LootTableEntry*>(
-                QString(), Qt::FindDirectChildrenOnly);
-        for (auto child : nestedEntryWids)
-            child->deleteLater();
+        /*Glhp::deleteChildrenIn(ui->entriesContainer); */
         break;
     }
 
@@ -218,6 +290,10 @@ void LootTableEntry::reset(int index) {
     default:
         break;
     }
+
+    Glhp::deleteChildrenIn(ui->conditionsContainer);
+    Glhp::deleteChildrenIn(ui->entriesContainer);
+    Glhp::deleteChildrenIn(ui->functionsContainer);
 }
 
 void LootTableEntry::onAddEntry() {
