@@ -57,6 +57,9 @@ private:
                                         "block_entity" };
     const QStringList operationTypes = { "addition", "multiply_base",
                                          "multiply_total" };
+    const QStringList slotTypes = { "mainhand", "offhand", "head",
+                                    "chest",    "legs",    "feet" };
+
     ViewEventFilter viewFilter;
 
     void initBlocksModel();

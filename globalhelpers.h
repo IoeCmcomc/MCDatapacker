@@ -26,6 +26,8 @@ namespace Glhp {
                                 const QString &nspace = "");
     void deleteChildrenIn(QWidget *widget);
 
+    void removePrefix(QString &str, const QString &prefix);
+
 
     /* Template functions */
     template < class T >

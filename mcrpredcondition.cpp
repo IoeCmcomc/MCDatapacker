@@ -275,8 +275,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
     auto value = QJsonObject::fromVariantMap(valueMap);
 
     QString condType = value["condition"].toString();
-    if (condType.startsWith("minecraft:"))
-        condType.remove(0, 10);
+    Glhp::removePrefix(condType, "minecraft:");
 
     bool isRandChanceWithLoot = false;
     if (condType.endsWith("random_chance_with_looting")) {
@@ -751,7 +750,7 @@ void MCRPredCondition::setupRefCombo() {
     if (condRefsModel.rowCount() > 0)
         condRefsModel.clear();
     auto predRefIDs = Glhp::fileIDList(MainWindow::getCurDir(),
-                                                "predicates");
+                                       "predicates");
 
     for (auto predRef : predRefIDs)
         condRefsModel.appendRow(new QStandardItem(predRef));

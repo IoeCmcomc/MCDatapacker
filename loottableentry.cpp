@@ -49,10 +49,9 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
         return;
 
     QString type = root.value("type").toString();
-    if (type.startsWith("minecraft:"))
-        type.remove(0, 10);
+    Glhp::removePrefix(type, "minecraft:");
 
-    int index = entryTypes.indexOf(type);
+    const int index = entryTypes.indexOf(type);
     if (index == -1)
         return;
 

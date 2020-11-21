@@ -1,12 +1,13 @@
 #include "loottablefunction.h"
 #include "loottableentry.h"
+
 #include "mcrpredcondition.h"
 #include "ui_loottablefunction.h"
 #include "mcrinvitem.h"
 #include "mainwindow.h"
-
 #include "extendeddelegate.h"
 #include "globalhelpers.h"
+#include "modelfunctions.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -65,7 +66,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     connect(ui->setAttr_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::setAttr_onAdded);
 
-    ui->entriesArea->setLayout(&entriesLayout);
+    ui->entriesContainer->setLayout(&entriesLayout);
     connect(ui->addEntryButton, &QPushButton::clicked,
             this, &LootTableFunction::entries_onAdded);
 
@@ -108,8 +109,8 @@ QJsonObject LootTableFunction::toJson() const {
         QJsonArray ops;
         for (int i = 0; i < ui->copyNBT_table->rowCount(); ++i) {
             auto source = ui->copyNBT_table->item(i, 0)->text();
-            auto op     = ui->copyNBT_table->item(i, 1)->
-                          data(Qt::UserRole + 1).toString();
+            auto op     = entityTargets[ui->copyNBT_table->item(i, 1)->
+                                        data(Qt::UserRole + 1).toInt()];
             auto target = ui->copyNBT_table->item(i, 2)->text();
             ops.push_back(
                 QJsonObject({ { QStringLiteral("source"), source },
@@ -122,8 +123,10 @@ QJsonObject LootTableFunction::toJson() const {
     }
 
     case 2: { /* Copy states */
-        root.insert("block", ui->copyState_blockCombo->currentData(
-                        Qt::UserRole + 1).toString());
+        root.insert("block",
+                    qvariant_cast<MCRInvItem>(
+                        ui->copyState_blockCombo->currentData(
+                            Qt::UserRole + 1)).getNamespacedID());
         QJsonArray properties;
         for (int i = 0; i < ui->copyState_list->count(); i++) {
             properties.append(ui->copyState_list->item(i)->text());
@@ -155,7 +158,7 @@ QJsonObject LootTableFunction::toJson() const {
                                                                   1).toString());
         root.insert("decoration", ui->map_decoCombo->currentData(Qt::UserRole +
                                                                  1).toString());
-        root.insert("root", ui->map_zoomSpin->value());
+        root.insert("zoom", ui->map_zoomSpin->value());
         root.insert("search_radius", ui->map_radiusSpin->value());
         ui->map_skipExistingCheck->insertToJsonObject(root,
                                                       "skip_existing_chunks");
@@ -192,14 +195,21 @@ QJsonObject LootTableFunction::toJson() const {
             auto slotList = QJsonArray::fromStringList(
                 ui->setAttr_table->item(i, 4)
                 ->data(Qt::UserRole + 1).toStringList());
+            QJsonValue slotValue;
+            if (slotList.count() == 1)
+                slotValue = slotList[0].toString();
+            else
+                slotValue = slotList;
+
             QJsonObject modifier {
                 { "name", name },
                 { "attribute", attr },
                 { "operation", op },
                 { "amount", ammount },
-                { "slot", slotList },
-                { "id", id }
+                { "slot", slotValue },
             };
+            if (!id.isEmpty())
+                modifier.insert("id", id);
             modifiers.append(modifier);
         }
         if (!modifiers.isEmpty())
@@ -287,6 +297,366 @@ QJsonObject LootTableFunction::toJson() const {
 }
 
 void LootTableFunction::fromJson(const QJsonObject &root) {
+    if (!root.contains("function"))
+        return;
+
+    QString function = root.value("function").toString();
+    Glhp::removePrefix(function, "minecraft:");
+
+    const int index = functTypes.indexOf(function);
+/*
+      if (index == -1)
+          return;
+ */
+
+    ui->functionTypeCombo->setCurrentIndex(index);
+
+    switch (index) {
+    case 0: { /*Apply bonus */
+        if (!(root.contains("enchantment") && root.contains("formula")))
+            return;
+
+        setupComboFrom(ui->bonus_enchantCombo, root.value("enchantment"));
+        int formulaIndex =
+            formulaTypes.indexOf(root.value("formula").toString());
+
+        ui->bonus_formulaCombo->setCurrentIndex(formulaIndex);
+        if (formulaIndex == 0) {
+            if (root.contains("extra"))
+                ui->bonus_extraSpin->setValue(root.value("extra").toInt());
+            if (root.contains("probability"))
+                ui->bonus_probSpin->setValue(root.value("probability").toInt());
+        } else if (formulaIndex == 1) {
+            if (root.contains("bonusMultiplier"))
+                ui->bonus_multiplierSpin->setValue(root.value(
+                                                       "bonusMultiplier").toInt());
+        }
+        break;
+    }
+
+    case 1: { /*Copy NBT */
+        if (!root.contains("source"))
+            return;
+
+        ui->copyNBT_entityCombo->setCurrentIndex(
+            entityTargets.indexOf(root.value("source").toString()));
+
+        if (root.contains("ops")) {
+            QJsonArray ops = root.value("ops").toArray();
+            for (auto opRef: ops) {
+                if (!opRef.isObject())
+                    continue;
+                auto op = opRef.toObject();
+                if (!(op.contains("source") && op.contains("target")))
+                    continue;
+                QTableWidgetItem *srcItem = new QTableWidgetItem(
+                    op.value("source").toString());
+                QString opText = op.value("op").toString();
+                if (operationTypes.indexOf(opText) == -1)
+                    continue;
+                QTableWidgetItem *opItem = new QTableWidgetItem(
+                    ui->copyNBT_opCombo->itemText(
+                        operationTypes.indexOf(opText)));
+                opItem->setData(Qt::UserRole + 1, opText);
+                opItem->setFlags(opItem->flags() & ~Qt::ItemIsEditable);
+                QTableWidgetItem *targetItem = new QTableWidgetItem(
+                    op.value("target").toString());
+                appendRowToTableWidget(ui->copyNBT_table,
+                                       { srcItem, opItem, targetItem });
+            }
+        }
+        break;
+    }
+
+    case 2: { /* Copy states */
+        if (!root.contains("block"))
+            return;
+
+        QVariant vari;
+        vari.setValue(MCRInvItem(root.value("block").toString()));
+
+        setupComboFrom(ui->copyState_blockCombo, vari);
+
+        if (root.contains("properties")) {
+            QJsonArray properties = root.value("properties").toArray();
+            for (auto propRef : properties) {
+                ui->copyState_list->addItem(propRef.toString());
+            }
+        }
+        break;
+    }
+
+    case 3: { /* Enchant randomly */
+        if (root.contains("enchantments")) {
+            QJsonArray enchantments = root.value("enchantments").toArray();
+            for (auto enchantmentRef : enchantments) {
+                auto enchantmentId  = enchantmentRef.toString();
+                int  enchantmentIdx = ui->enchantRand_enchantCombo->
+                                      findData(enchantmentId, Qt::UserRole + 1);
+                if (enchantmentIdx == -1)
+                    continue;
+
+                QListWidgetItem *enchantItem = new QListWidgetItem(
+                    ui->enchantRand_enchantCombo->itemText(enchantmentIdx));
+
+                enchantItem->setData(Qt::UserRole + 1,
+                                     enchantmentId);
+                ui->enchantRand_list->addItem(enchantItem);
+            }
+        }
+        break;
+    }
+
+    case 4: { /* Enchant with level */
+        if (!root.contains("levels"))
+            return;
+
+        ui->levelEnchant_treasureCheck->setupFromJsonObject(root, "treasure");
+        ui->levelEnchant_levelInput->fromJson(root.value("levels"));
+        break;
+    }
+
+    case 5: { /* Exploration map */
+        setupComboFrom(ui->map_destCombo, root.value("destination").toString());
+        setupComboFrom(ui->map_decoCombo, root.value("decoration").toString());
+
+        if (root.contains("zoom"))
+            ui->map_zoomSpin->setValue(root.value("zoom").toInt());
+        if (root.contains("search_radius"))
+            ui->map_radiusSpin->setValue(root.value("search_radius").toInt());
+
+        ui->map_skipExistingCheck
+        ->setupFromJsonObject(root, "skip_existing_chunks");
+        break;
+    }
+
+    case 6: {   /* Fills player head */
+        if (!root.contains("entity"))
+            return;
+
+        ui->fillHead_entityType->setCurrentIndex(
+            entityTargets.indexOf(root.value("entity").toString()));
+        break;
+    }
+
+    case 7: {   /* Limit count */
+        if (!root.contains("limit"))
+            return;
+
+        ui->limitCount_limitInput->fromJson(root.value("limit"));
+        break;
+    }
+
+    case 8: {   /* Looting enchant */
+        if (!root.contains("count"))
+            return;
+
+        ui->lootEnchant_countInput->fromJson(root.value("count"));
+
+        if (root.contains("limit"))
+            ui->lootEnchant_limitSpin->setValue(root.value("limit").toInt());
+        break;
+    }
+
+    case 9: {   /* Set attributes */
+        if (!root.contains("modifiers"))
+            return;
+
+        QJsonArray modifiers = root.value("modifiers").toArray();
+        for (auto modifierRef: modifiers) {
+            auto modifier = modifierRef.toObject();
+
+            if (!(modifier.contains("attribute")
+                  && modifier.contains("name")
+                  && modifier.contains("amount")
+                  && modifier.contains("operation")
+                  && modifier.contains("slot"))) {
+                continue;
+            }
+
+            QTableWidgetItem *nameItem = new QTableWidgetItem(
+                modifier.value("name").toString());
+
+            auto attrId  = modifier.value("attribute").toString();
+            int  attrIdx = ui->setAttr_attrCombo->findText(attrId);
+            if (attrIdx == -1)
+                continue;
+
+            QTableWidgetItem *attrItem = new QTableWidgetItem(
+                ui->setAttr_attrCombo->itemText(attrIdx));
+            attrItem->setFlags(attrItem->flags() & ~Qt::ItemIsEditable);
+
+            auto opId  = modifier.value("operation").toString();
+            int  opIdx = operationTypes.indexOf(opId);
+            if (opIdx == -1)
+                continue;
+
+            QTableWidgetItem *opItem = new QTableWidgetItem(
+                ui->setAttr_opCombo->itemText(opIdx));
+            opItem->setData(Qt::UserRole + 1, opId);
+            opItem->setFlags(opItem->flags() & ~Qt::ItemIsEditable);
+
+            QTableWidgetItem *IDItem = new QTableWidgetItem(
+                (modifier.contains("id"))
+                    ? modifier.value("id").toString() : "");
+
+            QTableWidgetItem *amountItem = new QTableWidgetItem();
+            amountItem->setData(Qt::DisplayRole,
+                                modifier.value("amount"));
+            amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
+
+            auto        slotsVal = modifier.value("slot");
+            QStringList slotsList;
+            if (slotsVal.isString()) {
+                QString slot = slotsVal.toString();
+                if (slotTypes.contains(slot))
+                    slotsList << slot;
+            } else if (slotsVal.isArray()) {
+                for (auto slotRef: slotsVal.toArray()) {
+                    QString slot = slotRef.toString();
+                    if (slotTypes.contains(slot))
+                        slotsList << slot;
+                    else
+                        continue;
+                }
+            }
+
+            QTableWidgetItem *slotsItem =
+                new QTableWidgetItem(slotsList.join(", "));
+            slotsItem->setData(Qt::UserRole + 1, slotsList);
+            slotsItem->setFlags(slotsItem->flags() & ~Qt::ItemIsEditable);
+
+            appendRowToTableWidget(ui->setAttr_table,
+                                   { nameItem, attrItem, opItem, amountItem,
+                                     slotsItem, IDItem });
+        }
+        break;
+    }
+
+    case 10: {   /* Set contents */
+        if (root.contains("entries")) {
+            QJsonArray children = root.value("entries").toArray();
+            Glhp::loadJsonToObjectsToLayout<LootTableEntry>(children,
+                                                            entriesLayout);
+        }
+        break;
+    }
+
+    case 11: {   /* Set count */
+        if (!root.contains("count"))
+            return;
+
+        ui->setCount_countInput->fromJson(root.value("count"));
+        break;
+    }
+
+    case 12: {   /* Set damage */
+        if (!root.contains("damage"))
+            return;
+
+        ui->setDamage_damageInput->fromJson(root.value("damage"));
+        break;
+    }
+
+    case 13: {   /* Set loot table */
+        if (!root.contains("name"))
+            return;
+
+        ui->lootTable_idEdit->setText(root.value("name").toString());
+
+        if (root.contains("seed"))
+            ui->lootTable_seedSpin->setValue(root.value("seed").toInt());
+        break;
+    }
+
+    case 14: {   /* Set lore */
+        if (root.contains("entity"))
+            ui->setLore_entityCombo->setCurrentIndex(
+                entityTargets.indexOf(root.value("entity").toString()));
+
+        ui->setLore_replaceCheck->setupFromJsonObject(root, "replace");
+
+        if (root.contains("lore")) {
+            auto lore = QVariantList(root.value("lore")
+                                     .toArray().toVariantList()).toVector();
+            auto *textEdit = ui->setLore_textEdit->getTextEdit();
+            textEdit->clear();
+            for (int i = 0; i < lore.count(); i++)
+                textEdit->append(lore[i].toString());
+        }
+        break;
+    }
+
+    case 15: {   /* Set name */
+        if (root.contains("entity"))
+            ui->setName_entityCombo->setCurrentIndex(
+                entityTargets.indexOf(root.value("entity").toString()));
+
+        if (root.contains("name"))
+            ui->setName_textEdit->getTextEdit()->setPlainText(
+                root.value("name").toString());
+        break;
+    }
+
+    case 16: {   /* Set NBT string */
+        if (!root.contains("nbt"))
+            return;
+
+        ui->setNBT_NBTEdit->setText(root.value("nbt").toString());
+        break;
+    }
+
+    case 17: {   /* Set stew effects */
+        if (!root.contains("effects"))
+            return;
+
+        QJsonArray effects = root.value("effects").toArray();
+        for (auto effectRef: effects) {
+            auto effect = effectRef.toObject();
+            if (!effect.contains("type"))
+                continue;
+            auto typeId  = effect.value("type").toString();
+            int  typeIdx = ui->stewEffect_effectCombo->
+                           findData(typeId, Qt::UserRole + 1);
+            if (typeIdx == -1)
+                continue;
+
+            QTableWidgetItem *effectItem = new QTableWidgetItem(
+                ui->stewEffect_effectCombo->itemText(typeIdx));
+            effectItem->setData(Qt::UserRole + 1, ui->stewEffect_effectCombo->
+                                currentData(Qt::UserRole + 1));
+            effectItem->setFlags(effectItem->flags() & ~Qt::ItemIsEditable);
+
+            if (!effect.contains("duration"))
+                continue;
+
+            QTableWidgetItem *durationItem = new QTableWidgetItem();
+            durationItem->setData(Qt::DisplayRole,
+                                  effect.value("duration").toInt());
+
+            appendRowToTableWidget(ui->stewEffect_table,
+                                   { effectItem, durationItem });
+        }
+        break;
+    }
+
+    case 18: {   /* Copy name */
+        if (!root.contains("source"))
+            return;
+
+        auto source = root.value("source").toString();
+        if (source != "block_entity")
+            return;
+
+        break;
+    }
+    }
+
+    if (root.contains("conditions")) {
+        QJsonArray conditions = root.value("conditions").toArray();
+        Glhp::loadJsonToObjectsToLayout<MCRPredCondition>(conditions,
+                                                          conditionsLayout);
+    }
 }
 
 void LootTableFunction::onTypeChanged(int index) {
@@ -388,7 +758,8 @@ void LootTableFunction::setAttr_onAdded() {
 }
 
 void LootTableFunction::entries_onAdded() {
-    LootTableEntry *entry = new LootTableEntry(ui->entriesContainer);
+    LootTableEntry *entry =
+        new LootTableEntry(ui->entriesContainer);
 
     entriesLayout.addWidget(entry, 0);
 }
@@ -400,6 +771,9 @@ void LootTableFunction::effectStew_onAdded() {
 
     QTableWidgetItem *effectItem = new QTableWidgetItem(
         ui->stewEffect_effectCombo->currentText());
+    effectItem->setData(Qt::UserRole + 1,
+                        ui->stewEffect_effectCombo->currentData(
+                            Qt::UserRole + 1));
     effectItem->setFlags(effectItem->flags() & ~Qt::ItemIsEditable);
 
     QTableWidgetItem *durationItem = new QTableWidgetItem();

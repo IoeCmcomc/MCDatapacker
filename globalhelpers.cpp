@@ -184,3 +184,8 @@ void Glhp::deleteChildrenIn(QWidget *widget) {
         child->deleteLater();
     /*widget->setUpdatesEnabled(true); */
 }
+
+void Glhp::removePrefix(QString &str, const QString &prefix) {
+    if (str.startsWith(prefix))
+        str.remove(0, prefix.length());
+}
