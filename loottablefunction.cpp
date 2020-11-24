@@ -248,16 +248,20 @@ QJsonObject LootTableFunction::toJson() const {
         root.insert("entity",
                     entityTargets[ui->setLore_entityCombo->currentIndex()]);
         ui->setLore_replaceCheck->insertToJsonObject(root, "replace");
-        QString loreText = ui->setLore_textEdit->getTextEdit()->toPlainText();
-        auto    lore     = QJsonArray::fromStringList(loreText.split('\n'));
-        root.insert("lore", lore);
+/*
+          QString loreText = ui->setLore_textEdit->getTextEdit()->toPlainText();
+          auto    lore     = QJsonArray::fromStringList(loreText.split('\n'));
+          root.insert("lore", lore);
+ */
+        root.insert("lore", ui->setLore_textEdit->toJson());
         break;
     }
 
     case 15: {   /* Set name */
         root.insert("entity",
                     entityTargets[ui->setName_entityCombo->currentIndex()]);
-        root.insert("name", ui->setName_textEdit->getTextEdit()->toPlainText());
+        /*root.insert("name", ui->setName_textEdit->getTextEdit()->toPlainText()); */
+        root.insert("name", ui->setName_textEdit->toJson());
         break;
     }
 
@@ -593,8 +597,11 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                 entityTargets.indexOf(root.value("entity").toString()));
 
         if (root.contains("name"))
-            ui->setName_textEdit->getTextEdit()->setPlainText(
-                root.value("name").toString());
+/*
+              ui->setName_textEdit->getTextEdit()->setPlainText(
+                  root.value("name").toString());
+ */
+            ui->setName_textEdit->fromJson(root.value("name"));
         break;
     }
 
