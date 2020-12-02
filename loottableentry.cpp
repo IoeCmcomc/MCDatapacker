@@ -263,6 +263,7 @@ void LootTableEntry::reset(int index) {
 
     case 1: {      /*Item */
         ui->itemSlot->clearItems();
+        break;
     }
 
     case 2: {     /*Loot table */

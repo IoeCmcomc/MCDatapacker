@@ -19,6 +19,7 @@ SOURCES += \
     basecondition.cpp \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
+    codefile.cpp \
     datapacktreeview.cpp \
     dialogdatabutton.cpp \
     entityconditiondialog.cpp \
@@ -46,6 +47,7 @@ SOURCES += \
     rawjsontextedit.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
+    tabbedcodeeditorinterface.cpp \
     tagselectordialog.cpp \
     truefalsebox.cpp \
     vieweventfilter.cpp \
@@ -55,6 +57,7 @@ HEADERS += \
     basecondition.h \
     blockitemselectordialog.h \
     codeeditor.h \
+    codefile.h \
     datapacktreeview.h \
     dialogdatabutton.h \
     entityconditiondialog.h \
@@ -82,6 +85,7 @@ HEADERS += \
     rawjsontextedit.h \
     settingsdialog.h \
     stackedwidget.h \
+    tabbedcodeeditorinterface.h \
     tagselectordialog.h \
     truefalsebox.h \
     vieweventfilter.h \
@@ -104,6 +108,7 @@ FORMS += \
     predicatedock.ui \
     rawjsontextedit.ui \
     settingsdialog.ui \
+    tabbedcodeeditorinterface.ui \
     tagselectordialog.ui \
     visualrecipeeditordock.ui
 

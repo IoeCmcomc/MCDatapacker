@@ -10,42 +10,42 @@ void Glhp::someTest() {
     qDebug() << "GlobalHelpers::someTest()";
 }
 
-MainWindow::MCRFileType Glhp::toMCRFileType(const QString &dirpath,
-                                            const QString &filepath) {
+CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
+                                        const QString &filepath) {
     if (filepath.isEmpty())
-        return MainWindow::Text;
+        return CodeFile::Text;
 
     QFileInfo     info     = QFileInfo(filepath);
     const QString jsonExts = "json mcmeta";
 
     if (info.suffix() == "mcfunction") {
-        return MainWindow::Function;
+        return CodeFile::Function;
     } else if (info.completeSuffix() == "nbt") {
-        return MainWindow::Structure;
+        return CodeFile::Structure;
     } else if (jsonExts.contains(info.completeSuffix())) {
         if (isPathRelativeTo(dirpath, filepath, "advancements")) {
-            return MainWindow::Advancement;
+            return CodeFile::Advancement;
         } else if (isPathRelativeTo(dirpath, filepath, "loot_tables")) {
-            return MainWindow::LootTable;
+            return CodeFile::LootTable;
         } else if (isPathRelativeTo(dirpath, filepath, "predicates")) {
-            return MainWindow::Predicate;
+            return CodeFile::Predicate;
         } else if (isPathRelativeTo(dirpath, filepath, "recipes")) {
-            return MainWindow::Recipe;
+            return CodeFile::Recipe;
         } else if (isPathRelativeTo(dirpath, filepath, "tags/blocks")) {
-            return MainWindow::BlockTag;
+            return CodeFile::BlockTag;
         } else if (isPathRelativeTo(dirpath, filepath, "tags/entity_types")) {
-            return MainWindow::EntityTypeTag;
+            return CodeFile::EntityTypeTag;
         } else if (isPathRelativeTo(dirpath, filepath, "tags/fluids")) {
-            return MainWindow::FluidTag;
+            return CodeFile::FluidTag;
         } else if (isPathRelativeTo(dirpath, filepath, "tags/functions")) {
-            return MainWindow::FunctionTag;
+            return CodeFile::FunctionTag;
         } else if (isPathRelativeTo(dirpath, filepath, "tags/items")) {
-            return MainWindow::ItemTag;
+            return CodeFile::ItemTag;
         } else {
-            return MainWindow::JsonText;
+            return CodeFile::JsonText;
         }
     } else {
-        return MainWindow::Text;
+        return CodeFile::Text;
     }
 }
 

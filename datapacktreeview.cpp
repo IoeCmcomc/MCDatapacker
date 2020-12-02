@@ -26,10 +26,8 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &DatapackTreeView::customContextMenuRequested, this,
             &DatapackTreeView::onCustomContextMenu);
-    connect(&dirModel,
-            &QFileSystemModel::fileRenamed,
-            this,
-            &DatapackTreeView::onFileRenamed);
+    connect(&dirModel, &QFileSystemModel::fileRenamed,
+            this, &DatapackTreeView::onFileRenamed);
 }
 
 QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
@@ -48,7 +46,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenu->addAction(cMenuActionOpen);
     }
 
-    if (toMCRFileType(dirPath, finfo.filePath()) == MainWindow::Function) {
+    if (pathToFileType(dirPath, finfo.filePath()) == CodeFile::Function) {
         QAction *cMenuActionInLoadDotJson
             = new QAction(tr("Run this function when loaded"), cMenu);
         cMenuActionInLoadDotJson->setCheckable(true);
@@ -267,14 +265,14 @@ void DatapackTreeView::onFileRenamed(const QString &path,
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
-    if (toMCRFileType(dirPath, oldpath) != MainWindow::Function) return;
+    if (pathToFileType(dirPath, oldpath) != CodeFile::Function) return;
 
     if (isStringInTagFile(dirPath + "/data/minecraft/tags/functions/load.json",
                           toNamespacedID(dirPath, oldpath))) {
         contextMenuModifyTagFile
             (dirPath + "/data/minecraft/tags/functions/load.json",
             toNamespacedID(dirPath, oldpath), false);
-        if (toMCRFileType(dirPath, newpath) != MainWindow::Function) return;
+        if (pathToFileType(dirPath, newpath) != CodeFile::Function) return;
 
         if (!isStringInTagFile(dirPath +
                                "/data/minecraft/tags/functions/load.json",
@@ -360,9 +358,8 @@ void DatapackTreeView::contextMenuOnOpen() {
         const QFileInfo finfo = dirModel.fileInfo(selected);
         /*qDebug() << finfo; */
         if (finfo.exists() && finfo.isFile()) {
-            /*qDebug() << "Open from tree (right click)"; */
-            qobject_cast<MainWindow*>(this->window())->openFile(
-                finfo.absoluteFilePath());
+            qDebug() << "Open from tree (right click)";
+            emit openFileRequested(finfo.absoluteFilePath());
         }
     }
 }
@@ -469,9 +466,7 @@ void DatapackTreeView::contextMenuOnDelete() {
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/tick.json",
                 toNamespacedID(dirPath, filepath), false);
-        auto mainWindow = qobject_cast<MainWindow*>(this->window());
-        mainWindow->setCurrentFile("");
-        mainWindow->setCodeEditorText("");
+        emit fileDeteted(filepath);
     }
 }
 
@@ -481,10 +476,9 @@ void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {
     if (index.isValid()) {
         const QFileInfo finfo = dirModel.fileInfo(index);
         if (finfo.exists() && finfo.isFile()) {
-            /*qDebug() << "Open from tree"; */
+            qDebug() << "Open from tree";
             setCurrentIndex(index);
-            qobject_cast<MainWindow*>(this->window())->openFile(
-                finfo.absoluteFilePath());
+            emit openFileRequested(finfo.absoluteFilePath());
         }
     }
 }

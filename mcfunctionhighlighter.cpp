@@ -1385,10 +1385,10 @@ void MCfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void MCfunctionHighlighter::setEnabled(bool state) {
-    /*qDebug() << "MCfunctionHighlighter::setEnabled : " << state; */
+    qDebug() << "MCfunctionHighlighter::setEnabled : " << state;
     this->enabled = state;
 
-    setDocument(state ? doc : 0);
+    setDocument(state ? doc : nullptr);
 
     /*rehighlight(); */
 }

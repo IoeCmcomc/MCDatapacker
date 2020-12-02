@@ -4,23 +4,20 @@
 #include "newdatapackdialog.h"
 #include "settingsdialog.h"
 #include "globalhelpers.h"
+#include "tabbedcodeeditorinterface.h"
 
 #include <QDebug>
 #include <QFileDialog>
-#include <QFile>
-#include <QIODevice>
-#include <QTextStream>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QUiLoader>
 #include <QSettings>
 #include <QScreen>
 #include <QGuiApplication>
-#include <QSaveFile>
 #include <QFileInfo>
 #include <QAbstractButton>
+#include <QCloseEvent>
 
-MainWindow::MCRFileType     MainWindow::curFileType = Text;
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
 QString                     MainWindow::curDir;
 
@@ -37,33 +34,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     qDebug() << MainWindow::getMCRInfo("blockTag").count();
 
-    QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    monoFont.setPointSize(11);
+    /*ui->codeEditor->setFocus(); */
 
-    ui->codeEditor->setFont(monoFont);
-    ui->codeEditor->setFocus();
-
-    connect(ui->actionNewDatapack,
-            &QAction::triggered,
-            this,
-            &MainWindow::newDatapack);
+    connect(ui->actionNewDatapack, &QAction::triggered,
+            this, &MainWindow::newDatapack);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
-    connect(ui->actionOpenFolder,
-            &QAction::triggered,
-            this,
-            &MainWindow::openFolder);
+    connect(ui->actionOpenFolder, &QAction::triggered,
+            this, &MainWindow::openFolder);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
-    connect(ui->codeEditor->document(), &QTextDocument::contentsChanged,
-            this, &MainWindow::documentWasModified);
-    connect(ui->actionSettings,
-            &QAction::triggered,
+    connect(ui->actionSettings, &QAction::triggered,
+            this, &MainWindow::pref_settings);
+    connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
+            this, &MainWindow::onSystemWatcherFileChanged);
+    connect(ui->codeEditorInterface,
+            &TabbedCodeEditorInterface::curModificationChanged,
             this,
-            &MainWindow::pref_settings);
-    connect(&fileWatcher,
-            &QFileSystemWatcher::fileChanged,
-            this,
-            &MainWindow::onSystemWatcherFileChanged);
+            &MainWindow::updateWindowTitle);
+    connect(ui->codeEditorInterface, &TabbedCodeEditorInterface::curFileChanged,
+            this, &MainWindow::onCurFileChanged);
+    connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::onOpenFile);
 
     readSettings();
 
@@ -78,14 +69,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
+    visualRecipeEditorDock->hide();
 
     lootTableEditorDock = new LootTableEditorDock(this);
     addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
 
     predicateDock = new PredicateDock(this);
     addDockWidget(Qt::RightDockWidgetArea, predicateDock);
-
-    setCurrentFile(QString());
+    predicateDock->hide();
 }
 
 void MainWindow::open() {
@@ -93,20 +84,23 @@ void MainWindow::open() {
         QString fileName
             = QFileDialog::getOpenFileName(this, tr("Open file"), "");
         if (!fileName.isEmpty())
-            openFile(fileName);
+            ui->codeEditorInterface->openFile(fileName);
     }
 }
 
 bool MainWindow::save() {
-    if (curFile.isEmpty()) {
+    if (ui->codeEditorInterface->isNoFile())
+        return false;
+
+    if (ui->codeEditorInterface->getCurFile()->fileInfo.fileName().isEmpty()) {
         QString filepath
             = QFileDialog::getSaveFileName(this, tr("Save File"), "");
         if (!filepath.isEmpty())
-            return saveFile(filepath);
+            return ui->codeEditorInterface->saveCurFile(filepath);
         else
             return false;
     } else {
-        return saveFile(curFile);
+        return ui->codeEditorInterface->saveCurFile();
     }
 }
 
@@ -116,14 +110,9 @@ void MainWindow::pref_settings() {
     dialog.exec();
 }
 
-void MainWindow::documentWasModified() {
-    /*qDebug() << "documentWasModified"; */
-    setWindowModified(ui->codeEditor->document()->isModified());
-}
-
 void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     /*qDebug() << "onSystemWatcherFileChanged"; */
-    if ((filepath != curFile)) return;
+    if ((filepath != ui->codeEditorInterface->getCurFilePath())) return;
 
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
                                                  0);
@@ -148,10 +137,33 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     }
 
     if (reloadExternChanges == 0) {
-        if (!ui->codeEditor->document()->isModified()) {
-            openFile(filepath, true);
+        if (auto *curDoc = ui->codeEditorInterface->getCurDoc();
+            !curDoc->isModified()) {
+            ui->codeEditorInterface->openFile(filepath, true);
         }
     }
+}
+
+void MainWindow::onCurFileChanged(const QString &path) {
+    qDebug() << "MainWindow::onCurFileChanged" << path;
+    if (!path.isEmpty()) {
+        fileWatcher.removePath(path);
+        fileWatcher.addPath(path);
+    }
+
+    auto curFileType = CodeFile::Text;
+
+    qDebug() << ui->codeEditorInterface->getCurIndex();
+    qDebug() << ui->codeEditorInterface->getCurFile()
+             << (bool)ui->codeEditorInterface->getCurFile();
+
+    if (auto *curFile = ui->codeEditorInterface->getCurFile())
+        curFileType = curFile->fileType;
+    /*lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable); */
+    visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
+    predicateDock->setVisible(curFileType == CodeFile::Predicate);
+
+    qDebug() << "MainWindow::onCurFileChanged end";
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -212,19 +224,19 @@ void MainWindow::writeSettings() {
 }
 
 bool MainWindow::maybeSave() {
-    if (!ui->codeEditor->document()->isModified())
+    if (!ui->codeEditorInterface->hasUnsavedChanges())
         return true;
 
     const QMessageBox::StandardButton ret
         = QMessageBox::warning(this,
                                tr("Unsaved changes"),
-                               tr("The document has been modified.\n"
+                               tr("Some document(s) has been modified.\n"
                                   "Do you want to save your changes?"),
                                QMessageBox::Save | QMessageBox::Discard |
                                QMessageBox::Cancel);
     switch (ret) {
     case QMessageBox::Save:
-        return save();
+        return ui->codeEditorInterface->saveAllFile();
 
     case QMessageBox::Cancel:
         return false;
@@ -299,42 +311,23 @@ void MainWindow::changeEvent(QEvent* event) {
 void MainWindow::commitData(QSessionManager &) {
 }
 
-void MainWindow::setCurrentFile(const QString &filepath) {
-    this->curFile = filepath;
-
-    updateWindowTitle();
-    ui->codeEditor->document()->setModified(false);
-    setWindowModified(false);
-
-    curFileType = Glhp::toMCRFileType(curDir, filepath);
-
-    if (!curFile.isEmpty()) {
-        fileWatcher.removePath(curFile);
-        fileWatcher.addPath(curFile);
-    }
-
-    visualRecipeEditorDock->setVisible(MainWindow::curFileType == Recipe);
-    predicateDock->setVisible(MainWindow::curFileType == Predicate);
-    /*lootTableEditorDock->setVisible(MainWindow::curFileType == LootTable); */
-
-    emit curFileChanged(filepath);
-}
-
 QString MainWindow::strippedName(const QString &fullFileName) {
     return QFileInfo(fullFileName).fileName();
 }
 
-void MainWindow::updateWindowTitle() {
+void MainWindow::updateWindowTitle(bool changed) {
     QStringList title;
 
-    if (!curFile.isEmpty())
-        title.push_back(strippedName(curFile) + "[*]");
+    if (auto curPath = ui->codeEditorInterface->getCurFilePath();
+        !curPath.isEmpty())
+        title.push_back(strippedName(curPath) + "[*]");
     else
         title.push_back(QStringLiteral("Untitled") + "[*]");
     if (!curDir.isEmpty())
         title.push_back("[" + strippedName(curDir) + "]");
     title.push_back(QCoreApplication::applicationName());
     setWindowTitle(title.join(QStringLiteral(" - ")));
+    this->setWindowModified(changed);
 }
 
 QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
@@ -385,8 +378,7 @@ void MainWindow::newDatapack() {
 
     if (dialogCode == 1) {
         if (maybeSave()) {
-            ui->codeEditor->clear();
-            setCurrentFile(QString());
+            ui->codeEditorInterface->clear();
         } else {
             return;
         }
@@ -429,76 +421,8 @@ void MainWindow::newDatapack() {
         dir.mkpath(dirPath + "/data/" + namesp);
 
         ui->datapackTreeView->load(dirPath);
-        setCurrentFile("");
     }
     delete dialog;
-}
-
-void MainWindow::openFile(const QString &filepath, bool reload) {
-    /*qDebug() << "openFile"; */
-    if (filepath.isEmpty() || (this->curFile == filepath && (!reload)))
-        return;
-    else {
-        QFile file(filepath);
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            QMessageBox::information(this, tr("Error"),
-                                     tr("Cannot read file %1:\n%2.")
-                                     .arg(QDir::toNativeSeparators(filepath),
-                                          file.errorString()));
-        } else {
-            QTextStream in(&file);
-            in.setCodec("UTF-8");
-
-            #ifndef QT_NO_CURSOR
-            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-            #endif
-
-            int     c = 0;
-            QString content;
-            while (!in.atEnd()) {
-                content += in.readLine();
-                if (!in.atEnd()) content += '\n';
-                ++c;
-            }
-            ui->codeEditor->setPlainText(content);
-            setCurrentFile(filepath);
-
-            #ifndef QT_NO_CURSOR
-            QGuiApplication::restoreOverrideCursor();
-            #endif
-        }
-        file.close();
-    }
-}
-
-bool MainWindow::saveFile(const QString &filepath) {
-    QString errorMessage;
-
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    QSaveFile file(filepath);
-    if (file.open(QFile::WriteOnly | QFile::Text)) {
-        QTextStream out(&file);
-        out.setCodec("UTF-8");
-        out << ui->codeEditor->toPlainText().toUtf8();
-        if (!file.commit()) {
-            errorMessage = tr("Cannot write file %1:\n%2.")
-                           .arg(QDir::toNativeSeparators(filepath),
-                                file.errorString());
-        }
-    } else {
-        errorMessage = tr("Cannot open file %1 for writing:\n%2.")
-                       .arg(QDir::toNativeSeparators(filepath),
-                            file.errorString());
-    }
-    QGuiApplication::restoreOverrideCursor();
-
-    if (!errorMessage.isEmpty()) {
-        QMessageBox::information(this, tr("Error"), errorMessage);
-        return false;
-    }
-
-    setCurrentFile(filepath);
-    return true;
 }
 
 void MainWindow::openFolder() {
@@ -568,14 +492,13 @@ void MainWindow::openFolder() {
                     if (pack.contains("description") &&
                         pack.contains("pack_format")) {
                         ui->datapackTreeView->load(dir);
-                        ui->codeEditor->clear();
                         this->curDir = dir;
 
                         if (!curDir.isEmpty()) {
                             this->fileWatcher.removePath(curDir);
                             this->fileWatcher.addPath(curDir);
                         }
-                        setCurrentFile("");
+                        ui->codeEditorInterface->clear();
                         emit curDirChanged(dir);
                     }
                 }
@@ -590,17 +513,17 @@ void MainWindow::openFolder() {
 
 void MainWindow::setCodeEditorText(const QString &text) {
     /*ui->codeEditor->setPlainText(text); */
-    QTextCursor cursor = ui->codeEditor->textCursor();
+    QTextCursor cursor = ui->codeEditorInterface->getEditor()->textCursor();
 
     cursor.beginEditBlock();
     cursor.select(QTextCursor::Document);
     cursor.insertText(text);
     cursor.endEditBlock();
-    ui->codeEditor->setTextCursor(cursor);
+    ui->codeEditorInterface->getEditor()->setTextCursor(cursor);
 }
 
 QString MainWindow::getCodeEditorText() {
-    return ui->codeEditor->toPlainText();
+    return ui->codeEditorInterface->getCurDoc()->toPlainText();
 }
 
 MainWindow::~MainWindow() {

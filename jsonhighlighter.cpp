@@ -50,6 +50,13 @@ void JsonHighlighter::setupRules() {
     highlightingRules.append(rule);
 }
 
+void JsonHighlighter::setDoc(QTextDocument *value) {
+    qDebug() << "setDocument" << doc << value;
+    doc = value;
+    setDocument(value);
+    qDebug() << doc << document();
+}
+
 void JsonHighlighter::highlightBlock(const QString &text) {
     if (this->enabled) {
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
@@ -68,10 +75,17 @@ void JsonHighlighter::highlightBlock(const QString &text) {
 }
 
 void JsonHighlighter::setEnabled(bool state) {
-    //qDebug() << "JsonHighlighter::setEnabled : " << state;
+    qDebug() << "JsonHighlighter::setEnabled :" << state;
     this->enabled = state;
 
-    setDocument(state ? doc : 0);
+/*
+      qDebug() << doc << document();
+      setDocument(doc);
+      qDebug() << doc << document();
+      setDocument(state ? doc : 0);
+ */
 
-    //rehighlight();
+    qDebug() << "setEnabled done";
+
+    /*rehighlight(); */
 }

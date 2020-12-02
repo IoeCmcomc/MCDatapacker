@@ -115,7 +115,7 @@ void MCRInvSlotEditor::onNewItem() {
 }
 
 void MCRInvSlotEditor::onNewItemTag() {
-    TagSelectorDialog dialog(this, MainWindow::ItemTag);
+    TagSelectorDialog dialog(this, CodeFile::ItemTag);
 
     if (dialog.exec()) {
         auto invItem = MCRInvItem(dialog.getSelectedID());

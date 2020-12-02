@@ -2,6 +2,7 @@
 #define TAGSELECTORDIALOG_H
 
 #include "mainwindow.h"
+#include "codefile.h"
 
 #include <QDialog>
 #include <QStandardItemModel>
@@ -17,8 +18,8 @@ class TagSelectorDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TagSelectorDialog(QWidget *parent              = nullptr,
-                               MainWindow::MCRFileType type = MainWindow::ItemTag);
+    explicit TagSelectorDialog(QWidget *parent         = nullptr,
+                               CodeFile::FileType type = CodeFile::ItemTag);
     ~TagSelectorDialog();
 
     QString getSelectedID();
@@ -34,7 +35,7 @@ private:
     QPushButton *selectButton;
     QMap<QString, QVariant> MCRTagInfo;
 
-    void setupTagTreeView(MainWindow::MCRFileType type);
+    void setupTagTreeView(CodeFile::FileType type);
     QString getInternalSelectedID();
 };
 

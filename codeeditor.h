@@ -2,11 +2,12 @@
 #define CODEEDITOR_H
 
 #include <QPlainTextEdit>
-#include <QTextEdit>
+/*#include <QTextEdit> */
 #include <QString>
 
 #include "jsonhighlighter.h"
 #include "mcfunctionhighlighter.h"
+#include "codefile.h"
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -24,7 +25,7 @@ public:
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
 
-    void setCurFile(QString filepath);
+    void setFilePath(const QString &path);
     CurrentNamespacedID getCurrentNamespacedID();
 
 protected:
@@ -35,7 +36,6 @@ protected:
     void dropEvent(QDropEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
 
-
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void onCursorPositionChanged();
@@ -43,8 +43,9 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
-    QString curFile;
-    QString prevCurFile;
+    CodeFile::FileType curFileType;
+    QString filepath;
+    QString prevFilepath;
     QStringList keyModifiers;
     JsonHighlighter *jsonHighlighter;
     MCfunctionHighlighter *mcfunctionHighlighter;

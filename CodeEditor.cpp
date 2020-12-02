@@ -17,10 +17,11 @@
 #include <QMimeData>
 #include <QDir>
 #include <QJsonDocument>
+#include <QFont>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
-    lineNumberArea        = new LineNumberArea(this);
-    jsonHighlighter       = new JsonHighlighter(this->document());
+    lineNumberArea = new LineNumberArea(this);
+    /*jsonHighlighter       = new JsonHighlighter(this->document()); */
     mcfunctionHighlighter = new MCfunctionHighlighter(this->document(), this);
 
     connect(this, &CodeEditor::blockCountChanged,
@@ -29,8 +30,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
             this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
-    connect(qobject_cast<MainWindow*>(window()), &MainWindow::curFileChanged,
-            this, &CodeEditor::setCurFile);
+
+    QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    monoFont.setPointSize(11);
+
+    this->setFont(monoFont);
 
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
@@ -60,18 +64,22 @@ void CodeEditor::resizeEvent(QResizeEvent *e) {
 void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
     QPlainTextEdit::mouseMoveEvent(e);
 
-    /*if(e->buttons() == Qt::LeftButton) {} */
-    QTextCursor cursor = cursorForPosition(e->pos());
-    this->mouseTextCursor = cursor;
+/*
+      / *if(e->buttons() == Qt::LeftButton) {} * /
+      QTextCursor cursor = cursorForPosition(e->pos());
+      this->mouseTextCursor = cursor;
+ */
 
-    if (cursor.blockNumber() != this->lastMouseTextCursor.blockNumber())
-        this->mcfunctionHighlighter->rehighlightBlock(
-            this->document()->findBlockByNumber(this->lastMouseTextCursor.
-                                                blockNumber()));
-    this->mcfunctionHighlighter->rehighlightBlock(
-        this->document()->findBlockByNumber(cursor.blockNumber()));
+/*
+      if (cursor.blockNumber() != this->lastMouseTextCursor.blockNumber())
+          this->mcfunctionHighlighter->rehighlightBlock(
+              this->document()->findBlockByNumber(this->lastMouseTextCursor.
+                                                  blockNumber()));
+      this->mcfunctionHighlighter->rehighlightBlock(
+          this->document()->findBlockByNumber(cursor.blockNumber()));
+ */
 
-    this->lastMouseTextCursor = cursorForPosition(e->pos());
+/*    this->lastMouseTextCursor = cursorForPosition(e->pos()); */
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
@@ -87,9 +95,9 @@ void CodeEditor::dropEvent(QDropEvent *e) {
     QString nspacedID;
 
     if (e->mimeData()->hasFormat("text/uri-list")) {
-        auto filepath = e->mimeData()->urls().at(0).toLocalFile();
-        auto dirpath  = MainWindow::getCurDir();
-        nspacedID = Glhp::toNamespacedID(dirpath, filepath);
+        auto path    = e->mimeData()->urls().at(0).toLocalFile();
+        auto dirpath = MainWindow::getCurDir();
+        nspacedID = Glhp::toNamespacedID(dirpath, path);
     } else if (e->mimeData()->hasText()) {
         nspacedID = e->mimeData()->text();
         if (!nspacedID.contains(':'))
@@ -126,12 +134,12 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 
     QAction *formatAction = new QAction(tr("Format"), menu);
     auto     dirpath      = MainWindow::getCurDir();
-    auto     fileType     = Glhp::toMCRFileType(dirpath, curFile);
+    auto     fileType     = Glhp::pathToFileType(dirpath, filepath);
 
-    qDebug() << MainWindow::JsonText << fileType << MainWindow::ItemTag;
+    /*qDebug() << MainWindow::JsonText << fileType << MainWindow::ItemTag; */
 
-    formatAction->setDisabled(!((MainWindow::JsonText <= fileType) &&
-                                (fileType <= MainWindow::ItemTag)));
+    formatAction->setDisabled(!((CodeFile::JsonText <= fileType) &&
+                                (fileType <= CodeFile::ItemTag)));
     if (formatAction->isEnabled()) {
         connect(formatAction, &QAction::triggered, [ = ]() {
             QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
@@ -170,9 +178,9 @@ void CodeEditor::onCursorPositionChanged() {
     setExtraSelections(extraSelections);
 }
 
-void CodeEditor::setCurFile(QString filepath) {
-    this->curFile = filepath;
-    QFileInfo     info     = QFileInfo(filepath);
+void CodeEditor::setFilePath(const QString &path) {
+    this->filepath = path;
+    QFileInfo     info     = QFileInfo(path);
     const QString jsonExts = "json mcmeta";
 
 /*
@@ -180,9 +188,8 @@ void CodeEditor::setCurFile(QString filepath) {
       mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
  */
 
-    jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
-    mcfunctionHighlighter->setEnabled(
-        MainWindow::curFileType == MainWindow::Function);
+    /*jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix())); */
+    /*mcfunctionHighlighter->setEnabled(curFileType == CodeFile::Function); */
 }
 
 int CodeEditor::lineNumberAreaWidth() {
@@ -300,8 +307,8 @@ void CodeEditor::followCurrentNamespacedID() {
 
         /*qDebug() << "final path: " << path; */
         if (!path.isEmpty() && !fileExt.isEmpty()) {
-            path             += fileExt;
-            this->prevCurFile = path;
+            path              += fileExt;
+            this->prevFilepath = path;
             qobject_cast<DatapackTreeView*>(
                 qobject_cast<QSplitter*>(this->parent()->parent())->widget(0))
             ->openFromPath(path);

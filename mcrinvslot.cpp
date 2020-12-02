@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #include "globalhelpers.h"
 #include "mcrinvsloteditor.h"
+#include "codefile.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -170,7 +171,7 @@ void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
         QAction *seclectTagAction = new QAction(tr("Select tag..."), cMenu);
         seclectTagAction->setEnabled(getAcceptTag());
         connect(seclectTagAction, &QAction::triggered, [ = ]() {
-            TagSelectorDialog dialog(this, MainWindow::ItemTag);
+            TagSelectorDialog dialog(this, CodeFile::ItemTag);
             if (dialog.exec()) {
                 setItem(MCRInvItem(dialog.getSelectedID()));
             }
@@ -409,7 +410,7 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
                 event->mimeData()->urls().at(0).toLocalFile();
             auto    dirpath = MainWindow::getCurDir();
             QString id      = Glhp::toNamespacedID(dirpath,
-                                                            filepath);
+                                                   filepath);
 
             if (!id.isEmpty()) {
                 MCRInvItem newItem(id);

@@ -11,6 +11,8 @@ public:
     JsonHighlighter(QTextDocument *parent = 0, QObject *parentObj = nullptr);
     void setEnabled(bool state);
 
+    void setDoc(QTextDocument *value);
+
 protected:
     void highlightBlock(const QString &text) override;
 
@@ -34,4 +36,4 @@ private:
     QObject *parentObj;
 };
 
-#endif // JSONHIGHLIGHTER_H
+#endif /* JSONHIGHLIGHTER_H */

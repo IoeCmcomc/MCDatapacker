@@ -25,27 +25,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    enum MCRFileType {
-        Text,
-        Function,
-        Structure,
-        JsonText,
-        Advancement,
-        LootTable,
-        Predicate,
-        Recipe,
-        BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag
-    };
-    static MCRFileType curFileType;
-
-    void openFile(const QString &filepath, bool reload = false);
     static QString getCurDir();
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
     static QMap<QString, QVariant> &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
-    void setCurrentFile(const QString &filepath);
     static QVariantMap readMCRInfo(const QString &type = "block",
                                    const int depth     = 0);
 
@@ -63,8 +48,9 @@ private slots:
     void openFolder();
     bool save();
     void pref_settings();
-    void documentWasModified();
     void onSystemWatcherFileChanged(const QString &filepath);
+    void onCurFileChanged(const QString &path);
+    void updateWindowTitle(bool changed);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
@@ -73,7 +59,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QString curFile;
     static QString curDir;
     static QMap<QString, QVariantMap> MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
@@ -88,10 +73,7 @@ private:
     void readSettings();
     void writeSettings();
     bool maybeSave();
-    bool saveFile(const QString &filepath);
-    /*void setCurrentFile(const QString &filepath); */
     QString strippedName(const QString &fullFilepath);
-    void updateWindowTitle();
 
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);

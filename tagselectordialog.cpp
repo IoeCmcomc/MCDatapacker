@@ -11,7 +11,7 @@
 #include <QFileInfo>
 
 TagSelectorDialog::TagSelectorDialog(QWidget *parent,
-                                     MainWindow::MCRFileType type) :
+                                     CodeFile::FileType type) :
     QDialog(parent),
     ui(new Ui::TagSelectorDialog) {
     ui->setupUi(this);
@@ -54,7 +54,7 @@ TagSelectorDialog::~TagSelectorDialog() {
 }
 
 void TagSelectorDialog::setupTagTreeView(
-    MainWindow::MCRFileType type = MainWindow::ItemTag) {
+    CodeFile::FileType type = CodeFile::ItemTag) {
     model.setParent(ui->tagListView);
     filterModel.setSourceModel(&model);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -63,23 +63,23 @@ void TagSelectorDialog::setupTagTreeView(
 
     QString tagStr = QStringLiteral("tag/");
     switch (type) {
-    case MainWindow::BlockTag:
+    case CodeFile::BlockTag:
         tagStr += "block";
         break;
 
-    case MainWindow::EntityTypeTag:
+    case CodeFile::EntityTypeTag:
         tagStr += "entity_type";
         break;
 
-    case MainWindow::FluidTag:
+    case CodeFile::FluidTag:
         tagStr += "fluid";
         break;
 
-    case MainWindow::FunctionTag:
+    case CodeFile::FunctionTag:
         tagStr += "function";
         break;
 
-    case MainWindow::ItemTag:
+    case CodeFile::ItemTag:
         tagStr += "item";
         break;
 

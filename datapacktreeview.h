@@ -15,6 +15,10 @@ public:
     void selectFromPath(const QString &path);
     void openFromPath(const QString path);
 
+signals:
+    void openFileRequested(const QString &path);
+    void fileDeteted(const QString &path);
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
 
@@ -34,7 +38,7 @@ private:
     QString dirPath;
     QPoint cMenuPos;
     QMenu *mkContextMenu(QModelIndex index);
-    QModelIndex makeNewFile(QModelIndex    index,
+    QModelIndex makeNewFile(QModelIndex index,
                             const QString &name,
                             const QString &catDir = "",
                             const QString &nspace = "");
@@ -44,4 +48,4 @@ private:
                                   bool added = true);
 };
 
-#endif // DATAPACKTREEVIEW_H
+#endif /* DATAPACKTREEVIEW_H */

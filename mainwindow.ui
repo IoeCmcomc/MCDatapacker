@@ -100,17 +100,7 @@
          <number>3</number>
         </property>
         <item row="0" column="0">
-         <widget class="CodeEditor" name="codeEditor">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="TabbedCodeEditorInterface" name="codeEditorInterface" native="true"/>
         </item>
        </layout>
       </widget>
@@ -207,9 +197,10 @@
    <header>datapacktreeview.h</header>
   </customwidget>
   <customwidget>
-   <class>CodeEditor</class>
-   <extends>QPlainTextEdit</extends>
-   <header>codeeditor.h</header>
+   <class>TabbedCodeEditorInterface</class>
+   <extends>QWidget</extends>
+   <header>tabbedcodeeditorinterface.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
