@@ -125,6 +125,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionOpenFolder"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSaveAll"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -187,6 +188,14 @@
    </property>
    <property name="menuRole">
     <enum>QAction::PreferencesRole</enum>
+   </property>
+  </action>
+  <action name="actionSaveAll">
+   <property name="text">
+    <string>Save all</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>

@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionOpenFolder, &QAction::triggered,
             this, &MainWindow::openFolder);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
+    connect(ui->actionSaveAll, &QAction::triggered,
+            this, &MainWindow::saveAll);
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
@@ -49,8 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onSystemWatcherFileChanged);
     connect(ui->codeEditorInterface,
             &TabbedCodeEditorInterface::curModificationChanged,
-            this,
-            &MainWindow::updateWindowTitle);
+            this, &MainWindow::updateWindowTitle);
     connect(ui->codeEditorInterface, &TabbedCodeEditorInterface::curFileChanged,
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
@@ -92,7 +93,8 @@ bool MainWindow::save() {
     if (ui->codeEditorInterface->isNoFile())
         return false;
 
-    if (ui->codeEditorInterface->getCurFile()->fileInfo.fileName().isEmpty()) {
+    if (auto *curFile = ui->codeEditorInterface->getCurFile();
+        curFile->fileInfo.fileName().isEmpty()) {
         QString filepath
             = QFileDialog::getSaveFileName(this, tr("Save File"), "");
         if (!filepath.isEmpty())
@@ -102,6 +104,10 @@ bool MainWindow::save() {
     } else {
         return ui->codeEditorInterface->saveCurFile();
     }
+}
+
+void MainWindow::saveAll() {
+    ui->codeEditorInterface->saveAllFile();
 }
 
 void MainWindow::pref_settings() {
@@ -145,25 +151,17 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
 }
 
 void MainWindow::onCurFileChanged(const QString &path) {
-    qDebug() << "MainWindow::onCurFileChanged" << path;
     if (!path.isEmpty()) {
         fileWatcher.removePath(path);
         fileWatcher.addPath(path);
     }
 
     auto curFileType = CodeFile::Text;
-
-    qDebug() << ui->codeEditorInterface->getCurIndex();
-    qDebug() << ui->codeEditorInterface->getCurFile()
-             << (bool)ui->codeEditorInterface->getCurFile();
-
     if (auto *curFile = ui->codeEditorInterface->getCurFile())
         curFileType = curFile->fileType;
     /*lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable); */
     visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
-
-    qDebug() << "MainWindow::onCurFileChanged end";
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
