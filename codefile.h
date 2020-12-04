@@ -27,6 +27,9 @@ struct CodeFile {
 
     CodeFile();
 
+    inline bool isVaild() const {
+        return !fileInfo.filePath().isEmpty();
+    };
     void changePath(const QString path);
     void initLayout();
 };

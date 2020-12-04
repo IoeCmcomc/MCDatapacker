@@ -40,9 +40,8 @@ void TabbedCodeEditorInterface::addCodeFile(const CodeFile &file) {
     connect(file.doc, &QTextDocument::modificationChanged,
             this, &TabbedCodeEditorInterface::onModificationChanged);
     files << file;
-    /*getCurIndex() += 1; */
     ui->tabBar->addTab(file.title);
-    setCurIndex(getCurIndex());
+    setCurIndex(count() - 1);
 }
 
 void TabbedCodeEditorInterface::openFile(const QString &filepath, bool reload) {
@@ -50,38 +49,9 @@ void TabbedCodeEditorInterface::openFile(const QString &filepath, bool reload) {
         || ((getCurFilePath() == filepath) && (!reload)))
         return;
     else {
-        QFile file(filepath);
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            QMessageBox::information(this, tr("Error"),
-                                     tr("Cannot read file %1:\n%2.")
-                                     .arg(QDir::toNativeSeparators(filepath),
-                                          file.errorString()));
-        } else {
-            QTextStream in(&file);
-            in.setCodec("UTF-8");
-
-#ifndef QT_NO_CURSOR
-            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-
-            int     c = 0;
-            QString content;
-            while (!in.atEnd()) {
-                content += in.readLine();
-                if (!in.atEnd()) content += '\n';
-                ++c;
-            }
-
-            auto newFile = CodeFile(filepath);
-            newFile.doc->setParent(this);
-            newFile.doc->setPlainText(content);
+        auto newFile = readFile(filepath);
+        if (newFile.isVaild())
             addCodeFile(newFile);
-
-#ifndef QT_NO_CURSOR
-            QGuiApplication::restoreOverrideCursor();
-#endif
-        }
-        file.close();
     }
 }
 
@@ -89,6 +59,7 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
     Q_ASSERT(index < files.count());
     qDebug() << "saveFile" << index << filepath << count();
     QString errorMessage;
+    bool    ok = true;
 
     /*onTabChanged(getCurIndex()); */
 
@@ -105,11 +76,13 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
             errorMessage = tr("Cannot write file %1:\n%2.")
                            .arg(QDir::toNativeSeparators(filepath),
                                 file.errorString());
+            ok = false;
         }
     } else {
         errorMessage = tr("Cannot open file %1 for writing:\n%2.")
                        .arg(QDir::toNativeSeparators(filepath),
                             file.errorString());
+        ok = false;
     }
 
 #ifndef QT_NO_CURSOR
@@ -118,12 +91,24 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
 
     if (!errorMessage.isEmpty()) {
         QMessageBox::information(this, tr("Error"), errorMessage);
-        return false;
+        ok = false;
     }
 
-    files[index].changePath(filepath);
+    if (ok) {
+        auto file = files[index];
+        file.changePath(filepath);
+        file.doc->setModified(false);
+    }
 
-    return true;
+    return ok;
+}
+
+void TabbedCodeEditorInterface::updateTabTitle(int index, bool changed) {
+    auto newTitle = getCurFile()->title;
+
+    if (changed)
+        newTitle += '*';
+    ui->tabBar->setTabText(index, newTitle);
 }
 
 int TabbedCodeEditorInterface::getCurIndex() const {
@@ -138,12 +123,45 @@ void TabbedCodeEditorInterface::onModificationChanged(bool changed) {
     /*qDebug() << "onModificationChanged" << changed; */
     Q_ASSERT(!isNoFile());
 
-    auto newTitle = getCurFile()->title;
-    if (changed)
-        newTitle += '*';
-    ui->tabBar->setTabText(getCurIndex(), newTitle);
-
+    updateTabTitle(getCurIndex(), changed);
     emit curModificationChanged(changed);
+}
+
+CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
+    auto newFile = CodeFile(path);
+
+    QFile file(path);
+
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::information(this, tr("Error"),
+                                 tr("Cannot read file %1:\n%2.")
+                                 .arg(QDir::toNativeSeparators(path),
+                                      file.errorString()));
+    } else {
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
+
+#ifndef QT_NO_CURSOR
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
+        int     c = 0;
+        QString content;
+        while (!in.atEnd()) {
+            content += in.readLine();
+            if (!in.atEnd()) content += '\n';
+            ++c;
+        }
+
+        newFile.doc->setParent(this);
+        newFile.doc->setPlainText(content);
+
+#ifndef QT_NO_CURSOR
+        QGuiApplication::restoreOverrideCursor();
+#endif
+    }
+    file.close();
+    return newFile;
 }
 
 CodeFile *TabbedCodeEditorInterface::getCurFile() {
@@ -182,7 +200,7 @@ void TabbedCodeEditorInterface::clear() {
 }
 
 bool TabbedCodeEditorInterface::hasUnsavedChanges() const {
-    for (auto file: files) {
+    for (const auto &file: files) {
         if (file.doc->isModified())
             return true;
     }
@@ -221,6 +239,26 @@ bool TabbedCodeEditorInterface::saveAllFile() {
         }
     }
     return r;
+}
+
+void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
+                                              const QString &oldName,
+                                              const QString &newName) {
+    qDebug() << "TabbedCodeEditorInterface::onFileRenamed" << oldName <<
+        newName << count();
+    QString oldpath = path + '/' + oldName;
+    QString newpath = path + '/' + newName;
+
+    for (int i = 0; i < count(); i++) {
+        auto *file = &files[i];
+        if (file->fileInfo.absoluteFilePath() == oldpath) {
+            file->changePath(newpath);
+            updateTabTitle(i, file->doc->isModified());
+            onModificationChanged(false);
+            setCurIndex(getCurIndex());
+            break;
+        }
+    }
 }
 
 void TabbedCodeEditorInterface::onTabChanged(int index) {

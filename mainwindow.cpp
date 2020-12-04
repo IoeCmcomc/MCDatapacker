@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::pref_settings);
     connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
             this, &MainWindow::onSystemWatcherFileChanged);
+    connect(ui->datapackTreeView, &DatapackTreeView::fileRenamed,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::onFileRenamed);
     connect(ui->codeEditorInterface,
             &TabbedCodeEditorInterface::curModificationChanged,
             this, &MainWindow::updateWindowTitle);
@@ -145,10 +147,7 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     }
 
     if (reloadExternChanges == 0) {
-        if (auto *curDoc = ui->codeEditorInterface->getCurDoc();
-            !curDoc->isModified()) {
-            ui->codeEditorInterface->openFile(filepath, true);
-        }
+        qDebug() << filepath << fileWatcher.files().contains(filepath);
     }
 }
 

@@ -44,18 +44,18 @@ public slots:
     bool saveCurFile();
     bool saveCurFile(const QString path);
     bool saveAllFile();
+    void onFileRenamed(const QString &path, const QString &oldName,
+                       const QString &newName);
 
 signals:
     void curFileChanged(const QString &path);
     /*void curContentsChange(int position, int charsRemoved, int charsAdded); */
     void curModificationChanged(bool changed);
 
-protected slots:
-    void onTabChanged(int index);
-    void onCloseFile(int index);
-
 private slots:
     void onModificationChanged(bool changed);
+    void onTabChanged(int index);
+    void onCloseFile(int index);
 
 private:
     Ui::TabbedCodeEditorInterface *ui;
@@ -63,9 +63,10 @@ private:
     QVector<CodeFile> files;
     int curIndex = -1;
 
-    void setCurFile(const CodeFile &file);
+    CodeFile readFile(const QString &path);
     void addCodeFile(const CodeFile &file);
     bool saveFile(int index, const QString &filepath);
+    void updateTabTitle(int index, bool changed = false);
 };
 
 #endif /* TABBEDCODEEDITORINTERFACE_H */

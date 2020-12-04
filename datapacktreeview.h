@@ -18,6 +18,8 @@ public:
 signals:
     void datapackChanged();
     void openFileRequested(const QString &path);
+    void fileRenamed(const QString &path, const QString &oldName,
+                     const QString &newName);
     void fileDeteted(const QString &path);
 
 protected:

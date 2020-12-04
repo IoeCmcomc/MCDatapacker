@@ -264,25 +264,30 @@ void DatapackTreeView::onCustomContextMenu(const QPoint &point) {
 void DatapackTreeView::onFileRenamed(const QString &path,
                                      const QString &oldName,
                                      const QString &newName) {
+    qDebug() << "DatapackTreeView::onFileRenamed" << oldName << newName;
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
-    if (pathToFileType(dirPath, oldpath) != CodeFile::Function) return;
-
-    if (isStringInTagFile(dirPath + "/data/minecraft/tags/functions/load.json",
-                          toNamespacedID(dirPath, oldpath))) {
-        contextMenuModifyTagFile
-            (dirPath + "/data/minecraft/tags/functions/load.json",
-            toNamespacedID(dirPath, oldpath), false);
-        if (pathToFileType(dirPath, newpath) != CodeFile::Function) return;
-
-        if (!isStringInTagFile(dirPath +
-                               "/data/minecraft/tags/functions/load.json",
-                               toNamespacedID(dirPath, newpath)))
+    if (pathToFileType(dirPath, oldpath) == CodeFile::Function) {
+        if (isStringInTagFile(dirPath +
+                              "/data/minecraft/tags/functions/load.json",
+                              toNamespacedID(dirPath, oldpath))) {
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
-                toNamespacedID(dirPath, newpath), true);
+                toNamespacedID(dirPath, oldpath), false);
+            if (pathToFileType(dirPath, newpath) == CodeFile::Function) {
+                if (!isStringInTagFile(dirPath +
+                                       "/data/minecraft/tags/functions/load.json",
+                                       toNamespacedID(dirPath, newpath))) {
+                    contextMenuModifyTagFile
+                        (dirPath + "/data/minecraft/tags/functions/load.json",
+                        toNamespacedID(dirPath, newpath), true);
+                }
+            }
+        }
     }
+
+    emit fileRenamed(path, oldName, newName);
 }
 
 void DatapackTreeView::contextMenuOnNewFolder() {
@@ -406,7 +411,7 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
                                .arg(QDir::toNativeSeparators(filepath),
                                     newFile.errorString());
             }
-        }  else{
+        } else{
             errorMessage = tr("Cannot open file %1 for writing:\n%2.")
                            .arg(QDir::toNativeSeparators(filepath),
                                 newFile.errorString());
