@@ -36,10 +36,13 @@ TabbedCodeEditorInterface::~TabbedCodeEditorInterface() {
 
 void TabbedCodeEditorInterface::addCodeFile(const CodeFile &file) {
     /*qDebug() << "addCodeFile"; */
+    file.doc->setModified(false);
+    connect(file.doc, &QTextDocument::modificationChanged,
+            this, &TabbedCodeEditorInterface::onModificationChanged);
     files << file;
-    curIndex += 1;
+    /*getCurIndex() += 1; */
     ui->tabBar->addTab(file.title);
-    setCurIndex(curIndex);
+    setCurIndex(getCurIndex());
 }
 
 void TabbedCodeEditorInterface::openFile(const QString &filepath, bool reload) {
@@ -87,7 +90,7 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
     qDebug() << "saveFile" << index << filepath << count();
     QString errorMessage;
 
-    /*onTabChanged(curIndex); */
+    /*onTabChanged(getCurIndex()); */
 
 #ifndef QT_NO_CURSOR
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
@@ -124,7 +127,7 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
 }
 
 int TabbedCodeEditorInterface::getCurIndex() const {
-    return curIndex;
+    return ui->tabBar->currentIndex();
 }
 
 void TabbedCodeEditorInterface::setCurIndex(int i) {
@@ -132,15 +135,23 @@ void TabbedCodeEditorInterface::setCurIndex(int i) {
 }
 
 void TabbedCodeEditorInterface::onModificationChanged(bool changed) {
+    /*qDebug() << "onModificationChanged" << changed; */
+    Q_ASSERT(!isNoFile());
+
+    auto newTitle = getCurFile()->title;
+    if (changed)
+        newTitle += '*';
+    ui->tabBar->setTabText(getCurIndex(), newTitle);
+
     emit curModificationChanged(changed);
 }
 
 CodeFile *TabbedCodeEditorInterface::getCurFile() {
-    /*qDebug() << "getCurFile" << count() << curIndex; */
-    if (isNoFile() || (curIndex == -1))
+    /*qDebug() << "getCurFile" << count() << getCurIndex(); */
+    if (isNoFile() || (getCurIndex() == -1))
         return nullptr;
     else
-        return &files[curIndex];
+        return &files[getCurIndex()];
 }
 
 QString TabbedCodeEditorInterface::getCurFilePath() {
@@ -189,13 +200,13 @@ void TabbedCodeEditorInterface::onOpenFile(const QString &filepath) {
 }
 
 bool TabbedCodeEditorInterface::saveCurFile(const QString path) {
-    return saveFile(curIndex, path);
+    return saveFile(getCurIndex(), path);
 }
 
 bool TabbedCodeEditorInterface::saveCurFile() {
-    /*qDebug() << "saveCurFile" << curIndex; */
+    /*qDebug() << "saveCurFile" << getCurIndex(); */
     if (auto *curFile = getCurFile()) {
-        return saveFile(curIndex, curFile->fileInfo.filePath());
+        return saveFile(getCurIndex(), curFile->fileInfo.filePath());
     }
     return false;
 }
@@ -213,8 +224,7 @@ bool TabbedCodeEditorInterface::saveAllFile() {
 }
 
 void TabbedCodeEditorInterface::onTabChanged(int index) {
-    qDebug() << "onTabChanged" << curIndex << index << count();
-    curIndex = index;
+    /*qDebug() << "onTabChanged" << getCurIndex() << index << count(); */
     if (index > -1) {
         auto *curDoc = files[index].doc;
         ui->codeEditor->setDocument(curDoc);
@@ -228,10 +238,16 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
 
         emit curFileChanged("");
     }
+    if (isNoFile())
+        emit curModificationChanged(false);
+    else
+        emit curModificationChanged(getCurDoc()->isModified());
 }
 
 void TabbedCodeEditorInterface::onCloseFile(int index) {
-    qDebug() << "onCloseFile" << index;
+    /*qDebug() << "onCloseFile" << index; */
+    disconnect(getCurDoc(), &QTextDocument::modificationChanged,
+               this, &TabbedCodeEditorInterface::onModificationChanged);
     files.remove(index);
     ui->tabBar->removeTab(index);
 }

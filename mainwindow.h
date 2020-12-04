@@ -51,6 +51,7 @@ private slots:
     void pref_settings();
     void onSystemWatcherFileChanged(const QString &filepath);
     void onCurFileChanged(const QString &path);
+    void onDatapackChanged();
     void updateWindowTitle(bool changed);
 
 #ifndef QT_NO_SESSIONMANAGER

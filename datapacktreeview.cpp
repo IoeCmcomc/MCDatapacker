@@ -225,6 +225,8 @@ void DatapackTreeView::load(const QString &dir) {
     setRootIndex(dirModel.index(dir));
 
     dirPath = dir;
+
+    emit datapackChanged();
 }
 
 
@@ -476,7 +478,7 @@ void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {
     if (index.isValid()) {
         const QFileInfo finfo = dirModel.fileInfo(index);
         if (finfo.exists() && finfo.isFile()) {
-            qDebug() << "Open from tree";
+            /*qDebug() << "Open from tree"; */
             setCurrentIndex(index);
             emit openFileRequested(finfo.absoluteFilePath());
         }

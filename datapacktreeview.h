@@ -16,6 +16,7 @@ public:
     void openFromPath(const QString path);
 
 signals:
+    void datapackChanged();
     void openFileRequested(const QString &path);
     void fileDeteted(const QString &path);
 

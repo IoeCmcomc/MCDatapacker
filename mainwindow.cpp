@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->codeEditorInterface,
             &TabbedCodeEditorInterface::curModificationChanged,
             this, &MainWindow::updateWindowTitle);
+    connect(ui->datapackTreeView, &DatapackTreeView::datapackChanged,
+            this, &MainWindow::onDatapackChanged);
     connect(ui->codeEditorInterface, &TabbedCodeEditorInterface::curFileChanged,
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
@@ -162,6 +164,10 @@ void MainWindow::onCurFileChanged(const QString &path) {
     /*lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable); */
     visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
+}
+
+void MainWindow::onDatapackChanged() {
+    updateWindowTitle(false);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -314,17 +320,19 @@ QString MainWindow::strippedName(const QString &fullFileName) {
 }
 
 void MainWindow::updateWindowTitle(bool changed) {
-    QStringList title;
+    QStringList titleParts;
 
-    if (auto curPath = ui->codeEditorInterface->getCurFilePath();
-        !curPath.isEmpty())
-        title.push_back(strippedName(curPath) + "[*]");
-    else
-        title.push_back(QStringLiteral("Untitled") + "[*]");
+    if (!ui->codeEditorInterface->isNoFile()) {
+        if (auto curPath = ui->codeEditorInterface->getCurFilePath();
+            !curPath.isEmpty())
+            titleParts << strippedName(curPath) + "[*]";
+        else
+            titleParts << QStringLiteral("Untitled") + "[*]";
+    }
     if (!curDir.isEmpty())
-        title.push_back("[" + strippedName(curDir) + "]");
-    title.push_back(QCoreApplication::applicationName());
-    setWindowTitle(title.join(QStringLiteral(" - ")));
+        titleParts << "[" + strippedName(curDir) + "]";
+    titleParts << QCoreApplication::applicationName();
+    setWindowTitle(titleParts.join(QStringLiteral(" - ")));
     this->setWindowModified(changed);
 }
 
