@@ -19,6 +19,8 @@ using namespace Glhp;
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
 
+    dirModel.setIconProvider(&iconProvider);
+
     connect(this, SIGNAL(doubleClicked(QModelIndex)), this,
             SLOT(onDoubleClicked(QModelIndex)));
     /*connect(this, &QTreeView::clicked, this, &DatapackTreeView::onDoubleClicked); */
@@ -143,7 +145,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             QAction *newMenuNewRecipe = new QAction(tr("Recipe"), newMenu);
             connect(newMenuNewRecipe, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("recipe_" + randStr() + ".json", "recipess");
+                    ("recipe_" + randStr() + ".json", "recipes");
             });
             newMenu->addAction(newMenuNewRecipe);
 

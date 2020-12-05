@@ -20,6 +20,7 @@ SOURCES += \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
     codefile.cpp \
+    datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
     dialogdatabutton.cpp \
     entityconditiondialog.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     blockitemselectordialog.h \
     codeeditor.h \
     codefile.h \
+    datapackfileiconprovider.h \
     datapacktreeview.h \
     dialogdatabutton.h \
     entityconditiondialog.h \

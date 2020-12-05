@@ -13,6 +13,7 @@ struct CodeFile {
         JsonText,
         Advancement,
         LootTable,
+        Meta,
         Predicate,
         Recipe,
         BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag

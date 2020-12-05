@@ -1,6 +1,8 @@
 #ifndef DATAPACKTREEVIEW_H
 #define DATAPACKTREEVIEW_H
 
+#include "datapackfileiconprovider.h"
+
 #include <QTreeView>
 #include <QFileSystemModel>
 #include <QMenu>
@@ -40,6 +42,8 @@ private:
     QFileSystemModel dirModel;
     QString dirPath;
     QPoint cMenuPos;
+    DatapackFileIconProvider iconProvider;
+
     QMenu *mkContextMenu(QModelIndex index);
     QModelIndex makeNewFile(QModelIndex index,
                             const QString &name,

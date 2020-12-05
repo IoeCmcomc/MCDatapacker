@@ -15,14 +15,16 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    QFileInfo     info     = QFileInfo(filepath);
-    const QString jsonExts = "json mcmeta";
+    QFileInfo     info       = QFileInfo(filepath);
+    const QString fullSuffix = info.completeSuffix();
 
-    if (info.suffix() == "mcfunction") {
+    if (fullSuffix == "mcmeta") {
+        return CodeFile::Meta;
+    } else if (fullSuffix == "mcfunction") {
         return CodeFile::Function;
-    } else if (info.completeSuffix() == "nbt") {
+    } else if (fullSuffix == "nbt") {
         return CodeFile::Structure;
-    } else if (jsonExts.contains(info.completeSuffix())) {
+    } else if (fullSuffix == "json") {
         if (isPathRelativeTo(dirpath, filepath, "advancements")) {
             return CodeFile::Advancement;
         } else if (isPathRelativeTo(dirpath, filepath, "loot_tables")) {
