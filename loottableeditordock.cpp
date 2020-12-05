@@ -92,8 +92,7 @@ void LootTableEditorDock::readJson() {
     }
 
     QString type = root.value("type").toString();
-    if (type.startsWith("minecraft:"))
-        type.remove(0, 10);
+    Glhp::removePrefix(type, "minecraft:");
 
     if (types.indexOf(type) > -1)
         ui->lootTableTypeCombo->setCurrentIndex(types.indexOf(type));

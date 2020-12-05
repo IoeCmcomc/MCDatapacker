@@ -155,6 +155,7 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
 
         newFile.doc->setParent(this);
         newFile.doc->setPlainText(content);
+        newFile.fileType = Glhp::pathToFileType(MainWindow::getCurDir(), path);
 
 #ifndef QT_NO_CURSOR
         QGuiApplication::restoreOverrideCursor();
@@ -262,7 +263,7 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
 }
 
 void TabbedCodeEditorInterface::onTabChanged(int index) {
-    /*qDebug() << "onTabChanged" << getCurIndex() << index << count(); */
+    qDebug() << "onTabChanged" << getCurIndex() << index << count();
     if (index > -1) {
         auto *curDoc = files[index].doc;
         ui->codeEditor->setDocument(curDoc);

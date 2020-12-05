@@ -3,6 +3,8 @@
 #include "mcrinvslot.h"
 #include "mainwindow.h"
 
+#include "globalhelpers.h"
+
 #include <QPainter>
 #include <QApplication>
 #include <QGraphicsColorizeEffect>
@@ -48,8 +50,7 @@ void MCRInvItem::setupItem(QString id) {
     QString iconpath;
     QPixmap iconpix;
 
-    if (id.startsWith(QStringLiteral("minecraft:")))
-        id.remove(0, 10);
+    Glhp::removePrefix(id, QStringLiteral("minecraft:"));
 
     if (id == QStringLiteral("debug_stick")) {
         iconpath = QStringLiteral(":minecraft/texture/item/stick.png");

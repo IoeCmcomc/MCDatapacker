@@ -28,6 +28,7 @@ QDebug operator<<(QDebug debug, const CodeFile &file) {
 
     debug.nospace() << "CodeFile(" << file.fileInfo << ", "
                     << file.title << ", "
+                    << file.fileType << ", "
                     << file.doc << ')';
 
     return debug;

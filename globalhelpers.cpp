@@ -52,23 +52,19 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
 QString Glhp::relPath(const QString &dirpath, QString path) {
     QString dataDir = dirpath + "/";
 
-    if (path.startsWith(dataDir)) {
-        path = path.remove(0, dataDir.length());
-    } else {
+    if (!removePrefix(path, dataDir))
         return "";
-    }
+
     return path;
 }
 
 QString Glhp::relNamespace(const QString &dirpath, QString path) {
     QString rp = relPath(dirpath, path);
 
-    if (rp.startsWith("data/")) {
-        rp.remove(0, 5);
+    if (removePrefix(rp, "data/"))
         rp = rp.section('/', 0, 0);
-    } else {
+    else
         rp = "";
-    }
     return rp;
 }
 
@@ -185,7 +181,10 @@ void Glhp::deleteChildrenIn(QWidget *widget) {
     /*widget->setUpdatesEnabled(true); */
 }
 
-void Glhp::removePrefix(QString &str, const QString &prefix) {
-    if (str.startsWith(prefix))
+bool Glhp::removePrefix(QString &str, const QString &prefix) {
+    bool r = str.startsWith(prefix);
+
+    if (r)
         str.remove(0, prefix.length());
+    return r;
 }

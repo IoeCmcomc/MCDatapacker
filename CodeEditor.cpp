@@ -280,8 +280,7 @@ void CodeEditor::followCurrentNamespacedID() {
         if (dirname.isEmpty()) return;
 
         QDir dir;
-        qDebug() << str.startsWith('#');
-        if (str.startsWith('#')) {
+        if (Glhp::removePrefix(str, "#")) {
             dir = QDir(dirname + "/data/" + str.remove(0, 1)
                        .section(":", 0, 0) + "/tags");
         } else {

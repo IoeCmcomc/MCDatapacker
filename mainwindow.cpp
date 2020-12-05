@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     lootTableEditorDock = new LootTableEditorDock(this);
     addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
+    lootTableEditorDock->hide();
 
     predicateDock = new PredicateDock(this);
     addDockWidget(Qt::RightDockWidgetArea, predicateDock);
@@ -160,7 +161,7 @@ void MainWindow::onCurFileChanged(const QString &path) {
     auto curFileType = CodeFile::Text;
     if (auto *curFile = ui->codeEditorInterface->getCurFile())
         curFileType = curFile->fileType;
-    /*lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable); */
+    lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable);
     visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
 }
