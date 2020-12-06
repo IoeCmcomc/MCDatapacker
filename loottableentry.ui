@@ -237,9 +237,6 @@
     </item>
     <item row="3" column="0">
      <widget class="QLabel" name="qualityLabel">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
       <property name="toolTip">
        <string>Bonus weight from luck.</string>
       </property>
@@ -250,9 +247,6 @@
     </item>
     <item row="3" column="1" colspan="3">
      <widget class="QSpinBox" name="qualitySpin">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
       <property name="specialValueText">
        <string>-</string>
       </property>

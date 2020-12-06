@@ -240,10 +240,6 @@ void LootTableEntry::onTypeChanged(int index) {
     }
 }
 
-void LootTableEntry::onLuckBasedChanged(bool checked) {
-    setIsLuckBased(checked);
-}
-
 void LootTableEntry::onAddCondition() {
     MCRPredCondition *cond = new MCRPredCondition(ui->conditionsContainer);
 
@@ -306,13 +302,4 @@ void LootTableEntry::onAddEntry() {
 
 void LootTableEntry::setLootTableEditor(QWidget *value) {
     lootTableEditor = value;
-    connect(qobject_cast<LootTableEditorDock*>(lootTableEditor),
-            &LootTableEditorDock::isLuckBasedChanged,
-            this, &LootTableEntry::onLuckBasedChanged);
-}
-
-void LootTableEntry::setIsLuckBased(bool value) {
-    isLuckBased = value;
-    ui->qualityLabel->setEnabled(isLuckBased);
-    ui->qualitySpin->setEnabled(isLuckBased);
 }

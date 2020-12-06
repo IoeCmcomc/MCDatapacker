@@ -37,11 +37,6 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     connect(ui->poolListView->selectionModel(),
             &QItemSelectionModel::currentChanged,
             this, &LootTableEditorDock::onCurrentPoolChanged);
-    connect(ui->luckBasedCheck, &QCheckBox::toggled, [this](bool checked) {
-        ui->bonusRollsLabel->setEnabled(checked);
-        ui->bonusRollsInput->setEnabled(checked);
-        emit isLuckBasedChanged(checked);
-    });
     connect(ui->addCondButton, &QPushButton::clicked,
             this, &LootTableEditorDock::onAddCondition);
     connect(ui->addFunctBtn, &QPushButton::clicked,
@@ -167,7 +162,6 @@ void LootTableEditorDock::checkPools() {
 
 void LootTableEditorDock::reset() {
     /*qDebug() << "reset"; */
-    ui->luckBasedCheck->setChecked(false);
     ui->rollsInput->unset();
     ui->bonusRollsInput->unset();
 
@@ -236,7 +230,6 @@ void LootTableEditorDock::readPoolJson(const QJsonObject &root) {
     reset();
 
     ui->rollsInput->fromJson(root.value("rolls"));
-    ui->luckBasedCheck->setChecked(root.contains("bonus_rolls"));
     if (root.contains("bonus_rolls"))
         ui->bonusRollsInput->fromJson(root.value("bonus_rolls"));
 

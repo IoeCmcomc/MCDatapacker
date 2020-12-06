@@ -27,14 +27,12 @@ public:
 
 private slots:
     void onTypeChanged(int index);
-    void onLuckBasedChanged(bool checked);
     void onAddCondition();
     void onAddEntry();
     void onAddFunction();
 
 private:
     Ui::LootTableEntry *ui;
-    bool isLuckBased         = false;
     QWidget *lootTableEditor = nullptr;
     QHBoxLayout conditionsLayout;
     QHBoxLayout functionsLayout;
