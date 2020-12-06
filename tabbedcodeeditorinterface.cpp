@@ -16,6 +16,7 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     ui->setupUi(this);
 
     ui->tabBar->setTabsClosable(true);
+    ui->tabBar->setMovable(true);
     ui->tabBar->setDocumentMode(true);
     ui->tabBar->setExpanding(false);
     ui->tabBar->adjustSize();
@@ -24,6 +25,9 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             this, &TabbedCodeEditorInterface::onTabChanged);
     connect(ui->tabBar, &QTabBar::tabCloseRequested,
             this, &TabbedCodeEditorInterface::onCloseFile);
+    connect(ui->tabBar, &QTabBar::tabMoved,
+            this, &TabbedCodeEditorInterface::onTabMoved);
+
     connect(ui->codeEditor->document(), &QTextDocument::modificationChanged,
             this, &TabbedCodeEditorInterface::onModificationChanged);
     connect(this, &TabbedCodeEditorInterface::curFileChanged,
@@ -291,6 +295,10 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
         emit curModificationChanged(false);
     else
         emit curModificationChanged(getCurDoc()->isModified());
+}
+
+void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
+    qSwap(files[from], files[to]);
 }
 
 void TabbedCodeEditorInterface::onCloseFile(int index) {

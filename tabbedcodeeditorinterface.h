@@ -55,6 +55,7 @@ signals:
 private slots:
     void onModificationChanged(bool changed);
     void onTabChanged(int index);
+    void onTabMoved(int from, int to);
     void onCloseFile(int index);
 
 private:
