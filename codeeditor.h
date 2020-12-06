@@ -2,7 +2,6 @@
 #define CODEEDITOR_H
 
 #include <QPlainTextEdit>
-/*#include <QTextEdit> */
 #include <QString>
 
 #include "jsonhighlighter.h"
@@ -42,13 +41,14 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
 
 private:
+    QFont monoFont;
     QWidget *lineNumberArea;
     CodeFile::FileType curFileType;
     QString filepath;
     QString prevFilepath;
     QStringList keyModifiers;
     JsonHighlighter *jsonHighlighter;
-    MCfunctionHighlighter *mcfunctionHighlighter;
+    McfunctionHighlighter *mcfunctionHighlighter;
     QTextCursor lastTextCursor;
     QTextCursor mouseTextCursor;
     QTextCursor lastMouseTextCursor;

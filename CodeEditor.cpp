@@ -20,9 +20,9 @@
 #include <QFont>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
-    lineNumberArea = new LineNumberArea(this);
-    /*jsonHighlighter       = new JsonHighlighter(this->document()); */
-    mcfunctionHighlighter = new MCfunctionHighlighter(this->document(), this);
+    lineNumberArea        = new LineNumberArea(this);
+    jsonHighlighter       = new JsonHighlighter(this);
+    mcfunctionHighlighter = new McfunctionHighlighter(this);
 
     connect(this, &CodeEditor::blockCountChanged,
             this, &CodeEditor::updateLineNumberAreaWidth);
@@ -31,10 +31,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(this, &CodeEditor::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
 
-    QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    monoFont.setPointSize(11);
+    monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    monoFont.setPointSize(13);
 
-    this->setFont(monoFont);
+    setFont(monoFont);
 
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
@@ -42,14 +42,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
-        int delta = e->delta() / 120 * 2;
-        /*qDebug() << e->delta() << " " << delta; */
-        QFont font = this->font();
-        font.setPointSize(font.pointSize() + delta);
-        this->setFont(font);
+        int delta = e->delta() / 120;
+        monoFont.setPointSize(monoFont.pointSize() + delta);
+        this->setFont(monoFont);
     }
-    /*this->mcfunctionHighlighter->rehighlight(); */
-
     QPlainTextEdit::wheelEvent(e);
 }
 
@@ -136,8 +132,6 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     auto     dirpath      = MainWindow::getCurDir();
     auto     fileType     = Glhp::pathToFileType(dirpath, filepath);
 
-    /*qDebug() << MainWindow::JsonText << fileType << MainWindow::ItemTag; */
-
     formatAction->setDisabled(!((CodeFile::JsonText <= fileType) &&
                                 (fileType <= CodeFile::ItemTag)));
     if (formatAction->isEnabled()) {
@@ -179,17 +173,19 @@ void CodeEditor::onCursorPositionChanged() {
 }
 
 void CodeEditor::setFilePath(const QString &path) {
-    this->filepath = path;
-    QFileInfo     info     = QFileInfo(path);
-    const QString jsonExts = "json mcmeta";
+    filepath    = path;
+    curFileType = Glhp::pathToFileType(MainWindow::getCurDir(), path);
 
-/*
-      jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix()));
-      mcfunctionHighlighter->setEnabled(info.completeSuffix() == "mcfunction");
- */
+    document()->setDefaultFont(monoFont);
+    setFont(monoFont);
 
-    /*jsonHighlighter->setEnabled(jsonExts.contains(info.completeSuffix())); */
-    /*mcfunctionHighlighter->setEnabled(curFileType == CodeFile::Function); */
+    if (curFileType == CodeFile::Function) {
+        jsonHighlighter->setDocument(nullptr);
+        mcfunctionHighlighter->setDocument(document());
+    } else if (curFileType >= CodeFile::JsonText) {
+        mcfunctionHighlighter->setDocument(nullptr);
+        jsonHighlighter->setDocument(document());
+    }
 }
 
 int CodeEditor::lineNumberAreaWidth() {

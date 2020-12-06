@@ -8,10 +8,7 @@
 class JsonHighlighter : public QSyntaxHighlighter
 {
 public:
-    JsonHighlighter(QTextDocument *parent = 0, QObject *parentObj = nullptr);
-    void setEnabled(bool state);
-
-    void setDoc(QTextDocument *value);
+    JsonHighlighter(QObject *parent = 0);
 
 protected:
     void highlightBlock(const QString &text) override;
@@ -30,10 +27,6 @@ private:
     QTextCharFormat cBracketFormat;
     QTextCharFormat rBracketFormat;
     QTextCharFormat quotationFormat;
-
-    bool enabled       = false;
-    QTextDocument *doc = nullptr;
-    QObject *parentObj;
 };
 
 #endif /* JSONHIGHLIGHTER_H */

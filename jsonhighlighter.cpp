@@ -3,10 +3,8 @@
 #include <QColor>
 #include <QDebug>
 
-JsonHighlighter::JsonHighlighter(QTextDocument *parent, QObject *parentObj)
+JsonHighlighter::JsonHighlighter(QObject *parent)
     : QSyntaxHighlighter(parent) {
-    this->doc       = parent;
-    this->parentObj = parentObj;
     setupRules();
 }
 
@@ -50,15 +48,8 @@ void JsonHighlighter::setupRules() {
     highlightingRules.append(rule);
 }
 
-void JsonHighlighter::setDoc(QTextDocument *value) {
-    qDebug() << "setDocument" << doc << value;
-    doc = value;
-    setDocument(value);
-    qDebug() << doc << document();
-}
-
 void JsonHighlighter::highlightBlock(const QString &text) {
-    if (this->enabled) {
+    if (this->document()) {
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
             QRegularExpressionMatchIterator matchIterator =
                 rule.pattern.globalMatch(text);
@@ -72,20 +63,4 @@ void JsonHighlighter::highlightBlock(const QString &text) {
     }
 
     setCurrentBlockState(0);
-}
-
-void JsonHighlighter::setEnabled(bool state) {
-    qDebug() << "JsonHighlighter::setEnabled :" << state;
-    this->enabled = state;
-
-/*
-      qDebug() << doc << document();
-      setDocument(doc);
-      qDebug() << doc << document();
-      setDocument(state ? doc : 0);
- */
-
-    qDebug() << "setEnabled done";
-
-    /*rehighlight(); */
 }

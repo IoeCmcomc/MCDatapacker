@@ -4,7 +4,7 @@
 #include "codefile.h"
 #include "mainwindow.h"
 
-DatapackFileIconProvider::DatapackFileIconProvider() {
+DatapackFileIconProvider::DatapackFileIconProvider() : QFileIconProvider() {
 }
 
 QIcon DatapackFileIconProvider::icon(const QFileInfo &info) const {

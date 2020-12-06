@@ -5,12 +5,10 @@
 #include <QRegularExpression>
 #include <QTextDocument>
 
-class MCfunctionHighlighter : public QSyntaxHighlighter
+class McfunctionHighlighter : public QSyntaxHighlighter
 {
 public:
-    MCfunctionHighlighter(QTextDocument *parent    = 0,
-                          QObject       *parentObj = nullptr);
-    void setEnabled(bool state);
+    McfunctionHighlighter(QObject *parent = nullptr);
 
 protected:
     void highlightBlock(const QString &text) override;
@@ -28,14 +26,9 @@ private:
     QTextCharFormat numberFormat;
     QTextCharFormat posFormat;
     QTextCharFormat entitySelectorFormat;
-    QTextCharFormat minecraftNamespacedIDFormat;
     QTextCharFormat namespacedIDFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat commentFormat;
-
-    bool enabled       = false;
-    QTextDocument *doc = nullptr;
-    QObject *parentObj;
 };
 
-#endif // MCFUNCTIONHIGHLIGHTER_H
+#endif /* MCFUNCTIONHIGHLIGHTER_H */

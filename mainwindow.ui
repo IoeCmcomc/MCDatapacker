@@ -100,7 +100,7 @@
          <number>3</number>
         </property>
         <item row="0" column="0">
-         <widget class="TabbedCodeEditorInterface" name="codeEditorInterface" native="true"/>
+         <widget class="TabbedCodeEditorInterface" name="codeEditorInterface"/>
         </item>
        </layout>
       </widget>
@@ -207,8 +207,8 @@
   </customwidget>
   <customwidget>
    <class>TabbedCodeEditorInterface</class>
-   <extends>QWidget</extends>
-   <header>tabbedcodeeditorinterface.h</header>
+   <extends>QFrame</extends>
+   <header location="global">tabbedcodeeditorinterface.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
