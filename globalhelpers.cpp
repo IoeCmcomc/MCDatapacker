@@ -10,6 +10,36 @@ void Glhp::someTest() {
     qDebug() << "GlobalHelpers::someTest()";
 }
 
+QString Glhp::randStr(int length) {
+    const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
+    QString       r;
+
+    for (int i = 0; i < (length + 1); ++i) {
+        int index = qrand() % charset.length();
+        r.append(charset.at(index));
+    }
+    return r;
+}
+
+QString Glhp::relPath(const QString &dirpath, QString path) {
+    QString dataDir = dirpath + "/";
+
+    if (!removePrefix(path, dataDir))
+        return "";
+
+    return path;
+}
+
+QString Glhp::relNamespace(const QString &dirpath, QString path) {
+    QString rp = relPath(dirpath, path);
+
+    if (removePrefix(rp, "data/"))
+        rp = rp.section('/', 0, 0);
+    else
+        rp = "";
+    return rp;
+}
+
 CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
                                         const QString &filepath) {
     if (filepath.isEmpty())
@@ -51,34 +81,25 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     }
 }
 
-QString Glhp::relPath(const QString &dirpath, QString path) {
-    QString dataDir = dirpath + "/";
+QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
+    switch (type) {
+    case CodeFile::Function:
+        return QIcon(":/file-mcfunction");
 
-    if (!removePrefix(path, dataDir))
-        return "";
+    case CodeFile::Structure:
+        return QIcon(":/file-nbt");
 
-    return path;
-}
+    case CodeFile::Meta:
+        return QIcon(":/file-mcmeta");
 
-QString Glhp::relNamespace(const QString &dirpath, QString path) {
-    QString rp = relPath(dirpath, path);
+    default: {
+        if (type >= CodeFile::JsonText)
+            return QIcon(":/file-json");
 
-    if (removePrefix(rp, "data/"))
-        rp = rp.section('/', 0, 0);
-    else
-        rp = "";
-    return rp;
-}
-
-QString Glhp::randStr(int length) {
-    const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
-    QString       r;
-
-    for (int i = 0; i < (length + 1); ++i) {
-        int index = qrand() % charset.length();
-        r.append(charset.at(index));
+        break;
     }
-    return r;
+    }
+    return QIcon();
 }
 
 bool Glhp::isPathRelativeTo(const QString &dirpath,

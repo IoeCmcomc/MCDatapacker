@@ -41,6 +41,11 @@ void TabbedCodeEditorInterface::addCodeFile(const CodeFile &file) {
             this, &TabbedCodeEditorInterface::onModificationChanged);
     files << file;
     ui->tabBar->addTab(file.title);
+    const int lastIndex = count() - 1;
+    ui->tabBar->setTabIcon(lastIndex, Glhp::fileTypeToIcon(
+                               Glhp::pathToFileType(MainWindow::getCurDir(),
+                                                    file.fileInfo.
+                                                    absoluteFilePath())));
     setCurIndex(count() - 1);
 }
 
@@ -57,7 +62,7 @@ void TabbedCodeEditorInterface::openFile(const QString &filepath, bool reload) {
 
 bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
     Q_ASSERT(index < files.count());
-    qDebug() << "saveFile" << index << filepath << count();
+    /*qDebug() << "saveFile" << index << filepath << count(); */
     QString errorMessage;
     bool    ok = true;
 
@@ -255,6 +260,11 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
         if (file->fileInfo.absoluteFilePath() == oldpath) {
             file->changePath(newpath);
             updateTabTitle(i, file->doc->isModified());
+            ui->tabBar->setTabIcon(
+                i, Glhp::fileTypeToIcon(Glhp::pathToFileType(
+                                            MainWindow::getCurDir(),
+                                            file->fileInfo.absoluteFilePath())));
+
             onModificationChanged(false);
             setCurIndex(getCurIndex());
             break;

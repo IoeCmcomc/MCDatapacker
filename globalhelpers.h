@@ -3,7 +3,7 @@
 
 #include "mainwindow.h"
 #include "vieweventfilter.h"
-#include "tabbedcodeeditorinterface.h"
+#include "codefile.h"
 
 #include <QString>
 #include <QVariant>
@@ -18,8 +18,11 @@ namespace Glhp {
     QString randStr(int length = 5);
     QString relPath(const QString &dirpath, QString path);
     QString relNamespace(const QString &dirpath, QString path);
+
     CodeFile::FileType pathToFileType(const QString &dirpath,
                                       const QString &filepath);
+    QIcon fileTypeToIcon(const CodeFile::FileType type);
+
     QString toNamespacedID(const QString &dirpath, QString filepath);
     QVariant strToVariant(const QString &str);
     QString variantToStr(const QVariant &vari);
