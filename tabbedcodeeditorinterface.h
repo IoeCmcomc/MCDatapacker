@@ -62,7 +62,7 @@ private:
     Ui::TabbedCodeEditorInterface *ui;
 
     QVector<CodeFile> files;
-    int curIndex = -1;
+    int prevIndex = -1;
 
     CodeFile readFile(const QString &path);
     void addCodeFile(const CodeFile &file);

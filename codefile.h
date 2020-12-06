@@ -4,6 +4,7 @@
 #include <QTextDocument>
 #include <QFileInfo>
 #include <QDebug>
+#include <QTextCursor>
 
 struct CodeFile {
     enum FileType {
@@ -22,7 +23,8 @@ struct CodeFile {
     QFileInfo      fileInfo;
     FileType       fileType = Text;
     QString        title;
-    QTextDocument *doc = new QTextDocument();
+    QTextDocument *doc        = new QTextDocument();
+    QTextCursor    textCursor = QTextCursor(doc);
 
     CodeFile(const QString path);
 

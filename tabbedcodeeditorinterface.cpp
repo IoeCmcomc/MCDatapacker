@@ -281,12 +281,17 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
 void TabbedCodeEditorInterface::onTabChanged(int index) {
     /*qDebug() << "onTabChanged" << getCurIndex() << index << count(); */
     if (index > -1) {
-        auto *curDoc = files[index].doc;
-        ui->codeEditor->setDocument(curDoc);
+        if (prevIndex > -1)
+            files[prevIndex].textCursor = ui->codeEditor->textCursor();
+
+        auto *curFile = getCurFile();
+        ui->codeEditor->setDocument(curFile->doc);
+        ui->codeEditor->setTextCursor(curFile->textCursor);
+
         if (ui->stackedWidget->currentIndex() == 0)
             ui->stackedWidget->setCurrentIndex(1);
 
-        emit curFileChanged(files.at(index).fileInfo.absoluteFilePath());
+        emit curFileChanged(curFile->fileInfo.absoluteFilePath());
     } else {
         if (ui->stackedWidget->currentIndex() == 1)
             ui->stackedWidget->setCurrentIndex(0);
@@ -297,6 +302,8 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
         emit curModificationChanged(false);
     else
         emit curModificationChanged(getCurDoc()->isModified());
+
+    prevIndex = index;
 }
 
 void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
