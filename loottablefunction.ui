@@ -38,13 +38,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="3">
-     <widget class="QPushButton" name="deleteButton">
-      <property name="text">
-       <string>Delete</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
@@ -820,8 +813,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>363</width>
-             <height>243</height>
+             <width>96</width>
+             <height>26</height>
             </rect>
            </property>
           </widget>
@@ -1087,6 +1080,17 @@
       <widget class="QWidget" name="empty"/>
      </widget>
     </item>
+    <item row="0" column="3">
+     <widget class="QToolButton" name="deleteButton">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resource/app/app.qrc">
+        <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="conditions">
@@ -1094,13 +1098,6 @@
     <string>Conditions</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_6">
-    <item row="0" column="0">
-     <widget class="QPushButton" name="addCondButton">
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QScrollArea" name="conditionsArea">
       <property name="widgetResizable">
@@ -1111,7 +1108,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>363</width>
+         <width>433</width>
          <height>286</height>
         </rect>
        </property>
@@ -1131,20 +1128,31 @@
       </property>
      </spacer>
     </item>
+    <item row="0" column="0">
+     <widget class="QToolButton" name="addCondButton">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resource/app/app.qrc">
+        <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
-  </customwidget>
-  <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
    <header location="global">numericinput.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>OptionalSpinBox</class>
@@ -1158,6 +1166,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resource/app/app.qrc"/>
+ </resources>
  <connections/>
 </ui>

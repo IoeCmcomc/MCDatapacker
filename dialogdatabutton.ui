@@ -79,7 +79,7 @@
      </property>
      <property name="icon">
       <iconset resource="resource/app/app.qrc">
-       <normaloff>:/icon/reset.ico</normaloff>:/icon/reset.ico</iconset>
+       <normaloff>:/icon/reset.png</normaloff>:/icon/reset.png</iconset>
      </property>
     </widget>
    </item>

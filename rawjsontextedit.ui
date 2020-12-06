@@ -40,7 +40,11 @@
      <item>
       <widget class="QToolButton" name="boldBtn">
        <property name="text">
-        <string>B</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resource/app/app.qrc">
+         <normaloff>:/icon/format-text-bold.png</normaloff>:/icon/format-text-bold.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -50,7 +54,11 @@
      <item>
       <widget class="QToolButton" name="italicBtn">
        <property name="text">
-        <string>I</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resource/app/app.qrc">
+         <normaloff>:/icon/format-text-italic.png</normaloff>:/icon/format-text-italic.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -60,7 +68,11 @@
      <item>
       <widget class="QToolButton" name="underlineBtn">
        <property name="text">
-        <string>U</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resource/app/app.qrc">
+         <normaloff>:/icon/format-text-underline.png</normaloff>:/icon/format-text-underline.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -70,7 +82,11 @@
      <item>
       <widget class="QToolButton" name="strikeBtn">
        <property name="text">
-        <string>S</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resource/app/app.qrc">
+         <normaloff>:/icon/format-text-strikethrough.png</normaloff>:/icon/format-text-strikethrough.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -130,6 +146,8 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource/app/app.qrc"/>
+ </resources>
  <connections/>
 </ui>

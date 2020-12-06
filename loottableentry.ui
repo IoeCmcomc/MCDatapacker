@@ -228,13 +228,6 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="3">
-     <widget class="QPushButton" name="deleteButton">
-      <property name="text">
-       <string>Delete</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="1" colspan="3">
      <widget class="QSpinBox" name="weightSpin">
       <property name="specialValueText">
@@ -265,6 +258,17 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="3">
+     <widget class="QToolButton" name="deleteButton">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resource/app/app.qrc">
+        <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="functions">
@@ -272,13 +276,6 @@
     <string>Functions</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_5">
-    <item row="0" column="0">
-     <widget class="QPushButton" name="addFunctButton">
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QScrollArea" name="functionsArea">
       <property name="widgetResizable">
@@ -289,7 +286,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>433</width>
+         <width>503</width>
          <height>324</height>
         </rect>
        </property>
@@ -308,6 +305,17 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="0" column="0">
+     <widget class="QToolButton" name="addFunctButton">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resource/app/app.qrc">
+        <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -328,13 +336,6 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="addCondButton">
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <spacer name="verticalSpacer">
       <property name="orientation">
@@ -358,11 +359,22 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>443</width>
+         <width>513</width>
          <height>334</height>
         </rect>
        </property>
       </widget>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QToolButton" name="addCondButton">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resource/app/app.qrc">
+        <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
+      </property>
      </widget>
     </item>
    </layout>
@@ -384,13 +396,6 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="addEntryButton">
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QScrollArea" name="entriesArea">
       <property name="widgetResizable">
@@ -401,7 +406,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>443</width>
+         <width>513</width>
          <height>334</height>
         </rect>
        </property>
@@ -421,22 +426,35 @@
       </property>
      </spacer>
     </item>
+    <item row="0" column="0">
+     <widget class="QToolButton" name="addEntryButton">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="resource/app/app.qrc">
+        <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
+  </customwidget>
   <customwidget>
    <class>MCRInvSlot</class>
    <extends>QFrame</extends>
    <header>mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
-  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resource/app/app.qrc"/>
+ </resources>
  <connections/>
 </ui>

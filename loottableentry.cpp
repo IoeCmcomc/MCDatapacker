@@ -21,7 +21,7 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     ui->functionsContainer->setLayout(&functionsLayout);
     ui->entriesContainer->setLayout(&entriesLayout);
 
-    connect(ui->deleteButton, &QPushButton::clicked, this,
+    connect(ui->deleteButton, &QToolButton::clicked, this,
             &QObject::deleteLater);
     connect(ui->typeCmobo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &LootTableEntry::onTypeChanged);
@@ -29,11 +29,11 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
             [this]() {
         setCurrentIndex(ENTRIES_TAB);
     });
-    connect(ui->addCondButton, &QPushButton::clicked,
+    connect(ui->addCondButton, &QToolButton::clicked,
             this, &LootTableEntry::onAddCondition);
-    connect(ui->addFunctButton, &QPushButton::clicked,
+    connect(ui->addFunctButton, &QToolButton::clicked,
             this, &LootTableEntry::onAddFunction);
-    connect(ui->addEntryButton, &QPushButton::clicked,
+    connect(ui->addEntryButton, &QToolButton::clicked,
             this, &LootTableEntry::onAddEntry);
 
     ui->itemSlot->setAcceptMultiItems(false);

@@ -142,13 +142,6 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="deleteButton">
-     <property name="text">
-      <string>Delete</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
@@ -554,8 +547,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>456</width>
-            <height>333</height>
+            <width>96</width>
+            <height>26</height>
            </rect>
           </property>
           <property name="alignment">
@@ -759,8 +752,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>456</width>
-            <height>299</height>
+            <width>96</width>
+            <height>26</height>
            </rect>
           </property>
          </widget>
@@ -1278,14 +1271,20 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="2">
+    <widget class="QToolButton" name="deleteButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="resource/app/app.qrc">
+       <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
-  </customwidget>
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
@@ -1293,16 +1292,23 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>DialogDataButton</class>
-   <extends>QLabel</extends>
-   <header location="global">dialogdatabutton.h</header>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>OptionalSpinBox</class>
    <extends>QSpinBox</extends>
    <header location="global">optionalspinbox.h</header>
   </customwidget>
+  <customwidget>
+   <class>DialogDataButton</class>
+   <extends>QLabel</extends>
+   <header location="global">dialogdatabutton.h</header>
+  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resource/app/app.qrc"/>
+ </resources>
  <connections/>
 </ui>

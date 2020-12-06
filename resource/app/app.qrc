@@ -1,9 +1,17 @@
 <RCC>
     <qresource prefix="/">
-        <file>icon/reset.ico</file>
         <file alias="file-json">icon/datapack/file-json-16x16.png</file>
         <file alias="file-mcfunction">icon/datapack/file-mcfunction-16x16.png</file>
         <file alias="file-mcmeta">icon/datapack/file-mcmeta-16x16.png</file>
         <file alias="file-nbt">icon/datapack/file-nbt-16x16.png</file>
+        <file>icon/favicon.ico</file>
+        <file>icon/list_add.png</file>
+        <file>icon/list_remove.png</file>
+        <file>icon/reset.png</file>
+        <file>icon/delete.png</file>
+        <file>icon/format-text-bold.png</file>
+        <file>icon/format-text-italic.png</file>
+        <file>icon/format-text-strikethrough.png</file>
+        <file>icon/format-text-underline.png</file>
     </qresource>
 </RCC>

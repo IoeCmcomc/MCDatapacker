@@ -9,5 +9,5 @@ QJsonObject BaseCondition::toJson() const {
     return QJsonObject();
 }
 
-void BaseCondition::fromJson(const QJsonObject &value) {
+void BaseCondition::fromJson([[maybe_unused]] const QJsonObject &value) {
 }

@@ -254,8 +254,10 @@ bool TabbedCodeEditorInterface::saveAllFile() {
 void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
                                               const QString &oldName,
                                               const QString &newName) {
-    qDebug() << "TabbedCodeEditorInterface::onFileRenamed" << oldName <<
-        newName << count();
+/*
+      qDebug() << "TabbedCodeEditorInterface::onFileRenamed" << oldName <<
+          newName << count();
+ */
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
@@ -277,7 +279,7 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
 }
 
 void TabbedCodeEditorInterface::onTabChanged(int index) {
-    qDebug() << "onTabChanged" << getCurIndex() << index << count();
+    /*qDebug() << "onTabChanged" << getCurIndex() << index << count(); */
     if (index > -1) {
         auto *curDoc = files[index].doc;
         ui->codeEditor->setDocument(curDoc);
