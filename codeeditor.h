@@ -53,8 +53,18 @@ private:
     QTextCursor mouseTextCursor;
     QTextCursor lastMouseTextCursor;
 
-    void highlightCurrLineSelection();
+    void highlightCurrentLine();
+
     void followCurrentNamespacedID();
+
+    bool matchLeftParenthesis(QTextBlock currentBlock,
+                              int i,
+                              int numLeftParentheses);
+    bool matchRightParenthesis(QTextBlock currentBlock,
+                               int i,
+                               int numRightParentheses);
+    void createParenthesisSelection(int pos);
+    void matchParentheses();
 };
 
 

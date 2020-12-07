@@ -154,8 +154,10 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     delete menu;
 }
 
-void CodeEditor::onCursorPositionChanged() {
-    QList<QTextEdit::ExtraSelection> extraSelections;
+void CodeEditor::highlightCurrentLine() {
+    QList<QTextEdit::ExtraSelection> selections = extraSelections();
+
+    qDebug() << "highlightCurrentLine" << selections.count();
 
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
@@ -167,9 +169,17 @@ void CodeEditor::onCursorPositionChanged() {
         selection.cursor = textCursor();
         selection.cursor.clearSelection();
 
-        extraSelections.append(selection);
+        selections.append(selection);
     }
-    setExtraSelections(extraSelections);
+    setExtraSelections(selections);
+
+    qDebug() << selections.count() << extraSelections().count();
+}
+
+void CodeEditor::onCursorPositionChanged() {
+    setExtraSelections({});
+    matchParentheses();
+    highlightCurrentLine();
 }
 
 void CodeEditor::setFilePath(const QString &path) {
@@ -217,6 +227,128 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
 
     if (rect.contains(viewport()->rect()))
         updateLineNumberAreaWidth(0);
+}
+
+void CodeEditor::matchParentheses() {
+    bool match = false;
+/*
+      QList<QTextEdit::ExtraSelection> selections;
+      setExtraSelections(selections);
+ */
+
+    TextBlockData *data =
+        static_cast<TextBlockData *>(textCursor().block().userData());
+
+    if (data) {
+        QVector<ParenthesisInfo *> infos = data->parentheses();
+
+        qDebug() << infos << infos.count();
+
+        int pos = textCursor().block().position();
+        for (int i = 0; i < infos.size(); ++i) {
+            ParenthesisInfo *info = infos.at(i);
+
+            int curPos = textCursor().position() -
+                         textCursor().block().position();
+            int isInfoPosNextToCurPos =
+                ((info->position == curPos) || (info->position == curPos - 1));
+            if (isInfoPosNextToCurPos && info->character == '{') {
+                if (matchLeftParenthesis(textCursor().block(), i + 1, 0))
+                    createParenthesisSelection(pos + info->position);
+            } else if (isInfoPosNextToCurPos && info->character == '}') {
+                if (matchRightParenthesis(textCursor().block(), i - 1, 0))
+                    createParenthesisSelection(pos + info->position);
+            }
+        }
+    }
+}
+
+bool CodeEditor::matchLeftParenthesis(QTextBlock currentBlock,
+                                      int i,
+                                      int numLeftParentheses) {
+    qDebug() << "matchLeftParenthesis" << &currentBlock << i <<
+        numLeftParentheses;
+    TextBlockData *data =
+        static_cast<TextBlockData *>(currentBlock.userData());
+    QVector<ParenthesisInfo *> infos = data->parentheses();
+
+    int docPos = currentBlock.position();
+
+    for (; i < infos.size(); ++i) {
+        ParenthesisInfo *info = infos.at(i);
+
+        if (info->character == '{') {
+            ++numLeftParentheses;
+            continue;
+        }
+
+        if (info->character == '}' && numLeftParentheses == 0) {
+            createParenthesisSelection(docPos + info->position);
+            return true;
+        } else
+            --numLeftParentheses;
+    }
+
+    currentBlock = currentBlock.next();
+    if (currentBlock.isValid())
+        return matchLeftParenthesis(currentBlock, 0, numLeftParentheses);
+
+    return false;
+}
+
+bool CodeEditor::matchRightParenthesis(QTextBlock currentBlock,
+                                       int i,
+                                       int numRightParentheses) {
+    qDebug() << "matchRightParenthesis" << &currentBlock << i <<
+        numRightParentheses;
+    TextBlockData *data =
+        static_cast<TextBlockData *>(currentBlock.userData());
+    QVector<ParenthesisInfo *> parentheses = data->parentheses();
+
+    int docPos = currentBlock.position();
+
+    for (; i > -1 && parentheses.size() > 0; --i) {
+        ParenthesisInfo *info = parentheses.at(i);
+        if (info->character == '}') {
+            ++numRightParentheses;
+            continue;
+        }
+        if (info->character == '{' && numRightParentheses == 0) {
+            createParenthesisSelection(docPos + info->position);
+            return true;
+        } else
+            --numRightParentheses;
+    }
+
+    currentBlock = currentBlock.previous();
+    if (currentBlock.isValid())
+        return matchRightParenthesis(currentBlock, 0, numRightParentheses);
+
+    return false;
+}
+
+void CodeEditor::createParenthesisSelection(int pos) {
+    QList<QTextEdit::ExtraSelection> selections = extraSelections();
+
+    qDebug() << "createParenthesisSelection" << pos << selections.count();
+
+    QTextEdit::ExtraSelection selection;
+    QTextCharFormat           format = selection.format;
+
+    format.setForeground(Qt::red);
+    format.setBackground(QColor("#BB00FF00"));
+    selection.format = format;
+
+    QTextCursor cursor = textCursor();
+    cursor.setPosition(pos);
+    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+    selection.cursor = cursor;
+
+    selections.append(selection);
+
+    setExtraSelections(selections);
+
+    qDebug() << selections.count() << extraSelections().count();
 }
 
 CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {

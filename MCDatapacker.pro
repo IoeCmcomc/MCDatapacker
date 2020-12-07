@@ -26,6 +26,7 @@ SOURCES += \
     entityconditiondialog.cpp \
     extendeddelegate.cpp \
     globalhelpers.cpp \
+    highlighter.cpp \
     itemconditiondialog.cpp \
     jsonhighlighter.cpp \
     locationconditiondialog.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     entityconditiondialog.h \
     extendeddelegate.h \
     globalhelpers.h \
+    highlighter.h \
     itemconditiondialog.h \
     jsonhighlighter.h \
     linenumberarea.h \

@@ -1,11 +1,12 @@
 #ifndef JSONHIGHLIGHTER_H
 #define JSONHIGHLIGHTER_H
 
-#include <QSyntaxHighlighter>
 #include <QRegularExpression>
 #include <QTextDocument>
 
-class JsonHighlighter : public QSyntaxHighlighter
+#include "highlighter.h"
+
+class JsonHighlighter : public Highlighter
 {
 public:
     JsonHighlighter(QObject *parent = 0);

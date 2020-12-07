@@ -4,7 +4,7 @@
 #include <QDebug>
 
 JsonHighlighter::JsonHighlighter(QObject *parent)
-    : QSyntaxHighlighter(parent) {
+    : Highlighter(parent) {
     setupRules();
 }
 
@@ -49,6 +49,7 @@ void JsonHighlighter::setupRules() {
 }
 
 void JsonHighlighter::highlightBlock(const QString &text) {
+    Highlighter::highlightBlock(text);
     if (this->document()) {
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
             QRegularExpressionMatchIterator matchIterator =
