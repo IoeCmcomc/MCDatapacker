@@ -4,7 +4,7 @@
 #include <QDebug>
 
 McfunctionHighlighter::McfunctionHighlighter(QObject *parent)
-    : QSyntaxHighlighter(parent) {
+    : Highlighter(parent) {
     setupRules();
 }
 
@@ -94,12 +94,10 @@ void McfunctionHighlighter::setupRules() {
     rule.format = namespacedIDFormat;
     highlightingRules.append(rule);
 
+    auto quoteFmt = QTextCharFormat();
+    quoteFmt.setForeground(QColor(170, 0, 0));
 
-    quotationFormat.setForeground(QColor(170, 0, 0));
-    rule.pattern =
-        QRegularExpression(QStringLiteral("\"[^\"\\\\]*(\\\\.[^\"\\\\]*)*\""));
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
+    quoteHighlightRules.insert('\'', quoteFmt);
 
     commentFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegularExpression(QStringLiteral("^#.*"));
@@ -108,14 +106,13 @@ void McfunctionHighlighter::setupRules() {
 }
 
 void McfunctionHighlighter::highlightBlock(const QString &text) {
-    /*qDebug() << "highlightBlock. Enabled: " << this->enabled; */
+    Highlighter::highlightBlock(text);
     if (this->document()) {
-        CodeEditor *codeEditor = qobject_cast<CodeEditor*>(this->parent());
-        /*qDebug() << codeEditor; */
+        CodeEditor *codeEditor =
+            qobject_cast<CodeEditor*>(this->parent());
         CodeEditor::CurrentNamespacedID currNamespacedID =
             codeEditor->getCurrentNamespacedID();
 
-        /*for (HighlightingRule rule : highlightingRules) { */
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
             QRegularExpressionMatchIterator matchIterator =
                 rule.pattern.globalMatch(text);
@@ -123,10 +120,6 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                 QRegularExpressionMatch match = matchIterator.next();
                 if (rule.format == namespacedIDFormat) {
                     QTextCharFormat fmt = rule.format;
-                    /*
-                       qDebug() << match.capturedStart() << " " << currNamespacedID.startingIndex;
-                       qDebug() << match.captured() << " " << currNamespacedID.string;
-                     */
                     if (match.capturedStart() == currNamespacedID.startingIndex
                         && match.captured() == currNamespacedID.string
                         && currentBlock().blockNumber() ==
@@ -136,11 +129,9 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                                   match.capturedLength(),
                                   fmt);
                         continue;
-                        /*qDebug() << "Didn't continued"; */
                     }
                 }
-                setFormat(match.capturedStart(),
-                          match.capturedLength(),
+                setFormat(match.capturedStart(), match.capturedLength(),
                           rule.format);
             }
         }

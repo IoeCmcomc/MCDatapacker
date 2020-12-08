@@ -30,22 +30,6 @@ void JsonHighlighter::setupRules() {
                                "-?(?:[1-9]\\d*|0)(?:\\.\\d+)?(:?[eE][+-]?\\d+)?"));
     rule.format = numberFormat;
     highlightingRules.append(rule);
-
-    cBracketFormat.setForeground(Qt::darkCyan);
-    rule.pattern = QRegularExpression(QStringLiteral("[{}]"));
-    rule.format  = cBracketFormat;
-    highlightingRules.append(rule);
-
-    rBracketFormat.setForeground(Qt::darkMagenta);
-    rule.pattern = QRegularExpression(QStringLiteral("[[\\]]"));
-    rule.format  = rBracketFormat;
-    highlightingRules.append(rule);
-
-    quotationFormat.setForeground(QColor(170, 0, 0));
-    rule.pattern =
-        QRegularExpression(QStringLiteral("\"[^\"\\\\]*(\\\\.[^\"\\\\]*)*\""));
-    rule.format = quotationFormat;
-    highlightingRules.append(rule);
 }
 
 void JsonHighlighter::highlightBlock(const QString &text) {

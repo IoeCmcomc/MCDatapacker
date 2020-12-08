@@ -7,6 +7,7 @@ struct ParenthesisInfo {
     char character;
     int  position;
 };
+
 class TextBlockData : public QTextBlockUserData
 {
 public:
@@ -24,9 +25,16 @@ class Highlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
+    enum BlockState {
+        Normal,
+        QuotedString,
+        Comment
+    };
     Highlighter(QObject *parent);
 
 protected:
+    QMap<QChar, QTextCharFormat> quoteHighlightRules;
+
     void highlightBlock(const QString &text);
 };
 

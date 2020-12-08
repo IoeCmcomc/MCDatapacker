@@ -22,6 +22,11 @@ void TextBlockData::insert(ParenthesisInfo *info) {
 
 
 Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
+    auto fmt = QTextCharFormat();
+
+    fmt.setForeground(QColor(170, 0, 0));
+
+    quoteHighlightRules.insert('"', fmt);
 }
 
 void Highlighter::highlightBlock(const QString &text) {
@@ -29,29 +34,44 @@ void Highlighter::highlightBlock(const QString &text) {
     if (document()) {
         TextBlockData *data = new TextBlockData;
 
-        int leftPos = text.indexOf('{');
+        QChar curQuoteChar = '\0';
+        bool  backslash    = false;
+        for (int i = 0; i < text.length(); i++) {
+            auto curChar = text[i];
+            if (quoteHighlightRules.contains(curChar)) {
+                if (!backslash && (currentBlockState() == QuotedString)) {
+                    setCurrentBlockState(Normal);
+                } else {
+                    setCurrentBlockState(QuotedString);
+                    curQuoteChar = curChar;
+                }
+            } else if (curChar == '\\') {
+                backslash = !backslash;
+            } else if (curChar == '{') {
+                if (currentBlockState() <= Normal) {
+                    ParenthesisInfo *info = new ParenthesisInfo;
+                    info->character = '{';
+                    info->position  = i;
 
-        while (leftPos != -1) {
-            ParenthesisInfo *info = new ParenthesisInfo;
-            info->character = '{';
-            info->position  = leftPos;
+                    qDebug() << info->character << info->position;
+                    data->insert(info);
+                }
+            } else if (curChar == '}') {
+                if (currentBlockState() <= Normal) {
+                    ParenthesisInfo *info = new ParenthesisInfo;
+                    info->character = '}';
+                    info->position  = i;
 
-            data->insert(info);
-            qDebug() << info->character << info->position;
-
-            leftPos = text.indexOf('{', leftPos + 1);
-        }
-
-        int rightPos = text.indexOf('}');
-        while (rightPos != -1) {
-            ParenthesisInfo *info = new ParenthesisInfo;
-            info->character = '}';
-            info->position  = rightPos;
-
-            data->insert(info);
-            qDebug() << info->character << info->position;
-
-            rightPos = text.indexOf('}', rightPos + 1);
+                    qDebug() << info->character << info->position;
+                    data->insert(info);
+                }
+            } else {
+                if (currentBlockState() == QuotedString) {
+                    setFormat(i, 1, quoteHighlightRules[curQuoteChar]);
+                }
+            }
+            qDebug() << i << curChar << currentBlockState() <<
+                (currentBlockState() <= Normal);
         }
 
         setCurrentBlockUserData(data);

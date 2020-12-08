@@ -1,11 +1,11 @@
 #ifndef MCFUNCTIONHIGHLIGHTER_H
 #define MCFUNCTIONHIGHLIGHTER_H
 
-#include <QSyntaxHighlighter>
 #include <QRegularExpression>
-#include <QTextDocument>
 
-class McfunctionHighlighter : public QSyntaxHighlighter
+#include "highlighter.h"
+
+class McfunctionHighlighter : public Highlighter
 {
 public:
     McfunctionHighlighter(QObject *parent = nullptr);
@@ -27,7 +27,6 @@ private:
     QTextCharFormat posFormat;
     QTextCharFormat entitySelectorFormat;
     QTextCharFormat namespacedIDFormat;
-    QTextCharFormat quotationFormat;
     QTextCharFormat commentFormat;
 };
 

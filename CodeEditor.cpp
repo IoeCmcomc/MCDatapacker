@@ -154,16 +154,22 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     delete menu;
 }
 
+void CodeEditor::onCursorPositionChanged() {
+    setExtraSelections({});
+    highlightCurrentLine();
+    matchParentheses();
+}
+
+
 void CodeEditor::highlightCurrentLine() {
     QList<QTextEdit::ExtraSelection> selections = extraSelections();
-
-    qDebug() << "highlightCurrentLine" << selections.count();
 
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
         QColor lineColor = QColor(237, 236, 223, 127);
 
+        selection.format = QTextCharFormat();
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
         selection.cursor = textCursor();
@@ -172,14 +178,6 @@ void CodeEditor::highlightCurrentLine() {
         selections.append(selection);
     }
     setExtraSelections(selections);
-
-    qDebug() << selections.count() << extraSelections().count();
-}
-
-void CodeEditor::onCursorPositionChanged() {
-    setExtraSelections({});
-    matchParentheses();
-    highlightCurrentLine();
 }
 
 void CodeEditor::setFilePath(const QString &path) {
@@ -231,18 +229,12 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
 
 void CodeEditor::matchParentheses() {
     bool match = false;
-/*
-      QList<QTextEdit::ExtraSelection> selections;
-      setExtraSelections(selections);
- */
 
     TextBlockData *data =
         static_cast<TextBlockData *>(textCursor().block().userData());
 
     if (data) {
         QVector<ParenthesisInfo *> infos = data->parentheses();
-
-        qDebug() << infos << infos.count();
 
         int pos = textCursor().block().position();
         for (int i = 0; i < infos.size(); ++i) {
@@ -330,8 +322,6 @@ bool CodeEditor::matchRightParenthesis(QTextBlock currentBlock,
 void CodeEditor::createParenthesisSelection(int pos) {
     QList<QTextEdit::ExtraSelection> selections = extraSelections();
 
-    qDebug() << "createParenthesisSelection" << pos << selections.count();
-
     QTextEdit::ExtraSelection selection;
     QTextCharFormat           format = selection.format;
 
@@ -347,8 +337,6 @@ void CodeEditor::createParenthesisSelection(int pos) {
     selections.append(selection);
 
     setExtraSelections(selections);
-
-    qDebug() << selections.count() << extraSelections().count();
 }
 
 CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
