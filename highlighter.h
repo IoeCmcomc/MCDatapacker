@@ -34,6 +34,7 @@ public:
 
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
+    QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
 
     void highlightBlock(const QString &text);
 };
