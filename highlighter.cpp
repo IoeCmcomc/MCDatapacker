@@ -5,19 +5,19 @@
 TextBlockData::TextBlockData() {
 }
 
-QVector<ParenthesisInfo *> TextBlockData::parentheses() {
-    return m_parentheses;
+QVector<BracketInfo *> TextBlockData::brackets() {
+    return m_brackets;
 }
 
 
-void TextBlockData::insert(ParenthesisInfo *info) {
+void TextBlockData::insert(BracketInfo *info) {
     int i = 0;
 
-    while (i < m_parentheses.size() &&
-           info->position > m_parentheses.at(i)->position)
+    while (i < m_brackets.size() &&
+           info->position > m_brackets.at(i)->position)
         ++i;
 
-    m_parentheses.insert(i, info);
+    m_brackets.insert(i, info);
 }
 
 
@@ -27,6 +27,9 @@ Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
     fmt.setForeground(QColor("#A31621"));
 
     quoteHighlightRules.insert('"', fmt);
+
+    fmt = QTextCharFormat();
+    bracketPairs.append({ '{', '}' });
 }
 
 void Highlighter::highlightBlock(const QString &text) {
@@ -48,7 +51,7 @@ void Highlighter::highlightBlock(const QString &text) {
                 if (quoteHighlightRules.contains(curChar)) {
                     if (!backslash && (currentBlockState() == QuotedString)) {
                         setCurrentBlockState(Normal);
-                        setFormat(quoteStart, quoteLength + 1,
+                        setFormat(quoteStart, quoteLength + 2,
                                   quoteHighlightRules[curQuoteChar]);
                     } else {
                         setCurrentBlockState(QuotedString);
@@ -56,29 +59,22 @@ void Highlighter::highlightBlock(const QString &text) {
                         quoteStart   = i;
                         quoteLength++;
                     }
-                } else if (curChar == '\\') {
+                } else if (curChar == QLatin1Char('\\')) {
                     backslash = !backslash;
-                } else if (curChar == '{') {
-                    if (currentBlockState() <= Normal) {
-                        ParenthesisInfo *info = new ParenthesisInfo;
-                        info->character = '{';
-                        info->position  = i;
+                } else if (currentBlockState() == QuotedString) {
+                    quoteLength++;
+                } else if (currentBlockState() <= Normal) {
+                    for (auto iter = bracketPairs.begin();
+                         iter != bracketPairs.end();
+                         ++iter) {
+                        if (curChar == iter->left || curChar == iter->right) {
+                            BracketInfo *info = new BracketInfo;
+                            info->character = curChar.toLatin1();
+                            info->position  = i;
 
-                        qDebug() << info->character << info->position;
-                        data->insert(info);
-                    }
-                } else if (curChar == '}') {
-                    if (currentBlockState() <= Normal) {
-                        ParenthesisInfo *info = new ParenthesisInfo;
-                        info->character = '}';
-                        info->position  = i;
-
-                        qDebug() << info->character << info->position;
-                        data->insert(info);
-                    }
-                } else {
-                    if (currentBlockState() == QuotedString) {
-                        quoteLength++;
+                            qDebug() << info->character << info->position;
+                            data->insert(info);
+                        }
                     }
                 }
 /*

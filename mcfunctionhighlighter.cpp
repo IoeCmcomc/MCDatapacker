@@ -9,10 +9,13 @@ McfunctionHighlighter::McfunctionHighlighter(QObject *parent)
 }
 
 void McfunctionHighlighter::setupRules() {
-    auto commentFmt = QTextCharFormat();
+    auto fmt = QTextCharFormat();
 
-    commentFmt.setForeground(QColor("#3EC300"));
-    singleCommentHighlightRules.insert('#', commentFmt);
+    fmt.setForeground(QColor("#3EC300"));
+    singleCommentHighlightRules.insert('#', fmt);
+
+    fmt = QTextCharFormat();
+    bracketPairs.append({ '[', ']' });
 
     HighlightingRule rule;
 

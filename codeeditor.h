@@ -49,6 +49,8 @@ private:
     QStringList keyModifiers;
     JsonHighlighter *jsonHighlighter;
     McfunctionHighlighter *mcfunctionHighlighter;
+    QTextCharFormat bracketSeclectFmt;
+    Highlighter *curHighlighter;
     QTextCursor lastTextCursor;
     QTextCursor mouseTextCursor;
     QTextCursor lastMouseTextCursor;
@@ -57,13 +59,13 @@ private:
 
     void followCurrentNamespacedID();
 
-    bool matchLeftParenthesis(QTextBlock currentBlock,
-                              int i,
-                              int numLeftParentheses);
-    bool matchRightParenthesis(QTextBlock currentBlock,
-                               int i,
-                               int numRightParentheses);
-    void createParenthesisSelection(int pos);
+    bool matchLeftBracket(QTextBlock currentBlock,
+                          int i, char chr, char corresponder,
+                          int numLeftParentheses);
+    bool matchRightBracket(QTextBlock currentBlock,
+                           int i, char chr, char corresponder,
+                           int numRightParentheses);
+    void createBracketSelection(int pos);
     void matchParentheses();
 };
 

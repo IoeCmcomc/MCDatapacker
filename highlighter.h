@@ -3,21 +3,28 @@
 
 #include <QSyntaxHighlighter>
 
-struct ParenthesisInfo {
+struct BracketInfo {
     char character;
     int  position;
 };
+
+struct BracketPair {
+    char left;
+    char right;
+};
+
+class CodeEditor;
 
 class TextBlockData : public QTextBlockUserData
 {
 public:
     TextBlockData();
 
-    QVector<ParenthesisInfo *> parentheses();
-    void insert(ParenthesisInfo *info);
+    QVector<BracketInfo *> brackets();
+    void insert(BracketInfo *info);
 
 private:
-    QVector<ParenthesisInfo *> m_parentheses;
+    QVector<BracketInfo *> m_brackets;
 };
 
 class Highlighter : public QSyntaxHighlighter
@@ -35,6 +42,9 @@ public:
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
     QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
+    QVector<BracketPair> bracketPairs;
+
+    friend class CodeEditor;
 
     void highlightBlock(const QString &text);
 };

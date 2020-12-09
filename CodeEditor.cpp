@@ -36,6 +36,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
     setFont(monoFont);
 
+    bracketSeclectFmt.setFontWeight(QFont::Bold);
+    bracketSeclectFmt.setForeground(Qt::red);
+    /*bracketSeclectFmt.setBackground(QColor("#BB00FF00")); */
+    /*bracketSeclectFmt.setBackground(Qt::white); */
+    bracketSeclectFmt.setBackground(QColor("#AA66E366"));
+
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
 }
@@ -190,9 +196,15 @@ void CodeEditor::setFilePath(const QString &path) {
     if (curFileType == CodeFile::Function) {
         jsonHighlighter->setDocument(nullptr);
         mcfunctionHighlighter->setDocument(document());
+        curHighlighter = mcfunctionHighlighter;
     } else if (curFileType >= CodeFile::JsonText) {
         mcfunctionHighlighter->setDocument(nullptr);
         jsonHighlighter->setDocument(document());
+        curHighlighter = jsonHighlighter;
+    } else {
+        jsonHighlighter->setDocument(nullptr);
+        mcfunctionHighlighter->setDocument(nullptr);
+        curHighlighter = nullptr;
     }
 }
 
@@ -218,9 +230,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
     if (dy)
         lineNumberArea->scroll(0, dy);
     else
-        lineNumberArea->update(0,
-                               rect.y(),
-                               lineNumberArea->width(),
+        lineNumberArea->update(0, rect.y(), lineNumberArea->width(),
                                rect.height());
 
     if (rect.contains(viewport()->rect()))
@@ -228,54 +238,66 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
 }
 
 void CodeEditor::matchParentheses() {
-    bool match = false;
+    /*bool match = false; */
 
     TextBlockData *data =
         static_cast<TextBlockData *>(textCursor().block().userData());
 
-    if (data) {
-        QVector<ParenthesisInfo *> infos = data->parentheses();
+    if (!data || !curHighlighter)
+        return;
 
-        int pos = textCursor().block().position();
-        for (int i = 0; i < infos.size(); ++i) {
-            ParenthesisInfo *info = infos.at(i);
+    QVector<BracketInfo *> infos = data->brackets();
 
-            int curPos = textCursor().position() -
-                         textCursor().block().position();
-            int isInfoPosNextToCurPos =
-                ((info->position == curPos) || (info->position == curPos - 1));
-            if (isInfoPosNextToCurPos && info->character == '{') {
-                if (matchLeftParenthesis(textCursor().block(), i + 1, 0))
-                    createParenthesisSelection(pos + info->position);
-            } else if (isInfoPosNextToCurPos && info->character == '}') {
-                if (matchRightParenthesis(textCursor().block(), i - 1, 0))
-                    createParenthesisSelection(pos + info->position);
+    int  pos            = textCursor().block().position();
+    auto highlightPairs = curHighlighter->bracketPairs;
+
+    for (int i = 0; i < infos.size(); ++i) {
+        BracketInfo *info = infos.at(i);
+
+        int curPos = textCursor().position() -
+                     textCursor().block().position();
+        if ((info->position == curPos) || (info->position == curPos - 1)) {
+            for (auto iter = highlightPairs.begin();
+                 iter != highlightPairs.end(); ++iter) {
+                if (info->character == iter->left) {
+                    if (matchLeftBracket(textCursor().block(), i + 1,
+                                         iter->left, iter->right,
+                                         0)) {
+                        createBracketSelection(pos + info->position);
+                    }
+                } else if (info->character == iter->right) {
+                    if (matchRightBracket(textCursor().block(), i - 1,
+                                          iter->right, iter->left,
+                                          0)) {
+                        createBracketSelection(pos + info->position);
+                    }
+                }
             }
         }
     }
 }
 
-bool CodeEditor::matchLeftParenthesis(QTextBlock currentBlock,
-                                      int i,
-                                      int numLeftParentheses) {
-    qDebug() << "matchLeftParenthesis" << &currentBlock << i <<
+bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
+                                  int i, char chr, char corresponder,
+                                  int numLeftParentheses) {
+    qDebug() << "matchLeftBracket" << chr << corresponder << i <<
         numLeftParentheses;
     TextBlockData *data =
         static_cast<TextBlockData *>(currentBlock.userData());
-    QVector<ParenthesisInfo *> infos = data->parentheses();
+    QVector<BracketInfo *> infos = data->brackets();
 
     int docPos = currentBlock.position();
 
     for (; i < infos.size(); ++i) {
-        ParenthesisInfo *info = infos.at(i);
+        BracketInfo *info = infos.at(i);
 
-        if (info->character == '{') {
+        if (info->character == chr) {
             ++numLeftParentheses;
             continue;
         }
 
-        if (info->character == '}' && numLeftParentheses == 0) {
-            createParenthesisSelection(docPos + info->position);
+        if (info->character == corresponder && numLeftParentheses == 0) {
+            createBracketSelection(docPos + info->position);
             return true;
         } else
             --numLeftParentheses;
@@ -283,30 +305,31 @@ bool CodeEditor::matchLeftParenthesis(QTextBlock currentBlock,
 
     currentBlock = currentBlock.next();
     if (currentBlock.isValid())
-        return matchLeftParenthesis(currentBlock, 0, numLeftParentheses);
+        return matchLeftBracket(currentBlock, 0, chr, corresponder,
+                                numLeftParentheses);
 
     return false;
 }
 
-bool CodeEditor::matchRightParenthesis(QTextBlock currentBlock,
-                                       int i,
-                                       int numRightParentheses) {
-    qDebug() << "matchRightParenthesis" << &currentBlock << i <<
+bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
+                                   int i, char chr, char corresponder,
+                                   int numRightParentheses) {
+    qDebug() << "matchRightBracket" << chr << corresponder << i <<
         numRightParentheses;
     TextBlockData *data =
         static_cast<TextBlockData *>(currentBlock.userData());
-    QVector<ParenthesisInfo *> parentheses = data->parentheses();
+    QVector<BracketInfo *> parentheses = data->brackets();
 
     int docPos = currentBlock.position();
 
     for (; i > -1 && parentheses.size() > 0; --i) {
-        ParenthesisInfo *info = parentheses.at(i);
-        if (info->character == '}') {
+        BracketInfo *info = parentheses.at(i);
+        if (info->character == chr) {
             ++numRightParentheses;
             continue;
         }
-        if (info->character == '{' && numRightParentheses == 0) {
-            createParenthesisSelection(docPos + info->position);
+        if (info->character == corresponder && numRightParentheses == 0) {
+            createBracketSelection(docPos + info->position);
             return true;
         } else
             --numRightParentheses;
@@ -314,20 +337,18 @@ bool CodeEditor::matchRightParenthesis(QTextBlock currentBlock,
 
     currentBlock = currentBlock.previous();
     if (currentBlock.isValid())
-        return matchRightParenthesis(currentBlock, 0, numRightParentheses);
+        return matchRightBracket(currentBlock, 0, chr, corresponder,
+                                 numRightParentheses);
 
     return false;
 }
 
-void CodeEditor::createParenthesisSelection(int pos) {
+void CodeEditor::createBracketSelection(int pos) {
     QList<QTextEdit::ExtraSelection> selections = extraSelections();
 
     QTextEdit::ExtraSelection selection;
-    QTextCharFormat           format = selection.format;
 
-    format.setForeground(Qt::red);
-    format.setBackground(QColor("#BB00FF00"));
-    selection.format = format;
+    selection.format = bracketSeclectFmt;
 
     QTextCursor cursor = textCursor();
     cursor.setPosition(pos);
