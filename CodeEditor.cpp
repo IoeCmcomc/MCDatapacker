@@ -264,12 +264,14 @@ void CodeEditor::matchParentheses() {
                                          iter->left, iter->right,
                                          0)) {
                         createBracketSelection(pos + info->position);
+                        break;
                     }
                 } else if (info->character == iter->right) {
                     if (matchRightBracket(textCursor().block(), i - 1,
                                           iter->right, iter->left,
                                           0)) {
                         createBracketSelection(pos + info->position);
+                        break;
                     }
                 }
             }
@@ -280,11 +282,12 @@ void CodeEditor::matchParentheses() {
 bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
                                   int i, char chr, char corresponder,
                                   int numLeftParentheses) {
-    qDebug() << "matchLeftBracket" << chr << corresponder << i <<
-        numLeftParentheses;
     TextBlockData *data =
         static_cast<TextBlockData *>(currentBlock.userData());
     QVector<BracketInfo *> infos = data->brackets();
+
+    qDebug() << "matchLeftBracket" << chr << corresponder << i <<
+        numLeftParentheses << infos.count();
 
     int docPos = currentBlock.position();
 
@@ -314,16 +317,20 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
 bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
                                    int i, char chr, char corresponder,
                                    int numRightParentheses) {
-    qDebug() << "matchRightBracket" << chr << corresponder << i <<
-        numRightParentheses;
     TextBlockData *data =
         static_cast<TextBlockData *>(currentBlock.userData());
-    QVector<BracketInfo *> parentheses = data->brackets();
+    QVector<BracketInfo *> infos = data->brackets();
+
+    if (i == -2)
+        i = infos.count() - 1;
+
+    qDebug() << "matchRightBracket" << chr << corresponder << i <<
+        numRightParentheses << infos.count();
 
     int docPos = currentBlock.position();
 
-    for (; i > -1 && parentheses.size() > 0; --i) {
-        BracketInfo *info = parentheses.at(i);
+    for (; i > -1 && infos.size() > 0; --i) {
+        BracketInfo *info = infos.at(i);
         if (info->character == chr) {
             ++numRightParentheses;
             continue;
@@ -337,7 +344,7 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
 
     currentBlock = currentBlock.previous();
     if (currentBlock.isValid())
-        return matchRightBracket(currentBlock, 0, chr, corresponder,
+        return matchRightBracket(currentBlock, -2, chr, corresponder,
                                  numRightParentheses);
 
     return false;
