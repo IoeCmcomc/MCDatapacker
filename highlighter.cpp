@@ -1,12 +1,21 @@
 #include "highlighter.h"
 
+#include "mainwindow.h"
+#include "globalhelpers.h"
+
 #include <QDebug>
+#include <QDir>
+#include <QRegularExpression>
 
 TextBlockData::TextBlockData() {
 }
 
 QVector<BracketInfo *> TextBlockData::brackets() {
     return m_brackets;
+}
+
+QVector<NamespacedIdInfo *> TextBlockData::namespacedIds() {
+    return m_namespaceIds;
 }
 
 
@@ -18,6 +27,16 @@ void TextBlockData::insert(BracketInfo *info) {
         ++i;
 
     m_brackets.insert(i, info);
+}
+
+void TextBlockData::insert(NamespacedIdInfo *info) {
+    int i = 0;
+
+    while (i < m_namespaceIds.size() &&
+           info->start > m_namespaceIds.at(i)->start)
+        ++i;
+
+    m_namespaceIds.insert(i, info);
 }
 
 
@@ -33,7 +52,7 @@ Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
 }
 
 void Highlighter::highlightBlock(const QString &text) {
-    qDebug() << "Highlighter::highlightBlock" << text;
+    /*qDebug() << "Highlighter::highlightBlock" << text; */
     if (document()) {
         TextBlockData *data = new TextBlockData;
 
@@ -72,7 +91,7 @@ void Highlighter::highlightBlock(const QString &text) {
                             info->character = curChar.toLatin1();
                             info->position  = i;
 
-                            qDebug() << info->character << info->position;
+                            /*qDebug() << info->character << info->position; */
                             data->insert(info);
                         }
                     }
@@ -84,6 +103,58 @@ void Highlighter::highlightBlock(const QString &text) {
             }
         }
 
+        collectNamespacedIds(text, data);
+
         setCurrentBlockUserData(data);
     }
+}
+
+void Highlighter::collectNamespacedIds(const QString &text,
+                                       TextBlockData *data) {
+    QRegularExpression namespacedIdRegex =
+        QRegularExpression(QStringLiteral("#?\\b[a-z0-9-_.]+:[a-z0-9-_./]+\\b"));
+    auto matchIter = namespacedIdRegex.globalMatch(text);
+
+    while (matchIter.hasNext()) {
+        auto match    = matchIter.next();
+        auto filepath = locateNamespacedId(match.captured());
+        if (!filepath.isEmpty()) {
+            auto *info = new NamespacedIdInfo();
+            info->start  = match.capturedStart();
+            info->length = match.capturedLength();
+            info->link   = filepath;
+            qDebug() << match.captured() << info->start << info->length;
+            data->insert(info);
+        }
+    }
+}
+
+QString Highlighter::locateNamespacedId(QString id) {
+    Q_ASSERT(!MainWindow::getCurDir().isEmpty());
+    bool isTag = false;
+    if (Glhp::removePrefix(id, "#"))
+        isTag = true;
+    QString dirpath = MainWindow::getCurDir() + "/data/"
+                      + id.section(":", 0, 0);
+    if (isTag)
+        dirpath += "/tags";
+
+    QDir dir(dirpath);
+
+    if (!dir.exists()) return "";
+
+    QStringList dirList =
+        dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    QString path;
+    for (const auto &catDir: dirList) {
+        /*qDebug() << "catDir: " << catDir; */
+        path = dir.path() + "/" + catDir + "/" + id.section(":", 1, 1);
+        if (catDir == "functions" && QFile::exists(path + ".mcfunction")) {
+            return path + ".mcfunction";
+        } else if (QFile::exists(path + ".json")) {
+            return path + ".json";
+        }
+    }
+
+    return "";
 }

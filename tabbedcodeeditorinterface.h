@@ -63,6 +63,7 @@ private:
 
     QVector<CodeFile> files;
     int prevIndex = -1;
+    bool tabMoved = false;
 
     CodeFile readFile(const QString &path);
     void addCodeFile(const CodeFile &file);

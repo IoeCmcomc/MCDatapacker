@@ -25,7 +25,9 @@ public:
     int lineNumberAreaWidth();
 
     void setFilePath(const QString &path);
-    CurrentNamespacedID getCurrentNamespacedID();
+
+signals:
+    void openFile(const QString &filepath);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -45,20 +47,13 @@ private:
     QWidget *lineNumberArea;
     CodeFile::FileType curFileType;
     QString filepath;
-    QString prevFilepath;
-    QStringList keyModifiers;
     JsonHighlighter *jsonHighlighter;
     McfunctionHighlighter *mcfunctionHighlighter;
     QTextCharFormat bracketSeclectFmt;
     Highlighter *curHighlighter;
-    QTextCursor lastTextCursor;
-    QTextCursor mouseTextCursor;
-    QTextCursor lastMouseTextCursor;
 
     void highlightCurrentLine();
-
-    void followCurrentNamespacedID();
-
+    void matchParentheses();
     bool matchLeftBracket(QTextBlock currentBlock,
                           int i, char chr, char corresponder,
                           int numLeftParentheses);
@@ -66,7 +61,7 @@ private:
                            int i, char chr, char corresponder,
                            int numRightParentheses);
     void createBracketSelection(int pos);
-    void matchParentheses();
+    void followNamespacedId(const QMouseEvent *event);
 };
 
 

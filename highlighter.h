@@ -13,6 +13,12 @@ struct BracketPair {
     char right;
 };
 
+struct NamespacedIdInfo {
+    int     start;
+    int     length;
+    QString link;
+};
+
 class CodeEditor;
 
 class TextBlockData : public QTextBlockUserData
@@ -21,10 +27,13 @@ public:
     TextBlockData();
 
     QVector<BracketInfo *> brackets();
+    QVector<NamespacedIdInfo *> namespacedIds();
     void insert(BracketInfo *info);
+    void insert(NamespacedIdInfo *info);
 
 private:
-    QVector<BracketInfo *> m_brackets;
+    QVector<BracketInfo*> m_brackets;
+    QVector<NamespacedIdInfo*> m_namespaceIds;
 };
 
 class Highlighter : public QSyntaxHighlighter
@@ -47,6 +56,10 @@ protected:
     friend class CodeEditor;
 
     void highlightBlock(const QString &text);
+
+private:
+    void collectNamespacedIds(const QString &text, TextBlockData *data);
+    QString locateNamespacedId(QString id);
 };
 
 #endif /* HIGHLIGHTER_H */

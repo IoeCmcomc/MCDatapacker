@@ -85,10 +85,13 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
-    /*qDebug() << "Mouse press event"; */
+/*
+      qDebug() << "Mouse press event" << QGuiApplication::keyboardModifiers() <<
+          e->modifiers();
+ */
     if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier
         && e->modifiers() & Qt::ControlModifier) {
-        followCurrentNamespacedID();
+        followNamespacedId(e);
     }
     QPlainTextEdit::mousePressEvent(e);
 }
@@ -237,6 +240,42 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
         updateLineNumberAreaWidth(0);
 }
 
+void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
+    QPainter painter(lineNumberArea);
+
+    painter.fillRect(event->rect(), QColor(210, 210, 210));
+    /*
+       painter.setPen(QColor(240, 240, 240));
+       painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
+     */
+    QTextBlock block       = firstVisibleBlock();
+    int        blockNumber = block.blockNumber();
+    int        top         =
+        qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
+    int bottom = top + qRound(blockBoundingRect(block).height());
+    while (block.isValid() && top <= event->rect().bottom()) {
+        if (block.isVisible() && bottom >= event->rect().top()) {
+            QString number = QString::number(blockNumber + 1);
+            if (blockNumber == this->textCursor().blockNumber()) {
+                painter.setPen(QColor(40, 40, 40));
+            } else {
+                painter.setPen(Qt::darkGray);
+            }
+            painter.drawText(0,
+                             top,
+                             lineNumberArea->width(),
+                             fontMetrics().height(),
+                             Qt::AlignRight,
+                             number);
+        }
+
+        block  = block.next();
+        top    = bottom;
+        bottom = top + qRound(blockBoundingRect(block).height());
+        ++blockNumber;
+    }
+}
+
 void CodeEditor::matchParentheses() {
     /*bool match = false; */
 
@@ -286,8 +325,10 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
         static_cast<TextBlockData *>(currentBlock.userData());
     QVector<BracketInfo *> infos = data->brackets();
 
-    qDebug() << "matchLeftBracket" << chr << corresponder << i <<
-        numLeftParentheses << infos.count();
+/*
+      qDebug() << "matchLeftBracket" << chr << corresponder << i <<
+          numLeftParentheses << infos.count();
+ */
 
     int docPos = currentBlock.position();
 
@@ -324,8 +365,10 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
     if (i == -2)
         i = infos.count() - 1;
 
-    qDebug() << "matchRightBracket" << chr << corresponder << i <<
-        numRightParentheses << infos.count();
+/*
+      qDebug() << "matchRightBracket" << chr << corresponder << i <<
+          numRightParentheses << infos.count();
+ */
 
     int docPos = currentBlock.position();
 
@@ -367,130 +410,30 @@ void CodeEditor::createBracketSelection(int pos) {
     setExtraSelections(selections);
 }
 
-CodeEditor::CurrentNamespacedID CodeEditor::getCurrentNamespacedID() {
-    QTextCursor cursor = this->mouseTextCursor;
-    /*
-       qDebug() << "cursor pos: " << cursor.position();
-       qDebug() << "cursor pos in block: " << cursor.positionInBlock();
-       qDebug() << "cursor block number: " << cursor.blockNumber();
-       qDebug() << "cursor column: " << cursor.columnNumber();
-     */
+void CodeEditor::followNamespacedId(const QMouseEvent *event) {
+    TextBlockData *data =
+        static_cast<TextBlockData *>(textCursor().block().userData());
 
-    QTextBlock block = this->document()->findBlockByNumber(
-        cursor.blockNumber());
-    QString lineText = block.text();
-    /*qDebug() << lineText; */
-    int cursorRelPos = cursor.positionInBlock();
+    if (!data || !curHighlighter)
+        return;
 
-    QChar currChar = lineText[cursor.columnNumber()];
+    QVector<NamespacedIdInfo *> infos = data->namespacedIds();
 
-    if (QRegularExpression(QStringLiteral("[^0-9a-z-_.:/]")).match(currChar).
-        hasMatch()) {
-        --cursorRelPos;
-    }
+    qDebug() << "followNamespacedId" << infos.count();
 
-    bool isStartofString = false;
-    while (!isStartofString && cursorRelPos >= 0) {
-        currChar = lineText[cursorRelPos];
-        /*qDebug() << "current character: " << currChar; */
-        QRegularExpression regex =
-            QRegularExpression(QStringLiteral("[#0-9a-z-_.:/]"));
-        QRegularExpressionMatch match = regex.match(currChar);
-        isStartofString = !match.hasMatch();
-        /*qDebug() << "is start of string: " << isStartofString; */
-        if (!isStartofString && cursorRelPos >= 0) --cursorRelPos;
-    }
-    /*qDebug() << "startIndex: " << cursorRelPos; */
-    int                startIndex        = qMax(cursorRelPos + 1, 0);
-    QString            str               = lineText.mid(startIndex);
-    QRegularExpression namespacedIDRegex =
-        QRegularExpression(QStringLiteral("^#?\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
-    /*qDebug() << str; */
-    CurrentNamespacedID currNamespacedID;
-    currNamespacedID.startingIndex = startIndex;
-    currNamespacedID.blockNumber   = cursor.blockNumber();
-    currNamespacedID.string        = namespacedIDRegex.match(str).captured();
+    auto cursor         = cursorForPosition(event->pos());
+    auto cursorBlockPos = cursor.positionInBlock();
 
-    return currNamespacedID;
-}
-
-void CodeEditor::followCurrentNamespacedID() {
-    QString str = getCurrentNamespacedID().string;
-
-    /*qDebug() << str; */
-    if (!str.isEmpty()) {
-        QString dirname =
-            MainWindow::getCurDir();
-        if (dirname.isEmpty()) return;
-
-        QDir dir;
-        if (Glhp::removePrefix(str, "#")) {
-            dir = QDir(dirname + "/data/" + str.remove(0, 1)
-                       .section(":", 0, 0) + "/tags");
-        } else {
-            dir = QDir(dirname + "/data/" + str.section(":", 0, 0));
-        }
-        if (!dir.exists()) return;
-
-        QStringList dirList =
-            dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-        QString path;
-        QString fileExt;
-        for (const auto& dirType: dirList) {
-            /*qDebug() << "dirType: " << dirType; */
-            path = dir.path() + "/" + dirType + "/" + str.section(":", 1, 1);
-            if (dirType == "functions" && QFile::exists(path + ".mcfunction")) {
-                fileExt = ".mcfunction";
-                break;
-            } else if (QFile::exists(path + ".json")) {
-                fileExt = ".json";
-                break;
-            }
-        }
-
-        /*qDebug() << "final path: " << path; */
-        if (!path.isEmpty() && !fileExt.isEmpty()) {
-            path              += fileExt;
-            this->prevFilepath = path;
-            qobject_cast<DatapackTreeView*>(
-                qobject_cast<QSplitter*>(this->parent()->parent())->widget(0))
-            ->openFromPath(path);
+    for (const auto info: infos) {
+        if (cursorBlockPos >= info->start &&
+            cursorBlockPos <= (info->start + info->length)) {
+            qDebug() << cursor.position() <<
+                (cursor.position() - cursorBlockPos + info->start) <<
+                cursor.positionInBlock() <<
+                info->start << (info->start + info->length);
+            emit openFile(info->link);
+            break;
         }
     }
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
-    QPainter painter(lineNumberArea);
-
-    painter.fillRect(event->rect(), QColor(210, 210, 210));
-    /*
-       painter.setPen(QColor(240, 240, 240));
-       painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
-     */
-    QTextBlock block       = firstVisibleBlock();
-    int        blockNumber = block.blockNumber();
-    int        top         =
-        qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
-    int bottom = top + qRound(blockBoundingRect(block).height());
-    while (block.isValid() && top <= event->rect().bottom()) {
-        if (block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(blockNumber + 1);
-            if (blockNumber == this->textCursor().blockNumber()) {
-                painter.setPen(QColor(40, 40, 40));
-            } else {
-                painter.setPen(Qt::darkGray);
-            }
-            painter.drawText(0,
-                             top,
-                             lineNumberArea->width(),
-                             fontMetrics().height(),
-                             Qt::AlignRight,
-                             number);
-        }
-
-        block  = block.next();
-        top    = bottom;
-        bottom = top + qRound(blockBoundingRect(block).height());
-        ++blockNumber;
-    }
-}

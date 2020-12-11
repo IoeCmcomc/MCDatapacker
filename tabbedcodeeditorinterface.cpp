@@ -32,6 +32,8 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             this, &TabbedCodeEditorInterface::onModificationChanged);
     connect(this, &TabbedCodeEditorInterface::curFileChanged,
             ui->codeEditor, &CodeEditor::setFilePath);
+    connect(ui->codeEditor, &CodeEditor::openFile,
+            this, &TabbedCodeEditorInterface::onOpenFile);
 }
 
 TabbedCodeEditorInterface::~TabbedCodeEditorInterface() {
@@ -164,6 +166,7 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
 
         newFile.doc->setParent(this);
         newFile.doc->setPlainText(content);
+        newFile.textCursor.setPosition(0);
         newFile.fileType = Glhp::pathToFileType(MainWindow::getCurDir(), path);
 
 #ifndef QT_NO_CURSOR
@@ -279,10 +282,12 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
 }
 
 void TabbedCodeEditorInterface::onTabChanged(int index) {
-    /*qDebug() << "onTabChanged" << getCurIndex() << index << count(); */
+    qDebug() << "onTabChanged" << prevIndex << getCurIndex() << index <<
+        count();
     if (index > -1) {
         if (prevIndex > -1)
-            files[prevIndex].textCursor = ui->codeEditor->textCursor();
+            if ((prevIndex < count()) && (prevIndex != index) && !tabMoved)
+                files[prevIndex].textCursor = ui->codeEditor->textCursor();
 
         auto *curFile = getCurFile();
         ui->codeEditor->setDocument(curFile->doc);
@@ -304,14 +309,18 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
         emit curModificationChanged(getCurDoc()->isModified());
 
     prevIndex = index;
+    tabMoved  = false;
 }
 
 void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
+    qDebug() << "onTabMoved" << from << to;
+    tabMoved = true;
     qSwap(files[from], files[to]);
 }
 
 void TabbedCodeEditorInterface::onCloseFile(int index) {
-    /*qDebug() << "onCloseFile" << index; */
+    Q_ASSERT(count() > 0);
+    /*qDebug() << "onCloseFile" << index << count(); */
     disconnect(getCurDoc(), &QTextDocument::modificationChanged,
                this, &TabbedCodeEditorInterface::onModificationChanged);
     files.remove(index);

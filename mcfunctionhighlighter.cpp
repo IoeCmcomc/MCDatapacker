@@ -133,29 +133,11 @@ void McfunctionHighlighter::setupRules() {
 void McfunctionHighlighter::highlightBlock(const QString &text) {
     Highlighter::highlightBlock(text);
     if (this->document()) {
-        CodeEditor *codeEditor =
-            qobject_cast<CodeEditor*>(this->parent());
-        CodeEditor::CurrentNamespacedID currNamespacedID =
-            codeEditor->getCurrentNamespacedID();
-
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
             QRegularExpressionMatchIterator matchIterator =
                 rule.pattern.globalMatch(text);
             while (matchIterator.hasNext()) {
                 QRegularExpressionMatch match = matchIterator.next();
-                if (rule.format == namespacedIDFormat) {
-                    QTextCharFormat fmt = rule.format;
-                    if (match.capturedStart() == currNamespacedID.startingIndex
-                        && match.captured() == currNamespacedID.string
-                        && currentBlock().blockNumber() ==
-                        currNamespacedID.blockNumber) {
-                        fmt.setFontUnderline(true);
-                        setFormat(match.capturedStart(),
-                                  match.capturedLength(),
-                                  fmt);
-                        continue;
-                    }
-                }
                 setFormat(match.capturedStart(), match.capturedLength(),
                           rule.format);
             }
