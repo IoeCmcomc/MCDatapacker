@@ -13,5 +13,6 @@
         <file>icon/format-text-italic.png</file>
         <file>icon/format-text-strikethrough.png</file>
         <file>icon/format-text-underline.png</file>
+        <file>icon/favicon_big.png</file>
     </qresource>
 </RCC>
