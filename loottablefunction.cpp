@@ -52,7 +52,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
 
     ui->lootEnchant_countInput->setTypes(NumericInput::ExactAndRange);
 
-    ui->setAttr_ammountInput->setTypes(NumericInput::Range);
+    ui->setAttr_amountInput->setTypes(NumericInput::Range);
     initComboModelView("attribute", attributesModel,
                        ui->setAttr_attrCombo, false);
 
@@ -189,8 +189,8 @@ QJsonObject LootTableFunction::toJson() const {
             auto attr = ui->setAttr_table->item(i, 1)->text();
             auto op   = ui->setAttr_table->item(i, 2)
                         ->data(Qt::UserRole + 1).toString();
-            auto ammount = ui->setAttr_table->item(i, 3)
-                           ->data(Qt::DisplayRole).toJsonValue();
+            auto amount = ui->setAttr_table->item(i, 3)
+                          ->data(Qt::DisplayRole).toJsonValue();
             auto id       = ui->setAttr_table->item(i, 5)->text();
             auto slotList = QJsonArray::fromStringList(
                 ui->setAttr_table->item(i, 4)
@@ -205,7 +205,7 @@ QJsonObject LootTableFunction::toJson() const {
                 { "name", name },
                 { "attribute", attr },
                 { "operation", op },
-                { "amount", ammount },
+                { "amount", amount },
                 { "slot", slotValue },
             };
             if (!id.isEmpty())
@@ -717,7 +717,7 @@ void LootTableFunction::enchantRand_onAdded() {
 
 void LootTableFunction::setAttr_onAdded() {
     if (ui->setAttr_nameEdit->text().isEmpty()
-        || ui->setAttr_ammountInput->isCurrentlyUnset())
+        || ui->setAttr_amountInput->isCurrentlyUnset())
         return;
 
     QTableWidgetItem *nameItem = new QTableWidgetItem(
@@ -738,7 +738,7 @@ void LootTableFunction::setAttr_onAdded() {
 
     QTableWidgetItem *amountItem = new QTableWidgetItem();
     amountItem->setData(Qt::DisplayRole,
-                        ui->setAttr_ammountInput->toJson());
+                        ui->setAttr_amountInput->toJson());
     amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
 
     QStringList slotsList;

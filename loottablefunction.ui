@@ -641,7 +641,7 @@
           </column>
           <column>
            <property name="text">
-            <string>Ammount</string>
+            <string>Amount</string>
            </property>
           </column>
           <column>
@@ -659,7 +659,7 @@
         <item row="4" column="0" rowspan="2">
          <widget class="QLabel" name="label_23">
           <property name="text">
-           <string>Ammount:</string>
+           <string>Amount:</string>
           </property>
          </widget>
         </item>
@@ -691,7 +691,7 @@
          </widget>
         </item>
         <item row="5" column="1" colspan="3">
-         <widget class="NumericInput" name="setAttr_ammountInput">
+         <widget class="NumericInput" name="setAttr_amountInput">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -813,7 +813,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
+             <width>43</width>
              <height>26</height>
             </rect>
            </property>
