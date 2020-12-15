@@ -45,7 +45,7 @@ private slots:
 private:
     QFont monoFont;
     QWidget *lineNumberArea;
-    CodeFile::FileType curFileType;
+    CodeFile::FileType curFileType = CodeFile::Text;
     QString filepath;
     JsonHighlighter *jsonHighlighter;
     McfunctionHighlighter *mcfunctionHighlighter;

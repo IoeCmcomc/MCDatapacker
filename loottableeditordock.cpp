@@ -64,7 +64,7 @@ void LootTableEditorDock::writeJson() {
     for (int i = 0; i < model.rowCount(); ++i) {
         auto index    = model.index(i, 0);
         auto poolJson =
-            model.data(index, Qt::UserRole + 1).value<QJsonObject>();
+            model.data(index, Qt::UserRole + 1).toJsonObject();
         pools.push_back(poolJson);
     }
     root.insert("pools", pools);
@@ -146,7 +146,7 @@ void LootTableEditorDock::onCurrentPoolChanged(const QModelIndex &current,
     }
     if (current.isValid() && (current != previous)) {
         auto moveInJson =
-            model.itemFromIndex(current)->data().value<QJsonObject>();
+            model.itemFromIndex(current)->data().toJsonObject();
         readPoolJson(moveInJson);
     }
 }
@@ -171,21 +171,21 @@ void LootTableEditorDock::reset() {
 }
 
 void LootTableEditorDock::onAddCondition() {
-    MCRPredCondition *cond = new MCRPredCondition(ui->conditionsContainer);
+    auto *cond = new MCRPredCondition(ui->conditionsContainer);
 
     cond->sizeHint().rheight() = cond->minimumHeight();
     conditionsLayout.addWidget(cond, 0);
 }
 
 void LootTableEditorDock::onAddFunction() {
-    LootTableFunction *funct = new LootTableFunction(ui->functionsContainer);
+    auto *funct = new LootTableFunction(ui->functionsContainer);
 
     funct->sizeHint().rheight() = funct->minimumHeight();
     functionsLayout.addWidget(funct, 0);
 }
 
 void LootTableEditorDock::onAddEntry() {
-    LootTableEntry *entry = new LootTableEntry(ui->entriesContainer);
+    auto *entry = new LootTableEntry(ui->entriesContainer);
 
     entry->setLootTableEditor(this);
 

@@ -19,7 +19,8 @@
 #include <QAction>
 #include <QVariant>
 
-MCRInvSlot::MCRInvSlot(QWidget *parent, MCRInvItem item) : QFrame(parent) {
+MCRInvSlot::MCRInvSlot(QWidget *parent,
+                       const MCRInvItem &item) : QFrame(parent) {
     setAcceptDrops(true);
     setMinimumSize(36, 36);
     setBackground();
@@ -34,7 +35,7 @@ MCRInvSlot::MCRInvSlot(QWidget *parent, MCRInvItem item) : QFrame(parent) {
     connect(this, &MCRInvSlot::itemChanged, this, &MCRInvSlot::onItemChanged);
 }
 
-void MCRInvSlot::setBackground(QString color) {
+void MCRInvSlot::setBackground(const QString &color) {
     if (color.isEmpty()) {
         setFrameShape(QFrame::StyledPanel);
         setFrameShadow(QFrame::Sunken);
@@ -64,14 +65,14 @@ void MCRInvSlot::setItem(const QVector<MCRInvItem> &items) {
     emit itemChanged();
 }
 
-void MCRInvSlot::setItem(MCRInvItem item) {
+void MCRInvSlot::setItem(const MCRInvItem &item) {
     clearItems();
     this->items.push_back(item);
     showItem();
     emit itemChanged();
 }
 
-void MCRInvSlot::appendItem(MCRInvItem item) {
+void MCRInvSlot::appendItem(const MCRInvItem &item) {
     /*qDebug() << "slot appendItem" << item << items.contains(item); */
     if (items.contains(item)) return;
 
@@ -83,7 +84,7 @@ void MCRInvSlot::appendItems(const QVector<MCRInvItem> &items) {
     this->items.append(items);
 }
 
-void MCRInvSlot::insertItem(const int index, MCRInvItem item) {
+void MCRInvSlot::insertItem(const int index, const MCRInvItem &item) {
     if (items.contains(item)) return;
 
     items.insert(index, item);
@@ -95,7 +96,7 @@ void MCRInvSlot::removeItem(const int index) {
     emit itemChanged();
 }
 
-int MCRInvSlot::removeItem(const MCRInvItem item) {
+int MCRInvSlot::removeItem(const MCRInvItem &item) {
     int r = items.removeAll(item);
 
     emit itemChanged();
@@ -137,7 +138,7 @@ QString MCRInvSlot::toolTipText() {
     if (items.count() > 1) {
         QStringList itemNames;
         int         c = 0;
-        for (auto item : items) {
+        for (const auto &item : items) {
             itemNames.push_back(item.getName());
             if (c > 5) {
                 itemNames.push_back(tr("..."));
@@ -156,7 +157,7 @@ QString MCRInvSlot::toolTipText() {
 }
 
 void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
-    QMenu *cMenu = new QMenu(this);
+    auto *cMenu = new QMenu(this);
 
     if (items.count() != 0) {
         QAction *removeAction = new QAction(tr("Remove"), cMenu);
@@ -164,7 +165,7 @@ void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
             clearItems();
         });
         cMenu->addAction(removeAction);
-        qDebug() << items.count();
+        /*qDebug() << items.count(); */
     }
 
     if (getAcceptTag()) {
@@ -179,7 +180,7 @@ void MCRInvSlot::onCustomContextMenu(const QPoint &point) {
         cMenu->addAction(seclectTagAction);
     }
 
-    QMenu *cMenu2 = new QMenu(this);
+    auto *cMenu2 = new QMenu(this);
     cMenu2->addAction("Test");
 
     if (!cMenu->isEmpty()) {
@@ -252,7 +253,7 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
         switch (event->button()) {
         case Qt::LeftButton: {
             BlockItemSelectorDialog dialog(this);
-            qDebug() << acceptMultiItems;
+            /*qDebug() << acceptMultiItems; */
             dialog.setAllowMultiItems(acceptMultiItems);
             if (dialog.exec()) {
                 setItem(dialog.getSelectedItems());
@@ -262,7 +263,7 @@ void MCRInvSlot::mouseReleaseEvent(QMouseEvent *event) {
 
         case Qt::MiddleButton: {
             if (getAcceptMultiItems()) {
-                MCRInvSlotEditor *editor = new MCRInvSlotEditor(this);
+                auto *editor = new MCRInvSlotEditor(this);
                 editor->show();
                 update();
             }
@@ -318,7 +319,7 @@ void MCRInvSlot::timerEvent(QTimerEvent *event) {
 
 void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
     if (event->mimeData()->hasFormat("application/x-mcrinvitem")) {
-        MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
+        auto *source = qobject_cast<MCRInvSlot*>(event->source());
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
             event->accept();
@@ -341,7 +342,7 @@ void MCRInvSlot::dragEnterEvent(QDragEnterEvent *event) {
 
 void MCRInvSlot::dragMoveEvent(QDragMoveEvent *event) {
     if (event->mimeData()->hasFormat("application/x-mcrinvitem")) {
-        MCRInvSlot *source = qobject_cast<MCRInvSlot*>(event->source());
+        auto *source = qobject_cast<MCRInvSlot*>(event->source());
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
             event->accept();
@@ -364,8 +365,8 @@ void MCRInvSlot::dragMoveEvent(QDragMoveEvent *event) {
 void MCRInvSlot::dropEvent(QDropEvent *event) {
     if (!isCreative) {
         if (event->mimeData()->hasFormat("application/x-mcrinvitem")) {
-            MCRInvSlot *source   = qobject_cast<MCRInvSlot*>(event->source());
-            QByteArray  itemData = event->mimeData()->data(
+            auto      *source   = qobject_cast<MCRInvSlot*>(event->source());
+            QByteArray itemData = event->mimeData()->data(
                 "application/x-mcrinvitem");
             QDataStream dataStream(&itemData, QIODevice::ReadOnly);
 
@@ -373,7 +374,7 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
             dataStream >> dropInvItems;
 
             bool hasTag = false;
-            for (auto item : dropInvItems)
+            for (const auto &item : dropInvItems)
                 if (item.getIsTag()) {
                     hasTag = true;
                     break;
@@ -457,11 +458,11 @@ void MCRInvSlot::startDrag([[maybe_unused]] QMouseEvent *event) {
     QDataStream dataStream(&itemData, QIODevice::WriteOnly);
     dataStream << items;
 
-    QMimeData *mimeData = new QMimeData;
+    auto *mimeData = new QMimeData;
     mimeData->setData("application/x-mcrinvitem", itemData);
     mimeData->setText(items[0].getNamespacedID());
 
-    QDrag *drag = new QDrag(this);
+    auto *drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->setPixmap(this->items[0].getPixmap());
     drag->setHotSpot(offset);

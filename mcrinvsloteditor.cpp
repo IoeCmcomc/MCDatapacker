@@ -26,7 +26,7 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     setWindowFlags(Qt::Popup);
 
     if (slot->getAcceptTag()) {
-        QMenu *newBtnMenu = new QMenu(ui->newButton);
+        auto *newBtnMenu = new QMenu(ui->newButton);
         newBtnMenu->addAction(tr("Item..."), this,
                               &MCRInvSlotEditor::onNewItem);
         newBtnMenu->addAction(tr("Item tag..."),
@@ -41,7 +41,7 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
                                   &MCRInvSlotEditor::onNewItem);
     }
 
-    for (auto invItem : slot->getItems()) {
+    for (const auto &invItem : slot->getItems()) {
         appendItem(invItem);
     }
     ui->listView->setModel(&model);
@@ -101,7 +101,7 @@ void MCRInvSlotEditor::onNewItem() {
 
     if (dialog.exec()) {
         auto newItems = dialog.getSelectedItems();
-        for (auto newItem : newItems) {
+        for (const auto &newItem : newItems) {
             /*qDebug() << newItem << slot->getItems().contains(newItem); */
             if (!slot->getItems().contains(newItem)) {
                 slot->appendItem(newItem);
@@ -150,7 +150,7 @@ void MCRInvSlotEditor::onRemoveItem() {
     for (auto index : indexes) {
         auto           i       = index.row();
         QStandardItem *item    = model.itemFromIndex(index);
-        MCRInvItem     invItem =
+        auto           invItem =
             item->data(Qt::UserRole + 1).value<MCRInvItem>();
 
         if (!slot->getItems().contains(invItem)) continue;
@@ -165,7 +165,7 @@ void MCRInvSlotEditor::onRemoveItem() {
 }
 
 void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {
-    QStandardItem *item = new QStandardItem();
+    auto *item = new QStandardItem();
 
     item->setIcon(QIcon(invItem.getPixmap()));
     item->setSizeHint(QSize(32 + (3 * 2), 32 + (3 * 2)));

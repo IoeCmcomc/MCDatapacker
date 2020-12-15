@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
                                    MainWindow::readMCRInfo(QStringLiteral(
                                                                "item")));
 
-    qDebug() << MainWindow::getMCRInfo("blockTag").count();
+    /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
     /*ui->codeEditor->setFocus(); */
 
@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
     #endif
 
     QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/icon");
-    qDebug() << QIcon::fallbackSearchPaths();
+    /*qDebug() << QIcon::fallbackSearchPaths(); */
 
     visualRecipeEditorDock = new VisualRecipeEditorDock(this);
     addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
@@ -161,7 +161,7 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     }
 
     if (reloadExternChanges == 0) {
-        qDebug() << filepath << fileWatcher.files().contains(filepath);
+        /*qDebug() << filepath << fileWatcher.files().contains(filepath); */
     }
 }
 
@@ -221,7 +221,7 @@ void MainWindow::readSettings() {
 
 void MainWindow::readPrefSettings(QSettings &settings) {
     settings.beginGroup("general");
-    qDebug() << settings.value("locale", "").toString();
+    /*qDebug() << settings.value("locale", "").toString(); */
     loadLanguage(settings.value("locale", "").toString(), true);
 
     settings.endGroup();
@@ -278,7 +278,7 @@ void MainWindow::loadLanguage(const QString& rLanguage, bool atStartup) {
     if ((curLocale.name() != rLanguage) || atStartup) {
         curLocale = QLocale(rLanguage);
         QLocale::setDefault(curLocale);
-        qDebug() << QLocale::system();
+        /*qDebug() << QLocale::system(); */
         QString transfile;
         if (rLanguage.isEmpty())
             transfile = QString("MCDatapacker_%1.qm").arg(
@@ -301,7 +301,7 @@ void MainWindow::switchTranslator(QTranslator& translator,
 
 
 void MainWindow::changeEvent(QEvent* event) {
-    if (0 != event) {
+    if (event != nullptr) {
         switch (event->type()) {
         /* this event is send if a translator is loaded */
         case QEvent::LanguageChange: {
@@ -328,8 +328,8 @@ void MainWindow::changeEvent(QEvent* event) {
 void MainWindow::commitData(QSessionManager &) {
 }
 
-QString MainWindow::strippedName(const QString &fullFileName) {
-    return QFileInfo(fullFileName).fileName();
+QString MainWindow::strippedName(const QString &fullFilepath) {
+    return QFileInfo(fullFilepath).fileName();
 }
 
 void MainWindow::updateWindowTitle(bool changed) {
@@ -365,7 +365,7 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     QByteArray data = inFile.readAll();
     inFile.close();
 
-    QJsonParseError errorPtr;
+    QJsonParseError errorPtr{};
     QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
         qWarning() << "Parse failed" << errorPtr.error;
@@ -373,7 +373,7 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     }
     QJsonObject root = doc.object();
     if (root.isEmpty()) {
-        qDebug() << "Root is empty. Return empty";
+        /*qDebug() << "Root is empty. Return empty"; */
         return retMap;
     }
 
@@ -392,8 +392,8 @@ QVariantMap &MainWindow::getMCRInfo(const QString &type) {
 }
 
 void MainWindow::newDatapack() {
-    NewDatapackDialog *dialog     = new NewDatapackDialog(this);
-    int                dialogCode = dialog->exec();
+    auto *dialog     = new NewDatapackDialog(this);
+    int   dialogCode = dialog->exec();
 
     if (dialogCode == 1) {
         if (maybeSave()) {
@@ -511,7 +511,7 @@ void MainWindow::openFolder() {
                     if (pack.contains("description") &&
                         pack.contains("pack_format")) {
                         ui->datapackTreeView->load(dir);
-                        this->curDir = dir;
+                        MainWindow::curDir = dir;
 
                         if (!curDir.isEmpty()) {
                             this->fileWatcher.removePath(curDir);

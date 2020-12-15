@@ -4,8 +4,7 @@
 #include "codefile.h"
 #include "mainwindow.h"
 
-DatapackFileIconProvider::DatapackFileIconProvider() : QFileIconProvider() {
-}
+DatapackFileIconProvider::DatapackFileIconProvider() = default;
 
 QIcon DatapackFileIconProvider::icon(const QFileInfo &info) const {
     if (info.isFile()) {

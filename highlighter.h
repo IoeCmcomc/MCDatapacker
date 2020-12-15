@@ -24,7 +24,7 @@ class CodeEditor;
 class TextBlockData : public QTextBlockUserData
 {
 public:
-    TextBlockData();
+    TextBlockData() = default;
 
     QVector<BracketInfo *> brackets();
     QVector<NamespacedIdInfo *> namespacedIds();

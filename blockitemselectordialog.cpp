@@ -31,7 +31,7 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent) :
 
     filterModel.setParent(ui->listView);
     model.setParent(this);
-    setupTreeView();
+    setupListView();
     connect(ui->searchLineEdit, &QLineEdit::textChanged,
             [ = ](const QString &input) {
         filterModel.setFilterRegularExpression(input);
@@ -58,7 +58,9 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent) :
     checkOK();
 }
 
-void BlockItemSelectorDialog::setupTreeView() {
+void BlockItemSelectorDialog::setupListView() {
+    const int itemPixmapSize = 32;
+
     model.setParent(ui->listView);
     filterModel.setSourceModel(&model);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -83,10 +85,11 @@ void BlockItemSelectorDialog::setupTreeView() {
         }
         auto key = (blockIter != MCRBlockInfo.constEnd())
                        ? blockIter.key() : itemIter.key();
-        MCRInvItem     invItem(key);
-        QStandardItem *item = new QStandardItem();
+        MCRInvItem invItem(key);
+        auto      *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
-        item->setSizeHint(QSize(32 + (3 * 2), 32 + (3 * 2)));
+        item->setSizeHint(QSize(itemPixmapSize + (3 * 2),
+                                itemPixmapSize + (3 * 2)));
         QVariant vari;
         vari.setValue(invItem);
         item->setData(vari, Qt::UserRole + 1);
@@ -113,7 +116,7 @@ QString BlockItemSelectorDialog::getSelectedID() {
 
     QStandardItem *item =
         model.itemFromIndex(filterModel.mapToSource(indexes[0]));
-    MCRInvItem invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
+    auto invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
     return invItem.getNamespacedID();
 }
 
@@ -127,7 +130,7 @@ QVector<MCRInvItem> BlockItemSelectorDialog::getSelectedItems() {
     for (auto index : indexes) {
         QStandardItem *item =
             model.itemFromIndex(filterModel.mapToSource(index));
-        MCRInvItem invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
+        auto invItem = item->data(Qt::UserRole + 1).value<MCRInvItem>();
         if (items.contains(invItem)) continue;
         items.push_back(invItem);
     }

@@ -6,10 +6,6 @@
 
 using namespace Glhp;
 
-void Glhp::someTest() {
-    qDebug() << "GlobalHelpers::someTest()";
-}
-
 QString Glhp::randStr(int length) {
     const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
     QString       r;
@@ -31,7 +27,7 @@ QString Glhp::relPath(const QString &dirpath, QString path) {
 }
 
 QString Glhp::relNamespace(const QString &dirpath, QString path) {
-    QString rp = relPath(dirpath, path);
+    QString rp = relPath(dirpath, std::move(path));
 
     if (removePrefix(rp, "data/"))
         rp = rp.section('/', 0, 0);
@@ -184,7 +180,7 @@ QVector<QString> Glhp::fileIDList(const QString &dirpath,
         QDir dir(dataPath);
         auto nspaceDirs = dir.entryList(
             QDir::Dirs | QDir::NoDotAndDotDot);
-        for (auto nspaceDir : nspaceDirs) {
+        for (const auto &nspaceDir : nspaceDirs) {
             auto nspace = nspaceDir.section('.', 0, 0);
             appendIDToList(nspace);
         }

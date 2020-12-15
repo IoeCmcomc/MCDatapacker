@@ -9,7 +9,7 @@
 #include <QApplication>
 #include <QGraphicsColorizeEffect>
 
-MCRInvItem::MCRInvItem(QString id) {
+MCRInvItem::MCRInvItem(const QString &id) {
 /*    qDebug() << "Calling normal constructor" << this; */
     init();
     setEmpty(id.isEmpty());

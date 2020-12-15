@@ -7,8 +7,7 @@
 #include <QScrollArea>
 
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
-    QDialog(parent), BaseCondition(),
-    ui(new Ui::EntityConditionDialog) {
+    QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
     auto typeFlag = NumericInput::Exact
                     | NumericInput::Range;
@@ -255,21 +254,21 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
             auto indexes = effectModel.match(
                 effectModel.index(0, 0), Qt::UserRole + 1, effectID);
             if (indexes.isEmpty()) continue;
-            QStandardItem *effectItem = new QStandardItem();
+            auto *effectItem = new QStandardItem();
             effectItem->setData(effectID);
             effectItem->setText(indexes[0].data(Qt::DisplayRole).toString());
             effectItem->setEditable(false);
-            QJsonObject    effect        = effects[effectID].toObject();
-            QStandardItem *amplifierItem = new QStandardItem();
+            QJsonObject effect        = effects[effectID].toObject();
+            auto       *amplifierItem = new QStandardItem();
             amplifierItem->setData(effect["amplifier"].toVariant(),
                                    Qt::DisplayRole);
-            QStandardItem *durationItem = new QStandardItem();
+            auto *durationItem = new QStandardItem();
             durationItem->setData(effect["duration"].toVariant(),
                                   Qt::DisplayRole);
-            QStandardItem *ambientItem = new QStandardItem();
+            auto *ambientItem = new QStandardItem();
             ambientItem->setData(effect["ambient"].toBool(),
                                  Qt::DisplayRole);
-            QStandardItem *visibleItem = new QStandardItem();
+            auto *visibleItem = new QStandardItem();
             visibleItem->setData(effect["visible"].toBool(),
                                  Qt::DisplayRole);
 
@@ -308,13 +307,13 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                 auto indexes = statTypeModel.match(
                     statTypeModel.index(0, 0), Qt::UserRole + 1, statType);
                 if (indexes.isEmpty()) continue;
-                QStandardItem *typeItem = new QStandardItem();
+                auto *typeItem = new QStandardItem();
                 typeItem->setData(statType);
                 typeItem->setText(statType);
                 typeItem->setEditable(false);
-                QStandardItem *statItem = new QStandardItem();
+                auto *statItem = new QStandardItem();
                 statItem->setText(statObj[QStringLiteral("stat")].toString());
-                QStandardItem *valueItem = new QStandardItem();
+                auto *valueItem = new QStandardItem();
                 valueItem->setData(statObj.value(QStringLiteral("value")),
                                    Qt::DisplayRole);
 
@@ -333,16 +332,16 @@ void EntityConditionDialog::onAddedEntityEffect() {
     if (!entityEffectModel.findItems(effectText).isEmpty())
         return;
 
-    QStandardItem *effectItem = new QStandardItem(effectText);
+    auto *effectItem = new QStandardItem(effectText);
     effectItem->setData(ui->effectCombo->currentData(Qt::UserRole + 1));
     effectItem->setEditable(false);
-    QStandardItem *amplifierItem = new QStandardItem();
+    auto *amplifierItem = new QStandardItem();
     amplifierItem->setData(ui->effectAmpInput->toJson(), Qt::DisplayRole);
-    QStandardItem *durationItem = new QStandardItem();
+    auto *durationItem = new QStandardItem();
     durationItem->setData(ui->effectDuraInput->toJson(), Qt::DisplayRole);
-    QStandardItem *ambientItem = new QStandardItem();
+    auto *ambientItem = new QStandardItem();
     ambientItem->setData(ui->effectAmbientCheck->isChecked(), Qt::DisplayRole);
-    QStandardItem *visibleItem = new QStandardItem();
+    auto *visibleItem = new QStandardItem();
     visibleItem->setData(ui->effectVisibleCheck->isChecked(), Qt::DisplayRole);
 
     entityEffectModel.appendRow({ effectItem, amplifierItem, durationItem,
@@ -355,8 +354,8 @@ void EntityConditionDialog::onAddedPlayerAdv() {
     if (!playerAdvanmModel.findItems(advText).isEmpty())
         return;
 
-    QStandardItem *advItem  = new QStandardItem(advText);
-    QStandardItem *boolItem = new QStandardItem();
+    auto *advItem  = new QStandardItem(advText);
+    auto *boolItem = new QStandardItem();
     boolItem->setData(ui->advanmCheck->isChecked(), Qt::DisplayRole);
 
     playerAdvanmModel.appendRow({ advItem, boolItem });
@@ -368,8 +367,8 @@ void EntityConditionDialog::onAddedPlayerRecipe() {
     if (!playerRecipeModel.findItems(recipeText).isEmpty())
         return;
 
-    QStandardItem *recipeItem = new QStandardItem(recipeText);
-    QStandardItem *boolItem   = new QStandardItem();
+    auto *recipeItem = new QStandardItem(recipeText);
+    auto *boolItem   = new QStandardItem();
     boolItem->setData(ui->recipeCheck->isChecked(), Qt::DisplayRole);
 
     playerRecipeModel.appendRow({ recipeItem, boolItem });
@@ -384,9 +383,9 @@ void EntityConditionDialog::onAddedPlayerStat() {
         new QStandardItem(ui->statTypeCombo->currentText());
     typeItem->setData(ui->statTypeCombo->currentData(Qt::UserRole + 1));
     typeItem->setEditable(false);
-    QStandardItem *statItem = new QStandardItem();
+    auto *statItem = new QStandardItem();
     statItem->setText(ui->statEdit->text());
-    QStandardItem *valueItem = new QStandardItem();
+    auto *valueItem = new QStandardItem();
     valueItem->setData(ui->statValueInput->toJson(), Qt::DisplayRole);
 
     playerStatModel.appendRow({ typeItem, statItem, valueItem });
@@ -402,7 +401,7 @@ void EntityConditionDialog::onEntityTypeChanged() {
         }
     } else {
         if (ui->player->parent() != nullptr) {
-            QScrollArea *sv = qobject_cast<QScrollArea*>(
+            auto *sv = qobject_cast<QScrollArea *>(
                 ui->player->parent()->parent());
             if (sv != nullptr) {
                 ui->toolBox->removeItem(ui->toolBox->indexOf(ui->player));
@@ -420,7 +419,7 @@ void EntityConditionDialog::initEffectsPage() {
     QStandardItem *ambientItem   = new QStandardItem(tr("Ambient"));
     QStandardItem *visibleItem   = new QStandardItem(tr("Visible"));
 
-    ExtendedDelegate *delegate = new ExtendedDelegate(this);
+    auto *delegate = new ExtendedDelegate(this);
 
     delegate->setExNumInputTypes(NumericInput::Exact
                                  | NumericInput::Range);
@@ -464,7 +463,7 @@ void EntityConditionDialog::initPlayerStat() {
     QStandardItem *statItem  = new QStandardItem(tr("Stat"));
     QStandardItem *valueItem = new QStandardItem(tr("Value"));
 
-    ExtendedDelegate *delegate = new ExtendedDelegate(this);
+    auto *delegate = new ExtendedDelegate(this);
 
     delegate->setExNumInputTypes(NumericInput::Exact
                                  | NumericInput::Range);
@@ -479,9 +478,9 @@ void EntityConditionDialog::initPlayerStat() {
 void EntityConditionDialog::setupGrantedTableFromJson(const QJsonObject &json,
                                                       QStandardItemModel &model)
 {
-    for (auto name : json.keys()) {
-        QStandardItem *nameItem = new QStandardItem(name);
-        QStandardItem *boolItem = new QStandardItem();
+    for (const auto &name : json.keys()) {
+        auto *nameItem = new QStandardItem(name);
+        auto *boolItem = new QStandardItem();
         boolItem->setData(json[name].toBool());
 
         model.appendRow({ nameItem, boolItem });

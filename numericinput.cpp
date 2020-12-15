@@ -99,8 +99,10 @@ QJsonValue NumericInput::toJson() {
 
     case 1: { /* Range */
         QJsonObject root;
-        qDebug() << ui->minSpinBox->isUnset() <<
-            ui->maxSpinBox->isUnset();
+/*
+          qDebug() << ui->minSpinBox->isUnset() <<
+              ui->maxSpinBox->isUnset();
+ */
         if (!ui->minSpinBox->isUnset())
             root.insert(QStringLiteral("min"), ui->minSpinBox->value());
         if (!ui->maxSpinBox->isUnset())

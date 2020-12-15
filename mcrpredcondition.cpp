@@ -137,7 +137,7 @@ QJsonObject MCRPredCondition::toJson() const {
     }
 
     case 4: { /*Inverted */
-        MCRPredCondition *cond =
+        auto *cond =
             ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
         if (cond != nullptr)
             root.insert("term", cond->toJson());
@@ -167,7 +167,7 @@ QJsonObject MCRPredCondition::toJson() const {
         int        childCount = ui->nested_condAreaInner->children().count();
         if (childCount != 0) {
             for (auto *child : ui->nested_condAreaInner->children()) {
-                MCRPredCondition *childCond = qobject_cast<MCRPredCondition*>(
+                auto *childCond = qobject_cast<MCRPredCondition*>(
                     child);
                 if (childCond != nullptr) {
                     QJsonObject cond = childCond->toJson();
@@ -186,7 +186,7 @@ QJsonObject MCRPredCondition::toJson() const {
             }
             auto rootMap = root.toVariantMap();
             simplifyCondition(rootMap);
-            root = root.fromVariantMap(rootMap);
+            root = QJsonObject::fromVariantMap(rootMap);
         }
         break;
     }
@@ -343,10 +343,10 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                 (entityTargets.indexOf(value["entity"].toString()));
         if (value.contains("scores")) {
             QJsonObject scores = value["scores"].toObject();
-            for (auto objective : scores.keys()) {
-                QTableWidgetItem *objectiveItem =
+            for (const auto &objective : scores.keys()) {
+                auto *objectiveItem =
                     new QTableWidgetItem(objective);
-                QTableWidgetItem *valueItem = new QTableWidgetItem();
+                auto *valueItem = new QTableWidgetItem();
                 valueItem->setData(Qt::DisplayRole,
                                    scores[objective].toVariant());
                 appendRowToTableWidget(ui->entityScores_table,
@@ -365,7 +365,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
             if (term["condition"].toString().endsWith("alternative")) {
                 fromJson(term, true);
             } else {
-                MCRPredCondition *cond =
+                auto *cond =
                     ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
                 if (cond == nullptr) {
                     cond = new MCRPredCondition(ui->nested_condAreaInner);
@@ -406,7 +406,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                       && term["condition"].toString().endsWith("inverted")))
                     areTermsInverted = false;
             }
-            qDebug() << "areTermsInverted" << areTermsInverted;
+            /*qDebug() << "areTermsInverted" << areTermsInverted; */
 
             for (auto termRef : terms) {
                 QJsonObject term = termRef.toObject();
@@ -419,7 +419,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                         term = sub;
                 }
 
-                MCRPredCondition *cond = new MCRPredCondition(
+                auto *cond = new MCRPredCondition(
                     ui->nested_condAreaInner);
                 cond->setMinimumHeight(300);
                 nestedCondLayout.addWidget(cond, 0);
@@ -480,7 +480,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         if (value.contains("chances")) {
             QJsonArray chances = value["chances"].toArray();
             for (auto chanceRef : chances) {
-                QStandardItem *chanceItem = new QStandardItem();
+                auto *chanceItem = new QStandardItem();
                 chanceItem->setData(chanceRef.toDouble(), Qt::DisplayRole);
                 tableBonusModel.appendRow(chanceItem);
             }
@@ -512,12 +512,12 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                 auto indexes = enchantmentsModel.match(
                     enchantmentsModel.index(0, 0), Qt::UserRole + 1, enchantId);
                 if (indexes.isEmpty()) continue;
-                QTableWidgetItem *enchantItem = new QTableWidgetItem();
+                auto *enchantItem = new QTableWidgetItem();
                 enchantItem->setData(Qt::UserRole + 1, enchantId);
                 enchantItem->setText(indexes[0].data(Qt::DisplayRole).toString());
                 enchantItem->setFlags(enchantItem->flags() &
                                       ~Qt::ItemIsEditable);
-                QTableWidgetItem *levelsItem = new QTableWidgetItem();
+                auto *levelsItem = new QTableWidgetItem();
                 levelsItem->setData(Qt::DisplayRole,
                                     enchantObj.value(QStringLiteral("levels")));
                 appendRowToTableWidget(ui->toolEnchant_table,
@@ -544,7 +544,7 @@ void MCRPredCondition::onTypeChanged(const int &i) {
     if ((ui->stackedWidget->currentWidget() == ui->inverted) &&
         invertedCondLayout.isEmpty()) {
         if (depth < 1) {
-            MCRPredCondition *cond = new MCRPredCondition(
+            auto *cond = new MCRPredCondition(
                 ui->nested_condAreaInner);
             cond->setDepth(depth + 1);
             cond->sizeHint().rheight() = minimumHeight();
@@ -602,9 +602,7 @@ void MCRPredCondition::reset(int index) {
     case 4: { /*Inverted */
         auto *cond =
             ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
-        if (cond != nullptr)
-            /*cond->deleteLater(); */
-            delete cond;
+        delete cond;
         break;
     }
 
@@ -730,10 +728,10 @@ void MCRPredCondition::entityScores_onAdded() {
     if (ui->entityScores_objectiveEdit->text().isEmpty())
         return;
 
-    QTableWidgetItem *objItem = new QTableWidgetItem(
+    auto *objItem = new QTableWidgetItem(
         ui->entityScores_objectiveEdit->text());
-    QTableWidgetItem *valueItem = new QTableWidgetItem();
-    auto              json      = ui->entityScores_valueInput->toJson();
+    auto *valueItem = new QTableWidgetItem();
+    auto  json      = ui->entityScores_valueInput->toJson();
     valueItem->setData(Qt::DisplayRole, json);
     appendRowToTableWidget(ui->entityScores_table, { objItem, valueItem });
 }

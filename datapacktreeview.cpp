@@ -34,7 +34,7 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
 
 QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     /*Right click context menu */
-    QMenu    *cMenu = new QMenu(this);
+    auto     *cMenu = new QMenu(this);
     QString   path  = relPath(dirPath, dirModel.filePath(index));
     QFileInfo finfo = dirModel.fileInfo(index);
 
@@ -213,7 +213,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 QModelIndex DatapackTreeView::getSelected() {
     QModelIndexList indexes = this->selectionModel()->selectedIndexes();
 
-    return (indexes.size() > 0) ? indexes.at(0) : QModelIndex();
+    return (!indexes.isEmpty()) ? indexes.at(0) : QModelIndex();
 }
 
 void DatapackTreeView::load(const QString &dir) {
@@ -266,7 +266,7 @@ void DatapackTreeView::onCustomContextMenu(const QPoint &point) {
 void DatapackTreeView::onFileRenamed(const QString &path,
                                      const QString &oldName,
                                      const QString &newName) {
-    qDebug() << "DatapackTreeView::onFileRenamed" << oldName << newName;
+/*    qDebug() << "DatapackTreeView::onFileRenamed" << oldName << newName; */
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
@@ -367,7 +367,7 @@ void DatapackTreeView::contextMenuOnOpen() {
         const QFileInfo finfo = dirModel.fileInfo(selected);
         /*qDebug() << finfo; */
         if (finfo.exists() && finfo.isFile()) {
-            qDebug() << "Open from tree (right click)";
+/*            qDebug() << "Open from tree (right click)"; */
             emit openFileRequested(finfo.absoluteFilePath());
         }
     }
@@ -375,7 +375,7 @@ void DatapackTreeView::contextMenuOnOpen() {
 
 bool DatapackTreeView::isStringInTagFile(const QString &filepath,
                                          const QString &str) {
-    if (!QFileInfo(filepath).exists()) return false;
+    if (!QFileInfo::exists(filepath)) return false;
 
     QFile inFile(filepath);
     inFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -396,7 +396,7 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
                                                 bool added) {
     QString errorMessage;
 
-    if (!QFileInfo(filepath).exists()) {
+    if (!QFileInfo::exists(filepath)) {
         QDir().mkpath(QFileInfo(filepath).dir().path());
         QSaveFile newFile(filepath);
         if (newFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -496,6 +496,6 @@ void DatapackTreeView::selectFromPath(const QString &path) {
     setCurrentIndex(dirModel.index(path));
 }
 
-void DatapackTreeView::openFromPath(const QString path) {
+void DatapackTreeView::openFromPath(const QString &path) {
     onDoubleClicked(dirModel.index(path));
 }

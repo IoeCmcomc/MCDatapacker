@@ -39,12 +39,12 @@ void ExtendedDelegate::paint(QPainter *painter,
                     QString min = (obj.contains(QStringLiteral("min")))
                               ? QString::number(
                         obj.value(QStringLiteral("min")).toInt())
-                              : QStringLiteral("");
+                              : QLatin1String("");
                     QString max = (obj.contains(QStringLiteral("max")))
                                   ? QString::number(
                         obj.value(QStringLiteral("max")).toInt())
-                                  : QStringLiteral("");
-                    newOption.text = QString("%1..%2").arg(min).arg(max);
+                                  : QLatin1String("");
+                    newOption.text = QString("%1..%2").arg(min, max);
                 }
             }
 

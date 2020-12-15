@@ -13,16 +13,16 @@ class MCRInvSlot : public QFrame
     Q_OBJECT
 
 public:
-    explicit MCRInvSlot(QWidget *parent = nullptr,
-                        MCRInvItem item = MCRInvItem());
+    explicit MCRInvSlot(QWidget *parent        = nullptr,
+                        const MCRInvItem &item = MCRInvItem());
 
     void setItem(const QVector<MCRInvItem> &items);
-    void setItem(MCRInvItem item);
-    void appendItem(MCRInvItem item);
+    void setItem(const MCRInvItem &item);
+    void appendItem(const MCRInvItem &item);
     void appendItems(const QVector<MCRInvItem> &items);
-    void insertItem(const int index, MCRInvItem item);
+    void insertItem(const int index, const MCRInvItem &item);
     void removeItem(const int index);
-    int removeItem(const MCRInvItem item);
+    int removeItem(const MCRInvItem &item);
     void clearItems();
     MCRInvItem &getItem(const int index = 0);
     QVector<MCRInvItem> &getItems();
@@ -33,7 +33,7 @@ public:
     QString itemNamespacedID(const int index = 0);
     QString itemName(const int index         = 0);
 
-    void setBackground(QString color = "#8B8B8B");
+    void setBackground(const QString &color = "#8B8B8B");
 
     bool getAcceptTag() const;
     void setAcceptTag(bool value);

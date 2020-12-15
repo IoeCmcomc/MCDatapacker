@@ -10,7 +10,7 @@ class MCRInvItem
 {
 public:
     MCRInvItem(void);
-    MCRInvItem(QString id);
+    MCRInvItem(const QString &id);
     MCRInvItem(const MCRInvItem &other);
     ~MCRInvItem();
 
@@ -51,9 +51,9 @@ public:
 private:
     QString name;
     QString namespacedID;
-    bool isTag     = false;
-    bool m_isEmpty = true;
-    bool hasBlockForm;
+    bool isTag        = false;
+    bool m_isEmpty    = true;
+    bool hasBlockForm = false;
     QPixmap pixmap;
 
     void setupItem(QString id);

@@ -15,7 +15,7 @@ public:
     DatapackTreeView(QWidget *parent = nullptr);
     void load(const QString &dir);
     void selectFromPath(const QString &path);
-    void openFromPath(const QString path);
+    void openFromPath(const QString &path);
 
 signals:
     void datapackChanged();

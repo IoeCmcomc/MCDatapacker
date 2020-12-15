@@ -10,8 +10,9 @@
 int main(int argc, char *argv[]) {
     /*Q_INIT_RESOURCE(application); */
 
-    qDebug() << "Starting application...";
+    /*qDebug() << "Starting application..."; */
     QApplication a(argc, argv);
+
     /*
        a.setStyle("fusion");
        a.setStyle("windowsxp");
@@ -39,5 +40,5 @@ int main(int argc, char *argv[]) {
        qDebug() << "Exitting application...";
      */
 
-    return a.exec();
+    return QApplication::exec();
 }

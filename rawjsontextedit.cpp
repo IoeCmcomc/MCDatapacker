@@ -62,7 +62,7 @@ void RawJsonTextEdit::setOneLine(bool value) {
     ui->textEdit->setVerticalScrollBarPolicy(
         (value) ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
     if (value) {
-        QLineEdit *lineEdit = new QLineEdit();
+        auto *lineEdit = new QLineEdit();
         ui->textEdit->setFixedHeight(lineEdit->sizeHint().height());
     } else {
         ui->textEdit->setMaximumHeight(0);
@@ -258,7 +258,7 @@ void RawJsonTextEdit::mergeCurrentFormat(const QTextCharFormat &format) {
 bool RawJsonTextEdit::eventFilter(QObject *obj, QEvent *event) {
     if (isOneLine) {
         if (event->type() == QEvent::KeyPress) {
-            QKeyEvent *key = static_cast<QKeyEvent*>(event);
+            auto *key = dynamic_cast<QKeyEvent*>(event);
             if ((key->key() == Qt::Key_Enter) ||
                 (key->key() == Qt::Key_Return)) {
                 /* */

@@ -241,13 +241,13 @@ void LootTableEntry::onTypeChanged(int index) {
 }
 
 void LootTableEntry::onAddCondition() {
-    MCRPredCondition *cond = new MCRPredCondition(ui->conditionsContainer);
+    auto *cond = new MCRPredCondition(ui->conditionsContainer);
 
     conditionsLayout.addWidget(cond, 0);
 }
 
 void LootTableEntry::onAddFunction() {
-    LootTableFunction *funct = new LootTableFunction(ui->functionsArea);
+    auto *funct = new LootTableFunction(ui->functionsArea);
 
     functionsLayout.addWidget(funct, 0);
 }
@@ -293,7 +293,7 @@ void LootTableEntry::reset(int index) {
 }
 
 void LootTableEntry::onAddEntry() {
-    LootTableEntry *entry =
+    auto *entry =
         new LootTableEntry(ui->entriesContainer);
 
     entry->setLootTableEditor(lootTableEditor);

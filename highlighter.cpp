@@ -7,9 +7,6 @@
 #include <QDir>
 #include <QRegularExpression>
 
-TextBlockData::TextBlockData() {
-}
-
 QVector<BracketInfo *> TextBlockData::brackets() {
     return m_brackets;
 }
@@ -54,7 +51,7 @@ Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
 void Highlighter::highlightBlock(const QString &text) {
     /*qDebug() << "Highlighter::highlightBlock" << text; */
     if (document()) {
-        TextBlockData *data = new TextBlockData;
+        auto *data = new TextBlockData;
 
         if ((!text.isEmpty()) &&
             singleCommentHighlightRules.contains(text[0])) {
@@ -83,11 +80,10 @@ void Highlighter::highlightBlock(const QString &text) {
                 } else if (currentBlockState() == QuotedString) {
                     quoteLength++;
                 } else if (currentBlockState() <= Normal) {
-                    for (auto iter = bracketPairs.begin();
-                         iter != bracketPairs.end();
-                         ++iter) {
-                        if (curChar == iter->left || curChar == iter->right) {
-                            BracketInfo *info = new BracketInfo;
+                    for (auto &bracketPair: bracketPairs) {
+                        if (curChar == bracketPair.left ||
+                            curChar == bracketPair.right) {
+                            auto *info = new BracketInfo;
                             info->character = curChar.toLatin1();
                             info->position  = i;
 
@@ -123,7 +119,7 @@ void Highlighter::collectNamespacedIds(const QString &text,
             info->start  = match.capturedStart();
             info->length = match.capturedLength();
             info->link   = filepath;
-            qDebug() << match.captured() << info->start << info->length;
+            /*qDebug() << match.captured() << info->start << info->length; */
             data->insert(info);
         }
     }

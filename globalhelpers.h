@@ -12,7 +12,6 @@
 #include <QJsonObject>
 
 namespace Glhp {
-    void someTest();
     bool isPathRelativeTo(const QString &dirpath, const QString &path,
                           const QString &catDir);
     QString randStr(int length = 5);

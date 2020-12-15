@@ -10,8 +10,7 @@ bool MCRItemSortFilterProxyModel::filterAcceptsRow(int sourceRow,
                                                    const QModelIndex &sourceParent)
 const {
     QModelIndex index   = sourceModel()->index(sourceRow, 0, sourceParent);
-    MCRInvItem  invItem = sourceModel()->data(index,
-                                              Qt::UserRole +
+    auto        invItem = sourceModel()->data(index, Qt::UserRole +
                                               1).value<MCRInvItem>();;
 
     if (invItem.getHasBlockForm()) {

@@ -2,9 +2,6 @@
 
 #include "mainwindow.h"
 
-BaseCondition::BaseCondition() {
-}
-
 QJsonObject BaseCondition::toJson() const {
     return QJsonObject();
 }

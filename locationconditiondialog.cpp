@@ -131,7 +131,7 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         ui->block_tagRadio->setChecked(block.contains(QStringLiteral("tag")));
         if (block.contains(QStringLiteral("block"))) {
             MCRInvItem invItem(block[QStringLiteral("block")].toString());
-            qDebug() << invItem;
+            /*qDebug() << invItem; */
             setupComboFrom(ui->blockCombo, QVariant::fromValue(invItem));
         } else if (block.contains(QStringLiteral("tag"))) {
             if (block.contains(QStringLiteral("tag")))
@@ -165,12 +165,10 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
 
 void LocationConditionDialog::setupStateTableFromJson(QTableWidget *table,
                                                       const QJsonObject &json) {
-    const QString deletiveToolTip = tr("Right click this row to delete.");
-
-    for (auto key : json.keys()) {
-        QTableWidgetItem *stateItem = new QTableWidgetItem();
+    for (const auto &key : json.keys()) {
+        auto *stateItem = new QTableWidgetItem();
         stateItem->setText(key);
-        QTableWidgetItem *valueItem = new QTableWidgetItem();
+        auto *valueItem = new QTableWidgetItem();
         valueItem->setText(
             Glhp::variantToStr(json[key].toVariant()));
         appendRowToTableWidget(table, { stateItem, valueItem });

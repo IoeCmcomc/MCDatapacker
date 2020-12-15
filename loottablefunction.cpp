@@ -504,7 +504,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                 (modifier.contains("id"))
                     ? modifier.value("id").toString() : "");
 
-            QTableWidgetItem *amountItem = new QTableWidgetItem();
+            auto *amountItem = new QTableWidgetItem();
             amountItem->setData(Qt::DisplayRole,
                                 modifier.value("amount"));
             amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
@@ -637,7 +637,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             if (!effect.contains("duration"))
                 continue;
 
-            QTableWidgetItem *durationItem = new QTableWidgetItem();
+            auto *durationItem = new QTableWidgetItem();
             durationItem->setData(Qt::DisplayRole,
                                   effect.value("duration").toInt());
 
@@ -676,7 +676,7 @@ void LootTableFunction::onTypeChanged(int index) {
 }
 
 void LootTableFunction::onAddCondition() {
-    MCRPredCondition *cond = new MCRPredCondition(ui->conditionsContainer);
+    auto *cond = new MCRPredCondition(ui->conditionsContainer);
 
     conditionsLayout.addWidget(cond, 0);
 }
@@ -705,10 +705,10 @@ void LootTableFunction::copyState_onAdded() {
 void LootTableFunction::enchantRand_onAdded() {
     QString enchantmentText = ui->enchantRand_enchantCombo->currentText();
 
-    if (!ui->enchantRand_list->findItems(enchantmentText, 0).isEmpty())
+    if (!ui->enchantRand_list->findItems(enchantmentText, nullptr).isEmpty())
         return;
 
-    QListWidgetItem *enchantItem = new QListWidgetItem(enchantmentText);
+    auto *enchantItem = new QListWidgetItem(enchantmentText);
 
     enchantItem->setData(Qt::UserRole + 1, ui->enchantRand_enchantCombo->
                          currentData(Qt::UserRole + 1));
@@ -736,7 +736,7 @@ void LootTableFunction::setAttr_onAdded() {
     QTableWidgetItem *IDItem = new QTableWidgetItem(
         ui->setAttr_IDEdit->text());
 
-    QTableWidgetItem *amountItem = new QTableWidgetItem();
+    auto *amountItem = new QTableWidgetItem();
     amountItem->setData(Qt::DisplayRole,
                         ui->setAttr_amountInput->toJson());
     amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
@@ -765,7 +765,7 @@ void LootTableFunction::setAttr_onAdded() {
 }
 
 void LootTableFunction::entries_onAdded() {
-    LootTableEntry *entry =
+    auto *entry =
         new LootTableEntry(ui->entriesContainer);
 
     entriesLayout.addWidget(entry, 0);
@@ -783,7 +783,7 @@ void LootTableFunction::effectStew_onAdded() {
                             Qt::UserRole + 1));
     effectItem->setFlags(effectItem->flags() & ~Qt::ItemIsEditable);
 
-    QTableWidgetItem *durationItem = new QTableWidgetItem();
+    auto *durationItem = new QTableWidgetItem();
     durationItem->setData(Qt::DisplayRole,
                           ui->stewEffect_durationSpin->value());
 
@@ -795,9 +795,9 @@ void LootTableFunction::initBlocksModel() {
     auto blocksInfo = MainWindow::getMCRInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
-    for (auto key : blocksInfo.keys()) {
-        MCRInvItem     invItem(key);
-        QStandardItem *item = new QStandardItem();
+    for (const auto &key : blocksInfo.keys()) {
+        MCRInvItem invItem(key);
+        auto      *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {
             auto name = blocksInfo.value(key).toMap().value("name").toString();

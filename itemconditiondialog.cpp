@@ -136,16 +136,16 @@ void ItemConditionDialog::onAddedEnchant() {
         return;
     }
     QString enchantmentText = ui->enchant_combo->currentText();
-    if (!ui->enchant_table->findItems(enchantmentText, 0).isEmpty())
+    if (!ui->enchant_table->findItems(enchantmentText, nullptr).isEmpty())
         return;
 
-    QTableWidgetItem *enchantItem = new QTableWidgetItem(enchantmentText);
+    auto *enchantItem = new QTableWidgetItem(enchantmentText);
     enchantItem->setData(Qt::UserRole + 1,
                          ui->enchant_combo->currentData(Qt::UserRole + 1));
     enchantItem->setFlags(enchantItem->flags() & ~(Qt::ItemIsEditable));
 
-    QTableWidgetItem *levelsItem = new QTableWidgetItem();
-    auto              json       = ui->enchant_levelInput->toJson();
+    auto *levelsItem = new QTableWidgetItem();
+    auto  json       = ui->enchant_levelInput->toJson();
     levelsItem->setData(Qt::DisplayRole, json);
     appendRowToTableWidget(ui->enchant_table, { enchantItem, levelsItem });
 }
@@ -158,16 +158,16 @@ void ItemConditionDialog::onAddedStoredEnchant() {
         return;
     }
     QString enchantmentText = ui->stored_combo->currentText();
-    if (!ui->stored_table->findItems(enchantmentText, 0).isEmpty())
+    if (!ui->stored_table->findItems(enchantmentText, nullptr).isEmpty())
         return;
 
-    QTableWidgetItem *enchantItem = new QTableWidgetItem(enchantmentText);
+    auto *enchantItem = new QTableWidgetItem(enchantmentText);
     enchantItem->setData(Qt::UserRole + 1,
                          ui->stored_combo->currentData(Qt::UserRole + 1));
     enchantItem->setFlags(enchantItem->flags() & ~(Qt::ItemIsEditable));
 
-    QTableWidgetItem *levelsItem = new QTableWidgetItem();
-    auto              json       = ui->stored_levelInput->toJson();
+    auto *levelsItem = new QTableWidgetItem();
+    auto  json       = ui->stored_levelInput->toJson();
     levelsItem->setData(Qt::DisplayRole, json);
     appendRowToTableWidget(ui->stored_table, { enchantItem, levelsItem });
 }
@@ -184,7 +184,7 @@ void ItemConditionDialog::initTable(QTableWidget *table) {
 
 void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,
                                         QTableWidget *table) {
-    for (auto enchantment : jsonArr) {
+    for (const auto &enchantment : jsonArr) {
         auto enchantObj = enchantment.toObject();
         if (enchantObj.isEmpty()) continue;
         if (!enchantObj.contains(QStringLiteral("enchantment"))) {
@@ -197,13 +197,13 @@ void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,
             enchantmentsModel.index(0, 0), Qt::UserRole + 1, enchantId);
         if (indexes.isEmpty()) continue;
 
-        QTableWidgetItem *enchantItem = new QTableWidgetItem();
+        auto *enchantItem = new QTableWidgetItem();
         enchantItem->setData(Qt::UserRole + 1, enchantId);
         enchantItem->setText(indexes[0].data(Qt::DisplayRole).toString());
         enchantItem->setFlags(enchantItem->flags() & ~(Qt::ItemIsEditable));
 
-        QTableWidgetItem *levelsItem = new QTableWidgetItem();
-        auto              json       = ui->stored_levelInput->toJson();
+        auto *levelsItem = new QTableWidgetItem();
+        auto  json       = ui->stored_levelInput->toJson();
         levelsItem->setData(Qt::DisplayRole,
                             enchantObj.value(QStringLiteral("levels")));
         appendRowToTableWidget(table, { enchantItem, levelsItem });

@@ -37,7 +37,7 @@ private:
     QPushButton *selectButton;
     bool allowMultiItems = true;
 
-    void setupTreeView();
+    void setupListView();
 };
 
 #endif /* BLOCKITEMSELECTORDIALOG_H */

@@ -11,7 +11,7 @@
 class BaseCondition
 {
 public:
-    explicit BaseCondition();
+    explicit BaseCondition() = default;
 
     virtual QJsonObject toJson() const;
     virtual void fromJson(const QJsonObject &value);

@@ -26,14 +26,14 @@ struct CodeFile {
     QTextDocument *doc        = new QTextDocument();
     QTextCursor    textCursor = QTextCursor(doc);
 
-    CodeFile(const QString path);
+    CodeFile(const QString &path);
 
     CodeFile();
 
     inline bool isVaild() const {
         return !fileInfo.filePath().isEmpty();
     };
-    void changePath(const QString path);
+    void changePath(const QString &path);
     void initLayout();
 };
 
