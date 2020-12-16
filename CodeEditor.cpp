@@ -89,11 +89,13 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
       qDebug() << "Mouse press event" << QGuiApplication::keyboardModifiers() <<
           e->modifiers();
  */
+
+    QPlainTextEdit::mousePressEvent(e);
+
     if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier
-        && e->modifiers() & Qt::ControlModifier) {
+        || e->modifiers() & Qt::ControlModifier) {
         followNamespacedId(e);
     }
-    QPlainTextEdit::mousePressEvent(e);
 }
 
 void CodeEditor::dropEvent(QDropEvent *e) {
@@ -164,6 +166,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 }
 
 void CodeEditor::onCursorPositionChanged() {
+    qDebug() << "onCursorPositionChanged";
     setExtraSelections({});
     highlightCurrentLine();
     matchParentheses();
@@ -285,33 +288,36 @@ void CodeEditor::matchParentheses() {
     if (!data || !curHighlighter)
         return;
 
-    QVector<BracketInfo *> infos = data->brackets();
+    QVector<BracketInfo*> infos = data->brackets();
 
-    int  pos            = textCursor().block().position();
-    auto highlightPairs = curHighlighter->bracketPairs;
+    int pos = textCursor().block().position();
 
     for (int i = 0; i < infos.size(); ++i) {
-        BracketInfo *info = infos.at(i);
+        const BracketInfo *info = infos.at(i);
 
         int curPos = textCursor().position() -
                      textCursor().block().position();
-        if ((info->position == curPos) || (info->position == curPos - 1)) {
-            for (auto & highlightPair : highlightPairs) {
-                if (info->character == highlightPair.left) {
+        /* info->position == curPos:
+         *     the text cursor is on the left of the character
+         * info->position == curPos - 1
+         *     the text cursor is on the right of the character */
+        bool isOnTheLeftOfChar = info->position == curPos;
+
+        if (isOnTheLeftOfChar || (info->position == curPos - 1)) {
+            for (const auto &pair: curHighlighter->bracketPairs) {
+                if (info->character == pair.left) {
                     if (matchLeftBracket(textCursor().block(), i + 1,
-                                         highlightPair.left,
-                                         highlightPair.right,
-                                         0)) {
-                        createBracketSelection(pos + info->position);
-                        break;
+                                         pair.left, pair.right,
+                                         0, isOnTheLeftOfChar)) {
+                        createBracketSelection(pos + info->position,
+                                               isOnTheLeftOfChar);
                     }
-                } else if (info->character == highlightPair.right) {
+                } else if (info->character == pair.right) {
                     if (matchRightBracket(textCursor().block(), i - 1,
-                                          highlightPair.right,
-                                          highlightPair.left,
-                                          0)) {
-                        createBracketSelection(pos + info->position);
-                        break;
+                                          pair.right, pair.left,
+                                          0, !isOnTheLeftOfChar)) {
+                        createBracketSelection(pos + info->position,
+                                               !isOnTheLeftOfChar);
                     }
                 }
             }
@@ -321,15 +327,17 @@ void CodeEditor::matchParentheses() {
 
 bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
                                   int i, char chr, char corresponder,
-                                  int numLeftParentheses) {
+                                  int numLeftParentheses, bool isPrimary) {
     auto *data =
         dynamic_cast<TextBlockData *>(currentBlock.userData());
     QVector<BracketInfo *> infos = data->brackets();
+
 
 /*
       qDebug() << "matchLeftBracket" << chr << corresponder << i <<
           numLeftParentheses << infos.count();
  */
+
 
     int docPos = currentBlock.position();
 
@@ -341,24 +349,27 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
             continue;
         }
 
-        if (info->character == corresponder && numLeftParentheses == 0) {
-            createBracketSelection(docPos + info->position);
-            return true;
-        } else
-            --numLeftParentheses;
+        if (info->character == corresponder) {
+            if (numLeftParentheses == 0) {
+                createBracketSelection(docPos + info->position, isPrimary);
+                return true;
+            } else {
+                --numLeftParentheses;
+            }
+        }
     }
 
     currentBlock = currentBlock.next();
     if (currentBlock.isValid())
         return matchLeftBracket(currentBlock, 0, chr, corresponder,
-                                numLeftParentheses);
+                                numLeftParentheses, isPrimary);
 
     return false;
 }
 
 bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
                                    int i, char chr, char corresponder,
-                                   int numRightParentheses) {
+                                   int numRightParentheses, bool isPrimary) {
     auto *data =
         dynamic_cast<TextBlockData *>(currentBlock.userData());
     QVector<BracketInfo *> infos = data->brackets();
@@ -379,27 +390,35 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
             ++numRightParentheses;
             continue;
         }
-        if (info->character == corresponder && numRightParentheses == 0) {
-            createBracketSelection(docPos + info->position);
-            return true;
-        } else
-            --numRightParentheses;
+
+        if (info->character == corresponder) {
+            if (numRightParentheses == 0) {
+                createBracketSelection(docPos + info->position, isPrimary);
+                return true;
+            } else {
+                --numRightParentheses;
+            }
+        }
     }
 
     currentBlock = currentBlock.previous();
     if (currentBlock.isValid())
         return matchRightBracket(currentBlock, -2, chr, corresponder,
-                                 numRightParentheses);
+                                 numRightParentheses, isPrimary);
 
     return false;
 }
 
-void CodeEditor::createBracketSelection(int pos) {
+void CodeEditor::createBracketSelection(int pos, bool isPrimary) {
+    /*qDebug() << "createBracketSelection" << pos; */
     QList<QTextEdit::ExtraSelection> selections = extraSelections();
 
     QTextEdit::ExtraSelection selection;
 
     selection.format = bracketSeclectFmt;
+    if (!isPrimary)
+        selection.format.setBackground(
+            selection.format.background().color().lighter());
 
     QTextCursor cursor = textCursor();
     cursor.setPosition(pos);

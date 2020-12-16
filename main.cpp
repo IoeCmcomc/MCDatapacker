@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
-    QCoreApplication::setApplicationVersion("beta-0.2.2");
+    QCoreApplication::setApplicationVersion("beta-0.3.0-test_1");
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();

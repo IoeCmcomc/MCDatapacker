@@ -56,11 +56,11 @@ private:
     void matchParentheses();
     bool matchLeftBracket(QTextBlock currentBlock,
                           int i, char chr, char corresponder,
-                          int numLeftParentheses);
+                          int numLeftParentheses, bool isPrimary);
     bool matchRightBracket(QTextBlock currentBlock,
                            int i, char chr, char corresponder,
-                           int numRightParentheses);
-    void createBracketSelection(int pos);
+                           int numRightParentheses, bool isPrimary);
+    void createBracketSelection(int pos, bool isPrimary);
     void followNamespacedId(const QMouseEvent *event);
 };
 

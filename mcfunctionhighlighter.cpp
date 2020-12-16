@@ -15,7 +15,6 @@ void McfunctionHighlighter::setupRules() {
     singleCommentHighlightRules.insert('#', fmt);
 
     fmt = QTextCharFormat();
-    bracketPairs.append({ '[', ']' });
 
     HighlightingRule rule;
 

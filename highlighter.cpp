@@ -44,8 +44,8 @@ Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
 
     quoteHighlightRules.insert('"', fmt);
 
-    fmt = QTextCharFormat();
     bracketPairs.append({ '{', '}' });
+    bracketPairs.append({ '[', ']' });
 }
 
 void Highlighter::highlightBlock(const QString &text) {
@@ -86,7 +86,6 @@ void Highlighter::highlightBlock(const QString &text) {
                             auto *info = new BracketInfo;
                             info->character = curChar.toLatin1();
                             info->position  = i;
-
                             /*qDebug() << info->character << info->position; */
                             data->insert(info);
                         }

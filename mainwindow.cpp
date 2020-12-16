@@ -180,6 +180,7 @@ void MainWindow::onCurFileChanged(const QString &path) {
 }
 
 void MainWindow::onDatapackChanged() {
+    ui->codeEditorInterface->clear();
     updateWindowTitle(false);
 }
 

@@ -206,10 +206,12 @@ CodeEditor *TabbedCodeEditorInterface::getEditor() const {
 
 void TabbedCodeEditorInterface::clear() {
     if (!isNoFile()) {
-        for (int i = 0; i < count(); i++) {
-            ui->tabBar->removeTab(i);
+        for (int i = count() - 1; i >= 0; --i) {
+            onCloseFile(i);
         }
     }
+
+    Q_ASSERT(isNoFile());
 }
 
 bool TabbedCodeEditorInterface::hasUnsavedChanges() const {
