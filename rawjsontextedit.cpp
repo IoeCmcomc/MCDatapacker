@@ -13,6 +13,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTextBlock>
+#include <QShortcut>
 
 RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
     QFrame(parent),
@@ -25,6 +26,27 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
     QPixmap pixmap(16, 16);
     pixmap.fill(currTextColor);
     ui->colorBtn->setIcon(pixmap);
+
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_B), this, nullptr,
+                          nullptr, Qt::WidgetWithChildrenShortcut),
+            &QShortcut::activated, [this]() {
+        ui->boldBtn->toggle();
+    });
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_I), this, nullptr,
+                          nullptr, Qt::WidgetWithChildrenShortcut),
+            &QShortcut::activated, [this]() {
+        ui->italicBtn->toggle();
+    });
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_U), this, nullptr,
+                          nullptr, Qt::WidgetWithChildrenShortcut),
+            &QShortcut::activated, [this]() {
+        ui->underlineBtn->toggle();
+    });
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_K), this, nullptr,
+                          nullptr, Qt::WidgetWithChildrenShortcut),
+            &QShortcut::activated, [this]() {
+        ui->strikeBtn->toggle();
+    });
 
     connect(ui->boldBtn, &QToolButton::toggled, this,
             &RawJsonTextEdit::setBold);
@@ -210,6 +232,7 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
 
 void RawJsonTextEdit::setBold(bool bold) {
     ui->textEdit->setFontWeight((bold) ? QFont::Bold : QFont::Normal);
+    ui->textEdit->setFocus();
 }
 
 void RawJsonTextEdit::setItalic(bool italic) {

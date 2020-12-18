@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QDir>
 #include <QSaveFile>
+#include <QShortcut>
 
 
 TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
@@ -34,6 +35,11 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             ui->codeEditor, &CodeEditor::setFilePath);
     connect(ui->codeEditor, &CodeEditor::openFile,
             this, &TabbedCodeEditorInterface::onOpenFile);
+
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
+            &QShortcut::activated, [this]() {
+        onCloseFile(getCurIndex());
+    });
 }
 
 TabbedCodeEditorInterface::~TabbedCodeEditorInterface() {
@@ -321,6 +327,9 @@ void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
 }
 
 void TabbedCodeEditorInterface::onCloseFile(int index) {
+    if (index == -1)
+        return;
+
     Q_ASSERT(count() > 0);
     /*qDebug() << "onCloseFile" << index << count(); */
     disconnect(getCurDoc(), &QTextDocument::modificationChanged,

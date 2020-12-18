@@ -166,7 +166,6 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 }
 
 void CodeEditor::onCursorPositionChanged() {
-    qDebug() << "onCursorPositionChanged";
     setExtraSelections({});
     highlightCurrentLine();
     matchParentheses();

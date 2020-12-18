@@ -11,13 +11,12 @@
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QUiLoader>
 #include <QSettings>
 #include <QScreen>
 #include <QGuiApplication>
 #include <QFileInfo>
-#include <QAbstractButton>
 #include <QCloseEvent>
+
 
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
 QString                     MainWindow::curDir;
@@ -35,8 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
-    /*ui->codeEditor->setFocus(); */
-
     connect(ui->actionNewDatapack, &QAction::triggered,
             this, &MainWindow::newDatapack);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
@@ -50,8 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::pref_settings);
     connect(ui->actionAboutApp, &QAction::triggered,
             this, &MainWindow::about);
-    connect(ui->actionAboutQt, &QAction::triggered,
-            [this]() {
+    connect(ui->actionAboutQt, &QAction::triggered, [this]() {
         QMessageBox::aboutQt(this);
     });
     connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
@@ -532,6 +528,9 @@ void MainWindow::openFolder() {
 }
 
 void MainWindow::setCodeEditorText(const QString &text) {
+    if (ui->codeEditorInterface->isNoFile())
+        return;
+
     /*ui->codeEditor->setPlainText(text); */
     QTextCursor cursor = ui->codeEditorInterface->getEditor()->textCursor();
 
@@ -543,7 +542,10 @@ void MainWindow::setCodeEditorText(const QString &text) {
 }
 
 QString MainWindow::getCodeEditorText() {
-    return ui->codeEditorInterface->getCurDoc()->toPlainText();
+    if (auto *doc = ui->codeEditorInterface->getCurDoc())
+        return ui->codeEditorInterface->getCurDoc()->toPlainText();
+    else
+        return QString();
 }
 
 MainWindow::~MainWindow() {
