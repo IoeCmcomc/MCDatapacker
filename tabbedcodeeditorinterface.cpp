@@ -78,8 +78,6 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
     QString errorMessage;
     bool    ok = true;
 
-    /*onTabChanged(getCurIndex()); */
-
 #ifndef QT_NO_CURSOR
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
@@ -126,6 +124,30 @@ void TabbedCodeEditorInterface::updateTabTitle(int index, bool changed) {
     if (changed)
         newTitle += '*';
     ui->tabBar->setTabText(index, newTitle);
+}
+
+bool TabbedCodeEditorInterface::maybeSave(int index) {
+    if (!files[index].doc->isModified())
+        return true;
+
+    const QMessageBox::StandardButton ret
+        = QMessageBox::warning(this,
+                               tr("Unsaved file"),
+                               tr("This document has been modified.\n"
+                                  "Do you want to save it?"),
+                               QMessageBox::Save | QMessageBox::Discard |
+                               QMessageBox::Cancel);
+    switch (ret) {
+    case QMessageBox::Save:
+        return saveFile(index, files[index].fileInfo.absoluteFilePath());
+
+    case QMessageBox::Cancel:
+        return false;
+
+    default:
+        break;
+    }
+    return true;
 }
 
 int TabbedCodeEditorInterface::getCurIndex() const {
@@ -332,8 +354,10 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
 
     Q_ASSERT(count() > 0);
     /*qDebug() << "onCloseFile" << index << count(); */
-    disconnect(getCurDoc(), &QTextDocument::modificationChanged,
-               this, &TabbedCodeEditorInterface::onModificationChanged);
-    files.remove(index);
-    ui->tabBar->removeTab(index);
+    if (maybeSave(index)) {
+        disconnect(getCurDoc(), &QTextDocument::modificationChanged,
+                   this, &TabbedCodeEditorInterface::onModificationChanged);
+        files.remove(index);
+        ui->tabBar->removeTab(index);
+    }
 }

@@ -69,7 +69,7 @@
 <context>
     <name>CodeEditor</name>
     <message>
-        <location filename="codeeditor.cpp" line="140"/>
+        <location filename="codeeditor.cpp" line="142"/>
         <source>Format</source>
         <translation>Định dạng</translation>
     </message>
@@ -355,7 +355,7 @@
     </message>
     <message>
         <location filename="entityconditiondialog.ui" line="387"/>
-        <location filename="entityconditiondialog.cpp" line="420"/>
+        <location filename="entityconditiondialog.cpp" line="419"/>
         <source>Ambient</source>
         <translation>Bầu không khí</translation>
     </message>
@@ -387,13 +387,13 @@
     </message>
     <message>
         <location filename="entityconditiondialog.ui" line="447"/>
-        <location filename="entityconditiondialog.cpp" line="421"/>
+        <location filename="entityconditiondialog.cpp" line="420"/>
         <source>Visible</source>
         <translation>Thấy được</translation>
     </message>
     <message>
         <location filename="entityconditiondialog.ui" line="463"/>
-        <location filename="entityconditiondialog.cpp" line="401"/>
+        <location filename="entityconditiondialog.cpp" line="400"/>
         <source>Player</source>
         <translation>Người chơi</translation>
     </message>
@@ -446,8 +446,8 @@
     <message>
         <location filename="entityconditiondialog.ui" line="576"/>
         <location filename="entityconditiondialog.ui" line="643"/>
-        <location filename="entityconditiondialog.cpp" line="442"/>
-        <location filename="entityconditiondialog.cpp" line="453"/>
+        <location filename="entityconditiondialog.cpp" line="441"/>
+        <location filename="entityconditiondialog.cpp" line="452"/>
         <source>Granted</source>
         <translation>Đã nhận được</translation>
     </message>
@@ -477,22 +477,22 @@
         <translation>Giá trị:</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="417"/>
+        <location filename="entityconditiondialog.cpp" line="416"/>
         <source>Effect</source>
         <translation>Hiệu ứng</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="418"/>
+        <location filename="entityconditiondialog.cpp" line="417"/>
         <source>Amplifier</source>
         <translation>Độ mạnh</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="419"/>
+        <location filename="entityconditiondialog.cpp" line="418"/>
         <source>Duration</source>
         <translation>Độ lâu</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="441"/>
+        <location filename="entityconditiondialog.cpp" line="440"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
@@ -501,22 +501,22 @@
         <translation type="vanished">Đã nhận được</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="452"/>
+        <location filename="entityconditiondialog.cpp" line="451"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="463"/>
+        <location filename="entityconditiondialog.cpp" line="462"/>
         <source>Type</source>
         <translation>Loại</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="464"/>
+        <location filename="entityconditiondialog.cpp" line="463"/>
         <source>Stat</source>
         <translation>Thống kê</translation>
     </message>
     <message>
-        <location filename="entityconditiondialog.cpp" line="465"/>
+        <location filename="entityconditiondialog.cpp" line="464"/>
         <source>Value</source>
         <translation>Giá trị</translation>
     </message>
@@ -720,9 +720,8 @@
         <translation>Độ sáng:</translation>
     </message>
     <message>
-        <location filename="locationconditiondialog.cpp" line="168"/>
         <source>Right click this row to delete.</source>
-        <translation>Nháy chuột phải vào hàng này để xoá.</translation>
+        <translation type="vanished">Nháy chuột phải vào hàng này để xoá.</translation>
     </message>
     <message>
         <source>(not selected)</source>
@@ -867,123 +866,118 @@
 <context>
     <name>LootTableEntry</name>
     <message>
-        <location filename="loottableentry.ui" line="14"/>
-        <source>TabWidget</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="loottableentry.ui" line="24"/>
+        <location filename="loottableentry.ui" line="21"/>
         <source>General</source>
         <translation>Chung</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="30"/>
+        <location filename="loottableentry.ui" line="27"/>
         <source>Weight:</source>
         <translation>Trọng số:</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="44"/>
+        <location filename="loottableentry.ui" line="41"/>
         <source>Empty</source>
         <translation>Rỗng</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="49"/>
+        <location filename="loottableentry.ui" line="46"/>
         <source>Item</source>
         <translation>Vật phẩm</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="54"/>
+        <location filename="loottableentry.ui" line="51"/>
         <source>Loot table</source>
         <translation>Bảng lợi phẩm</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="59"/>
+        <location filename="loottableentry.ui" line="56"/>
         <source>Tag</source>
         <translation>Nhãn</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="64"/>
+        <location filename="loottableentry.ui" line="61"/>
         <source>Group</source>
         <translation>Nhóm</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="69"/>
+        <location filename="loottableentry.ui" line="66"/>
         <source>Dynamic</source>
         <translation>Động</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="77"/>
+        <location filename="loottableentry.ui" line="74"/>
         <source>Type:</source>
         <translation>Loại:</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="106"/>
+        <location filename="loottableentry.ui" line="103"/>
         <source>Item:</source>
         <translation>Vật phẩm:</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="151"/>
+        <location filename="loottableentry.ui" line="148"/>
         <source>Name:</source>
         <translation>Tên:</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="161"/>
+        <location filename="loottableentry.ui" line="158"/>
         <source>Expand</source>
         <translation>Mở rộng</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="184"/>
+        <location filename="loottableentry.ui" line="181"/>
         <source>Select mode</source>
         <translation>Chọn chế độ</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="190"/>
+        <location filename="loottableentry.ui" line="187"/>
         <source>Until the first entry fails</source>
         <translation>Cho đến khi có mục thất bại</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="197"/>
+        <location filename="loottableentry.ui" line="194"/>
         <source>All entries</source>
         <translation>Tất cả các mục</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="207"/>
+        <location filename="loottableentry.ui" line="204"/>
         <source>Only the first successful entry</source>
         <translation>Chỉ mỗi mục đầu tiên thành công</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="217"/>
+        <location filename="loottableentry.ui" line="214"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add and remove entries in the &lt;a href=&quot;/entries&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Entries&lt;/span&gt;&lt;/a&gt; tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thêm bớt các mục ở thẻ &lt;a href=&quot;/entries&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Các mục&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="234"/>
-        <location filename="loottableentry.ui" line="251"/>
+        <location filename="loottableentry.ui" line="231"/>
+        <location filename="loottableentry.ui" line="248"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="241"/>
+        <location filename="loottableentry.ui" line="238"/>
         <source>Bonus weight from luck.</source>
         <translation>Trọng số thưởng thêm tờ sự may mắn.</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="244"/>
+        <location filename="loottableentry.ui" line="241"/>
         <source>Quality:</source>
         <translation>Chất lượng:</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="270"/>
+        <location filename="loottableentry.ui" line="267"/>
         <source>Functions</source>
         <translation>Các hàm</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="318"/>
+        <location filename="loottableentry.ui" line="315"/>
         <source>Conditions</source>
         <translation>Các điều kiện</translation>
     </message>
     <message>
-        <location filename="loottableentry.ui" line="378"/>
+        <location filename="loottableentry.ui" line="375"/>
         <source>Entries</source>
         <translation>Các mục</translation>
     </message>
@@ -1506,22 +1500,22 @@
 <context>
     <name>MCRInvSlot</name>
     <message>
-        <location filename="mcrinvslot.cpp" line="143"/>
+        <location filename="mcrinvslot.cpp" line="144"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="mcrinvslot.cpp" line="148"/>
+        <location filename="mcrinvslot.cpp" line="149"/>
         <source>%1 items: </source>
         <translation>%1 vật phẩm: </translation>
     </message>
     <message>
-        <location filename="mcrinvslot.cpp" line="162"/>
+        <location filename="mcrinvslot.cpp" line="163"/>
         <source>Remove</source>
         <translation>Loại bỏ</translation>
     </message>
     <message>
-        <location filename="mcrinvslot.cpp" line="171"/>
+        <location filename="mcrinvslot.cpp" line="172"/>
         <source>Select tag...</source>
         <translation>Chọn nhãn...</translation>
     </message>
@@ -1667,7 +1661,7 @@
     </message>
     <message>
         <location filename="mcrpredcondition.ui" line="175"/>
-        <location filename="mcrpredcondition.cpp" line="790"/>
+        <location filename="mcrpredcondition.cpp" line="788"/>
         <source>(not set)</source>
         <translation>(không đặt)</translation>
     </message>
@@ -1926,7 +1920,7 @@
     </message>
     <message>
         <location filename="mcrpredcondition.cpp" line="555"/>
-        <location filename="mcrpredcondition.cpp" line="712"/>
+        <location filename="mcrpredcondition.cpp" line="710"/>
         <source>Inverting an inverted condition is very silly.</source>
         <translation>Đảo ngược một điều kiện đã được đảo ngược là rất ngớ ngẩn.</translation>
     </message>
@@ -2028,32 +2022,32 @@
         <translation>Về Qt...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="98"/>
+        <location filename="mainwindow.cpp" line="94"/>
         <source>Open file</source>
         <translation>Mở tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="111"/>
+        <location filename="mainwindow.cpp" line="107"/>
         <source>Save File</source>
         <translation>Lưu tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="148"/>
+        <location filename="mainwindow.cpp" line="144"/>
         <source>Reload file</source>
         <translation>Tải lại tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="149"/>
+        <location filename="mainwindow.cpp" line="145"/>
         <source>The file %1 has been changed exernally.</source>
         <translation>Tệp %1 đã được thay đổi từ bên ngoài.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="151"/>
+        <location filename="mainwindow.cpp" line="147"/>
         <source>Do you want to reload this file?</source>
         <translation>Bạn có muốn tải lại tệp này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="249"/>
+        <location filename="mainwindow.cpp" line="246"/>
         <source>Unsaved changes</source>
         <translation>Thay đổi chưa lưu</translation>
     </message>
@@ -2082,52 +2076,52 @@ Bạn có muốn lưu các thay đổi không?</translation>
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="452"/>
+        <location filename="mainwindow.cpp" line="449"/>
         <source>Open datapack folder</source>
         <translation>Mở thư mục gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="528"/>
+        <location filename="mainwindow.cpp" line="525"/>
         <source>Invaild datapack folder.</source>
         <translation>Thư mục gói dữ liệu không hợp lệ.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="470"/>
-        <location filename="mainwindow.cpp" line="527"/>
+        <location filename="mainwindow.cpp" line="467"/>
+        <location filename="mainwindow.cpp" line="524"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="250"/>
+        <location filename="mainwindow.cpp" line="247"/>
         <source>Some document(s) has been modified.
 Do you want to save your changes?</source>
         <translation>Một vài tài liệu đã được thay đổi.
 Bạn có muốn lưu các thay đổi của bạn không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="409"/>
+        <location filename="mainwindow.cpp" line="406"/>
         <source>Folder not empty</source>
         <translation>Thư mục không rỗng</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="410"/>
+        <location filename="mainwindow.cpp" line="407"/>
         <source>The folder is not empty.
 Do you want to recreate this folder?</source>
         <translation>Thư mục này không trống.
 Bạn có muốn tạo lại thư mục này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="485"/>
+        <location filename="mainwindow.cpp" line="482"/>
         <source>Failed to parse the pack.mcmeta file.</source>
         <translation>Không thể phân tích cú pháp của tệp pack.mcmeta.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="492"/>
+        <location filename="mainwindow.cpp" line="489"/>
         <source>The pack.mcmeta file is not a JSON object.</source>
         <translation>Tệp pack.mcmeta không phải là một đối tương JSON.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="502"/>
+        <location filename="mainwindow.cpp" line="499"/>
         <source>The pack.mcmeta file&apos;s contents is empty.</source>
         <translation>Tệp pack.mcmeta rỗng.</translation>
     </message>
@@ -2227,17 +2221,17 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <translation>Xác suất:</translation>
     </message>
     <message>
-        <location filename="numericinput.cpp" line="146"/>
+        <location filename="numericinput.cpp" line="148"/>
         <source>Exactly</source>
         <translation>Chính xác</translation>
     </message>
     <message>
-        <location filename="numericinput.cpp" line="150"/>
+        <location filename="numericinput.cpp" line="152"/>
         <source>Range</source>
         <translation>Khoảng</translation>
     </message>
     <message>
-        <location filename="numericinput.cpp" line="154"/>
+        <location filename="numericinput.cpp" line="156"/>
         <source>Binomial</source>
         <translation>Nhị thức</translation>
     </message>
@@ -2262,11 +2256,6 @@ Bạn có muốn tạo lại thư mục này không?</translation>
 </context>
 <context>
     <name>RawJsonTextEdit</name>
-    <message>
-        <location filename="rawjsontextedit.ui" line="20"/>
-        <source>Frame</source>
-        <translation></translation>
-    </message>
     <message>
         <location filename="rawjsontextedit.ui" line="139"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -2333,27 +2322,39 @@ p, li { white-space: pre-wrap; }
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chưa có tệp nào được mở.&lt;/p&gt;&lt;p&gt;Đầu tiên, mở một gói dữ liệu; sau đó mở một tệp từ khung nhìn cây phía bên trái.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="87"/>
+        <location filename="tabbedcodeeditorinterface.cpp" line="91"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="93"/>
+        <location filename="tabbedcodeeditorinterface.cpp" line="97"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
 %2.</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="104"/>
-        <location filename="tabbedcodeeditorinterface.cpp" line="147"/>
+        <location filename="tabbedcodeeditorinterface.cpp" line="108"/>
+        <location filename="tabbedcodeeditorinterface.cpp" line="175"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="148"/>
+        <location filename="tabbedcodeeditorinterface.cpp" line="135"/>
+        <source>Unsaved file</source>
+        <translation>Tệp chưa được lưu</translation>
+    </message>
+    <message>
+        <location filename="tabbedcodeeditorinterface.cpp" line="136"/>
+        <source>This document has been modified.
+Do you want to save it?</source>
+        <translation>Tài liệu này đã được chỉnh sửa.
+Bạn có muốn lưu nó không?</translation>
+    </message>
+    <message>
+        <location filename="tabbedcodeeditorinterface.cpp" line="176"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>Không thể đọc tệp %1:

@@ -69,6 +69,8 @@ private:
     void addCodeFile(const CodeFile &file);
     bool saveFile(int index, const QString &filepath);
     void updateTabTitle(int index, bool changed = false);
+
+    bool maybeSave(int index);
 };
 
 #endif /* TABBEDCODEEDITORINTERFACE_H */
