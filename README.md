@@ -15,11 +15,16 @@ This tool can be used for making a new datapack, opening existing datapack, addi
  
 ## Download
 The program currently only supports up to 1.15 data packs, and it only runs on Windows (tested on Windows 7 and Windows).
+
 Warning: This is currently an under-development program, which may contain errors. Use it with your own risk.
+
 Download link: https://github.com/IoeCmcomc/MCDatapacker/releases/latest
+
 Download the zip file, extract it and run the MCDatapacker.exe file.
 
 ## Disclaimer
 All the Minecraft textures and other material are copyright © 2009-2020 Mojang Studios.
+
 Some contents in the program are from Minecraft Wiki (see [Minecraft Wiki:General disclaimer](https://minecraft.gamepedia.com/Minecraft_Wiki:General_disclaimer "Minecraft Wiki:General disclaimer")).
+
 This program is not affiliated with Mojang Studios.
