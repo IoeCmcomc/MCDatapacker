@@ -6,6 +6,7 @@
 #include <QTranslator>
 #include <QDebug>
 #include <QDir>
+#include <QStyleFactory>
 
 int main(int argc, char *argv[]) {
     /*Q_INIT_RESOURCE(application); */
@@ -13,15 +14,16 @@ int main(int argc, char *argv[]) {
     /*qDebug() << "Starting application..."; */
     QApplication a(argc, argv);
 
+    /*qDebug() << QStyleFactory::keys(); */
     /*
-       a.setStyle("fusion");
-       a.setStyle("windowsxp");
-       a.setStyle("macintosh");
+       a.setStyle("windowsvista");
+       a.setStyle("Windows");
+        a.setStyle("Fusion");
      */
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
-    QCoreApplication::setApplicationVersion("beta-0.3.0-test_1");
+    QCoreApplication::setApplicationVersion("0.3.0-beta");
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();

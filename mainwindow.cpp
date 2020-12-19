@@ -294,6 +294,8 @@ void MainWindow::switchTranslator(QTranslator& translator,
     QString path = QApplication::applicationDirPath() + "/translations/";
     if (translator.load(path + filename))
         qApp->installTranslator(&translator);
+    else if (translator.load(":/i18n/" + filename))
+        qApp->installTranslator(&translator);
 }
 
 
@@ -302,14 +304,14 @@ void MainWindow::changeEvent(QEvent* event) {
         switch (event->type()) {
         /* this event is send if a translator is loaded */
         case QEvent::LanguageChange: {
-            qDebug() << "QEvent::LanguageChange";
+            /*qDebug() << "QEvent::LanguageChange"; */
             ui->retranslateUi(this);
             break;
         }
 
         /* this event is send, if the system, language changes */
         case QEvent::LocaleChange: {
-            qDebug() << "QEvent::LocaleChange";
+            /*qDebug() << "QEvent::LocaleChange"; */
             QString locale = QLocale::system().name();
             loadLanguage(locale);
             break;

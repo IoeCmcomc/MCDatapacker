@@ -1,8 +1,8 @@
-QT       += core gui
+QT       += core gui uitools
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++17 lrelease embed_translations
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -122,8 +122,6 @@ FORMS += \
 TRANSLATIONS += \
     MCDatapacker_vi_VN.ts
 
-QT += uitools
-
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -134,3 +132,8 @@ RESOURCES += \
     resource/minecraft/minecraft.qrc
 
 RC_ICONS = resource/app/icon/favicon.ico
+
+VERSION = 0.3.0
+QMAKE_TARGET_COMPANY = IoeCmcomc
+QMAKE_TARGET = MCDatapacker
+QMAKE_TARGET_PRODUCT = MCDatapacker
