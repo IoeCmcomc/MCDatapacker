@@ -1,5 +1,4 @@
 ![](https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png?token=AMZ6227FGWS3BYPMKOT5HFC73X5R2)
-<font size="6">**MCDatapacker**</font>
 
 MCDatapacker is a Minecraft datapack editor which supports 1.15 data packs.
 
@@ -14,13 +13,13 @@ This tool can be used for making a new datapack, opening existing datapack, addi
  - Predicate and loot table editor.(idea fron the [misode's generator](https://misode.github.io/ "misode's generator")).
  
  
- ##Download
+## Download
 The program currently only supports up to 1.15 data packs, and it only runs on Windows (tested on Windows 7 and Windows).
 Warning: This is currently an under-development program, which may contain errors. Use it with your own risk.
 Download link: https://github.com/IoeCmcomc/MCDatapacker/releases/latest
 Download the zip file, extract it and run the MCDatapacker.exe file.
 
-##Disclaimer
+## Disclaimer
 All the Minecraft textures and other material are copyright © 2009-2020 Mojang Studios.
 Some contents in the program are from Minecraft Wiki (see [Minecraft Wiki:General disclaimer](https://minecraft.gamepedia.com/Minecraft_Wiki:General_disclaimer "Minecraft Wiki:General disclaimer")).
 This program is not affiliated with Mojang Studios.
