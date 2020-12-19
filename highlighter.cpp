@@ -40,7 +40,7 @@ void TextBlockData::insert(NamespacedIdInfo *info) {
 Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
     auto fmt = QTextCharFormat();
 
-    fmt.setForeground(QColor("#A31621"));
+    fmt.setForeground(QColor(QStringLiteral("#A31621")));
 
     quoteHighlightRules.insert('"', fmt);
 
@@ -51,7 +51,13 @@ Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
 void Highlighter::highlightBlock(const QString &text) {
     /*qDebug() << "Highlighter::highlightBlock" << text; */
     if (document()) {
-        auto *data = new TextBlockData;
+        TextBlockData *data;
+        if (currentBlockUserData()) {
+            data =
+                dynamic_cast<TextBlockData*>(currentBlockUserData());
+        } else {
+            data = new TextBlockData();
+        }
 
         if ((!text.isEmpty()) &&
             singleCommentHighlightRules.contains(text[0])) {
@@ -86,15 +92,10 @@ void Highlighter::highlightBlock(const QString &text) {
                             auto *info = new BracketInfo;
                             info->character = curChar.toLatin1();
                             info->position  = i;
-                            /*qDebug() << info->character << info->position; */
                             data->insert(info);
                         }
                     }
                 }
-/*
-                  qDebug() << i << curChar << currentBlockState() <<
-                      (currentBlockState() <= Normal);
- */
             }
         }
 
@@ -127,12 +128,12 @@ void Highlighter::collectNamespacedIds(const QString &text,
 QString Highlighter::locateNamespacedId(QString id) {
     Q_ASSERT(!MainWindow::getCurDir().isEmpty());
     bool isTag = false;
-    if (Glhp::removePrefix(id, "#"))
+    if (Glhp::removePrefix(id, QStringLiteral("#")))
         isTag = true;
-    QString dirpath = MainWindow::getCurDir() + "/data/"
+    QString dirpath = MainWindow::getCurDir() + QStringLiteral("/data/")
                       + id.section(":", 0, 0);
     if (isTag)
-        dirpath += "/tags";
+        dirpath += QStringLiteral("/tags");
 
     QDir dir(dirpath);
 
@@ -142,12 +143,12 @@ QString Highlighter::locateNamespacedId(QString id) {
         dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     QString path;
     for (const auto &catDir: dirList) {
-        /*qDebug() << "catDir: " << catDir; */
         path = dir.path() + "/" + catDir + "/" + id.section(":", 1, 1);
-        if (catDir == "functions" && QFile::exists(path + ".mcfunction")) {
-            return path + ".mcfunction";
-        } else if (QFile::exists(path + ".json")) {
-            return path + ".json";
+        if (catDir == QStringLiteral("functions")
+            && QFile::exists(path + QStringLiteral(".mcfunction"))) {
+            return path + QStringLiteral(".mcfunction");
+        } else if (QFile::exists(path + QStringLiteral(".json"))) {
+            return path + QStringLiteral(".json");
         }
     }
 

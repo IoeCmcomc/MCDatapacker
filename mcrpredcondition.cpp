@@ -812,7 +812,7 @@ void MCRPredCondition::initEntityScoresPage() {
     ui->entityScores_valueInput->setTypes(
         NumericInput::Exact | NumericInput::Range);
 
-    auto *delegate = new ExtendedDelegate();
+    auto *delegate = new ExtendedDelegate(this);
     delegate->setExNumInputTypes(NumericInput::Exact
                                  | NumericInput::Range);
 
@@ -874,7 +874,7 @@ void MCRPredCondition::initTableBonusPage() {
 void MCRPredCondition::initToolEnchantPage() {
     ui->toolEnchant_levelsInput->setTypes(NumericInput::Range);
 
-    auto *delegate = new ExtendedDelegate();
+    auto *delegate = new ExtendedDelegate(this);
     delegate->setExNumInputTypes(NumericInput::Exact | NumericInput::Range);
     ui->toolEnchant_table->setItemDelegate(delegate);
     ui->toolEnchant_table->installEventFilter(&viewFilter);

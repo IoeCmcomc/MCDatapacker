@@ -321,7 +321,7 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
 }
 
 void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
-    qDebug() << "onTabMoved" << from << to;
+    /*qDebug() << "onTabMoved" << from << to; */
     tabMoved = true;
     qSwap(files[from], files[to]);
 }
