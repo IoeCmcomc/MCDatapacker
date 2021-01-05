@@ -3,6 +3,7 @@
 
 #include "globalhelpers.h"
 #include "mainwindow.h"
+#include "fileswitcher.h"
 
 #include <QMessageBox>
 #include <QTextStream>
@@ -40,6 +41,9 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             &QShortcut::activated, [this]() {
         onCloseFile(getCurIndex());
     });
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, nullptr),
+            &QShortcut::activated, this,
+            &TabbedCodeEditorInterface::onSwitchFile);
 }
 
 TabbedCodeEditorInterface::~TabbedCodeEditorInterface() {
@@ -228,6 +232,10 @@ QTextDocument *TabbedCodeEditorInterface::getCurDoc() {
         return nullptr;
 }
 
+QVector<CodeFile> *TabbedCodeEditorInterface::getFiles() {
+    return &files;
+}
+
 CodeEditor *TabbedCodeEditorInterface::getEditor() const {
     return ui->codeEditor;
 }
@@ -359,5 +367,11 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
                    this, &TabbedCodeEditorInterface::onModificationChanged);
         files.remove(index);
         ui->tabBar->removeTab(index);
+    }
+}
+
+void TabbedCodeEditorInterface::onSwitchFile() {
+    if (!isNoFile()) {
+        new FileSwitcher(this);
     }
 }

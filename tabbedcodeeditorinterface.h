@@ -26,6 +26,8 @@ public:
     QString getCurFilePath();
     QTextDocument *getCurDoc();
 
+    QVector<CodeFile> *getFiles();
+
     CodeEditor *getEditor() const;
 
     inline int count() const {
@@ -57,6 +59,7 @@ private slots:
     void onTabChanged(int index);
     void onTabMoved(int from, int to);
     void onCloseFile(int index);
+    void onSwitchFile();
 
 private:
     Ui::TabbedCodeEditorInterface *ui;

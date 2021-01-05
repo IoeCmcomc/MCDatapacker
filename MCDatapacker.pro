@@ -26,6 +26,7 @@ SOURCES += \
     dialogdatabutton.cpp \
     entityconditiondialog.cpp \
     extendeddelegate.cpp \
+    fileswitcher.cpp \
     globalhelpers.cpp \
     highlighter.cpp \
     itemconditiondialog.cpp \
@@ -67,6 +68,7 @@ HEADERS += \
     dialogdatabutton.h \
     entityconditiondialog.h \
     extendeddelegate.h \
+    fileswitcher.h \
     globalhelpers.h \
     highlighter.h \
     itemconditiondialog.h \
