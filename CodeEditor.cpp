@@ -103,7 +103,7 @@ void CodeEditor::dropEvent(QDropEvent *e) {
 
     if (e->mimeData()->hasFormat("text/uri-list")) {
         auto path    = e->mimeData()->urls().at(0).toLocalFile();
-        auto dirpath = MainWindow::getCurDir();
+        auto dirpath = QDir::currentPath();
         nspacedID = Glhp::toNamespacedID(dirpath, path);
     } else if (e->mimeData()->hasText()) {
         nspacedID = e->mimeData()->text();
@@ -140,7 +140,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     menu->addAction(sep1Action);
 
     QAction *formatAction = new QAction(tr("Format"), menu);
-    auto     dirpath      = MainWindow::getCurDir();
+    auto     dirpath      = QDir::currentPath();
     auto     fileType     = Glhp::pathToFileType(dirpath, filepath);
 
     formatAction->setDisabled(!((CodeFile::JsonText <= fileType) &&
@@ -193,7 +193,7 @@ void CodeEditor::highlightCurrentLine() {
 
 void CodeEditor::setFilePath(const QString &path) {
     filepath    = path;
-    curFileType = Glhp::pathToFileType(MainWindow::getCurDir(), path);
+    curFileType = Glhp::pathToFileType(QDir::currentPath(), path);
 
     document()->setDefaultFont(monoFont);
     setFont(monoFont);

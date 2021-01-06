@@ -6,6 +6,7 @@
 #include <QFrame>
 #include <QVBoxLayout>
 #include <QFileSystemWatcher>
+#include <QDir>
 
 namespace Ui {
     class MCRPredCondition;
@@ -43,7 +44,7 @@ protected slots:
     void tableBonus_onAdded();
     void toolEnchant_onAdded();
     void onTypeChanged(const int &i);
-    void onCurDirChanged(const QString &path);
+    void onCurDirChanged(const QDir &dir);
 
 private:
     Ui::MCRPredCondition *ui;

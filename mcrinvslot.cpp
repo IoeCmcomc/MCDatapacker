@@ -409,9 +409,8 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
         } else if (event->mimeData()->hasFormat("text/uri-list")) {
             auto filepath =
                 event->mimeData()->urls().at(0).toLocalFile();
-            auto    dirpath = MainWindow::getCurDir();
-            QString id      = Glhp::toNamespacedID(dirpath,
-                                                   filepath);
+            QString id = Glhp::toNamespacedID(QDir::currentPath(),
+                                              filepath);
 
             if (!id.isEmpty()) {
                 MCRInvItem newItem(id);

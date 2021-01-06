@@ -13,7 +13,7 @@ class DatapackTreeView : public QTreeView
     Q_OBJECT
 public:
     DatapackTreeView(QWidget *parent = nullptr);
-    void load(const QString &dir);
+    void load(const QDir &dir);
     void selectFromPath(const QString &path);
     void openFromPath(const QString &path);
 
@@ -25,6 +25,7 @@ signals:
     void fileDeteted(const QString &path);
 
 protected:
+    bool event(QEvent *event) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
 
 private slots:

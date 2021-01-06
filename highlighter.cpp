@@ -126,16 +126,14 @@ void Highlighter::collectNamespacedIds(const QString &text,
 }
 
 QString Highlighter::locateNamespacedId(QString id) {
-    Q_ASSERT(!MainWindow::getCurDir().isEmpty());
+    Q_ASSERT(QDir::current().exists());
     bool isTag = false;
     if (Glhp::removePrefix(id, QStringLiteral("#")))
         isTag = true;
-    QString dirpath = MainWindow::getCurDir() + QStringLiteral("/data/")
-                      + id.section(":", 0, 0);
+    auto dir = QDir::current();
+    dir.cd(QStringLiteral("data/") + id.section(":", 0, 0));
     if (isTag)
-        dirpath += QStringLiteral("/tags");
-
-    QDir dir(dirpath);
+        dir.cd(QStringLiteral("tags"));
 
     if (!dir.exists()) return "";
 

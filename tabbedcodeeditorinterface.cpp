@@ -58,10 +58,11 @@ void TabbedCodeEditorInterface::addCodeFile(const CodeFile &file) {
     files << file;
     ui->tabBar->addTab(file.title);
     const int lastIndex = count() - 1;
+    ui->tabBar->setTabToolTip(lastIndex, file.fileInfo.filePath());
     ui->tabBar->setTabIcon(lastIndex, Glhp::fileTypeToIcon(
-                               Glhp::pathToFileType(MainWindow::getCurDir(),
+                               Glhp::pathToFileType(QDir::currentPath(),
                                                     file.fileInfo.
-                                                    absoluteFilePath())));
+                                                    filePath())));
     setCurIndex(count() - 1);
 }
 
@@ -199,7 +200,7 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
         newFile.doc->setParent(this);
         newFile.doc->setPlainText(content);
         newFile.textCursor.setPosition(0);
-        newFile.fileType = Glhp::pathToFileType(MainWindow::getCurDir(), path);
+        newFile.fileType = Glhp::pathToFileType(QDir::currentPath(), path);
 
 #ifndef QT_NO_CURSOR
         QGuiApplication::restoreOverrideCursor();
@@ -309,8 +310,8 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
             updateTabTitle(i, file->doc->isModified());
             ui->tabBar->setTabIcon(
                 i, Glhp::fileTypeToIcon(Glhp::pathToFileType(
-                                            MainWindow::getCurDir(),
-                                            file->fileInfo.absoluteFilePath())));
+                                            QDir::currentPath(),
+                                            file->fileInfo.filePath())));
 
             onModificationChanged(false);
             setCurIndex(getCurIndex());
@@ -334,7 +335,7 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
         if (ui->stackedWidget->currentIndex() == 0)
             ui->stackedWidget->setCurrentIndex(1);
 
-        emit curFileChanged(curFile->fileInfo.absoluteFilePath());
+        emit curFileChanged(curFile->fileInfo.filePath());
     } else {
         if (ui->stackedWidget->currentIndex() == 1)
             ui->stackedWidget->setCurrentIndex(0);

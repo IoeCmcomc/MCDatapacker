@@ -19,7 +19,6 @@
 
 
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
-QString                     MainWindow::curDir;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -261,12 +260,6 @@ bool MainWindow::maybeSave() {
     return true;
 }
 
-
-QString MainWindow::getCurDir() {
-/*    return this->curDir; */
-    return MainWindow::curDir;
-}
-
 QString MainWindow::getCurLocale() {
     return this->curLocale.name();
 }
@@ -327,22 +320,19 @@ void MainWindow::changeEvent(QEvent* event) {
 void MainWindow::commitData(QSessionManager &) {
 }
 
-QString MainWindow::strippedName(const QString &fullFilepath) {
-    return QFileInfo(fullFilepath).fileName();
-}
-
 void MainWindow::updateWindowTitle(bool changed) {
     QStringList titleParts;
 
     if (!ui->codeEditorInterface->isNoFile()) {
         if (auto curPath = ui->codeEditorInterface->getCurFilePath();
             !curPath.isEmpty())
-            titleParts << strippedName(curPath) + "[*]";
+            titleParts << QFileInfo(curPath).fileName() + "[*]";
         else
             titleParts << QStringLiteral("Untitled") + "[*]";
     }
-    if (!curDir.isEmpty())
-        titleParts << "[" + strippedName(curDir) + "]";
+    auto curDir = QDir::current();
+    if (curDir.exists())
+        titleParts << "[" + curDir.dirName() + "]";
     titleParts << QCoreApplication::applicationName();
     setWindowTitle(titleParts.join(QStringLiteral(" - ")));
     this->setWindowModified(changed);
@@ -438,27 +428,27 @@ void MainWindow::newDatapack() {
                          .replace(".", "_").replace(":", "_");
         dir.mkpath(dirPath + "/data/" + namesp);
 
-        ui->datapackTreeView->load(dirPath);
+        ui->datapackTreeView->load(dir);
     }
     delete dialog;
 }
 
 void MainWindow::openFolder() {
-    QString dir;
+    QString dirPath;
 
     if (maybeSave())
-        dir = QFileDialog::getExistingDirectory(this,
-                                                tr(
-                                                    "Open datapack folder"),
-                                                "",
-                                                QFileDialog::ShowDirsOnly |
-                                                QFileDialog::DontResolveSymlinks);
+        dirPath = QFileDialog::getExistingDirectory(this,
+                                                    tr(
+                                                        "Open datapack folder"),
+                                                    "",
+                                                    QFileDialog::ShowDirsOnly |
+                                                    QFileDialog::DontResolveSymlinks);
     else
         return;
 
-    if (dir.isEmpty()) return;
+    if (dirPath.isEmpty()) return;
 
-    QString pack_mcmeta = dir + "/pack.mcmeta";
+    QString pack_mcmeta = dirPath + "/pack.mcmeta";
 
     if (QFile::exists(pack_mcmeta)) {
         if (pack_mcmeta.isEmpty())
@@ -505,19 +495,21 @@ void MainWindow::openFolder() {
 
                 QVariantMap json_map = json_obj.toVariantMap();
 
+                auto curDir = QDir::current();
                 if (json_map.contains("pack")) {
                     QVariantMap pack = json_map["pack"].toMap();
                     if (pack.contains("description") &&
                         pack.contains("pack_format")) {
+                        QDir dir(dirPath);
+                        QDir::setCurrent(dir.absolutePath());
                         ui->datapackTreeView->load(dir);
-                        MainWindow::curDir = dir;
 
-                        if (!curDir.isEmpty()) {
-                            this->fileWatcher.removePath(curDir);
-                            this->fileWatcher.addPath(curDir);
+                        if (!curDir.path().isEmpty()) {
+                            this->fileWatcher.removePath(curDir.path());
+                            this->fileWatcher.addPath(curDir.path());
                         }
                         ui->codeEditorInterface->clear();
-                        emit curDirChanged(dir);
+                        emit curDirChanged(dirPath);
                     }
                 }
             }

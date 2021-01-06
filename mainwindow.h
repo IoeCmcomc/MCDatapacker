@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QFileSystemWatcher>
 #include <QMessageBox>
+#include <QDir>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,7 +26,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    static QString getCurDir();
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
@@ -40,7 +40,7 @@ protected:
 
 signals:
     void curFileChanged(const QString filepath);
-    void curDirChanged(const QString dirpath);
+    void curDirChanged(const QDir dir);
 
 private slots:
     void open();
@@ -62,7 +62,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    static QString curDir;
     static QMap<QString, QVariantMap> MCRInfoMaps;
     VisualRecipeEditorDock *visualRecipeEditorDock;
     QLocale curLocale;
@@ -76,7 +75,6 @@ private:
     void readSettings();
     void writeSettings();
     bool maybeSave();
-    QString strippedName(const QString &fullFilepath);
 
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);

@@ -557,10 +557,10 @@ void MCRPredCondition::onTypeChanged(const int &i) {
     }
 }
 
-void MCRPredCondition::onCurDirChanged(const QString &path) {
+void MCRPredCondition::onCurDirChanged(const QDir &dir) {
     if (!predRefWatcher.directories().isEmpty())
         predRefWatcher.removePaths(predRefWatcher.directories());
-    predRefWatcher.addPath(path);
+    predRefWatcher.addPath(dir.path());
     predRefWatcher.directories();
     setupRefCombo();
 }
@@ -747,7 +747,7 @@ void MCRPredCondition::setupRefCombo() {
     /*qDebug() << "setupRefCombo"; */
     if (condRefsModel.rowCount() > 0)
         condRefsModel.clear();
-    auto predRefIDs = Glhp::fileIDList(MainWindow::getCurDir(),
+    auto predRefIDs = Glhp::fileIDList(QDir::currentPath(),
                                        "predicates");
 
     for (auto predRef : predRefIDs)

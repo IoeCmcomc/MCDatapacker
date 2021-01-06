@@ -2,15 +2,14 @@
 
 #include "globalhelpers.h"
 #include "codefile.h"
-#include "mainwindow.h"
 
 DatapackFileIconProvider::DatapackFileIconProvider() = default;
 
 QIcon DatapackFileIconProvider::icon(const QFileInfo &info) const {
     if (info.isFile()) {
         auto icon = Glhp::fileTypeToIcon(Glhp::pathToFileType(
-                                             MainWindow::getCurDir(),
-                                             info.absoluteFilePath()));
+                                             QDir::currentPath(),
+                                             info.filePath()));
         if (!icon.isNull())
             return icon;
     }

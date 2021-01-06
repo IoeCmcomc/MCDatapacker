@@ -13,8 +13,7 @@
 #include <QJsonArray>
 #include <QStringList>
 #include <QSaveFile>
-
-using namespace Glhp;
+#include <QToolTip>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
@@ -35,7 +34,7 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
 QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     /*Right click context menu */
     auto     *cMenu = new QMenu(this);
-    QString   path  = relPath(dirPath, dirModel.filePath(index));
+    QString   path  = Glhp::relPath(dirPath, dirModel.filePath(index));
     QFileInfo finfo = dirModel.fileInfo(index);
 
     if (finfo.isFile()) {
@@ -48,20 +47,21 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenu->addAction(cMenuActionOpen);
     }
 
-    if (pathToFileType(dirPath, finfo.filePath()) == CodeFile::Function) {
+    if (Glhp::pathToFileType(dirPath, finfo.filePath()) == CodeFile::Function) {
         QAction *cMenuActionInLoadDotJson
             = new QAction(tr("Run this function when loaded"), cMenu);
         cMenuActionInLoadDotJson->setCheckable(true);
         cMenuActionInLoadDotJson->setChecked(isStringInTagFile
                                                  (dirPath +
                                                  "/data/minecraft/tags/functions/load.json",
-                                                 toNamespacedID(dirPath,
-                                                                finfo.filePath())));
+                                                 Glhp::toNamespacedID(dirPath,
+                                                                      finfo.
+                                                                      filePath())));
         connect(cMenuActionInLoadDotJson, &QAction::triggered,
                 [ = ](bool checked) {
             this->contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
-                toNamespacedID(dirPath, finfo.filePath()), checked);
+                Glhp::toNamespacedID(dirPath, finfo.filePath()), checked);
         });
         cMenu->addAction(cMenuActionInLoadDotJson);
 
@@ -71,13 +71,14 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenuActionInTickDotJson->setChecked(isStringInTagFile
                                                  (dirPath +
                                                  "/data/minecraft/tags/functions/tick.json",
-                                                 toNamespacedID(dirPath,
-                                                                finfo.filePath())));
+                                                 Glhp::toNamespacedID(dirPath,
+                                                                      finfo.
+                                                                      filePath())));
         connect(cMenuActionInTickDotJson, &QAction::triggered,
                 [ = ](bool checked) {
             this->contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/tick.json",
-                toNamespacedID(dirPath, finfo.filePath()), checked);
+                Glhp::toNamespacedID(dirPath, finfo.filePath()), checked);
         });
         cMenu->addAction(cMenuActionInTickDotJson);
     }
@@ -117,35 +118,37 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             QAction *newMenuNewAdv = new QAction(tr("Advancement"), newMenu);
             connect(newMenuNewAdv, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("advancement_" + randStr() + ".json", "advancements");
+                (
+                    "advancement_" + Glhp::randStr() + ".json", "advancements");
             });
             newMenu->addAction(newMenuNewAdv);
 
             QAction *newMenuNewFunct = new QAction(tr("Function"), newMenu);
             connect(newMenuNewFunct, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("function_" + randStr() + ".mcfunction", "functions");
+                (
+                    "function_" + Glhp::randStr() + ".mcfunction", "functions");
             });
             newMenu->addAction(newMenuNewFunct);
 
             QAction *newMenuNewLoot = new QAction(tr("Loot table"), newMenu);
             connect(newMenuNewLoot, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("loot_table_" + randStr() + ".json", "loot_tables");
+                    ("loot_table_" + Glhp::randStr() + ".json", "loot_tables");
             });
             newMenu->addAction(newMenuNewLoot);
 
             QAction *newMenuNewPred = new QAction(tr("Predicate"), newMenu);
             connect(newMenuNewPred, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("predicate_" + randStr() + ".json", "predicates");
+                    ("predicate_" + Glhp::randStr() + ".json", "predicates");
             });
             newMenu->addAction(newMenuNewPred);
 
             QAction *newMenuNewRecipe = new QAction(tr("Recipe"), newMenu);
             connect(newMenuNewRecipe, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("recipe_" + randStr() + ".json", "recipes");
+                    ("recipe_" + Glhp::randStr() + ".json", "recipes");
             });
             newMenu->addAction(newMenuNewRecipe);
 
@@ -153,7 +156,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             newMenuNewStruct->setDisabled(true);
             connect(newMenuNewStruct, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("structure_" + randStr() + ".nbt", "structures");
+                    ("structure_" + Glhp::randStr() + ".nbt", "structures");
             });
             newMenu->addAction(newMenuNewStruct);
 
@@ -163,35 +166,35 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             QAction *newBlockTag = new QAction(tr("Blocks"), tagMenu);
             connect(newBlockTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("tag_" + randStr() + ".json", "tags/blocks");
+                    ("tag_" + Glhp::randStr() + ".json", "tags/blocks");
             });
             tagMenu->addAction(newBlockTag);
 
             QAction *newEntityTag = new QAction(tr("Entity types"), tagMenu);
             connect(newEntityTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("tag_" + randStr() + ".json", "tags/entity_types");
+                    ("tag_" + Glhp::randStr() + ".json", "tags/entity_types");
             });
             tagMenu->addAction(newEntityTag);
 
             QAction *newFluidTag = new QAction(tr("Fluids"), tagMenu);
             connect(newFluidTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("tag_" + randStr() + ".json", "tags/fluids");
+                    ("tag_" + Glhp::randStr() + ".json", "tags/fluids");
             });
             tagMenu->addAction(newFluidTag);
 
             QAction *newFunctTag = new QAction(tr("Functions"), tagMenu);
             connect(newFunctTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("tag_" + randStr() + ".json", "tags/functions");
+                    ("tag_" + Glhp::randStr() + ".json", "tags/functions");
             });
             tagMenu->addAction(newFunctTag);
 
             QAction *newItemTag = new QAction(tr("Items"), tagMenu);
             connect(newItemTag, &QAction::triggered, [this]() {
                 this->contextMenuOnNew
-                    ("tag_" + randStr() + ".json", "tags/items");
+                    ("tag_" + Glhp::randStr() + ".json", "tags/items");
             });
             tagMenu->addAction(newItemTag);
 
@@ -200,7 +203,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
             QAction *newMenuNewFile = new QAction(tr("File"), tagMenu);
             connect(newMenuNewFile, &QAction::triggered, [this]() {
-                this->contextMenuOnNew("file" + randStr() + ".text");
+                this->contextMenuOnNew("file" + Glhp::randStr() + ".text");
             });
             newMenu->addAction(newMenuNewFile);
         }
@@ -216,19 +219,36 @@ QModelIndex DatapackTreeView::getSelected() {
     return (!indexes.isEmpty()) ? indexes.at(0) : QModelIndex();
 }
 
-void DatapackTreeView::load(const QString &dir) {
-    /*dirModel.setRootPath(dir); */
-    dirModel.setRootPath("");
+void DatapackTreeView::load(const QDir &dir) {
+    dirPath = dir.path();
+    dirModel.setRootPath(dirPath);
     setModel(&dirModel);
 
     for (int i = 1; i < dirModel.columnCount(); ++i)
         hideColumn(i);
 
-    setRootIndex(dirModel.index(dir));
-
-    dirPath = dir;
+    setRootIndex(dirModel.index(dirPath));
 
     emit datapackChanged();
+}
+
+
+bool DatapackTreeView::event(QEvent *event) {
+    if (event->type() == QEvent::ToolTip) {
+        auto helpEvent = static_cast<QHelpEvent*>(event);
+        auto pos       = viewport()->mapFrom(this, helpEvent->pos());
+        auto index     = indexAt(pos);
+
+        if (visualRect(index).contains(pos)) {
+            QToolTip::showText(helpEvent->globalPos(),
+                               dirModel.filePath(index));
+        } else {
+            QToolTip::hideText();
+        }
+        return true;
+    } else {
+        return QTreeView::event(event);
+    }
 }
 
 
@@ -270,20 +290,21 @@ void DatapackTreeView::onFileRenamed(const QString &path,
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
-    if (pathToFileType(dirPath, oldpath) == CodeFile::Function) {
+    if (Glhp::pathToFileType(dirPath, oldpath) == CodeFile::Function) {
         if (isStringInTagFile(dirPath +
                               "/data/minecraft/tags/functions/load.json",
-                              toNamespacedID(dirPath, oldpath))) {
+                              Glhp::toNamespacedID(dirPath, oldpath))) {
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
-                toNamespacedID(dirPath, oldpath), false);
-            if (pathToFileType(dirPath, newpath) == CodeFile::Function) {
+                Glhp::toNamespacedID(dirPath, oldpath), false);
+            if (Glhp::pathToFileType(dirPath, newpath) == CodeFile::Function) {
                 if (!isStringInTagFile(dirPath +
                                        "/data/minecraft/tags/functions/load.json",
-                                       toNamespacedID(dirPath, newpath))) {
+                                       Glhp::toNamespacedID(dirPath,
+                                                            newpath))) {
                     contextMenuModifyTagFile
                         (dirPath + "/data/minecraft/tags/functions/load.json",
-                        toNamespacedID(dirPath, newpath), true);
+                        Glhp::toNamespacedID(dirPath, newpath), true);
                 }
             }
         }
@@ -301,7 +322,7 @@ void DatapackTreeView::contextMenuOnNewFolder() {
         QModelIndex     newDir;
         if (finfo.exists() && finfo.isFile())
             selected = selected.parent();
-        newDir = dirModel.mkdir(selected, "new_folder_" + randStr());
+        newDir = dirModel.mkdir(selected, "new_folder_" + Glhp::randStr());
         setCurrentIndex(newDir);
         edit(newDir);
     }
@@ -319,7 +340,7 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
         QDir tmpDir;
         if (!catDir.isEmpty()) {
             QString pathWithNspace = dirPath + "/data/"
-                                     + ((nspace.isEmpty()) ? relNamespace(
+                                     + ((nspace.isEmpty()) ? Glhp::relNamespace(
                                             dirPath,
                                             finfo.filePath()) : nspace);
             tmpDir = QDir(pathWithNspace);
@@ -465,16 +486,16 @@ void DatapackTreeView::contextMenuOnDelete() {
         dirModel.remove(selected);
         if (isStringInTagFile(dirPath +
                               "/data/minecraft/tags/functions/load.json",
-                              toNamespacedID(dirPath, filepath)))
+                              Glhp::toNamespacedID(dirPath, filepath)))
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
-                toNamespacedID(dirPath, filepath), false);
+                Glhp::toNamespacedID(dirPath, filepath), false);
         if (isStringInTagFile(dirPath +
                               "/data/minecraft/tags/functions/tick.json",
-                              toNamespacedID(dirPath, filepath)))
+                              Glhp::toNamespacedID(dirPath, filepath)))
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/tick.json",
-                toNamespacedID(dirPath, filepath), false);
+                Glhp::toNamespacedID(dirPath, filepath), false);
         emit fileDeteted(filepath);
     }
 }
@@ -484,10 +505,11 @@ void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {
 
     if (index.isValid()) {
         const QFileInfo finfo = dirModel.fileInfo(index);
+
         if (finfo.exists() && finfo.isFile()) {
             /*qDebug() << "Open from tree"; */
             setCurrentIndex(index);
-            emit openFileRequested(finfo.absoluteFilePath());
+            emit openFileRequested(finfo.filePath());
         }
     }
 }

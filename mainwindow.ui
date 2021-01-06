@@ -24,10 +24,25 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="opaqueResize">
+       <bool>true</bool>
       </property>
       <widget class="DatapackTreeView" name="datapackTreeView">
        <property name="sizePolicy">
@@ -35,12 +50,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>400</height>
-        </size>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::EditKeyPressed</set>
@@ -59,9 +68,6 @@
        </property>
        <property name="alternatingRowColors">
         <bool>false</bool>
-       </property>
-       <property name="animated">
-        <bool>true</bool>
        </property>
        <attribute name="headerVisible">
         <bool>false</bool>

@@ -9,6 +9,8 @@ FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
     this->parent = parent;
     setWindowFlag(Qt::Popup, true);
     setSelectionMode(QAbstractItemView::SingleSelection);
+    setSizeAdjustPolicy(QListWidget::AdjustToContents);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     initFileList();
 
@@ -31,6 +33,11 @@ FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
 
     setCurrentRow(parent->getCurIndex());
     onSelectNextItem();
+    setMinimumWidth(sizeHintForColumn(0) + 2 * frameWidth());
+    setMinimumHeight(sizeHintForRow(0) * count() + 2 * frameWidth());
+    setMaximumWidth(700);
+    setMaximumHeight(500);
+    adjustSize();
     show();
     grabMouse();
     setFocus();
@@ -81,10 +88,12 @@ void FileSwitcher::initFileList() {
     }
 
     for (const auto &file: *files) {
+        QFileInfo        finfo(file.fileInfo);
         QListWidgetItem *fileItem = new QListWidgetItem(this);
-        fileItem->setText(file.title);
+        fileItem->setText
+            (QDir::current().relativeFilePath(finfo.filePath()));
         fileItem->setIcon(Glhp::fileTypeToIcon(file.fileType));
-        fileItem->setToolTip(file.fileInfo.filePath());
+        fileItem->setToolTip(finfo.filePath());
         addItem(fileItem);
     }
 }
