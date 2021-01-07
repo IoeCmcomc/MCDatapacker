@@ -108,6 +108,12 @@ void LootTableEditorDock::readJson() {
     checkPools();
 }
 
+void LootTableEditorDock::changeEvent(QEvent *event) {
+    QDockWidget::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange)
+        retranslate();
+}
+
 void LootTableEditorDock::onAddPool() {
     /*qDebug() << "onAddPool"; */
     QStandardItem *item =
@@ -250,4 +256,8 @@ void LootTableEditorDock::readPoolJson(const QJsonObject &root) {
 
     ui->poolListView->setEnabled(true);
     ui->poolListView->setFocus();
+}
+
+void LootTableEditorDock::retranslate() {
+    ui->retranslateUi(this);
 }

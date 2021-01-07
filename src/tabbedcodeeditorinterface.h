@@ -54,6 +54,9 @@ signals:
     /*void curContentsChange(int position, int charsRemoved, int charsAdded); */
     void curModificationChanged(bool changed);
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private slots:
     void onModificationChanged(bool changed);
     void onTabChanged(int index);
@@ -74,6 +77,7 @@ private:
     void updateTabTitle(int index, bool changed = false);
 
     bool maybeSave(int index);
+    void retranslate();
 };
 
 #endif /* TABBEDCODEEDITORINTERFACE_H */

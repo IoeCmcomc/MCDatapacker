@@ -547,7 +547,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="resource/minecraft/minecraft.qrc">:/minecraft/texture/gui_fire.png</pixmap>
+                     <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/gui_fire.png</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -644,7 +644,7 @@
                <enum>Qt::PlainText</enum>
               </property>
               <property name="pixmap">
-               <pixmap resource="resource/minecraft/minecraft.qrc">:/minecraft/texture/right_arrow.png</pixmap>
+               <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/right_arrow.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -1023,24 +1023,24 @@
   <customwidget>
    <class>MCRInvSlot</class>
    <extends>QFrame</extends>
-   <header>mcrinvslot.h</header>
+   <header>src/mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QTabBar</class>
    <extends>QWidget</extends>
-   <header>qtabbar.h</header>
+   <header>src/qtabbar.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>StackedWidget</class>
    <extends>QStackedWidget</extends>
-   <header location="global">stackedwidget.h</header>
+   <header location="global">src/stackedwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resource/minecraft/minecraft.qrc"/>
+  <include location="../resource/minecraft/minecraft.qrc"/>
  </resources>
  <connections/>
 </ui>

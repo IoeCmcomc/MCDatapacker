@@ -208,7 +208,7 @@
   <customwidget>
    <class>OptionalSpinBox</class>
    <extends>QSpinBox</extends>
-   <header location="global">optionalspinbox.h</header>
+   <header location="global">src/optionalspinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

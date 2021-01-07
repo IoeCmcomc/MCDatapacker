@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QDir>
 
 namespace Ui {
     class SettingsDialog;
@@ -24,4 +25,4 @@ private:
     void setupLanguageSetting();
 };
 
-#endif // SETTINGSDIALOG_H
+#endif /* SETTINGSDIALOG_H */

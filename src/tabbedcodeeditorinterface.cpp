@@ -155,6 +155,10 @@ bool TabbedCodeEditorInterface::maybeSave(int index) {
     return true;
 }
 
+void TabbedCodeEditorInterface::retranslate() {
+    ui->retranslateUi(this);
+}
+
 int TabbedCodeEditorInterface::getCurIndex() const {
     return ui->tabBar->currentIndex();
 }
@@ -318,6 +322,12 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
             break;
         }
     }
+}
+
+void TabbedCodeEditorInterface::changeEvent(QEvent *event) {
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange)
+        retranslate();
 }
 
 void TabbedCodeEditorInterface::onTabChanged(int index) {

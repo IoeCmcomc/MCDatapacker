@@ -255,7 +255,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resource/app/app.qrc">
+       <iconset resource="../resource/app/app.qrc">
         <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
       </property>
      </widget>
@@ -277,8 +277,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>503</width>
-         <height>324</height>
+         <width>29</width>
+         <height>16</height>
         </rect>
        </property>
       </widget>
@@ -303,7 +303,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resource/app/app.qrc">
+       <iconset resource="../resource/app/app.qrc">
         <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
       </property>
      </widget>
@@ -350,8 +350,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>513</width>
-         <height>334</height>
+         <width>59</width>
+         <height>18</height>
         </rect>
        </property>
       </widget>
@@ -363,7 +363,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resource/app/app.qrc">
+       <iconset resource="../resource/app/app.qrc">
         <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
       </property>
      </widget>
@@ -397,8 +397,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>513</width>
-         <height>334</height>
+         <width>59</width>
+         <height>18</height>
         </rect>
        </property>
       </widget>
@@ -423,7 +423,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resource/app/app.qrc">
+       <iconset resource="../resource/app/app.qrc">
         <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
       </property>
      </widget>
@@ -435,17 +435,17 @@
   <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
+   <header location="global">src/truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>MCRInvSlot</class>
    <extends>QFrame</extends>
-   <header>mcrinvslot.h</header>
+   <header>src/mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resource/app/app.qrc"/>
+  <include location="../resource/app/app.qrc"/>
  </resources>
  <connections/>
 </ui>

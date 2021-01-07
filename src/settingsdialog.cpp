@@ -23,25 +23,30 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 }
 
 void SettingsDialog::setupLanguageSetting() {
-    QString m_langPath = QApplication::applicationDirPath()
-                         + "/translations";
-    QDir dir(m_langPath);
-    //qDebug() << dir.exists() << dir.isEmpty();
+    ui->languageCombo->addItem(tr("<Default>"), "");
+
+    QDir dir(QStringLiteral(":/i18n"));
+    dir.setNameFilters({ QStringLiteral("*.qm") });
+
     QStringList fileNames = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
 
-    //qDebug() << fileNames.count() << dir.count();
+    dir.setPath(QApplication::applicationDirPath() +
+                QStringLiteral("/translations"));
 
-    ui->languageCombo->addItem(tr("<Default>"), "");
+    fileNames += dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    fileNames.removeDuplicates();
+
     for (int i = 0; i < fileNames.size(); ++i) {
         QString locale = fileNames[i].section('.', 0, 0).section('_', 1);
 
         QString lang = QString("%1 (%2)").arg(
             QLocale::languageToString(QLocale(locale).language()),
             QLocale(locale).nativeLanguageName());
-        //QIcon ico(QString("%1_%2.png").arg(m_langPath).arg(locale));
+        /*QIcon ico(QString("%1_%2.png").arg(m_langPath).arg(locale)); */
 
         ui->languageCombo->addItem(lang, locale);
     }
+
 
     ui->languageCombo->addItem(QString("%1 (%2)").arg(
                                    QLocale::languageToString(QLocale("en_US").

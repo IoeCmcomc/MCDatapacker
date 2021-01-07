@@ -22,6 +22,9 @@ public:
     void writeJson();
     void readJson();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 protected slots:
     void onAddPool();
     void onDeletePool();
@@ -53,6 +56,7 @@ private:
     void getSelectedPool();
     QJsonObject writePoolJson();
     void readPoolJson(const QJsonObject &root);
+    void retranslate();
 };
 
 #endif /* LOOTTABLEEDITORDOCK_H */

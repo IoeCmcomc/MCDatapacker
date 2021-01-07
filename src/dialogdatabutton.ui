@@ -78,7 +78,7 @@
       <string>Click to reset</string>
      </property>
      <property name="icon">
-      <iconset resource="resource/app/app.qrc">
+      <iconset resource="../resource/app/app.qrc">
        <normaloff>:/icon/reset.png</normaloff>:/icon/reset.png</iconset>
      </property>
     </widget>
@@ -86,7 +86,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resource/app/app.qrc"/>
+  <include location="../resource/app/app.qrc"/>
  </resources>
  <connections/>
 </ui>

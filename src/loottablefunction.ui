@@ -1086,7 +1086,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resource/app/app.qrc">
+       <iconset resource="../resource/app/app.qrc">
         <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
       </property>
      </widget>
@@ -1108,8 +1108,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>433</width>
-         <height>286</height>
+         <width>29</width>
+         <height>16</height>
         </rect>
        </property>
       </widget>
@@ -1134,7 +1134,7 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset resource="resource/app/app.qrc">
+       <iconset resource="../resource/app/app.qrc">
         <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
       </property>
      </widget>
@@ -1146,28 +1146,28 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">src/numericinput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
+   <header location="global">src/truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>OptionalSpinBox</class>
    <extends>QSpinBox</extends>
-   <header location="global">optionalspinbox.h</header>
+   <header location="global">src/optionalspinbox.h</header>
   </customwidget>
   <customwidget>
    <class>RawJsonTextEdit</class>
    <extends>QFrame</extends>
-   <header location="global">rawjsontextedit.h</header>
+   <header location="global">src/rawjsontextedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resource/app/app.qrc"/>
+  <include location="../resource/app/app.qrc"/>
  </resources>
  <connections/>
 </ui>
