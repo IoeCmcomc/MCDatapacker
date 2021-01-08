@@ -50,6 +50,7 @@ private slots:
     void saveAll();
     void pref_settings();
     void about();
+    void disclaimer();
     void onSystemWatcherFileChanged(const QString &filepath);
     void onCurFileChanged(const QString &path);
     void onDatapackChanged();

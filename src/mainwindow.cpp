@@ -4,6 +4,7 @@
 #include "newdatapackdialog.h"
 #include "settingsdialog.h"
 #include "aboutdialog.h"
+#include "disclaimerdialog.h"
 #include "globalhelpers.h"
 #include "tabbedcodeeditorinterface.h"
 
@@ -49,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAboutQt, &QAction::triggered, [this]() {
         QMessageBox::aboutQt(this);
     });
+    connect(ui->actionDisclaimer, &QAction::triggered,
+            this, &MainWindow::disclaimer);
     connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
             this, &MainWindow::onSystemWatcherFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::fileRenamed,
@@ -125,6 +128,12 @@ void MainWindow::pref_settings() {
 
 void MainWindow::about() {
     auto *dialog = new AboutDialog(this);
+
+    dialog->open();
+}
+
+void MainWindow::disclaimer() {
+    auto *dialog = new DisclaimerDialog(this);
 
     dialog->open();
 }

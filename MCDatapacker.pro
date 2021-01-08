@@ -24,6 +24,7 @@ SOURCES += \
     src/datapackfileiconprovider.cpp \
     src/datapacktreeview.cpp \
     src/dialogdatabutton.cpp \
+    src/disclaimerdialog.cpp \
     src/entityconditiondialog.cpp \
     src/extendeddelegate.cpp \
     src/fileswitcher.cpp \
@@ -66,6 +67,7 @@ HEADERS += \
     src/datapackfileiconprovider.h \
     src/datapacktreeview.h \
     src/dialogdatabutton.h \
+    src/disclaimerdialog.h \
     src/entityconditiondialog.h \
     src/extendeddelegate.h \
     src/fileswitcher.h \
@@ -104,6 +106,7 @@ FORMS += \
     src/aboutdialog.ui \
     src/blockitemselectordialog.ui \
     src/dialogdatabutton.ui \
+    src/disclaimerdialog.ui \
     src/entityconditiondialog.ui \
     src/itemconditiondialog.ui \
     src/locationconditiondialog.ui \
