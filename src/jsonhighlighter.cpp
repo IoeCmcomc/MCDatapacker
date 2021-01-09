@@ -3,7 +3,7 @@
 #include <QColor>
 #include <QDebug>
 
-JsonHighlighter::JsonHighlighter(QObject *parent)
+JsonHighlighter::JsonHighlighter(QTextDocument *parent)
     : Highlighter(parent) {
     setupRules();
 }

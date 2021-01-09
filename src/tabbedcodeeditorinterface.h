@@ -64,6 +64,7 @@ private slots:
     void onCloseFile(int index);
     void onSwitchFile();
     void onCurTextChanged();
+    void onCurFileChanged(const QString &path);
 
 private:
     Ui::TabbedCodeEditorInterface *ui;

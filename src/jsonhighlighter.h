@@ -9,7 +9,7 @@
 class JsonHighlighter : public Highlighter
 {
 public:
-    JsonHighlighter(QObject *parent = 0);
+    JsonHighlighter(QTextDocument *parent = 0);
 
 protected:
     void highlightBlock(const QString &text) override;

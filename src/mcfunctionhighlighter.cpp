@@ -3,7 +3,7 @@
 
 #include <QDebug>
 
-McfunctionHighlighter::McfunctionHighlighter(QObject *parent)
+McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
     : Highlighter(parent) {
     setupRules();
 }

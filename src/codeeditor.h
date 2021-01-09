@@ -3,8 +3,6 @@
 
 #include <QPlainTextEdit>
 
-#include "jsonhighlighter.h"
-#include "mcfunctionhighlighter.h"
 #include "codefile.h"
 
 class CodeEditor : public QPlainTextEdit
@@ -13,17 +11,13 @@ class CodeEditor : public QPlainTextEdit
 
 public:
     CodeEditor(QWidget *parent = nullptr);
-    struct CurrentNamespacedID {
-        int     startingIndex;
-        int     blockNumber;
-        QString string;
-        QString link;
-    };
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int lineNumberAreaWidth();
 
     void setFilePath(const QString &path);
+
+    void setCurHighlighter(Highlighter *value);
 
 signals:
     void openFile(const QString &filepath);
@@ -48,8 +42,6 @@ private:
     QWidget *lineNumberArea;
     CodeFile::FileType curFileType = CodeFile::Text;
     QString filepath;
-    JsonHighlighter *jsonHighlighter;
-    McfunctionHighlighter *mcfunctionHighlighter;
     QTextCharFormat bracketSeclectFmt;
     Highlighter *curHighlighter;
 

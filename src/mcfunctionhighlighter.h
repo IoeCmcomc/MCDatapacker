@@ -8,7 +8,7 @@
 class McfunctionHighlighter : public Highlighter
 {
 public:
-    McfunctionHighlighter(QObject *parent = nullptr);
+    McfunctionHighlighter(QTextDocument *parent = nullptr);
 
 protected:
     void highlightBlock(const QString &text) override;

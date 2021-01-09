@@ -23,9 +23,7 @@
 #include <QShortcut>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
-    lineNumberArea        = new LineNumberArea(this);
-    jsonHighlighter       = new JsonHighlighter(this);
-    mcfunctionHighlighter = new McfunctionHighlighter(this);
+    lineNumberArea = new LineNumberArea(this);
 
     connect(this, &CodeEditor::blockCountChanged,
             this, &CodeEditor::updateLineNumberAreaWidth);
@@ -200,25 +198,10 @@ void CodeEditor::highlightCurrentLine() {
 }
 
 void CodeEditor::setFilePath(const QString &path) {
-    filepath    = path;
-    curFileType = Glhp::pathToFileType(QDir::currentPath(), path);
+    filepath = path;
 
     document()->setDefaultFont(monoFont);
     setFont(monoFont);
-
-    if (curFileType == CodeFile::Function) {
-        jsonHighlighter->setDocument(nullptr);
-        mcfunctionHighlighter->setDocument(document());
-        curHighlighter = mcfunctionHighlighter;
-    } else if (curFileType >= CodeFile::JsonText) {
-        mcfunctionHighlighter->setDocument(nullptr);
-        jsonHighlighter->setDocument(document());
-        curHighlighter = jsonHighlighter;
-    } else {
-        jsonHighlighter->setDocument(nullptr);
-        mcfunctionHighlighter->setDocument(nullptr);
-        curHighlighter = nullptr;
-    }
 }
 
 int CodeEditor::lineNumberAreaWidth() {
@@ -262,6 +245,10 @@ void CodeEditor::openReplaceDialog() {
 
     frdialog->setEditor(this);
     frdialog->show();
+}
+
+void CodeEditor::setCurHighlighter(Highlighter *value) {
+    curHighlighter = value;
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {

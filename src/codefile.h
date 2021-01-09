@@ -1,6 +1,8 @@
 #ifndef CODEFILE_H
 #define CODEFILE_H
 
+#include "highlighter.h"
+
 #include <QTextDocument>
 #include <QFileInfo>
 #include <QDebug>
@@ -25,6 +27,7 @@ struct CodeFile {
     QString        title;
     QTextDocument *doc        = new QTextDocument();
     QTextCursor    textCursor = QTextCursor(doc);
+    Highlighter   *highlighter;
 
     CodeFile(const QString &path);
 

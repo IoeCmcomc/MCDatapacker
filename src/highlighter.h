@@ -49,7 +49,7 @@ public:
         QuotedString,
         Comment
     };
-    Highlighter(QObject *parent);
+    Highlighter(QTextDocument *parent);
 
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;

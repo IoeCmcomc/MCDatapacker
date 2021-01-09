@@ -381,7 +381,7 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     else
         tmpMap2 = root.toVariantMap();
     if (!tmpMap2.isEmpty())
-        retMap.unite(tmpMap2);
+        retMap.insert(tmpMap2);
     return retMap;
 }
 

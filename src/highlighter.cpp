@@ -44,7 +44,7 @@ void TextBlockData::insert(NamespacedIdInfo *info) {
 }
 
 
-Highlighter::Highlighter(QObject *parent) : QSyntaxHighlighter(parent) {
+Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     auto fmt = QTextCharFormat();
 
     fmt.setForeground(QColor(QStringLiteral("#A31621")));

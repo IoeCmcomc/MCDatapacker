@@ -4,6 +4,8 @@
 #include "globalhelpers.h"
 #include "mainwindow.h"
 #include "fileswitcher.h"
+#include "mcfunctionhighlighter.h"
+#include "jsonhighlighter.h"
 
 #include <QMessageBox>
 #include <QTextStream>
@@ -34,7 +36,7 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     connect(ui->codeEditor->document(), &QTextDocument::modificationChanged,
             this, &TabbedCodeEditorInterface::onModificationChanged);
     connect(this, &TabbedCodeEditorInterface::curFileChanged,
-            ui->codeEditor, &CodeEditor::setFilePath);
+            this, &TabbedCodeEditorInterface::onCurFileChanged);
     connect(ui->codeEditor, &CodeEditor::openFile,
             this, &TabbedCodeEditorInterface::onOpenFile);
     connect(ui->codeEditor, &CodeEditor::textChanged,
@@ -208,6 +210,11 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
         newFile.doc->setPlainText(content);
         newFile.textCursor.setPosition(0);
         newFile.fileType = Glhp::pathToFileType(QDir::currentPath(), path);
+        if (newFile.fileType == CodeFile::Function) {
+            newFile.highlighter = new McfunctionHighlighter(newFile.doc);
+        } else if (newFile.fileType >= CodeFile::JsonText) {
+            newFile.highlighter = new JsonHighlighter(newFile.doc);
+        }
 
 #ifndef QT_NO_CURSOR
         QGuiApplication::restoreOverrideCursor();
@@ -427,4 +434,10 @@ void TabbedCodeEditorInterface::onCurTextChanged() {
             ui->codeEditor->setExtraSelections(selections);
         }
     }
+}
+
+void TabbedCodeEditorInterface::onCurFileChanged(const QString &path) {
+    ui->codeEditor->setFilePath(path);
+    ui->codeEditor->setCurHighlighter(
+        (!isNoFile()) ? getCurFile()->highlighter : nullptr);
 }
