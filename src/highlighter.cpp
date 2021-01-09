@@ -7,6 +7,13 @@
 #include <QDir>
 #include <QRegularExpression>
 
+void TextBlockData::clear() {
+    qDeleteAll(m_brackets);
+    m_brackets.clear();
+    qDeleteAll(m_namespaceIds);
+    m_namespaceIds.clear();
+}
+
 QVector<BracketInfo *> TextBlockData::brackets() {
     return m_brackets;
 }
@@ -55,6 +62,7 @@ void Highlighter::highlightBlock(const QString &text) {
         if (currentBlockUserData()) {
             data =
                 dynamic_cast<TextBlockData*>(currentBlockUserData());
+            data->clear();
         } else {
             data = new TextBlockData();
         }
@@ -101,7 +109,9 @@ void Highlighter::highlightBlock(const QString &text) {
 
         collectNamespacedIds(text, data);
 
-        setCurrentBlockUserData(data);
+        if (!currentBlockUserData()) {
+            setCurrentBlockUserData(data);
+        }
     }
 }
 

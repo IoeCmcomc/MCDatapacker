@@ -769,7 +769,8 @@ void MCRPredCondition::toolEnchant_onAdded() {
         return;
     }
     QString enchantmentText = ui->toolEnchant_enchantCombo->currentText();
-    if (!ui->toolEnchant_table->findItems(enchantmentText, 0).isEmpty())
+    if (!ui->toolEnchant_table->findItems(enchantmentText,
+                                          Qt::MatchExactly).isEmpty())
         return;
 
     QTableWidgetItem *enchantItem = new QTableWidgetItem(enchantmentText);

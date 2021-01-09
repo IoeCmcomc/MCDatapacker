@@ -5,6 +5,8 @@
 #include "datapacktreeview.h"
 #include "mainwindow.h"
 #include "globalhelpers.h"
+#include "lib/QFindDialogs/src/finddialog.h"
+#include "lib/QFindDialogs/src/findreplacedialog.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -18,6 +20,7 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QFont>
+#include <QShortcut>
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     lineNumberArea        = new LineNumberArea(this);
@@ -30,6 +33,11 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
             this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
+
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
+            &QShortcut::activated, this, &CodeEditor::openFindDialog);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this),
+            &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
 
     monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     monoFont.setPointSize(13);
@@ -48,7 +56,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
-        int delta = e->delta() / 120;
+        int delta = e->angleDelta().y() / 120;
         monoFont.setPointSize(monoFont.pointSize() + delta);
         this->setFont(monoFont);
     }
@@ -240,6 +248,20 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
 
     if (rect.contains(viewport()->rect()))
         updateLineNumberAreaWidth(0);
+}
+
+void CodeEditor::openFindDialog() {
+    auto *fdialog = new FindDialog(this);
+
+    fdialog->setEditor(this);
+    fdialog->show();
+}
+
+void CodeEditor::openReplaceDialog() {
+    auto *frdialog = new FindReplaceDialog(this);
+
+    frdialog->setEditor(this);
+    frdialog->show();
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {

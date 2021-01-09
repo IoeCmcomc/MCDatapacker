@@ -26,8 +26,11 @@ class TextBlockData : public QTextBlockUserData
 public:
     TextBlockData() = default;
 
+    void clear();
+
     QVector<BracketInfo *> brackets();
     QVector<NamespacedIdInfo *> namespacedIds();
+
     void insert(BracketInfo *info);
     void insert(NamespacedIdInfo *info);
 

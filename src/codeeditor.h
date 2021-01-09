@@ -2,7 +2,6 @@
 #define CODEEDITOR_H
 
 #include <QPlainTextEdit>
-#include <QString>
 
 #include "jsonhighlighter.h"
 #include "mcfunctionhighlighter.h"
@@ -41,6 +40,8 @@ private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void onCursorPositionChanged();
     void updateLineNumberArea(const QRect &rect, int dy);
+    void openFindDialog();
+    void openReplaceDialog();
 
 private:
     QFont monoFont;

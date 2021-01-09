@@ -16,6 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    lib/QFindDialogs/src/finddialog.cpp \
+    lib/QFindDialogs/src/findreplacedialog.cpp \
     src/aboutdialog.cpp \
     src/basecondition.cpp \
     src/blockitemselectordialog.cpp \
@@ -59,6 +61,8 @@ SOURCES += \
     src/visualrecipeeditordock.cpp
 
 HEADERS += \
+    lib/QFindDialogs/src/finddialog.h \
+    lib/QFindDialogs/src/findreplacedialog.h \
     src/aboutdialog.h \
     src/basecondition.h \
     src/blockitemselectordialog.h \
@@ -145,4 +149,14 @@ QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
 
 DISTFILES += \
+    lib/QFindDialogs/.gitignore \
+    lib/QFindDialogs/AUTHORS \
+    lib/QFindDialogs/CONTRIBUTORS \
+    lib/QFindDialogs/LICENSE \
+    lib/QFindDialogs/README.md \
+    lib/QFindDialogs/snaps/README.txt \
+    lib/QFindDialogs/snaps/screenshot.png \
+    lib/QFindDialogs/snaps/screenshot2.png \
+    lib/QFindDialogs/snaps/screenshot3.png \
+    lib/QFindDialogs/src/README.txt \
     src/MCDatapacker_vi_VN.ts

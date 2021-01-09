@@ -41,7 +41,7 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             &QShortcut::activated, [this]() {
         onCloseFile(getCurIndex());
     });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, nullptr),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this),
             &QShortcut::activated, this,
             &TabbedCodeEditorInterface::onSwitchFile);
 }

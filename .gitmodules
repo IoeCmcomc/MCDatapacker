@@ -1,0 +1,3 @@
+[submodule "lib/QFindDialogs"]
+	path = lib/QFindDialogs
+	url = https://github.com/teamYetZio/QFindDialogs

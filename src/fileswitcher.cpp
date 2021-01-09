@@ -18,12 +18,10 @@ FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
             this, &QObject::deleteLater);
     connect(this, &QListWidget::itemActivated,
             this, &QObject::deleteLater);
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this,
-                          nullptr, nullptr, Qt::WidgetWithChildrenShortcut),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this),
             &QShortcut::activated, this, &FileSwitcher::onSelectNextItem);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Tab),
-                          this, nullptr, nullptr,
-                          Qt::WidgetWithChildrenShortcut),
+                          this),
             &QShortcut::activated, this, &FileSwitcher::onSelectPrevItem);
 
     QRect parentRect(parentWidget()->mapToGlobal(QPoint(0, 0)),

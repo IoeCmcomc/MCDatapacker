@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QRandomGenerator>
 
 using namespace Glhp;
 
@@ -11,7 +12,7 @@ QString Glhp::randStr(int length) {
     QString       r;
 
     for (int i = 0; i < (length + 1); ++i) {
-        int index = qrand() % charset.length();
+        int index = QRandomGenerator::global()->bounded(charset.length());
         r.append(charset.at(index));
     }
     return r;

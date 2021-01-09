@@ -705,7 +705,8 @@ void LootTableFunction::copyState_onAdded() {
 void LootTableFunction::enchantRand_onAdded() {
     QString enchantmentText = ui->enchantRand_enchantCombo->currentText();
 
-    if (!ui->enchantRand_list->findItems(enchantmentText, nullptr).isEmpty())
+    if (!ui->enchantRand_list->findItems(enchantmentText,
+                                         Qt::MatchExactly).isEmpty())
         return;
 
     auto *enchantItem = new QListWidgetItem(enchantmentText);

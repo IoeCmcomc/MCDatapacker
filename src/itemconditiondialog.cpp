@@ -136,7 +136,8 @@ void ItemConditionDialog::onAddedEnchant() {
         return;
     }
     QString enchantmentText = ui->enchant_combo->currentText();
-    if (!ui->enchant_table->findItems(enchantmentText, nullptr).isEmpty())
+    if (!ui->enchant_table->findItems(enchantmentText,
+                                      Qt::MatchExactly).isEmpty())
         return;
 
     auto *enchantItem = new QTableWidgetItem(enchantmentText);
@@ -158,7 +159,8 @@ void ItemConditionDialog::onAddedStoredEnchant() {
         return;
     }
     QString enchantmentText = ui->stored_combo->currentText();
-    if (!ui->stored_table->findItems(enchantmentText, nullptr).isEmpty())
+    if (!ui->stored_table->findItems(enchantmentText,
+                                     Qt::MatchExactly).isEmpty())
         return;
 
     auto *enchantItem = new QTableWidgetItem(enchantmentText);
