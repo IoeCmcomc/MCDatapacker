@@ -63,6 +63,7 @@ private slots:
     void onTabMoved(int from, int to);
     void onCloseFile(int index);
     void onSwitchFile();
+    void onCurTextChanged();
 
 private:
     Ui::TabbedCodeEditorInterface *ui;

@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QSaveFile>
 #include <QShortcut>
+#include <QJsonDocument>
 
 
 TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
@@ -36,6 +37,8 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             ui->codeEditor, &CodeEditor::setFilePath);
     connect(ui->codeEditor, &CodeEditor::openFile,
             this, &TabbedCodeEditorInterface::onOpenFile);
+    connect(ui->codeEditor, &CodeEditor::textChanged,
+            this, &TabbedCodeEditorInterface::onCurTextChanged);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
             &QShortcut::activated, [this]() {
@@ -384,5 +387,44 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
 void TabbedCodeEditorInterface::onSwitchFile() {
     if (!isNoFile()) {
         new FileSwitcher(this);
+    }
+}
+
+void TabbedCodeEditorInterface::onCurTextChanged() {
+    auto *curFile = getCurFile();
+
+    if (!curFile) {
+        return;
+    }
+
+    if (curFile->fileType >= CodeFile::JsonText) {
+        QJsonParseError jsonErr{};
+        auto            jsonDoc = QJsonDocument::fromJson(
+            curFile->doc->toPlainText().toUtf8(), &jsonErr);
+        if (!jsonDoc.isNull()) {
+        } else {
+            qDebug() << jsonErr.errorString() << jsonErr.offset;
+            ui->codeEditor->setExtraSelections({});
+
+            QList<QTextEdit::ExtraSelection> selections =
+                ui->codeEditor->extraSelections();
+
+            if (!ui->codeEditor->isReadOnly()) {
+                QTextEdit::ExtraSelection selection;
+
+                selection.format = QTextCharFormat();
+                selection.format.setUnderlineStyle(
+                    QTextCharFormat::SpellCheckUnderline);
+                selection.format.setUnderlineColor(Qt::red);
+                selection.format.setBackground(QColor(100, 0, 0, 127));
+                selection.cursor = ui->codeEditor->textCursor();
+                selection.cursor.setPosition(jsonErr.offset - 1);
+                selection.format.setProperty(QTextFormat::FullWidthSelection,
+                                             true);
+
+                selections.append(selection);
+            }
+            ui->codeEditor->setExtraSelections(selections);
+        }
     }
 }
