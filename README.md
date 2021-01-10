@@ -1,6 +1,7 @@
 ![GitHub](https://img.shields.io/github/license/IoeCmcomc/MCDatapacker)
 ![GitHub repo size](https://img.shields.io/github/repo-size/IoeCmcomc/MCDatapacker)
 ![Lines of code](https://img.shields.io/tokei/lines/github/IoeCmcomc/MCDatapacker)
+[![HitCount](http://hits.dwyl.com/IoeCmcomc/MCDatapacker.svg)](http://hits.dwyl.com/IoeCmcomc/MCDatapacker)
 
 ![](https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png?token=AMZ6227FGWS3BYPMKOT5HFC73X5R2)
 
