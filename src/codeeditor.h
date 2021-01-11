@@ -19,6 +19,9 @@ public:
 
     void setCurHighlighter(Highlighter *value);
 
+    void displayErrors();
+    void updateErrorSelections();
+
 signals:
     void openFile(const QString &filepath);
 
@@ -43,7 +46,11 @@ private:
     CodeFile::FileType curFileType = CodeFile::Text;
     QString filepath;
     QTextCharFormat bracketSeclectFmt;
+    QTextCharFormat errorHighlightRule;
+    QTextCharFormat warningHighlightRule;
     Highlighter *curHighlighter;
+    QList<QTextEdit::ExtraSelection> problemExtraSelections;
+    int problemSelectionStartIndex;
 
     void highlightCurrentLine();
     void matchParentheses();

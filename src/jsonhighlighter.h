@@ -1,10 +1,11 @@
 #ifndef JSONHIGHLIGHTER_H
 #define JSONHIGHLIGHTER_H
 
+#include "highlighter.h"
+
 #include <QRegularExpression>
 #include <QTextDocument>
-
-#include "highlighter.h"
+#include <QJsonDocument>
 
 class JsonHighlighter : public Highlighter
 {
@@ -13,10 +14,9 @@ public:
 
 protected:
     void highlightBlock(const QString &text) override;
+    void checkProblems() override;
 
 private:
-    void setupRules();
-
     struct HighlightingRule {
         QRegularExpression pattern;
         QTextCharFormat    format;
@@ -28,6 +28,10 @@ private:
     QTextCharFormat cBracketFormat;
     QTextCharFormat rBracketFormat;
     QTextCharFormat quotationFormat;
+
+    QJsonParseError jsonErr;
+
+    void setupRules();
 };
 
 #endif /* JSONHIGHLIGHTER_H */

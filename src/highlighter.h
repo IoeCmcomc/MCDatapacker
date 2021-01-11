@@ -3,9 +3,11 @@
 
 #include <QSyntaxHighlighter>
 
+#include <optional>
+
 struct BracketInfo {
-    char character;
     int  position;
+    char character;
 };
 
 struct BracketPair {
@@ -17,6 +19,19 @@ struct NamespacedIdInfo {
     int     start;
     int     length;
     QString link;
+};
+
+struct ProblemInfo {
+    int     start;
+    int     length;
+    QString message;
+    bool    isError   = false;
+    bool    isWarning = false;
+
+    ProblemInfo(bool isError = false) {
+        this->isError   = isError;
+        this->isWarning = !isError;
+    }
 };
 
 class CodeEditor;
@@ -34,9 +49,13 @@ public:
     void insert(BracketInfo *info);
     void insert(NamespacedIdInfo *info);
 
+    std::optional<ProblemInfo> problem() const;
+    void setProblem(const std::optional<ProblemInfo> &problem);
+
 private:
     QVector<BracketInfo*> m_brackets;
     QVector<NamespacedIdInfo*> m_namespaceIds;
+    std::optional<ProblemInfo> m_problem;
 };
 
 class Highlighter : public QSyntaxHighlighter
@@ -51,6 +70,10 @@ public:
     };
     Highlighter(QTextDocument *parent);
 
+    QTextDocument *getParentDoc() const;
+
+    virtual void checkProblems() = 0;
+
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
     QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
@@ -61,6 +84,8 @@ protected:
     void highlightBlock(const QString &text);
 
 private:
+    QTextDocument *m_parentDoc;
+
     void collectNamespacedIds(const QString &text, TextBlockData *data);
     QString locateNamespacedId(QString id);
 };

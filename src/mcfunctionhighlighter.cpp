@@ -145,3 +145,6 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 
     setCurrentBlockState(0);
 }
+
+void McfunctionHighlighter::checkProblems() {
+}

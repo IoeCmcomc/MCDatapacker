@@ -398,42 +398,15 @@ void TabbedCodeEditorInterface::onSwitchFile() {
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
+    /*qDebug() << "TabbedCodeEditorInterface::onCurTextChanged"; */
     auto *curFile = getCurFile();
 
     if (!curFile) {
         return;
     }
 
-    if (curFile->fileType >= CodeFile::JsonText) {
-        QJsonParseError jsonErr{};
-        auto            jsonDoc = QJsonDocument::fromJson(
-            curFile->doc->toPlainText().toUtf8(), &jsonErr);
-        if (!jsonDoc.isNull()) {
-        } else {
-            qDebug() << jsonErr.errorString() << jsonErr.offset;
-            ui->codeEditor->setExtraSelections({});
-
-            QList<QTextEdit::ExtraSelection> selections =
-                ui->codeEditor->extraSelections();
-
-            if (!ui->codeEditor->isReadOnly()) {
-                QTextEdit::ExtraSelection selection;
-
-                selection.format = QTextCharFormat();
-                selection.format.setUnderlineStyle(
-                    QTextCharFormat::SpellCheckUnderline);
-                selection.format.setUnderlineColor(Qt::red);
-                selection.format.setBackground(QColor(100, 0, 0, 127));
-                selection.cursor = ui->codeEditor->textCursor();
-                selection.cursor.setPosition(jsonErr.offset - 1);
-                selection.format.setProperty(QTextFormat::FullWidthSelection,
-                                             true);
-
-                selections.append(selection);
-            }
-            ui->codeEditor->setExtraSelections(selections);
-        }
-    }
+    curFile->highlighter->checkProblems();
+    ui->codeEditor->updateErrorSelections();
 }
 
 void TabbedCodeEditorInterface::onCurFileChanged(const QString &path) {

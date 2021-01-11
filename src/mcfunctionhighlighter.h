@@ -12,6 +12,7 @@ public:
 
 protected:
     void highlightBlock(const QString &text) override;
+    void checkProblems() override;
 
 private:
     void setupRules();

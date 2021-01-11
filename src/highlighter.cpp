@@ -12,6 +12,7 @@ void TextBlockData::clear() {
     m_brackets.clear();
     qDeleteAll(m_namespaceIds);
     m_namespaceIds.clear();
+    m_problem = std::nullopt;
 }
 
 QVector<BracketInfo *> TextBlockData::brackets() {
@@ -43,8 +44,16 @@ void TextBlockData::insert(NamespacedIdInfo *info) {
     m_namespaceIds.insert(i, info);
 }
 
+std::optional<ProblemInfo> TextBlockData::problem() const {
+    return m_problem;
+}
+
+void TextBlockData::setProblem(const std::optional<ProblemInfo> &problem) {
+    m_problem = problem;
+}
 
 Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
+    m_parentDoc = parent;
     auto fmt = QTextCharFormat();
 
     fmt.setForeground(QColor(QStringLiteral("#A31621")));
@@ -115,6 +124,10 @@ void Highlighter::highlightBlock(const QString &text) {
     }
 }
 
+QTextDocument *Highlighter::getParentDoc() const {
+    return m_parentDoc;
+}
+
 void Highlighter::collectNamespacedIds(const QString &text,
                                        TextBlockData *data) {
     QRegularExpression namespacedIdRegex =
@@ -159,6 +172,7 @@ QString Highlighter::locateNamespacedId(QString id) {
             return path + QStringLiteral(".json");
         }
     }
+
 
     return "";
 }

@@ -48,6 +48,15 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     /*bracketSeclectFmt.setBackground(Qt::white); */
     bracketSeclectFmt.setBackground(QColor(102, 227, 102, 170));
 
+    /*
+       errorHighlightRule.setUnderlineStyle(
+          QTextCharFormat::SpellCheckUnderline);
+       errorHighlightRule.setUnderlineColor(Qt::red);
+     */
+    errorHighlightRule.setBackground(QColor(255, 127, 127, 100));
+    errorHighlightRule.setProperty(QTextFormat::FullWidthSelection,
+                                   true);
+
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
 }
@@ -172,9 +181,14 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 }
 
 void CodeEditor::onCursorPositionChanged() {
+    /*qDebug() << "CodeEditor::onCursorPositionChanged"; */
     setExtraSelections({});
     highlightCurrentLine();
     matchParentheses();
+    problemSelectionStartIndex = extraSelections().size() - 1;
+    if (!problemExtraSelections.isEmpty()) {
+        setExtraSelections(extraSelections() << problemExtraSelections);
+    }
 }
 
 
@@ -249,6 +263,49 @@ void CodeEditor::openReplaceDialog() {
 
 void CodeEditor::setCurHighlighter(Highlighter *value) {
     curHighlighter = value;
+}
+
+void CodeEditor::displayErrors() {
+    qDebug() << "CodeEditor::displayErrors";
+    if (!isReadOnly()) {
+        auto selections = extraSelections().mid(0,
+                                                problemSelectionStartIndex + 1);
+        selections += problemExtraSelections;
+
+        setExtraSelections(selections);
+    }
+}
+
+void CodeEditor::updateErrorSelections() {
+    qDebug() << "CodeEditor::updateErrorSelections";
+    if (!isReadOnly()) {
+        if (!document() || !curHighlighter)
+            return;
+
+        problemExtraSelections.clear();
+
+        for (auto it = document()->firstBlock();
+             it != document()->end(); it = it.next()) {
+            if (TextBlockData *data =
+                    dynamic_cast<TextBlockData *>(it.userData())) {
+                if (std::optional<ProblemInfo> problem =
+                        data->problem(); problem) {
+                    QTextEdit::ExtraSelection selection;
+                    selection.cursor = textCursor();
+                    selection.cursor.setPosition(problem->start);
+                    selection.cursor.clearSelection();
+                    selection.format = errorHighlightRule;
+                    problemExtraSelections << selection;
+                }
+/*
+              qDebug() << "Line" << it.blockNumber()
+                       << ", has error:"
+                       << (data->problem() != std::nullopt);
+ */
+            }
+        }
+    }
+    displayErrors();
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
