@@ -398,7 +398,7 @@ void TabbedCodeEditorInterface::onSwitchFile() {
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
-    /*qDebug() << "TabbedCodeEditorInterface::onCurTextChanged"; */
+    qDebug() << "TabbedCodeEditorInterface::onCurTextChanged";
     auto *curFile = getCurFile();
 
     if (!curFile) {

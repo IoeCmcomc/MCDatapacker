@@ -32,6 +32,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e) override;
     void dropEvent(QDropEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
+    bool event(QEvent *event) override;
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);

@@ -65,7 +65,7 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
 }
 
 void Highlighter::highlightBlock(const QString &text) {
-    /*qDebug() << "Highlighter::highlightBlock" << text; */
+    qDebug() << "Highlighter::highlightBlock" << text;
     if (document()) {
         TextBlockData *data;
         if (currentBlockUserData()) {

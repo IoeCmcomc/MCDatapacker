@@ -20,6 +20,7 @@ void McfunctionHighlighter::setupRules() {
 
     keywordFormat.setForeground(Qt::blue);
     keywordFormat.setFontWeight(QFont::Bold);
+    keywordFormat.setToolTip("minecraft command");
     const QString keywordPatterns[] = {
         QStringLiteral("\\badvancement\\b"),
         QStringLiteral("\\bban\\b"),
@@ -112,7 +113,6 @@ void McfunctionHighlighter::setupRules() {
     highlightingRules.append(rule);
 
     namespacedIDFormat.setForeground(QColor("#45503B"));
-    namespacedIDFormat.setFontWeight(QFont::Bold);
     rule.pattern =
         QRegularExpression(QStringLiteral("\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
     rule.format = namespacedIDFormat;
@@ -140,6 +140,19 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                 setFormat(match.capturedStart(), match.capturedLength(),
                           rule.format);
             }
+        }
+        auto *data = static_cast<TextBlockData*>(currentBlockUserData());
+
+        if (!data)
+            return;
+
+        auto infos = data->namespacedIds();
+
+        for (const auto info: infos) {
+            auto fmt = namespacedIDFormat;
+            fmt.setFontUnderline(true);
+            fmt.setToolTip(info->link);
+            setFormat(info->start, info->start + info->length, fmt);
         }
     }
 

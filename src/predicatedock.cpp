@@ -9,9 +9,12 @@
 PredicateDock::PredicateDock(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::PredicateDock) {
+    qDebug() << minimumWidth() << width();
+
     ui->setupUi(this);
 
     ui->condition->setIsModular(false);
+    resize(minimumWidth(), height());
 
     connect(ui->readBtn, &QPushButton::clicked,
             this, &PredicateDock::onReadBtn);
@@ -19,6 +22,7 @@ PredicateDock::PredicateDock(QWidget *parent) :
             this, &PredicateDock::onWriteBtn);
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
         adjustSize();
+        qDebug() << minimumWidth() << width() << floating;
         if (floating) {
             resize(minimumWidth(), height());
         }

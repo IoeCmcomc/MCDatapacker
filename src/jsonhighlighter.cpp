@@ -14,6 +14,7 @@ void JsonHighlighter::setupRules() {
 
     keywordFormat.setForeground(Qt::blue);
     keywordFormat.setFontWeight(QFont::Bold);
+    keywordFormat.setToolTip("boolean");
     const QString keywordPatterns[] = {
         QStringLiteral("\\btrue\\b"),
         QStringLiteral("\\bfalse\\b"),
@@ -26,6 +27,7 @@ void JsonHighlighter::setupRules() {
     }
 
     numberFormat.setForeground(QColor(220, 150, 30));
+    numberFormat.setToolTip("number");
     rule.pattern =
         QRegularExpression(QStringLiteral(
                                "-?(?:[1-9]\\d*|0)(?:\\.\\d+)?(:?[eE][+-]?\\d+)?"));
@@ -35,7 +37,6 @@ void JsonHighlighter::setupRules() {
 
 void JsonHighlighter::highlightBlock(const QString &text) {
     /*qDebug() << "JsonHighlighter::highlightBlock"; */
-    Highlighter::highlightBlock(text);
     if (this->document()) {
         if (jsonErr.error == QJsonParseError::NoError) {
             /*qDebug() << "Highlight normally"; */
@@ -53,6 +54,7 @@ void JsonHighlighter::highlightBlock(const QString &text) {
     }
 
     setCurrentBlockState(0);
+    Highlighter::highlightBlock(text);
 }
 
 void JsonHighlighter::checkProblems() {
