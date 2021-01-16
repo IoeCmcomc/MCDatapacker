@@ -26,6 +26,7 @@
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     lineNumberArea = new LineNumberArea(this);
+    setAttribute(Qt::WA_Hover);
 
     connect(this, &CodeEditor::blockCountChanged,
             this, &CodeEditor::updateLineNumberAreaWidth);
@@ -55,7 +56,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
           QTextCharFormat::SpellCheckUnderline);
        errorHighlightRule.setUnderlineColor(Qt::red);
      */
-    errorHighlightRule.setBackground(QColor(255, 127, 127, 100));
+    errorHighlightRule.setBackground(QColor(255, 127, 127, 63));
     errorHighlightRule.setProperty(QTextFormat::FullWidthSelection,
                                    true);
 
@@ -78,31 +79,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e) {
     QRect cr = contentsRect();
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(),
                                       lineNumberAreaWidth(), cr.height()));
-}
-
-void CodeEditor::mouseMoveEvent(QMouseEvent *e) {
-    QPlainTextEdit::mouseMoveEvent(e);
-
-/*
-      / *if(e->buttons() == Qt::LeftButton) {} * /
-      QTextCursor cursor = cursorForPosition(e->pos());
-      this->mouseTextCursor = cursor;
- */
-
-/*
-      if (cursor.blockNumber() != this->lastMouseTextCursor.blockNumber())
-          this->mcfunctionHighlighter->rehighlightBlock(
-              this->document()->findBlockByNumber(this->lastMouseTextCursor.
-                                                  blockNumber()));
-      this->mcfunctionHighlighter->rehighlightBlock(
-          this->document()->findBlockByNumber(cursor.blockNumber()));
- */
-
-/*    this->lastMouseTextCursor = cursorForPosition(e->pos()); */
-/*
-      QToolTip::showText(viewport()->mapToGlobal(e->pos()),
-                         "CodeEditor::mouseMoveEvent");
- */
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
@@ -187,54 +163,57 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 }
 
 bool CodeEditor::event(QEvent *event) {
-    if (event->type() == QEvent::ToolTip) {
-        auto helpEvent = static_cast<QHelpEvent*>(event);
-        auto helpPos   = helpEvent->pos();
-        helpPos.rx() -= viewportMargins().left();
-        helpPos.ry() -= viewportMargins().top();
-        auto cursor    = cursorForPosition(helpPos);
+    if (event->type() == QEvent::HoverMove) {
+        /*QToolTip::hideText(); */
+
+        auto *hoverEvent = static_cast<QHoverEvent*>(event);
+        auto  globalPos  = mapToGlobal(hoverEvent->pos());
+        auto  pos        = hoverEvent->pos();
+        bool  done       = false;
+
+        pos.rx() -= viewportMargins().left();
+        pos.ry() -= viewportMargins().top();
+        auto cursor    = cursorForPosition(pos);
         auto block     = cursor.block();
         int  cursorPos = cursor.positionInBlock();
 
         for (const auto &selection: qAsConst(problemExtraSelections)) {
             auto selectionCursor = selection.cursor;
-            qDebug() << selectionCursor.selectionStart() - block.position()
-                     << cursorPos
-                     << selectionCursor.selectionEnd() - block.position();
-            if ((selectionCursor.selectionStart() - block.position() <=
-                 cursorPos)
-                && (cursorPos <=
-                    selectionCursor.selectionEnd() - block.position())) {
-                QToolTip::showText(helpEvent->globalPos(),
+            if (selection.cursor.block().contains(cursor.position())) {
+                QToolTip::showText(globalPos,
                                    selection.format.toolTip());
+                done = true;
+                break;
             }
         }
-        if (QToolTip::isVisible())
+        if (done)
             return true;
 
         const auto formats = block.layout()->formats();
-        QString    fmtTooltip;
         for (const auto &format: qAsConst(formats)) {
             int formatStart = format.start;
             if ((formatStart <= cursorPos)
-                && (cursorPos <= formatStart + format.length)) {
-                fmtTooltip = format.format.toolTip();
+                && (cursorPos <= formatStart + format.length)
+                && !format.format.toolTip().isEmpty()) {
+                QToolTip::showText(globalPos, format.format.toolTip());
+                done = true;
+                break;
             }
         }
-        if (!fmtTooltip.isEmpty()) {
-            QToolTip::showText(helpEvent->globalPos(), fmtTooltip);
+        if (done)
+            return true;
+
+        cursor.select(QTextCursor::WordUnderCursor);
+        if (!cursor.selectedText().isEmpty()) {
+            QToolTip::showText(globalPos,
+                               QString("%1 %2").arg(cursor.selectedText(),
+                                                    QString::number(cursor.
+                                                                    selectedText()
+                                                                    .length())));
         } else {
-            cursor.select(QTextCursor::WordUnderCursor);
-            if (!cursor.selectedText().isEmpty()) {
-                QToolTip::showText(helpEvent->globalPos(),
-                                   QString("%1 %2").arg(cursor.selectedText(),
-                                                        QString::number(cursor.
-                                                                        selectedText()
-                                                                        .length())));
-            } else {
-                QToolTip::hideText();
-            }
+            QToolTip::hideText();
         }
+        /*qDebug() << QToolTip::text() << QToolTip::isVisible(); */
 
         return true;
     } else {
@@ -355,7 +334,8 @@ void CodeEditor::updateErrorSelections() {
                     QTextEdit::ExtraSelection selection;
                     selection.cursor = textCursor();
                     selection.cursor.setPosition(problem->start);
-                    selection.cursor.select(QTextCursor::LineUnderCursor);
+                    /*selection.cursor.select(QTextCursor::LineUnderCursor); */
+                    selection.cursor.clearSelection();
                     selection.format = errorHighlightRule;
                     selection.format.setToolTip(problem->message);
                     problemExtraSelections << selection;

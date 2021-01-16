@@ -29,7 +29,6 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void mousePressEvent(QMouseEvent *e) override;
     void wheelEvent(QWheelEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *e) override;
     void dropEvent(QDropEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
     bool event(QEvent *event) override;
