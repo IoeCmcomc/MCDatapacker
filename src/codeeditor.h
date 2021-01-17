@@ -22,6 +22,8 @@ public:
     void displayErrors();
     void updateErrorSelections();
 
+    void readPrefSettings();
+    
 signals:
     void openFile(const QString &filepath);
 

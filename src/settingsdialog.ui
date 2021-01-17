@@ -19,7 +19,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="generalTab">
       <attribute name="title">
        <string>General</string>
       </attribute>
@@ -86,6 +86,57 @@
           </size>
          </property>
         </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="editorTab">
+      <attribute name="title">
+       <string>Editor</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Text size:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QSpinBox" name="editorTextSizeSpin">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="value">
+          <number>13</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Text font family:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QFontComboBox" name="editorTextFontCombo">
+         <property name="fontFilters">
+          <set>QFontComboBox::MonospacedFonts</set>
+         </property>
+         <property name="currentFont">
+          <font>
+           <family>Courier New</family>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="editorWrapCheck">
+         <property name="text">
+          <string>Wrap text</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

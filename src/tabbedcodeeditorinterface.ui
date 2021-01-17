@@ -81,7 +81,11 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="CodeEditor" name="codeEditor"/>
+        <widget class="CodeEditor" name="codeEditor">
+         <property name="lineWrapMode">
+          <enum>QPlainTextEdit::NoWrap</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

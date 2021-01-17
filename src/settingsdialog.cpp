@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QFontDatabase>
 #include <QSettings>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
@@ -15,9 +16,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     setupLanguageSetting();
 
-    QSettings settings;
-    ui->reloadExternChangesCombo->setCurrentIndex
-        (settings.value("general/reloadExternChanges", 0).toInt());
+    initSettings();
 
     connect(this, &QDialog::accepted, this, &SettingsDialog::onAccepted);
 }
@@ -74,7 +73,33 @@ void SettingsDialog::onAccepted() {
     settings.setValue("reloadExternChanges",
                       ui->reloadExternChangesCombo->currentIndex());
     settings.endGroup();
+    settings.beginGroup("editor");
+    settings.setValue("textSize", ui->editorTextSizeSpin->value());
+    settings.setValue("textFont", ui->editorTextFontCombo->currentFont());
+    settings.setValue("wrap", ui->editorWrapCheck->isChecked());
+    settings.endGroup();
+
     qobject_cast<MainWindow*>(parent())->readPrefSettings(settings);
+}
+
+void SettingsDialog::initSettings() {
+    QSettings settings;
+
+    ui->reloadExternChangesCombo->setCurrentIndex
+        (settings.value("general/reloadExternChanges", 0).toInt());
+
+    settings.beginGroup("editor");
+    ui->editorTextSizeSpin->setValue(settings.value("textSize", 13).toInt());
+    if (settings.contains("textFont")) {
+        ui->editorTextFontCombo->setCurrentFont(qvariant_cast<QFont>(settings.
+                                                                     value(
+                                                                         "textFont")));
+    } else {
+        ui->editorTextFontCombo->setCurrentFont(QFontDatabase::systemFont(
+                                                    QFontDatabase::FixedFont));
+    }
+    ui->editorWrapCheck->setChecked(settings.value("wrap", false).toBool());
+    settings.endGroup();
 }
 
 SettingsDialog::~SettingsDialog() {

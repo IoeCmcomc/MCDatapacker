@@ -230,6 +230,7 @@ void MainWindow::readPrefSettings(QSettings &settings) {
     loadLanguage(settings.value("locale", "").toString(), true);
 
     settings.endGroup();
+    ui->codeEditorInterface->getEditor()->readPrefSettings();
 }
 
 void MainWindow::writeSettings() {

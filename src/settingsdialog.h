@@ -22,6 +22,7 @@ protected slots:
 private:
     Ui::SettingsDialog *ui;
 
+    void initSettings();
     void setupLanguageSetting();
 };
 

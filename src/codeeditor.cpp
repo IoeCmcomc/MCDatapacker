@@ -24,6 +24,7 @@
 #include <QToolTip>
 #include <QTextDocumentFragment>
 
+
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     lineNumberArea = new LineNumberArea(this);
     setAttribute(Qt::WA_Hover);
@@ -40,10 +41,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this),
             &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
 
-    monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    monoFont.setPointSize(13);
-
-    setFont(monoFont);
+    readPrefSettings();
 
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
@@ -62,6 +60,25 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
+}
+
+void CodeEditor::readPrefSettings() {
+    QSettings settings;
+
+    settings.beginGroup("editor");
+
+    if (settings.contains("textFont")) {
+        monoFont = qvariant_cast<QFont>(settings.value("textFont"));
+    } else {
+        monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    }
+    monoFont.setPointSize(settings.value("textSize", 13).toInt());
+
+    setFont(monoFont);
+    setLineWrapMode(settings.value("wrap", false).toBool()
+                        ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
+
+    settings.endGroup();
 }
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
