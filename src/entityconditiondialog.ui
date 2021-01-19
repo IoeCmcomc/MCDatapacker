@@ -772,18 +772,18 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">src/numericinput.h</header>
+   <header location="global">numericinput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>DialogDataButton</class>
    <extends>QLabel</extends>
-   <header location="global">src/dialogdatabutton.h</header>
+   <header location="global">dialogdatabutton.h</header>
   </customwidget>
   <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
-   <header location="global">src/truefalsebox.h</header>
+   <header location="global">truefalsebox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

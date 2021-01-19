@@ -5,8 +5,8 @@
 #include "datapacktreeview.h"
 #include "mainwindow.h"
 #include "globalhelpers.h"
-#include "lib/QFindDialogs/src/finddialog.h"
-#include "lib/QFindDialogs/src/findreplacedialog.h"
+#include "QFindDialogs/src/finddialog.h"
+#include "QFindDialogs/src/findreplacedialog.h"
 
 #include <QDebug>
 #include <QPainter>

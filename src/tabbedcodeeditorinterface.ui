@@ -97,12 +97,12 @@
   <customwidget>
    <class>CodeEditor</class>
    <extends>QPlainTextEdit</extends>
-   <header>src/codeeditor.h</header>
+   <header>codeeditor.h</header>
   </customwidget>
   <customwidget>
    <class>QTabBar</class>
    <extends>QWidget</extends>
-   <header location="global">src/qtabbar.h</header>
+   <header location="global">qtabbar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

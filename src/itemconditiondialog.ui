@@ -323,13 +323,13 @@
   <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
-   <header location="global">src/numericinput.h</header>
+   <header location="global">numericinput.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>MCRInvSlot</class>
    <extends>QFrame</extends>
-   <header>src/mcrinvslot.h</header>
+   <header>mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

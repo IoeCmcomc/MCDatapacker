@@ -435,12 +435,12 @@
   <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
-   <header location="global">src/truefalsebox.h</header>
+   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>MCRInvSlot</class>
    <extends>QFrame</extends>
-   <header>src/mcrinvslot.h</header>
+   <header>mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

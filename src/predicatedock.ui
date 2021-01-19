@@ -49,7 +49,7 @@
   <customwidget>
    <class>MCRPredCondition</class>
    <extends>QFrame</extends>
-   <header location="global">src/mcrpredcondition.h</header>
+   <header location="global">mcrpredcondition.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

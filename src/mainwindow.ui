@@ -249,12 +249,12 @@
   <customwidget>
    <class>DatapackTreeView</class>
    <extends>QTreeView</extends>
-   <header>src/datapacktreeview.h</header>
+   <header>datapacktreeview.h</header>
   </customwidget>
   <customwidget>
    <class>TabbedCodeEditorInterface</class>
    <extends>QFrame</extends>
-   <header location="global">src/tabbedcodeeditorinterface.h</header>
+   <header location="global">tabbedcodeeditorinterface.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1023,19 +1023,19 @@
   <customwidget>
    <class>MCRInvSlot</class>
    <extends>QFrame</extends>
-   <header>src/mcrinvslot.h</header>
+   <header>mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QTabBar</class>
    <extends>QWidget</extends>
-   <header>src/qtabbar.h</header>
+   <header>qtabbar.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>StackedWidget</class>
    <extends>QStackedWidget</extends>
-   <header location="global">src/stackedwidget.h</header>
+   <header location="global">stackedwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
