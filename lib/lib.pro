@@ -5,7 +5,8 @@ CONFIG += staticlib qt gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 DISTFILES += \
-    QFindDialogs/LICENSE
+    QFindDialogs/LICENSE \
+    QFindDialogs/src/README.txt
 
 HEADERS += \
     QFindDialogs/src/finddialog.h \

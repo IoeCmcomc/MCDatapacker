@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-TARGET = "MCDAtapacker"
+TARGET = MCDatapacker
 
 QT += core gui uitools
 
@@ -52,7 +52,8 @@ SOURCES += \
     newdatapackdialog.cpp \
     numericinput.cpp \
     optionalspinbox.cpp \
-    parsers/command/parsenode.cpp \
+    parsers/command/nodes/parsenode.cpp \
+    parsers/command/nodes/rootnode.cpp \
     parsers/command/parser.cpp \
     predicatedock.cpp \
     rawjsontextedit.cpp \
@@ -98,7 +99,8 @@ HEADERS += \
     numericinput.cpp.GANRTu \
     numericinput.h \
     optionalspinbox.h \
-    parsers/command/parsenode.h \
+    parsers/command/nodes/parsenode.h \
+    parsers/command/nodes/rootnode.h \
     parsers/command/parser.h \
     predicatedock.h \
     rawjsontextedit.h \
@@ -156,10 +158,10 @@ DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
     MCDatapacker_vi_VN.ts
 
-LIBS +=
+
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/release/ -llib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/debug/ -llib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/debug/ -lliblib
 else:unix: LIBS += -L$$OUT_PWD/../lib/ -llib
 
 INCLUDEPATH += $$PWD/../lib

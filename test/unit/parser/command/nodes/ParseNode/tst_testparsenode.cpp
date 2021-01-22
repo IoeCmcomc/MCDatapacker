@@ -1,9 +1,7 @@
 #include <QtTest/QTest>
 #include <QCoreApplication>
 
-#include "../../../../../src/parsers/command/parsenode.h"
-
-using namespace CommandParser;
+#include "../../../../../../src/parsers/command/nodes/parsenode.h"
 
 class TestParseNode : public QObject
 {
@@ -32,7 +30,7 @@ void TestParseNode::cleanupTestCase() {
 }
 
 void TestParseNode::test_case1() {
-    ParseNode node(this);
+    Command::ParseNode node(this);
 
     QCOMPARE(node.toString(), "ParseNode()");
     /* QVERIFY(node.toString() == "ParseNode()"); */

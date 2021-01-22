@@ -2,19 +2,18 @@
 #define PARSENODE_H
 
 #include <QObject>
+#include <QDebug>
 
-namespace CommandParser {
+namespace Command {
     class ParseNode : public QObject
     {
-        Q_OBJECT
 public:
         explicit ParseNode(QObject *parent = nullptr);
 
-        QString toString() const;
+        virtual QString toString() const;
     };
 }
 
-QDebug operator<<(QDebug debug, const CommandParser::ParseNode &node);
-
+QDebug operator<<(QDebug debug, const Command::ParseNode &node);
 
 #endif /* PARSENODE_H */
