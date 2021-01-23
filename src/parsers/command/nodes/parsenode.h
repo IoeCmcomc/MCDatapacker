@@ -8,9 +8,21 @@ namespace Command {
     class ParseNode : public QObject
     {
 public:
-        explicit ParseNode(QObject *parent = nullptr);
+        explicit ParseNode(QObject *parent, int pos = -1, int length = 0);
 
         virtual QString toString() const;
+
+        int pos() const;
+        void setPos(int pos);
+
+        int length() const;
+        bool isVaild() const;
+protected:
+        void setLength(int length);
+
+private:
+        int m_pos    = 0;
+        int m_length = 0;
     };
 }
 

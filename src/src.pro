@@ -52,8 +52,15 @@ SOURCES += \
     newdatapackdialog.cpp \
     numericinput.cpp \
     optionalspinbox.cpp \
+    parsers/command/nodes/argumentnode.cpp \
+    parsers/command/nodes/boolnode.cpp \
+    parsers/command/nodes/doublenode.cpp \
+    parsers/command/nodes/floatnode.cpp \
+    parsers/command/nodes/integernode.cpp \
+    parsers/command/nodes/literalnode.cpp \
     parsers/command/nodes/parsenode.cpp \
     parsers/command/nodes/rootnode.cpp \
+    parsers/command/nodes/stringnode.cpp \
     parsers/command/parser.cpp \
     predicatedock.cpp \
     rawjsontextedit.cpp \
@@ -99,8 +106,15 @@ HEADERS += \
     numericinput.cpp.GANRTu \
     numericinput.h \
     optionalspinbox.h \
+    parsers/command/nodes/argumentnode.h \
+    parsers/command/nodes/boolnode.h \
+    parsers/command/nodes/doublenode.h \
+    parsers/command/nodes/floatnode.h \
+    parsers/command/nodes/integernode.h \
+    parsers/command/nodes/literalnode.h \
     parsers/command/nodes/parsenode.h \
     parsers/command/nodes/rootnode.h \
+    parsers/command/nodes/stringnode.h \
     parsers/command/parser.h \
     predicatedock.h \
     rawjsontextedit.h \
