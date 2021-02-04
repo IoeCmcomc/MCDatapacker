@@ -1,0 +1,255 @@
+<!DOCTYPE QPH>
+<QPH sourcelanguage="en_US" language="vi_VN">
+<phrase>
+    <source>File</source>
+    <target>Tệp</target>
+</phrase>
+<phrase>
+    <source>Preferences</source>
+    <target>Sở thích</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Mở</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Lưu</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Thoát</target>
+</phrase>
+<phrase>
+    <source>Error</source>
+    <target>Lỗi</target>
+</phrase>
+<phrase>
+    <source>Options</source>
+    <target>Tuỳ chọn</target>
+</phrase>
+<phrase>
+    <source>General</source>
+    <target>Chung</target>
+</phrase>
+<phrase>
+    <source>Never</source>
+    <target>Không bao giờ</target>
+</phrase>
+<phrase>
+    <source>&lt;Default&gt;</source>
+    <target>&lt;Mặc định&gt;</target>
+</phrase>
+<phrase>
+    <source>Always</source>
+    <target>Luôn luôn</target>
+</phrase>
+<phrase>
+    <source>Read</source>
+    <target>Đọc</target>
+</phrase>
+<phrase>
+    <source>Write</source>
+    <target>Viết</target>
+</phrase>
+<phrase>
+    <source>Datapapck</source>
+    <target>Gói dữ liệu</target>
+</phrase>
+<phrase>
+    <source>Block</source>
+    <target>Khối</target>
+</phrase>
+<phrase>
+    <source>Item</source>
+    <target>Vật phẩm</target>
+</phrase>
+<phrase>
+    <source>Minecrafr</source>
+    <target>Minecraft</target>
+</phrase>
+<phrase>
+    <source>Recipe</source>
+    <target>Công thức</target>
+</phrase>
+<phrase>
+    <source>Type</source>
+    <target>Loại</target>
+</phrase>
+<phrase>
+    <source>Close</source>
+    <target>Đóng</target>
+</phrase>
+<phrase>
+    <source>Crafting</source>
+    <target>Chế tạo</target>
+</phrase>
+<phrase>
+    <source>Smelting</source>
+    <target>Nấu nung</target>
+</phrase>
+<phrase>
+    <source>Stonecutting</source>
+    <target>Cắt đá</target>
+</phrase>
+<phrase>
+    <source> point</source>
+    <target> điểm</target>
+</phrase>
+<phrase>
+    <source> tick</source>
+    <target> tíc</target>
+</phrase>
+<phrase>
+    <source>Furnace</source>
+    <target>Lò nung</target>
+</phrase>
+<phrase>
+    <source>Blast furnace</source>
+    <target>Lò luyện kim</target>
+</phrase>
+<phrase>
+    <source>Smoker</source>
+    <target>Lò hun khói</target>
+</phrase>
+<phrase>
+    <source>Campfire</source>
+    <target>Lửa trại</target>
+</phrase>
+<phrase>
+    <source>Browse</source>
+    <target>Duyệt</target>
+</phrase>
+<phrase>
+    <source>Rename</source>
+    <target>Đổi tên</target>
+</phrase>
+<phrase>
+    <source>Delete</source>
+    <target>Xoá</target>
+</phrase>
+<phrase>
+    <source>New</source>
+    <target>Mới</target>
+</phrase>
+<phrase>
+    <source>Folder</source>
+    <target>Thư mục</target>
+</phrase>
+<phrase>
+    <source>Namespace</source>
+    <target>Không gian tên</target>
+</phrase>
+<phrase>
+    <source>Advancement</source>
+    <target>Tiến trình</target>
+</phrase>
+<phrase>
+    <source>Function</source>
+    <target>Hàm</target>
+</phrase>
+<phrase>
+    <source>Loot table</source>
+    <target>Bảng lợi phẩm</target>
+</phrase>
+<phrase>
+    <source>Predicate</source>
+    <target>Vị từ</target>
+</phrase>
+<phrase>
+    <source>Structure</source>
+    <target>Cấu trúc</target>
+</phrase>
+<phrase>
+    <source>Tag</source>
+    <target>Nhãn</target>
+</phrase>
+<phrase>
+    <source>Blocks</source>
+    <target>Khối</target>
+</phrase>
+<phrase>
+    <source>Entity types</source>
+    <target>Loại thực thể</target>
+</phrase>
+<phrase>
+    <source>Functions</source>
+    <target>Hàm</target>
+</phrase>
+<phrase>
+    <source>Items</source>
+    <target>Vật phẩm</target>
+</phrase>
+<phrase>
+    <source>Reload</source>
+    <target>Tải lại</target>
+</phrase>
+<phrase>
+    <source>Fluids</source>
+    <target>Chất lỏng</target>
+</phrase>
+<phrase>
+    <source>Tag selector</source>
+    <target>Hộp chọn nhãn</target>
+</phrase>
+<phrase>
+    <source>Details</source>
+    <target>Chi tiết</target>
+</phrase>
+<phrase>
+    <source>Select</source>
+    <target>Chọn</target>
+</phrase>
+<phrase>
+    <source>Search:</source>
+    <target>Tìm kiếm:</target>
+</phrase>
+<phrase>
+    <source>Remove</source>
+    <target>Loại bỏ</target>
+</phrase>
+<phrase>
+    <source>Team</source>
+    <target>Đội</target>
+</phrase>
+<phrase>
+    <source>Distance</source>
+    <target>Khoảng cách</target>
+</phrase>
+<phrase>
+    <source>Add</source>
+    <target>Thêm</target>
+</phrase>
+<phrase>
+    <source>Player</source>
+    <target>Người chơi</target>
+</phrase>
+<phrase>
+    <source>Fluid</source>
+    <target>Chất lỏng</target>
+</phrase>
+<phrase>
+    <source>Position</source>
+    <target>Vị trí</target>
+</phrase>
+<phrase>
+    <source>Condition</source>
+    <target>Điều kiện</target>
+</phrase>
+<phrase>
+    <source>Time</source>
+    <target>Thời gian</target>
+</phrase>
+<phrase>
+    <source>Weather</source>
+    <target>Thời tiết</target>
+</phrase>
+<phrase>
+    <source>Help</source>
+    <target>Trợ giúp</target>
+</phrase>
+<phrase>
+    <source>Save all</source>
+    <target>Lưu tất cả</target>
+</phrase>
+</QPH>
