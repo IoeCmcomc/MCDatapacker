@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    unit/parser/command/Parser \
     unit/parser/command/nodes/ArgumentNode \
     unit/parser/command/nodes/BoolNode \
     unit/parser/command/nodes/DoubleNode \

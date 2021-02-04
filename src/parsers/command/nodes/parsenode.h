@@ -7,6 +7,7 @@
 namespace Command {
     class ParseNode : public QObject
     {
+        Q_OBJECT
 public:
         explicit ParseNode(QObject *parent, int pos = -1, int length = 0);
 
@@ -27,5 +28,7 @@ private:
 }
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node);
+
+Q_DECLARE_METATYPE(Command::ParseNode*);
 
 #endif /* PARSENODE_H */

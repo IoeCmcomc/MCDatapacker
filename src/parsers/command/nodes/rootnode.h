@@ -6,8 +6,10 @@
 namespace Command {
     class RootNode : public ParseNode
     {
+        Q_OBJECT
 public:
         explicit RootNode(QObject *parent = nullptr);
+        ~RootNode();
 
         QString toString() const;
 
@@ -15,8 +17,10 @@ public:
         int size();
 
         void append(Command::ParseNode *node);
+        void prepend(Command::ParseNode *node);
         void remove(int i);
         void removeNode(Command::ParseNode *node);
+        void clear();
 
         Command::ParseNode *operator[](int index);
         Command::ParseNode *operator[](int index) const;
@@ -29,5 +33,7 @@ private:
         QVector<Command::ParseNode*> m_children;
     };
 }
+
+Q_DECLARE_METATYPE(Command::RootNode*);
 
 #endif /* ROOTNODE_H */

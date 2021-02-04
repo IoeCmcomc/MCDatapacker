@@ -3,6 +3,7 @@
 Command::DoubleNode::DoubleNode(QObject *parent, int pos, int length,
                                 double value)
     : Command::ArgumentNode(parent, pos, -1, "brigadier:double") {
+    qRegisterMetaType<Command::DoubleNode*>();
     setValue(value);
     setLength(length);
     setLength((value) ? 4 : 5);

@@ -1,7 +1,8 @@
 #include "literalnode.h"
 
-Command::LiteralNode::LiteralNode(QObject *parent, const QString &txt)
-    : Command::ParseNode(parent, -1, txt.length()) {
+Command::LiteralNode::LiteralNode(QObject *parent, int pos, const QString &txt)
+    : Command::ParseNode(parent, pos, txt.length()) {
+    qRegisterMetaType<Command::LiteralNode*>();
     setText(txt);
 }
 
@@ -16,3 +17,12 @@ QString Command::LiteralNode::text() const {
 void Command::LiteralNode::setText(const QString &text) {
     m_text = text;
 }
+
+Command::StringNode *Command::LiteralNode::toStringNode(bool autoDelete) {
+    auto *ret = new Command::StringNode(parent(), pos(), text());
+
+    if (autoDelete)
+        deleteLater();
+    return ret;
+}
+

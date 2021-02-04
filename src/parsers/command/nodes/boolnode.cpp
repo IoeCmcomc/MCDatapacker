@@ -2,6 +2,7 @@
 
 Command::BoolNode::BoolNode(QObject *parent, int pos, bool value)
     : Command::ArgumentNode(parent, pos, -1, "brigadier:bool") {
+    qRegisterMetaType<Command::BoolNode*>();
     setValue(value);
     setLength((value) ? 4 : 5);
 }

@@ -1,6 +1,14 @@
 #ifndef COMMANDPARSER_H
 #define COMMANDPARSER_H
 
+#include "nodes/boolnode.h"
+#include "nodes/doublenode.h"
+#include "nodes/floatnode.h"
+#include "nodes/integernode.h"
+#include "nodes/literalnode.h"
+/*#include "nodes/stringnode.h" */
+#include "nodes/rootnode.h"
+
 #include <QJsonObject>
 #include <QObject>
 
@@ -12,7 +20,7 @@ namespace Command {
         Q_OBJECT
 
 public:
-        explicit Parser(QObject *parent = nullptr);
+        explicit Parser(QObject *parent = nullptr, const QString &input = "");
 
         class ParsingError : std::runtime_error {
 public:
@@ -20,15 +28,49 @@ public:
             QString message;
         };
 
-        class ParseNode;
-        class RootNode;
+        QChar curChar() const;
+
+        static QJsonObject getSchema();
+        static void setSchema(const QJsonObject &schema);
+        static void setSchema(const QString &filepath);
+
+        Command::RootNode *parsingResult();
+
+        QString text() const;
+        void setText(const QString &text);
+
+        static QString parserIdToMethodName(const QString &str);
+
+        Q_INVOKABLE Command::BoolNode *brigadier_bool(QObject *parent,
+                                                      const QVariantMap &props = {});
+        Q_INVOKABLE Command::DoubleNode *brigadier_double(QObject *parent,
+                                                          const QVariantMap &props = {});
+        Q_INVOKABLE Command::FloatNode *brigadier_float(QObject *parent,
+                                                        const QVariantMap &props = {});
+        Q_INVOKABLE Command::IntegerNode *brigadier_integer(QObject *parent,
+                                                            const QVariantMap &props = {});
+        Q_INVOKABLE Command::LiteralNode *brigadier_literal(QObject *parent,
+                                                            const QVariantMap &props = {});
+        Q_INVOKABLE Command::StringNode *brigadier_string(QObject *parent,
+                                                          const QVariantMap &props = {});
+        Q_INVOKABLE Command::ParseNode *parse();
+
+        ParsingError lastError() const;
+
+protected:
+        typedef Command::ParseNode *(Parser::*parserMethod)(QObject *,
+                                                            const QVariantMap &);
+        QMap<QString, parserMethod> parserIdMap;
 
 private:
+        Command::RootNode m_parsingResult;
+        ParsingError m_lastError = ParsingError("");
+        static QJsonObject m_schema;
         QString m_text;
-        QJsonObject m_schema;
         int m_pos = 0;
         QChar m_curChar;
-        QJsonObject *m_curSchemaNode;
+
+        void setPos(int pos);
 
         void error(QStringView msg);
         void advance(int n                            = 1);
@@ -37,10 +79,18 @@ private:
         void eat(const QChar &chr, bool acceptNull    = false);
         QString getUntil(const QChar &chr);
         QString getWithCharset(const QString &charset);
+        QString getWithRegex(const QString &pattern);
         QString peek(int n);
         void skipWs();
 
         QString peekLiteral();
+        QString getQuotedString();
+
+        bool castThenPrependTo(QVariant &vari, Command::RootNode *root);
+
+        bool parseResursively(QObject *parentObj,
+                              QJsonObject curSchemaNode,
+                              int depth = 0);
 
         template<typename T>
         void checkMin(T value, T min) {
@@ -51,7 +101,7 @@ private:
 
         template<typename T>
         void checkMax(T value, T max) {
-            if (value <= max)
+            if (value >= max)
                 error(tr("%1 must be lesser than or equal to %2").arg(value,
                                                                       max));
         }
@@ -61,6 +111,7 @@ private:
             checkMin(value, min);
             checkMax(value, max);
         }
+        void printMethods();
     };
 }
 

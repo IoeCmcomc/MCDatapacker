@@ -2,6 +2,7 @@
 
 Command::StringNode::StringNode(QObject *parent, int pos, const QString &value)
     : Command::ArgumentNode(parent, pos, value.length(), "brigadier:string") {
+    qRegisterMetaType<Command::StringNode*>();
     setValue(value);
 }
 
@@ -15,4 +16,5 @@ QString Command::StringNode::value() const {
 
 void Command::StringNode::setValue(const QString &value) {
     m_value = value;
+    setLength(value.length());
 }

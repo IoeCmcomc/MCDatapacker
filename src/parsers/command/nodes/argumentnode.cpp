@@ -1,12 +1,8 @@
 #include "argumentnode.h"
 
-Command::ArgumentNode::ArgumentNode(QObject *parent,
-                                    int pos,
-                                    int length,
-                                    QString parserId) : Command::ParseNode(
-        parent,
-        -1,
-        0) {
+Command::ArgumentNode::ArgumentNode(QObject *parent, int pos,
+                                    int length, QString parserId)
+    : Command::ParseNode(parent, pos, length) {
     setParserId(parserId);
 }
 

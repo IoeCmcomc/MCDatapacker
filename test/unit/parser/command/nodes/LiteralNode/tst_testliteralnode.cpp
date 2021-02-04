@@ -34,19 +34,19 @@ void TestLiteralNode::cleanupTestCase() {
 }
 
 void TestLiteralNode::test_case1() {
-    LiteralNode node(this, "test_case1");
+    LiteralNode node(this, -1, "test_case1");
 
     QCOMPARE(node.toString(), "LiteralNode(test_case1)");
 }
 
 void TestLiteralNode::text() {
-    LiteralNode node(this, "kill");
+    LiteralNode node(this, -1, "kill");
 
     QCOMPARE(node.text(), "kill");
 }
 
 void TestLiteralNode::setText() {
-    LiteralNode node(this, "ban");
+    LiteralNode node(this, -1, "ban");
 
     QCOMPARE(node.text(), "ban");
 

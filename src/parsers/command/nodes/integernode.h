@@ -6,6 +6,7 @@
 namespace Command {
     class IntegerNode : public ArgumentNode
     {
+        Q_OBJECT
 public:
         explicit IntegerNode(QObject *parent, int pos = -1, int length = 0,
                              int value                = false);
@@ -18,5 +19,7 @@ private:
         int m_value;
     };
 }
+
+Q_DECLARE_METATYPE(Command::IntegerNode*)
 
 #endif /* INTEGERNODE_H */

@@ -1201,5 +1201,6 @@
         <file>info/stat_type.json</file>
         <file>info/attribute.json</file>
         <file>info/map_icon.json</file>
+        <file>info/commands.json</file>
     </qresource>
 </RCC>

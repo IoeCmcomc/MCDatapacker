@@ -6,6 +6,7 @@
 namespace Command {
     class ArgumentNode : public ParseNode
     {
+        Q_OBJECT
 public:
         explicit ArgumentNode(QObject *parent,
                               int pos,

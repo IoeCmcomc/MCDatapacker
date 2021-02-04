@@ -6,6 +6,7 @@
 namespace Command {
     class StringNode : public ArgumentNode
     {
+        Q_OBJECT
 public:
         explicit StringNode(QObject *parent, int pos = -1,
                             const QString &value     = "");
@@ -18,5 +19,7 @@ private:
         QString m_value;
     };
 }
+
+Q_DECLARE_METATYPE(Command::StringNode*);
 
 #endif /* STRINGNODE_H */

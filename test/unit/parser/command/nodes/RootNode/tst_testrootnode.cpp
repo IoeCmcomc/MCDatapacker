@@ -38,7 +38,7 @@ void TestRootNode::cleanupTestCase() {
 void TestRootNode::test_case1() {
     RootNode root(this);
 
-    QVERIFY(root.toString() == "RootNode(0)");
+    QVERIFY(root.toString() == "RootNode[0]()");
 }
 
 void TestRootNode::append() {
@@ -46,15 +46,16 @@ void TestRootNode::append() {
     auto    *node = new ParseNode(this);
 
     root.append(node);
-    QCOMPARE(root.toString(), "RootNode(1)");
+    QCOMPARE(root.toString(), "RootNode[1](ParseNode())");
 
     root << new ParseNode(this);
 
-    QCOMPARE(root.toString(), "RootNode(2)");
+    QCOMPARE(root.toString(), "RootNode[2](ParseNode(), ParseNode())");
 
     root.append(new ParseNode(this));
 
-    QCOMPARE(root.toString(), "RootNode(3)");
+    QCOMPARE(root.toString(),
+             "RootNode[3](ParseNode(), ParseNode(), ParseNode())");
 
     QCOMPARE(root[0]->toString(), "ParseNode()");
 }
@@ -64,15 +65,16 @@ void TestRootNode::remove() {
 
     root << new ParseNode(this) << new ParseNode(this) << new ParseNode(this);
 
-    QCOMPARE(root.toString(), "RootNode(3)");
+    QCOMPARE(root.toString(),
+             "RootNode[3](ParseNode(), ParseNode(), ParseNode())");
 
     root.remove(1);
 
-    QCOMPARE(root.toString(), "RootNode(2)");
+    QCOMPARE(root.toString(), "RootNode[2](ParseNode(), ParseNode())");
 
     root.remove(0);
 
-    QCOMPARE(root.toString(), "RootNode(1)");
+    QCOMPARE(root.toString(), "RootNode[1](ParseNode())");
 }
 
 void TestRootNode::isEmpty() {
