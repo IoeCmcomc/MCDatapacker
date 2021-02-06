@@ -52,14 +52,21 @@ SOURCES += \
     newdatapackdialog.cpp \
     numericinput.cpp \
     optionalspinbox.cpp \
+    parsers/command/minecraftparser.cpp \
     parsers/command/nodes/argumentnode.cpp \
+    parsers/command/nodes/axesnode.cpp \
+    parsers/command/nodes/axisnode.cpp \
     parsers/command/nodes/boolnode.cpp \
     parsers/command/nodes/doublenode.cpp \
     parsers/command/nodes/floatnode.cpp \
     parsers/command/nodes/integernode.cpp \
     parsers/command/nodes/literalnode.cpp \
     parsers/command/nodes/parsenode.cpp \
+    parsers/command/nodes/resourcelocationnode.cpp \
     parsers/command/nodes/rootnode.cpp \
+    parsers/command/nodes/similaraxesnodes.cpp \
+    parsers/command/nodes/similarresourcelocationnodes.cpp \
+    parsers/command/nodes/similarstringnodes.cpp \
     parsers/command/nodes/stringnode.cpp \
     parsers/command/parser.cpp \
     predicatedock.cpp \
@@ -106,14 +113,21 @@ HEADERS += \
     numericinput.cpp.GANRTu \
     numericinput.h \
     optionalspinbox.h \
+    parsers/command/minecraftparser.h \
     parsers/command/nodes/argumentnode.h \
+    parsers/command/nodes/axesnode.h \
+    parsers/command/nodes/axisnode.h \
     parsers/command/nodes/boolnode.h \
     parsers/command/nodes/doublenode.h \
     parsers/command/nodes/floatnode.h \
     parsers/command/nodes/integernode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/parsenode.h \
+    parsers/command/nodes/resourcelocationnode.h \
     parsers/command/nodes/rootnode.h \
+    parsers/command/nodes/similaraxesnodes.h \
+    parsers/command/nodes/similarresourcelocationnodes.h \
+    parsers/command/nodes/similarstringnodes.h \
     parsers/command/nodes/stringnode.h \
     parsers/command/parser.h \
     predicatedock.h \

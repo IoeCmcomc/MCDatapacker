@@ -11,7 +11,7 @@ public:
         explicit StringNode(QObject *parent, int pos = -1,
                             const QString &value     = "");
 
-        QString toString() const;
+        virtual QString toString() const;
         QString value() const;
         void setValue(const QString &value);
 

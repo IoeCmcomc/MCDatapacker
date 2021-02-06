@@ -431,6 +431,10 @@ Command::Parser::ParsingError Command::Parser::lastError() const {
     return m_lastError;
 }
 
+int Command::Parser::pos() const {
+    return m_pos;
+}
+
 #define IF_TYPE_BRANCH(Type)         if (type == qMetaTypeId<Type*>()) \
     root->prepend(qvariant_cast<Type*>(vari));
 #define ELSE_IF_TYPE_BRANCH(Type)    else IF_TYPE_BRANCH(Type)
@@ -543,13 +547,14 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                 auto     typeName   = method.typeName();
                 QVariant vari(returnType, nullptr);
                 void    *data = vari.data();
+                qDebug() << returnType << vari << data;
                 try {
                     bool invoked =
                         method.invoke(this,
                                       QGenericReturnArgument(typeName, data),
                                       Q_ARG(QObject*, &m_parsingResult),
                                       Q_ARG(QVariantMap, props));
-/*                    qDebug() << invoked << vari << data; */
+                    qDebug() << invoked << vari << data;
                     if (invoked && data) {
                         found = true;
                         ret   = vari.value<Command::ParseNode*>();

@@ -57,18 +57,9 @@ public:
 
         ParsingError lastError() const;
 
-protected:
-        typedef Command::ParseNode *(Parser::*parserMethod)(QObject *,
-                                                            const QVariantMap &);
-        QMap<QString, parserMethod> parserIdMap;
+        int pos() const;
 
-private:
-        Command::RootNode m_parsingResult;
-        ParsingError m_lastError = ParsingError("");
-        static QJsonObject m_schema;
-        QString m_text;
-        int m_pos = 0;
-        QChar m_curChar;
+protected:
 
         void setPos(int pos);
 
@@ -112,6 +103,13 @@ private:
             checkMax(value, max);
         }
         void printMethods();
+private:
+        Command::RootNode m_parsingResult;
+        ParsingError m_lastError = ParsingError("");
+        static QJsonObject m_schema;
+        QString m_text;
+        int m_pos = 0;
+        QChar m_curChar;
     };
 }
 
