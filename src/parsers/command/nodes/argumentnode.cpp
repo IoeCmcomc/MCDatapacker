@@ -1,5 +1,7 @@
 #include "argumentnode.h"
 
+static int _ = qRegisterMetaType<Command::ArgumentNode*>();
+
 Command::ArgumentNode::ArgumentNode(QObject *parent, int pos,
                                     int length, QString parserId)
     : Command::ParseNode(parent, pos, length) {

@@ -1,8 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += \
-    unit/parser/command/Parser \
-    unit/parser/command/nodes/ArgumentNode \
+SUBDIRS += unit/parser/command/nodes/ArgumentNode \
+    unit/parser/command/MinecraftParser \
     unit/parser/command/nodes/AxesNode \
     unit/parser/command/nodes/AxisNode \
     unit/parser/command/nodes/BoolNode \
@@ -16,4 +15,5 @@ SUBDIRS += \
     unit/parser/command/nodes/SimilarAxesNodes \
     unit/parser/command/nodes/SimilarResourceLocationNodes \
     unit/parser/command/nodes/SimilarStringNode \
-    unit/parser/command/nodes/StringNode
+    unit/parser/command/nodes/StringNode \
+    unit/parser/command/Parser

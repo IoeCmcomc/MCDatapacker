@@ -23,4 +23,6 @@ private:
     };
 }
 
+Q_DECLARE_METATYPE(Command::ArgumentNode*);
+
 #endif /* ARGUMENTNODE_H */

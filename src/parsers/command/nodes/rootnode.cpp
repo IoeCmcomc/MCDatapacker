@@ -1,7 +1,8 @@
 #include "rootnode.h"
 
+static int _ = qRegisterMetaType<Command::RootNode*>();
+
 Command::RootNode::RootNode(QObject *parent) : Command::ParseNode(parent) {
-    qRegisterMetaType<Command::RootNode*>();
 }
 
 Command::RootNode::~RootNode() {

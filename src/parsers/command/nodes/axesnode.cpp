@@ -1,8 +1,9 @@
 #include "axesnode.h"
 
+static int _ = qRegisterMetaType<Command::AxesNode*>();
+
 Command::AxesNode::AxesNode(QObject *parent, int pos, int length)
     : Command::ArgumentNode(parent, pos, length, "mcdatapacker:axes") {
-    qMetaTypeId<Command::AxesNode*>();
 }
 
 QString Command::AxesNode::toString() const {

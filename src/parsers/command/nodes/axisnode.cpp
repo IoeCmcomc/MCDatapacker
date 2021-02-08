@@ -1,5 +1,7 @@
 #include "axisnode.h"
 
+static int _ = qRegisterMetaType<Command::AxisNode*>();
+
 Command::AxisNode::AxisNode(QObject *parent,
                             int pos,
                             int length,
@@ -11,7 +13,8 @@ Command::AxisNode::AxisNode(QObject *parent,
 }
 
 Command::AxisNode::AxisNode(QObject *parent)
-    : Command::ParseNode(this) {
+    : Command::ParseNode(parent) {
+    setValue(0);
 }
 
 Command::AxisNode::AxisNode(QObject *parent,

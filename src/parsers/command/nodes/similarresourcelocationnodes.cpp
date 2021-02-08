@@ -1,14 +1,14 @@
 #include "similarresourcelocationnodes.h"
 
 #define DEFINE_TYPE_FROM_RESOURCELOCATIONNODE(Type, Id)                  \
+    static const int _ ## Type = qRegisterMetaType<Command::Type*>();    \
     Command::Type::Type(QObject *parent, int pos, const QString &nspace, \
                         const QString &id)                               \
         : Command::ResourceLocationNode(parent, pos, nspace, id) {       \
-        qMetaTypeId<Command::Type*>();                                   \
         setParserId(Id);                                                 \
     }                                                                    \
     QString Command::Type::toString() const {                            \
-        return #Type + QString("(%1:%2)").arg(nspace(), id());           \
+        return ResourceLocationNode::toString().replace(0, 20, #Type);   \
     }
 
 DEFINE_TYPE_FROM_RESOURCELOCATIONNODE(DimensionNode, "minecraft:dimension")

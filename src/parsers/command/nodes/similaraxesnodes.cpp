@@ -1,14 +1,13 @@
 #include "similaraxesnodes.h"
 
-#define DEFINE_TYPE_FROM_AXESNODE(Type, Id)                   \
-    Command::Type::Type(QObject *parent, int pos, int length) \
-        : Command::AxesNode(parent, pos, length) {            \
-        qMetaTypeId<Command::Type*>();                        \
-        setParserId(Id);                                      \
-    }                                                         \
-    QString Command::Type::toString() const                   \
-    {                                                         \
-        return AxesNode::toString().replace(0, 8, #Type);     \
+#define DEFINE_TYPE_FROM_AXESNODE(Type, Id)                           \
+    static const int _ ## Type = qRegisterMetaType<Command::Type*>(); \
+    Command::Type::Type(QObject *parent, int pos, int length)         \
+        : Command::AxesNode(parent, pos, length) {                    \
+        setParserId(Id);                                              \
+    }                                                                 \
+    QString Command::Type::toString() const {                         \
+        return AxesNode::toString().replace(0, 8, #Type);             \
     }
 
 DEFINE_TYPE_FROM_AXESNODE(BlockPosNode, "minecraft:block_pos")

@@ -113,7 +113,6 @@ HEADERS += \
     numericinput.cpp.GANRTu \
     numericinput.h \
     optionalspinbox.h \
-    parsers/command/minecraftparser.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
     parsers/command/nodes/axisnode.h \
@@ -130,6 +129,7 @@ HEADERS += \
     parsers/command/nodes/similarstringnodes.h \
     parsers/command/nodes/stringnode.h \
     parsers/command/parser.h \
+    parsers/command/minecraftparser.h \
     predicatedock.h \
     rawjsontextedit.h \
     settingsdialog.h \

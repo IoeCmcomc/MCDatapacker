@@ -1,8 +1,9 @@
 #include "parsenode.h"
 
+static int _ = qRegisterMetaType<Command::ParseNode*>();
+
 Command::ParseNode::ParseNode(QObject *parent, int pos, int length) : QObject(
         parent) {
-    qRegisterMetaType<Command::ParseNode*>();
     setPos(pos);
     setLength(length);
 }

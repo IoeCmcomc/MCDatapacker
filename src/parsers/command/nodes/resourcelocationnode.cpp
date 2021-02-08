@@ -1,14 +1,14 @@
 #include "resourcelocationnode.h"
 
+static int _ = qRegisterMetaType<Command::ResourceLocationNode*>();
+
 Command::ResourceLocationNode::ResourceLocationNode(QObject *parent,
                                                     int pos,
                                                     const QString &nspace,
                                                     const QString &id)
-    : Command::ArgumentNode(parent,
-                            pos,
+    : Command::ArgumentNode(parent, pos,
                             nspace.length() + id.length() + 1,
                             "minecraft:resource_location") {
-    qMetaTypeId<ResourceLocationNode*>();
     setNspace(nspace);
     setId(id);
 }

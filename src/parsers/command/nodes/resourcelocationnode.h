@@ -11,7 +11,6 @@ public:
         explicit ResourceLocationNode(QObject *parent, int pos = -1,
                                       const QString &nspace    = "minecraft",
                                       const QString &id        = "");
-
         virtual QString toString() const;
 
         QString nspace() const;

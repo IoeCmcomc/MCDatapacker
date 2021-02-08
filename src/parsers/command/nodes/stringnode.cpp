@@ -1,8 +1,9 @@
 #include "stringnode.h"
 
+static int _ = qRegisterMetaType<Command::StringNode*>();
+
 Command::StringNode::StringNode(QObject *parent, int pos, const QString &value)
     : Command::ArgumentNode(parent, pos, value.length(), "brigadier:string") {
-    qRegisterMetaType<Command::StringNode*>();
     setValue(value);
 }
 

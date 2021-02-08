@@ -77,8 +77,6 @@ protected:
         QString peekLiteral();
         QString getQuotedString();
 
-        bool castThenPrependTo(QVariant &vari, Command::RootNode *root);
-
         bool parseResursively(QObject *parentObj,
                               QJsonObject curSchemaNode,
                               int depth = 0);

@@ -34,6 +34,7 @@ TestParser::~TestParser() {
 }
 
 void TestParser::initTestCase() {
+    Parser::setSchema(":/minecraft/info/commands.json");
 }
 
 void TestParser::cleanupTestCase() {
@@ -99,7 +100,6 @@ void TestParser::parse() {
 
     timer.start();
 
-    Parser::setSchema(":/minecraft/info/commands.json");
     Parser parser(this, "gamemode creative");
 
     auto *result = parser.parse();
@@ -107,7 +107,7 @@ void TestParser::parse() {
              "RootNode[2](LiteralNode(gamemode), LiteralNode(creative))");
 
     parser.setText("schedule clear test");
-    result = parser.parse();
+    parser.parse();
     QCOMPARE(
         result->toString(),
         "RootNode[3](LiteralNode(schedule), LiteralNode(clear), StringNode(\"test\"))");

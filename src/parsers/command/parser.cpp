@@ -16,7 +16,7 @@ Command::Parser::Parser(QObject *parent, const QString &input)
     : QObject(parent) {
     setText(input);
 
-    /*printMethods(); */
+/*    printMethods(); */
 }
 
 void Command::Parser::printMethods() {
@@ -59,7 +59,7 @@ void Command::Parser::setSchema(const QString &filepath) {
     QJsonParseError errorPtr{};
     QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
-        qWarning() << "Parse failed" << errorPtr.error;
+        qWarning() << "Parsing failed" << errorPtr.error;
         return;
     }
     QJsonObject root = doc.object();
@@ -105,6 +105,7 @@ void Command::Parser::setPos(int pos) {
         m_curChar = QChar();
     else
         m_curChar = m_text[pos];
+    /*qDebug() << "Command::Parser::setPos" << m_pos << m_curChar; */
 }
 
 /*!
@@ -290,6 +291,9 @@ QString Command::Parser::getQuotedString() {
     return value;
 }
 
+/*!
+ * \brief Converts the specified parser ID into a method name to use with Qt's meta method system.
+ */
 QString Command::Parser::parserIdToMethodName(const QString &str) {
     if (str.contains(':')) {
         QStringList splited = str.split(':');
@@ -335,7 +339,6 @@ Command::DoubleNode *Command::Parser::brigadier_double(QObject *parent,
         checkMin(value, vari.toDouble());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toDouble());
-    advance(lit.length());
     return new Command::DoubleNode(parent, start, lit.length(), value);
 }
 
@@ -353,7 +356,6 @@ Command::FloatNode *Command::Parser::brigadier_float(QObject *parent,
         checkMin(value, vari.toFloat());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toFloat());
-    advance(raw.length());
     return new Command::FloatNode(parent, start, raw.length(), value);
 }
 
@@ -371,7 +373,6 @@ Command::IntegerNode *Command::Parser::brigadier_integer(QObject *parent,
         checkMin(value, vari.toInt());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toInt());
-    advance(raw.length());
     return new Command::IntegerNode(parent, start, raw.length(), value);
 }
 
@@ -438,32 +439,6 @@ int Command::Parser::pos() const {
 #define IF_TYPE_BRANCH(Type)         if (type == qMetaTypeId<Type*>()) \
     root->prepend(qvariant_cast<Type*>(vari));
 #define ELSE_IF_TYPE_BRANCH(Type)    else IF_TYPE_BRANCH(Type)
-
-/*!
- * \brief Casts the data in \a vari to its original type and prepend it to the RootNode \a root.
- */
-bool Command::Parser::castThenPrependTo(QVariant &vari,
-                                        Command::RootNode *root) {
-    /*qDebug() << "canConvert:" << vari.canConvert<Command::ParseNode*>(); */
-    if (!vari.canConvert<Command::ParseNode*>())
-        return false;
-
-    int type = vari.userType();
-
-    IF_TYPE_BRANCH(Command::RootNode)
-    ELSE_IF_TYPE_BRANCH(Command::BoolNode)
-    ELSE_IF_TYPE_BRANCH(Command::DoubleNode)
-    ELSE_IF_TYPE_BRANCH(Command::FloatNode)
-    ELSE_IF_TYPE_BRANCH(Command::IntegerNode)
-    ELSE_IF_TYPE_BRANCH(Command::LiteralNode)
-    ELSE_IF_TYPE_BRANCH(Command::ParseNode)
-    ELSE_IF_TYPE_BRANCH(Command::StringNode)
-    ELSE_IF_TYPE_BRANCH(Command::ArgumentNode)
-    else return false;
-
-    return true;
-}
-
 
 bool Command::Parser::parseResursively(QObject *parentObj,
                                        QJsonObject curSchemaNode,
@@ -545,19 +520,23 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                     curSchemaNode["properties"].toObject().toVariantMap();
                 int      returnType = method.returnType();
                 auto     typeName   = method.typeName();
-                QVariant vari(returnType, nullptr);
-                void    *data = vari.data();
-                qDebug() << returnType << vari << data;
+                QVariant returnVari(returnType, nullptr);
+
+                QGenericReturnArgument returnArgument(
+                    typeName,
+                    const_cast<void*>(returnVari.constData())
+                    );
+
+                qDebug() << returnType << returnVari;
                 try {
-                    bool invoked =
-                        method.invoke(this,
-                                      QGenericReturnArgument(typeName, data),
-                                      Q_ARG(QObject*, &m_parsingResult),
-                                      Q_ARG(QVariantMap, props));
-                    qDebug() << invoked << vari << data;
-                    if (invoked && data) {
+                    bool invoked = method.invoke(
+                        this, returnArgument,
+                        Q_ARG(QObject*, &m_parsingResult),
+                        Q_ARG(QVariantMap, props));
+                    qDebug() << invoked << returnVari;
+                    if (invoked) {
                         found = true;
-                        ret   = vari.value<Command::ParseNode*>();
+                        ret   = returnVari.value<Command::ParseNode*>();
                         qDebug() << ret << found;
                         bool ok = this->parseResursively(&m_parsingResult,
                                                          curSchemaNode,
@@ -565,7 +544,8 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                         /*qDebug() << "ok:" << ok; */
                         if (!ok)
                             qWarning() << "parseResursively returns false";
-                        castThenPrependTo(vari, &m_parsingResult);
+                        m_parsingResult.prepend(qvariant_cast<Command::ParseNode*>(
+                                                    returnVari));
                         break;
                     } else {
                         qWarning() << "Method not invoked:" << methodName;

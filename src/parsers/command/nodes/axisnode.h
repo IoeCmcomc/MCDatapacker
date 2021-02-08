@@ -18,13 +18,11 @@ public:
             float floatVal;
         };
 
-        AxisNode(QObject *parent,
-                 int pos,
+        AxisNode(QObject *parent, int pos,
                  int length    = 0,
                  AxisType type = Absolute,
                  int value     = 0);
-        AxisNode(QObject *parent,
-                 int pos,
+        AxisNode(QObject *parent, int pos,
                  int length    = 0,
                  AxisType type = Absolute,
                  double value  = 0);

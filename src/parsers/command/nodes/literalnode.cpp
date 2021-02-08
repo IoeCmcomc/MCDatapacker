@@ -1,8 +1,9 @@
 #include "literalnode.h"
 
+static int _ = qRegisterMetaType<Command::LiteralNode*>();
+
 Command::LiteralNode::LiteralNode(QObject *parent, int pos, const QString &txt)
     : Command::ParseNode(parent, pos, txt.length()) {
-    qRegisterMetaType<Command::LiteralNode*>();
     setText(txt);
 }
 
