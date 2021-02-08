@@ -26,6 +26,8 @@ public:
 public:
             explicit ParsingError(const QString& what_arg);
             QString message;
+            int pos    = 0;
+            int length = 1;
         };
 
         QChar curChar() const;
@@ -64,10 +66,11 @@ protected:
         void setPos(int pos);
 
         void error(QStringView msg);
-        void advance(int n                            = 1);
-        void recede(int n                             = 1);
-        bool expect(const QChar &chr, bool acceptNull = false);
-        void eat(const QChar &chr, bool acceptNull    = false);
+        void error(QStringView msg, int pos, int length = 1);
+        void advance(int n                              = 1);
+        void recede(int n                               = 1);
+        bool expect(const QChar &chr, bool acceptNull   = false);
+        void eat(const QChar &chr, bool acceptNull      = false);
         QString getUntil(const QChar &chr);
         QString getWithCharset(const QString &charset);
         QString getWithRegex(const QString &pattern);

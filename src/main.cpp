@@ -32,15 +32,7 @@ int main(int argc, char *argv[]) {
     parser.process(a);
 
     MainWindow w;
-    /*
-       w.resize(250, 150);
-       w.setWindowTitle("Simple example");
-     */
     w.show();
-    /*
-       w.showMaximized();
-       qDebug() << "Exitting application...";
-     */
 
     return QApplication::exec();
 }

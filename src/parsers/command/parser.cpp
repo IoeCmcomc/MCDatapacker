@@ -112,20 +112,24 @@ void Command::Parser::setPos(int pos) {
  * \brief Throws a \c Command::Parser::ParsingError with a formatted message.
  */
 void Command::Parser::error(QStringView msg) {
-    qWarning() << "Parsing error:" << msg;
+    error(msg, m_pos);
+}
+
+void Command::Parser::error(QStringView msg, int pos, int length) {
+    qWarning() << "Command::Parser::error" << msg;
     QString errorIndicatorText =
         QString("\"%1«%2»%3\" (%4 chars)").arg(
-            m_text.left(m_pos - 1),
-            m_curChar,
-            m_text.mid(m_pos + 1),
+            m_text.left(pos - 1),
+            m_text.mid(pos, length),
+            m_text.mid(pos + length + 1),
             QString::number(m_text.length()));
 
-    throw Command::Parser::ParsingError(tr(
-                                            "Input: %1\nparser error at pos %2: %3").arg(
-                                            errorIndicatorText,
-                                            QString
-                                            ::number(
-                                                m_pos), msg));
+    Command::Parser::ParsingError err(
+        tr("Input: %1\nParser error at pos %2: %3").arg(
+            errorIndicatorText, QString ::number(pos), msg));
+    err.pos    = pos;
+    err.length = length;
+    throw err;
 }
 
 /*!
@@ -411,21 +415,25 @@ Command::StringNode *Command::Parser::brigadier_string(QObject *parent,
  */
 Command::ParseNode *Command::Parser::parse() {
     qDebug() << "Command::Parser::parse" << m_text;
+    m_parsingResult.clear();
+    m_parsingResult.setPos(-1);
+    m_parsingResult.setLength(-1);
     if (m_schema.isEmpty()) {
         qWarning() << "The parser schema hasn't been initialized";
-        new Command::ParseNode(this);
-    }
-    m_parsingResult.clear();
-    m_parsingResult.setPos(0);
-    try {
-        if (parseResursively(this, m_schema)) {
-            return &m_parsingResult;
+    } else if (text().isEmpty() || text()[0] == '#') {
+        m_parsingResult.setPos(0);
+    } else {
+        try {
+            if (parseResursively(this, m_schema)) {
+                m_parsingResult.setPos(0);
+                m_parsingResult.setLength(pos() - 1);
+            }
+        } catch (const Command::Parser::ParsingError &err) {
+            qDebug() << "Command::Parser::parse" << err.message;
+            m_lastError = err;
         }
-    } catch (const Command::Parser::ParsingError &err) {
-        qDebug() << err.message;
-        m_lastError = err;
     }
-    return new Command::ParseNode(this);
+    return &m_parsingResult;
 }
 
 Command::Parser::ParsingError Command::Parser::lastError() const {
@@ -464,7 +472,7 @@ bool Command::Parser::parseResursively(QObject *parentObj,
             if (!curSchemaNode.contains("executable")
                 || (curSchemaNode.contains("executable")
                     && curSchemaNode.contains("redirect"))) {
-                if (this->m_curChar.isNull()) {
+                if (m_curChar.isNull()) {
                     QJsonArray redirect;
                     if (curSchemaNode.contains("redirect"))
                         redirect = curSchemaNode["redirect"].toArray();
@@ -476,48 +484,51 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                     }
                     ;
                 } else {
-                    this->error(tr("Incompleted command"));
+                    error(tr("Incompleted command"));
                 }
             } else {
-                this->expect(QChar());
+                expect(QChar());
                 return true;
             }
         } else {
             if (curSchemaNode.contains("executable")) {
-                if (this->m_curChar.isNull())
+                if (m_curChar.isNull())
                     return true;
             }
         }
-        this->eat(' ');
+        eat(' ');
     } else {
         curSchemaNode = m_schema;
     }
-    int     startPos = this->m_pos;
-    QString literal  = this->peekLiteral();
+    int     startPos = m_pos;
+    bool    success  = false;
+    QString literal  = peekLiteral();
     qDebug() << "literal:" << literal;
     bool found    = false;
-    auto children = curSchemaNode["children"].toObject();
+    auto children = curSchemaNode[QStringLiteral("children")].toObject();
     for (auto it = children.constBegin(); it != children.constEnd(); it++) {
         curSchemaNode = it.value().toObject();
-        if (curSchemaNode["type"] == "literal") {
+        if (curSchemaNode[QStringLiteral("type")] ==
+            QStringLiteral("literal")) {
             if (literal == it.key()) {
-                found = true;
-                ret   = this->brigadier_literal(parentObj);
-                this->parseResursively(&m_parsingResult,
-                                       curSchemaNode,
-                                       depth + 1);
-                this->m_parsingResult.prepend(ret);
+                found   = true;
+                ret     = brigadier_literal(parentObj);
+                success = parseResursively(&m_parsingResult,
+                                           curSchemaNode,
+                                           depth + 1);
+                m_parsingResult.prepend(ret);
                 break;
             }
         } else if (curSchemaNode["type"].toString() == "argument") {
             QString parserId    = curSchemaNode["parser"].toString();
-            auto    methodName  = parserIdToMethodName(parserId).toLatin1();
             int     methodIndex = metaObject()->indexOfMethod(
-                methodName + "(QObject*,QVariantMap)");
+                parserIdToMethodName(parserId).toLatin1()
+                + QStringLiteral("(QObject*,QVariantMap)").toLatin1());
             if (methodIndex != -1) {
                 auto method = metaObject()->method(methodIndex);
                 auto props  =
-                    curSchemaNode["properties"].toObject().toVariantMap();
+                    curSchemaNode[QStringLiteral("properties")].toObject().
+                    toVariantMap();
                 int      returnType = method.returnType();
                 auto     typeName   = method.typeName();
                 QVariant returnVari(returnType, nullptr);
@@ -526,8 +537,6 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                     typeName,
                     const_cast<void*>(returnVari.constData())
                     );
-
-                qDebug() << returnType << returnVari;
                 try {
                     bool invoked = method.invoke(
                         this, returnArgument,
@@ -538,54 +547,53 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                         found = true;
                         ret   = returnVari.value<Command::ParseNode*>();
                         qDebug() << ret << found;
-                        bool ok = this->parseResursively(&m_parsingResult,
-                                                         curSchemaNode,
-                                                         depth + 1);
-                        /*qDebug() << "ok:" << ok; */
-                        if (!ok)
-                            qWarning() << "parseResursively returns false";
+                        success = parseResursively(&m_parsingResult,
+                                                   curSchemaNode,
+                                                   depth + 1);
                         m_parsingResult.prepend(qvariant_cast<Command::ParseNode*>(
                                                     returnVari));
                         break;
                     } else {
-                        qWarning() << "Method not invoked:" << methodName;
+                        qWarning() << QStringLiteral(
+                            "Method not invoked: %1 (%2)").arg(parserIdToMethodName(
+                                                                   parserId),
+                                                               parserId);
                     }
                 } catch (const Command::Parser::ParsingError &err) {
+                    qWarning() << "Argument error:" << err.message;
                     errors << err;
-                    int argLength = this->m_pos - startPos;
+                    int argLength = m_pos - startPos;
                     if (argLength > 0) {
-                        this->recede(argLength);
+                        recede(argLength);
                     }
                     argLengths << argLength;
                 }
             } else {
-                this->error("Unknown parser " + parserId);
+                error("Unknown parser " + parserId);
             }
         }
     }
-    if (ret && ret->pos() == -2) { /* If succeed */
+    if (ret && ret->isVaild() && success) { /* If succeed */
+    } else if (errors.size() == 1) {
+        throw errors[0];
     } else if (errors.size() == curSchemaNode.size()) {
-        if (errors.size() == 1) {
-            throw errors[0];
+        bool sameAll =
+            std::all_of(argLengths.cbegin(), argLengths.cend(),
+                        [argLengths](int v) {
+            return v == argLengths[0];
+        });
+        if (sameAll) {
+            throw Command::Parser::ParsingError("Incorrect argument");
         } else {
-            bool sameAll =
-                std::all_of(argLengths.cbegin(), argLengths.cend(),
-                            [argLengths](int v) {
-                return v == argLengths[0];
-            });
-            if (sameAll) {
-                throw new Command::Parser::ParsingError("Incorrect argument");
-            } else {
-                throw errors[*std::max_element(argLengths.cbegin(),
-                                               argLengths.cend())];
-            }
+            throw errors[*std::max_element(argLengths.cbegin(),
+                                           argLengths.cend())];
         }
     }
     if (!found) {
-        if (curSchemaNode["type"] != "root") {
-            this->error("Unknown literal '" + literal + "'");
+        if (curSchemaNode[QStringLiteral("type")] != QStringLiteral("root")) {
+            error("Unknown literal '" + literal + "'");
         } else {
-            this->error("Unknown command '" + literal + "'");
+            error("Unknown command '" + literal + "'");
         }
     }
     return true;

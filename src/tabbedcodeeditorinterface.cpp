@@ -42,6 +42,12 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     connect(ui->codeEditor, &CodeEditor::textChanged,
             this, &TabbedCodeEditorInterface::onCurTextChanged);
 
+    textChangedTimer = new QTimer(this);
+    textChangedTimer->setSingleShot(true);
+    connect(textChangedTimer, &QTimer::timeout,
+            this, &TabbedCodeEditorInterface::onCurTextChangingDone); /* connect it to your slot */
+
+
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
             &QShortcut::activated, [this]() {
         onCloseFile(getCurIndex());
@@ -398,15 +404,17 @@ void TabbedCodeEditorInterface::onSwitchFile() {
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
-    qDebug() << "TabbedCodeEditorInterface::onCurTextChanged";
+    textChangedTimer->start(260);
+}
+
+void TabbedCodeEditorInterface::onCurTextChangingDone() {
+    qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone";
     auto *curFile = getCurFile();
 
-    if (!curFile) {
-        return;
+    if (curFile) {
+        curFile->highlighter->checkProblems();
+        ui->codeEditor->updateErrorSelections();
     }
-
-    curFile->highlighter->checkProblems();
-    ui->codeEditor->updateErrorSelections();
 }
 
 void TabbedCodeEditorInterface::onCurFileChanged(const QString &path) {

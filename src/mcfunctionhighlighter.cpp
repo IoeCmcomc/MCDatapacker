@@ -1,6 +1,8 @@
 #include "mcfunctionhighlighter.h"
 #include "codeeditor.h"
 
+#include "parsers/command/minecraftparser.h"
+
 #include <QDebug>
 
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
@@ -160,4 +162,35 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void McfunctionHighlighter::checkProblems() {
+    Command::MinecraftParser parser(this);
+    Command::ParseNode      *result = nullptr;
+
+    for (auto block = getParentDoc()->begin();
+         block != getParentDoc()->end(); block = block.next()) {
+        if (TextBlockData *data =
+                dynamic_cast<TextBlockData*>(block.userData())) {
+            QString lineText = block.text();
+            parser.setText(lineText);
+            result = parser.parse();
+            if (result->isVaild()) {
+                data->setProblem(std::nullopt);
+            } else {
+                auto parseErr = parser.lastError();
+                auto error    = ProblemInfo(true);
+                error.start   = block.position() + parseErr.pos;
+                error.length  = parseErr.length;
+                error.message = parseErr.message;
+
+/*
+                  qDebug() << "A problem found at line"
+                           << block.blockNumber()
+                           << ", row"
+                           << error.start - block.position()
+                           << ":" << error.message;
+ */
+
+                data->setProblem(error);
+            }
+        }
+    }
 }

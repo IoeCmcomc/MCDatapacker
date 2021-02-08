@@ -7,6 +7,7 @@
 #include "disclaimerdialog.h"
 #include "globalhelpers.h"
 #include "tabbedcodeeditorinterface.h"
+#include "parsers/command/minecraftparser.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -24,6 +25,7 @@ QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    Command::MinecraftParser::setSchema(":/minecraft/info/commands.json");
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                    MainWindow::readMCRInfo(QStringLiteral(

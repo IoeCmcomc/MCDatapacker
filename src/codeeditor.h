@@ -23,7 +23,7 @@ public:
     void updateErrorSelections();
 
     void readPrefSettings();
-    
+
 signals:
     void openFile(const QString &filepath);
 
@@ -44,12 +44,12 @@ private slots:
 
 private:
     QFont monoFont;
-    QWidget *lineNumberArea;
-    CodeFile::FileType curFileType = CodeFile::Text;
-    QString filepath;
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
+    QWidget *lineNumberArea;
+    CodeFile::FileType curFileType = CodeFile::Text;
+    QString filepath;
     Highlighter *curHighlighter;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;

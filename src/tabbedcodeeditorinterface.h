@@ -4,6 +4,7 @@
 #include "codeeditor.h"
 
 #include <QFrame>
+#include <QTimer>
 
 namespace Ui {
     class TabbedCodeEditorInterface;
@@ -64,6 +65,7 @@ private slots:
     void onCloseFile(int index);
     void onSwitchFile();
     void onCurTextChanged();
+    void onCurTextChangingDone();
     void onCurFileChanged(const QString &path);
 
 private:
@@ -71,6 +73,7 @@ private:
 
     QVector<CodeFile> files;
     int prevIndex = -1;
+    QTimer *textChangedTimer;
     bool tabMoved = false;
 
     CodeFile readFile(const QString &path);
