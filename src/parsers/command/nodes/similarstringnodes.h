@@ -21,12 +21,21 @@ public:                                          \
 namespace Command {
     DECLARE_TYPE_FROM_STRINGNODE(ColorNode)
     DECLARE_TYPE_FROM_STRINGNODE(EntityAnchorNode)
+    DECLARE_TYPE_FROM_STRINGNODE(MessageNode)
+    DECLARE_TYPE_FROM_STRINGNODE(ObjectiveNode)
+    DECLARE_TYPE_FROM_STRINGNODE(ObjectiveCriteriaNode)
     DECLARE_TYPE_FROM_STRINGNODE(OperationNode)
+    DECLARE_TYPE_FROM_STRINGNODE(ScoreboardSlotNode)
+    DECLARE_TYPE_FROM_STRINGNODE(TeamNode)
 }
 
 Q_DECLARE_METATYPE(Command::ColorNode*);
 Q_DECLARE_METATYPE(Command::EntityAnchorNode*);
+Q_DECLARE_METATYPE(Command::MessageNode*);
+Q_DECLARE_METATYPE(Command::ObjectiveNode*);
+Q_DECLARE_METATYPE(Command::ObjectiveCriteriaNode*);
 Q_DECLARE_METATYPE(Command::OperationNode*);
-
+Q_DECLARE_METATYPE(Command::ScoreboardSlotNode*);
+Q_DECLARE_METATYPE(Command::TeamNode*);
 
 #endif /* SIMILARSTRINGNODES_H */

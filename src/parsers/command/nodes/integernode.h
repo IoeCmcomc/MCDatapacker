@@ -9,7 +9,7 @@ namespace Command {
         Q_OBJECT
 public:
         explicit IntegerNode(QObject *parent, int pos = -1, int length = 0,
-                             int value                = false);
+                             int value                = 0);
 
         QString toString() const;
         int value() const;

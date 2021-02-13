@@ -162,6 +162,16 @@ void TestParser::parseString() {
     QCOMPARE(result->value(), "Speed Upgrade for Blocks");
 }
 
-QTEST_GUILESS_MAIN(TestParser)
+/*QTEST_GUILESS_MAIN(TestParser) */
+
+int main(int argc, char *argv[]) {
+    TESTLIB_SELFCOVERAGE_START("TestParser")
+    QT_PREPEND_NAMESPACE(QTest::Internal::callInitMain) < TestParser > ();
+    QCoreApplication app(argc, argv);
+    app.setAttribute(Qt::AA_Use96Dpi, true);
+    TestParser tc;
+    QTEST_SET_MAIN_SOURCE_PATH
+    return QTest::qExec(&tc, argc, argv);
+}
 
 #include "tst_testparser.moc"

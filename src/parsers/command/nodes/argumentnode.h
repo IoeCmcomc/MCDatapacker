@@ -13,7 +13,7 @@ public:
                               int length,
                               QString parserId);
 
-        virtual QString toString() const;
+        virtual QString toString() const override;
         QString parserId() const;
 protected:
         void setParserId(const QString &parserId);

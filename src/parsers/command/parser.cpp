@@ -463,16 +463,16 @@ bool Command::Parser::parseResursively(QObject *parentObj,
     if (depth > 0) {
         if (depth > 100)
             qWarning() << "The parsing stack depth is too large:" << depth;
-/*
-          qDebug() << "has children:" << curSchemaNode.contains("children");
-          qDebug() << "has executable:" << curSchemaNode.contains("executable");
-          qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
- */
+        /*
+           qDebug() << "has children:" << curSchemaNode.contains("children");
+           qDebug() << "has executable:" << curSchemaNode.contains("executable");
+           qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
+         */
         if (!curSchemaNode.contains("children")) {
             if (!curSchemaNode.contains("executable")
                 || (curSchemaNode.contains("executable")
                     && curSchemaNode.contains("redirect"))) {
-                if (m_curChar.isNull()) {
+                if (!m_curChar.isNull()) {
                     QJsonArray redirect;
                     if (curSchemaNode.contains("redirect"))
                         redirect = curSchemaNode["redirect"].toArray();
@@ -497,8 +497,6 @@ bool Command::Parser::parseResursively(QObject *parentObj,
             }
         }
         eat(' ');
-    } else {
-        curSchemaNode = m_schema;
     }
     int     startPos = m_pos;
     bool    success  = false;
@@ -519,7 +517,8 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                 m_parsingResult.prepend(ret);
                 break;
             }
-        } else if (curSchemaNode["type"].toString() == "argument") {
+        } else if (curSchemaNode[QStringLiteral("type")] ==
+                   QStringLiteral("argument")) {
             QString parserId    = curSchemaNode["parser"].toString();
             int     methodIndex = metaObject()->indexOfMethod(
                 parserIdToMethodName(parserId).toLatin1()

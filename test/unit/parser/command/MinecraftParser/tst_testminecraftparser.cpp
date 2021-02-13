@@ -18,6 +18,7 @@ private slots:
     void cleanupTestCase();
     void functionCmd();
     void forceloadCmd();
+    void tpCmd();
 };
 
 TestMinecraftParser::TestMinecraftParser() {
@@ -68,6 +69,14 @@ void TestMinecraftParser::forceloadCmd() {
     QCOMPARE(
         result->toString(),
         "RootNode[3](LiteralNode(forceload), LiteralNode(query), ColumnPosNode(x: AxisNode(3), z: AxisNode(5)))");
+}
+
+void TestMinecraftParser::tpCmd() {
+    MinecraftParser parser(this, "tp ~ ~1 ~");
+
+    auto *result = parser.parse();
+
+    qDebug() << *result;
 }
 
 QTEST_MAIN(TestMinecraftParser)

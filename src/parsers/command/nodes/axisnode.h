@@ -8,7 +8,7 @@ namespace Command {
     {
         Q_OBJECT
 public:
-        enum AxisType {
+        enum AxisType : unsigned char {
             Absolute,
             Relative,
             Local
@@ -28,7 +28,7 @@ public:
                  double value  = 0);
         AxisNode(QObject *parent);
 
-        virtual QString toString() const;
+        virtual QString toString() const override;
         QString format() const;
 
         AxisType type() const;
@@ -48,7 +48,7 @@ protected:
         void setValue(const Number &value);
 
 private:
-        Number m_value    = Number();
+        Number m_value;
         AxisType m_type   = Absolute;
         bool m_useInteger = false;
     };

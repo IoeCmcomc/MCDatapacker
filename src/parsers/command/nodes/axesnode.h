@@ -11,8 +11,8 @@ namespace Command {
 public:
         explicit AxesNode(QObject *parent, int pos = -1,
                           int length               = 0);
-        virtual QString toString() const;
-        bool isVaild() const;
+        virtual QString toString() const override;
+        bool isVaild() const override;
 
         AxisNode *y();
         void setY(AxisNode *y);

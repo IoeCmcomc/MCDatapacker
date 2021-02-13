@@ -56,11 +56,15 @@ SOURCES += \
     parsers/command/nodes/argumentnode.cpp \
     parsers/command/nodes/axesnode.cpp \
     parsers/command/nodes/axisnode.cpp \
+    parsers/command/nodes/blockstatenode.cpp \
     parsers/command/nodes/boolnode.cpp \
     parsers/command/nodes/doublenode.cpp \
     parsers/command/nodes/floatnode.cpp \
+    parsers/command/nodes/floatrangenode.cpp \
     parsers/command/nodes/integernode.cpp \
+    parsers/command/nodes/intrangenode.cpp \
     parsers/command/nodes/literalnode.cpp \
+    parsers/command/nodes/mapnode.cpp \
     parsers/command/nodes/parsenode.cpp \
     parsers/command/nodes/resourcelocationnode.cpp \
     parsers/command/nodes/rootnode.cpp \
@@ -68,6 +72,9 @@ SOURCES += \
     parsers/command/nodes/similarresourcelocationnodes.cpp \
     parsers/command/nodes/similarstringnodes.cpp \
     parsers/command/nodes/stringnode.cpp \
+    parsers/command/nodes/swizzlenode.cpp \
+    parsers/command/nodes/timenode.cpp \
+    parsers/command/nodes/uuidnode.cpp \
     parsers/command/parser.cpp \
     predicatedock.cpp \
     rawjsontextedit.cpp \
@@ -116,18 +123,26 @@ HEADERS += \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
     parsers/command/nodes/axisnode.h \
+    parsers/command/nodes/blockstatenode.h \
     parsers/command/nodes/boolnode.h \
     parsers/command/nodes/doublenode.h \
     parsers/command/nodes/floatnode.h \
+    parsers/command/nodes/floatrangenode.h \
     parsers/command/nodes/integernode.h \
+    parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/literalnode.h \
+    parsers/command/nodes/mapnode.h \
     parsers/command/nodes/parsenode.h \
+    parsers/command/nodes/rangenode.h \
     parsers/command/nodes/resourcelocationnode.h \
     parsers/command/nodes/rootnode.h \
     parsers/command/nodes/similaraxesnodes.h \
     parsers/command/nodes/similarresourcelocationnodes.h \
     parsers/command/nodes/similarstringnodes.h \
     parsers/command/nodes/stringnode.h \
+    parsers/command/nodes/swizzlenode.h \
+    parsers/command/nodes/timenode.h \
+    parsers/command/nodes/uuidnode.h \
     parsers/command/parser.h \
     parsers/command/minecraftparser.h \
     predicatedock.h \
