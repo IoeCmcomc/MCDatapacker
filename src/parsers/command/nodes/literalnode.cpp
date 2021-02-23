@@ -18,12 +18,3 @@ QString Command::LiteralNode::text() const {
 void Command::LiteralNode::setText(const QString &text) {
     m_text = text;
 }
-
-Command::StringNode *Command::LiteralNode::toStringNode(bool autoDelete) {
-    auto *ret = new Command::StringNode(parent(), pos(), text());
-
-    if (autoDelete)
-        deleteLater();
-    return ret;
-}
-

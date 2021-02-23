@@ -24,8 +24,6 @@ public:
 
         Command::ParseNode *operator[](int index);
         Command::ParseNode *operator[](int index) const;
-        Command::RootNode &operator<<(Command::ParseNode *node);
-
 
         QVector<Command::ParseNode *> children() const;
 

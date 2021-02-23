@@ -2,6 +2,7 @@
 #define STRINGNODE_H
 
 #include "argumentnode.h"
+#include "literalnode.h"
 
 namespace Command {
     class StringNode : public ArgumentNode
@@ -14,6 +15,8 @@ public:
         virtual QString toString() const;
         QString value() const;
         void setValue(const QString &value);
+
+        static StringNode *fromLiteralNode(LiteralNode *node);
 
 private:
         QString m_value;

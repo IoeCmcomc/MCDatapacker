@@ -17,7 +17,6 @@
 #include <QSplitter>
 #include <QApplication>
 #include <QMimeData>
-#include <QDir>
 #include <QJsonDocument>
 #include <QFont>
 #include <QShortcut>

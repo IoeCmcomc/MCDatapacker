@@ -116,12 +116,13 @@ void Command::Parser::error(QStringView msg) {
 }
 
 void Command::Parser::error(QStringView msg, int pos, int length) {
-    qWarning() << "Command::Parser::error" << msg;
+    qWarning() << "Command::Parser::error" << msg << (pos - 1) << pos <<
+        (pos + length);
     QString errorIndicatorText =
         QString("\"%1«%2»%3\" (%4 chars)").arg(
-            m_text.left(pos - 1),
+            m_text.left(pos),
             m_text.mid(pos, length),
-            m_text.mid(pos + length + 1),
+            m_text.mid(pos + length),
             QString::number(m_text.length()));
 
     Command::Parser::ParsingError err(
@@ -156,7 +157,7 @@ void Command::Parser::recede(int n) {
  * \brief throws a \c error if the char \a chr isn't equal to the current character.
  */
 bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
-    /*qDebug() << "Command::Parser::expect" << chr << acceptNull << m_curChar; */
+/*    qDebug() << "Command::Parser::expect" << chr << acceptNull << m_curChar; */
     bool cond = m_curChar == chr;
 
     if (!cond && acceptNull)
@@ -240,9 +241,12 @@ QString Command::Parser::peek(int n) {
     return m_text.mid(m_pos, n);
 }
 
-void Command::Parser::skipWs() {
-    if (m_curChar.isSpace())
+void Command::Parser::skipWs(bool once) {
+    while (m_curChar.isSpace()) {
         advance();
+        if (once)
+            break;
+    }
 }
 
 /*!
@@ -281,6 +285,12 @@ QString Command::Parser::getQuotedString() {
                 value += curQuoteChar;
             else if (m_curChar == '\\')
                 value += '\\';
+            else if (m_curChar == 'n')
+                value += '\n';
+            else if (m_curChar == 'r')
+                value += '\r';
+            else if (m_curChar == 't')
+                value += '\t';
             else
                 value += m_curChar;
             backslash = false;
@@ -385,7 +395,8 @@ Command::LiteralNode *Command::Parser::brigadier_literal(QObject *parent,
 {
     int start = m_pos;
 
-    return new Command::LiteralNode(parent, start, getWithRegex(R"([\S]+)"));
+    return new Command::LiteralNode(parent, start,
+                                    getWithRegex(R"([a-zA-Z0-9-_*<=>]+)"));
 }
 
 Command::StringNode *Command::Parser::brigadier_string(QObject *parent,
@@ -405,7 +416,8 @@ Command::StringNode *Command::Parser::brigadier_string(QObject *parent,
         if (m_curChar == '"' || m_curChar == '\'')
             return new Command::StringNode(parent, m_pos, getQuotedString());
     } else if (type == "word") {
-        return brigadier_literal(parent)->toStringNode(true);
+        QScopedPointer<LiteralNode> literal(brigadier_literal(parent));
+        return Command::StringNode::fromLiteralNode(literal.get());
     }
     return defaultRet;
 }
@@ -414,7 +426,7 @@ Command::StringNode *Command::Parser::brigadier_string(QObject *parent,
  * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invaild \c ParseNode if an error occured.
  */
 Command::ParseNode *Command::Parser::parse() {
-    qDebug() << "Command::Parser::parse" << m_text;
+    /*qDebug() << "Command::Parser::parse" << m_text; */
     m_parsingResult.clear();
     m_parsingResult.setPos(-1);
     m_parsingResult.setLength(-1);
@@ -444,10 +456,6 @@ int Command::Parser::pos() const {
     return m_pos;
 }
 
-#define IF_TYPE_BRANCH(Type)         if (type == qMetaTypeId<Type*>()) \
-    root->prepend(qvariant_cast<Type*>(vari));
-#define ELSE_IF_TYPE_BRANCH(Type)    else IF_TYPE_BRANCH(Type)
-
 bool Command::Parser::parseResursively(QObject *parentObj,
                                        QJsonObject curSchemaNode,
                                        int depth) {
@@ -456,7 +464,7 @@ bool Command::Parser::parseResursively(QObject *parentObj,
           curSchemaNode << depth;
  */
 
-    Command::ParseNode                    *ret;
+    Command::ParseNode                    *ret = nullptr;
     QVector<Command::Parser::ParsingError> errors;
     QVector<int>                           argLengths;
 
@@ -496,6 +504,8 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                     return true;
             }
         }
+        if (curChar().isNull())
+            error(tr("Incompleted command"));
         eat(' ');
     }
     int     startPos = m_pos;
@@ -549,7 +559,7 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                         success = parseResursively(&m_parsingResult,
                                                    curSchemaNode,
                                                    depth + 1);
-                        m_parsingResult.prepend(qvariant_cast<Command::ParseNode*>(
+                        m_parsingResult.prepend(qvariant_cast<Command::ArgumentNode*>(
                                                     returnVari));
                         break;
                     } else {
@@ -561,10 +571,8 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                 } catch (const Command::Parser::ParsingError &err) {
                     qWarning() << "Argument error:" << err.message;
                     errors << err;
-                    int argLength = m_pos - startPos;
-                    if (argLength > 0) {
-                        recede(argLength);
-                    }
+                    int argLength = m_pos - startPos + 1;
+                    setPos(startPos);
                     argLengths << argLength;
                 }
             } else {

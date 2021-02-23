@@ -12,6 +12,7 @@
 
 DEFINE_TYPE_FROM_STRINGNODE(ColorNode, "minecraft:color")
 DEFINE_TYPE_FROM_STRINGNODE(EntityAnchorNode, "minecraft:entity_anchor")
+DEFINE_TYPE_FROM_STRINGNODE(ItemSlotNode, "minecraft:item_slot")
 DEFINE_TYPE_FROM_STRINGNODE(MessageNode, "minecraft:message")
 DEFINE_TYPE_FROM_STRINGNODE(ObjectiveNode, "minecraft:objective")
 DEFINE_TYPE_FROM_STRINGNODE(ObjectiveCriteriaNode,

@@ -102,7 +102,7 @@ void MainWindow::open() {
 }
 
 bool MainWindow::save() {
-    if (ui->codeEditorInterface->isNoFile())
+    if (ui->codeEditorInterface->hasNoFile())
         return false;
 
     if (auto *curFile = ui->codeEditorInterface->getCurFile();
@@ -335,7 +335,7 @@ void MainWindow::commitData(QSessionManager &) {
 void MainWindow::updateWindowTitle(bool changed) {
     QStringList titleParts;
 
-    if (!ui->codeEditorInterface->isNoFile()) {
+    if (!ui->codeEditorInterface->hasNoFile()) {
         if (auto curPath = ui->codeEditorInterface->getCurFilePath();
             !curPath.isEmpty())
             titleParts << QFileInfo(curPath).fileName() + "[*]";
@@ -534,7 +534,7 @@ void MainWindow::openFolder() {
 }
 
 void MainWindow::setCodeEditorText(const QString &text) {
-    if (ui->codeEditorInterface->isNoFile())
+    if (ui->codeEditorInterface->hasNoFile())
         return;
 
     /*ui->codeEditor->setPlainText(text); */

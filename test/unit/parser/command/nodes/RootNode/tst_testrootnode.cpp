@@ -48,7 +48,7 @@ void TestRootNode::append() {
     root.append(node);
     QCOMPARE(root.toString(), "RootNode[1](ParseNode())");
 
-    root << new ParseNode(this);
+    root.append(new ParseNode(this));
 
     QCOMPARE(root.toString(), "RootNode[2](ParseNode(), ParseNode())");
 
@@ -63,7 +63,9 @@ void TestRootNode::append() {
 void TestRootNode::remove() {
     RootNode root(this);
 
-    root << new ParseNode(this) << new ParseNode(this) << new ParseNode(this);
+    root.append(new ParseNode(this));
+    root.append(new ParseNode(this));
+    root.append(new ParseNode(this));
 
     QCOMPARE(root.toString(),
              "RootNode[3](ParseNode(), ParseNode(), ParseNode())");
@@ -82,7 +84,9 @@ void TestRootNode::isEmpty() {
 
     QCOMPARE(root.isEmpty(), true);
 
-    root << new ParseNode(this) << new ParseNode(this) << new ParseNode(this);
+    root.append(new ParseNode(this));
+    root.append(new ParseNode(this));
+    root.append(new ParseNode(this));
 
     QCOMPARE(root.isEmpty(), false);
 }
@@ -92,10 +96,12 @@ void TestRootNode::size() {
 
     QCOMPARE(root.size(), 0);
 
-    root << new ParseNode(this);
+    root.append(new ParseNode(this));
     QCOMPARE(root.size(), 1);
 
-    root << new ParseNode(this) << new ParseNode(this) << new ParseNode(this);
+    root.append(new ParseNode(this));
+    root.append(new ParseNode(this));
+    root.append(new ParseNode(this));
     QCOMPARE(root.size(), 4);
 
     root.remove(3);

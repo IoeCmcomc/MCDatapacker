@@ -6,7 +6,7 @@ QT += core gui uitools
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17 lrelease embed_translations
+CONFIG += c++17 lrelease embed_translations conan_basic_setup
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -58,14 +58,20 @@ SOURCES += \
     parsers/command/nodes/axisnode.cpp \
     parsers/command/nodes/blockstatenode.cpp \
     parsers/command/nodes/boolnode.cpp \
+    parsers/command/nodes/componentnode.cpp \
     parsers/command/nodes/doublenode.cpp \
+    parsers/command/nodes/entitynode.cpp \
     parsers/command/nodes/floatnode.cpp \
     parsers/command/nodes/floatrangenode.cpp \
     parsers/command/nodes/integernode.cpp \
     parsers/command/nodes/intrangenode.cpp \
+    parsers/command/nodes/itemstacknode.cpp \
     parsers/command/nodes/literalnode.cpp \
     parsers/command/nodes/mapnode.cpp \
+    parsers/command/nodes/nbtnodes.cpp \
+    parsers/command/nodes/nbtpathnode.cpp \
     parsers/command/nodes/parsenode.cpp \
+    parsers/command/nodes/particlenode.cpp \
     parsers/command/nodes/resourcelocationnode.cpp \
     parsers/command/nodes/rootnode.cpp \
     parsers/command/nodes/similaraxesnodes.cpp \
@@ -73,6 +79,7 @@ SOURCES += \
     parsers/command/nodes/similarstringnodes.cpp \
     parsers/command/nodes/stringnode.cpp \
     parsers/command/nodes/swizzlenode.cpp \
+    parsers/command/nodes/targetselectornode.cpp \
     parsers/command/nodes/timenode.cpp \
     parsers/command/nodes/uuidnode.cpp \
     parsers/command/parser.cpp \
@@ -125,14 +132,20 @@ HEADERS += \
     parsers/command/nodes/axisnode.h \
     parsers/command/nodes/blockstatenode.h \
     parsers/command/nodes/boolnode.h \
+    parsers/command/nodes/componentnode.h \
     parsers/command/nodes/doublenode.h \
+    parsers/command/nodes/entitynode.h \
     parsers/command/nodes/floatnode.h \
     parsers/command/nodes/floatrangenode.h \
     parsers/command/nodes/integernode.h \
     parsers/command/nodes/intrangenode.h \
+    parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/mapnode.h \
+    parsers/command/nodes/nbtnodes.h \
+    parsers/command/nodes/nbtpathnode.h \
     parsers/command/nodes/parsenode.h \
+    parsers/command/nodes/particlenode.h \
     parsers/command/nodes/rangenode.h \
     parsers/command/nodes/resourcelocationnode.h \
     parsers/command/nodes/rootnode.h \
@@ -141,6 +154,7 @@ HEADERS += \
     parsers/command/nodes/similarstringnodes.h \
     parsers/command/nodes/stringnode.h \
     parsers/command/nodes/swizzlenode.h \
+    parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \
     parsers/command/nodes/uuidnode.h \
     parsers/command/parser.h \
@@ -200,8 +214,6 @@ QMAKE_TARGET_PRODUCT = MCDatapacker
 DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
     MCDatapacker_vi_VN.ts
-
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/release/ -llib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/debug/ -lliblib

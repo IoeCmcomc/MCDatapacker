@@ -25,9 +25,9 @@ struct CodeFile {
     QFileInfo      fileInfo;
     FileType       fileType = Text;
     QString        title;
-    QTextDocument *doc        = new QTextDocument();
-    QTextCursor    textCursor = QTextCursor(doc);
-    Highlighter   *highlighter;
+    QTextDocument *doc         = new QTextDocument();
+    QTextCursor    textCursor  = QTextCursor(doc);
+    Highlighter   *highlighter = nullptr;
 
     CodeFile(const QString &path);
 

@@ -2,7 +2,6 @@
 #define LITERALNODE_H
 
 #include "parsenode.h"
-#include "stringnode.h"
 
 namespace Command {
     class LiteralNode : public ParseNode
@@ -14,8 +13,6 @@ public:
         QString toString() const;
         QString text() const;
         void setText(const QString &text);
-
-        StringNode *toStringNode(bool autoDelete = false);
 
 private:
         QString m_text;

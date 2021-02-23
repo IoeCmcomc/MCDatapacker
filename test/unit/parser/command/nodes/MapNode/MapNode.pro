@@ -7,9 +7,11 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES +=  tst_testmapnode.cpp \
+    ../../../../../../src/parsers/command/nodes/literalnode.cpp \
     ../../../../../../src/parsers/command/nodes/mapnode.cpp \
     ../../../../../../src/parsers/command/nodes/parsenode.cpp
 
 HEADERS += \
+    ../../../../../../src/parsers/command/nodes/literalnode.h \
     ../../../../../../src/parsers/command/nodes/mapnode.h \
     ../../../../../../src/parsers/command/nodes/parsenode.h

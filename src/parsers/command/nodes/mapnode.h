@@ -1,7 +1,7 @@
 #ifndef MAPNODE_H
 #define MAPNODE_H
 
-#include "parsenode.h"
+#include "literalnode.h"
 
 namespace Command {
 /*
@@ -17,6 +17,13 @@ namespace Command {
    and it is said that "Prefer composition over inheritance".
    Therefore, I changed my mind.
  */
+    struct MapKey {
+        int     pos = -1;
+        QString text;
+        bool operator<(const MapKey &other) const;
+    };
+    using ParseNodeMap = QMap<MapKey, ParseNode*>;
+
     class MapNode : public ParseNode
     {
         Q_OBJECT
@@ -27,15 +34,17 @@ public:
 
         int size() const;
         bool contains(const QString &key) const;
-        void insert(const QString &key, ParseNode *node);
-        int remove(const QString &key);
+        bool contains(const MapKey &key) const;
+        ParseNodeMap::const_iterator find(const QString &key) const;
+        void insert(const MapKey &key, ParseNode *node);
+        int remove(const MapKey &key);
         void clear();
-        Command::ParseNode* &operator[](const QString &key);
-        Command::ParseNode* operator[](const QString &key) const;
-
+        ParseNode* &operator[](const MapKey &key);
+        ParseNode *operator[](const MapKey &key) const;
+        ParseNodeMap toMap() const;
 
 private:
-        QMap<QString, ParseNode*> m_map;
+        ParseNodeMap m_map;
     };
 }
 

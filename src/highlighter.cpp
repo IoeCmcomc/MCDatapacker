@@ -98,8 +98,11 @@ void Highlighter::highlightBlock(const QString &text) {
                         quoteStart   = i;
                         quoteLength++;
                     }
+                } else if (backslash) {
+                    quoteLength++;
+                    backslash = false;
                 } else if (curChar == QLatin1Char('\\')) {
-                    backslash = !backslash;
+                    backslash = true;
                 } else if (currentBlockState() == QuotedString) {
                     quoteLength++;
                 } else if (currentBlockState() <= Normal) {

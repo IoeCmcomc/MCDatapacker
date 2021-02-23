@@ -5,8 +5,7 @@
 #include "nodes/doublenode.h"
 #include "nodes/floatnode.h"
 #include "nodes/integernode.h"
-#include "nodes/literalnode.h"
-/*#include "nodes/stringnode.h" */
+#include "nodes/stringnode.h"
 #include "nodes/rootnode.h"
 
 #include <QJsonObject>
@@ -75,7 +74,7 @@ protected:
         QString getWithCharset(const QString &charset);
         QString getWithRegex(const QString &pattern);
         QString peek(int n);
-        void skipWs();
+        void skipWs(bool once = true);
 
         QString peekLiteral();
         QString getQuotedString();
@@ -86,16 +85,18 @@ protected:
 
         template<typename T>
         void checkMin(T value, T min) {
-            if (value <= min)
-                error(tr("%1 must be greater than or equal to %2").arg(value,
-                                                                       min));
+            if (value < min)
+                error(
+                    QString("The value must be greater than or equal to %1").arg(
+                        min));
         }
 
         template<typename T>
         void checkMax(T value, T max) {
-            if (value >= max)
-                error(tr("%1 must be lesser than or equal to %2").arg(value,
-                                                                      max));
+            if (value > max)
+                error(
+                    QString("The value must be lesser than or equal to %1").arg(
+                        max));
         }
 
         template<typename T>

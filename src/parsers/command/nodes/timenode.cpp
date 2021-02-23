@@ -4,7 +4,7 @@ static int _ = qRegisterMetaType<Command::TimeNode*>();
 
 Command::TimeNode::TimeNode(QObject *parent, int pos, int length, int v,
                             Unit unit)
-    : Command::ArgumentNode(parent, pos, length, "minecraf;time") {
+    : Command::ArgumentNode(parent, pos, length, "minecraf:time") {
     setValue(v);
     setUnit(unit);
 }

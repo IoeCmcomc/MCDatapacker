@@ -4,10 +4,8 @@ static int _ = qRegisterMetaType<Command::DoubleNode*>();
 
 Command::DoubleNode::DoubleNode(QObject *parent, int pos, int length,
                                 double value)
-    : Command::ArgumentNode(parent, pos, -1, "brigadier:double") {
+    : Command::ArgumentNode(parent, pos, length, "brigadier:double") {
     setValue(value);
-    setLength(length);
-    setLength((value) ? 4 : 5);
 }
 
 QString Command::DoubleNode::toString() const {

@@ -19,3 +19,10 @@ void Command::StringNode::setValue(const QString &value) {
     m_value = value;
     setLength(value.length());
 }
+
+Command::StringNode *Command::StringNode::fromLiteralNode(LiteralNode *node) {
+    if (node) {
+        return new StringNode(node->parent(), node->pos(), node->text());
+    }
+    return nullptr;
+}

@@ -60,11 +60,6 @@ Command::ParseNode *Command::RootNode::operator[](int index) const {
     return m_children[index];
 }
 
-Command::RootNode &Command::RootNode::operator<<(Command::ParseNode *node) {
-    append(node);
-    return *this;
-}
-
 QVector<Command::ParseNode *> Command::RootNode::children() const {
     return m_children;
 }

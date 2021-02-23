@@ -9,9 +9,10 @@ namespace Command {
         Q_OBJECT
 public:
         explicit ResourceLocationNode(QObject *parent, int pos = -1,
-                                      const QString &nspace    = "minecraft",
+                                      const QString &nspace    = "",
                                       const QString &id        = "");
         virtual QString toString() const;
+        QString format() const;
 
         QString nspace() const;
         void setNspace(const QString &nspace);

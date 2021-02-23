@@ -34,7 +34,7 @@ public:
     inline int count() const {
         return files.count();
     };
-    inline bool isNoFile() const {
+    inline bool hasNoFile() const {
         return count() == 0;
     };
 

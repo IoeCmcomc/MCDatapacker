@@ -34,12 +34,20 @@ void TestMapNode::cleanupTestCase() {
 void TestMapNode::test_case1() {
     MapNode node(this, 0, 999);
 
-    QCOMPARE(node.size(), 0);
-    node.insert("test", new ParseNode(this, 0, 5));
-    node["second"] = new ParseNode(this, 23, 6);
-    QCOMPARE(node.size(), 2);
+    QCOMPARE(node.size(), 0);;
+    node.insert(MapKey{ 2, "test" }, new ParseNode(this, 0, 5));
+    node.insert(MapKey{ 1, "first" }, new ParseNode(this, 0, 5));
+
+    auto map = node.toMap();
+    auto it  = map.cbegin();
+
+    while (it != map.cend()) {
+        qDebug() << it.key().text << *it.value();
+        ++it;
+    }
+    QCOMPARE(map.size(), 2);
     QCOMPARE(node.toString(),
-             "MapNode(second: ParseNode(), test: ParseNode())");
+             "MapNode(first: ParseNode(), test: ParseNode())");
 }
 
 QTEST_MAIN(TestMapNode)

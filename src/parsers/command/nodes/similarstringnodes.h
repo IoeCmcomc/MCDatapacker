@@ -21,6 +21,7 @@ public:                                          \
 namespace Command {
     DECLARE_TYPE_FROM_STRINGNODE(ColorNode)
     DECLARE_TYPE_FROM_STRINGNODE(EntityAnchorNode)
+    DECLARE_TYPE_FROM_STRINGNODE(ItemSlotNode)
     DECLARE_TYPE_FROM_STRINGNODE(MessageNode)
     DECLARE_TYPE_FROM_STRINGNODE(ObjectiveNode)
     DECLARE_TYPE_FROM_STRINGNODE(ObjectiveCriteriaNode)
@@ -31,6 +32,7 @@ namespace Command {
 
 Q_DECLARE_METATYPE(Command::ColorNode*);
 Q_DECLARE_METATYPE(Command::EntityAnchorNode*);
+Q_DECLARE_METATYPE(Command::ItemSlotNode*);
 Q_DECLARE_METATYPE(Command::MessageNode*);
 Q_DECLARE_METATYPE(Command::ObjectiveNode*);
 Q_DECLARE_METATYPE(Command::ObjectiveCriteriaNode*);

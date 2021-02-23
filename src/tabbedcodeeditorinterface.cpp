@@ -180,7 +180,7 @@ void TabbedCodeEditorInterface::setCurIndex(int i) {
 
 void TabbedCodeEditorInterface::onModificationChanged(bool changed) {
     /*qDebug() << "onModificationChanged" << changed; */
-    Q_ASSERT(!isNoFile());
+    Q_ASSERT(!hasNoFile());
 
     updateTabTitle(getCurIndex(), changed);
     emit curModificationChanged(changed);
@@ -232,7 +232,7 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
 
 CodeFile *TabbedCodeEditorInterface::getCurFile() {
     /*qDebug() << "getCurFile" << count() << getCurIndex(); */
-    if (isNoFile() || (getCurIndex() == -1))
+    if (hasNoFile() || (getCurIndex() == -1))
         return nullptr;
     else
         return &files[getCurIndex()];
@@ -262,13 +262,13 @@ CodeEditor *TabbedCodeEditorInterface::getEditor() const {
 }
 
 void TabbedCodeEditorInterface::clear() {
-    if (!isNoFile()) {
+    if (!hasNoFile()) {
         for (int i = count() - 1; i >= 0; --i) {
             onCloseFile(i);
         }
     }
 
-    Q_ASSERT(isNoFile());
+    Q_ASSERT(hasNoFile());
 }
 
 bool TabbedCodeEditorInterface::hasUnsavedChanges() const {
@@ -304,7 +304,7 @@ bool TabbedCodeEditorInterface::saveCurFile() {
 bool TabbedCodeEditorInterface::saveAllFile() {
     bool r = true;
 
-    if (!isNoFile()) {
+    if (!hasNoFile()) {
         for (int i = 0; i < count(); i++) {
             /* AND operation */
             r &= saveFile(i, files[i].fileInfo.filePath());
@@ -368,7 +368,7 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
 
         emit curFileChanged("");
     }
-    if (isNoFile())
+    if (hasNoFile())
         emit curModificationChanged(false);
     else
         emit curModificationChanged(getCurDoc()->isModified());
@@ -398,20 +398,22 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
 }
 
 void TabbedCodeEditorInterface::onSwitchFile() {
-    if (!isNoFile()) {
+    if (!hasNoFile()) {
         new FileSwitcher(this);
     }
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
-    textChangedTimer->start(260);
+    if (!hasNoFile())
+        textChangedTimer->start(260);
+    else
+        textChangedTimer->stop();
 }
 
 void TabbedCodeEditorInterface::onCurTextChangingDone() {
     qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone";
     auto *curFile = getCurFile();
-
-    if (curFile) {
+    if (curFile && curFile->highlighter) {
         curFile->highlighter->checkProblems();
         ui->codeEditor->updateErrorSelections();
     }
@@ -420,5 +422,5 @@ void TabbedCodeEditorInterface::onCurTextChangingDone() {
 void TabbedCodeEditorInterface::onCurFileChanged(const QString &path) {
     ui->codeEditor->setFilePath(path);
     ui->codeEditor->setCurHighlighter(
-        (!isNoFile()) ? getCurFile()->highlighter : nullptr);
+        (!hasNoFile()) ? getCurFile()->highlighter : nullptr);
 }
