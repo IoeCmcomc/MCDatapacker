@@ -33,7 +33,7 @@ void TestUuidNode::cleanupTestCase() {
 }
 
 void TestUuidNode::isVaild() {
-    UuidNode node(this, 2021, "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx");
+    UuidNode node(2021, "xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx");
 
     QCOMPARE(node.isVaild(), false);
     node.setUuid(QUuid("123e4567-e89b-12d3-a456-426614174000"));
@@ -41,7 +41,7 @@ void TestUuidNode::isVaild() {
 }
 
 void TestUuidNode::test_case1() {
-    UuidNode node(this, 2, "dd12be42-52a9-4a91-a8a1-11c01849e498");
+    UuidNode node(2, "dd12be42-52a9-4a91-a8a1-11c01849e498");
 
     QCOMPARE(node.toString(), "UuidNode(dd12be42-52a9-4a91-a8a1-11c01849e498)");
 }

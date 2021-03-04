@@ -1,10 +1,10 @@
 #include "particlenode.h"
 
 static const int _ParticleColorNode =
-    qRegisterMetaType<Command::ParticleColorNode*>();
+    qRegisterMetaType<QSharedPointer<Command::ParticleColorNode> >();
 
-Command::ParticleColorNode::ParticleColorNode(QObject *parent, int pos)
-    : Command::ParseNode(parent, pos) {
+Command::ParticleColorNode::ParticleColorNode(int pos)
+    : Command::ParseNode(pos) {
 }
 
 QString Command::ParticleColorNode::toString() const {
@@ -19,53 +19,55 @@ QString Command::ParticleColorNode::toString() const {
 
 bool Command::ParticleColorNode::isVaild() const {
     qDebug() << "ParticleColorNode::isVaild" << ParseNode::isVaild() << m_r <<
-    m_g << m_b << m_size;
+        m_g << m_b << m_size;
     return ParseNode::isVaild() && m_r && m_g && m_b && m_size;
 }
 
-Command::FloatNode *Command::ParticleColorNode::size() const {
+QSharedPointer<Command::FloatNode> Command::ParticleColorNode::size() const {
     return m_size;
 }
 
-void Command::ParticleColorNode::setSize(FloatNode *size) {
+void Command::ParticleColorNode::setSize(QSharedPointer<FloatNode> size) {
     m_size = size;
 }
 
-Command::FloatNode *Command::ParticleColorNode::b() const {
+QSharedPointer<Command::FloatNode> Command::ParticleColorNode::b() const {
     return m_b;
 }
 
-void Command::ParticleColorNode::setB(FloatNode *b) {
+void Command::ParticleColorNode::setB(QSharedPointer<FloatNode> b) {
     m_b = b;
 }
 
-Command::FloatNode *Command::ParticleColorNode::g() const {
+QSharedPointer<Command::FloatNode> Command::ParticleColorNode::g() const {
     return m_g;
 }
 
-void Command::ParticleColorNode::setG(FloatNode *g) {
+void Command::ParticleColorNode::setG(QSharedPointer<FloatNode> g) {
     m_g = g;
 }
 
-Command::FloatNode *Command::ParticleColorNode::r() const {
+QSharedPointer<Command::FloatNode> Command::ParticleColorNode::r() const {
     return m_r;
 }
 
-void Command::ParticleColorNode::setR(FloatNode *r) {
+void Command::ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
     m_r = r;
 }
 
-static const int _ParticleNode = qRegisterMetaType<Command::ParticleNode*>();
+static const int _ParticleNode =
+    qRegisterMetaType<QSharedPointer<Command::ParticleNode> >();
 
-Command::ParticleNode::ParticleNode(QObject *parent, int pos,
-                                    const QString &nspace, const QString &id)
-    : Command::ResourceLocationNode(parent, pos, nspace, id) {
+Command::ParticleNode::ParticleNode(int pos,
+                                    const QString &nspace,
+                                    const QString &id)
+    : Command::ResourceLocationNode(pos, nspace, id) {
     setParserId("minecraft:particle");
 }
 
 Command::ParticleNode::ParticleNode(Command::ResourceLocationNode *other)
-    : Command::ResourceLocationNode(other->parent(), other->pos(),
-                                    other->nspace(), other->id()) {
+    : Command::ResourceLocationNode(other->pos(), other->nspace(),
+                                    other->id()) {
     setParserId("minecraft:particle");
 }
 
@@ -77,18 +79,19 @@ QString Command::ParticleNode::toString() const {
     return ret + ')';
 }
 
-Command::ParseNode *Command::ParticleNode::params() const {
+QSharedPointer<Command::ParseNode> Command::ParticleNode::params() const {
     return m_params;
 }
 
-void Command::ParticleNode::setParams(Command::BlockStateNode *params) {
+void Command::ParticleNode::setParams(QSharedPointer<BlockStateNode> params) {
     m_params = params;
 }
 
-void Command::ParticleNode::setParams(Command::ItemStackNode *params) {
+void Command::ParticleNode::setParams(QSharedPointer<ItemStackNode> params) {
     m_params = params;
 }
 
-void Command::ParticleNode::setParams(Command::ParticleColorNode *params) {
+void Command::ParticleNode::setParams(QSharedPointer<ParticleColorNode> params)
+{
     m_params = params;
 }

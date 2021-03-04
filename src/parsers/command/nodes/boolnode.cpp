@@ -1,9 +1,9 @@
 #include "boolnode.h"
 
-static int _ = qRegisterMetaType<Command::BoolNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::BoolNode> >();
 
-Command::BoolNode::BoolNode(QObject *parent, int pos, bool value)
-    : Command::ArgumentNode(parent, pos, -1, "brigadier:bool") {
+Command::BoolNode::BoolNode(int pos, bool value)
+    : Command::ArgumentNode(pos, -1, "brigadier:bool") {
     setValue(value);
     setLength((value) ? 4 : 5);
 }

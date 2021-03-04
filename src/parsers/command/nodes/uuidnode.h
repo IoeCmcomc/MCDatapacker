@@ -8,9 +8,8 @@
 namespace Command {
     class UuidNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        UuidNode(QObject *parent, int pos, QString uuidStr);
+        UuidNode(int pos, QString uuidStr);
         QString toString() const override;
         bool isVaild() const override;
 
@@ -22,6 +21,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::UuidNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::UuidNode>);
 
 #endif /* UUIDNODE_H */

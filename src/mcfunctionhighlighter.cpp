@@ -162,8 +162,8 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void McfunctionHighlighter::checkProblems() {
-    Command::MinecraftParser parser(this);
-    Command::ParseNode      *result = nullptr;
+    Command::MinecraftParser           parser(this);
+    QSharedPointer<Command::ParseNode> result = nullptr;
 
     for (auto block = getParentDoc()->begin();
          block != getParentDoc()->end(); block = block.next()) {
@@ -179,7 +179,7 @@ void McfunctionHighlighter::checkProblems() {
                 auto error    = ProblemInfo(true);
                 error.start   = block.position() + parseErr.pos;
                 error.length  = parseErr.length;
-                error.message = parseErr.message;
+                error.message = parseErr.toLocalizedMessage();
 
 /*
                   qDebug() << "A problem found at line"

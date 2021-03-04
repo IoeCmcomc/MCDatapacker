@@ -9,48 +9,47 @@
 namespace Command {
     class ParticleColorNode : public ParseNode {
 public:
-        ParticleColorNode(QObject *parent, int pos);
+        ParticleColorNode(int pos);
         QString toString() const override;
         bool isVaild() const override;
 
-        FloatNode *r() const;
-        void setR(FloatNode *r);
+        QSharedPointer<FloatNode> r() const;
+        void setR(QSharedPointer<FloatNode> r);
 
-        FloatNode *g() const;
-        void setG(FloatNode *g);
+        QSharedPointer<FloatNode> g() const;
+        void setG(QSharedPointer<FloatNode> g);
 
-        FloatNode *b() const;
-        void setB(FloatNode *b);
+        QSharedPointer<FloatNode> b() const;
+        void setB(QSharedPointer<FloatNode> b);
 
-        FloatNode *size() const;
-        void setSize(FloatNode *size);
+        QSharedPointer<FloatNode> size() const;
+        void setSize(QSharedPointer<FloatNode> size);
 
 private:
-        FloatNode *m_r    = nullptr;
-        FloatNode *m_g    = nullptr;
-        FloatNode *m_b    = nullptr;
-        FloatNode *m_size = nullptr;
+        QSharedPointer<FloatNode> m_r    = nullptr;
+        QSharedPointer<FloatNode> m_g    = nullptr;
+        QSharedPointer<FloatNode> m_b    = nullptr;
+        QSharedPointer<FloatNode> m_size = nullptr;
     };
 
     class ParticleNode : public ResourceLocationNode
     {
-        Q_OBJECT
 public:
-        ParticleNode(QObject *parent, int pos, const QString &nspace,
+        ParticleNode(int pos, const QString &nspace,
                      const QString &id);
         ParticleNode(ResourceLocationNode *other);
         QString toString() const override;
 
-        ParseNode *params() const;
-        void setParams(BlockStateNode *params);
-        void setParams(ItemStackNode *params);
-        void setParams(ParticleColorNode *params);
+        QSharedPointer<ParseNode> params() const;
+        void setParams(QSharedPointer<BlockStateNode> params);
+        void setParams(QSharedPointer<ItemStackNode> params);
+        void setParams(QSharedPointer<ParticleColorNode> params);
 private:
-        ParseNode *m_params = nullptr;
+        QSharedPointer<ParseNode> m_params = nullptr;
     };
 }
 
-Q_DECLARE_METATYPE(Command::ParticleColorNode*)
-Q_DECLARE_METATYPE(Command::ParticleNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::ParticleColorNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::ParticleNode>)
 
 #endif /* PARTICLENODE_H */

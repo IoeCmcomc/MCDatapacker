@@ -1,32 +1,27 @@
 #include "axisnode.h"
 
-static int _ = qRegisterMetaType<Command::AxisNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::AxisNode> >();
 
-Command::AxisNode::AxisNode(QObject *parent,
-                            int pos,
-                            int length,
+Command::AxisNode::AxisNode(int pos, int length,
                             Command::AxisNode::AxisType type,
                             double value)
-    : Command::ParseNode(parent, pos, length) {
+    : Command::ParseNode(pos, length) {
     setValue((float)value);
     setType(type);
 }
 
-Command::AxisNode::AxisNode(QObject *parent)
-    : Command::ParseNode(parent) {
-    setValue(0);
-}
-
-Command::AxisNode::AxisNode(QObject *parent,
-                            int pos,
-                            int length,
+Command::AxisNode::AxisNode(int pos, int length,
                             Command::AxisNode::AxisType type,
                             int value)
-    : Command::ParseNode(parent, pos, length) {
+    : Command::ParseNode(pos, length) {
     setValue(value);
     setType(type);
 }
 
+Command::AxisNode::AxisNode(int pos)
+    : Command::ParseNode(pos, -1) {
+    setValue(0);
+}
 
 QString Command::AxisNode::toString() const {
     return QString("AxisNode(%1)").arg(format());

@@ -1,16 +1,31 @@
 #include "parser.h"
 
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMetaMethod>
 
-QJsonObject Command::Parser::m_schema = {};
-
-Command::Parser::ParsingError::ParsingError(const QString &what_arg)
-    : runtime_error(what_arg.toStdString()) {
-    message = what_arg;
+Command::Parser::Error::Error(const QString &whatArg,
+                              int pos,
+                              int length,
+                              const QVariantList &args)
+    : std::runtime_error(whatArg.toStdString()) {
+    this->pos    = pos;
+    this->length = length;
+    this->args   = args;
 }
+
+QString Command::Parser::Error::toLocalizedMessage() const {
+    QString ret = QCoreApplication::translate("Command::Parser::Error", what());
+
+    for (int i = 0; i < args.size(); ++i) {
+        ret = ret.arg(args.at(i).toString());
+    }
+    return ret;
+}
+
+QJsonObject Command::Parser::m_schema = {};
 
 Command::Parser::Parser(QObject *parent, const QString &input)
     : QObject(parent) {
@@ -72,10 +87,10 @@ void Command::Parser::setSchema(const QString &filepath) {
 }
 
 /*!
- * \brief Returns a pointer to the parsing result as a \c RootNode.
+ * \brief Returns a shared pointer to the parsing result as a \c RootNode.
  */
-Command::RootNode *Command::Parser::parsingResult() {
-    return &m_parsingResult;
+QSharedPointer<Command::RootNode> Command::Parser::parsingResult() {
+    return m_parsingResult;
 }
 
 /*!
@@ -109,28 +124,39 @@ void Command::Parser::setPos(int pos) {
 }
 
 /*!
- * \brief Throws a \c Command::Parser::ParsingError with a formatted message.
+ * \brief Gets the last parse error of the parser.
  */
-void Command::Parser::error(QStringView msg) {
-    error(msg, m_pos);
+Command::Parser::Error Command::Parser::lastError() const {
+    return m_lastError;
 }
 
-void Command::Parser::error(QStringView msg, int pos, int length) {
-    qWarning() << "Command::Parser::error" << msg << (pos - 1) << pos <<
-        (pos + length);
-    QString errorIndicatorText =
-        QString("\"%1«%2»%3\" (%4 chars)").arg(
-            m_text.left(pos),
-            m_text.mid(pos, length),
-            m_text.mid(pos + length),
-            QString::number(m_text.length()));
+/*!
+ * \brief Gets the current position of the parser.
+ */
+int Command::Parser::pos() const {
+    return m_pos;
+}
 
-    Command::Parser::ParsingError err(
-        tr("Input: %1\nParser error at pos %2: %3").arg(
-            errorIndicatorText, QString ::number(pos), msg));
-    err.pos    = pos;
-    err.length = length;
-    throw err;
+/*!
+ * \brief Throws a \c Command::Parser::ParsingError with a formatted message.
+ */
+void Command::Parser::error(const QString &msg, const QVariantList &args) {
+    error(msg, args, m_pos);
+}
+
+void Command::Parser::error(const QString &msg, const QVariantList &args,
+                            int pos, int length) {
+    qWarning() << "Command::Parser::error" << msg << pos << length;
+    QString errorIndicatorText = QString("\"%1«%2»%3\" (%4 chars)").arg(
+        m_text.left(pos),
+        m_text.mid(pos, length),
+        m_text.mid(pos + length),
+        QString::number(m_text.length()));
+
+    throw Command::Parser::Error(
+              QStringLiteral("Input: %1\nParser error at pos %2: %3").
+              arg(errorIndicatorText, QString ::number(pos), msg),
+              pos, length, args);
 }
 
 /*!
@@ -165,16 +191,12 @@ bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
     if (cond) {
         return true;
     } else {
-        QString curCharTxt = (m_curChar.isNull()) ? "end of line" : QString(
-            "character '%1'").arg(m_curChar);
-        QString charTxt = (chr.isNull()) ? "end of line" : QString(
-            "character '%1'").arg(chr);
-        if (acceptNull)
-            error(tr("Unexpected %1, expecting %2 or end of line").arg(
-                      m_curChar, charTxt));
-        else
-            error(tr("Unexpected %1, expecting %2").arg(m_curChar,
-                                                        charTxt));
+        QString curCharTxt =
+            (m_curChar.isNull()) ? QStringLiteral("end of line") : '\'' +
+            m_curChar + '\'';
+        QString charTxt =
+            (chr.isNull()) ? QStringLiteral("end of line") : '\'' + chr + '\'';
+        error("Unexpacted %1, expecting %2", { m_curChar, charTxt });
         return false;
     }
 }
@@ -279,7 +301,7 @@ QString Command::Parser::getQuotedString() {
     bool    backslash = false;
     while ((m_curChar != curQuoteChar) || backslash) {
         if (m_pos >= m_text.length())
-            error("Incomplete quoted string: " + value);
+            error("Incomplete quoted string: %1" + value);
         if (backslash) {
             if (m_curChar == curQuoteChar)
                 value += curQuoteChar;
@@ -322,25 +344,23 @@ QString Command::Parser::parserIdToMethodName(const QString &str) {
     return "";
 }
 
-Command::BoolNode *Command::Parser::brigadier_bool(QObject *parent,
-                                                   [[maybe_unused]] const QVariantMap &)
-{
+QSharedPointer<Command::BoolNode> Command::Parser::brigadier_bool(
+    [[maybe_unused]] const QVariantMap &) {
     int start = m_pos;
 
     if (peek(4) == "true") {
         advance(4);
-        return new Command::BoolNode(parent, start, true);
+        return QSharedPointer<Command::BoolNode>::create(start, true);
     } else if (peek(5) == "false") {
         advance(5);
-        return new Command::BoolNode(parent, start, false);
+        return QSharedPointer<Command::BoolNode>::create(start, false);
     } else {
-        return new Command::BoolNode(this); /* Returns an invaild node */
+        return QSharedPointer<Command::BoolNode>::create(); /* Returns an invaild node */
     }
 }
 
-Command::DoubleNode *Command::Parser::brigadier_double(QObject *parent,
-                                                       const QVariantMap &props)
-{
+QSharedPointer<Command::DoubleNode> Command::Parser::brigadier_double(
+    const QVariantMap &props) {
     int start = m_pos;
 
     QString lit   = getWithCharset("-0-9.eE");
@@ -353,11 +373,13 @@ Command::DoubleNode *Command::Parser::brigadier_double(QObject *parent,
         checkMin(value, vari.toDouble());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toDouble());
-    return new Command::DoubleNode(parent, start, lit.length(), value);
+    return QSharedPointer<Command::DoubleNode>::create(start,
+                                                       lit.length(),
+                                                       value);
 }
 
-Command::FloatNode *Command::Parser::brigadier_float(QObject *parent,
-                                                     const QVariantMap &props) {
+QSharedPointer<Command::FloatNode> Command::Parser::brigadier_float(
+    const QVariantMap &props) {
     int     start = m_pos;
     QString raw   =
         getWithRegex(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+)(?:[eE]\d+)?)");
@@ -370,12 +392,12 @@ Command::FloatNode *Command::Parser::brigadier_float(QObject *parent,
         checkMin(value, vari.toFloat());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toFloat());
-    return new Command::FloatNode(parent, start, raw.length(), value);
+    return QSharedPointer<Command::FloatNode>::create(start, raw.length(),
+                                                      value);
 }
 
-Command::IntegerNode *Command::Parser::brigadier_integer(QObject *parent,
-                                                         const QVariantMap &props)
-{
+QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
+    const QVariantMap &props) {
     int     start = m_pos;
     QString raw   = getWithRegex(R"([+-]?\d+)");
     bool    ok    = false;
@@ -387,36 +409,39 @@ Command::IntegerNode *Command::Parser::brigadier_integer(QObject *parent,
         checkMin(value, vari.toInt());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toInt());
-    return new Command::IntegerNode(parent, start, raw.length(), value);
+    return QSharedPointer<Command::IntegerNode>::create(start,
+                                                        raw.length(),
+                                                        value);
 }
 
-Command::LiteralNode *Command::Parser::brigadier_literal(QObject *parent,
-                                                         const QVariantMap &props)
-{
+QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal(
+    const QVariantMap &props) {
     int start = m_pos;
 
-    return new Command::LiteralNode(parent, start,
-                                    getWithRegex(R"([a-zA-Z0-9-_*<=>]+)"));
+    return QSharedPointer<Command::LiteralNode>::create(start,
+                                                        getWithRegex(
+                                                            R"([a-zA-Z0-9-_*<=>]+)"));
 }
 
-Command::StringNode *Command::Parser::brigadier_string(QObject *parent,
-                                                       const QVariantMap &props)
-{
-    auto *defaultRet = new Command::StringNode(parent, m_pos);
+QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
+    const QVariantMap &props) {
+    auto defaultRet = QSharedPointer<Command::StringNode>::create(m_pos);
 
     if (!props.contains("type"))
         return defaultRet;
 
     QString type = props["type"].toString();
     if (type == "greedy") {
-        auto *ret = new Command::StringNode(parent, m_pos, m_text.mid(m_pos));
+        auto ret = QSharedPointer<Command::StringNode>::create(m_pos,
+                                                               m_text.mid(m_pos));
         setPos(m_text.length());
         return ret;
     } else if (type == "phrase") {
         if (m_curChar == '"' || m_curChar == '\'')
-            return new Command::StringNode(parent, m_pos, getQuotedString());
+            return QSharedPointer<Command::StringNode>::create(m_pos,
+                                                               getQuotedString());
     } else if (type == "word") {
-        QScopedPointer<LiteralNode> literal(brigadier_literal(parent));
+        auto literal = brigadier_literal();
         return Command::StringNode::fromLiteralNode(literal.get());
     }
     return defaultRet;
@@ -425,48 +450,56 @@ Command::StringNode *Command::Parser::brigadier_string(QObject *parent,
 /*!
  * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invaild \c ParseNode if an error occured.
  */
-Command::ParseNode *Command::Parser::parse() {
+QSharedPointer<Command::ParseNode> Command::Parser::parse() {
     /*qDebug() << "Command::Parser::parse" << m_text; */
-    m_parsingResult.clear();
-    m_parsingResult.setPos(-1);
-    m_parsingResult.setLength(-1);
+    m_parsingResult = QSharedPointer<RootNode>::create(pos());
+
     if (m_schema.isEmpty()) {
         qWarning() << "The parser schema hasn't been initialized";
     } else if (text().isEmpty() || text()[0] == '#') {
-        m_parsingResult.setPos(0);
+        m_parsingResult->setPos(0);
     } else {
         try {
-            if (parseResursively(this, m_schema)) {
-                m_parsingResult.setPos(0);
-                m_parsingResult.setLength(pos() - 1);
+            if (parseResursively(m_schema)) {
+                m_parsingResult->setPos(0);
+                m_parsingResult->setLength(pos() - 1);
             }
-        } catch (const Command::Parser::ParsingError &err) {
-            qDebug() << "Command::Parser::parse" << err.message;
+        } catch (const Command::Parser::Error &err) {
+            qDebug() << "Command::Parser::parse" << err.what();
             m_lastError = err;
+            m_parsingResult->setPos(-1); /* Make the result invaild */
         }
     }
-    return &m_parsingResult;
+    return m_parsingResult;
 }
 
-Command::Parser::ParsingError Command::Parser::lastError() const {
-    return m_lastError;
+QSharedPointer<Command::ParseNode> Command::Parser::
+QVariantToParseNodeSharedPointer(
+    const QVariant &vari) {
+    unsigned short int typeId = vari.userType();
+
+    QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(ParseNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(RootNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ArgumentNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(BoolNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(DoubleNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(FloatNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(IntegerNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(StringNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(LiteralNode)
+    return nullptr;
 }
 
-int Command::Parser::pos() const {
-    return m_pos;
-}
-
-bool Command::Parser::parseResursively(QObject *parentObj,
-                                       QJsonObject curSchemaNode,
+bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                                        int depth) {
 /*
-      qDebug() << "Command::Parser::parseResursively" << parentObj <<
-          curSchemaNode << depth;
+      qDebug() << "Command::Parser::parseResursively"
+   << curSchemaNode << depth;
  */
 
-    Command::ParseNode                    *ret = nullptr;
-    QVector<Command::Parser::ParsingError> errors;
-    QVector<int>                           argLengths;
+    QSharedPointer<Command::ParseNode> ret = nullptr;
+    QVector<Command::Parser::Error>    errors;
+    QVector<int>                       argLengths;
 
     if (depth > 0) {
         if (depth > 100)
@@ -520,11 +553,9 @@ bool Command::Parser::parseResursively(QObject *parentObj,
             QStringLiteral("literal")) {
             if (literal == it.key()) {
                 found   = true;
-                ret     = brigadier_literal(parentObj);
-                success = parseResursively(&m_parsingResult,
-                                           curSchemaNode,
-                                           depth + 1);
-                m_parsingResult.prepend(ret);
+                ret     = brigadier_literal();
+                success = parseResursively(curSchemaNode, depth + 1);
+                m_parsingResult->prepend(ret);
                 break;
             }
         } else if (curSchemaNode[QStringLiteral("type")] ==
@@ -532,7 +563,7 @@ bool Command::Parser::parseResursively(QObject *parentObj,
             QString parserId    = curSchemaNode["parser"].toString();
             int     methodIndex = metaObject()->indexOfMethod(
                 parserIdToMethodName(parserId).toLatin1()
-                + QStringLiteral("(QObject*,QVariantMap)").toLatin1());
+                + QStringLiteral("(QVariantMap)").toLatin1());
             if (methodIndex != -1) {
                 auto method = metaObject()->method(methodIndex);
                 auto props  =
@@ -541,26 +572,28 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                 int      returnType = method.returnType();
                 auto     typeName   = method.typeName();
                 QVariant returnVari(returnType, nullptr);
+                qDebug() << returnType << typeName << returnVari;
 
                 QGenericReturnArgument returnArgument(
                     typeName,
                     const_cast<void*>(returnVari.constData())
                     );
                 try {
-                    bool invoked = method.invoke(
-                        this, returnArgument,
-                        Q_ARG(QObject*, &m_parsingResult),
-                        Q_ARG(QVariantMap, props));
+                    bool invoked = method.invoke(this, returnArgument,
+                                                 Q_ARG(QVariantMap, props));
                     qDebug() << invoked << returnVari;
                     if (invoked) {
                         found = true;
-                        ret   = returnVari.value<Command::ParseNode*>();
+                        ret   = QVariantToParseNodeSharedPointer(returnVari);
                         qDebug() << ret << found;
-                        success = parseResursively(&m_parsingResult,
-                                                   curSchemaNode,
-                                                   depth + 1);
-                        m_parsingResult.prepend(qvariant_cast<Command::ArgumentNode*>(
-                                                    returnVari));
+                        Q_ASSERT(ret != nullptr);
+                        qDebug() << ret->isVaild();
+                        qDebug() << ret->pos();
+                        qDebug() << ret->length();
+                        qDebug() << ret->toString();
+                        success = parseResursively(curSchemaNode, depth + 1);
+                        qDebug() << "After parseResursively, before prepend";
+                        m_parsingResult->prepend(ret);
                         break;
                     } else {
                         qWarning() << QStringLiteral(
@@ -568,8 +601,8 @@ bool Command::Parser::parseResursively(QObject *parentObj,
                                                                    parserId),
                                                                parserId);
                     }
-                } catch (const Command::Parser::ParsingError &err) {
-                    qWarning() << "Argument error:" << err.message;
+                } catch (const Command::Parser::Error &err) {
+                    qWarning() << "Argument error:" << err.what();
                     errors << err;
                     int argLength = m_pos - startPos + 1;
                     setPos(startPos);
@@ -590,7 +623,7 @@ bool Command::Parser::parseResursively(QObject *parentObj,
             return v == argLengths[0];
         });
         if (sameAll) {
-            throw Command::Parser::ParsingError("Incorrect argument");
+            throw Command::Parser::Error("Incorrect argument");
         } else {
             throw errors[*std::max_element(argLengths.cbegin(),
                                            argLengths.cend())];

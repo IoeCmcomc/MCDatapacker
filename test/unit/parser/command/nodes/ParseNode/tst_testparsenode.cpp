@@ -35,14 +35,14 @@ void TestParseNode::cleanupTestCase() {
 }
 
 void TestParseNode::test_case1() {
-    ParseNode node(this);
+    ParseNode node;
 
     QCOMPARE(node.toString(), "ParseNode()");
     /* QVERIFY(node.toString() == "ParseNode()"); */
 }
 
 void TestParseNode::pos() {
-    ParseNode node(this, 5);
+    ParseNode node(5);
 
     QCOMPARE(node.pos(), 5);
 
@@ -51,16 +51,16 @@ void TestParseNode::pos() {
 }
 
 void TestParseNode::length() {
-    ParseNode node(this, 0, 3);
+    ParseNode node(0, 3);
 
     QCOMPARE(node.length(), 3);
 
-    ParseNode node2(this, 1, 15);
+    ParseNode node2(1, 15);
     QCOMPARE(node2.length(), 15);
 }
 
 void TestParseNode::isVaild() {
-    ParseNode node(this);
+    ParseNode node;
 
     QCOMPARE(node.isVaild(), false);
 

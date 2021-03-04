@@ -6,32 +6,29 @@
 namespace Command {
     class RootNode : public ParseNode
     {
-        Q_OBJECT
 public:
-        explicit RootNode(QObject *parent = nullptr);
-        ~RootNode();
+        explicit RootNode(int pos);
 
-        QString toString() const;
+        QString toString() const override;
 
         bool isEmpty();
         int size();
 
-        void append(Command::ParseNode *node);
-        void prepend(Command::ParseNode *node);
+        void append(QSharedPointer<ParseNode> node);
+        void prepend(QSharedPointer<ParseNode> node);
         void remove(int i);
-        void removeNode(Command::ParseNode *node);
         void clear();
 
-        Command::ParseNode *operator[](int index);
-        Command::ParseNode *operator[](int index) const;
+        QSharedPointer<Command::ParseNode> &operator[](int index);
+        const QSharedPointer<Command::ParseNode> operator[](int index) const;
 
-        QVector<Command::ParseNode *> children() const;
+        QVector<QSharedPointer<ParseNode> > children() const;
 
 private:
-        QVector<Command::ParseNode*> m_children;
+        QVector<QSharedPointer<ParseNode> > m_children;
     };
 }
 
-Q_DECLARE_METATYPE(Command::RootNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::RootNode>);
 
 #endif /* ROOTNODE_H */

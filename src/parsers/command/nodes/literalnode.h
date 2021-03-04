@@ -6,9 +6,8 @@
 namespace Command {
     class LiteralNode : public ParseNode
     {
-        Q_OBJECT
 public:
-        explicit LiteralNode(QObject *parent, int pos, const QString &txt);
+        explicit LiteralNode(int pos, const QString &txt);
 
         QString toString() const;
         QString text() const;
@@ -19,6 +18,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::LiteralNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::LiteralNode>);
 
 #endif /* LITERALNODE_H */

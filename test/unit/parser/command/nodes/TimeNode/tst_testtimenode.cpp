@@ -33,13 +33,13 @@ void TestTimeUnit::cleanupTestCase() {
 }
 
 void TestTimeUnit::test_case1() {
-    TimeNode node(this, 64, 4, 6000);
+    TimeNode node(64, 4, 6000);
 
-    QCOMPARE(node.toString(), "TimeNode(6000t)");
+    QCOMPARE(node.toString(), "TimeNode(6000)");
 }
 
 void TestTimeUnit::toTick() {
-    TimeNode node(this, 64, 4, 6000);
+    TimeNode node(64, 4, 6000);
 
     QCOMPARE(node.toTick(), 6000);
     node.setUnit(TimeNode::Unit::Second);

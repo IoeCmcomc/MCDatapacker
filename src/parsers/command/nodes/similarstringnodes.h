@@ -4,17 +4,15 @@
 #include "stringnode.h"
 
 /*
-   Template classes are not supported by Q_OBJECT, so I had to
-   use this macro instead.
+   Template classes hasn't supported literal strings as arguments,
+   so I had to use this macro instead.
  */
-#define DECLARE_TYPE_FROM_STRINGNODE(Type)       \
-    class Type : public StringNode {             \
-        Q_OBJECT                                 \
-public:                                          \
-        explicit Type(QObject * parent, int pos, \
-                      const QString &txt);       \
-        QString toString() const;                \
-    };                                           \
+#define DECLARE_TYPE_FROM_STRINGNODE(Type)          \
+    class Type : public StringNode {                \
+public:                                             \
+        explicit Type(int pos, const QString &txt); \
+        QString toString() const;                   \
+    };                                              \
 /* End of macro
  */
 
@@ -30,14 +28,14 @@ namespace Command {
     DECLARE_TYPE_FROM_STRINGNODE(TeamNode)
 }
 
-Q_DECLARE_METATYPE(Command::ColorNode*);
-Q_DECLARE_METATYPE(Command::EntityAnchorNode*);
-Q_DECLARE_METATYPE(Command::ItemSlotNode*);
-Q_DECLARE_METATYPE(Command::MessageNode*);
-Q_DECLARE_METATYPE(Command::ObjectiveNode*);
-Q_DECLARE_METATYPE(Command::ObjectiveCriteriaNode*);
-Q_DECLARE_METATYPE(Command::OperationNode*);
-Q_DECLARE_METATYPE(Command::ScoreboardSlotNode*);
-Q_DECLARE_METATYPE(Command::TeamNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ColorNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::EntityAnchorNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ItemSlotNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::MessageNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ObjectiveNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ObjectiveCriteriaNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::OperationNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ScoreboardSlotNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::TeamNode>);
 
 #endif /* SIMILARSTRINGNODES_H */

@@ -32,7 +32,7 @@ void TestFloatNode::cleanupTestCase() {
 }
 
 void TestFloatNode::test_case1() {
-    FloatNode node(this, 0, 6, 0.7749);
+    FloatNode node(0, 6, 0.7749);
 
     QCOMPARE(node.toString(), "FloatNode(0.7749)");
 }

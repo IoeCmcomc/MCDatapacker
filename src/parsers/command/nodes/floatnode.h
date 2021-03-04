@@ -6,20 +6,18 @@
 namespace Command {
     class FloatNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        explicit FloatNode(QObject *parent, int pos = -1, int length = 0,
-                           float value              = false);
+        explicit FloatNode(int pos = -1, int length = 0, float value = 0);
 
         QString toString() const;
         float value() const;
         void setValue(float value);
 
 private:
-        float m_value;
+        float m_value = 0;
     };
 }
 
-Q_DECLARE_METATYPE(Command::FloatNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::FloatNode>);
 
 #endif /* FLOATNODE_H */

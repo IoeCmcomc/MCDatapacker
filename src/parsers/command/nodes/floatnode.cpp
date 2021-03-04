@@ -1,12 +1,10 @@
 #include "floatnode.h"
 
-static int _ = qRegisterMetaType<Command::FloatNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::FloatNode> >();
 
-Command::FloatNode::FloatNode(QObject *parent, int pos, int length,
-                              float value)
-    : Command::ArgumentNode(parent, pos, -1, "brigadier:float") {
+Command::FloatNode::FloatNode(int pos, int length, float value)
+    : Command::ArgumentNode(pos, length, "brigadier:float") {
     setValue(value);
-    setLength(length);
 }
 
 QString Command::FloatNode::toString() const {

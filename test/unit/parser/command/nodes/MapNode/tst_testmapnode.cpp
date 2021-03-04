@@ -32,11 +32,11 @@ void TestMapNode::cleanupTestCase() {
 }
 
 void TestMapNode::test_case1() {
-    MapNode node(this, 0, 999);
+    MapNode node(0, 999);
 
     QCOMPARE(node.size(), 0);;
-    node.insert(MapKey{ 2, "test" }, new ParseNode(this, 0, 5));
-    node.insert(MapKey{ 1, "first" }, new ParseNode(this, 0, 5));
+    node.insert(MapKey{ 2, "test" }, QSharedPointer<ParseNode>::create(0, 5));
+    node.insert(MapKey{ 1, "first" }, QSharedPointer<ParseNode>::create(0, 5));
 
     auto map = node.toMap();
     auto it  = map.cbegin();

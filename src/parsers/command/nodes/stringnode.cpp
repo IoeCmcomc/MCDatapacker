@@ -1,9 +1,9 @@
 #include "stringnode.h"
 
-const static int _ = qRegisterMetaType<Command::StringNode*>();
+const static int _ = qRegisterMetaType<QSharedPointer<Command::StringNode> >();
 
-Command::StringNode::StringNode(QObject *parent, int pos, const QString &value)
-    : Command::ArgumentNode(parent, pos, value.length(), "brigadier:string") {
+Command::StringNode::StringNode(int pos, const QString &value)
+    : Command::ArgumentNode(pos, value.length(), "brigadier:string") {
     setValue(value);
 }
 
@@ -20,9 +20,10 @@ void Command::StringNode::setValue(const QString &value) {
     setLength(value.length());
 }
 
-Command::StringNode *Command::StringNode::fromLiteralNode(LiteralNode *node) {
+QSharedPointer<Command::StringNode> Command::StringNode::fromLiteralNode(
+    LiteralNode *node) {
     if (node) {
-        return new StringNode(node->parent(), node->pos(), node->text());
+        return QSharedPointer<StringNode>::create(node->pos(), node->text());
     }
     return nullptr;
 }

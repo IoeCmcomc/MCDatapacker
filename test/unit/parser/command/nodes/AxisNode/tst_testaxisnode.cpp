@@ -34,7 +34,7 @@ void TestAxisNode::cleanupTestCase() {
 }
 
 void TestAxisNode::test_case1() {
-    AxisNode node(this, 0, 4, AxisNode::AxisType::Relative, 1);
+    AxisNode node(0, 4, AxisNode::AxisType::Relative, 1);
 
 
     QCOMPARE(node.type(), AxisNode::AxisType::Relative);
@@ -43,7 +43,7 @@ void TestAxisNode::test_case1() {
 }
 
 void TestAxisNode::type() {
-    AxisNode node(this, 0, 3, AxisNode::AxisType::Absolute, 11);
+    AxisNode node(0, 3, AxisNode::AxisType::Absolute, 11);
 
     QCOMPARE(node.format(), "11");
 
@@ -55,7 +55,7 @@ void TestAxisNode::type() {
 }
 
 void TestAxisNode::value() {
-    AxisNode node(this, 0, 3, AxisNode::AxisType::Relative, 3.14);
+    AxisNode node(0, 3, AxisNode::AxisType::Relative, 3.14);
 
     QCOMPARE(node.toFloat(), 3.14f);
     qDebug() << node.toInt();

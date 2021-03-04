@@ -34,13 +34,13 @@ void TestSwizzleNode::cleanupTestCase() {
 }
 
 void TestSwizzleNode::test_case1() {
-    SwizzleNode node(this, 0, true, true, true);
+    SwizzleNode node(0, true, true, true);
 
     QCOMPARE(node.toString(), "SwizzleNode(xyz)");
 }
 
 void TestSwizzleNode::isVaild() {
-    SwizzleNode node(this, 0, false, false, false);
+    SwizzleNode node(0, false, false, false);
 
     QCOMPARE(node.isVaild(), false);
     node.setAxes(SwizzleNode::Axis::X | SwizzleNode::Axis::Y);
@@ -48,7 +48,7 @@ void TestSwizzleNode::isVaild() {
 }
 
 void TestSwizzleNode::length() {
-    SwizzleNode node(this, 0, false, false, true);
+    SwizzleNode node(0, false, false, true);
 
     QCOMPARE(node.length(), 1);
     node.setAxes(SwizzleNode::Axis::X | SwizzleNode::Axis::Y);

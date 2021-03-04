@@ -2,7 +2,8 @@
 
 #include <QMetaEnum>
 
-static const int _ = qRegisterMetaType<Command::TargetSelectorNode*>();
+static const int _ =
+    qRegisterMetaType<QSharedPointer<Command::TargetSelectorNode> >();
 
 const QMap<Command::TargetSelectorNode::Variable, char>
 Command::TargetSelectorNode::variableMap =
@@ -11,8 +12,8 @@ Command::TargetSelectorNode::variableMap =
     { Command::TargetSelectorNode::Variable::P, 'p' },
     { Command::TargetSelectorNode::Variable::S, 's' } };
 
-Command::TargetSelectorNode::TargetSelectorNode(QObject *parent, int pos)
-    : Command::ParseNode(parent, pos) {
+Command::TargetSelectorNode::TargetSelectorNode(int pos)
+    : Command::ParseNode(pos) {
 }
 
 QString Command::TargetSelectorNode::toString() const {
@@ -23,11 +24,11 @@ QString Command::TargetSelectorNode::toString() const {
     return ret;
 }
 
-Command::MapNode *Command::TargetSelectorNode::args() const {
+QSharedPointer<Command::MapNode> Command::TargetSelectorNode::args() const {
     return m_args;
 }
 
-void Command::TargetSelectorNode::setArgs(MapNode *args) {
+void Command::TargetSelectorNode::setArgs(QSharedPointer<MapNode> args) {
     m_args = args;
 }
 

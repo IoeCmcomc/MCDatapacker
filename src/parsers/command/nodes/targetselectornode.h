@@ -7,7 +7,6 @@
 namespace Command {
     class TargetSelectorNode : public ParseNode
     {
-        Q_OBJECT
 public:
         enum class Variable {
             A,
@@ -16,22 +15,22 @@ public:
             S
         };
 
-        TargetSelectorNode(QObject *parent, int pos);
+        TargetSelectorNode(int pos);
         QString toString() const override;
 
         Variable variable() const;
         void setVariable(const Variable &variable);
 
-        MapNode *args() const;
-        void setArgs(MapNode *args);
+        QSharedPointer<MapNode> args() const;
+        void setArgs(QSharedPointer<MapNode> args);
 
 private:
-        Variable m_variable = Variable::A;
-        MapNode *m_args     = nullptr;
+        Variable m_variable            = Variable::A;
+        QSharedPointer<MapNode> m_args = nullptr;
         static const QMap<Variable, char> variableMap;
     };
 }
 
-Q_DECLARE_METATYPE(Command::TargetSelectorNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::TargetSelectorNode>)
 
 #endif /* TARGETSELECTORNODE_H */

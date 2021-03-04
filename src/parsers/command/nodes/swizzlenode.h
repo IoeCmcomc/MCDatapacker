@@ -6,7 +6,6 @@
 namespace Command {
     class SwizzleNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
         enum class Axis : unsigned char {
             X = 1,
@@ -15,8 +14,8 @@ public:
         };
         Q_DECLARE_FLAGS(Axes, Axis);
 
-        SwizzleNode(QObject *parent, int pos, bool hasX, bool hasY, bool hasZ);
-        SwizzleNode(QObject *parent, int pos, Axes axes);
+        SwizzleNode(int pos, bool hasX, bool hasY, bool hasZ);
+        SwizzleNode(int pos, Axes axes);
 
         QString toString() const override;
         bool isVaild() const override;
@@ -31,7 +30,7 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::SwizzleNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::SwizzleNode>)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Command::SwizzleNode::Axes)
 
 #endif /* SWIZZLENODE_H */

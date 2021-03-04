@@ -33,13 +33,13 @@ void TestArgumentNode::cleanupTestCase() {
 }
 
 void TestArgumentNode::test_case1() {
-    ArgumentNode node(this, 0, 1, "mcdatapacker:test");
+    ArgumentNode node(0, 1, "mcdatapacker:test");
 
     QCOMPARE(node.toString(), "ArgumentNode<mcdatapacker:test>");
 }
 
 void TestArgumentNode::parserId() {
-    ArgumentNode node(this, 2, 4, "mcdatapacker:id");
+    ArgumentNode node(2, 4, "mcdatapacker:id");
 
     QCOMPARE(node.parserId(), "mcdatapacker:id");
 }

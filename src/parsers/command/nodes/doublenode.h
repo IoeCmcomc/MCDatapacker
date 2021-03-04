@@ -6,20 +6,18 @@
 namespace Command {
     class DoubleNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        explicit DoubleNode(QObject *parent, int pos = -1, int length = 0,
-                            double value             = false);
+        explicit DoubleNode(int pos = -1, int length = 0, double value = 0);
 
         QString toString() const;
         double value() const;
         void setValue(double value);
 
 private:
-        double m_value;
+        double m_value = 0;
     };
 }
 
-Q_DECLARE_METATYPE(Command::DoubleNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::DoubleNode>);
 
 #endif /* DOUBLENODE_H */

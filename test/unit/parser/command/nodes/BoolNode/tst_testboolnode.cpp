@@ -34,22 +34,22 @@ void TestBoolNode::cleanupTestCase() {
 }
 
 void TestBoolNode::test_case1() {
-    BoolNode node(this, 0, true);
+    BoolNode node(0, true);
 
     QCOMPARE(node.toString(), "BoolNode(true)");
 }
 
 void TestBoolNode::value() {
-    BoolNode node(this, 0, false);
+    BoolNode node(0, false);
 
     QCOMPARE(node.value(), false);
 
-    BoolNode node2(this, 41, true);
+    BoolNode node2(41, true);
     QCOMPARE(node2.value(), true);
 }
 
 void TestBoolNode::setValue() {
-    BoolNode node(this, 0, true);
+    BoolNode node(0, true);
 
     QCOMPARE(node.value(), true);
 

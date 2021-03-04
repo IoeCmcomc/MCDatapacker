@@ -6,15 +6,15 @@
 namespace Command {
     class TimeNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
         enum Unit : unsigned char {
+            ImplicitTick,
             Tick,
             Second,
             Day,
         };
-        TimeNode(QObject *parent, int pos, int length,
-                 int v, Unit unit = Unit::Tick);
+        TimeNode(int pos, int length,
+                 int v, Unit unit = Unit::ImplicitTick);
         QString toString() const override;
 
         float value() const;
@@ -27,12 +27,12 @@ public:
 
 private:
         float m_value;
-        Unit m_unit = Unit::Tick;
+        Unit m_unit = Unit::ImplicitTick;
 
 private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::TimeNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::TimeNode>)
 
 #endif /* TIMENODE_H */

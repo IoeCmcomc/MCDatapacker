@@ -1,10 +1,9 @@
 #include "intrangenode.h"
 
-static int _ = qRegisterMetaType<Command::IntRangeNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::IntRangeNode> >();
 
-Command::IntRangeNode::IntRangeNode(QObject *parent, int pos, int length)
-    : Command::ArgumentNode(parent, pos, length, "minecraft:int_range") {
-    setExactValue(new Command::IntegerNode(this));
+Command::IntRangeNode::IntRangeNode(int pos, int length)
+    : RangeNode(pos, length, "minecraft:int_range") {
 }
 
 QString Command::IntRangeNode::toString() const {

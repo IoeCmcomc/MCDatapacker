@@ -1,12 +1,14 @@
 #include "blockstatenode.h"
 
-static const int _ = qRegisterMetaType<Command::BlockStateNode*>();
+static const int _BlockStateNode =
+    qRegisterMetaType<QSharedPointer<Command::BlockStateNode> >();
+static const int _BlockPredicateNode =
+    qRegisterMetaType<QSharedPointer<Command::BlockPredicateNode> >();
 
-Command::BlockStateNode::BlockStateNode(QObject *parent,
-                                        int pos,
-                                        const QString &nspace,
+
+Command::BlockStateNode::BlockStateNode(int pos, const QString &nspace,
                                         const QString &id)
-    : Command::ResourceLocationNode(parent, pos, nspace, id) {
+    : Command::ResourceLocationNode(pos, nspace, id) {
 }
 
 QString Command::BlockStateNode::toString() const {
@@ -25,33 +27,30 @@ bool Command::BlockStateNode::isVaild() const {
 }
 
 
-Command::MapNode *Command::BlockStateNode::states() const {
+QSharedPointer<Command::MapNode> Command::BlockStateNode::states() const {
     return m_states;
 }
 
-void Command::BlockStateNode::setStates(MapNode *states) {
+void Command::BlockStateNode::setStates(QSharedPointer<MapNode> states) {
     m_states = states;
 }
 
-Command::NbtCompoundNode *Command::BlockStateNode::nbt() const {
+QSharedPointer<Command::NbtCompoundNode> Command::BlockStateNode::nbt() const {
     return m_nbt;
 }
 
-void Command::BlockStateNode::setNbt(NbtCompoundNode *nbt) {
+void Command::BlockStateNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
     m_nbt = nbt;
 }
 
-Command::BlockPredicateNode::BlockPredicateNode(QObject *parent,
-                                                int pos,
-                                                const QString &nspace,
+Command::BlockPredicateNode::BlockPredicateNode(int pos, const QString &nspace,
                                                 const QString &id)
-    : Command::BlockStateNode(parent, pos, nspace, id) {
+    : Command::BlockStateNode(pos, nspace, id) {
     setParserId("minecraft:block_predicate");
 }
 
 Command::BlockPredicateNode::BlockPredicateNode(Command::BlockStateNode *other)
-    : Command::BlockStateNode(other->parent(), other->pos(),
-                              other->nspace(), other->id()) {
+    : Command::BlockStateNode(other->pos(), other->nspace(), other->id()) {
     setParserId("minecraft:block_predicate");
     setLength(other->length());
 }

@@ -6,11 +6,10 @@
 namespace Command {
     class ResourceLocationNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        explicit ResourceLocationNode(QObject *parent, int pos = -1,
-                                      const QString &nspace    = "",
-                                      const QString &id        = "");
+        explicit ResourceLocationNode(int pos               = -1,
+                                      const QString &nspace = "",
+                                      const QString &id     = "");
         virtual QString toString() const;
         QString format() const;
 
@@ -32,6 +31,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::ResourceLocationNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::ResourceLocationNode>)
 
 #endif /* RESOURCELOCATIONNODE_H */

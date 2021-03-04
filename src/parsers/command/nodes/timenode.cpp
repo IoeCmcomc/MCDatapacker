@@ -1,16 +1,15 @@
 #include "timenode.h"
 
-static int _ = qRegisterMetaType<Command::TimeNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::TimeNode> >();
 
-Command::TimeNode::TimeNode(QObject *parent, int pos, int length, int v,
-                            Unit unit)
-    : Command::ArgumentNode(parent, pos, length, "minecraf:time") {
+Command::TimeNode::TimeNode(int pos, int length, int v, Unit unit)
+    : Command::ArgumentNode(pos, length, "minecraf:time") {
     setValue(v);
     setUnit(unit);
 }
 
 QString Command::TimeNode::toString() const {
-    QString type2char[] = { "t", "s", "d" };
+    QString type2char[] = { "", "t", "s", "d" };
 
     return QString("TimeNode(%1)").arg(QString::number(m_value) +
                                        type2char[m_unit]);
@@ -21,7 +20,7 @@ Command::TimeNode::Unit Command::TimeNode::unit() const {
 }
 
 void Command::TimeNode::setUnit(const Unit &unit) {
-    if (unit > 2) {
+    if (unit > 3) {
         qWarning() << "Invaild unit type";
         return;
     }
@@ -30,6 +29,7 @@ void Command::TimeNode::setUnit(const Unit &unit) {
 
 int Command::TimeNode::toTick() const {
     switch (m_unit) {
+    case Unit::ImplicitTick:
     case Unit::Tick:
         return qRound(m_value);
 

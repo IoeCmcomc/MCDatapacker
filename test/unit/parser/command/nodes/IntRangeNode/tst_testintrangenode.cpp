@@ -35,34 +35,34 @@ void TestIntRangeNode::cleanupTestCase() {
 }
 
 void TestIntRangeNode::test_case1() {
-    IntRangeNode node(this, 2, 5);
+    IntRangeNode node(2, 5);
 
-    node.setMinValue(new IntegerNode(&node, 0, 1, 7), false);
-    node.setMaxValue(new IntegerNode(&node, 0, 1, 12), true);
+    node.setMinValue(QSharedPointer<IntegerNode>::create(0, 1, 7), false);
+    node.setMaxValue(QSharedPointer<IntegerNode>::create(0, 1, 12), true);
 
     QCOMPARE(node.toString(), "IntRangeNode(7..12)");
 }
 
 void TestIntRangeNode::minValue() {
-    IntRangeNode node(this, 0, 0);
+    IntRangeNode node(0, 0);
 
-    node.setMinValue(new IntegerNode(&node, 0, 1, 1), false);
+    node.setMinValue(QSharedPointer<IntegerNode>::create(0, 1, 1), false);
     QCOMPARE(node.hasMinValue(), true);
     QCOMPARE(node.minValue()->value(), 1);
 }
 
 void TestIntRangeNode::maxValue() {
-    IntRangeNode node(this, 0, 0);
+    IntRangeNode node(0, 0);
 
-    node.setMaxValue(new IntegerNode(&node, 0, 1, 22), false);
+    node.setMaxValue(QSharedPointer<IntegerNode>::create(0, 1, 22), false);
     QCOMPARE(node.hasMaxValue(), true);
     QCOMPARE(node.maxValue()->value(), 22);
 }
 
 void TestIntRangeNode::exactValue() {
-    IntRangeNode node(this, 0, 0);
+    IntRangeNode node(0, 0);
 
-    node.setExactValue(new IntegerNode(&node, 0, 2, -9));
+    node.setExactValue(QSharedPointer<IntegerNode>::create(0, 2, -9));
     QCOMPARE(node.hasMinValue(), false);
     QCOMPARE(node.hasMaxValue(), false);
     QCOMPARE(node.exactValue()->value(), -9);

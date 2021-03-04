@@ -8,34 +8,32 @@
 namespace Command {
     class BlockStateNode : public ResourceLocationNode
     {
-        Q_OBJECT
 public:
-        BlockStateNode(QObject *parent, int pos, const QString &nspace,
-                       const QString &id);
+        BlockStateNode(int pos, const QString &nspace, const QString &id);
         virtual QString toString() const override;
         bool isVaild() const override;
 
-        MapNode *states() const;
-        void setStates(MapNode *states);
+        QSharedPointer<MapNode> states() const;
+        void setStates(QSharedPointer<MapNode> states);
 
-        NbtCompoundNode *nbt() const;
-        void setNbt(NbtCompoundNode *nbt);
+        QSharedPointer<NbtCompoundNode> nbt() const;
+        void setNbt(QSharedPointer<NbtCompoundNode> nbt);
 
 private:
-        MapNode *m_states      = nullptr;
-        NbtCompoundNode *m_nbt = nullptr;
+        QSharedPointer<MapNode> m_states      = nullptr;
+        QSharedPointer<NbtCompoundNode> m_nbt = nullptr;
     };
 
     class BlockPredicateNode final : public BlockStateNode {
-        Q_OBJECT
 public:
-        BlockPredicateNode(QObject *parent, int pos, const QString &nspace,
+        BlockPredicateNode(int pos, const QString &nspace,
                            const QString &id);
         BlockPredicateNode(BlockStateNode *other);
         QString toString() const override;
     };
 }
 
-Q_DECLARE_METATYPE(Command::BlockStateNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::BlockStateNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::BlockPredicateNode>)
 
 #endif /* BLOCKSTATENODE_H */

@@ -1,13 +1,10 @@
 #include "swizzlenode.h"
 
-const static int _ = qRegisterMetaType<Command::SwizzleNode*>();
+const static int _ = qRegisterMetaType<QSharedPointer<Command::SwizzleNode> >();
 
-Command::SwizzleNode::SwizzleNode(QObject *parent,
-                                  int pos,
-                                  bool hasX,
-                                  bool hasY,
-                                  bool hasZ)
-    : ArgumentNode(parent, pos, 0, "minecraft:swizzle") {
+Command::SwizzleNode::SwizzleNode(int pos, bool hasX,
+                                  bool hasY, bool hasZ)
+    : ArgumentNode(pos, 0, "minecraft:swizzle") {
     m_axes.setFlag(Axis::X, hasX);
     m_axes.setFlag(Axis::Y, hasY);
     m_axes.setFlag(Axis::Z, hasZ);
@@ -15,8 +12,8 @@ Command::SwizzleNode::SwizzleNode(QObject *parent,
     update();
 }
 
-Command::SwizzleNode::SwizzleNode(QObject *parent, int pos, Axes axes)
-    : ArgumentNode(parent, pos, 0, "minecraft:swizzle") {
+Command::SwizzleNode::SwizzleNode(int pos, Axes axes)
+    : ArgumentNode(pos, 0, "minecraft:swizzle") {
     setAxes(axes);
 }
 

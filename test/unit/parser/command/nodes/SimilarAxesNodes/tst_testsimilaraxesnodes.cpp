@@ -32,10 +32,14 @@ void TestSimilarAxesNodes::cleanupTestCase() {
 }
 
 void TestSimilarAxesNodes::columnPosNode() {
-    ColumnPosNode node(this, 0, 8);
+    ColumnPosNode node(0, 8);
 
-    node.setX(new AxisNode(this, 0, 2, AxisNode::AxisType::Absolute, 12));
-    node.setZ(new AxisNode(this, 6, 2, AxisNode::AxisType::Absolute, 56));
+    node.setX(QSharedPointer<AxisNode>::create(0, 2,
+                                               AxisNode::AxisType::Absolute,
+                                               12));
+    node.setZ(QSharedPointer<AxisNode>::create(6, 2,
+                                               AxisNode::AxisType::Absolute,
+                                               56));
 
     QCOMPARE(node.toString(),
              "ColumnPosNode(x: AxisNode(12), z: AxisNode(56))");

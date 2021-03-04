@@ -1,15 +1,13 @@
 #ifndef PARSENODE_H
 #define PARSENODE_H
 
-#include <QObject>
 #include <QDebug>
 
 namespace Command {
-    class ParseNode : public QObject
+    class ParseNode
     {
-        Q_OBJECT
 public:
-        explicit ParseNode(QObject *parent, int pos = -1, int length = 0);
+        explicit ParseNode(int pos = -1, int length = 0);
 
         virtual QString toString() const;
         virtual bool isVaild() const;
@@ -28,6 +26,6 @@ private:
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node);
 
-Q_DECLARE_METATYPE(Command::ParseNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ParseNode>);
 
 #endif /* PARSENODE_H */

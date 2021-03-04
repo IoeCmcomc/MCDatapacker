@@ -6,7 +6,6 @@
 namespace Command {
     class AxisNode : public ParseNode
     {
-        Q_OBJECT
 public:
         enum AxisType : unsigned char {
             Absolute,
@@ -18,15 +17,11 @@ public:
             float floatVal;
         };
 
-        AxisNode(QObject *parent, int pos,
-                 int length    = 0,
-                 AxisType type = Absolute,
-                 int value     = 0);
-        AxisNode(QObject *parent, int pos,
-                 int length    = 0,
-                 AxisType type = Absolute,
-                 double value  = 0);
-        AxisNode(QObject *parent);
+        AxisNode(int pos, int length, AxisType type = Absolute,
+                 int value                          = 0);
+        AxisNode(int pos, int length, AxisType type = Absolute,
+                 double value                       = 0);
+        AxisNode(int pos);
 
         virtual QString toString() const override;
         QString format() const;
@@ -54,6 +49,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::AxisNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::AxisNode>)
 
 #endif /* AXISNODE_H */

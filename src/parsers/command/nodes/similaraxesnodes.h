@@ -3,16 +3,12 @@
 
 #include "axesnode.h"
 
-/*
-   Template classes are not supported by Q_OBJECT, so I had to
-   use this macro instead.
- */
-#define DECLARE_TYPE_FROM_AXESNODE(Type)                      \
-    class Type : public AxesNode {                            \
-        Q_OBJECT                                              \
-public:                                                       \
-        explicit Type(QObject * parent, int pos, int length); \
-        QString toString() const;                             \
+
+#define DECLARE_TYPE_FROM_AXESNODE(Type)    \
+    class Type : public AxesNode {          \
+public:                                     \
+        explicit Type(int pos, int length); \
+        QString toString() const;           \
     };
 
 namespace Command {
@@ -23,10 +19,10 @@ namespace Command {
     DECLARE_TYPE_FROM_AXESNODE(Vec3Node)
 }
 
-Q_DECLARE_METATYPE(Command::BlockPosNode*);
-Q_DECLARE_METATYPE(Command::ColumnPosNode*);
-Q_DECLARE_METATYPE(Command::RotationNode*);
-Q_DECLARE_METATYPE(Command::Vec2Node*);
-Q_DECLARE_METATYPE(Command::Vec3Node*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::BlockPosNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::ColumnPosNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::RotationNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::Vec2Node>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::Vec3Node>);
 
 #endif /* SIMILARAXESNODES_H */

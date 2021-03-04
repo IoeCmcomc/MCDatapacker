@@ -1,9 +1,9 @@
 #include "axesnode.h"
 
-static int _ = qRegisterMetaType<Command::AxesNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::AxesNode> >();
 
-Command::AxesNode::AxesNode(QObject *parent, int pos, int length)
-    : Command::ArgumentNode(parent, pos, length, "mcdatapacker:axes") {
+Command::AxesNode::AxesNode(int pos, int length)
+    : Command::ArgumentNode(pos, length, "mcdatapacker:axes") {
 }
 
 QString Command::AxesNode::toString() const {
@@ -22,28 +22,25 @@ bool Command::AxesNode::isVaild() const {
     return ArgumentNode::isVaild() && (m_x) && (m_z);
 }
 
-Command::AxisNode *Command::AxesNode::x() const {
+QSharedPointer<Command::AxisNode> Command::AxesNode::x() const {
     return m_x;
 }
 
-void Command::AxesNode::setX(AxisNode *x) {
-    x->setParent(this);
+void Command::AxesNode::setX(QSharedPointer<AxisNode> x) {
     m_x = x;
 }
 
-Command::AxisNode *Command::AxesNode::y() {
+QSharedPointer<Command::AxisNode> Command::AxesNode::y() {
     return m_y;
 }
-void Command::AxesNode::setY(AxisNode *y) {
-    y->setParent(this);
+void Command::AxesNode::setY(QSharedPointer<AxisNode> y) {
     m_y = y;
 }
 
-Command::AxisNode *Command::AxesNode::z() const {
+QSharedPointer<Command::AxisNode> Command::AxesNode::z() const {
     return m_z;
 }
 
-void Command::AxesNode::setZ(AxisNode *z) {
-    z->setParent(this);
+void Command::AxesNode::setZ(QSharedPointer<AxisNode> z) {
     m_z = z;
 }

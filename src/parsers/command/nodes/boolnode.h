@@ -6,19 +6,18 @@
 namespace Command {
     class BoolNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        explicit BoolNode(QObject *parent, int pos = -1, bool value = false);
+        explicit BoolNode(int pos = -1, bool value = false);
 
         QString toString() const;
         bool value() const;
         void setValue(bool value);
 
 private:
-        bool m_value;
+        bool m_value = false;
     };
 }
 
-Q_DECLARE_METATYPE(Command::BoolNode*);
+Q_DECLARE_METATYPE(QSharedPointer<Command::BoolNode>);
 
 #endif /* BOOLNODE_H */

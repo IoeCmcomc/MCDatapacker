@@ -3,10 +3,10 @@
 #include <QMetaEnum>
 
 static const int _NbtPathStepnode =
-    qRegisterMetaType<Command::NbtPathStepNode*>();
+    qRegisterMetaType<QSharedPointer<Command::NbtPathStepNode> >();
 
-Command::NbtPathStepNode::NbtPathStepNode(QObject *parent, int pos)
-    : Command::ParseNode(parent, pos) {
+Command::NbtPathStepNode::NbtPathStepNode(int pos)
+    : Command::ParseNode(pos) {
 }
 
 QString Command::NbtPathStepNode::toString() const {
@@ -69,29 +69,31 @@ bool Command::NbtPathStepNode::isVaild() const {
     }
 }
 
-Command::StringNode *Command::NbtPathStepNode::name() const {
+QSharedPointer<Command::StringNode> Command::NbtPathStepNode::name() const {
     return m_name;
 }
 
-void Command::NbtPathStepNode::setName(StringNode *name) {
+void Command::NbtPathStepNode::setName(QSharedPointer<StringNode> name) {
     m_name = name;
     setType(Type::Key);
 }
 
-Command::IntegerNode *Command::NbtPathStepNode::index() const {
+QSharedPointer<Command::IntegerNode> Command::NbtPathStepNode::index() const {
     return m_index;
 }
 
-void Command::NbtPathStepNode::setIndex(IntegerNode *index) {
+void Command::NbtPathStepNode::setIndex(QSharedPointer<IntegerNode> index) {
     m_index = index;
     setType(Type::Index);
 }
 
-Command::NbtCompoundNode *Command::NbtPathStepNode::filter() const {
+QSharedPointer<Command::NbtCompoundNode> Command::NbtPathStepNode::filter()
+const {
     return m_filter;
 }
 
-void Command::NbtPathStepNode::setFilter(NbtCompoundNode *filter) {
+void Command::NbtPathStepNode::setFilter(QSharedPointer<NbtCompoundNode> filter)
+{
     m_filter = filter;
 }
 
@@ -111,16 +113,17 @@ void Command::NbtPathStepNode::setHasTrailingDot(bool hasTrailingDot) {
     m_hasTrailingDot = hasTrailingDot;
 }
 
-static const int _NbtPathnode = qRegisterMetaType<Command::NbtPathNode*>();
+static const int _NbtPathnode =
+    qRegisterMetaType<QSharedPointer<Command::NbtPathNode> >();
 
-Command::NbtPathNode::NbtPathNode(QObject *parent, int pos)
-    : Command::ArgumentNode(parent, pos, -1, "minecraft:nbt_path") {
+Command::NbtPathNode::NbtPathNode(int pos)
+    : Command::ArgumentNode(pos, -1, "minecraft:nbt_path") {
 }
 
 QString Command::NbtPathNode::toString() const {
     QStringList steps;
 
-    for (const NbtPathStepNode *step: m_steps)
+    for (const auto &step: m_steps)
         steps += step->toString();
     return QString("NbtPathNode(%1)").arg(steps.join(", "));
 }
@@ -129,7 +132,7 @@ bool Command::NbtPathNode::isVaild() const {
     return ArgumentNode::isVaild() && !m_steps.isEmpty();
 }
 
-void Command::NbtPathNode::append(Command::NbtPathStepNode *node) {
+void Command::NbtPathNode::append(QSharedPointer<NbtPathStepNode> node) {
     m_steps.append(node);
 }
 
@@ -141,18 +144,21 @@ void Command::NbtPathNode::clear() {
     m_steps.clear();
 }
 
-Command::NbtPathStepNode *Command::NbtPathNode::last() const {
+QSharedPointer<Command::NbtPathStepNode> Command::NbtPathNode::last() const {
     return m_steps.last();;
 }
 
-Command::NbtPathStepNode *Command::NbtPathNode::operator[](int index) {
+QSharedPointer<Command::NbtPathStepNode> &Command::NbtPathNode::operator[](
+    int index) {
     return m_steps[index];
 }
 
-Command::NbtPathStepNode *Command::NbtPathNode::operator[](int index) const {
+const QSharedPointer<Command::NbtPathStepNode> Command::NbtPathNode::operator[](
+    int index) const {
     return m_steps[index];
 }
 
-QVector<Command::NbtPathStepNode*> Command::NbtPathNode::steps() const {
+QVector<QSharedPointer<Command::NbtPathStepNode> > Command::NbtPathNode::steps()
+const {
     return m_steps;
 }

@@ -33,7 +33,7 @@ void TestSimilarResourceLocationNodes::cleanupTestCase() {
 }
 
 void TestSimilarResourceLocationNodes::dimensionNode() {
-    DimensionNode node(this, 99, "minecraft", "nether");
+    DimensionNode node(99, "minecraft", "nether");
 
     QCOMPARE(node.fullId(), "minecraft:nether");
 }

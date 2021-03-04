@@ -5,14 +5,11 @@
 
 #include "json/single_include/nlohmann/json.hpp"
 
-#include <QJsonValue>
-
 namespace Command {
     class ComponentNode final : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        ComponentNode(QObject *parent, int pos, int length);
+        ComponentNode(int pos, int length);
         QString toString() const override;
         bool isVaild() const override;
 
@@ -24,6 +21,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::ComponentNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::ComponentNode>)
 
 #endif /* COMPONENTNODE_H */

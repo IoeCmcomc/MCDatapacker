@@ -1,11 +1,11 @@
 #include "itemstacknode.h"
 
-static const int _ItemStackNode = qRegisterMetaType<Command::ItemStackNode*>();
+static const int _ItemStackNode =
+    qRegisterMetaType<QSharedPointer<Command::ItemStackNode> >();
 
-Command::ItemStackNode::ItemStackNode(QObject *parent, int pos,
-                                      const QString &nspace,
+Command::ItemStackNode::ItemStackNode(int pos, const QString &nspace,
                                       const QString &id)
-    : Command::ResourceLocationNode(parent, pos, nspace, id) {
+    : Command::ResourceLocationNode(pos, nspace, id) {
 }
 
 QString Command::ItemStackNode::toString() const {
@@ -21,27 +21,25 @@ bool Command::ItemStackNode::isVaild() const {
     return ResourceLocationNode::isVaild() && m_nbt;
 }
 
-Command::NbtCompoundNode *Command::ItemStackNode::nbt() const {
+QSharedPointer<Command::NbtCompoundNode> Command::ItemStackNode::nbt() const {
     return m_nbt;
 }
 
-void Command::ItemStackNode::setNbt(NbtCompoundNode *nbt) {
+void Command::ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
     m_nbt = nbt;
 }
 
 static const int _ItemPredicateNode =
-    qRegisterMetaType<Command::ItemPredicateNode*>();
+    qRegisterMetaType<QSharedPointer<Command::ItemPredicateNode> >();
 
-Command::ItemPredicateNode::ItemPredicateNode(QObject *parent, int pos,
-                                              const QString &nspace,
+Command::ItemPredicateNode::ItemPredicateNode(int pos, const QString &nspace,
                                               const QString &id)
-    : Command::ItemStackNode(parent, pos, nspace, id) {
+    : Command::ItemStackNode(pos, nspace, id) {
     setParserId("minecraft:item_predicate");
 }
 
 Command::ItemPredicateNode::ItemPredicateNode(Command::ItemStackNode *other)
-    : Command::ItemStackNode(other->parent(), other->pos(),
-                             other->nspace(), other->id()) {
+    : Command::ItemStackNode(other->pos(), other->nspace(), other->id()) {
     setParserId("minecraft:item_predicate");
     setLength(other->length());
 }

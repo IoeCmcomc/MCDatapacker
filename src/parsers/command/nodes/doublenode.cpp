@@ -1,10 +1,10 @@
 #include "doublenode.h"
 
-static int _ = qRegisterMetaType<Command::DoubleNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::DoubleNode> >();
 
-Command::DoubleNode::DoubleNode(QObject *parent, int pos, int length,
+Command::DoubleNode::DoubleNode(int pos, int length,
                                 double value)
-    : Command::ArgumentNode(parent, pos, length, "brigadier:double") {
+    : Command::ArgumentNode(pos, length, "brigadier:double") {
     setValue(value);
 }
 

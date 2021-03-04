@@ -53,7 +53,7 @@ void TestMinecraftParser::dataCmd() {
     MinecraftParser parser(this,
                            "data get entity @p foo.bar[0].\"A [crazy name]!\".baz");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     qDebug() << *result;
     QCOMPARE(
@@ -67,12 +67,17 @@ void TestMinecraftParser::dataCmd() {
     QCOMPARE(
         result->toString(),
         "RootNode[5](LiteralNode(data), LiteralNode(get), LiteralNode(entity), EntityNode[single, player](TargetSelectorNode(@p)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"A\")), NbtPathStepNode<Index>([IntegerNode(-1)].), NbtPathStepNode<Key>(StringNode(\"B\"))))");
+
+    parser.setText("data modify storage test {} set value {Key:1b}");
+    result = parser.parse();
+
+    qDebug() << *result;
 }
 
 void TestMinecraftParser::functionCmd() {
     MinecraftParser parser(this, "function custom:example/test");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -82,7 +87,7 @@ void TestMinecraftParser::functionCmd() {
 void TestMinecraftParser::forceloadCmd() {
     MinecraftParser parser(this, "forceload add 0 -1 31 47");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -100,7 +105,7 @@ void TestMinecraftParser::giveCmd() {
     MinecraftParser parser(this,
                            R"(give @p diamond_sword{Enchantments:[{id:"minecraft:sharpness",lvl:10}]} 1)");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -118,7 +123,7 @@ void TestMinecraftParser::particleCmd() {
     MinecraftParser parser(this,
                            "particle block minecraft:furnace[lit=true] ~ ~ ~ 0 0 0 1 1");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -140,7 +145,7 @@ void TestMinecraftParser::particleCmd() {
 void TestMinecraftParser::scoreboardCmd() {
     MinecraftParser parser(this, "scoreboard objectives add joined dummy");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -156,7 +161,7 @@ void TestMinecraftParser::setblockCmd() {
     MinecraftParser parser(this,
                            "setblock ^ ^ ^3 minecraft:hopper[facing=east]{id: 'minecraft:hopper', TransferCooldown: 23}");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -168,7 +173,7 @@ void TestMinecraftParser::tpCmd() {
 
     MinecraftParser parser(this, "tp 100 ~2 300");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(
         result->toString(),
@@ -178,7 +183,7 @@ void TestMinecraftParser::tpCmd() {
 void TestMinecraftParser::timeCmd() {
     MinecraftParser parser(this, "time add 90s");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
 
     QCOMPARE(result->toString(),
              "RootNode[3](LiteralNode(time), LiteralNode(add), TimeNode(90s))");

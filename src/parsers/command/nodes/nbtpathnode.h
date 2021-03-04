@@ -7,7 +7,7 @@
 
 namespace Command {
     class NbtPathStepNode : public ParseNode {
-        Q_OBJECT
+        Q_GADGET
 public:
         enum class Type : unsigned char {
             Root,
@@ -16,18 +16,18 @@ public:
         };
         Q_ENUM(Type)
 
-        NbtPathStepNode(QObject *parent, int pos);
+        NbtPathStepNode(int pos);
         QString toString() const override;
         bool isVaild() const override;
 
-        StringNode *name() const;
-        void setName(StringNode *name);
+        QSharedPointer<StringNode> name() const;
+        void setName(QSharedPointer<StringNode> name);
 
-        IntegerNode *index() const;
-        void setIndex(IntegerNode *index);
+        QSharedPointer<IntegerNode> index() const;
+        void setIndex(QSharedPointer<IntegerNode> index);
 
-        NbtCompoundNode *filter() const;
-        void setFilter(NbtCompoundNode *filter);
+        QSharedPointer<NbtCompoundNode> filter() const;
+        void setFilter(QSharedPointer<NbtCompoundNode> filter);
 
         Type type() const;
         void setType(const Type &type);
@@ -36,40 +36,39 @@ public:
         void setHasTrailingDot(bool hasTrailingDot);
 
 private:
-        StringNode *m_name        = nullptr;
-        IntegerNode *m_index      = nullptr;
-        NbtCompoundNode *m_filter = nullptr;
-        Type m_type               = Type::Root;
-        bool m_hasTrailingDot     = false;
+        QSharedPointer<StringNode> m_name        = nullptr;
+        QSharedPointer<IntegerNode> m_index      = nullptr;
+        QSharedPointer<NbtCompoundNode> m_filter = nullptr;
+        Type m_type                              = Type::Root;
+        bool m_hasTrailingDot                    = false;
     };
 
     class NbtPathNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        NbtPathNode(QObject *parent, int pos);
+        NbtPathNode(int pos);
         QString toString() const override;
         bool isVaild() const override;
 
         bool isEmpty();
         int size();
 
-        void append(Command::NbtPathStepNode *node);
+        void append(QSharedPointer<NbtPathStepNode> node);
         void remove(int i);
         void clear();
 
-        Command::NbtPathStepNode *last() const;
-        Command::NbtPathStepNode *operator[](int index);
-        Command::NbtPathStepNode *operator[](int index) const;
+        QSharedPointer<NbtPathStepNode> last() const;
+        QSharedPointer<NbtPathStepNode> &operator[](int index);
+        const QSharedPointer<NbtPathStepNode> operator[](int index) const;
 
-        QVector<NbtPathStepNode *> steps() const;
+        QVector<QSharedPointer<NbtPathStepNode> > steps() const;
 
 private:
-        QVector<NbtPathStepNode*> m_steps;
+        QVector<QSharedPointer<NbtPathStepNode> > m_steps;
     };
 }
 
-Q_DECLARE_METATYPE(Command::NbtPathStepNode*)
-Q_DECLARE_METATYPE(Command::NbtPathNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathStepNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathNode>)
 
 #endif /* NBTPATHNODE_H */

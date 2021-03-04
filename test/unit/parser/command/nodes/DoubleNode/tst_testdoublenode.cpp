@@ -32,7 +32,7 @@ void TestDoubleNode::cleanupTestCase() {
 }
 
 void TestDoubleNode::test_case1() {
-    DoubleNode node(this, 0, 4, 22.4);
+    DoubleNode node(0, 4, 22.4);
 
     QCOMPARE(node.toString(), "DoubleNode(22.4)");
 }

@@ -22,13 +22,12 @@ namespace Command {
         QString text;
         bool operator<(const MapKey &other) const;
     };
-    using ParseNodeMap = QMap<MapKey, ParseNode*>;
+    using ParseNodeMap = QMap<MapKey, QSharedPointer<ParseNode> >;
 
     class MapNode : public ParseNode
     {
-        Q_OBJECT
 public:
-        MapNode(QObject *parent, int pos, int length = 0);
+        MapNode(int pos, int length = 0);
 
         QString toString() const override;
 
@@ -36,11 +35,11 @@ public:
         bool contains(const QString &key) const;
         bool contains(const MapKey &key) const;
         ParseNodeMap::const_iterator find(const QString &key) const;
-        void insert(const MapKey &key, ParseNode *node);
+        void insert(const MapKey &key, QSharedPointer<ParseNode> node);
         int remove(const MapKey &key);
         void clear();
-        ParseNode* &operator[](const MapKey &key);
-        ParseNode *operator[](const MapKey &key) const;
+        QSharedPointer<ParseNode> &operator[](const MapKey &key);
+        const QSharedPointer<ParseNode> operator[](const MapKey &key) const;
         ParseNodeMap toMap() const;
 
 private:
@@ -48,6 +47,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::MapNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::MapNode>)
 
 #endif /* MAPNODE_H */

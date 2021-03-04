@@ -32,7 +32,7 @@ void TestIntegerNode::cleanupTestCase() {
 }
 
 void TestIntegerNode::test_case1() {
-    Command::IntegerNode node(this, 22, 10, 1700290000);
+    Command::IntegerNode node(22, 10, 1700290000);
 
     QCOMPARE(node.toString(), "IntegerNode(1700290000)");
 }

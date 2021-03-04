@@ -32,7 +32,7 @@ void TestStringNode::cleanupTestCase() {
 }
 
 void TestStringNode::test_case1() {
-    StringNode node(this, 51,
+    StringNode node(51,
                     "Although a long argument type is present in brigadier, it is not used by Minecraft.");
 
     QCOMPARE(

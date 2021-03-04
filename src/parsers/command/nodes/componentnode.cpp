@@ -1,10 +1,11 @@
 #include "componentnode.h"
 
-static const int _ = qRegisterMetaType<Command::ComponentNode*>();
+static const int _ =
+    qRegisterMetaType<QSharedPointer<Command::ComponentNode> >();
 
 
-Command::ComponentNode::ComponentNode(QObject *parent, int pos, int length)
-    : Command::ArgumentNode(parent, pos, length, "minecraft:component") {
+Command::ComponentNode::ComponentNode(int pos, int length)
+    : Command::ArgumentNode(pos, length, "minecraft:component") {
 }
 
 QString Command::ComponentNode::toString() const {

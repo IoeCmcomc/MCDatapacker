@@ -1,10 +1,9 @@
 #include "floatrangenode.h"
 
-static int _ = qRegisterMetaType<Command::FloatRangeNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::FloatRangeNode> >();
 
-Command::FloatRangeNode::FloatRangeNode(QObject *parent, int pos, int length)
-    : Command::ArgumentNode(parent, pos, length, "minecraft:float_range") {
-    setExactValue(new Command::FloatNode(this));
+Command::FloatRangeNode::FloatRangeNode(int pos, int length)
+    : RangeNode(pos, length, "minecraft:float_range") {
 }
 
 QString Command::FloatRangeNode::toString() const {

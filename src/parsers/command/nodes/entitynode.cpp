@@ -1,22 +1,23 @@
 #include "entitynode.h"
 
-static const int _EntityNode = qRegisterMetaType<Command::EntityNode*>();
+static const int _EntityNode =
+    qRegisterMetaType<QSharedPointer<Command::EntityNode> >();
 
-Command::EntityNode::EntityNode(QObject *parent, int pos)
-    : Command::ArgumentNode(parent, pos, -1, "minecraft:entity") {
+Command::EntityNode::EntityNode(int pos)
+    : Command::ArgumentNode(pos, -1, "minecraft:entity") {
     m_PtrVari.setValue(nullptr);
 }
 
-Command::EntityNode::EntityNode(QObject *parent, Command::StringNode *other)
-    : Command::ArgumentNode(parent, other->pos(),
+Command::EntityNode::EntityNode(QSharedPointer<Command::StringNode> other)
+    : Command::ArgumentNode(other->pos(),
                             other->length(), "minecraft:entity") {
     m_PtrVari.setValue(other);
     m_singleOnly = true;
 }
 
-Command::EntityNode::EntityNode(QObject *parent,
-                                Command::TargetSelectorNode *other)
-    : Command::ArgumentNode(parent, other->pos(),
+Command::EntityNode::EntityNode(
+    QSharedPointer<Command::TargetSelectorNode> other)
+    : Command::ArgumentNode(other->pos(),
                             other->length(), "minecraft:entity") {
     m_PtrVari.setValue(other);
 
@@ -43,9 +44,8 @@ Command::EntityNode::EntityNode(QObject *parent,
     }
 }
 
-Command::EntityNode::EntityNode(QObject *parent, Command::UuidNode *other)
-    : Command::ArgumentNode(parent, other->pos(),
-                            other->length(), "minecraft:entity") {
+Command::EntityNode::EntityNode(QSharedPointer<Command::UuidNode> other)
+    : Command::ArgumentNode(other->pos(), other->length(), "minecraft:entity") {
     m_PtrVari.setValue(other);
     m_singleOnly = true;
 }
@@ -59,7 +59,20 @@ QString Command::EntityNode::toString() const {
         items << "player";
     QString ret = QString("EntityNode[%1](").arg(items.join(", "));
     if (m_PtrVari.isValid() && !m_PtrVari.isNull()) {
-        auto *argNode = qvariant_cast<ParseNode*>(m_PtrVari);
+        QSharedPointer<ParseNode> argNode = nullptr;
+        if (m_PtrVari.canConvert<QSharedPointer<TargetSelectorNode> >()) {
+            argNode = qSharedPointerCast<ParseNode>(
+                m_PtrVari.value<QSharedPointer<TargetSelectorNode> >());
+        } else if (m_PtrVari.canConvert<QSharedPointer<StringNode> >()) {
+            argNode = qSharedPointerCast<ParseNode>(
+                m_PtrVari.value<QSharedPointer<StringNode> >());
+        } else if (m_PtrVari.canConvert<QSharedPointer<UuidNode> >()) {
+            argNode = qSharedPointerCast<ParseNode>(
+                m_PtrVari.value<QSharedPointer<UuidNode> >());
+        } else {
+            qFatal(
+                "Cannot cast value in EntityNode to QSharedPointer<ParseNode>");
+        }
         ret += argNode->toString();
     }
     return ret + ')';
@@ -94,15 +107,15 @@ void Command::EntityNode::setSingleOnly(bool singleOnly) {
 }
 
 static const int _GameProfileNode =
-    qRegisterMetaType<Command::GameProfileNode*>();
+    qRegisterMetaType<QSharedPointer<Command::GameProfileNode> >();
 
-Command::GameProfileNode::GameProfileNode(QObject *parent, int pos)
-    : Command::EntityNode(parent, pos) {
+Command::GameProfileNode::GameProfileNode(int pos)
+    : Command::EntityNode(pos) {
     setParserId("minecraft:game_profile");
 }
 
 Command::GameProfileNode::GameProfileNode(Command::EntityNode *other)
-    : Command::EntityNode(other->parent(), other->pos()) {
+    : Command::EntityNode(other->pos()) {
     setLength(other->length());
     setPtrVari(other->PtrVari());
     setParserId("minecraft:game_profile");
@@ -113,15 +126,15 @@ QString Command::GameProfileNode::toString() const {
 }
 
 static const int _ScoreHolderNode =
-    qRegisterMetaType<Command::ScoreHolderNode*>();
+    qRegisterMetaType<QSharedPointer<Command::ScoreHolderNode> >();
 
-Command::ScoreHolderNode::ScoreHolderNode(QObject *parent, int pos)
-    : Command::EntityNode(parent, pos) {
+Command::ScoreHolderNode::ScoreHolderNode(int pos)
+    : Command::EntityNode(pos) {
     setParserId("minecraft:game_profile");
 }
 
 Command::ScoreHolderNode::ScoreHolderNode(Command::EntityNode *other)
-    : Command::EntityNode(other->parent(), other->pos()) {
+    : Command::EntityNode(other->pos()) {
     setLength(other->length());
     setPtrVari(other->PtrVari());
     setSingleOnly(other->singleOnly());
@@ -145,13 +158,12 @@ void Command::ScoreHolderNode::setAll(bool all) {
 }
 
 static const int _EntityArgumentValueNode =
-    qRegisterMetaType<Command::EntityArgumentValueNode*>();
+    qRegisterMetaType<QSharedPointer<Command::EntityArgumentValueNode> >();
 
 Command::EntityArgumentValueNode::EntityArgumentValueNode(
-    Command::ParseNode *valNode, bool negative)
-    : Command::ParseNode(valNode->parent(), valNode->pos(), valNode->length()) {
+    QSharedPointer<ParseNode> valNode, bool negative)
+    : Command::ParseNode(valNode->pos(), valNode->length()) {
     m_value = valNode;
-    valNode->setParent(this);
     setNegative(negative);
 }
 
@@ -173,10 +185,12 @@ void Command::EntityArgumentValueNode::setNegative(bool negative) {
     m_negative = negative;
 }
 
-Command::ParseNode *Command::EntityArgumentValueNode::value() const {
+QSharedPointer<Command::ParseNode> Command::EntityArgumentValueNode::value()
+const {
     return m_value;
 }
 
-void Command::EntityArgumentValueNode::setValue(ParseNode *value) {
+void Command::EntityArgumentValueNode::setValue(QSharedPointer<ParseNode> value)
+{
     m_value = value;
 }

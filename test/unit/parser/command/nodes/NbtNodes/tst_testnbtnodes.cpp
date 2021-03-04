@@ -36,12 +36,12 @@ void TestNbtNodes::cleanupTestCase() {
 }
 
 void TestNbtNodes::test_case1() {
-    class NbtIntNode node(this, 0, 3, 123);
+    class NbtIntNode node(0, 3, 123);
     QCOMPARE(node.toString(), "NbtIntNode(123)");
 }
 
 void TestNbtNodes::NbtIntNode() {
-    class NbtIntNode node(this, 20, 9, -45645245);
+    class NbtIntNode node(20, 9, -45645245);
     QCOMPARE(node.id(), nbt::tag_id::tag_int);
     QCOMPARE(node.value(), -45645245);
     node.setValue(14022021);
@@ -49,10 +49,10 @@ void TestNbtNodes::NbtIntNode() {
 }
 
 void TestNbtNodes::NbtByteArrayNode() {
-    class NbtByteArrayNode array(this, 5);
-    array.append(new NbtByteNode(this, 5, 3, (char)255));
-    array.append(new NbtByteNode(this, 1, 2, (char)45));
-    auto *third = new NbtByteNode(this, 52, 2, (char)-6);
+    class NbtByteArrayNode array(5);
+    array.append(QSharedPointer<NbtByteNode>::create(5, 3, (char)255));
+    array.append(QSharedPointer<NbtByteNode>::create(1, 2, (char)45));
+    auto third = QSharedPointer<NbtByteNode>::create(52, 2, (char)-6);
     qDebug() << array;
     array.append(third);
     QCOMPARE(array.size(), 3);
@@ -60,9 +60,9 @@ void TestNbtNodes::NbtByteArrayNode() {
 }
 
 void TestNbtNodes::NbtListNode() {
-    class NbtListNode array(this, 5);
-    array.append(new NbtStringNode(this, 5, "first string"));
-    auto *third = new NbtStringNode(this, 52, "mcdatapacker:ok");
+    class NbtListNode array(5);
+    array.append(QSharedPointer<NbtStringNode>::create(5, "first string"));
+    auto third = QSharedPointer<NbtStringNode>::create(52, "mcdatapacker:ok");
     array.append(third);
     QCOMPARE(array.size(), 2);
     QCOMPARE(array[1], third);
@@ -71,11 +71,11 @@ void TestNbtNodes::NbtListNode() {
 }
 
 void TestNbtNodes::NbtCompoundNode() {
-    class NbtCompoundNode compound(this, 21);
+    class NbtCompoundNode compound(21);
     compound.insert(MapKey{ 1, "CustomName" },
-                    new NbtStringNode(&compound, 12, "IoeCmcomc"));
+                    QSharedPointer<NbtStringNode>::create(12, "IoeCmcomc"));
     compound.insert(MapKey{ 14, "Air" },
-                    new NbtShortNode(&compound, 18, 4, 300));
+                    QSharedPointer<NbtShortNode>::create(18, 4, 300));
     QCOMPARE(compound.size(), 2);
     QCOMPARE(compound.contains("Air"), true);
     qDebug() << compound;

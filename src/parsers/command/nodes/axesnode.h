@@ -7,29 +7,27 @@
 namespace Command {
     class AxesNode : public ArgumentNode /* Axes, as the plural form of 'axis' */
     {
-        Q_OBJECT
 public:
-        explicit AxesNode(QObject *parent, int pos = -1,
-                          int length               = 0);
+        explicit AxesNode(int pos = -1, int length = 0);
         virtual QString toString() const override;
         bool isVaild() const override;
 
-        AxisNode *y();
-        void setY(AxisNode *y);
+        QSharedPointer<AxisNode> y();
+        void setY(QSharedPointer<AxisNode> y);
 
-        AxisNode *x() const;
-        void setX(AxisNode *x);
+        QSharedPointer<AxisNode> x() const;
+        void setX(QSharedPointer<AxisNode> x);
 
-        AxisNode *z() const;
-        void setZ(AxisNode *z);
+        QSharedPointer<AxisNode> z() const;
+        void setZ(QSharedPointer<AxisNode> z);
 
 private:
-        AxisNode *m_x = nullptr;
-        AxisNode *m_z = nullptr;
-        AxisNode *m_y = nullptr;
+        QSharedPointer<AxisNode> m_x = nullptr;
+        QSharedPointer<AxisNode> m_z = nullptr;
+        QSharedPointer<AxisNode> m_y = nullptr;
     };
 }
 
-Q_DECLARE_METATYPE(Command::AxesNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::AxesNode>)
 
 #endif /* AXESNODE_H */

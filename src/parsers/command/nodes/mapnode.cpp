@@ -5,10 +5,10 @@ bool Command::MapKey::operator<(const Command::MapKey &other) const {
     return std::tie(pos, text) < std::tie(other.pos, other.text);
 }
 
-const static int _ = qRegisterMetaType<Command::MapNode*>();
+const static int _ = qRegisterMetaType<QSharedPointer<Command::MapNode> >();
 
-Command::MapNode::MapNode(QObject *parent, int pos, int length)
-    : Command::ParseNode(parent, pos, length) {
+Command::MapNode::MapNode(int pos, int length)
+    : Command::ParseNode(pos, length) {
 }
 
 QString Command::MapNode::toString() const {
@@ -55,7 +55,7 @@ const {
 }
 
 void Command::MapNode::insert(const MapKey &key,
-                              Command::ParseNode *node) {
+                              QSharedPointer<ParseNode> node) {
     m_map.insert(key, node);
 }
 
@@ -66,11 +66,13 @@ void Command::MapNode::clear() {
     m_map.clear();
 }
 
-Command::ParseNode *&Command::MapNode::operator[](const Command::MapKey &key) {
+QSharedPointer<Command::ParseNode> &Command::MapNode::operator[](
+    const Command::MapKey &key) {
     return m_map[key];
 }
 
-Command::ParseNode *Command::MapNode::operator[](const Command::MapKey &key)
+const QSharedPointer<Command::ParseNode> Command::MapNode::operator[](
+    const Command::MapKey &key)
 const {
     return m_map[key];
 }

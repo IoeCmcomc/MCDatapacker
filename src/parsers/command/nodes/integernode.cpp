@@ -1,12 +1,10 @@
 #include "integernode.h"
 
-static int _ = qRegisterMetaType<Command::IntegerNode*>();
+static int _ = qRegisterMetaType<QSharedPointer<Command::IntegerNode> >();
 
-Command::IntegerNode::IntegerNode(QObject *parent, int pos, int length,
-                                  int value)
-    : Command::ArgumentNode(parent, pos, -1, "brigadier:integer") {
+Command::IntegerNode::IntegerNode(int pos, int length, int value)
+    : Command::ArgumentNode(pos, length, "brigadier:integer") {
     setValue(value);
-    setLength(length);
 }
 
 QString Command::IntegerNode::toString() const {

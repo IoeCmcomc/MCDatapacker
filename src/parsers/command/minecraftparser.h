@@ -32,16 +32,22 @@ public:
 
         explicit MinecraftParser(QObject *parent      = nullptr,
                                  const QString &input = "");
+protected:
+        QSharedPointer<ParseNode> QVariantToParseNodeSharedPointer(
+            const QVariant &vari);
+
 private:
         QString oneOf(QStringList strArr);
 
         template<class Container, class Type>
-        Container *parseMap(QObject *parent, const QChar &beginChar,
-                            const QChar &endChar, const QChar &sepChar,
-                            std::function<Type*(const QString &)> func,
-                            bool acceptQuotation      = false,
-                            const QString &keyCharset = R"(0-9a-zA-Z-_)") {
-            QScopedPointer<Container> obj(new Container(parent, pos()));
+        QSharedPointer<Container> parseMap(const QChar &beginChar,
+                                           const QChar &endChar,
+                                           const QChar &sepChar,
+                                           std::function<QSharedPointer<Type>(const QString &)> func,
+                                           bool acceptQuotation      = false,
+                                           const QString &keyCharset = R"(0-9a-zA-Z-_)")
+        {
+            auto obj = QSharedPointer<Container>::create(pos());
 
             this->eat(beginChar);
             int KeyPos = pos();
@@ -52,7 +58,7 @@ private:
                     (curChar() == '"' || curChar() == '\'')) {
                     try {
                         name = getQuotedString();
-                    } catch (const Command::Parser::ParsingError &err) {
+                    } catch (const Command::Parser::Error &err) {
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
@@ -69,30 +75,28 @@ private:
                 }
             }
             this->eat(endChar);
-            return obj.take();
+            return obj;
         }
 
-        AxisNode *parseAxis(QObject *parent,
-                            AxisParseOptions options,
-                            bool &isLocal);
-        AxesNode *parseAxes(QObject *parent, AxisParseOptions options);
-        Command::NbtCompoundNode *parseCompoundTag(QObject *parent);
-        Command::NbtNode *parseTagValue(QObject *parent);
-        Command::NbtNode *parseNumericTag(QObject *parent);
+        QSharedPointer<AxisNode> parseAxis(AxisParseOptions options,
+                                           bool &isLocal);
+        QSharedPointer<AxesNode> parseAxes(AxisParseOptions options);
+        QSharedPointer<Command::NbtCompoundNode> parseCompoundTag();
+        QSharedPointer<Command::NbtNode> parseTagValue();
+        QSharedPointer<Command::NbtNode> parseNumericTag();
 
         template<class Container, class Type>
-        Container *parseArrayTag(QObject *parent,
-                                 const QString &errorMsg) {
+        QSharedPointer<Container> parseArrayTag(const QString &errorMsg) {
             advance();
             if (curChar() == ';') {
-                QScopedPointer<Container> ret(new Container(parent, pos() - 3));
+                auto ret = QSharedPointer<Container>::create(pos() - 3);
                 advance();
                 while (curChar() != ']') {
                     skipWs(false);
-                    QScopedPointer<Type> elem(qobject_cast<Type*>(
-                                                  parseNumericTag(parent)));
+                    auto elem = qSharedPointerCast<Type>(
+                        parseNumericTag());
                     if (elem)
-                        ret->append(elem.take());
+                        ret->append(elem);
                     else
                         error(QString(errorMsg));
                     skipWs(false);
@@ -102,92 +106,93 @@ private:
                     }
                 }
                 eat(']');
+                return ret;
             } else {
                 error(QString(
                           "Missing the character ';' after array type indicator"));
             }
         }
-        Command::NbtListNode *parseListTag(QObject *parent);
-        Command::MapNode *parseEntityAdvancements(QObject *parent);
-        Command::MapNode *parseEntityArguments(QObject *parent);
-        Command::TargetSelectorNode *parseTargetSelector(QObject *parent);
-        Command::NbtPathStepNode *parseNbtPathStep(QObject *parent);
+        QSharedPointer<Command::NbtListNode> parseListTag();
+        QSharedPointer<Command::MapNode> parseEntityAdvancements();
+        QSharedPointer<Command::MapNode> parseEntityArguments();
+        QSharedPointer<Command::TargetSelectorNode> parseTargetSelector();
+        QSharedPointer<Command::NbtPathStepNode> parseNbtPathStep();
 
         /* Direct parsing methods */
-        Q_INVOKABLE Command::BlockPosNode *minecraft_blockPos(QObject *parent,
-                                                              const QVariantMap &props = {});
-        Q_INVOKABLE Command::BlockStateNode *minecraft_blockState(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::BlockPredicateNode *minecraft_blockPredicate(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::ColorNode *minecraft_color(QObject *parent,
-                                                        const QVariantMap &props = {});
-        Q_INVOKABLE Command::ColumnPosNode *minecraft_columnPos(QObject *parent,
-                                                                const QVariantMap &props = {});
-        Q_INVOKABLE Command::ComponentNode *minecraft_component(QObject *parent,
-                                                                const QVariantMap &props = {});
-        Q_INVOKABLE Command::DimensionNode *minecraft_dimension(QObject *parent,
-                                                                const QVariantMap &props = {});
-        Q_INVOKABLE Command::EntityNode *minecraft_entity(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::EntityAnchorNode *minecraft_entityAnchor(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::EntitySummonNode *minecraft_entitySummon(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::FloatRangeNode *minecraft_floatRange(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::FunctionNode *minecraft_function(QObject *parent,
-                                                              const QVariantMap &props = {});
-        Q_INVOKABLE Command::GameProfileNode *minecraft_gameProfile(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::IntRangeNode *minecraft_intRange(QObject *parent,
-                                                              const QVariantMap &props = {});
-        Q_INVOKABLE Command::ItemEnchantmentNode *minecraft_itemEnchantment(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::ItemSlotNode *minecraft_itemSlot(QObject *parent,
-                                                              const QVariantMap &props = {});
-        Q_INVOKABLE Command::ItemStackNode *minecraft_itemStack(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::ItemPredicateNode *minecraft_itemPredicate(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::MessageNode *minecraft_message(QObject *parent,
-                                                            const QVariantMap &props = {});
-        Q_INVOKABLE Command::MobEffectNode *minecraft_mobEffect(QObject *parent,
-                                                                const QVariantMap &props = {});
-        Q_INVOKABLE Command::NbtCompoundNode *minecraft_nbtCompoundTag(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::NbtPathNode *minecraft_nbtPath(QObject *parent,
-                                                            const QVariantMap &props = {});
-        Q_INVOKABLE Command::NbtNode *minecraft_nbtTag(QObject *parent,
-                                                       const QVariantMap &props = {});
-        Q_INVOKABLE Command::ObjectiveNode *minecraft_objective(QObject *parent,
-                                                                const QVariantMap &props = {});
-        Q_INVOKABLE Command::ObjectiveCriteriaNode *minecraft_objectiveCriteria(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::OperationNode *minecraft_operation(QObject *parent,
-                                                                const QVariantMap &props = {});
-        Q_INVOKABLE Command::ParticleNode *minecraft_particle(QObject *parent,
-                                                              const QVariantMap &props = {});
-        Q_INVOKABLE Command::ResourceLocationNode *minecraft_resourceLocation(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::RotationNode *minecraft_rotation(QObject *parent,
-                                                              const QVariantMap &props = {});
-        Q_INVOKABLE Command::ScoreHolderNode *minecraft_scoreHolder(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::ScoreboardSlotNode *minecraft_scoreboardSlot(
-            QObject *parent, const QVariantMap &props = {});
-        Q_INVOKABLE Command::SwizzleNode *minecraft_swizzle(QObject *parent,
-                                                            const QVariantMap &props = {});
-        Q_INVOKABLE Command::TeamNode *minecraft_team(QObject *parent,
-                                                      const QVariantMap &props = {});
-        Q_INVOKABLE Command::TimeNode *minecraft_time(QObject *parent,
-                                                      const QVariantMap &props = {});
-        Q_INVOKABLE Command::UuidNode *minecraft_uuid(QObject *parent,
-                                                      const QVariantMap &props = {});
-        Q_INVOKABLE Command::Vec2Node *minecraft_vec2(QObject *parent,
-                                                      const QVariantMap &props = {});
-        Q_INVOKABLE Command::Vec3Node *minecraft_vec3(QObject *parent,
-                                                      const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::BlockPosNode> minecraft_blockPos(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::BlockStateNode> minecraft_blockState(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::BlockPredicateNode>
+        minecraft_blockPredicate(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ColorNode> minecraft_color(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ColumnPosNode> minecraft_columnPos(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ComponentNode> minecraft_component(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::DimensionNode> minecraft_dimension(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::EntityNode> minecraft_entity(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::EntityAnchorNode>
+        minecraft_entityAnchor(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::EntitySummonNode>
+        minecraft_entitySummon(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::FloatRangeNode> minecraft_floatRange(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::FunctionNode> minecraft_function(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::GameProfileNode>
+        minecraft_gameProfile(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::IntRangeNode> minecraft_intRange(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ItemEnchantmentNode>
+        minecraft_itemEnchantment(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ItemSlotNode> minecraft_itemSlot(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ItemStackNode> minecraft_itemStack(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ItemPredicateNode>
+        minecraft_itemPredicate(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::MessageNode> minecraft_message(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::MobEffectNode> minecraft_mobEffect(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::NbtCompoundNode>
+        minecraft_nbtCompoundTag(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::NbtPathNode> minecraft_nbtPath(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::NbtNode> minecraft_nbtTag(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ObjectiveNode> minecraft_objective(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ObjectiveCriteriaNode>
+        minecraft_objectiveCriteria(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::OperationNode> minecraft_operation(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ParticleNode> minecraft_particle(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode>
+        minecraft_resourceLocation(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::RotationNode> minecraft_rotation(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ScoreHolderNode>
+        minecraft_scoreHolder(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::ScoreboardSlotNode>
+        minecraft_scoreboardSlot(const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::SwizzleNode> minecraft_swizzle(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::TeamNode> minecraft_team(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::TimeNode> minecraft_time(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::UuidNode> minecraft_uuid(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::Vec2Node> minecraft_vec2(
+            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::Vec3Node> minecraft_vec3(
+            const QVariantMap &props = {});
     };
 }
 

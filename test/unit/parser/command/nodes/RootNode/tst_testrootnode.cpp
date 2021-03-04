@@ -36,23 +36,23 @@ void TestRootNode::cleanupTestCase() {
 }
 
 void TestRootNode::test_case1() {
-    RootNode root(this);
+    RootNode root(0);
 
     QVERIFY(root.toString() == "RootNode[0]()");
 }
 
 void TestRootNode::append() {
-    RootNode root(this);
-    auto    *node = new ParseNode(this);
+    RootNode root(0);
+    auto     node = QSharedPointer<ParseNode>::create();
 
     root.append(node);
     QCOMPARE(root.toString(), "RootNode[1](ParseNode())");
 
-    root.append(new ParseNode(this));
+    root.append(QSharedPointer<ParseNode>::create());
 
     QCOMPARE(root.toString(), "RootNode[2](ParseNode(), ParseNode())");
 
-    root.append(new ParseNode(this));
+    root.append(QSharedPointer<ParseNode>::create());
 
     QCOMPARE(root.toString(),
              "RootNode[3](ParseNode(), ParseNode(), ParseNode())");
@@ -61,11 +61,11 @@ void TestRootNode::append() {
 }
 
 void TestRootNode::remove() {
-    RootNode root(this);
+    RootNode root(0);
 
-    root.append(new ParseNode(this));
-    root.append(new ParseNode(this));
-    root.append(new ParseNode(this));
+    root.append(QSharedPointer<ParseNode>::create());
+    root.append(QSharedPointer<ParseNode>::create());
+    root.append(QSharedPointer<ParseNode>::create());
 
     QCOMPARE(root.toString(),
              "RootNode[3](ParseNode(), ParseNode(), ParseNode())");
@@ -80,28 +80,28 @@ void TestRootNode::remove() {
 }
 
 void TestRootNode::isEmpty() {
-    RootNode root(this);
+    RootNode root(0);
 
     QCOMPARE(root.isEmpty(), true);
 
-    root.append(new ParseNode(this));
-    root.append(new ParseNode(this));
-    root.append(new ParseNode(this));
+    root.append(QSharedPointer<ParseNode>::create());
+    root.append(QSharedPointer<ParseNode>::create());
+    root.append(QSharedPointer<ParseNode>::create());
 
     QCOMPARE(root.isEmpty(), false);
 }
 
 void TestRootNode::size() {
-    RootNode root(this);
+    RootNode root(0);
 
     QCOMPARE(root.size(), 0);
 
-    root.append(new ParseNode(this));
+    root.append(QSharedPointer<ParseNode>::create());
     QCOMPARE(root.size(), 1);
 
-    root.append(new ParseNode(this));
-    root.append(new ParseNode(this));
-    root.append(new ParseNode(this));
+    root.append(QSharedPointer<ParseNode>::create());
+    root.append(QSharedPointer<ParseNode>::create());
+    root.append(QSharedPointer<ParseNode>::create());
     QCOMPARE(root.size(), 4);
 
     root.remove(3);

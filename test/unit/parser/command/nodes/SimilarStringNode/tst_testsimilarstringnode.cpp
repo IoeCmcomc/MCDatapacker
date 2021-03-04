@@ -32,7 +32,7 @@ void TestSimilarStringNode::cleanupTestCase() {
 }
 
 void TestSimilarStringNode::colorNode() {
-    ColorNode node(this, 1, "green");
+    ColorNode node(1, "green");
 
     QCOMPARE(node.value(), "green");
 }

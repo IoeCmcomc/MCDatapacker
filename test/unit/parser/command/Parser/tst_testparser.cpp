@@ -48,30 +48,30 @@ void TestParser::test_case1() {
 
 void TestParser::parseBool() {
     Parser                   parser(this, "true");
-    QSharedPointer<BoolNode> result(parser.brigadier_bool(&parser));
+    QSharedPointer<BoolNode> result(parser.brigadier_bool());
 
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), true);
 
     parser.setText("false");
-    result = QSharedPointer<BoolNode>(parser.brigadier_bool(&parser));
+    result = QSharedPointer<BoolNode>(parser.brigadier_bool());
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), false);
 
     parser.setText("false");
-    result = QSharedPointer<BoolNode>(parser.brigadier_bool(&parser));
+    result = QSharedPointer<BoolNode>(parser.brigadier_bool());
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), false);
 
 
     parser.setText("simp");
-    result = QSharedPointer<BoolNode>(parser.brigadier_bool(&parser));
+    result = QSharedPointer<BoolNode>(parser.brigadier_bool());
     QCOMPARE(result->isVaild(), false);
 }
 
 void TestParser::parseDouble() {
     Parser                     parser(this, "3.1415926535897932");
-    QScopedPointer<DoubleNode> result(parser.brigadier_double(&parser));
+    QSharedPointer<DoubleNode> result(parser.brigadier_double());
 
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), 3.1415926535897932);
@@ -79,7 +79,7 @@ void TestParser::parseDouble() {
 
 void TestParser::parseFloat() {
     Parser                    parser(this, "99.9");
-    QScopedPointer<FloatNode> result(parser.brigadier_float(&parser, { { "max",
+    QSharedPointer<FloatNode> result(parser.brigadier_float({ { "max",
                                                                 100 } }));
 
     QCOMPARE(result->isVaild(), true);
@@ -88,8 +88,8 @@ void TestParser::parseFloat() {
 
 void TestParser::parseInteger() {
     Parser                      parser(this, "66771508");
-    QScopedPointer<IntegerNode> result(
-        parser.brigadier_integer(&parser, { { "min", 1000000 } }));
+    QSharedPointer<IntegerNode> result(
+        parser.brigadier_integer({ { "min", 1000000 } }));
 
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), 66771508);
@@ -102,12 +102,12 @@ void TestParser::parse() {
 
     Parser parser(this, "gamemode creative");
 
-    auto *result = parser.parse();
+    auto result = parser.parse();
     QCOMPARE(result->toString(),
              "RootNode[2](LiteralNode(gamemode), LiteralNode(creative))");
 
     parser.setText("schedule clear test");
-    parser.parse();
+    result = parser.parse();
     QCOMPARE(
         result->toString(),
         "RootNode[3](LiteralNode(schedule), LiteralNode(clear), StringNode(\"test\"))");
@@ -144,20 +144,20 @@ void TestParser::parserIdToMethodName() {
 void TestParser::parseString() {
     Parser                     parser(this, "firstWord secondWord");
     QSharedPointer<StringNode> result(
-        parser.brigadier_string(&parser, { { "type", "word" } }));
+        parser.brigadier_string({ { "type", "word" } }));
 
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), "firstWord");
 
     parser.setText("cho xin it da cuoi");
     result = QSharedPointer<StringNode>(
-        parser.brigadier_string(&parser, { { "type", "greedy" } }));
+        parser.brigadier_string({ { "type", "greedy" } }));
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), "cho xin it da cuoi");
 
     parser.setText("\"Speed Upgrade for Blocks\"");
     result = QSharedPointer<StringNode>(
-        parser.brigadier_string(&parser, { { "type", "phrase" } }));
+        parser.brigadier_string({ { "type", "phrase" } }));
     QCOMPARE(result->isVaild(), true);
     QCOMPARE(result->value(), "Speed Upgrade for Blocks");
 }

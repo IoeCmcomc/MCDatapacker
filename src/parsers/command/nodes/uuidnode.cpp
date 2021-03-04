@@ -1,9 +1,9 @@
 #include "uuidnode.h"
 
-const static int _ = qRegisterMetaType<Command::UuidNode*>();
+const static int _ = qRegisterMetaType<QSharedPointer<Command::UuidNode> >();
 
-Command::UuidNode::UuidNode(QObject *parent, int pos, QString uuidStr)
-    : Command::ArgumentNode(parent, pos, uuidStr.length(), "minecraft:uuid") {
+Command::UuidNode::UuidNode(int pos, QString uuidStr)
+    : Command::ArgumentNode(pos, uuidStr.length(), "minecraft:uuid") {
     m_uuid = QUuid::fromString(uuidStr);
 }
 

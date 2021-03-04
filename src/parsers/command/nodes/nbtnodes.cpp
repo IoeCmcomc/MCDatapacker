@@ -1,8 +1,10 @@
 #include "nbtnodes.h"
 
-Command::NbtNode::NbtNode(QObject *parent, int pos, int length,
-                          const QString &parserId)
-    : Command::ArgumentNode(parent, pos, length, parserId) {
+static const int _NbtNode =
+    qRegisterMetaType<QSharedPointer<Command::NbtNode> >();
+
+Command::NbtNode::NbtNode(int pos, int length, const QString &parserId)
+    : Command::ArgumentNode(pos, length, parserId) {
 }
 
 QString Command::NbtNode::toString() const {
@@ -14,10 +16,10 @@ nbt::tag_id Command::NbtNode::id() const noexcept {
 }
 
 #define DEFINE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)              \
-    static const int _ ## Class = qRegisterMetaType<Command::Class*>();  \
-    Command::Class::Class(QObject *parent, int pos,                      \
-                          int length, ValueType value)                   \
-        : Command::NbtNode(parent, pos, length), tags::Tag(value) {      \
+    static const int _ ## Class =                                        \
+        qRegisterMetaType<QSharedPointer<Command::Class> >();            \
+    Command::Class::Class(int pos, int length, ValueType value)          \
+        : Command::NbtNode(pos, length), tags::Tag(value) {              \
     }                                                                    \
     QString Command::Class::toString() const {                           \
         return #Class + QString("(%1)").arg(QString::fromStdString(      \
@@ -40,29 +42,30 @@ DEFINE_PRIMITIVE_TAG_NBTNODE(NbtIntNode, int_tag, int)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtLongNode, long_tag, int64_t)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtShortNode, short_tag, short)
 
-#define DEFINE_ARRAY_NBTNODE(Class, TagId)                              \
-    static const int _ ## Class = qRegisterMetaType<Command::Class*>(); \
-    Command::Class::Class(QObject *parent, int pos, int length)         \
-        : Command::NbtNode(parent, pos, length, "minecraft:nbt_tag") {  \
-    }                                                                   \
-    QString Command::Class::toString() const {                          \
-        QStringList items;                                              \
-        for (const auto *node: m_vector)                                \
-        items << node->toString();                                      \
-        return #Class + QString("(%1)").arg(items.join(", "));          \
-    }                                                                   \
-    nbt::tag_id Command::Class::id() const noexcept {                   \
-        return nbt::tag_id::TagId;                                      \
+#define DEFINE_ARRAY_NBTNODE(Class, TagId)                     \
+    static const int _ ## Class =                              \
+        qRegisterMetaType<QSharedPointer<Command::Class> >();  \
+    Command::Class::Class(int pos, int length)                 \
+        : Command::NbtNode(pos, length, "minecraft:nbt_tag") { \
+    }                                                          \
+    QString Command::Class::toString() const {                 \
+        QStringList items;                                     \
+        for (const auto &node: m_vector)                       \
+        items << node->toString();                             \
+        return #Class + QString("(%1)").arg(items.join(", ")); \
+    }                                                          \
+    nbt::tag_id Command::Class::id() const noexcept {          \
+        return nbt::tag_id::TagId;                             \
     }
 
 DEFINE_ARRAY_NBTNODE(NbtByteArrayNode, tag_bytearray)
 DEFINE_ARRAY_NBTNODE(NbtIntArrayNode, tag_intarray)
 DEFINE_ARRAY_NBTNODE(NbtLongArrayNode, tag_longarray)
 
-static const int _NbtStringNode = qRegisterMetaType<Command::NbtStringNode*>();
-Command::NbtStringNode::NbtStringNode(QObject *parent, int pos,
-                                      const QString &value)
-    : Command::NbtNode(parent, pos, value.length()) {
+static const int _NbtStringNode =
+    qRegisterMetaType<QSharedPointer<Command::NbtStringNode> >();
+Command::NbtStringNode::NbtStringNode(int pos, const QString &value)
+    : Command::NbtNode(pos, value.length()) {
     setValue(value);
 }
 QString Command::NbtStringNode::toString() const {
@@ -79,21 +82,27 @@ nbt::tag_id Command::NbtStringNode::id() const noexcept {
 }
 
 
-static const int _NbtListNode = qRegisterMetaType<Command::NbtListNode*>();
-Command::NbtListNode::NbtListNode(QObject *parent, int pos, int length)
-    : Command::NbtNode(parent, pos, length, "minecraft:nbt_tag") {
+static const int _NbtListNode =
+    qRegisterMetaType<QSharedPointer<Command::NbtListNode> >();
+Command::NbtListNode::NbtListNode(int pos, int length)
+    : Command::NbtNode(pos, length, "minecraft:nbt_tag") {
 }
 QString Command::NbtListNode::toString() const {
     QStringList items;
 
-    for (const auto *node: m_vector)
+    int c = 0;
+
+    for (const auto &node: m_vector) {
+        qDebug() << "NbtListNode::toString" << c << node;
         items << node->toString();
+        ++c;
+    }
     return QString("NbtListNode(%1)").arg(items.join(", "));
 }
 nbt::tag_id Command::NbtListNode::id() const noexcept {
     return nbt::tag_id::tag_list;
 }
-void Command::NbtListNode::append(NbtNode * node) {
+void Command::NbtListNode::append(QSharedPointer<NbtNode> node) {
     if (isEmpty())
         m_prefix = node->id();
     if (node->id() == m_prefix)
@@ -109,16 +118,23 @@ void Command::NbtListNode::setPrefix(const nbt::tag_id &prefix) {
 }
 
 
-const static int _ = qRegisterMetaType<Command::NbtCompoundNode*>();
-Command::NbtCompoundNode::NbtCompoundNode(QObject *parent, int pos, int length)
-    : Command::NbtNode(parent, pos, length, "minecraft:nbt_compound_tag") {
+const static int _ =
+    qRegisterMetaType<QSharedPointer<Command::NbtCompoundNode> >();
+Command::NbtCompoundNode::NbtCompoundNode(int pos, int length)
+    : Command::NbtNode(pos, length, "minecraft:nbt_compound_tag") {
 }
 QString Command::NbtCompoundNode::toString() const {
     QStringList itemReprs;
 
-    for (auto i = m_map.cbegin(); i != m_map.cend(); ++i)
+    int c = 0;
+
+    for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
+        qDebug() << "NbtCompoundNode::toString" << c << i.key().text <<
+            i.value();
         itemReprs << QString("%1: %2").arg(i.key().text,
                                            i.value()->toString());
+        ++c;
+    }
     return "MapNode(" + itemReprs.join(", ") + ')';
 }
 int Command::NbtCompoundNode::size() const {
@@ -153,7 +169,7 @@ const {
     return m_map.cend();
 }
 void Command::NbtCompoundNode::insert(const MapKey &key,
-                                      Command::NbtNode *node) {
+                                      QSharedPointer<NbtNode> node) {
     m_map.insert(key, node);
 }
 int Command::NbtCompoundNode::remove(const MapKey &key) {
@@ -162,11 +178,11 @@ int Command::NbtCompoundNode::remove(const MapKey &key) {
 void Command::NbtCompoundNode::clear() {
     m_map.clear();
 }
-Command::NbtNode *&Command::NbtCompoundNode::operator[](
+QSharedPointer<Command::NbtNode> &Command::NbtCompoundNode::operator[](
     const Command::MapKey &key) {
     return m_map[key];
 }
-Command::NbtNode *Command::NbtCompoundNode::operator[](
+const QSharedPointer<Command::NbtNode> Command::NbtCompoundNode::operator[](
     const Command::MapKey &key)
 const {
     return m_map[key];

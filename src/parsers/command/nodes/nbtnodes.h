@@ -12,23 +12,21 @@ namespace Command {
     using namespace nbt;
     class NbtNode : public ArgumentNode
     {
-        Q_OBJECT
 public:
-        NbtNode(QObject *parent, int pos, int length,
+        NbtNode(int pos, int length,
                 const QString &parserId = "minecraft:nbt_tag");
         virtual QString toString() const override;
         virtual nbt::tag_id id() const noexcept;
     };
 
-#define DECLARE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)                    \
-    class Class : public NbtNode, tags::Tag {                                   \
-        Q_OBJECT                                                                \
-public:                                                                         \
-        explicit Class(QObject * parent, int pos, int length, ValueType value); \
-        QString toString() const override;                                      \
-        ValueType value() const;                                                \
-        void setValue(ValueType v);                                             \
-        nbt::tag_id id() const noexcept override;                               \
+#define DECLARE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)  \
+    class Class : public NbtNode, tags::Tag {                 \
+public:                                                       \
+        explicit Class(int pos, int length, ValueType value); \
+        QString toString() const override;                    \
+        ValueType value() const;                              \
+        void setValue(ValueType v);                           \
+        nbt::tag_id id() const noexcept override;             \
     };
 
     DECLARE_PRIMITIVE_TAG_NBTNODE(NbtByteNode, byte_tag, char)
@@ -65,37 +63,32 @@ public:
         int size() {
             return m_vector.size();
         }
-        virtual void append(T *node) {
+        virtual void append(QSharedPointer<T> node) {
             m_vector.append(node);
         }
-        void insert(int i, T *node) {
+        void insert(int i, QSharedPointer<T> node) {
             m_vector.insert(i, node);
         }
         void remove(int i) {
             m_vector.remove(i);
         }
-        void removeNode(T *node) {
-            if (int i = m_vector.indexOf(node); i > -1)
-                m_vector.remove(i);
-        }
         void clear() {
             m_vector.clear();
         }
-        T *operator[](int index) {
+        QSharedPointer<T> &operator[](int index) {
             return m_vector[index];
         };
-        T *operator[](int index) const {
+        const QSharedPointer<T> &operator[](int index) const {
             return m_vector[index];
         };
 protected:
-        QVector<T*> m_vector;
+        QVector<QSharedPointer<T> > m_vector;
     };
 
 #define DECLARE_ARRAY_NBTNODE(Class, ValueType)                       \
     class Class : public NbtNode, public NbtListlikeNode<ValueType> { \
-        Q_OBJECT                                                      \
 public:                                                               \
-        explicit Class(QObject * parent, int pos, int length = 0);    \
+        explicit Class(int pos, int length = 0);                      \
         QString toString() const override;                            \
         nbt::tag_id id() const noexcept override;                     \
     };
@@ -107,10 +100,8 @@ public:                                                               \
 #undef DECLARE_ARRAY_NBTNODE
 
     class NbtStringNode : public NbtNode {
-        Q_OBJECT
 public:
-        explicit NbtStringNode(QObject * parent, int pos,
-                               const QString &value);
+        explicit NbtStringNode(int pos, const QString &value);
         QString toString() const override;
         QString value() const;
         void setValue(const QString &v);
@@ -120,11 +111,10 @@ private:
     };
 
     class NbtListNode : public NbtNode, public NbtListlikeNode<NbtNode> {
-        Q_OBJECT
 public:
-        explicit NbtListNode(QObject * parent, int pos, int length = 0);
+        explicit NbtListNode(int pos, int length = 0);
         QString toString() const override;
-        void append(NbtNode* node) override;
+        void append(QSharedPointer<NbtNode> node) override;
         nbt::tag_id id() const noexcept override;
         nbt::tag_id prefix() const;
         void setPrefix(const nbt::tag_id &prefix);
@@ -132,13 +122,12 @@ private:
         nbt::tag_id m_prefix;
     };
 
-    using NbtNodeMap = QMap<MapKey, NbtNode*>;
+    using NbtNodeMap = QMap<MapKey, QSharedPointer<NbtNode> >;
 
     class NbtCompoundNode : public NbtNode
     {
-        Q_OBJECT
 public:
-        NbtCompoundNode(QObject *parent, int pos, int length = 0);
+        NbtCompoundNode(int pos, int length = 0);
 
         QString toString() const override;
 
@@ -146,11 +135,11 @@ public:
         bool contains(const QString &key) const;
         bool contains(const MapKey &key) const;
         NbtNodeMap::const_iterator find(const QString &key) const;
-        void insert(const MapKey &key, NbtNode *node);
+        void insert(const MapKey &key, QSharedPointer<NbtNode> node);
         int remove(const MapKey &key);
         void clear();
-        NbtNode* &operator[](const MapKey &key);
-        NbtNode *operator[](const MapKey &key) const;
+        QSharedPointer<NbtNode> &operator[](const MapKey &key);
+        const QSharedPointer<NbtNode> operator[](const MapKey &key) const;
         NbtNodeMap toMap() const;
 
 private:
@@ -158,20 +147,20 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(Command::NbtNode*)
-Q_DECLARE_METATYPE(Command::NbtByteNode*)
-Q_DECLARE_METATYPE(Command::NbtDoubleNode*)
-Q_DECLARE_METATYPE(Command::NbtFloatNode*)
-Q_DECLARE_METATYPE(Command::NbtIntNode*)
-Q_DECLARE_METATYPE(Command::NbtLongNode*)
-Q_DECLARE_METATYPE(Command::NbtShortNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtByteNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtDoubleNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtFloatNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtIntNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtLongNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtShortNode>)
 
-Q_DECLARE_METATYPE(Command::NbtByteArrayNode*)
-Q_DECLARE_METATYPE(Command::NbtIntArrayNode*)
-Q_DECLARE_METATYPE(Command::NbtLongArrayNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtByteArrayNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtIntArrayNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtLongArrayNode>)
 
-Q_DECLARE_METATYPE(Command::NbtStringNode*)
-Q_DECLARE_METATYPE(Command::NbtListNode*)
-Q_DECLARE_METATYPE(Command::NbtCompoundNode*)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtStringNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtListNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::NbtCompoundNode>)
 
 #endif /* NBTNODES_H */

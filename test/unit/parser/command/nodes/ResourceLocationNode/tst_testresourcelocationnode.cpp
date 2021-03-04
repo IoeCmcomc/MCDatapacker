@@ -36,19 +36,19 @@ void TestResourceLocationNode::cleanupTestCase() {
 }
 
 void TestResourceLocationNode::test_case1() {
-    ResourceLocationNode node(this, 5, "minecraft", "apple");
+    ResourceLocationNode node(5, "minecraft", "apple");
 
     QCOMPARE(node.toString(), "ResourceLocationNode(minecraft:apple)");
 }
 
 void TestResourceLocationNode::fullId() {
-    ResourceLocationNode node(this, 5, "test", "first/second");
+    ResourceLocationNode node(5, "test", "first/second");
 
     QCOMPARE(node.fullId(), "test:first/second");
 }
 
 void TestResourceLocationNode::nspace() {
-    ResourceLocationNode node(this, 5, "test", "first/second");
+    ResourceLocationNode node(5, "test", "first/second");
 
     QCOMPARE(node.nspace(), "test");
 
@@ -57,7 +57,7 @@ void TestResourceLocationNode::nspace() {
 }
 
 void TestResourceLocationNode::id() {
-    ResourceLocationNode node(this, 5, "minecraft", "diamond_pickaxe");
+    ResourceLocationNode node(5, "minecraft", "diamond_pickaxe");
 
     QCOMPARE(node.id(), "diamond_pickaxe");
 
@@ -66,7 +66,7 @@ void TestResourceLocationNode::id() {
 }
 
 void TestResourceLocationNode::isTag() {
-    ResourceLocationNode node(this, 5, "qwerty", "test");
+    ResourceLocationNode node(5, "qwerty", "test");
 
     QCOMPARE(node.isTag(), false);
 
