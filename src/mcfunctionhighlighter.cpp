@@ -1,12 +1,10 @@
 #include "mcfunctionhighlighter.h"
 #include "codeeditor.h"
 
-#include "parsers/command/minecraftparser.h"
-
 #include <QDebug>
 
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
-    : Highlighter(parent) {
+    : Highlighter(parent), parser(this) {
     setupRules();
 }
 
@@ -162,7 +160,6 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void McfunctionHighlighter::checkProblems() {
-    Command::MinecraftParser           parser(this);
     QSharedPointer<Command::ParseNode> result = nullptr;
 
     for (auto block = getParentDoc()->begin();
@@ -193,4 +190,10 @@ void McfunctionHighlighter::checkProblems() {
             }
         }
     }
+    qDebug() << "Size:" << parser.cache().size() << '/' <<
+    parser.cache().capacity()
+             << "Total access:" << parser.cache().stats().total_accesses()
+             << "Total hit:" << parser.cache().stats().total_hits()
+             << "Total miss:" << parser.cache().stats().total_hits()
+             << "Hit rate::" << parser.cache().stats().hit_rate();
 }

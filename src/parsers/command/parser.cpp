@@ -44,6 +44,10 @@ void Command::Parser::printMethods() {
     }
 }
 
+const Command::ParseNodeCache &Command::Parser::cache() const {
+    return m_cache;
+}
+
 QChar Command::Parser::curChar() const {
     return m_curChar;
 }
@@ -196,7 +200,7 @@ bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
             m_curChar + '\'';
         QString charTxt =
             (chr.isNull()) ? QStringLiteral("end of line") : '\'' + chr + '\'';
-        error("Unexpacted %1, expecting %2", { m_curChar, charTxt });
+        error("Unexpected %1, expecting %2", { curCharTxt, charTxt });
         return false;
     }
 }
@@ -416,11 +420,18 @@ QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
 
 QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal(
     const QVariantMap &props) {
-    int start = m_pos;
+    int           start   = m_pos;
+    const QString literal = getWithRegex(R"([a-zA-Z0-9-_*<=>]+)");
+    const int     typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
+    CacheKey      key{ typeId, literal };
 
-    return QSharedPointer<Command::LiteralNode>::create(start,
-                                                        getWithRegex(
-                                                            R"([a-zA-Z0-9-_*<=>]+)"));
+    if (m_cache.contains(key)) {
+        return qSharedPointerCast<LiteralNode>(m_cache[key]);
+    } else {
+        auto ret = QSharedPointer<Command::LiteralNode>::create(start, literal);
+        m_cache.emplace(typeId, literal, ret);
+        return ret;
+    }
 }
 
 QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
@@ -456,16 +467,27 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
 
     if (m_schema.isEmpty()) {
         qWarning() << "The parser schema hasn't been initialized";
-    } else if (text().isEmpty() || text()[0] == '#') {
+    } else if (text().trimmed().isEmpty() || text()[0] == '#') {
         m_parsingResult->setPos(0);
+        return m_parsingResult;
+    }
+    const int typeId = qMetaTypeId<QSharedPointer<RootNode> >();
+    CacheKey  key{ typeId, m_text };
+
+    if (m_cache.contains(key)) {
+        m_parsingResult = qSharedPointerCast<RootNode>(m_cache[key]);
+        qDebug() << "Got cached" << m_parsingResult;
+        setPos(m_text.length());
     } else {
         try {
             if (parseResursively(m_schema)) {
                 m_parsingResult->setPos(0);
                 m_parsingResult->setLength(pos() - 1);
+
+                m_cache.emplace(typeId, m_text, m_parsingResult);
             }
         } catch (const Command::Parser::Error &err) {
-            qDebug() << "Command::Parser::parse" << err.what();
+            qDebug() << "Command::Parser::parse" << err.toLocalizedMessage();
             m_lastError = err;
             m_parsingResult->setPos(-1); /* Make the result invaild */
         }
@@ -565,14 +587,27 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 parserIdToMethodName(parserId).toLatin1()
                 + QStringLiteral("(QVariantMap)").toLatin1());
             if (methodIndex != -1) {
-                auto method = metaObject()->method(methodIndex);
-                auto props  =
+                auto     method     = metaObject()->method(methodIndex);
+                int      returnType = method.returnType();
+                CacheKey key{ returnType, literal };
+
+                if (m_cache.contains(key)) {
+                    found = true;
+                    ret   = m_cache[key];
+                    qDebug() << "Cached: " << ret << found;
+                    Q_ASSERT(ret != nullptr);
+                    advance(literal.length());
+                    success = parseResursively(curSchemaNode, depth + 1);
+                    m_parsingResult->prepend(ret);
+                    break;
+                }
+
+                auto props =
                     curSchemaNode[QStringLiteral("properties")].toObject().
                     toVariantMap();
-                int      returnType = method.returnType();
-                auto     typeName   = method.typeName();
+
+                auto     typeName = method.typeName();
                 QVariant returnVari(returnType, nullptr);
-                qDebug() << returnType << typeName << returnVari;
 
                 QGenericReturnArgument returnArgument(
                     typeName,
@@ -587,12 +622,10 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                         ret   = QVariantToParseNodeSharedPointer(returnVari);
                         qDebug() << ret << found;
                         Q_ASSERT(ret != nullptr);
-                        qDebug() << ret->isVaild();
-                        qDebug() << ret->pos();
-                        qDebug() << ret->length();
-                        qDebug() << ret->toString();
+                        if ((literal.length() == ret->length()) &&
+                            ret->isVaild())
+                            m_cache.emplace(returnType, literal, ret);
                         success = parseResursively(curSchemaNode, depth + 1);
-                        qDebug() << "After parseResursively, before prepend";
                         m_parsingResult->prepend(ret);
                         break;
                     } else {
@@ -602,7 +635,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                                                                parserId);
                     }
                 } catch (const Command::Parser::Error &err) {
-                    qWarning() << "Argument error:" << err.what();
+                    qWarning() << "Argument error:" << err.toLocalizedMessage();
                     errors << err;
                     int argLength = m_pos - startPos + 1;
                     setPos(startPos);

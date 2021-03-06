@@ -37,6 +37,7 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/targetselectornode.cpp \
     ../../../../../src/parsers/command/nodes/timenode.cpp \
     ../../../../../src/parsers/command/nodes/uuidnode.cpp \
+    ../../../../../src/parsers/command/parsenodecache.cpp \
     ../../../../../src/parsers/command/parser.cpp
 
 HEADERS += \
@@ -71,6 +72,7 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/targetselectornode.h \
     ../../../../../src/parsers/command/nodes/timenode.h \
     ../../../../../src/parsers/command/nodes/uuidnode.h \
+    ../../../../../src/parsers/command/parsenodecache.h \
     ../../../../../src/parsers/command/parser.h
 
 RESOURCES += \
@@ -83,6 +85,8 @@ else:unix: LIBS += -L$$OUT_PWD/../../../../../lib/ -llib
 
 INCLUDEPATH += $$PWD/../../../../../lib
 DEPENDPATH += $$PWD/../../../../../lib
+
+INCLUDEPATH += $$PWD/../../../../../lib/lru-cache/include
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/release/liblib.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/debug/liblib.a

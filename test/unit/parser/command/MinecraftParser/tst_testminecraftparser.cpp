@@ -13,10 +13,13 @@ public:
     TestMinecraftParser();
     ~TestMinecraftParser();
 
+    QElapsedTimer timer;
+
 private slots:
     void initTestCase();
     void cleanupTestCase();
     void dataCmd();
+    void executeCmd();
     void functionCmd();
     void forceloadCmd();
     void giveCmd();
@@ -44,9 +47,12 @@ void TestMinecraftParser::initTestCase() {
             break;
         }
     }
+
+    timer.start();
 }
 
 void TestMinecraftParser::cleanupTestCase() {
+    qDebug() << "Elapsed time in ms:" << timer.elapsed();
 }
 
 void TestMinecraftParser::dataCmd() {
@@ -70,6 +76,15 @@ void TestMinecraftParser::dataCmd() {
 
     parser.setText("data modify storage test {} set value {Key:1b}");
     result = parser.parse();
+
+    qDebug() << *result;
+}
+
+void TestMinecraftParser::executeCmd() {
+    MinecraftParser parser(this,
+                           "execute as @a[x_rotation=-90..-1,scores={uncraftfly=1..},gamemode=!creative] at @s if block ~ ~-1 ~ air run effect give @s minecraft:levitation 1 1 true");
+
+    auto result = parser.parse();
 
     qDebug() << *result;
 }

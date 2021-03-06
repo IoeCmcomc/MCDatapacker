@@ -1,3 +1,4 @@
+
 TEMPLATE = app
 
 TARGET = MCDatapacker
@@ -82,6 +83,7 @@ SOURCES += \
     parsers/command/nodes/targetselectornode.cpp \
     parsers/command/nodes/timenode.cpp \
     parsers/command/nodes/uuidnode.cpp \
+    parsers/command/parsenodecache.cpp \
     parsers/command/parser.cpp \
     predicatedock.cpp \
     rawjsontextedit.cpp \
@@ -157,6 +159,7 @@ HEADERS += \
     parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \
     parsers/command/nodes/uuidnode.h \
+    parsers/command/parsenodecache.h \
     parsers/command/parser.h \
     parsers/command/minecraftparser.h \
     predicatedock.h \
@@ -221,6 +224,8 @@ else:unix: LIBS += -L$$OUT_PWD/../lib/ -llib
 
 INCLUDEPATH += $$PWD/../lib
 DEPENDPATH += $$PWD/../lib
+
+INCLUDEPATH += $$PWD/../lib/lru-cache/include
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/release/liblib.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/debug/liblib.a

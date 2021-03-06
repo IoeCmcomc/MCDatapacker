@@ -16,6 +16,7 @@ SOURCES +=  tst_testparser.cpp \
     ../../../../../src/parsers/command/nodes/parsenode.cpp \
     ../../../../../src/parsers/command/nodes/rootnode.cpp \
     ../../../../../src/parsers/command/nodes/stringnode.cpp \
+    ../../../../../src/parsers/command/parsenodecache.cpp \
     ../../../../../src/parsers/command/parser.cpp
 
 HEADERS += \
@@ -28,7 +29,23 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/parsenode.h \
     ../../../../../src/parsers/command/nodes/rootnode.h \
     ../../../../../src/parsers/command/nodes/stringnode.h \
+    ../../../../../src/parsers/command/parsenodecache.h \
     ../../../../../src/parsers/command/parser.h
 
 RESOURCES += \
     ../../../../../resource/minecraft/minecraft.qrc
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/release/ -llib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/debug/ -llib
+else:unix: LIBS += -L$$OUT_PWD/../../../../../lib/ -llib
+
+INCLUDEPATH += $$PWD/../../../../../lib
+DEPENDPATH += $$PWD/../../../../../lib
+
+INCLUDEPATH += $$PWD/../../../../../lib/lru-cache/include
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/release/liblib.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/debug/liblib.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/release/lib.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/debug/lib.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/liblib.a

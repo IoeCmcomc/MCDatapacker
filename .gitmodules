@@ -7,3 +7,6 @@
 [submodule "lib/json"]
 	path = lib/json
 	url = git@github.com:nlohmann/json.git
+[submodule "lib/lru-cache"]
+	path = lib/lru-cache
+	url = git@github.com:goldsborough/lru-cache.git

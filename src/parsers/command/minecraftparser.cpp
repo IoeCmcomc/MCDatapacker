@@ -11,7 +11,6 @@ Command::MinecraftParser::MinecraftParser(QObject *parent,
     /*printMethods(); */
     connect(this, &QObject::destroyed, [ = ](QObject *obj) {
         qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
-        qDebug() << obj;
     });
 }
 
@@ -586,7 +585,7 @@ minecraft_blockState(const QVariantMap &props) {
     if (this->curChar() == '{') {
         ret->setNbt(parseCompoundTag());
     }
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 
@@ -636,8 +635,7 @@ minecraft_columnPos(
 }
 
 QSharedPointer<Command::ComponentNode> Command::MinecraftParser::
-minecraft_component(
-    const QVariantMap &props) {
+minecraft_component(const QVariantMap &props) {
     int     curPos  = pos();
     QString literal = getUntil(QChar());
 
@@ -653,6 +651,7 @@ minecraft_component(
     }  catch (const json::parse_error &err) {
         error(err.what(), {}, curPos + err.byte - 1);
     }
+    return nullptr;
 }
 
 QSharedPointer<Command::DimensionNode> Command::MinecraftParser::
@@ -725,8 +724,15 @@ minecraft_floatRange(const QVariantMap &props) {
     }
     auto num1 = this->brigadier_float();
     if (!hasMax) {
+        bool hasDoubleDot = false;
         if (this->peek(2) == "..") {
             this->advance(2);
+            hasDoubleDot = true;
+        } else if ((text()[pos() - 1] == '.') && (curChar() == '.')) {
+            this->advance();
+            hasDoubleDot = true;
+        }
+        if (hasDoubleDot) {
             if (curChar().isDigit() || curChar() == '.' || curChar() == '-') {
                 ret->setMaxValue(this->brigadier_float(), true);
             }
@@ -737,7 +743,7 @@ minecraft_floatRange(const QVariantMap &props) {
     } else {
         ret->setMaxValue(num1, false);
     }
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 
@@ -790,7 +796,7 @@ minecraft_intRange(
     } else {
         ret->setMaxValue(num1, false);
     }
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 
@@ -822,7 +828,7 @@ minecraft_itemStack(
     if (this->curChar() == '{') {
         ret->setNbt(parseCompoundTag());
     }
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 
@@ -890,7 +896,7 @@ QSharedPointer<Command::NbtPathNode> Command::MinecraftParser::minecraft_nbtPath
         if (curChar().isNull())
             break;
     }
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 
@@ -952,13 +958,13 @@ minecraft_particle(
         color->setB(brigadier_float());
         this->eat(' ');
         color->setSize(brigadier_float());
-        color->setLength(pos() - color->pos() + 1);
+        color->setLength(pos() - color->pos());
         ret->setParams(color);
     } else if (fullid == "minecraft:item") {
         eat(' ');
         ret->setParams(minecraft_itemStack());
     }
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 

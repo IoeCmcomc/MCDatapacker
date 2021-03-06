@@ -4,6 +4,7 @@
 #include <QRegularExpression>
 
 #include "highlighter.h"
+#include "parsers/command/minecraftparser.h"
 
 class McfunctionHighlighter : public Highlighter
 {
@@ -29,6 +30,8 @@ private:
     QTextCharFormat entitySelectorFormat;
     QTextCharFormat namespacedIDFormat;
     QTextCharFormat commentFormat;
+
+    Command::MinecraftParser parser;
 };
 
 #endif /* MCFUNCTIONHIGHLIGHTER_H */

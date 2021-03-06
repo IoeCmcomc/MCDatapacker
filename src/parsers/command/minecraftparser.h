@@ -111,6 +111,7 @@ private:
                 error(QString(
                           "Missing the character ';' after array type indicator"));
             }
+            return nullptr;
         }
         QSharedPointer<Command::NbtListNode> parseListTag();
         QSharedPointer<Command::MapNode> parseEntityAdvancements();

@@ -7,6 +7,7 @@
 #include "nodes/integernode.h"
 #include "nodes/stringnode.h"
 #include "nodes/rootnode.h"
+#include "parsenodecache.h"
 
 #include <QJsonObject>
 #include <QObject>
@@ -23,8 +24,7 @@ public:
 
         class Error : public std::runtime_error {
 public:
-            explicit Error(const QString &whatArg   = "",
-                           int pos                  = -1,
+            explicit Error(const QString &whatArg   = "", int pos = -1,
                            int length               = 0,
                            const QVariantList &args = {});
             int pos           = 0;
@@ -63,9 +63,10 @@ public:
         Error lastError() const;
 
         int pos() const;
+        const ParseNodeCache &cache() const;
+
 
 protected:
-
         void setPos(int pos);
 
         void error(const QString &msg, const QVariantList &args = {});
@@ -116,11 +117,12 @@ protected:
         }
         void printMethods();
 private:
+        ParseNodeCache m_cache;
         QSharedPointer<Command::RootNode> m_parsingResult = nullptr;
-        Error m_lastError;
         static QJsonObject m_schema;
         QString m_text;
         int m_pos = 0;
+        Error m_lastError;
         QChar m_curChar;
     };
 }
