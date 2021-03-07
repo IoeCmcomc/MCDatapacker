@@ -12,6 +12,7 @@ public:
             A,
             E,
             P,
+            R,
             S
         };
 

@@ -95,8 +95,8 @@ QString Command::MinecraftParser::oneOf(QStringList strArr) {
 }
 
 QSharedPointer<Command::AxisNode> Command::MinecraftParser::parseAxis(
-    AxisParseOptions options,
-    bool &isLocal) {
+    AxisParseOptions options, bool &isLocal) {
+    using AxisType = Command::AxisNode::AxisType;
     auto axis =
         QSharedPointer<Command::AxisNode>::create(pos());
     const bool canBeLocal     = options & AxisParseOption::CanBeLocal;
@@ -117,7 +117,7 @@ QSharedPointer<Command::AxisNode> Command::MinecraftParser::parseAxis(
     bool hasPrefix = false;
     if (this->curChar() == '~') {
         if (!isLocal) {
-            axis->setType(Command::AxisNode::AxisType::Relative);
+            axis->setType(AxisType::Relative);
             hasPrefix = true;
             isLocal   = false;
             this->advance();
@@ -128,7 +128,7 @@ QSharedPointer<Command::AxisNode> Command::MinecraftParser::parseAxis(
         if (isLocal == false)
             isLocal = true;
         if (canBeLocal && isLocal) {
-            axis->setType(Command::AxisNode::AxisType::Local);
+            axis->setType(AxisType::Local);
             hasPrefix = true;
             this->advance();
         } else if (!isLocal) {
@@ -220,7 +220,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
         } else {
             return QSharedPointer<Command::NbtStringNode>::create(pos(),
                                                                   getWithCharset(
-                                                                      "a-zA-Z-_."));
+                                                                      "a-zA-Z0-9-_."));
         }
     }
     }
@@ -476,6 +476,11 @@ parseTargetSelector() {
 
     case 'p': {
         ret->setVariable(Variable::P);
+        break;
+    }
+
+    case 'r': {
+        ret->setVariable(Variable::R);
         break;
     }
 

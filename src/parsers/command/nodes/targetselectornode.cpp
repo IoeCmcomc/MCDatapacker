@@ -10,6 +10,7 @@ Command::TargetSelectorNode::variableMap =
 {   { Command::TargetSelectorNode::Variable::A, 'a' },
     { Command::TargetSelectorNode::Variable::E, 'e' },
     { Command::TargetSelectorNode::Variable::P, 'p' },
+    { Command::TargetSelectorNode::Variable::R, 'r' },
     { Command::TargetSelectorNode::Variable::S, 's' } };
 
 Command::TargetSelectorNode::TargetSelectorNode(int pos)

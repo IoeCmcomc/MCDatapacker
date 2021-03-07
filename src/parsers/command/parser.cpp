@@ -124,7 +124,10 @@ void Command::Parser::setPos(int pos) {
         m_curChar = QChar();
     else
         m_curChar = m_text[pos];
-    /*qDebug() << "Command::Parser::setPos" << m_pos << m_curChar; */
+/*
+      if (m_pos < 500)
+          qDebug() << "Command::Parser::setPos" << m_pos << m_curChar;
+ */
 }
 
 /*!
@@ -152,9 +155,9 @@ void Command::Parser::error(const QString &msg, const QVariantList &args,
                             int pos, int length) {
     qWarning() << "Command::Parser::error" << msg << pos << length;
     QString errorIndicatorText = QString("\"%1«%2»%3\" (%4 chars)").arg(
-        m_text.left(pos),
+        m_text.mid(pos - 10, 10),
         m_text.mid(pos, length),
-        m_text.mid(pos + length),
+        m_text.mid(pos + length, 10),
         QString::number(m_text.length()));
 
     throw Command::Parser::Error(
@@ -421,7 +424,7 @@ QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
 QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal(
     const QVariantMap &props) {
     int           start   = m_pos;
-    const QString literal = getWithRegex(R"([a-zA-Z0-9-_*<=>]+)");
+    const QString literal = getWithRegex(R"([a-zA-Z0-9-_.*<=>]+)");
     const int     typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
     CacheKey      key{ typeId, literal };
 
@@ -452,7 +455,7 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
             return QSharedPointer<Command::StringNode>::create(m_pos,
                                                                getQuotedString());
     } else if (type == "word") {
-        auto literal = brigadier_literal();
+        const auto &literal = brigadier_literal();
         return Command::StringNode::fromLiteralNode(literal.get());
     }
     return defaultRet;
@@ -620,7 +623,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     if (invoked) {
                         found = true;
                         ret   = QVariantToParseNodeSharedPointer(returnVari);
-                        qDebug() << ret << found;
+                        qDebug() << ret << found << returnVari.constData();
                         Q_ASSERT(ret != nullptr);
                         if ((literal.length() == ret->length()) &&
                             ret->isVaild())
