@@ -22,6 +22,7 @@ private slots:
 private:
     TabbedCodeEditorInterface *parent = nullptr;
     void initFileList();
+    void show();
 };
 
 #endif /* FILESWITCHER_H */

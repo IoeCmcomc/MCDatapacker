@@ -2,6 +2,7 @@
 #include "codeeditor.h"
 
 #include <QDebug>
+#include <QElapsedTimer>
 
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
     : Highlighter(parent), parser(this) {
@@ -162,22 +163,35 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 void McfunctionHighlighter::checkProblems() {
     QSharedPointer<Command::ParseNode> result = nullptr;
 
+    QElapsedTimer timer;
+
+    timer.start();
     for (auto block = getParentDoc()->begin();
          block != getParentDoc()->end(); block = block.next()) {
         if (TextBlockData *data =
                 dynamic_cast<TextBlockData*>(block.userData())) {
             QString lineText = block.text();
             parser.setText(lineText);
+            QElapsedTimer timer;
+            timer.start();
             result = parser.parse();
             if (result->isVaild()) {
                 data->setProblem(std::nullopt);
+
+                qDebug() << "Size:" << parser.cache().size() << '/' <<
+                    parser.cache().capacity()
+                         << "Total access:" <<
+                    parser.cache().stats().total_accesses()
+                         << "Total hit:" << parser.cache().stats().total_hits()
+                         << "Total miss:" << parser.cache().stats().total_hits()
+                         << "Hit rate:" << parser.cache().stats().hit_rate()
+                         << "Time elapsed:" << timer.elapsed();
             } else {
                 auto parseErr = parser.lastError();
                 auto error    = ProblemInfo(true);
                 error.start   = block.position() + parseErr.pos;
                 error.length  = parseErr.length;
                 error.message = parseErr.toLocalizedMessage();
-
 /*
                   qDebug() << "A problem found at line"
                            << block.blockNumber()
@@ -185,15 +199,15 @@ void McfunctionHighlighter::checkProblems() {
                            << error.start - block.position()
                            << ":" << error.message;
  */
-
                 data->setProblem(error);
             }
         }
     }
     qDebug() << "Size:" << parser.cache().size() << '/' <<
-    parser.cache().capacity()
+        parser.cache().capacity()
              << "Total access:" << parser.cache().stats().total_accesses()
              << "Total hit:" << parser.cache().stats().total_hits()
              << "Total miss:" << parser.cache().stats().total_hits()
-             << "Hit rate::" << parser.cache().stats().hit_rate();
+             << "Hit rate:" << parser.cache().stats().hit_rate()
+             << "Time elapsed:" << timer.elapsed();
 }

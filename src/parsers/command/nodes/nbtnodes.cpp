@@ -11,10 +11,6 @@ QString Command::NbtNode::toString() const {
     return "NbtNode()";
 }
 
-nbt::tag_id Command::NbtNode::id() const noexcept {
-    return nbt::tag_id::tag_end;
-}
-
 #define DEFINE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)              \
     static const int _ ## Class =                                        \
         qRegisterMetaType<QSharedPointer<Command::Class> >();            \
@@ -24,12 +20,6 @@ nbt::tag_id Command::NbtNode::id() const noexcept {
     QString Command::Class::toString() const {                           \
         return #Class + QString("(%1)").arg(QString::fromStdString(      \
                                                 std::to_string(*this))); \
-    }                                                                    \
-    ValueType Command::Class::value() const {                            \
-        return tags::Tag::value;                                         \
-    }                                                                    \
-    void Command::Class::setValue(ValueType v) {                         \
-        tags::Tag::value = v;                                            \
     }                                                                    \
     nbt::tag_id Command::Class::id() const noexcept {                    \
         return tags::Tag::id();                                          \

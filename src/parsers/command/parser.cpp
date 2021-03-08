@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QMetaMethod>
+#include <QElapsedTimer>
 
 Command::Parser::Error::Error(const QString &whatArg,
                               int pos,
@@ -249,15 +250,21 @@ QString Command::Parser::getWithCharset(const QString &charset) {
 }
 
 /*!
- * \brief Returns the substring from the current character with the given regex. \a pattern.
+ * \brief Returns the substring from the current character with the given regex \a pattern.
  */
 QString Command::Parser::getWithRegex(const QString &pattern) {
+    return getWithRegex(QRegularExpression(pattern));
+}
+
+/*!
+ * \brief Returns the substring from the current character with the given \a regex.
+ */
+QString Command::Parser::getWithRegex(const QRegularExpression &regex) {
     QString ret;
 
-    auto match = QRegularExpression(pattern)
-                 .match(m_text, m_pos,
-                        QRegularExpression::NormalMatch,
-                        QRegularExpression::AnchoredMatchOption);
+    const auto &match = regex.match(m_text, m_pos,
+                                    QRegularExpression::NormalMatch,
+                                    QRegularExpression::AnchoredMatchOption);
 
     if (match.hasMatch()) {
         ret = match.captured();
@@ -370,18 +377,19 @@ QSharedPointer<Command::DoubleNode> Command::Parser::brigadier_double(
     const QVariantMap &props) {
     int start = m_pos;
 
-    QString lit   = getWithCharset("-0-9.eE");
-    bool    ok    = false;
-    double  value = lit.toDouble(&ok);
+    QString raw =
+        getWithRegex(m_decimalNumRegex);
+    bool   ok    = false;
+    double value = raw.toDouble(&ok);
 
     if (!ok)
-        error(tr("%1 is not a vaild double number").arg(lit));
+        error(tr("%1 is not a vaild double number").arg(raw));
     if (QVariant vari = props.value("min"); vari.isValid())
         checkMin(value, vari.toDouble());
     if (QVariant vari = props.value("max"); vari.isValid())
         checkMax(value, vari.toDouble());
     return QSharedPointer<Command::DoubleNode>::create(start,
-                                                       lit.length(),
+                                                       raw.length(),
                                                        value);
 }
 
@@ -389,7 +397,7 @@ QSharedPointer<Command::FloatNode> Command::Parser::brigadier_float(
     const QVariantMap &props) {
     int     start = m_pos;
     QString raw   =
-        getWithRegex(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+)(?:[eE]\d+)?)");
+        getWithRegex(m_decimalNumRegex);
     bool  ok    = false;
     float value = raw.toFloat(&ok);
 
@@ -424,7 +432,7 @@ QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
 QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal(
     const QVariantMap &props) {
     int           start   = m_pos;
-    const QString literal = getWithRegex(R"([a-zA-Z0-9-_.*<=>]+)");
+    const QString literal = getWithRegex(m_literalStrRegex);
     const int     typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
     CacheKey      key{ typeId, literal };
 
@@ -467,6 +475,8 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
 QSharedPointer<Command::ParseNode> Command::Parser::parse() {
     /*qDebug() << "Command::Parser::parse" << m_text; */
     m_parsingResult = QSharedPointer<RootNode>::create(pos());
+    QElapsedTimer timer;
+    timer.start();
 
     if (m_schema.isEmpty()) {
         qWarning() << "The parser schema hasn't been initialized";
@@ -479,13 +489,16 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
 
     if (m_cache.contains(key)) {
         m_parsingResult = qSharedPointerCast<RootNode>(m_cache[key]);
-        qDebug() << "Got cached" << m_parsingResult;
+        qDebug() << "Got cached" << m_parsingResult << "in ms:" <<
+            timer.elapsed();
         setPos(m_text.length());
     } else {
         try {
             if (parseResursively(m_schema)) {
                 m_parsingResult->setPos(0);
                 m_parsingResult->setLength(pos() - 1);
+                qDebug() << "Parsed line" << m_parsingResult << "in ms:" <<
+                    timer.elapsed();
 
                 m_cache.emplace(typeId, m_text, m_parsingResult);
             }
@@ -515,25 +528,16 @@ QVariantToParseNodeSharedPointer(
     return nullptr;
 }
 
-bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
-                                       int depth) {
-/*
-      qDebug() << "Command::Parser::parseResursively"
-   << curSchemaNode << depth;
- */
-
-    QSharedPointer<Command::ParseNode> ret = nullptr;
-    QVector<Command::Parser::Error>    errors;
-    QVector<int>                       argLengths;
-
+bool Command::Parser::processCurSchemaNode(int depth,
+                                           QJsonObject &curSchemaNode) {
     if (depth > 0) {
         if (depth > 100)
             qWarning() << "The parsing stack depth is too large:" << depth;
-        /*
-           qDebug() << "has children:" << curSchemaNode.contains("children");
-           qDebug() << "has executable:" << curSchemaNode.contains("executable");
-           qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
-         */
+/*
+          qDebug() << "has children:" << curSchemaNode.contains("children");
+          qDebug() << "has executable:" << curSchemaNode.contains("executable");
+          qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
+ */
         if (!curSchemaNode.contains("children")) {
             if (!curSchemaNode.contains("executable")
                 || (curSchemaNode.contains("executable")
@@ -566,6 +570,23 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             error(tr("Incompleted command"));
         eat(' ');
     }
+    return false; /* Should continue parsing */
+}
+
+bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
+                                       int depth) {
+/*
+      qDebug() << "Command::Parser::parseResursively"
+   << curSchemaNode << depth;
+ */
+
+    QSharedPointer<Command::ParseNode> ret = nullptr;
+    QVector<Command::Parser::Error>    errors;
+    QVector<int>                       argLengths;
+
+    if (processCurSchemaNode(depth, curSchemaNode))
+        return true;
+
     int     startPos = m_pos;
     bool    success  = false;
     QString literal  = peekLiteral();
@@ -590,40 +611,43 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 parserIdToMethodName(parserId).toLatin1()
                 + QStringLiteral("(QVariantMap)").toLatin1());
             if (methodIndex != -1) {
-                auto     method     = metaObject()->method(methodIndex);
-                int      returnType = method.returnType();
+                auto          method     = metaObject()->method(methodIndex);
+                int           returnType = method.returnType();
+                QElapsedTimer timer;
+                timer.start();
                 CacheKey key{ returnType, literal };
 
-                if (m_cache.contains(key)) {
-                    found = true;
-                    ret   = m_cache[key];
-                    qDebug() << "Cached: " << ret << found;
-                    Q_ASSERT(ret != nullptr);
-                    advance(literal.length());
-                    success = parseResursively(curSchemaNode, depth + 1);
-                    m_parsingResult->prepend(ret);
-                    break;
-                }
-
-                auto props =
-                    curSchemaNode[QStringLiteral("properties")].toObject().
-                    toVariantMap();
-
-                auto     typeName = method.typeName();
-                QVariant returnVari(returnType, nullptr);
-
-                QGenericReturnArgument returnArgument(
-                    typeName,
-                    const_cast<void*>(returnVari.constData())
-                    );
                 try {
+                    if (m_cache.contains(key)) {
+                        found = true;
+                        ret   = m_cache[key];
+                        qDebug() << "Cached: " << ret << found << ret->pos() <<
+                            ret->length() << "elapsed time:" << timer.elapsed();
+                        Q_ASSERT(ret != nullptr);
+                        advance(literal.length());
+                        success = parseResursively(curSchemaNode, depth + 1);
+                        m_parsingResult->prepend(ret);
+                        break;
+                    }
+
+                    auto props =
+                        curSchemaNode[QStringLiteral("properties")].toObject().
+                        toVariantMap();
+
+                    auto     typeName = method.typeName();
+                    QVariant returnVari(returnType, nullptr);
+
+                    QGenericReturnArgument
+                        returnArgument(typeName,
+                                       const_cast<void*>(returnVari.constData()));
                     bool invoked = method.invoke(this, returnArgument,
                                                  Q_ARG(QVariantMap, props));
                     qDebug() << invoked << returnVari;
                     if (invoked) {
                         found = true;
                         ret   = QVariantToParseNodeSharedPointer(returnVari);
-                        qDebug() << ret << found << returnVari.constData();
+                        qDebug() << ret << found << "elapsed time:" <<
+                            timer.elapsed();
                         Q_ASSERT(ret != nullptr);
                         if ((literal.length() == ret->length()) &&
                             ret->isVaild())
@@ -649,6 +673,8 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             }
         }
     }
+    /*qDebug() << "After loop" << ret->isVaild() << success << errors.length() << */
+    curSchemaNode.size();
     if (ret && ret->isVaild() && success) { /* If succeed */
     } else if (errors.size() == 1) {
         throw errors[0];

@@ -3,6 +3,8 @@
 #include "globalhelpers.h"
 
 #include <QShortcut>
+#include <QApplication>
+#include <QScreen>
 
 FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
     : QListWidget(parent) {
@@ -14,10 +16,8 @@ FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
 
     initFileList();
 
-    connect(this, &QListWidget::itemClicked,
-            this, &QObject::deleteLater);
-    connect(this, &QListWidget::itemActivated,
-            this, &QObject::deleteLater);
+    connect(this, &QListWidget::itemClicked, this, &QObject::deleteLater);
+    connect(this, &QListWidget::itemActivated, this, &QObject::deleteLater);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this),
             &QShortcut::activated, this, &FileSwitcher::onSelectNextItem);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Tab),
@@ -31,11 +31,6 @@ FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
 
     setCurrentRow(parent->getCurIndex());
     onSelectNextItem();
-    setMinimumWidth(sizeHintForColumn(0) + 2 * frameWidth());
-    setMinimumHeight(sizeHintForRow(0) * count() + 2 * frameWidth());
-    setMaximumWidth(700);
-    setMaximumHeight(500);
-    adjustSize();
     show();
     grabMouse();
     setFocus();
@@ -47,7 +42,36 @@ FileSwitcher::~FileSwitcher() {
     }
 }
 
-void FileSwitcher::focusOutEvent(QFocusEvent *event) {
+void FileSwitcher::show() {
+    setMinimumWidth(sizeHintForColumn(0) + 2 * frameWidth());
+    setMinimumHeight(sizeHintForRow(0) * count() + 2 * frameWidth());
+    setMaximumWidth(700);
+    setMaximumHeight(500);
+    adjustSize();
+
+    const auto scrSize  = qApp->screens()[0]->size();
+    QPoint     newPoint = pos();
+
+    if ((newPoint.x() + width()) > scrSize.width())
+        newPoint.rx() = scrSize.width() - width();
+    if ((newPoint.y() + height()) > scrSize.height())
+        newPoint.ry() = scrSize.height() - height();
+
+    newPoint.rx() = qMax(newPoint.x(), 0);
+    newPoint.ry() = qMax(newPoint.y(), 0);
+
+    if ((newPoint.x() + width()) > scrSize.width())
+        sizeHint().rwidth() = scrSize.width();
+    if ((newPoint.y() + height()) > scrSize.height())
+        sizeHint().rheight() = scrSize.height();
+
+
+    move(newPoint);
+
+    QListWidget::show();
+}
+
+void FileSwitcher::focusOutEvent(QFocusEvent *) {
     deleteLater();
 }
 

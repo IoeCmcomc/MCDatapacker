@@ -10,22 +10,21 @@
 
 namespace Command {
     using namespace nbt;
-    class NbtNode : public ArgumentNode
-    {
+    class NbtNode : public ArgumentNode {
 public:
         NbtNode(int pos, int length,
                 const QString &parserId = "minecraft:nbt_tag");
         virtual QString toString() const override;
-        virtual nbt::tag_id id() const noexcept;
+        virtual tag_id id() const noexcept {
+            return tag_id::tag_end;
+        };
     };
 
 #define DECLARE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)  \
-    class Class : public NbtNode, tags::Tag {                 \
+    class Class : public NbtNode, public tags::Tag {          \
 public:                                                       \
         explicit Class(int pos, int length, ValueType value); \
         QString toString() const override;                    \
-        ValueType value() const;                              \
-        void setValue(ValueType v);                           \
         nbt::tag_id id() const noexcept override;             \
     };
 
@@ -37,21 +36,6 @@ public:                                                       \
     DECLARE_PRIMITIVE_TAG_NBTNODE(NbtShortNode, short_tag, short)
 
 #undef DECLARE_PRIMITIVE_TAG_NBTNODE
-
-/*
-      class AbstractNbtListlikeNode {
-          virtual bool isEmpty() = 0;
-          virtual int size();
-          virtual void append(T *node);
-          virtual void insert(int i, T *node);
-          virtual void remove(int i);
-          virtual void removeNode(T *node);
-          virtual void clear();
-          virtual T *operator[](int index);
-          virtual T *operator[](int index) const;
-          virtual NbtListlikeNode &operator<<(T *node);
-      };
- */
 
     template<typename T>
     class NbtListlikeNode {

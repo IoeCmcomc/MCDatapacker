@@ -71,26 +71,25 @@ protected:
 
         void error(const QString &msg, const QVariantList &args = {});
         void error(const QString &msg, const QVariantList &args,
-                   int pos, int length = 1);
-        void advance(
-            int n = 1);
-        void recede(
-            int n = 1);
-        bool expect(const QChar &chr,
-                    bool acceptNull = false);
-        void eat(const QChar &chr,
-                 bool acceptNull = false);
+                   int pos, int length                = 1);
+        void advance(int n                            = 1);
+        void recede(int n                             = 1);
+        bool expect(const QChar &chr, bool acceptNull = false);
+        void eat(const QChar &chr, bool acceptNull    = false);
         QString getUntil(const QChar &chr);
         QString getWithCharset(const QString &charset);
         QString getWithRegex(const QString &pattern);
+        QString getWithRegex(const QRegularExpression &regex);
         QString peek(int n);
         void skipWs(bool once = true);
 
         QString peekLiteral();
         QString getQuotedString();
 
+        bool processCurSchemaNode(int depth, QJsonObject &curSchemaNode);
         bool parseResursively(QJsonObject curSchemaNode,
                               int depth = 0);
+
         virtual QSharedPointer<ParseNode> QVariantToParseNodeSharedPointer(
             const QVariant &vari);
 
@@ -118,11 +117,15 @@ protected:
         void printMethods();
 private:
         ParseNodeCache m_cache;
+        Error m_lastError;
         QSharedPointer<Command::RootNode> m_parsingResult = nullptr;
+        QRegularExpression m_literalStrRegex              = QRegularExpression(
+            R"([a-zA-Z0-9-_.*<=>]+)");
+        QRegularExpression m_decimalNumRegex = QRegularExpression(
+            R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+)(?:[eE]\d+)?)");
         static QJsonObject m_schema;
         QString m_text;
         int m_pos = 0;
-        Error m_lastError;
         QChar m_curChar;
     };
 }

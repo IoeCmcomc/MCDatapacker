@@ -43,9 +43,9 @@ void TestNbtNodes::test_case1() {
 void TestNbtNodes::NbtIntNode() {
     class NbtIntNode node(20, 9, -45645245);
     QCOMPARE(node.id(), nbt::tag_id::tag_int);
-    QCOMPARE(node.value(), -45645245);
-    node.setValue(14022021);
-    QCOMPARE(node.value(), 14022021);
+    QCOMPARE(node.value, -45645245);
+    node.value = 14022021;
+    QCOMPARE(node.value, 14022021);
 }
 
 void TestNbtNodes::NbtByteArrayNode() {
