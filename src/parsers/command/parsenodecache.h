@@ -8,12 +8,12 @@ namespace Command {
     struct CacheKey {
         const int     typeId = 0;
         const QString literalStr;
-        CacheKey(const int id, const QString &str) : typeId(id),
-            literalStr(str) {
+        int           pos = -1;
+        CacheKey(const int id, const QString &str, const int pos = -1) : typeId(
+                id),
+            literalStr(str), pos(pos) {
         }
-        bool operator==(const CacheKey rhs) const {
-            return (typeId == rhs.typeId) && (literalStr == rhs.literalStr);
-        }
+        bool operator==(const CacheKey rhs) const;
     };
 }
 
@@ -48,6 +48,8 @@ public:
         bool contains(const CacheKey &key) const;
         const QSharedPointer<ParseNode> &lookup(const CacheKey &key) const;
         void emplace(const int typeId, const QString &literalStr,
+                     QSharedPointer<ParseNode> node);
+        void emplace(const int typeId, const QString &literalStr, int pos,
                      QSharedPointer<ParseNode> node);
         QSharedPointer<ParseNode> &operator[](const CacheKey &key);
         const QSharedPointer<ParseNode> &operator[](const CacheKey &key) const;

@@ -105,6 +105,7 @@ void TestMinecraftParser::executeCmd() {
     QCOMPARE(
         result->toString(),
         "RootNode[7](LiteralNode(execute), LiteralNode(as), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(run), LiteralNode(tp), EntityNode[single](TargetSelectorNode(@s)), Vec3Node(x: AxisNode(12), y: AxisNode(45), z: AxisNode(78)))");
+    "RootNode[8](LiteralNode(execute), LiteralNode(as), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(run), LiteralNode(tp), EntityNode[single](TargetSelectorNode(@s)), EntityNode[single](StringNode(\"12\")), RotationNode(x: AxisNode(45), z: AxisNode(78)))";
 }
 
 void TestMinecraftParser::functionCmd() {

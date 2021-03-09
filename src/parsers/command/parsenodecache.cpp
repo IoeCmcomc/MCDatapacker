@@ -3,6 +3,14 @@
 using NodePointerCache = LRU::Cache<Command::CacheKey,
                                     QSharedPointer<Command::ParseNode> >;
 
+bool Command::CacheKey::operator==(const Command::CacheKey rhs) const {
+    if (pos > -1)
+        return (pos == rhs.pos) && (typeId == rhs.typeId) &&
+               (literalStr == rhs.literalStr);
+    else
+        return (typeId == rhs.typeId) && (literalStr == rhs.literalStr);
+}
+
 Command::ParseNodeCache::ParseNodeCache(int capacity)
     : m_cache(capacity) {
     m_cache.monitor();
@@ -34,6 +42,15 @@ void Command::ParseNodeCache::emplace(const int typeId,
                                       QSharedPointer<ParseNode> node) {
     m_cache.emplace(std::piecewise_construct,
                     std::forward_as_tuple(typeId, literalStr),
+                    std::forward_as_tuple(node));
+}
+
+void Command::ParseNodeCache::emplace(const int typeId,
+                                      const QString &literalStr,
+                                      int pos,
+                                      QSharedPointer<Command::ParseNode> node) {
+    m_cache.emplace(std::piecewise_construct,
+                    std::forward_as_tuple(typeId, literalStr, pos),
                     std::forward_as_tuple(node));
 }
 

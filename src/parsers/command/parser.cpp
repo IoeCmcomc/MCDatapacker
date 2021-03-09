@@ -611,11 +611,12 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 parserIdToMethodName(parserId).toLatin1()
                 + QStringLiteral("(QVariantMap)").toLatin1());
             if (methodIndex != -1) {
+                qDebug() << "Argument parser ID:" << parserId;
                 auto          method     = metaObject()->method(methodIndex);
                 int           returnType = method.returnType();
                 QElapsedTimer timer;
                 timer.start();
-                CacheKey key{ returnType, literal };
+                CacheKey key{ returnType, literal, startPos };
 
                 try {
                     if (m_cache.contains(key)) {
@@ -623,8 +624,22 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                         ret   = m_cache[key];
                         qDebug() << "Cached: " << ret << found << ret->pos() <<
                             ret->length() << "elapsed time:" << timer.elapsed();
+                    } else if (key.pos = -1; m_cache.contains(key)) { /* Not taking position into account */
+                        /* Make a copy of the cached object */
+                        ret = QSharedPointer<ParseNode>::create(*m_cache[key]);
+                        /* Change its pos to the start pos */
+                        ret->setPos(startPos);
+
+                        qDebug() << "Detached from cache: " << ret << found <<
+                            ret->pos() <<
+                            ret->length() << "elapsed time:" << timer.elapsed();
+                    }
+                    if (found) {
                         Q_ASSERT(ret != nullptr);
                         advance(literal.length());
+                        if ((literal.length() == ret->length()) &&
+                            ret->isVaild())
+                            m_cache.emplace(returnType, literal, startPos, ret);
                         success = parseResursively(curSchemaNode, depth + 1);
                         m_parsingResult->prepend(ret);
                         break;
@@ -651,7 +666,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                         Q_ASSERT(ret != nullptr);
                         if ((literal.length() == ret->length()) &&
                             ret->isVaild())
-                            m_cache.emplace(returnType, literal, ret);
+                            m_cache.emplace(returnType, literal, startPos, ret);
                         success = parseResursively(curSchemaNode, depth + 1);
                         m_parsingResult->prepend(ret);
                         break;

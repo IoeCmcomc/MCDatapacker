@@ -683,8 +683,11 @@ QSharedPointer<Command::EntityNode> Command::MinecraftParser::minecraft_entity(
             ret = QSharedPointer<Command::EntityNode>::create(uuid);
         } else {
             setPos(curPos);
-            QString literal = getWithCharset((props.contains(
-                                                  "charset")) ? props["charset"].toString() : "0-9a-zA-Z_");
+            QString literal;
+            if (props.contains("charset")) {
+            }
+            getWithCharset((props.contains(
+                                "charset")) ? props["charset"].toString() : "0-9a-zA-Z_");
             if (literal.isEmpty()) {
                 this->error(QString("Invaild empty player name"));
             }
