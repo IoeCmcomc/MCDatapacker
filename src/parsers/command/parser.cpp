@@ -484,6 +484,7 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
         m_parsingResult->setPos(0);
         return m_parsingResult;
     }
+    setPos(0);
     const int typeId = qMetaTypeId<QSharedPointer<RootNode> >();
     CacheKey  key{ typeId, m_text };
 
@@ -611,7 +612,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 parserIdToMethodName(parserId).toLatin1()
                 + QStringLiteral("(QVariantMap)").toLatin1());
             if (methodIndex != -1) {
-                qDebug() << "Argument parser ID:" << parserId;
+                /*qDebug() << "Argument parser ID:" << parserId; */
                 auto          method     = metaObject()->method(methodIndex);
                 int           returnType = method.returnType();
                 QElapsedTimer timer;

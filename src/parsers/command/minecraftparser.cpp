@@ -157,15 +157,18 @@ QSharedPointer<Command::AxesNode> Command::MinecraftParser::parseAxes(
     bool isLocal = false;
     auto axes    = QSharedPointer<Command::AxesNode>::create(pos());
 
-    axes->setX(parseAxis(options, isLocal));
+    /*axes->setX(parseAxis(options, isLocal)); */
+    axes->setX(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
+                                       peekLiteral(), options, isLocal));
     if (options & AxisParseOption::ParseY) {
         this->eat(' ');
-        axes->setY(parseAxis(options, isLocal));
-        axes->z();
+        axes->setY(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
+                                           peekLiteral(), options, isLocal));
     }
 
     this->eat(' ');
-    axes->setZ(parseAxis(options, isLocal));
+    axes->setZ(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
+                                       peekLiteral(), options, isLocal));
     return axes;
 }
 
@@ -509,8 +512,8 @@ parseNbtPathStep() {
 
     switch (curChar().toLatin1()) {
     case '"': {
-        ret->setName(QSharedPointer<Command::StringNode>::create(pos(),
-                                                                 getQuotedString()));
+        ret->setName(QSharedPointer<StringNode>::create(pos(),
+                                                        getQuotedString()));
         if (curChar() == '{')
             ret->setFilter(minecraft_nbtCompoundTag());
         break;

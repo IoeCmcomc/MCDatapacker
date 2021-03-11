@@ -83,7 +83,7 @@ QString Command::NbtListNode::toString() const {
     int c = 0;
 
     for (const auto &node: m_vector) {
-        qDebug() << "NbtListNode::toString" << c << node;
+        /*qDebug() << "NbtListNode::toString" << c << node; */
         items << node->toString();
         ++c;
     }
@@ -119,8 +119,10 @@ QString Command::NbtCompoundNode::toString() const {
     int c = 0;
 
     for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
-        qDebug() << "NbtCompoundNode::toString" << c << i.key().text <<
-            i.value();
+/*
+          qDebug() << "NbtCompoundNode::toString" << c << i.key().text <<
+              i.value();
+ */
         itemReprs << QString("%1: %2").arg(i.key().text,
                                            i.value()->toString());
         ++c;

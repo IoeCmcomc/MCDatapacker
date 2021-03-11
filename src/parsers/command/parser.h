@@ -114,6 +114,42 @@ protected:
             checkMin(value, min);
             checkMax(value, max);
         }
+
+        template<typename Type, typename Class, typename ... Args1,
+                 typename ... Args2>
+        auto callWithCache(QSharedPointer<Type> (Class::*funcPtr)(Args1 ...),
+                           Class *that, const QString &literal,
+                           Args2 &&... args) {
+            const int startPos  = pos();
+            const int retTypeId = qMetaTypeId<QSharedPointer<Type> >();
+
+            Q_ASSERT(retTypeId != 0);
+            CacheKey key{ retTypeId, literal, startPos };
+
+            if (m_cache.contains(key)) {
+                const auto value = qSharedPointerCast<Type>(m_cache[key]);
+                Q_ASSERT(value != nullptr);
+                advance(value->length());
+                return value;
+            } else if (key.pos = -1; m_cache.contains(key)) {     /* Not taking position into account */
+                /* Make a copy of the cached object */
+                auto value = QSharedPointer<Type>::create(*qSharedPointerCast<Type>(
+                                                              m_cache[key]));
+                /* Change its pos to the start pos */
+                value->setPos(startPos);
+                if ((literal.length() == value->length()) && value->isVaild())
+                    m_cache.emplace(retTypeId, literal, startPos, value);
+                advance(value->length());
+                return value;
+            }
+            auto value =
+                (that->*funcPtr)(std::forward<decltype(args)>(args)...);
+            Q_ASSERT(value != nullptr);
+            m_cache.emplace(retTypeId, literal, startPos, value);
+
+            return value;
+        }
+
         void printMethods();
 private:
         ParseNodeCache m_cache;
