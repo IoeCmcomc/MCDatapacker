@@ -41,6 +41,7 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
     void openFindDialog();
     void openReplaceDialog();
+    void toggleComment();
 
 private:
     QFont monoFont;

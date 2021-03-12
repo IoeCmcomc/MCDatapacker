@@ -39,6 +39,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this),
             &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Slash), this),
+            &QShortcut::activated, this, &CodeEditor::toggleComment);
 
     readPrefSettings();
 
@@ -179,13 +181,13 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 }
 
 bool CodeEditor::event(QEvent *event) {
-    if (event->type() == QEvent::HoverMove) {
+    if (event->type() == QEvent::HelpRequest) {
         /*QToolTip::hideText(); */
 
-        auto *hoverEvent = static_cast<QHoverEvent*>(event);
-        auto  globalPos  = mapToGlobal(hoverEvent->pos());
-        auto  pos        = hoverEvent->pos();
-        bool  done       = false;
+        auto *helpEvent = static_cast<QHelpEvent*>(event);
+        auto  globalPos = mapToGlobal(helpEvent->pos());
+        auto  pos       = helpEvent->pos();
+        bool  done      = false;
 
         pos.rx() -= viewportMargins().left();
         pos.ry() -= viewportMargins().top();
@@ -316,6 +318,75 @@ void CodeEditor::openReplaceDialog() {
 
     frdialog->setEditor(this);
     frdialog->show();
+}
+
+void CodeEditor::toggleComment() {
+    /*
+       This function is subject to change in the future.
+       TODO: Changeable comment character
+       TODO: Support "fill mode": the first comment character decides the behavior
+     */
+
+    auto   txtCursor = textCursor();
+    QPoint posPoint(txtCursor.positionInBlock(), txtCursor.blockNumber());
+    auto   posBlock     = txtCursor.block();
+    auto   anchorCursor = txtCursor;
+
+    anchorCursor.setPosition(txtCursor.anchor());
+    QPoint anchorPoint(anchorCursor.positionInBlock(),
+                       anchorCursor.blockNumber());
+    auto anchorBlock     = anchorCursor.block();
+    bool hasFirstComment = false;
+    bool hasLastComment  = false;
+    bool fromTopDown     = txtCursor.position() > txtCursor.anchor();;
+    int  count           =
+        txtCursor.selection().toPlainText().count('\n') + 1;
+
+    qDebug() << anchorPoint << posPoint << count << fromTopDown <<
+        txtCursor.hasSelection() << txtCursor.atBlockStart();
+
+    txtCursor.beginEditBlock();
+    qDebug() << txtCursor.position() << txtCursor.blockNumber() <<
+        txtCursor.positionInBlock();
+    if (txtCursor.hasSelection() && txtCursor.atBlockStart()) {
+        txtCursor.movePosition(
+            (fromTopDown) ? QTextCursor::PreviousBlock : QTextCursor::NextBlock);
+        count--;
+        qDebug() << count;
+    }
+    txtCursor.clearSelection();
+    qDebug() << count;
+
+    for (int i = 0; i < count; i++) {
+        txtCursor.movePosition(QTextCursor::StartOfLine);
+        QString curLine    = txtCursor.block().text();
+        bool    hasComment = curLine.startsWith("#");
+        qDebug() << i << txtCursor.blockNumber() << curLine << hasComment;
+        if (hasComment) {
+            txtCursor.deleteChar();
+        } else if (!curLine.isEmpty()) {
+            txtCursor.insertText("#");
+        }
+        if (i == 0)
+            hasFirstComment = !hasComment;
+        if (i < count - 1) {
+            txtCursor.movePosition(
+                (fromTopDown) ? QTextCursor::PreviousBlock : QTextCursor::PreviousBlock);
+        } else if (i == count - 1) {
+            hasLastComment = !hasComment;
+        }
+
+
+        qDebug() << i << curLine << hasComment << hasFirstComment <<
+            hasLastComment;
+    }
+
+    txtCursor.setPosition(anchorBlock.position() + anchorPoint.x());
+    txtCursor.setPosition(posBlock.position() + posPoint.x(),
+                          QTextCursor::KeepAnchor);
+
+    txtCursor.endEditBlock();
+    setTextCursor(txtCursor);
 }
 
 void CodeEditor::setCurHighlighter(Highlighter *value) {

@@ -2,6 +2,7 @@
 #define HIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
+#include <QRegularExpression>
 
 #include <optional>
 
@@ -84,6 +85,10 @@ protected:
     void highlightBlock(const QString &text);
 
 private:
+    QRegularExpression namespacedIdRegex =
+        QRegularExpression(QStringLiteral(
+                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+\b)"));
+
     QTextDocument *m_parentDoc;
 
     void collectNamespacedIds(const QString &text, TextBlockData *data);

@@ -5,7 +5,6 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QRegularExpression>
 
 void TextBlockData::clear() {
     qDeleteAll(m_brackets);
@@ -133,8 +132,6 @@ QTextDocument *Highlighter::getParentDoc() const {
 
 void Highlighter::collectNamespacedIds(const QString &text,
                                        TextBlockData *data) {
-    QRegularExpression namespacedIdRegex =
-        QRegularExpression(QStringLiteral("#?\\b[a-z0-9-_.]+:[a-z0-9-_./]+\\b"));
     auto matchIter = namespacedIdRegex.globalMatch(text);
 
     while (matchIter.hasNext()) {
@@ -175,7 +172,5 @@ QString Highlighter::locateNamespacedId(QString id) {
             return path + QStringLiteral(".json");
         }
     }
-
-
     return "";
 }

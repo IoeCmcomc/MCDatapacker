@@ -147,13 +147,13 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
         if (!data)
             return;
 
-        auto infos = data->namespacedIds();
+        const auto infos = data->namespacedIds();
 
         for (const auto info: infos) {
             auto fmt = namespacedIDFormat;
             fmt.setFontUnderline(true);
             fmt.setToolTip(info->link);
-            setFormat(info->start, info->start + info->length, fmt);
+            setFormat(info->start, info->length, fmt);
         }
     }
 
