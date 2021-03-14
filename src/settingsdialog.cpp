@@ -77,6 +77,8 @@ void SettingsDialog::onAccepted() {
     settings.setValue("textSize", ui->editorTextSizeSpin->value());
     settings.setValue("textFont", ui->editorTextFontCombo->currentFont());
     settings.setValue("wrap", ui->editorWrapCheck->isChecked());
+    settings.setValue("toggleComments",
+                      ui->commentToggleModeRadio->isChecked());
     settings.endGroup();
 
     qobject_cast<MainWindow*>(parent())->readPrefSettings(settings);
@@ -99,6 +101,8 @@ void SettingsDialog::initSettings() {
                                                     QFontDatabase::FixedFont));
     }
     ui->editorWrapCheck->setChecked(settings.value("wrap", false).toBool());
+    if (settings.value("toggleComments", false).toBool())
+        ui->commentToggleModeRadio->setChecked(true);
     settings.endGroup();
 }
 
