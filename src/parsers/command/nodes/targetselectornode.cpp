@@ -25,11 +25,12 @@ QString Command::TargetSelectorNode::toString() const {
     return ret;
 }
 
-QSharedPointer<Command::MapNode> Command::TargetSelectorNode::args() const {
+QSharedPointer<Command::MultiMapNode> Command::TargetSelectorNode::args() const
+{
     return m_args;
 }
 
-void Command::TargetSelectorNode::setArgs(QSharedPointer<MapNode> args) {
+void Command::TargetSelectorNode::setArgs(QSharedPointer<MultiMapNode> args) {
     m_args = args;
 }
 

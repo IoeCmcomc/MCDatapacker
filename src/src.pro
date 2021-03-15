@@ -69,6 +69,7 @@ SOURCES += \
     parsers/command/nodes/itemstacknode.cpp \
     parsers/command/nodes/literalnode.cpp \
     parsers/command/nodes/mapnode.cpp \
+    parsers/command/nodes/multimapnode.cpp \
     parsers/command/nodes/nbtnodes.cpp \
     parsers/command/nodes/nbtpathnode.cpp \
     parsers/command/nodes/parsenode.cpp \
@@ -144,6 +145,7 @@ HEADERS += \
     parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/mapnode.h \
+    parsers/command/nodes/multimapnode.h \
     parsers/command/nodes/nbtnodes.h \
     parsers/command/nodes/nbtpathnode.h \
     parsers/command/nodes/parsenode.h \

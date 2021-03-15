@@ -368,9 +368,9 @@ parseEntityAdvancements() {
 
 
 
-QSharedPointer<Command::MapNode> Command::MinecraftParser::parseEntityArguments()
-{
-    return this->parseMap<MapNode, ParseNode>(
+QSharedPointer<Command::MultiMapNode> Command::MinecraftParser::
+parseEntityArguments() {
+    return this->parseMap<MultiMapNode, ParseNode>(
         '[', ']', '=', [this](
             const QString &key) -> QSharedPointer<ParseNode> {
         const QStringList doubleValKeys = { "x", "y", "z", "dx", "dy", "dz" };

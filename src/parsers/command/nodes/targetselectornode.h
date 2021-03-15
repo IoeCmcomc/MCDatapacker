@@ -2,7 +2,7 @@
 #define TARGETSELECTORNODE_H
 
 #include "parsenode.h"
-#include "mapnode.h"
+#include "multimapnode.h"
 
 namespace Command {
     class TargetSelectorNode : public ParseNode
@@ -22,12 +22,12 @@ public:
         Variable variable() const;
         void setVariable(const Variable &variable);
 
-        QSharedPointer<MapNode> args() const;
-        void setArgs(QSharedPointer<MapNode> args);
+        QSharedPointer<MultiMapNode> args() const;
+        void setArgs(QSharedPointer<MultiMapNode> args);
 
 private:
-        Variable m_variable            = Variable::A;
-        QSharedPointer<MapNode> m_args = nullptr;
+        Variable m_variable                 = Variable::A;
+        QSharedPointer<MultiMapNode> m_args = nullptr;
         static const QMap<Variable, char> variableMap;
     };
 }

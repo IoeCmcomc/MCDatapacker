@@ -23,6 +23,7 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/itemstacknode.cpp \
     ../../../../../src/parsers/command/nodes/literalnode.cpp \
     ../../../../../src/parsers/command/nodes/mapnode.cpp \
+    ../../../../../src/parsers/command/nodes/multimapnode.cpp \
     ../../../../../src/parsers/command/nodes/nbtnodes.cpp \
     ../../../../../src/parsers/command/nodes/nbtpathnode.cpp \
     ../../../../../src/parsers/command/nodes/parsenode.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/itemstacknode.h \
     ../../../../../src/parsers/command/nodes/literalnode.h \
     ../../../../../src/parsers/command/nodes/mapnode.h \
+    ../../../../../src/parsers/command/nodes/multimapnode.h \
     ../../../../../src/parsers/command/nodes/nbtnodes.h \
     ../../../../../src/parsers/command/nodes/nbtpathnode.h \
     ../../../../../src/parsers/command/nodes/parsenode.h \

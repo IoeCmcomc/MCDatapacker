@@ -8,7 +8,7 @@
 #include "nodes/floatrangenode.h"
 #include "nodes/intrangenode.h"
 #include "nodes/itemstacknode.h"
-#include "nodes/mapnode.h"
+#include "nodes/multimapnode.h"
 #include "nodes/nbtpathnode.h"
 #include "nodes/particlenode.h"
 #include "nodes/similaraxesnodes.h"
@@ -115,7 +115,7 @@ private:
         }
         QSharedPointer<Command::NbtListNode> parseListTag();
         QSharedPointer<Command::MapNode> parseEntityAdvancements();
-        QSharedPointer<Command::MapNode> parseEntityArguments();
+        QSharedPointer<Command::MultiMapNode> parseEntityArguments();
         QSharedPointer<Command::TargetSelectorNode> parseTargetSelector();
         QSharedPointer<Command::NbtPathStepNode> parseNbtPathStep();
 
