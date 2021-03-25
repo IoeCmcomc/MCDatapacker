@@ -9,7 +9,10 @@ namespace Command {
 public:
         explicit FloatNode(int pos = -1, int length = 0, float value = 0);
 
-        QString toString() const;
+        QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         float value() const;
         void setValue(float value);
 

@@ -11,6 +11,9 @@ public:
                                       const QString &nspace = "",
                                       const QString &id     = "");
         virtual QString toString() const;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         QString format() const;
 
         QString nspace() const;

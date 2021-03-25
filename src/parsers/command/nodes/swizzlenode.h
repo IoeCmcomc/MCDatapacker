@@ -19,6 +19,9 @@ public:
 
         QString toString() const override;
         bool isVaild() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
 
         Axes axes() const;
         void setAxes(const Axes &axes);

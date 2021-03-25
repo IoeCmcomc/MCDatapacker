@@ -404,6 +404,7 @@ void TabbedCodeEditorInterface::onSwitchFile() {
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
+    qDebug() << "TabbedCodeEditorInterface::onCurTextChanged";
     if (!hasNoFile())
         textChangedTimer->start(260);
     else

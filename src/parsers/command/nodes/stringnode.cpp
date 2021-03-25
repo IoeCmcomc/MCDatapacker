@@ -2,9 +2,11 @@
 
 const static int _ = qRegisterMetaType<QSharedPointer<Command::StringNode> >();
 
-Command::StringNode::StringNode(int pos, const QString &value)
+Command::StringNode::StringNode(int pos, const QString &value, bool isQuote)
     : Command::ArgumentNode(pos, value.length(), "brigadier:string") {
     setValue(value);
+    if (isQuote)
+        setLength(length() + 2);
 }
 
 QString Command::StringNode::toString() const {

@@ -24,6 +24,9 @@ public:
         AxisNode(int pos);
 
         virtual QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         QString format() const;
 
         AxisType type() const;

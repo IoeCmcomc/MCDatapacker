@@ -50,24 +50,29 @@ private:
             auto obj = QSharedPointer<Container>::create(pos());
 
             this->eat(beginChar);
-            int KeyPos = pos();
             while (this->curChar() != endChar) {
-                QString name;
                 this->skipWs(false);
+                bool    isQuote = false;
+                int     KeyPos  = pos();
+                QString name;
                 if (acceptQuotation &&
                     (curChar() == '"' || curChar() == '\'')) {
                     try {
-                        name = getQuotedString();
+                        name    = getQuotedString();
+                        isQuote = true;
                     } catch (const Command::Parser::Error &err) {
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
                 if (name.isNull())
                     name = this->getWithCharset(keyCharset);
+                if (name.isNull())
+                    error("Invaild empty key", {}, KeyPos);
                 this->skipWs(false);
                 this->eat(sepChar);
                 this->skipWs(false);
-                obj->insert(Command::MapKey{ KeyPos, name }, func(name));
+                obj->insert(Command::MapKey{ KeyPos, name, isQuote, false },
+                            func(name));
                 this->skipWs(false);
                 if (this->curChar() != endChar) {
                     this->eat(',');
@@ -75,6 +80,7 @@ private:
                 }
             }
             this->eat(endChar);
+            obj->setLength(pos() - obj->pos());
             return obj;
         }
 

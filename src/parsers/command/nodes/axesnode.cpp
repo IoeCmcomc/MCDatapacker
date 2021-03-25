@@ -22,6 +22,16 @@ bool Command::AxesNode::isVaild() const {
     return ArgumentNode::isVaild() && (m_x) && (m_z);
 }
 
+void Command::AxesNode::accept(Command::NodeVisitor *visitor) {
+    if (m_x)
+        m_x->accept(visitor);
+    if (m_y)
+        m_y->accept(visitor);
+    if (m_z)
+        m_z->accept(visitor);
+    visitor->visit(this);
+}
+
 QSharedPointer<Command::AxisNode> Command::AxesNode::x() const {
     return m_x;
 }

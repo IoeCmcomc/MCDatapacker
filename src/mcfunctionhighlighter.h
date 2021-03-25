@@ -11,8 +11,11 @@ class McfunctionHighlighter : public Highlighter
 public:
     McfunctionHighlighter(QTextDocument *parent = nullptr);
 
-protected:
+protected slots:
     void highlightBlock(const QString &text) override;
+    void rehighlightBlock(const QTextBlock &block,
+                          const QVector<QTextLayout::FormatRange> formats);
+
     void checkProblems() override;
 
 private:
@@ -23,6 +26,7 @@ private:
         QTextCharFormat    format;
     };
     QVector<HighlightingRule> highlightingRules;
+    QVector<QTextLayout::FormatRange> m_formats;
 
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;

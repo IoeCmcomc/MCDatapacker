@@ -15,6 +15,9 @@ public:
         NbtNode(int pos, int length,
                 const QString &parserId = "minecraft:nbt_tag");
         virtual QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         virtual tag_id id() const noexcept {
             return tag_id::tag_end;
         };
@@ -25,6 +28,9 @@ public:
 public:                                                       \
         explicit Class(int pos, int length, ValueType value); \
         QString toString() const override;                    \
+        void accept(NodeVisitor * visitor) override {         \
+            visitor->visit(this);                             \
+        }                                                     \
         nbt::tag_id id() const noexcept override;             \
     };
 
@@ -74,6 +80,9 @@ protected:
 public:                                                               \
         explicit Class(int pos, int length = 0);                      \
         QString toString() const override;                            \
+        void accept(NodeVisitor * visitor) override {                 \
+            visitor->visit(this);                                     \
+        }                                                             \
         nbt::tag_id id() const noexcept override;                     \
     };
 
@@ -85,8 +94,13 @@ public:                                                               \
 
     class NbtStringNode : public NbtNode {
 public:
-        explicit NbtStringNode(int pos, const QString &value);
+        explicit NbtStringNode(int pos,
+                               const QString &value,
+                               bool isQuote = false);
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         QString value() const;
         void setValue(const QString &v);
         nbt::tag_id id() const noexcept override;
@@ -98,6 +112,12 @@ private:
 public:
         explicit NbtListNode(int pos, int length = 0);
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            for (const auto &node: m_vector) {
+                node->accept(visitor);
+            }
+            visitor->visit(this);
+        }
         void append(QSharedPointer<NbtNode> node) override;
         nbt::tag_id id() const noexcept override;
         nbt::tag_id prefix() const;
@@ -114,6 +134,13 @@ public:
         NbtCompoundNode(int pos, int length = 0);
 
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
+                visitor->visit(i.key());
+                i.value()->accept(visitor);
+            }
+            visitor->visit(this);
+        }
 
         int size() const;
         bool contains(const QString &key) const;

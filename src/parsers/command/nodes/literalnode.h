@@ -9,9 +9,13 @@ namespace Command {
 public:
         explicit LiteralNode(int pos, const QString &txt);
 
-        QString toString() const;
+        QString toString() const override;
         QString text() const;
         void setText(const QString &text);
+
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
 
 private:
         QString m_text;

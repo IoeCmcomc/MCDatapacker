@@ -2,7 +2,10 @@
 #include <tuple>
 
 bool Command::MapKey::operator<(const Command::MapKey &other) const {
-    return std::tie(pos, text) < std::tie(other.pos, other.text);
+    if (sortByPos)
+        return std::tie(pos, text) < std::tie(other.pos, other.text);
+    else
+        return text < other.text;
 }
 
 const static int _ = qRegisterMetaType<QSharedPointer<Command::MapNode> >();

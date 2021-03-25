@@ -317,18 +317,44 @@ QString Command::Parser::getQuotedString() {
         if (m_pos >= m_text.length())
             error("Incomplete quoted string: %1" + value);
         if (backslash) {
-            if (m_curChar == curQuoteChar)
+            if (m_curChar == curQuoteChar) {
                 value += curQuoteChar;
-            else if (m_curChar == '\\')
-                value += '\\';
-            else if (m_curChar == 'n')
-                value += '\n';
-            else if (m_curChar == 'r')
-                value += '\r';
-            else if (m_curChar == 't')
-                value += '\t';
-            else
-                value += m_curChar;
+            } else {
+                switch (m_curChar.toLatin1()) {
+                case '\\': {
+                    value += '\\';
+                    break;
+                }
+
+                case 'b': {
+                    value += 'b';
+                    break;
+                }
+
+                case 'f': {
+                    value += 'f';
+                    break;
+                }
+
+                case 'n': {
+                    value += 'n';
+                    break;
+                }
+
+                case 't': {
+                    value += 't';
+                    break;
+                }
+
+                case 'r': {
+                    value += 'r';
+                    break;
+                }
+
+                default:
+                    value += m_curChar;
+                }
+            }
             backslash = false;
         } else if (m_curChar == '\\') {
             backslash = true;
@@ -434,10 +460,15 @@ QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal(
     int           start   = m_pos;
     const QString literal = getWithRegex(m_literalStrRegex);
     const int     typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
-    CacheKey      key{ typeId, literal };
+    CacheKey      key{ typeId, literal, start };
 
     if (m_cache.contains(key)) {
         return qSharedPointerCast<LiteralNode>(m_cache[key]);
+    } else if (key.pos = -1; m_cache.contains(key)) {
+        auto ret = QSharedPointer<LiteralNode>::create(*qSharedPointerCast<LiteralNode>(
+                                                           m_cache[key]));
+        ret->setPos(start);
+        return ret;
     } else {
         auto ret = QSharedPointer<Command::LiteralNode>::create(start, literal);
         m_cache.emplace(typeId, literal, ret);
@@ -461,7 +492,8 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
     } else if (type == "phrase") {
         if (m_curChar == '"' || m_curChar == '\'')
             return QSharedPointer<Command::StringNode>::create(m_pos,
-                                                               getQuotedString());
+                                                               getQuotedString(),
+                                                               true);
     } else if (type == "word") {
         const auto &literal = brigadier_literal();
         return Command::StringNode::fromLiteralNode(literal.get());
@@ -473,7 +505,7 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
  * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invaild \c ParseNode if an error occured.
  */
 QSharedPointer<Command::ParseNode> Command::Parser::parse() {
-    /*qDebug() << "Command::Parser::parse" << m_text; */
+    qDebug() << "Command::Parser::parse" << m_text;
     m_parsingResult = QSharedPointer<RootNode>::create(pos());
     QElapsedTimer timer;
     timer.start();
@@ -612,12 +644,15 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 parserIdToMethodName(parserId).toLatin1()
                 + QStringLiteral("(QVariantMap)").toLatin1());
             if (methodIndex != -1) {
-                /*qDebug() << "Argument parser ID:" << parserId; */
+                qDebug() << "Argument parser ID:" << parserId;
                 auto          method     = metaObject()->method(methodIndex);
                 int           returnType = method.returnType();
                 QElapsedTimer timer;
                 timer.start();
                 CacheKey key{ returnType, literal, startPos };
+
+                if (parserId == "minecraft:vec3")
+                    qDebug() << "vec3" << startPos << m_pos << m_curChar;
 
                 try {
                     if (m_cache.contains(key)) {
@@ -682,6 +717,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     errors << err;
                     int argLength = m_pos - startPos + 1;
                     setPos(startPos);
+                    found = false;
                     argLengths << argLength;
                 }
             } else {

@@ -18,6 +18,12 @@ public:
 
         TargetSelectorNode(int pos);
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            if (m_args) {
+                m_args->accept(visitor);
+            }
+            visitor->visit(this);
+        }
 
         Variable variable() const;
         void setVariable(const Variable &variable);

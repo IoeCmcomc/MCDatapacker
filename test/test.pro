@@ -22,4 +22,5 @@ SUBDIRS += unit/parser/command/nodes/ArgumentNode \
     unit/parser/command/nodes/TimeNode \
     unit/parser/command/nodes/UuidNode \
     unit/parser/command/Parser \
-    unit/parser/command/MinecraftParser
+    unit/parser/command/MinecraftParser \
+    unit/parser/command/visitors/NodeFormatter

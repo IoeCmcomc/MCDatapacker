@@ -19,6 +19,9 @@ public:
         NbtPathStepNode(int pos);
         QString toString() const override;
         bool isVaild() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
 
         QSharedPointer<StringNode> name() const;
         void setName(QSharedPointer<StringNode> name);
@@ -49,6 +52,11 @@ public:
         NbtPathNode(int pos);
         QString toString() const override;
         bool isVaild() const override;
+        void accept(NodeVisitor *visitor) override {
+            for (const auto &step: m_steps)
+                step->accept(visitor);
+            visitor->visit(this);
+        }
 
         bool isEmpty();
         int size();

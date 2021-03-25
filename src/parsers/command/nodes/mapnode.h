@@ -20,6 +20,8 @@ namespace Command {
     struct MapKey {
         int     pos = -1;
         QString text;
+        bool    isQuote   = false;
+        bool    sortByPos = true;
         bool operator<(const MapKey &other) const;
     };
     using ParseNodeMap = QMap<MapKey, QSharedPointer<ParseNode> >;
@@ -30,6 +32,13 @@ public:
         MapNode(int pos, int length = 0);
 
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
+                visitor->visit(i.key());
+                i.value()->accept(visitor);
+            }
+            visitor->visit(this);
+        }
 
         int size() const;
         bool contains(const QString &key) const;

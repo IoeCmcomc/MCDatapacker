@@ -86,6 +86,8 @@ SOURCES += \
     parsers/command/nodes/uuidnode.cpp \
     parsers/command/parsenodecache.cpp \
     parsers/command/parser.cpp \
+    parsers/command/visitors/nodeformatter.cpp \
+    parsers/command/visitors/nodevisitor.cpp \
     predicatedock.cpp \
     rawjsontextedit.cpp \
     settingsdialog.cpp \
@@ -164,6 +166,8 @@ HEADERS += \
     parsers/command/parsenodecache.h \
     parsers/command/parser.h \
     parsers/command/minecraftparser.h \
+    parsers/command/visitors/nodeformatter.h \
+    parsers/command/visitors/nodevisitor.h \
     predicatedock.h \
     rawjsontextedit.h \
     settingsdialog.h \

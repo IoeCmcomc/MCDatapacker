@@ -9,9 +9,13 @@ namespace Command {
     {
 public:
         explicit StringNode(int pos              = -1,
-                            const QString &value = "");
+                            const QString &value = "",
+                            bool isQuote         = false);
 
-        virtual QString toString() const;
+        virtual QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         QString value() const;
         void setValue(const QString &value);
 

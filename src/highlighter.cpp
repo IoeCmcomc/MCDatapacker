@@ -102,6 +102,7 @@ void Highlighter::highlightBlock(const QString &text) {
                     backslash = false;
                 } else if (curChar == QLatin1Char('\\')) {
                     backslash = true;
+                    quoteLength++;
                 } else if (currentBlockState() == QuotedString) {
                     quoteLength++;
                 } else if (currentBlockState() <= Normal) {
@@ -124,6 +125,21 @@ void Highlighter::highlightBlock(const QString &text) {
             setCurrentBlockUserData(data);
         }
     }
+}
+
+void Highlighter::mergeFormat(int start, int count,
+                              const QTextCharFormat &fmt) {
+    for (int i = 0; i < count; ++i) {
+        QTextCharFormat newFmt = format(start + i);
+        newFmt.merge(fmt);
+        setFormat(start + i, 1, std::move(newFmt));
+    }
+}
+
+void Highlighter::rehighlightBlock(const QTextBlock &block) {
+    m_highlightMunually = true;
+    QSyntaxHighlighter::rehighlightBlock(block);
+    m_highlightMunually = false;
 }
 
 QTextDocument *Highlighter::getParentDoc() const {

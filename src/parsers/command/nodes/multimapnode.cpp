@@ -11,13 +11,20 @@ Command::MultiMapNode::MultiMapNode(int pos, int length)
 QString Command::MultiMapNode::toString() const {
     QStringList itemReprs;
 
-    for (const auto &key: m_map.uniqueKeys()) {
+    const auto &keys = m_map.uniqueKeys();
+
+    for (auto key = keys.cbegin(); key != keys.cend(); key++) {
+        /*qDebug() << key->text << m_map.values(*key).count(); */
         QStringList valReprs;
-        for (const auto &value: m_map.values(key))
-            valReprs << value->toString();
-        itemReprs << QString("%1: (%2)").arg(key.text, valReprs.join(", "));
+        for (const auto &val: m_map.values(*key))
+            valReprs << val->toString();
+        itemReprs << QString("%1: (%2)").arg(key->text, valReprs.join(", "));
     }
-    return "MapNode(" + itemReprs.join("; ") + ')';
+/*
+      for (auto i = m_map.cbegin(); i != m_map.cend(); ++i)
+          qDebug() << i.key().text << *i.value();
+ */
+    return "MultiMapNode(" + itemReprs.join("; ") + ')';
 }
 
 int Command::MultiMapNode::size() const {

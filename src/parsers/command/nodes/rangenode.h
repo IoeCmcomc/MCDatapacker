@@ -20,6 +20,9 @@ public:
             : ArgumentNode(pos, length, parserId) {
             setExactValue(QSharedPointer<T>::create(pos, length, 0));
         };
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         QString format() const {
             if (hasMinValue() || hasMaxValue()) {
                 QStringList parts;

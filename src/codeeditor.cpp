@@ -181,8 +181,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 }
 
 bool CodeEditor::event(QEvent *event) {
-    if (event->type() == QEvent::HelpRequest) {
+    if (event->type() == QEvent::ToolTip) {
         /*QToolTip::hideText(); */
+        qDebug() << "QEvent::ToolTip";
 
         auto *helpEvent = static_cast<QHelpEvent*>(event);
         auto  globalPos = mapToGlobal(helpEvent->pos());
@@ -231,7 +232,7 @@ bool CodeEditor::event(QEvent *event) {
         } else {
             QToolTip::hideText();
         }
-        /*qDebug() << QToolTip::text() << QToolTip::isVisible(); */
+        qDebug() << QToolTip::text() << QToolTip::isVisible();
 
         return true;
     } else {
@@ -242,7 +243,7 @@ bool CodeEditor::event(QEvent *event) {
 void CodeEditor::onCursorPositionChanged() {
     /*qDebug() << "CodeEditor::onCursorPositionChanged"; */
     setExtraSelections({});
-    highlightCurrentLine();
+    /*highlightCurrentLine(); */
     matchParentheses();
     problemSelectionStartIndex = extraSelections().size() - 1;
     if (!problemExtraSelections.isEmpty()) {
@@ -437,9 +438,6 @@ void CodeEditor::updateErrorSelections() {
                     selection.format.setToolTip(problem->message);
                     problemExtraSelections << selection;
                 }
-                blockSignals(true); /* Prevents infinite recursion */
-                curHighlighter->rehighlightBlock(it);
-                blockSignals(false);
 /*
               qDebug() << "Line" << it.blockNumber()
                        << ", has error:"

@@ -12,6 +12,14 @@ public:
         MultiMapNode(int pos, int length = 0);
 
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            for (const auto &key: m_map.uniqueKeys()) {
+                visitor->visit(key);
+                for (const auto &value: m_map.values(key))
+                    value->accept(visitor);
+            }
+            visitor->visit(this);
+        }
 
         int size() const;
         bool contains(const MapKey &key) const;

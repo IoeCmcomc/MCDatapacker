@@ -1,9 +1,13 @@
 #ifndef PARSENODE_H
 #define PARSENODE_H
 
+#include "../visitors/nodevisitor.h"
+
 #include <QDebug>
 
 namespace Command {
+    class NodeVisitor;
+
     class ParseNode
     {
 public:
@@ -17,6 +21,8 @@ public:
 
         int length() const;
         void setLength(int length);
+
+        virtual void accept(NodeVisitor *visitor);
 
 private:
         int m_pos    = 0;

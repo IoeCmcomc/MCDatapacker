@@ -19,6 +19,10 @@ void Command::ParseNode::setLength(int length) {
     m_length = length;
 }
 
+void Command::ParseNode::accept(Command::NodeVisitor *visitor) {
+    visitor->visit(this);
+}
+
 int Command::ParseNode::length() const {
     return m_length;
 }

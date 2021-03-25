@@ -53,6 +53,8 @@ Command::BlockPredicateNode::BlockPredicateNode(Command::BlockStateNode *other)
     : Command::BlockStateNode(other->pos(), other->nspace(), other->id()) {
     setParserId("minecraft:block_predicate");
     setLength(other->length());
+    setStates(other->states());
+    setNbt(other->nbt());
 }
 
 QString Command::BlockPredicateNode::toString() const {

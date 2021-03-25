@@ -2,6 +2,7 @@
 
 #include <QColor>
 #include <QDebug>
+#include <QAbstractTextDocumentLayout>
 
 
 JsonHighlighter::JsonHighlighter(QTextDocument *parent)
@@ -83,5 +84,9 @@ void JsonHighlighter::checkProblems() {
                 data->setProblem(error);
             }
         }
+        document()->blockSignals(true);
+        rehighlightBlock(block);
+        document()->blockSignals(false);
+        emit document()->documentLayout()->updateBlock(block);
     }
 }

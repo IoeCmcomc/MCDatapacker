@@ -75,6 +75,10 @@ public:
 
     virtual void checkProblems() = 0;
 
+public:
+    using QSyntaxHighlighter::rehighlightBlock;
+    void rehighlightBlock(const QTextBlock &block);
+
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
     QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
@@ -83,8 +87,11 @@ protected:
     friend class CodeEditor;
 
     void highlightBlock(const QString &text);
+    void mergeFormat(int start, int count, const QTextCharFormat &fmt);
 
 private:
+    QVector<QTextBlock> m_changedBlocks;
+    bool m_highlightMunually             = false;
     QRegularExpression namespacedIdRegex =
         QRegularExpression(QStringLiteral(
                                R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+\b)"));

@@ -12,6 +12,9 @@ public:
         ComponentNode(int pos, int length);
         QString toString() const override;
         bool isVaild() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
 
         nlohmann::json value() const;
         void setValue(const nlohmann::json &value);

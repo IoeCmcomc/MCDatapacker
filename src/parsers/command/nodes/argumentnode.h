@@ -11,6 +11,10 @@ public:
 
         virtual QString toString() const override;
         QString parserId() const;
+
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
 protected:
         void setParserId(const QString &parserId);
 

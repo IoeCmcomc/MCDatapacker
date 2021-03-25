@@ -9,7 +9,10 @@ namespace Command {
 public:
         explicit DoubleNode(int pos = -1, int length = 0, double value = 0);
 
-        QString toString() const;
+        QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         double value() const;
         void setValue(double value);
 

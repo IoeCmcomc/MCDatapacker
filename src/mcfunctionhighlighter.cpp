@@ -1,6 +1,8 @@
 #include "mcfunctionhighlighter.h"
 #include "codeeditor.h"
 
+#include "parsers/command/visitors/nodeformatter.h"
+
 #include <QDebug>
 #include <QElapsedTimer>
 
@@ -133,15 +135,6 @@ void McfunctionHighlighter::setupRules() {
 void McfunctionHighlighter::highlightBlock(const QString &text) {
     Highlighter::highlightBlock(text);
     if (this->document()) {
-        for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
-            QRegularExpressionMatchIterator matchIterator =
-                rule.pattern.globalMatch(text);
-            while (matchIterator.hasNext()) {
-                QRegularExpressionMatch match = matchIterator.next();
-                setFormat(match.capturedStart(), match.capturedLength(),
-                          rule.format);
-            }
-        }
         auto *data = static_cast<TextBlockData*>(currentBlockUserData());
 
         if (!data)
@@ -155,9 +148,43 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
             fmt.setToolTip(info->link);
             setFormat(info->start, info->length, fmt);
         }
+
+        if (m_formats.isEmpty()) {
+            for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
+                QRegularExpressionMatchIterator matchIterator =
+                    rule.pattern.globalMatch(text);
+                while (matchIterator.hasNext()) {
+                    QRegularExpressionMatch match = matchIterator.next();
+/*
+                      qDebug() << "Regex:" << rule.format <<
+                          rule.format.background() <<
+                          rule.format.foreground();
+ */
+                    setFormat(match.capturedStart(), match.capturedLength(),
+                              rule.format);
+                }
+            }
+        } else {
+            for (const auto &range: m_formats) {
+/*
+                  qDebug() << "Fmter:" << range.format <<
+                      range.format.background() <<
+                      range.format.toolTip();
+ */
+                mergeFormat(range.start, range.length, range.format);
+            }
+        }
     }
 
     setCurrentBlockState(0);
+}
+
+void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
+                                             const QVector<QTextLayout::FormatRange> formats)
+{
+    m_formats = formats;
+    QSyntaxHighlighter::rehighlightBlock(block);
+    m_formats.clear();
 }
 
 void McfunctionHighlighter::checkProblems() {
@@ -177,6 +204,13 @@ void McfunctionHighlighter::checkProblems() {
             result = parser.parse();
             if (result->isVaild()) {
                 data->setProblem(std::nullopt);
+
+                Command::NodeFormatter formatter;
+                result->accept(&formatter);
+                qDebug() << "rehighlight manually" << block.firstLineNumber();
+                document()->blockSignals(true);
+                rehighlightBlock(block, formatter.formatRanges());
+                document()->blockSignals(false);
 
                 qDebug() << "Size:" << parser.cache().size() << '/' <<
                     parser.cache().capacity()

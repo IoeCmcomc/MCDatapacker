@@ -1,5 +1,7 @@
 #include "rootnode.h"
 
+#include "literalnode.h"
+
 static int _ = qRegisterMetaType<QSharedPointer<Command::RootNode> >();
 
 Command::RootNode::RootNode(int pos) : Command::ParseNode(pos) {
@@ -15,6 +17,13 @@ QString Command::RootNode::toString() const {
             ret += ", ";
     }
     return ret + ')';
+}
+
+void Command::RootNode::accept(Command::NodeVisitor *visitor) {
+    for (const auto &child: m_children) {
+        child->accept(visitor);
+    }
+    visitor->visit(this);
 }
 
 bool Command::RootNode::isEmpty() {

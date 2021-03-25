@@ -10,6 +10,7 @@ public:
         explicit RootNode(int pos);
 
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override;
 
         bool isEmpty();
         int size();

@@ -9,7 +9,10 @@ namespace Command {
 public:
         explicit BoolNode(int pos = -1, bool value = false);
 
-        QString toString() const;
+        QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         bool value() const;
         void setValue(bool value);
 

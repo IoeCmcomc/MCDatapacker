@@ -31,6 +31,7 @@ QVariantToParseNodeSharedPointer(const QVariant &vari) {
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(IntRangeNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ItemStackNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(MapNode)
+    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(MultiMapNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(EntityArgumentValueNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtByteArrayNode)
@@ -169,6 +170,7 @@ QSharedPointer<Command::AxesNode> Command::MinecraftParser::parseAxes(
     this->eat(' ');
     axes->setZ(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
                                        peekLiteral(), options, isLocal));
+    axes->setLength(pos() - axes->pos());
     return axes;
 }
 
@@ -182,6 +184,8 @@ parseCompoundTag() {
 }
 
 QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
+    const int startPos = pos();
+
     switch (curChar().toLatin1()) {
     case '{': {
         return parseCompoundTag();
@@ -213,8 +217,9 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
 
     case '"':
     case '\'': {
-        return QSharedPointer<Command::NbtStringNode>::create(pos(),
-                                                              getQuotedString());
+        return QSharedPointer<Command::NbtStringNode>::create(startPos,
+                                                              getQuotedString(),
+                                                              true);
     }
 
     default: {
@@ -222,10 +227,13 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
             return parseNumericTag();
         } else if (const auto &boolean = brigadier_bool(); boolean->isVaild()) {
             return QSharedPointer<Command::NbtByteNode>::create(
-                pos(), boolean->length(), boolean->value());
+                startPos, boolean->length(), boolean->value());
         } else {
+            const QString value = getWithCharset("a-zA-Z0-9-_.");
+            if (value.isEmpty())
+                error("Invaild empty tag value");
             return QSharedPointer<Command::NbtStringNode>::create(
-                pos(), getWithCharset("a-zA-Z0-9-_."));
+                startPos, value);
         }
     }
     }
@@ -347,12 +355,15 @@ parseEntityAdvancements() {
                                                   const QString &key) -> QSharedPointer<ParseNode> {
         if (this->curChar() == '{') {
             return parseMap<MapNode, BoolNode>('{', '}', '=', [this](
-                                                   const QString &key) {
+                                                   const QString &key) ->
+                                               QSharedPointer<Command::BoolNode>
+            {
                 auto ret = brigadier_bool();
                 if (ret->isVaild())
                     return ret;
                 else
                     this->error(QString("Argument value must be boolean"));
+                return nullptr;
             }, false, R"(a-zA-z0-9-_:/)");
         } else {
             auto ret = brigadier_bool();
@@ -360,7 +371,9 @@ parseEntityAdvancements() {
                 return ret;
             else
                 this->error(QString("Argument value must be boolean"));
+            return nullptr;
         }
+        return nullptr;
     },
                                               false,
                                               R"(a-zA-z0-9-_:/)");
@@ -409,16 +422,16 @@ parseEntityArguments() {
                 advance();
             int curPos = pos();
             QString literal;
-            if (curChar() == '"')
+            bool isQuote = false;
+            if (curChar() == '"' || curChar() == '\'') {
                 literal = getQuotedString();
-            else
+                isQuote = true;
+            } else {
                 literal = this->getWithCharset("0-9a-zA-Z-_");
+            }
             return QSharedPointer<EntityArgumentValueNode>::create(
-                QSharedPointer<Command::StringNode>
-                ::create(
-                    curPos,
-                    literal),
-                isNegative);
+                QSharedPointer<Command::StringNode>::create(
+                    curPos, literal, isQuote), isNegative);
         } else if (key == "type") {
             bool isNegative = curChar() == '!';
             if (isNegative)
@@ -512,8 +525,9 @@ parseNbtPathStep() {
 
     switch (curChar().toLatin1()) {
     case '"': {
-        ret->setName(QSharedPointer<StringNode>::create(pos(),
-                                                        getQuotedString()));
+        ret->setName(QSharedPointer<StringNode>::create(ret->pos(),
+                                                        getQuotedString(),
+                                                        true));
         if (curChar() == '{')
             ret->setFilter(minecraft_nbtCompoundTag());
         break;
@@ -543,12 +557,12 @@ parseNbtPathStep() {
     }
 
     default: {
-        ret->setName(QSharedPointer<Command::StringNode>::create(pos(),
+        ret->setName(QSharedPointer<Command::StringNode>::create(ret->pos(),
                                                                  getWithCharset(
                                                                      "a-zA-Z0-9_")));
         /*qDebug() << "After key" << ret->name()->value(); */
         if (ret->name()->value().isEmpty())
-            error(QString("Invaild NBT pat key name"));
+            error(QString("Invaild NBT path key"));
         if (curChar() == '{')
             ret->setFilter(minecraft_nbtCompoundTag());
     };
@@ -559,7 +573,7 @@ parseNbtPathStep() {
         ret->setHasTrailingDot(true);
     }
     /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
-    ret->setLength(pos() - ret->pos() + 1);
+    ret->setLength(pos() - ret->pos());
     /*qDebug() << ret->toString() << ret->index(); */
     return ret;
 }
@@ -608,10 +622,12 @@ minecraft_blockPredicate(
         isTag = true;
         advance();
     }
-    auto blockState = minecraft_blockState();
-    auto ret        = QSharedPointer<BlockPredicateNode>::create(
+    const auto blockState = minecraft_blockState();
+    const auto ret        = QSharedPointer<BlockPredicateNode>::create(
         blockState.get());
     ret->setIsTag(isTag);
+    ret->setPos(ret->pos() - isTag);
+    ret->setLength(pos() - ret->pos());
     return ret;
 }
 
@@ -654,7 +670,7 @@ minecraft_component(const QVariantMap &props) {
         QVariant vari;
         auto     ret =
             QSharedPointer<Command::ComponentNode>::create(curPos,
-                                                           pos() - curPos + 1);
+                                                           pos() - curPos);
         ret->setValue(j);
         return ret;
     }  catch (const json::parse_error &err) {
@@ -687,10 +703,8 @@ QSharedPointer<Command::EntityNode> Command::MinecraftParser::minecraft_entity(
         } else {
             setPos(curPos);
             QString literal;
-            if (props.contains("charset")) {
-            }
-            getWithCharset((props.contains(
-                                "charset")) ? props["charset"].toString() : "0-9a-zA-Z_");
+            literal = getWithCharset((props.contains(
+                                          "charset")) ? props["charset"].toString() : "0-9a-zA-Z_");
             if (literal.isEmpty()) {
                 this->error(QString("Invaild empty player name"));
             }
@@ -847,6 +861,7 @@ minecraft_itemPredicate(const QVariantMap &props) {
     auto itemStack = minecraft_itemStack();
     auto ret       = QSharedPointer<ItemPredicateNode>::create(itemStack.get());
     ret->setIsTag(isTag);
+    ret->setPos(ret->pos() - isTag);
     return ret;
 }
 
@@ -1097,7 +1112,7 @@ QSharedPointer<Command::TimeNode> Command::MinecraftParser::minecraft_time(
         break;
     }
     }
-    return QSharedPointer<Command::TimeNode>::create(curPos, pos() - curPos + 1,
+    return QSharedPointer<Command::TimeNode>::create(curPos, pos() - curPos,
                                                      number->value(), unit);
 }
 

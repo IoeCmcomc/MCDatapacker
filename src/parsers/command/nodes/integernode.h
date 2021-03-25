@@ -10,6 +10,9 @@ public:
         explicit IntegerNode(int pos = -1, int length = 0, int value = 0);
 
         QString toString() const;
+        void accept(NodeVisitor *visitor) override {
+            visitor->visit(this);
+        }
         int value() const;
         void setValue(int value);
 

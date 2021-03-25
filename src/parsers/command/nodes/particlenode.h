@@ -12,6 +12,13 @@ public:
         ParticleColorNode(int pos);
         QString toString() const override;
         bool isVaild() const override;
+        void accept(NodeVisitor *visitor) override {
+            m_r->accept(visitor);
+            m_g->accept(visitor);
+            m_b->accept(visitor);
+            m_size->accept(visitor);
+            visitor->visit(this);
+        }
 
         QSharedPointer<FloatNode> r() const;
         void setR(QSharedPointer<FloatNode> r);
@@ -39,6 +46,11 @@ public:
                      const QString &id);
         ParticleNode(ResourceLocationNode *other);
         QString toString() const override;
+        void accept(NodeVisitor *visitor) override {
+            if (m_params)
+                m_params->accept(visitor);
+            visitor->visit(this);
+        }
 
         QSharedPointer<ParseNode> params() const;
         void setParams(QSharedPointer<BlockStateNode> params);

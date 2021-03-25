@@ -54,8 +54,10 @@ DEFINE_ARRAY_NBTNODE(NbtLongArrayNode, tag_longarray)
 
 static const int _NbtStringNode =
     qRegisterMetaType<QSharedPointer<Command::NbtStringNode> >();
-Command::NbtStringNode::NbtStringNode(int pos, const QString &value)
-    : Command::NbtNode(pos, value.length()) {
+Command::NbtStringNode::NbtStringNode(int pos,
+                                      const QString &value,
+                                      bool isQuote)
+    : Command::NbtNode(pos, value.length() + (isQuote * 2)) {
     setValue(value);
 }
 QString Command::NbtStringNode::toString() const {
@@ -80,12 +82,8 @@ Command::NbtListNode::NbtListNode(int pos, int length)
 QString Command::NbtListNode::toString() const {
     QStringList items;
 
-    int c = 0;
-
     for (const auto &node: m_vector) {
-        /*qDebug() << "NbtListNode::toString" << c << node; */
         items << node->toString();
-        ++c;
     }
     return QString("NbtListNode(%1)").arg(items.join(", "));
 }
@@ -116,16 +114,9 @@ Command::NbtCompoundNode::NbtCompoundNode(int pos, int length)
 QString Command::NbtCompoundNode::toString() const {
     QStringList itemReprs;
 
-    int c = 0;
-
     for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
-/*
-          qDebug() << "NbtCompoundNode::toString" << c << i.key().text <<
-              i.value();
- */
         itemReprs << QString("%1: %2").arg(i.key().text,
                                            i.value()->toString());
-        ++c;
     }
     return "MapNode(" + itemReprs.join(", ") + ')';
 }

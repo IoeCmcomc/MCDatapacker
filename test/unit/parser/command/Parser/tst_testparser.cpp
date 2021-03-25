@@ -51,30 +51,30 @@ void TestParser::parseBool() {
     Parser                   parser(this, "true");
     QSharedPointer<BoolNode> result(parser.brigadier_bool());
 
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), true);
 
     parser.setText("false");
     result = QSharedPointer<BoolNode>(parser.brigadier_bool());
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), false);
 
     parser.setText("false");
     result = QSharedPointer<BoolNode>(parser.brigadier_bool());
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), false);
 
 
     parser.setText("simp");
     result = QSharedPointer<BoolNode>(parser.brigadier_bool());
-    QCOMPARE(result->isVaild(), false);
+    QVERIFY(!result->isVaild());
 }
 
 void TestParser::parseDouble() {
     Parser                     parser(this, "3.1415926535897932");
     QSharedPointer<DoubleNode> result(parser.brigadier_double());
 
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), 3.1415926535897932);
 }
 
@@ -83,7 +83,7 @@ void TestParser::parseFloat() {
     QSharedPointer<FloatNode> result(parser.brigadier_float({ { "max",
                                                                 100 } }));
 
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QVERIFY(qFuzzyCompare(result->value(), (float)99.9));
 }
 
@@ -92,7 +92,7 @@ void TestParser::parseInteger() {
     QSharedPointer<IntegerNode> result(
         parser.brigadier_integer({ { "min", 1000000 } }));
 
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), 66771508);
 }
 
@@ -147,19 +147,19 @@ void TestParser::parseString() {
     QSharedPointer<StringNode> result(
         parser.brigadier_string({ { "type", "word" } }));
 
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), "firstWord");
 
     parser.setText("cho xin it da cuoi");
     result = QSharedPointer<StringNode>(
         parser.brigadier_string({ { "type", "greedy" } }));
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), "cho xin it da cuoi");
 
     parser.setText("\"Speed Upgrade for Blocks\"");
     result = QSharedPointer<StringNode>(
         parser.brigadier_string({ { "type", "phrase" } }));
-    QCOMPARE(result->isVaild(), true);
+    QVERIFY(result->isVaild());
     QCOMPARE(result->value(), "Speed Upgrade for Blocks");
 }
 
