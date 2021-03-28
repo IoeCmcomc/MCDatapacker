@@ -425,8 +425,13 @@ void CodeEditor::updateErrorSelections() {
 
         for (auto it = document()->firstBlock();
              it != document()->end(); it = it.next()) {
+            /*qDebug() << it.blockNumber(); */
             if (TextBlockData *data =
                     dynamic_cast<TextBlockData *>(it.userData())) {
+/*
+                  qDebug() << it.blockNumber() << data <<
+                      data->problem().has_value();
+ */
                 if (std::optional<ProblemInfo> problem =
                         data->problem(); problem) {
                     QTextEdit::ExtraSelection selection;

@@ -37,25 +37,20 @@ void JsonHighlighter::setupRules() {
 }
 
 void JsonHighlighter::highlightBlock(const QString &text) {
-    /*qDebug() << "JsonHighlighter::highlightBlock"; */
+    qDebug() << "JsonHighlighter::highlightBlock" << text;
+    Highlighter::highlightBlock(text);
     if (this->document()) {
-        if (jsonErr.error == QJsonParseError::NoError) {
-            /*qDebug() << "Highlight normally"; */
-            for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
-                QRegularExpressionMatchIterator matchIterator =
-                    rule.pattern.globalMatch(text);
-                while (matchIterator.hasNext()) {
-                    QRegularExpressionMatch match = matchIterator.next();
-                    setFormat(match.capturedStart(),
-                              match.capturedLength(),
-                              rule.format);
-                }
+        for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
+            QRegularExpressionMatchIterator matchIterator =
+                rule.pattern.globalMatch(text);
+            while (matchIterator.hasNext()) {
+                QRegularExpressionMatch match = matchIterator.next();
+                setFormat(match.capturedStart(),
+                          match.capturedLength(),
+                          rule.format);
             }
         }
     }
-
-    setCurrentBlockState(0);
-    Highlighter::highlightBlock(text);
 }
 
 void JsonHighlighter::checkProblems() {
@@ -83,10 +78,8 @@ void JsonHighlighter::checkProblems() {
 
                 data->setProblem(error);
             }
+            /*qDebug() << data << (bool)data->problem(); */
         }
-        document()->blockSignals(true);
-        rehighlightBlock(block);
-        document()->blockSignals(false);
-        emit document()->documentLayout()->updateBlock(block);
+        /*emit document()->documentLayout()->updateBlock(block); */
     }
 }
