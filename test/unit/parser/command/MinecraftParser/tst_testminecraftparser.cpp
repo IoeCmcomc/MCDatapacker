@@ -39,7 +39,8 @@ TestMinecraftParser::~TestMinecraftParser() {
 }
 
 void TestMinecraftParser::initTestCase() {
-    MinecraftParser::setSchema(":/minecraft/info/commands.json");
+    Command::MinecraftParser::setSchema(
+        ":/minecraft/1.15/mcdata/generated/reports/commands.json");
     for (int i = 1024; i < 2000; ++i) {
         QMetaType metatype(i);
         if (metatype.isRegistered()) {

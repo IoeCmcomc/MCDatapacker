@@ -21,11 +21,14 @@
 
 
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
+QVersionNumber              MainWindow::curGameVersion = QVersionNumber(1, 15);
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    Command::MinecraftParser::setSchema(":/minecraft/info/commands.json");
+    Command::MinecraftParser::setSchema(
+        ":/minecraft/" + MainWindow::curGameVersion.toString() +
+        "/mcdata/generated/reports/commands.json");
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                    MainWindow::readMCRInfo(QStringLiteral(
@@ -332,6 +335,10 @@ void MainWindow::changeEvent(QEvent* event) {
 void MainWindow::commitData(QSessionManager &) {
 }
 
+QVersionNumber MainWindow::getCurGameVersion() {
+    return curGameVersion;
+}
+
 void MainWindow::updateWindowTitle(bool changed) {
     QStringList titleParts;
 
@@ -355,7 +362,8 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
 {
     QMap<QString, QVariant> retMap;
 
-    QFileInfo finfo = QFileInfo(":minecraft/info/" + type + ".json");
+    QFileInfo finfo = QFileInfo(
+        ":minecraft/" + curGameVersion.toString() + "/" + type + ".json");
 
     if (!(finfo.exists() && finfo.isFile())) {
         qWarning() << "File not exists:" << finfo.path() << "Return empty.";
@@ -366,7 +374,7 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
     QByteArray data = inFile.readAll();
     inFile.close();
 
-    QJsonParseError errorPtr{};
+    QJsonParseError errorPtr;
     QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
         qWarning() << "Parse failed" << errorPtr.error;

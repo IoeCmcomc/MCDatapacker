@@ -1110,18 +1110,6 @@
         <file>texture/effect/water_breathing.png</file>
         <file>texture/effect/weakness.png</file>
         <file>texture/effect/wither.png</file>
-        <file>info/biome.json</file>
-        <file>info/block.json</file>
-        <file>info/dimension.json</file>
-        <file>info/effect.json</file>
-        <file>info/enchantment.json</file>
-        <file>info/feature.json</file>
-        <file>info/fluid.json</file>
-        <file>info/item.json</file>
-        <file>info/tag/block.json</file>
-        <file>info/tag/entity_type.json</file>
-        <file>info/tag/fluid.json</file>
-        <file>info/tag/item.json</file>
         <file>texture/biome/badlands.png</file>
         <file>texture/biome/badlands_plateau.png</file>
         <file>texture/biome/bamboo_jungle.png</file>
@@ -1197,10 +1185,5 @@
         <file>texture/biome/wooded_badlands_plateau.png</file>
         <file>texture/biome/wooded_hills.png</file>
         <file>texture/biome/wooded_mountains.png</file>
-        <file>info/entity.json</file>
-        <file>info/stat_type.json</file>
-        <file>info/attribute.json</file>
-        <file>info/map_icon.json</file>
-        <file>info/commands.json</file>
     </qresource>
 </RCC>

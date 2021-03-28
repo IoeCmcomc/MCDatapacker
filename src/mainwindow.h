@@ -13,6 +13,7 @@
 #include <QFileSystemWatcher>
 #include <QMessageBox>
 #include <QDir>
+#include <QVersionNumber>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,6 +34,9 @@ public:
     void readPrefSettings(QSettings &settings);
     static QVariantMap readMCRInfo(const QString &type = "block",
                                    const int depth     = 0);
+
+
+    static QVersionNumber getCurGameVersion();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -64,7 +68,7 @@ private:
     Ui::MainWindow *ui;
 
     static QMap<QString, QVariantMap> MCRInfoMaps;
-    VisualRecipeEditorDock *visualRecipeEditorDock;
+    VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
     QLocale curLocale;
     QFileSystemWatcher fileWatcher;
     QTranslator m_translator;
@@ -72,6 +76,7 @@ private:
     QMessageBox *uniqueMessageBox            = nullptr;
     LootTableEditorDock *lootTableEditorDock = nullptr;
     PredicateDock *predicateDock             = nullptr;
+    static QVersionNumber curGameVersion;
 
     void readSettings();
     void writeSettings();

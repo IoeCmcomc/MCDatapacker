@@ -100,4 +100,7 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../../../../lib/liblib.a
 message($$INCLUDEPATH)
 
 RESOURCES += \
-    ../../../../../../resource/minecraft/minecraft.qrc
+    ../../../../../../resource/minecraft/info/1.15/1.15.qrc
+
+DISTFILES += \
+    ../../../../../../resource/minecraft/info/1.15/mcdata/generated/reports/commands.json

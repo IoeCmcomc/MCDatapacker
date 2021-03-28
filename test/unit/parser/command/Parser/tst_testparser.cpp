@@ -35,7 +35,8 @@ TestParser::~TestParser() {
 }
 
 void TestParser::initTestCase() {
-    Parser::setSchema(":/minecraft/info/commands.json");
+    Parser::setSchema(
+        ":/minecraft/1.15/mcdata/generated/reports/commands.json");
 }
 
 void TestParser::cleanupTestCase() {

@@ -78,7 +78,6 @@ void JsonHighlighter::checkProblems() {
 
                 data->setProblem(error);
             }
-            /*qDebug() << data << (bool)data->problem(); */
         }
         /*emit document()->documentLayout()->updateBlock(block); */
     }
