@@ -89,6 +89,8 @@ void SettingsDialog::onAccepted() {
     settings.setValue("locale", ui->languageCombo->currentData().toString());
     settings.setValue("reloadExternChanges",
                       ui->reloadExternChangesCombo->currentIndex());
+    settings.setValue("gameVersion",
+                      ui->gameVersionCombo->currentText());
     settings.endGroup();
     settings.beginGroup("editor");
     settings.setValue("textSize", ui->editorTextSizeSpin->value());

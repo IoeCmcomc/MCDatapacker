@@ -1185,5 +1185,10 @@
         <file>texture/biome/wooded_badlands_plateau.png</file>
         <file>texture/biome/wooded_hills.png</file>
         <file>texture/biome/wooded_mountains.png</file>
+        <file>texture/biome/basalt_deltas.png</file>
+        <file>texture/biome/crimson_forest.png</file>
+        <file>texture/biome/nether_wastes.png</file>
+        <file>texture/biome/soul_sand_valley.png</file>
+        <file>texture/biome/warped_forest.png</file>
     </qresource>
 </RCC>

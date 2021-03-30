@@ -234,6 +234,19 @@ void MainWindow::readPrefSettings(QSettings &settings) {
     /*qDebug() << settings.value("locale", "").toString(); */
     loadLanguage(settings.value("locale", "").toString(), true);
 
+    if (settings.value("gameVersion",
+                       "1.15").toString() != getCurGameVersion().toString()) {
+        MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
+                                       MainWindow::readMCRInfo(QStringLiteral(
+                                                                   "block")));
+        MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
+                                       MainWindow::readMCRInfo(QStringLiteral(
+                                                                   "item")));
+    }
+    MainWindow::curGameVersion =
+        QVersionNumber::fromString(settings.value("gameVersion",
+                                                  "1.15").toString());
+
     settings.endGroup();
     ui->codeEditorInterface->getEditor()->readPrefSettings();
 }
@@ -357,13 +370,15 @@ void MainWindow::updateWindowTitle(bool changed) {
     this->setWindowModified(changed);
 }
 
-QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
-                                                [[maybe_unused]] const int depth)
-{
-    QMap<QString, QVariant> retMap;
+QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,
+                                    [[maybe_unused]] const int depth) {
+    QVariantMap retMap;
 
     QFileInfo finfo = QFileInfo(
-        ":minecraft/" + curGameVersion.toString() + "/" + type + ".json");
+        ":minecraft/" + ver + "/" + type + ".json");
+
+    if (!finfo.exists())
+        finfo.setFile(":minecraft/1.15/" + type + ".json");
 
     if (!(finfo.exists() && finfo.isFile())) {
         qWarning() << "File not exists:" << finfo.path() << "Return empty.";
@@ -386,13 +401,23 @@ QMap<QString, QVariant> MainWindow::readMCRInfo(const QString &type,
         return retMap;
     }
 
-    QMap<QString, QVariant> tmpMap2;
+    if (root.contains("base")) {
+        const auto &tmpMap = MainWindow::readMCRInfo(type,
+                                                     root["base"].toString(),
+                                                     depth);
+        retMap.insert(std::move(tmpMap));
+        root.remove("base");
+    }
+    if (root.contains("removed"))
+        for (const auto &keyRef: root["removed"].toArray()) {
+            const QString &key = keyRef.toString();
+            if (retMap.contains(key))
+                retMap.remove(key);
+        }
     if (root.contains("added"))
-        tmpMap2 = root["added"].toVariant().toMap();
+        retMap.insert(root["added"].toVariant().toMap());
     else
-        tmpMap2 = root.toVariantMap();
-    if (!tmpMap2.isEmpty())
-        retMap.insert(tmpMap2);
+        retMap.insert(root.toVariantMap());
     return retMap;
 }
 

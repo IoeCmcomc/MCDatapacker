@@ -30,11 +30,11 @@ public:
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
-    static QMap<QString, QVariant> &getMCRInfo(const QString &type);
+    static QVariantMap &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings);
     static QVariantMap readMCRInfo(const QString &type = "block",
-                                   const int depth     = 0);
-
+                                   const QString &ver = curGameVersion.toString(),
+                                   const int depth    = 0);
 
     static QVersionNumber getCurGameVersion();
 

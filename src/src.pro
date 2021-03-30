@@ -212,6 +212,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     ../resource/app/app.qrc \
     ../resource/minecraft/info/1.15/1.15.qrc \
+    ../resource/minecraft/info/1.16/1.16.qrc \
     ../resource/minecraft/minecraft.qrc
 
 RC_ICONS = ../resource/app/icon/favicon.ico

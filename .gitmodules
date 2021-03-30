@@ -13,3 +13,6 @@
 [submodule "resource/minecraft/info/1.15/mcdata"]
 	path = resource/minecraft/info/1.15/mcdata
 	url = git@github.com:Arcensoth/mcdata.git
+[submodule "resource/minecraft/info/1.16/mcdata"]
+	path = resource/minecraft/info/1.16/mcdata
+	url = git@github.com:Arcensoth/mcdata.git

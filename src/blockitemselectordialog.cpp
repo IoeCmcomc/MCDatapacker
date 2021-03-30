@@ -66,8 +66,8 @@ void BlockItemSelectorDialog::setupListView() {
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->listView->setModel(&filterModel);
 
-    auto MCRItemInfo  = MainWindow::getMCRInfo("item");
-    auto MCRBlockInfo = MainWindow::getMCRInfo("block");
+    const auto &MCRItemInfo  = MainWindow::getMCRInfo("item");
+    const auto &MCRBlockInfo = MainWindow::getMCRInfo("block");
 
     QMap<QString,
          QVariant>::const_iterator blockIter = MCRBlockInfo.constBegin();
