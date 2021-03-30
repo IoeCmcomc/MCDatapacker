@@ -3,6 +3,8 @@
 
 #include "mainwindow.h"
 
+#include <QtWin>
+#include <QOperatingSystemVersion>
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -13,6 +15,21 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
+
+    if (QOperatingSystemVersion::current() <
+        QOperatingSystemVersion::Windows8) {
+        /* Set styling options relevant only to Windows 7. */
+        if (QtWin::isCompositionEnabled()) {
+            QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
+            setAttribute(Qt::WA_TranslucentBackground, true);
+            setAttribute(Qt::WA_NoSystemBackground, false);
+            setStyleSheet(QStringLiteral(
+                              "SettingsDialog, QTabWidget { background: transparent; }"));
+        } else {
+            QtWin::resetExtendedFrame(this);
+            setAttribute(Qt::WA_TranslucentBackground, false);
+        }
+    }
 
     setupLanguageSetting();
 
@@ -87,8 +104,15 @@ void SettingsDialog::onAccepted() {
 void SettingsDialog::initSettings() {
     QSettings settings;
 
+    settings.beginGroup("general");
     ui->reloadExternChangesCombo->setCurrentIndex
-        (settings.value("general/reloadExternChanges", 0).toInt());
+        (settings.value("reloadExternChanges", 0).toInt());
+
+    for (const auto &finfo: QDir(":/minecraft").entryInfoList({ "1.*" }))
+        ui->gameVersionCombo->addItem(finfo.fileName());
+    ui->gameVersionCombo->setCurrentText(settings.value("gameVersion",
+                                                        0).toString());
+    settings.endGroup();
 
     settings.beginGroup("editor");
     ui->editorTextSizeSpin->setValue(settings.value("textSize", 13).toInt());
