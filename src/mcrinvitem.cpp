@@ -9,9 +9,16 @@
 #include <QApplication>
 #include <QGraphicsColorizeEffect>
 
+char _init() {
+    qRegisterMetaType<MCRInvItem>();
+    qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
+    QMetaType::registerComparators<MCRInvItem>();
+    return 0;
+};
+const auto _ = _init();
+
 MCRInvItem::MCRInvItem(const QString &id) {
 /*    qDebug() << "Calling normal constructor" << this; */
-    init();
     setEmpty(id.isEmpty());
     if (!isEmpty()) {
         setNamespacedID(id);
@@ -20,13 +27,11 @@ MCRInvItem::MCRInvItem(const QString &id) {
 
 MCRInvItem::MCRInvItem() {
     /*qDebug() << "Calling void constructor" << this; */
-    init();
     setEmpty(true);
 }
 
 MCRInvItem::MCRInvItem(const MCRInvItem &other) {
 /*    qDebug() << "Calling copy constructor" << this; */
-    init();
     setEmpty(other.isEmpty());
     if (!isEmpty()) {
         setNamespacedID(other.getNamespacedID());
@@ -38,107 +43,23 @@ MCRInvItem::~MCRInvItem() {
     /*qDebug() << this << "is going to be deleted."; */
 }
 
-void MCRInvItem::init() {
-    qRegisterMetaType<MCRInvItem>();
-    if (!QMetaType::hasRegisteredDebugStreamOperator<MCRInvItem>())
-        qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
-    if (!QMetaType::hasRegisteredComparators<MCRInvItem>())
-        QMetaType::registerComparators<MCRInvItem>();
-}
-
 void MCRInvItem::setupItem(QString id) {
     QString iconpath;
     QPixmap iconpix;
 
     Glhp::removePrefix(id, QStringLiteral("minecraft:"));
 
-    if (id == QStringLiteral("debug_stick")) {
-        iconpath = QStringLiteral(":minecraft/texture/item/stick.png");
+    if (id.endsWith(QStringLiteral("banner_pattern"))) {
+        iconpath = ":/minecraft/texture/item/banner_pattern.png";
         iconpix  = QPixmap(iconpath);
-    } else if (id == QStringLiteral("enchanted_golden_apple")) {
-        iconpath = QStringLiteral(":minecraft/texture/item/golden_apple.png");
-        iconpix  = QPixmap(iconpath);
-    } else if (id == QStringLiteral("potion") ||
-               id == QStringLiteral("lingering_potion")
-               || id == QStringLiteral("splash_potion")) {
-        QPixmap overlay = QPixmap(":minecraft/texture/item/potion_overlay.png");
-        {
-            QPainter painter(&overlay);
-            painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-            painter.setOpacity(0.5);
-            painter.setBackgroundMode(Qt::OpaqueMode);
-            painter.fillRect(overlay.rect(),
-                             QBrush(QColor(QStringLiteral("#CA00CA"))));
-            painter.end();
-        }
-        iconpix = QPixmap(QStringLiteral(
-                              ":minecraft/texture/item/") + id +
-                          QStringLiteral(".png"));
-        {
-            QPainter painter(&iconpix);
-            painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-            painter.drawPixmap(overlay.rect(), overlay);
-            painter.end();
-        }
-    } else if (id == QStringLiteral("leather_boots")
-               || id == QStringLiteral("leather_chestplate")
-               || id == QStringLiteral("leather_helmet")
-               || id == QStringLiteral("leather_leggings")
-               || id == QStringLiteral("leather_horse_armor")) {
-        iconpix = QPixmap(QStringLiteral(
-                              ":minecraft/texture/item/") + id +
-                          QStringLiteral(".png"));
-        {
-            QPainter painter(&iconpix);
-/*
-              painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-              painter.setOpacity(0.83);
-              painter.setBackgroundMode(Qt::OpaqueMode);
-              painter.fillRect(iconpix.rect(), QBrush(QColor("#A06540")));
- */
-            painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-            QPixmap overlay = QPixmap(
-                QStringLiteral(":minecraft/texture/item/") + id + QStringLiteral(
-                    "_overlay.png"));
-            painter.drawPixmap(overlay.rect(), overlay);
-            painter.end();
-        }
-    } else if (id == QStringLiteral("firework_star")) {
-        QPixmap overlay = QPixmap(
-            QStringLiteral(":minecraft/texture/item/firework_star_overlay.png"));
-        iconpix =
-            QPixmap(QStringLiteral(":minecraft/texture/item/firework_star.png"));
-        {
-            QPainter painter(&iconpix);
-            painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-            painter.drawPixmap(overlay.rect(), overlay);
-            painter.end();
-        }
-    } else if (id == QStringLiteral("tipped_arrow")) {
-        QPixmap overlay = QPixmap(
-            QStringLiteral(":minecraft/texture/item/tipped_arrow_head.png"));
-        {
-            QPainter painter(&overlay);
-            painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-            painter.setOpacity(0.5);
-            painter.setBackgroundMode(Qt::OpaqueMode);
-            painter.fillRect(overlay.rect(),
-                             QBrush(QColor(QStringLiteral("#CA00CA"))));
-            painter.end();
-        }
-        iconpix =
-            QPixmap(QStringLiteral(":minecraft/texture/item/tipped_arrow.png"));
-        {
-            QPainter painter(&iconpix);
-            painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-            painter.drawPixmap(overlay.rect(), overlay);
-            painter.end();
-        }
     } else {
         iconpath = QStringLiteral(":minecraft/texture/item/") + id +
+                   QStringLiteral(".png");
+        iconpix = QPixmap(iconpath);
+    }
+
+    if (!iconpix) {
+        iconpath = QStringLiteral(":minecraft/texture/inv_item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
     }
@@ -148,41 +69,6 @@ void MCRInvItem::setupItem(QString id) {
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
     }
-
-    if (!iconpix) {
-        if (id.endsWith(QStringLiteral("_spawn_egg"))) {
-            iconpix =
-                QPixmap(QStringLiteral(":minecraft/texture/item/spawn_egg.png"));
-            {
-                QPainter painter(&iconpix);
-                painter.setCompositionMode(
-                    QPainter::CompositionMode_DestinationOver);
-                QPixmap overlay = QPixmap(
-                    QStringLiteral(
-                        ":minecraft/texture/item/spawn_egg_overlay.png"));
-                painter.drawPixmap(overlay.rect(), overlay);
-                painter.end();
-            }
-        }
-    }
-
-/*
-      if(id == "vine") {
-          {
-              QPainter painter(&iconpix);
-              //painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-              painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-              //QBrush brush = QBrush(QColor("#7748B518").darker(200));
-              QColor color = QColor("#7748B518");
-              //color.setHsv(color.hue(), color.saturation(), color.value()/2, color.alpha());
-              color.setHsv(color.hue(), qMin(color.saturation(), 1), color.value()*1, color.alpha());
-              qDebug() << color;
-              QBrush brush = QBrush(color);
-              painter.fillRect(iconpix.rect(), brush);
-              painter.end();
-          }
-      }
- */
 
     if (!iconpix) {
         /*qWarning() << "unknown ID: " + id; */
@@ -215,8 +101,8 @@ void MCRInvItem::setupItem(QString id) {
     }
     setPixmap(iconpix);
 
-    auto MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
-    auto MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+    const auto MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
+    const auto MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
     if (MCRItemInfo.contains(id)) {
         setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
                                                         "name")).toString());

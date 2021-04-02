@@ -10,7 +10,6 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::BlockItemSelectorDialog) {
     ui->setupUi(this);
-
     /*
        setStyleSheet(
        "#listView {"
@@ -69,11 +68,9 @@ void BlockItemSelectorDialog::setupListView() {
     const auto &MCRItemInfo  = MainWindow::getMCRInfo("item");
     const auto &MCRBlockInfo = MainWindow::getMCRInfo("block");
 
-    QMap<QString,
-         QVariant>::const_iterator blockIter = MCRBlockInfo.constBegin();
-    QMap<QString,
-         QVariant>::const_iterator itemIter = MCRItemInfo.constBegin();
-    int                            c        = 0;
+    auto blockIter = MCRBlockInfo.constBegin();
+    auto itemIter  = MCRItemInfo.constBegin();
+    int  c         = 0;
     while ((blockIter != MCRBlockInfo.constEnd())
            || (itemIter != MCRItemInfo.constEnd())) {
         if (blockIter.value().toMap().contains("unobtainable")) {
@@ -83,8 +80,9 @@ void BlockItemSelectorDialog::setupListView() {
                 ++itemIter;
             continue;
         }
-        auto key = (blockIter != MCRBlockInfo.constEnd())
+        const auto key = (blockIter != MCRBlockInfo.constEnd())
                        ? blockIter.key() : itemIter.key();
+        /*qDebug() << key << c; */
         MCRInvItem invItem(key);
         auto      *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
@@ -94,7 +92,9 @@ void BlockItemSelectorDialog::setupListView() {
         vari.setValue(invItem);
         item->setData(vari, Qt::UserRole + 1);
         item->setToolTip(invItem.toolTip());
+        /*qDebug() << item << vari; */
         model.appendRow(item);
+        /*qDebug() << "appended" << c; */
         ++c;
         if (blockIter != MCRBlockInfo.constEnd())
             ++blockIter;

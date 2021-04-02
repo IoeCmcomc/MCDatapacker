@@ -16,5 +16,7 @@
         <file>mcdata/generated/reports/blocks.json</file>
         <file>mcdata/generated/reports/commands.json</file>
         <file>mcdata/generated/reports/registries.json</file>
+        <file>block.json</file>
+        <file>item.json</file>
     </qresource>
 </RCC>

@@ -14,8 +14,6 @@ public:
     MCRInvItem(const MCRInvItem &other);
     ~MCRInvItem();
 
-    void init();
-
     MCRInvItem &operator=(const MCRInvItem &other);
     bool operator==(const MCRInvItem &other);
     bool operator==(const MCRInvItem &other) const;

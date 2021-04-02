@@ -13,6 +13,9 @@
   <property name="acceptDrops">
    <bool>true</bool>
   </property>
+  <property name="windowTitle">
+   <string>Items in slot</string>
+  </property>
   <property name="frameShape">
    <enum>QFrame::StyledPanel</enum>
   </property>

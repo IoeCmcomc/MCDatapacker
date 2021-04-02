@@ -5,9 +5,6 @@
 
 #include <QtWin>
 #include <QOperatingSystemVersion>
-#include <QDebug>
-#include <QDir>
-#include <QFileInfo>
 #include <QFontDatabase>
 #include <QSettings>
 
@@ -18,7 +15,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     if (QOperatingSystemVersion::current() <
         QOperatingSystemVersion::Windows8) {
-        /* Set styling options relevant only to Windows 7. */
         if (QtWin::isCompositionEnabled()) {
             QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
             setAttribute(Qt::WA_TranslucentBackground, true);

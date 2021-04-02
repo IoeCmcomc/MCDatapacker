@@ -7,13 +7,10 @@
 #include "mainwindow.h"
 #include "globalhelpers.h"
 
-#include <QStandardItem>
-#include <QPushButton>
 #include <QMenu>
-#include <QWidgetAction>
 #include <QScreen>
-#include <QMouseEvent>
-#include <QMimeData>
+#include <QtWin>
+#include <QOperatingSystemVersion>
 
 MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     QFrame(parent),
@@ -24,6 +21,25 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     this->initPos = QCursor::pos();
 
     setWindowFlags(Qt::Popup);
+
+    if (QOperatingSystemVersion::current() <
+        QOperatingSystemVersion::Windows8) {
+        if (QtWin::isCompositionEnabled()) {
+/*
+              setWindowFlags(Qt::Dialog
+                             | Qt::WindowStaysOnTopHint
+                             | Qt::CustomizeWindowHint);
+ */
+            QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
+            setAttribute(Qt::WA_TranslucentBackground, true);
+            setAttribute(Qt::WA_NoSystemBackground, false);
+            setStyleSheet(QStringLiteral(
+                              "MCRInvSlotEditor, QGroupBox { background: transparent; }"));
+        } else {
+            QtWin::resetExtendedFrame(this);
+            setAttribute(Qt::WA_TranslucentBackground, false);
+        }
+    }
 
     if (slot->getAcceptTag()) {
         auto *newBtnMenu = new QMenu(ui->newButton);
@@ -52,16 +68,13 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
             &QItemSelectionModel::selectionChanged,
             this,
             &MCRInvSlotEditor::checkRemove);
-    connect(ui->removeButton,
-            &QPushButton::clicked,
-            this,
-            &MCRInvSlotEditor::onRemoveItem);
+    connect(ui->removeButton, &QPushButton::clicked,
+            this, &MCRInvSlotEditor::onRemoveItem);
 
     checkRemove();
 }
 
 MCRInvSlotEditor::~MCRInvSlotEditor() {
-/*    qDebug() << this << "is going to be deleted."; */
     delete ui;
 }
 
@@ -132,7 +145,7 @@ void MCRInvSlotEditor::onNewItemTag() {
 }
 
 void MCRInvSlotEditor::checkRemove() {
-    auto indexes = ui->listView->selectionModel()->selectedIndexes();
+    const auto indexes = ui->listView->selectionModel()->selectedIndexes();
 
     ui->removeButton->setDisabled(indexes.isEmpty());
 }

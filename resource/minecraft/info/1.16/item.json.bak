@@ -1,0 +1,68 @@
+{
+	"base": "1.15",
+    "added": {
+        "hoglin_spawn_egg": {
+            "name": "Hoglin Spawn Egg"
+        },
+        "music_disc_pigstep": {
+            "name": "Music Disc (Pigstep)"
+        },
+        "netherite_axe": {
+            "name": "Netherite Axe"
+        },
+        "netherite_boots": {
+            "name": "Netherite Boots"
+        },
+        "netherite_chestplate": {
+            "name": "Netherite Chestplate"
+        },
+        "netherite_helmet": {
+            "name": "Netherite Helmet"
+        },
+        "netherite_hoe": {
+            "name": "Netherite Hoe"
+        },
+        "netherite_ingot": {
+            "name": "Netherite Ingot"
+        },
+        "netherite_leggings": {
+            "name": "Netherite Leggings"
+        },
+        "netherite_pickaxe": {
+            "name": "Netherite Pickaxe"
+        },
+        "netherite_scrap": {
+            "name": "Netherite Scrap"
+        },
+        "netherite_shovel": {
+            "name": "Netherite Shovel"
+        },
+        "netherite_sword": {
+            "name": "Netherite Sword"
+        },
+        "piglin_banner_pattern": {
+            "name": "Banner Pattern (Snout)"
+        },
+        "piglin_spawn_egg": {
+            "name": "Piglin Spawn Egg"
+        },
+        "piglin_brute_spawn_egg": {
+            "name": "Piglin Brute Spawn Egg"
+        },
+        "strider_spawn_egg": {
+            "name": "Strider Spawn Egg"
+        },
+        "warped_fungus_on_a_stick": {
+            "name": "Warped Fungus on a Stick"
+        },
+        "zoglin_spawn_egg": {
+            "name": "Zoglin Spawn Egg"
+        },
+        "zombified_piglin_spawn_egg": {
+            "name": "Zombified Piglin Spawn Egg"
+        }
+    },
+    "removed: [
+    	"zombie_pigman_spawn_egg"
+    }
+}

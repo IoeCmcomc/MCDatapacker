@@ -233,15 +233,18 @@ void MainWindow::readPrefSettings(QSettings &settings) {
     settings.beginGroup("general");
     /*qDebug() << settings.value("locale", "").toString(); */
     loadLanguage(settings.value("locale", "").toString(), true);
+    const QString gameVer = settings.value("gameVersion", "1.15").toString();
 
-    if (settings.value("gameVersion",
-                       "1.15").toString() != getCurGameVersion().toString()) {
+    if (gameVer != getCurGameVersion().toString()) {
+        qDebug() << "Game version was changed to" << gameVer;
         MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                        MainWindow::readMCRInfo(QStringLiteral(
-                                                                   "block")));
+                                                                   "block"),
+                                                               gameVer));
         MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
                                        MainWindow::readMCRInfo(QStringLiteral(
-                                                                   "item")));
+                                                                   "item"),
+                                                               gameVer));
     }
     MainWindow::curGameVersion =
         QVersionNumber::fromString(settings.value("gameVersion",
@@ -377,6 +380,8 @@ QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,
     QFileInfo finfo = QFileInfo(
         ":minecraft/" + ver + "/" + type + ".json");
 
+    qDebug() << "readMCRInfo" << type << ver << finfo << finfo.exists();
+
     if (!finfo.exists())
         finfo.setFile(":minecraft/1.15/" + type + ".json");
 
@@ -384,6 +389,7 @@ QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,
         qWarning() << "File not exists:" << finfo.path() << "Return empty.";
         return retMap;
     }
+    qDebug() << finfo;
     QFile inFile(finfo.filePath());
     inFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray data = inFile.readAll();
