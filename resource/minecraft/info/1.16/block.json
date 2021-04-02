@@ -1,0 +1,295 @@
+{
+	"base": "1.15",
+    "added": {
+        "ancient_debris": {
+            "name": "Ancient Debris"
+        },
+        "bamboo_sapling": {
+            "name": "Bamboo Shoot",
+            "unobtainable": true
+        },
+        "basalt": {
+            "name": "Basalt"
+        },
+        "blackstone": {
+            "name": "Blackstone"
+        },
+        "blackstone_slab": {
+            "name": "Blackstone Slab"
+        },
+        "blackstone_stairs": {
+            "name": "Blackstone Stairs"
+        },
+        "blackstone_wall": {
+            "name": "Blackstone Wall"
+        },
+        "bubble_column": {
+            "name": "Bubble Column"
+        },
+        "chain": {
+            "name": "Chain"
+        },
+        "chiseled_nether_bricks": {
+            "name": "Chiseled Nether Bricks"
+        },
+        "chiseled_polished_blackstone": {
+            "name": "Chiseled Polished Blackstone"
+        },
+        "cocoa": {
+            "name": "Cocoa"
+        },
+        "cracked_nether_bricks": {
+            "name": "Cracked Nether Bricks"
+        },
+        "cracked_polished_blackstone_bricks": {
+            "name": "Cracked Polished Blackstone Bricks"
+        },
+        "crimson_button": {
+            "name": "Crimson Button"
+        },
+        "crimson_door": {
+            "name": "Crimson Door"
+        },
+        "crimson_fence_gate": {
+            "name": "Crimson Fence Gate"
+        },
+        "crimson_fence": {
+            "name": "Crimson Fence"
+        },
+        "crimson_fungus": {
+            "name": "Crimson Fungus"
+        },
+        "crimson_hyphae": {
+            "name": "Crimson Hyphae"
+        },
+        "crimson_nylium": {
+            "name": "Crimson Nylium"
+        },
+        "crimson_planks": {
+            "name": "Crimson Planks"
+        },
+        "crimson_pressure_plate": {
+            "name": "Crimson Pressure Plate"
+        },
+        "crimson_roots": {
+            "name": "Crimson Roots"
+        },
+        "crimson_sign": {
+            "name": "Crimson Sign"
+        },
+        "crimson_slab": {
+            "name": "Crimson Slab"
+        },
+        "crimson_stairs": {
+            "name": "Crimson Stairs"
+        },
+        "crimson_stem": {
+            "name": "Crimson Stem"
+        },
+        "crimson_trapdoor": {
+            "name": "Crimson Trapdoor"
+        },
+        "crimson_wall_sign": {
+            "name": "Crimson Wall Sign",
+            "unobtainable": true
+        },
+        "crying_obsidian": {
+            "name": "Crying Obsidian"
+        },
+        "dead_fire_coral_fan": {
+            "name": "Dead Fire Coral Fan"
+        },
+        "dead_horn_coral_fan": {
+            "name": "Dead Horn Coral Fan"
+        },
+        "dead_tube_coral_fan": {
+            "name": "Dead Tube Coral Fan"
+        },
+        "fire_coral_fan": {
+            "name": "Fire Coral Fan"
+        },
+        "gilded_blackstone": {
+            "name": "Gilded Blackstone"
+        },
+        "hopper": {
+            "name": "Hopper"
+        },
+        "horn_coral_fan": {
+            "name": "Horn Coral Fan"
+        },
+        "lodestone": {
+            "name": "Lodestone"
+        },
+        "nether_gold_ore": {
+            "name": "Nether Gold Ore"
+        },
+        "nether_sprouts": {
+            "name": "Nether Sprouts"
+        },
+        "netherite_block": {
+            "name": "Block of Netherite"
+        },
+        "polished_basalt": {
+            "name": "Polished Basalt"
+        },
+        "polished_blackstone": {
+            "name": "Polished Blackstone"
+        },
+        "polished_blackstone_brick_slab": {
+            "name": "Polished Blackstone Brick Slab"
+        },
+        "polished_blackstone_brick_stairs": {
+            "name": "Polished Blackstone Brick Stairs"
+        },
+        "polished_blackstone_brick_wall": {
+            "name": "Polished Blackstone Brick Wall"
+        },
+        "polished_blackstone_bricks": {
+            "name": "Polished Blackstone Bricks"
+        },
+        "polished_blackstone_button": {
+            "name": "Polished Blackstone Button"
+        },
+        "polished_blackstone_pressure_plate": {
+            "name": "Polished Blackstone Pressure Plate"
+        },
+        "polished_blackstone_slab": {
+            "name": "Polished Blackstone Slab"
+        },
+        "polished_blackstone_stairs": {
+            "name": "Polished Blackstone Stairs"
+        },
+        "polished_blackstone_wall": {
+            "name": "Polished Blackstone Wall"
+        },
+        "potted_crimson_fungus": {
+            "name": "Potted Crimson Fungus",
+            "unobtainable": true
+        },
+        "potted_crimson_roots": {
+            "name": "Potted Crimson Roots",
+            "unobtainable": true
+        },
+        "potted_warped_fungus": {
+            "name": "Potted Warped Fungus",
+            "unobtainable": true
+        },
+        "potted_warped_roots": {
+            "name": "Potted Warped Roots",
+            "unobtainable": true
+        },
+        "quartz_bricks": {
+            "name": "Quartz Bricks"
+        },
+        "respawn_anchor": {
+            "name": "Respawn Anchor"
+        },
+        "shroomlight": {
+            "name": "Shroomlight"
+        },
+        "soul_campfire": {
+            "name": "Soul Campfire"
+        },
+        "soul_fire": {
+            "name": "Soul Fire",
+            "unobtainable": true
+        },
+        "soul_lantern": {
+            "name": "Soul Lantern"
+        },
+        "soul_soil": {
+            "name": "Soul Soil"
+        },
+        "soul_torch": {
+            "name": "Soul Torch"
+        },
+        "soul_wall_torch": {
+            "name": "Soul Wall Torch",
+            "unobtainable": true
+        },
+        "stripped_crimson_hyphae": {
+            "name": "Stripped Crimson Hyphae"
+        },
+        "stripped_crimson_stem": {
+            "name": "Stripped Crimson Stem"
+        },
+        "stripped_warped_hyphae": {
+            "name": "Stripped Warped Hyphae"
+        },
+        "stripped_warped_stem": {
+            "name": "Stripped Warped Stem"
+        },
+        "target": {
+            "name": "Target"
+        },
+        "tube_coral_fan": {
+            "name": "Tube Coral Fan"
+        },
+        "twisting_vines": {
+            "name": "Twisting Vines"
+        },
+        "twisting_vines_plant": {
+            "name": "Twisting Vines Plant",
+            "unobtainable": true
+        },
+        "warped_button": {
+            "name": "Warped Button"
+        },
+        "warped_door": {
+            "name": "Warped Door"
+        },
+        "warped_fence_gate": {
+            "name": "Warped Fence Gate"
+        },
+        "warped_fence": {
+            "name": "Warped Fence"
+        },
+        "warped_fungus": {
+            "name": "Warped Fungus"
+        },
+        "warped_hyphae": {
+            "name": "Warped Hyphae"
+        },
+        "warped_nylium": {
+            "name": "Warped Nylium"
+        },
+        "warped_planks": {
+            "name": "Warped Planks"
+        },
+        "warped_pressure_plate": {
+            "name": "Warped Pressure Plate"
+        },
+        "warped_roots": {
+            "name": "Warped Roots"
+        },
+        "warped_sign": {
+            "name": "Warped Sign"
+        },
+        "warped_slab": {
+            "name": "Warped Slab"
+        },
+        "warped_stairs": {
+            "name": "Warped Stairs"
+        },
+        "warped_stem": {
+            "name": "Warped Stem"
+        },
+        "warped_trapdoor": {
+            "name": "Warped Trapdoor"
+        },
+        "warped_wall_sign": {
+            "name": "Warped Wall Sign",
+            "unobtainable": true
+        },
+        "warped_wart_block": {
+            "name": "Warped Wart Block"
+        },
+        "weeping_vines": {
+            "name": "Weeping Vines"
+        },
+        "weeping_vines_plant": {
+            "name": "Weeping Vines Plant",
+            "unobtainable": true
+        }
+    }
+}
