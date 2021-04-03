@@ -31,6 +31,7 @@ protected slots:
     void onNewItemTag();
     void checkRemove();
     void onRemoveItem();
+    void close();
 
 private:
     Ui::MCRInvSlotEditor *ui;

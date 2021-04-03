@@ -18,6 +18,7 @@
 #include <QGuiApplication>
 #include <QFileInfo>
 #include <QCloseEvent>
+#include <QProcess>
 
 
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
@@ -229,27 +230,52 @@ void MainWindow::readSettings() {
     readPrefSettings(settings);
 }
 
-void MainWindow::readPrefSettings(QSettings &settings) {
+void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     settings.beginGroup("general");
     /*qDebug() << settings.value("locale", "").toString(); */
     loadLanguage(settings.value("locale", "").toString(), true);
     const QString gameVer = settings.value("gameVersion", "1.15").toString();
 
     if (gameVer != getCurGameVersion().toString()) {
-        qDebug() << "Game version was changed to" << gameVer;
-        MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
-                                       MainWindow::readMCRInfo(QStringLiteral(
-                                                                   "block"),
-                                                               gameVer));
-        MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
-                                       MainWindow::readMCRInfo(QStringLiteral(
-                                                                   "item"),
-                                                               gameVer));
-    }
-    MainWindow::curGameVersion =
-        QVersionNumber::fromString(settings.value("gameVersion",
-                                                  "1.15").toString());
+        if (fromDialog) {
+            QMessageBox msgBox(QMessageBox::Warning,
+                               tr("Changing game version"),
+                               tr(
+                                   "The game version has been changed from %1 to %2\n"
+                                   "The program need to restart to apply the changes.")
+                               .arg(
+                                   getCurGameVersion().toString(), gameVer));
+            QPushButton* restartBtn = msgBox.addButton(tr("Restart"),
+                                                       QMessageBox::YesRole);
+            msgBox.setDefaultButton(restartBtn);
+            msgBox.addButton(tr("Keep"), QMessageBox::NoRole);
 
+            msgBox.exec();
+            if (msgBox.clickedButton() == restartBtn) {
+                const int restartExitCode = 2020;
+                qApp->exit(restartExitCode);
+
+                QProcess process;
+                process.startDetached(qApp->arguments()[0], qApp->arguments());
+            } else {
+                settings.setValue("gameVersion",
+                                  getCurGameVersion().toString());
+            }
+        } else {
+            qDebug() << "Game version was changed to" << gameVer;
+            MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
+                                           MainWindow::readMCRInfo(
+                                               QStringLiteral(
+                                                   "block"),
+                                               gameVer));
+            MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
+                                           MainWindow::readMCRInfo(
+                                               QStringLiteral(
+                                                   "item"),
+                                               gameVer));
+            MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
+        }
+    }
     settings.endGroup();
     ui->codeEditorInterface->getEditor()->readPrefSettings();
 }

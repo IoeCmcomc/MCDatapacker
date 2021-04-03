@@ -9,8 +9,6 @@
 
 #include <QMenu>
 #include <QScreen>
-#include <QtWin>
-#include <QOperatingSystemVersion>
 
 MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     QFrame(parent),
@@ -21,25 +19,6 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     this->initPos = QCursor::pos();
 
     setWindowFlags(Qt::Popup);
-
-    if (QOperatingSystemVersion::current() <
-        QOperatingSystemVersion::Windows8) {
-        if (QtWin::isCompositionEnabled()) {
-/*
-              setWindowFlags(Qt::Dialog
-                             | Qt::WindowStaysOnTopHint
-                             | Qt::CustomizeWindowHint);
- */
-            QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
-            setAttribute(Qt::WA_TranslucentBackground, true);
-            setAttribute(Qt::WA_NoSystemBackground, false);
-            setStyleSheet(QStringLiteral(
-                              "MCRInvSlotEditor, QGroupBox { background: transparent; }"));
-        } else {
-            QtWin::resetExtendedFrame(this);
-            setAttribute(Qt::WA_TranslucentBackground, false);
-        }
-    }
 
     if (slot->getAcceptTag()) {
         auto *newBtnMenu = new QMenu(ui->newButton);
@@ -103,8 +82,7 @@ void MCRInvSlotEditor::mousePressEvent(QMouseEvent *event) {
 /*    qDebug() << "mousePressEvent" << event; */
     if ((!rect().contains(event->pos()))
         || (event->buttons() ^ Qt::LeftButton)) {
-        slot->update();
-        deleteLater();
+        close();
     }
     QFrame::mousePressEvent(event);
 }
@@ -175,6 +153,11 @@ void MCRInvSlotEditor::onRemoveItem() {
     show();
     ui->groupBox->setTitle(tr("Items") +
                            QString(" (%1)").arg(model.rowCount()));
+}
+
+void MCRInvSlotEditor::close() {
+    slot->update();
+    deleteLater();
 }
 
 void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {

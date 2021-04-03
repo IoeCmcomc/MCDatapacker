@@ -96,7 +96,7 @@ void SettingsDialog::onAccepted() {
                       ui->commentToggleModeRadio->isChecked());
     settings.endGroup();
 
-    qobject_cast<MainWindow*>(parent())->readPrefSettings(settings);
+    qobject_cast<MainWindow*>(parent())->readPrefSettings(settings, true);
 }
 
 void SettingsDialog::initSettings() {
