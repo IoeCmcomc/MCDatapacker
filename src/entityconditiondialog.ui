@@ -14,13 +14,6 @@
    <string>Entity condition</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Entity type:</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="2" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
@@ -28,6 +21,13 @@
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Entity type:</string>
      </property>
     </widget>
    </item>
@@ -49,7 +49,7 @@
    <item row="1" column="0" colspan="4">
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <property name="tabSpacing">
       <number>4</number>
@@ -59,8 +59,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>662</width>
-        <height>514</height>
+        <width>658</width>
+        <height>482</height>
        </rect>
       </property>
       <attribute name="label">
@@ -353,8 +353,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>662</width>
-        <height>514</height>
+        <width>658</width>
+        <height>482</height>
        </rect>
       </property>
       <attribute name="label">
@@ -455,8 +455,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>662</width>
-        <height>514</height>
+        <width>637</width>
+        <height>499</height>
        </rect>
       </property>
       <attribute name="label">
@@ -764,6 +764,36 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="fishingHook">
+      <attribute name="label">
+       <string>Fishing hook</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="TrueFalseBox" name="inOpenWaterCheck">
+         <property name="text">
+          <string>In open water</string>
+         </property>
+         <property name="tristate">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -776,14 +806,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>DialogDataButton</class>
-   <extends>QLabel</extends>
-   <header location="global">dialogdatabutton.h</header>
-  </customwidget>
-  <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
    <header location="global">truefalsebox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DialogDataButton</class>
+   <extends>QLabel</extends>
+   <header location="global">dialogdatabutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

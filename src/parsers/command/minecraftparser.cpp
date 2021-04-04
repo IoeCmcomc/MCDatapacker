@@ -21,6 +21,7 @@ QVariantToParseNodeSharedPointer(const QVariant &vari) {
 
     unsigned short int typeId = vari.userType();
     QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(AxisNode)
+    QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(AngleNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(AxesNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(BlockStateNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ComponentNode)
@@ -576,6 +577,14 @@ parseNbtPathStep() {
     ret->setLength(pos() - ret->pos());
     /*qDebug() << ret->toString() << ret->index(); */
     return ret;
+}
+
+QSharedPointer<Command::AngleNode> Command::MinecraftParser::minecraft_angle(
+    const QVariantMap &props) {
+    bool       _    = false;
+    const auto axis = parseAxis(AxisParseOption::NoOption, _);
+
+    return QSharedPointer<Command::AngleNode>::create(axis.get());
 }
 
 QSharedPointer<Command::BlockPosNode> Command::MinecraftParser::

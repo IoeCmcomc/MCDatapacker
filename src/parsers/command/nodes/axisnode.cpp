@@ -1,6 +1,7 @@
 #include "axisnode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::AxisNode> >();
+int _  = qRegisterMetaType<QSharedPointer<Command::AxisNode> >();
+int _1 = qRegisterMetaType<QSharedPointer<Command::AngleNode> >();
 
 Command::AxisNode::AxisNode(int pos, int length,
                             Command::AxisNode::AxisType type,
@@ -75,4 +76,13 @@ Command::AxisNode::Number Command::AxisNode::value() const {
 
 void Command::AxisNode::setValue(const Number &value) {
     m_value = value;
+}
+
+Command::AngleNode::AngleNode(Command::AxisNode *other)
+    : Command::AxisNode(other->pos(), other->length(), other->type(), 0) {
+    setValue(other->value());
+}
+
+QString Command::AngleNode::toString() const {
+    return AxisNode::toString().replace(0, 8, "AngleNode");
 }

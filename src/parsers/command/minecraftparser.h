@@ -126,6 +126,8 @@ private:
         QSharedPointer<Command::NbtPathStepNode> parseNbtPathStep();
 
         /* Direct parsing methods */
+        Q_INVOKABLE QSharedPointer<Command::AngleNode> minecraft_angle(
+            const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::BlockPosNode> minecraft_blockPos(
             const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::BlockStateNode> minecraft_blockState(

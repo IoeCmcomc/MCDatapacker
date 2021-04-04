@@ -9,8 +9,7 @@
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
-    auto typeFlag = NumericInput::Exact
-                    | NumericInput::Range;
+    const auto typeFlag = NumericInput::ExactAndRange;
     ui->absDistanceInput->setTypes(typeFlag);
     ui->horizDistanceInput->setTypes(typeFlag);
     ui->xDistanceInput->setTypes(typeFlag);
@@ -134,9 +133,11 @@ QJsonObject EntityConditionDialog::toJson() const {
     if (!effects.isEmpty())
         root.insert(QStringLiteral("effects"), effects);
 
-    if ((ui->entityTypeCombo->currentIndex() == 0)
-        || (ui->entityTypeCombo->currentData(Qt::UserRole + 1).toString() ==
-            QStringLiteral("minecraft:player"))) {
+    const QString &entityId = ui->entityTypeCombo->currentData(
+        Qt::UserRole + 1).toString();
+    const bool isNotSelected = ui->entityTypeCombo->currentIndex() == 0;
+
+    if (isNotSelected || (entityId == QStringLiteral("minecraft:player"))) {
         QJsonObject player;
         if (ui->gameModeCombo->currentIndex() != 0)
             player.insert(QStringLiteral("gamemode"),
@@ -185,7 +186,14 @@ QJsonObject EntityConditionDialog::toJson() const {
         if (!player.isEmpty())
             root.insert(QStringLiteral("player"), player);
     }
-    ;
+
+    if (isNotSelected ||
+        (entityId == QStringLiteral("minecraft:fishing_bobber"))) {
+        QJsonObject fishingHook;
+        ui->inOpenWaterCheck->insertToJsonObject(fishingHook, "in_open_water");
+        if (!fishingHook.isEmpty())
+            root["fishing_hook"] = fishingHook;
+    }
 
     return root;
 }
@@ -321,6 +329,10 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
             }
         }
     }
+    if (value.contains(QStringLiteral("fishing_hook"))) {
+        auto fishingHook = value[QStringLiteral("fishing_hook")].toObject();
+        ui->inOpenWaterCheck->setupFromJsonObject(fishingHook, "in_open_water");
+    }
 }
 
 void EntityConditionDialog::onAddedEntityEffect() {
@@ -393,21 +405,36 @@ void EntityConditionDialog::onAddedPlayerStat() {
 
 void EntityConditionDialog::onEntityTypeChanged() {
     /*qDebug() << "onEntityTypeChanged" << ui->player; */
-    if ((ui->entityTypeCombo->currentIndex() == 0)
-        || (ui->entityTypeCombo->currentData(Qt::UserRole + 1).toString() ==
-            QStringLiteral("minecraft:player"))) {
+    const QString &entityId = ui->entityTypeCombo->currentData(
+        Qt::UserRole + 1).toString();
+    const bool isNotSelected = ui->entityTypeCombo->currentIndex() == 0;
+
+    if (isNotSelected || entityId == QStringLiteral("minecraft:player")) {
         if (ui->toolBox->indexOf(ui->player) == -1) {
             ui->toolBox->addItem(ui->player, tr("Player"));
         }
-    } else {
-        if (ui->player->parent() != nullptr) {
-            auto *sv = qobject_cast<QScrollArea *>(
-                ui->player->parent()->parent());
-            if (sv != nullptr) {
-                ui->toolBox->removeItem(ui->toolBox->indexOf(ui->player));
-                ui->player->setParent(nullptr);
-                delete sv;
-            }
+    } else if (ui->player->parent() != nullptr) {
+        auto *sv = qobject_cast<QScrollArea *>(
+            ui->player->parent()->parent());
+        if (sv != nullptr) {
+            ui->toolBox->removeItem(ui->toolBox->indexOf(ui->player));
+            ui->player->setParent(nullptr);
+            delete sv;
+        }
+    }
+
+    if (isNotSelected ||
+        entityId == QStringLiteral("minecraft:fishing_bobber")) {
+        if (ui->toolBox->indexOf(ui->fishingHook) == -1) {
+            ui->toolBox->addItem(ui->fishingHook, tr("Fishing hook"));
+        }
+    } else if (ui->fishingHook->parent() != nullptr) {
+        auto *sv = qobject_cast<QScrollArea *>(
+            ui->fishingHook->parent()->parent());
+        if (sv != nullptr) {
+            ui->toolBox->removeItem(ui->toolBox->indexOf(ui->fishingHook));
+            ui->fishingHook->setParent(nullptr);
+            delete sv;
         }
     }
 }

@@ -45,13 +45,23 @@ protected:
         Number value() const;
         void setValue(const Number &value);
 
+        friend class AngleNode;
+
 private:
         Number m_value;
         AxisType m_type   = Absolute;
         bool m_useInteger = false;
     };
+
+    class AngleNode : public AxisNode {
+public:
+        AngleNode(AxisNode *other);
+        virtual QString toString() const override;
+    };
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::AxisNode>)
+Q_DECLARE_METATYPE(QSharedPointer<Command::AngleNode>)
+
 
 #endif /* AXISNODE_H */
