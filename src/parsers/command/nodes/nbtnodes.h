@@ -113,7 +113,7 @@ public:
         explicit NbtListNode(int pos, int length = 0);
         QString toString() const override;
         void accept(NodeVisitor *visitor) override {
-            for (const auto &node: m_vector) {
+            for (const auto &node: qAsConst(m_vector)) {
                 node->accept(visitor);
             }
             visitor->visit(this);

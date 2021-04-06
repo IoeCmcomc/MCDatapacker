@@ -26,7 +26,8 @@ QString Command::Parser::Error::toLocalizedMessage() const {
     return ret;
 }
 
-QJsonObject Command::Parser::m_schema = {};
+QJsonObject Command::Parser::m_schema   = {};
+bool        Command::Parser::m_testMode = false;
 
 Command::Parser::Parser(QObject *parent, const QString &input)
     : QObject(parent) {
@@ -155,16 +156,17 @@ void Command::Parser::error(const QString &msg, const QVariantList &args) {
 void Command::Parser::error(const QString &msg, const QVariantList &args,
                             int pos, int length) {
     qWarning() << "Command::Parser::error" << msg << pos << length;
-    QString errorIndicatorText = QString("\"%1«%2»%3\" (%4 chars)").arg(
-        m_text.mid(pos - 10, 10),
-        m_text.mid(pos, length),
-        m_text.mid(pos + length, 10),
-        QString::number(m_text.length()));
+/*
+      QString errorIndicatorText = QString("\"%1«%2»%3\" (%4 chars)").arg(
+          m_text.mid(pos - 10, 10),
+          m_text.mid(pos, length),
+          m_text.mid(pos + length, 10),
+          QString::number(m_text.length()));
+ */
 
     throw Command::Parser::Error(
-              QStringLiteral("Input: %1\nParser error at pos %2: %3").
-              arg(errorIndicatorText, QString ::number(pos), msg),
-              pos, length, args);
+              /*QStringLiteral("Input: %1\nParser error at pos %2: %3"). */
+              msg, pos, length, args);
 }
 
 /*!
@@ -204,7 +206,8 @@ bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
             m_curChar + '\'';
         QString charTxt =
             (chr.isNull()) ? QStringLiteral("end of line") : '\'' + chr + '\'';
-        error("Unexpected %1, expecting %2", { curCharTxt, charTxt });
+        error(QT_TR_NOOP("Unexpected %1, expecting %2"),
+              { curCharTxt, charTxt });
         return false;
     }
 }
@@ -315,7 +318,7 @@ QString Command::Parser::getQuotedString() {
     bool    backslash = false;
     while ((m_curChar != curQuoteChar) || backslash) {
         if (m_pos >= m_text.length())
-            error("Incomplete quoted string: %1" + value);
+            error(QT_TR_NOOP("Incomplete quoted string: %1"), { value });
         if (backslash) {
             if (m_curChar == curQuoteChar) {
                 value += curQuoteChar;
@@ -408,7 +411,7 @@ QSharedPointer<Command::DoubleNode> Command::Parser::brigadier_double(
     double value = raw.toDouble(&ok);
 
     if (!ok)
-        error(tr("%1 is not a vaild double number").arg(raw));
+        error(QT_TR_NOOP("%1 is not a vaild double number"), { raw });
     if (QVariant vari = props.value("min"); vari.isValid())
         checkMin(value, vari.toDouble());
     if (QVariant vari = props.value("max"); vari.isValid())
@@ -427,7 +430,7 @@ QSharedPointer<Command::FloatNode> Command::Parser::brigadier_float(
     float value = raw.toFloat(&ok);
 
     if (!ok)
-        error(tr("%1 is not a vaild float number").arg(raw));
+        error(QT_TR_NOOP("%1 is not a vaild float number"), { raw });
     if (QVariant vari = props.value("min"); vari.isValid())
         checkMin(value, vari.toFloat());
     if (QVariant vari = props.value("max"); vari.isValid())
@@ -444,7 +447,7 @@ QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
     int     value = raw.toFloat(&ok);
 
     if (!ok)
-        error(tr("%1 is not a vaild integer number").arg(raw));
+        error(QT_TR_NOOP("%1 is not a vaild integer number"), { raw });
     if (QVariant vari = props.value("min"); vari.isValid())
         checkMin(value, vari.toInt());
     if (QVariant vari = props.value("max"); vari.isValid())
@@ -510,13 +513,13 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
 
     if (m_schema.isEmpty()) {
         qWarning() << "The parser schema hasn't been initialized";
-    } else if (text().trimmed().isEmpty() || text()[0] == '#') {
+    } else if (text().trimmed().isEmpty() || text().at(0) == '#') {
         m_parsingResult->setPos(0);
         return m_parsingResult;
     }
     setPos(0);
     const int typeId = qMetaTypeId<QSharedPointer<RootNode> >();
-    CacheKey  key{ typeId, m_text };
+    CacheKey  key{ typeId, m_text, (!Parser::m_testMode) ? -1 : 1 };
 
     if (m_cache.contains(key)) {
         m_parsingResult = qSharedPointerCast<RootNode>(m_cache[key]);
@@ -585,7 +588,7 @@ bool Command::Parser::processCurSchemaNode(int depth,
                     }
                     ;
                 } else {
-                    error(tr("Incompleted command"));
+                    error(QT_TR_NOOP("Incompleted command"));
                 }
             } else {
                 expect(QChar());
@@ -598,7 +601,7 @@ bool Command::Parser::processCurSchemaNode(int depth,
             }
         }
         if (curChar().isNull())
-            error(tr("Incompleted command"));
+            error("Incompleted command");
         eat(' ');
     }
     return false; /* Should continue parsing */
@@ -722,7 +725,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     argLengths << argLength;
                 }
             } else {
-                error("Unknown parser " + parserId);
+                error(QT_TR_NOOP("Unknown parser '%1'"), { parserId });
             }
         }
     }
@@ -746,9 +749,9 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
     }
     if (!found) {
         if (curSchemaNode[QStringLiteral("type")] != QStringLiteral("root")) {
-            error("Unknown word '%1'", { literal });
+            error(QT_TR_NOOP("Unknown word '%1'"), { literal });
         } else {
-            error("Unknown command '%1'", { literal });
+            error(QT_TR_NOOP("Unknown command '%1'"), { literal });
         }
     }
     return true;

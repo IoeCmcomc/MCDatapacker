@@ -53,7 +53,7 @@ public:
         QString toString() const override;
         bool isVaild() const override;
         void accept(NodeVisitor *visitor) override {
-            for (const auto &step: m_steps)
+            for (const auto &step: qAsConst(m_steps))
                 step->accept(visitor);
             visitor->visit(this);
         }

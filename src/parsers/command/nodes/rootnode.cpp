@@ -20,7 +20,7 @@ QString Command::RootNode::toString() const {
 }
 
 void Command::RootNode::accept(Command::NodeVisitor *visitor) {
-    for (const auto &child: m_children) {
+    for (const auto &child: qAsConst(m_children)) {
         child->accept(visitor);
     }
     visitor->visit(this);

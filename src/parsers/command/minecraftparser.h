@@ -126,82 +126,58 @@ private:
         QSharedPointer<Command::NbtPathStepNode> parseNbtPathStep();
 
         /* Direct parsing methods */
-        Q_INVOKABLE QSharedPointer<Command::AngleNode> minecraft_angle(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::BlockPosNode> minecraft_blockPos(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::BlockStateNode> minecraft_blockState(
-            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::AngleNode> minecraft_angle();
+        Q_INVOKABLE QSharedPointer<Command::BlockPosNode> minecraft_blockPos();
+        Q_INVOKABLE QSharedPointer<Command::BlockStateNode> minecraft_blockState();
         Q_INVOKABLE QSharedPointer<Command::BlockPredicateNode>
-        minecraft_blockPredicate(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ColorNode> minecraft_color(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ColumnPosNode> minecraft_columnPos(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ComponentNode> minecraft_component(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::DimensionNode> minecraft_dimension(
-            const QVariantMap &props = {});
+        minecraft_blockPredicate();
+        Q_INVOKABLE QSharedPointer<Command::ColorNode> minecraft_color();
+        Q_INVOKABLE QSharedPointer<Command::ColumnPosNode> minecraft_columnPos();
+        Q_INVOKABLE QSharedPointer<Command::ComponentNode> minecraft_component();
+        Q_INVOKABLE QSharedPointer<Command::DimensionNode> minecraft_dimension();
         Q_INVOKABLE QSharedPointer<Command::EntityNode> minecraft_entity(
             const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::EntityAnchorNode>
-        minecraft_entityAnchor(const QVariantMap &props = {});
+        minecraft_entityAnchor();
         Q_INVOKABLE QSharedPointer<Command::EntitySummonNode>
-        minecraft_entitySummon(const QVariantMap &props = {});
+        minecraft_entitySummon();
         Q_INVOKABLE QSharedPointer<Command::FloatRangeNode> minecraft_floatRange(
             const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::FunctionNode> minecraft_function(
-            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::FunctionNode> minecraft_function();
         Q_INVOKABLE QSharedPointer<Command::GameProfileNode>
         minecraft_gameProfile(const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::IntRangeNode> minecraft_intRange(
             const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::ItemEnchantmentNode>
-        minecraft_itemEnchantment(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ItemSlotNode> minecraft_itemSlot(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ItemStackNode> minecraft_itemStack(
-            const QVariantMap &props = {});
+        minecraft_itemEnchantment();
+        Q_INVOKABLE QSharedPointer<Command::ItemSlotNode> minecraft_itemSlot();
+        Q_INVOKABLE QSharedPointer<Command::ItemStackNode> minecraft_itemStack();
         Q_INVOKABLE QSharedPointer<Command::ItemPredicateNode>
-        minecraft_itemPredicate(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::MessageNode> minecraft_message(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::MobEffectNode> minecraft_mobEffect(
-            const QVariantMap &props = {});
+        minecraft_itemPredicate();
+        Q_INVOKABLE QSharedPointer<Command::MessageNode> minecraft_message();
+        Q_INVOKABLE QSharedPointer<Command::MobEffectNode> minecraft_mobEffect();
         Q_INVOKABLE QSharedPointer<Command::NbtCompoundNode>
-        minecraft_nbtCompoundTag(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::NbtPathNode> minecraft_nbtPath(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::NbtNode> minecraft_nbtTag(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ObjectiveNode> minecraft_objective(
-            const QVariantMap &props = {});
+        minecraft_nbtCompoundTag();
+        Q_INVOKABLE QSharedPointer<Command::NbtPathNode> minecraft_nbtPath();
+        Q_INVOKABLE QSharedPointer<Command::NbtNode> minecraft_nbtTag();
+        Q_INVOKABLE QSharedPointer<Command::ObjectiveNode> minecraft_objective();
         Q_INVOKABLE QSharedPointer<Command::ObjectiveCriteriaNode>
-        minecraft_objectiveCriteria(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::OperationNode> minecraft_operation(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ParticleNode> minecraft_particle(
-            const QVariantMap &props = {});
+        minecraft_objectiveCriteria();
+        Q_INVOKABLE QSharedPointer<Command::OperationNode> minecraft_operation();
+        Q_INVOKABLE QSharedPointer<Command::ParticleNode> minecraft_particle();
         Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode>
-        minecraft_resourceLocation(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::RotationNode> minecraft_rotation(
-            const QVariantMap &props = {});
+        minecraft_resourceLocation();
+        Q_INVOKABLE QSharedPointer<Command::RotationNode> minecraft_rotation();
         Q_INVOKABLE QSharedPointer<Command::ScoreHolderNode>
         minecraft_scoreHolder(const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::ScoreboardSlotNode>
-        minecraft_scoreboardSlot(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::SwizzleNode> minecraft_swizzle(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::TeamNode> minecraft_team(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::TimeNode> minecraft_time(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::UuidNode> minecraft_uuid(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::Vec2Node> minecraft_vec2(
-            const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::Vec3Node> minecraft_vec3(
-            const QVariantMap &props = {});
+        minecraft_scoreboardSlot();
+        Q_INVOKABLE QSharedPointer<Command::SwizzleNode> minecraft_swizzle();
+        Q_INVOKABLE QSharedPointer<Command::TeamNode> minecraft_team();
+        Q_INVOKABLE QSharedPointer<Command::TimeNode> minecraft_time();
+        Q_INVOKABLE QSharedPointer<Command::UuidNode> minecraft_uuid();
+        Q_INVOKABLE QSharedPointer<Command::Vec2Node> minecraft_vec2();
+        Q_INVOKABLE QSharedPointer<Command::Vec3Node> minecraft_vec3();
     };
 }
 

@@ -62,9 +62,14 @@ public:
 
         int pos() const;
         const ParseNodeCache &cache() const;
+        static void setTestMode(bool value) {
+            Parser::m_testMode = value;
+        }
 
 
 protected:
+        static bool m_testMode;
+
         void setPos(int pos);
 
         void error(const QString &msg, const QVariantList &args = {});
@@ -95,16 +100,16 @@ protected:
         void checkMin(T value, T min) {
             if (value < min)
                 error(
-                    QString("The value must be greater than or equal to %1").arg(
-                        min));
+                    QT_TR_NOOP("The value must be greater than or equal to %1"),
+                    { min });
         }
 
         template<typename T>
         void checkMax(T value, T max) {
             if (value > max)
                 error(
-                    QString("The value must be lesser than or equal to %1").arg(
-                        max));
+                    QT_TR_NOOP("The value must be lesser than or equal to %1"),
+                    { max });
         }
 
         template<typename T>

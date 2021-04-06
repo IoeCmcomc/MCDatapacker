@@ -13,9 +13,12 @@ public:
 
         QString toString() const override;
         void accept(NodeVisitor *visitor) override {
-            for (const auto &key: m_map.uniqueKeys()) {
+            const auto keys = m_map.uniqueKeys();
+
+            for (const auto &key: qAsConst(keys)) {
                 visitor->visit(key);
-                for (const auto &value: m_map.values(key))
+                const auto values = m_map.values(key);
+                for (const auto &value: qAsConst(values))
                     value->accept(visitor);
             }
             visitor->visit(this);

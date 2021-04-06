@@ -16,7 +16,8 @@ QString Command::MultiMapNode::toString() const {
     for (auto key = keys.cbegin(); key != keys.cend(); key++) {
         /*qDebug() << key->text << m_map.values(*key).count(); */
         QStringList valReprs;
-        for (const auto &val: m_map.values(*key))
+        const auto &keys = m_map.values(*key);
+        for (const auto &val: qAsConst(keys))
             valReprs << val->toString();
         itemReprs << QString("%1: (%2)").arg(key->text, valReprs.join(", "));
     }
