@@ -73,7 +73,9 @@ void BlockItemSelectorDialog::setupListView() {
     int  c         = 0;
     while ((blockIter != MCRBlockInfo.constEnd())
            || (itemIter != MCRItemInfo.constEnd())) {
-        if (blockIter.value().toMap().contains("unobtainable")) {
+        const auto &blockIterVal = blockIter.value();
+        if ((blockIterVal.type() == QVariant::Map)
+            && (blockIterVal.toMap().contains("unobtainable"))) {
             if (blockIter != MCRBlockInfo.constEnd())
                 ++blockIter;
             else

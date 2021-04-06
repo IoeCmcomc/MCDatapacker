@@ -43,9 +43,12 @@ private:
     QJsonObject genCraftingJson(QJsonObject root);
     QJsonObject genSmeltingJson(QJsonObject root);
     QJsonObject genStonecuttingJson(QJsonObject root);
+    QJsonObject genSmithingJson(QJsonObject root);
+
     void readCraftingJson(const QJsonObject &root);
     void readSmeltingJson(const QJsonObject &root);
     void readStonecuttingJson(const QJsonObject &root);
+    void readSmithingJson(const QJsonObject &root);
 };
 
 QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items);

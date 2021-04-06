@@ -1188,5 +1188,6 @@
         <file>texture/item/zombie_villager_spawn_egg.png</file>
         <file>texture/item/zombified_piglin_spawn_egg.png</file>
         <file>texture/right_arrow.png</file>
+        <file>texture/plus.png</file>
     </qresource>
 </RCC>
