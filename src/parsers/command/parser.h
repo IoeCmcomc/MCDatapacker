@@ -46,19 +46,17 @@ public:
 
         static QString parserIdToMethodName(const QString &str);
 
-        Q_INVOKABLE QSharedPointer<Command::BoolNode> brigadier_bool(
-            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::BoolNode> brigadier_bool();
         Q_INVOKABLE QSharedPointer<Command::DoubleNode> brigadier_double(
             const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::FloatNode> brigadier_float(
             const QVariantMap &props = {});
         Q_INVOKABLE QSharedPointer<Command::IntegerNode> brigadier_integer(
             const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::LiteralNode> brigadier_literal(
-            const QVariantMap &props = {});
+        Q_INVOKABLE QSharedPointer<Command::LiteralNode> brigadier_literal();
         Q_INVOKABLE QSharedPointer<Command::StringNode> brigadier_string(
             const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ParseNode> parse();
+        QSharedPointer<Command::ParseNode> parse();
 
         Error lastError() const;
 

@@ -2,6 +2,7 @@
 #include "ui_entityconditiondialog.h"
 
 #include "extendeddelegate.h"
+#include "mainwindow.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -187,8 +188,9 @@ QJsonObject EntityConditionDialog::toJson() const {
             root.insert(QStringLiteral("player"), player);
     }
 
-    if (isNotSelected ||
-        (entityId == QStringLiteral("minecraft:fishing_bobber"))) {
+    if ((isNotSelected ||
+         (entityId == QStringLiteral("minecraft:fishing_bobber")))
+        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
         QJsonObject fishingHook;
         ui->inOpenWaterCheck->insertToJsonObject(fishingHook, "in_open_water");
         if (!fishingHook.isEmpty())
@@ -329,7 +331,8 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
             }
         }
     }
-    if (value.contains(QStringLiteral("fishing_hook"))) {
+    if (value.contains(QStringLiteral("fishing_hook"))
+        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
         auto fishingHook = value[QStringLiteral("fishing_hook")].toObject();
         ui->inOpenWaterCheck->setupFromJsonObject(fishingHook, "in_open_water");
     }
@@ -423,8 +426,9 @@ void EntityConditionDialog::onEntityTypeChanged() {
         }
     }
 
-    if (isNotSelected ||
-        entityId == QStringLiteral("minecraft:fishing_bobber")) {
+    if ((isNotSelected ||
+         entityId == QStringLiteral("minecraft:fishing_bobber"))
+        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
         if (ui->toolBox->indexOf(ui->fishingHook) == -1) {
             ui->toolBox->addItem(ui->fishingHook, tr("Fishing hook"));
         }

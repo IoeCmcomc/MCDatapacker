@@ -142,7 +142,7 @@ QJsonObject LootTableEntry::toJson() const {
             break;
 
         case 1: {  /*Item */
-            if (ui->itemSlot->getItems().count() == 1)
+            if (ui->itemSlot->size() == 1)
                 root.insert("name", ui->itemSlot->itemNamespacedID(0));
             break;
         }

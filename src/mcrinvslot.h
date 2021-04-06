@@ -26,6 +26,12 @@ public:
     void clearItems();
     MCRInvItem &getItem(const int index = 0);
     QVector<MCRInvItem> &getItems();
+    inline int size() const {
+        return items.size();
+    }
+    inline int isEmpty() const {
+        return items.isEmpty();
+    }
 
     bool getIsCreative() const;
     void setIsCreative(bool value);

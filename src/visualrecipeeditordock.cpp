@@ -59,7 +59,8 @@ void VisualRecipeEditorDock::setupCustomTab() {
     ui->customTabBar->addTab(tr("Crafting"));
     ui->customTabBar->addTab(tr("Smelting"));
     ui->customTabBar->addTab(tr("Stonecutting"));
-    ui->customTabBar->addTab(tr("Smithing"));
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))
+        ui->customTabBar->addTab(tr("Smithing"));
 
     /*Make tab bar overlay top pixel of tab frame */
     ui->customTabWidgetLayout->removeWidget(ui->customTabBar);
@@ -77,7 +78,8 @@ void VisualRecipeEditorDock::retranslate() {
     ui->customTabBar->setTabText(0, tr("Crafting"));
     ui->customTabBar->setTabText(1, tr("Smelting"));
     ui->customTabBar->setTabText(2, tr("Stonecutting"));
-    ui->customTabBar->setTabText(2, tr("Smithing"));
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))
+        ui->customTabBar->setTabText(3, tr("Smithing"));
 }
 
 void VisualRecipeEditorDock::changeEvent(QEvent *event) {
@@ -89,7 +91,10 @@ void VisualRecipeEditorDock::changeEvent(QEvent *event) {
 void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
     Q_ASSERT(index >= 0 && index < 4);
     ui->stackedRecipeWidget->setCurrentIndex(index);
-    ui->stackedOptions->setCurrentIndex(qMin(index, 2));
+    if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)))
+        ui->stackedOptions->setCurrentIndex(qMin(index, 3));
+    else
+        ui->stackedOptions->setCurrentIndex(qMin(index, 2));
 }
 
 void VisualRecipeEditorDock::writeRecipe() {
@@ -113,7 +118,8 @@ void VisualRecipeEditorDock::writeRecipe() {
         break;
 
     case 3:
-        jsonDoc = QJsonDocument(genSmithingJson(root));
+        if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)))
+            jsonDoc = QJsonDocument(genSmithingJson(root));
         break;
     }
 
@@ -252,7 +258,7 @@ QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
     root.insert(QStringLiteral("type"),
                 QStringLiteral("minecraft:smithing"));
 
-    if (ui->smithingSlot_0->getItems().isEmpty())
+    if (ui->smithingSlot_0->isEmpty())
         return root;
 
     const auto &base = ui->smithingSlot_0->getItems();
@@ -341,7 +347,8 @@ void VisualRecipeEditorDock::readRecipe() {
         return;
     }
 
-    if (type == QStringLiteral("smithing")) {
+    if (type == QStringLiteral("smithing")
+        && ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)))) {
         ui->customTabBar->setCurrentIndex(3);
         readSmithingJson(root);
     }

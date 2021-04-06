@@ -384,8 +384,7 @@ QString Command::Parser::parserIdToMethodName(const QString &str) {
     return "";
 }
 
-QSharedPointer<Command::BoolNode> Command::Parser::brigadier_bool(
-    [[maybe_unused]] const QVariantMap &) {
+QSharedPointer<Command::BoolNode> Command::Parser::brigadier_bool() {
     int start = m_pos;
 
     if (peek(4) == "true") {
@@ -455,8 +454,7 @@ QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
                                                         value);
 }
 
-QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal(
-    const QVariantMap &props) {
+QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal() {
     int           start   = m_pos;
     const QString literal = getWithRegex(m_literalStrRegex);
     const int     typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
@@ -626,7 +624,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
     qDebug() << "literal:" << literal;
     bool found    = false;
     auto children = curSchemaNode[QStringLiteral("children")].toObject();
-    for (auto it = children.constBegin(); it != children.constEnd(); it++) {
+    for (auto it = children.constBegin(); it != children.constEnd(); ++it) {
         curSchemaNode = it.value().toObject();
         if (curSchemaNode[QStringLiteral("type")] ==
             QStringLiteral("literal")) {
@@ -639,10 +637,16 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             }
         } else if (curSchemaNode[QStringLiteral("type")] ==
                    QStringLiteral("argument")) {
-            QString parserId    = curSchemaNode["parser"].toString();
-            int     methodIndex = metaObject()->indexOfMethod(
-                parserIdToMethodName(parserId).toLatin1()
-                + QStringLiteral("(QVariantMap)").toLatin1());
+            QString parserId = curSchemaNode["parser"].toString();
+            int     methodIndex;
+            if (curSchemaNode.contains("properties")) {
+                methodIndex = metaObject()->indexOfMethod(
+                    parserIdToMethodName(parserId).toLatin1()
+                    + QStringLiteral("(QVariantMap)").toLatin1());
+            } else {
+                methodIndex = metaObject()->indexOfMethod(
+                    parserIdToMethodName(parserId).toLatin1() + "()");
+            }
             if (methodIndex != -1) {
                 qDebug() << "Argument parser ID:" << parserId;
                 auto          method     = metaObject()->method(methodIndex);
@@ -650,9 +654,6 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 QElapsedTimer timer;
                 timer.start();
                 CacheKey key{ returnType, literal, startPos };
-
-                if (parserId == "minecraft:vec3")
-                    qDebug() << "vec3" << startPos << m_pos << m_curChar;
 
                 try {
                     if (m_cache.contains(key)) {
@@ -725,8 +726,8 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             }
         }
     }
-    /*qDebug() << "After loop" << ret->isVaild() << success << errors.length() << */
-    curSchemaNode.size();
+    /*qDebug() << "After loop" << ret->isVaild() << success << errors.length() <<
+       curSchemaNode.size(); */
     if (ret && ret->isVaild() && success) { /* If succeed */
     } else if (errors.size() == 1) {
         throw errors[0];
@@ -745,9 +746,9 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
     }
     if (!found) {
         if (curSchemaNode[QStringLiteral("type")] != QStringLiteral("root")) {
-            error("Unknown literal '" + literal + "'");
+            error("Unknown word '%1'", { literal });
         } else {
-            error("Unknown command '" + literal + "'");
+            error("Unknown command '%1'", { literal });
         }
     }
     return true;

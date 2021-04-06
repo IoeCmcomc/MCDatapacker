@@ -49,7 +49,7 @@ QJsonObject ItemConditionDialog::toJson() const {
     QJsonObject root;
 
     if (ui->itemRadio->isChecked()) {
-        if (!ui->itemSlot->getItems().isEmpty())
+        if (!ui->itemSlot->isEmpty())
             root.insert(QStringLiteral("item"),
                         ui->itemSlot->getItem().getNamespacedID());
     } else {

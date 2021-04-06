@@ -48,9 +48,6 @@
    </item>
    <item row="1" column="0" colspan="4">
     <widget class="QToolBox" name="toolBox">
-     <property name="currentIndex">
-      <number>2</number>
-     </property>
      <property name="tabSpacing">
       <number>4</number>
      </property>
@@ -765,6 +762,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="fishingHook">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>658</width>
+        <height>482</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Fishing hook</string>
       </attribute>
