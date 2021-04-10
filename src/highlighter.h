@@ -79,6 +79,10 @@ public:
     using QSyntaxHighlighter::rehighlightBlock;
     void rehighlightBlock(const QTextBlock &block);
 
+    QVector<QTextBlock> changedBlocks() const;
+    void onDocChanged();
+
+
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
     QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
@@ -92,6 +96,7 @@ protected:
 private:
     QVector<QTextBlock> m_changedBlocks;
     bool m_highlightMunually             = false;
+    bool m_highlightingFirstBlock        = false;
     QRegularExpression namespacedIdRegex =
         QRegularExpression(QStringLiteral(
                                R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+\b)"));

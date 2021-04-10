@@ -405,17 +405,22 @@ void TabbedCodeEditorInterface::onSwitchFile() {
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
     qDebug() << "TabbedCodeEditorInterface::onCurTextChanged";
-    if (!hasNoFile())
-        textChangedTimer->start(260);
-    else
+    if (!hasNoFile()) {
+        const auto *highlighter = getCurFile()->highlighter;
+        textChangedTimer->start(
+            (highlighter) ? highlighter->changedBlocks().length() : 0);
+    }else{
         textChangedTimer->stop();
+    }
 }
 
 void TabbedCodeEditorInterface::onCurTextChangingDone() {
     qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone";
-    auto *curFile = getCurFile();
-    if (curFile && curFile->highlighter) {
-        curFile->highlighter->checkProblems();
+    const auto *curFile     = getCurFile();
+    auto       *highlighter = curFile->highlighter;
+    if (curFile && highlighter) {
+        highlighter->checkProblems();
+        highlighter->onDocChanged();
         ui->codeEditor->updateErrorSelections();
     }
 }

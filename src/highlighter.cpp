@@ -61,10 +61,24 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
 
     bracketPairs.append({ '{', '}' });
     bracketPairs.append({ '[', ']' });
+
+/*
+      connect(parent, &QTextDocument::contentsChanged,
+              this, &Highlighter::onDocChanged);
+ */
 }
 
 void Highlighter::highlightBlock(const QString &text) {
-    /*qDebug() << "Highlighter::highlightBlock" << text; */
+    qDebug() << "Highlighter::highlightBlock" << text << m_highlightMunually;
+    if (m_highlightMunually) {
+    } else {
+        if (m_highlightingFirstBlock) {
+            m_changedBlocks.clear();
+            m_highlightingFirstBlock = false;
+        }
+        m_changedBlocks << currentBlock();
+    }
+
     if (document()) {
         TextBlockData *data;
         if (currentBlockUserData()) {
@@ -136,7 +150,19 @@ void Highlighter::mergeFormat(int start, int count,
     }
 }
 
+void Highlighter::onDocChanged() {
+    qDebug() << "onDocChanged";
+    m_highlightingFirstBlock = true;
+    for (const auto &block: m_changedBlocks)
+        qDebug() << "Block changed" << block.blockNumber() << block.text();
+}
+
+QVector<QTextBlock> Highlighter::changedBlocks() const {
+    return m_changedBlocks;
+}
+
 void Highlighter::rehighlightBlock(const QTextBlock &block) {
+    qDebug() << "reHighlightblock" << block.blockNumber();
     m_highlightMunually = true;
     QSyntaxHighlighter::rehighlightBlock(block);
     m_highlightMunually = false;

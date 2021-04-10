@@ -183,7 +183,7 @@ void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
                                              const QVector<QTextLayout::FormatRange> formats)
 {
     m_formats = formats;
-    QSyntaxHighlighter::rehighlightBlock(block);
+    Highlighter::rehighlightBlock(block);
     m_formats.clear();
 }
 
@@ -193,8 +193,7 @@ void McfunctionHighlighter::checkProblems() {
     QElapsedTimer timer;
 
     timer.start();
-    for (auto block = getParentDoc()->begin();
-         block != getParentDoc()->end(); block = block.next()) {
+    for (const auto &block: changedBlocks()) {
         if (TextBlockData *data =
                 dynamic_cast<TextBlockData*>(block.userData())) {
             QString lineText = block.text();
@@ -207,19 +206,21 @@ void McfunctionHighlighter::checkProblems() {
 
                 Command::NodeFormatter formatter;
                 result->accept(&formatter);
-                qDebug() << "rehighlight manually" << block.firstLineNumber();
+                /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
                 document()->blockSignals(true);
                 rehighlightBlock(block, formatter.formatRanges());
                 document()->blockSignals(false);
 
-                qDebug() << "Size:" << parser.cache().size() << '/' <<
-                    parser.cache().capacity()
-                         << "Total access:" <<
-                    parser.cache().stats().total_accesses()
-                         << "Total hit:" << parser.cache().stats().total_hits()
-                         << "Total miss:" << parser.cache().stats().total_hits()
-                         << "Hit rate:" << parser.cache().stats().hit_rate()
-                         << "Time elapsed:" << timer.elapsed();
+/*
+                  qDebug() << "Size:" << parser.cache().size() << '/' <<
+                      parser.cache().capacity()
+                           << "Total access:" <<
+                      parser.cache().stats().total_accesses()
+                           << "Total hit:" << parser.cache().stats().total_hits()
+                           << "Total miss:" << parser.cache().stats().total_hits()
+                           << "Hit rate:" << parser.cache().stats().hit_rate()
+                           << "Time elapsed:" << timer.elapsed();
+ */
             } else {
                 auto parseErr = parser.lastError();
                 auto error    = ProblemInfo(true);
