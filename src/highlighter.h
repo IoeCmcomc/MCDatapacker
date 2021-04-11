@@ -73,7 +73,7 @@ public:
 
     QTextDocument *getParentDoc() const;
 
-    virtual void checkProblems() = 0;
+    virtual void checkProblems(bool checkAll = false) = 0;
 
 public:
     using QSyntaxHighlighter::rehighlightBlock;

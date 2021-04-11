@@ -88,7 +88,6 @@ void Command::Parser::setSchema(const QString &filepath) {
         qWarning() << "Root is empty.";
         return;
     }
-
     setSchema(root);
 }
 

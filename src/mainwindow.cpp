@@ -28,8 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     Command::MinecraftParser::setSchema(
-        ":/minecraft/" + MainWindow::curGameVersion.toString() +
-        "/mcdata/generated/reports/commands.json");
+        QStringLiteral(":/minecraft/") + MainWindow::curGameVersion.toString() +
+        QStringLiteral("/mcdata/generated/reports/commands.json"));
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                    MainWindow::readMCRInfo(QStringLiteral(
@@ -71,6 +71,9 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
             ui->codeEditorInterface, &TabbedCodeEditorInterface::onOpenFile);
+    connect(this, &MainWindow::gameVersionChanged,
+            ui->codeEditorInterface,
+            &TabbedCodeEditorInterface::onGameVersionChanged);
 
     readSettings();
 
@@ -274,6 +277,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                                                    "item"),
                                                gameVer));
             MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
+            emit gameVersionChanged(gameVer);
         }
     }
     settings.endGroup();

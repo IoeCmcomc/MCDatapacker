@@ -53,7 +53,7 @@ void JsonHighlighter::highlightBlock(const QString &text) {
     }
 }
 
-void JsonHighlighter::checkProblems() {
+void JsonHighlighter::checkProblems(bool) {
     /*qDebug() << "JsonHighlighter::checkProblems"; */
     auto jsonDoc = QJsonDocument::fromJson(
         getParentDoc()->toPlainText().toUtf8(), &jsonErr);

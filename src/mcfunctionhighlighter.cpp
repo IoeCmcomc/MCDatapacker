@@ -187,13 +187,26 @@ void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
     m_formats.clear();
 }
 
-void McfunctionHighlighter::checkProblems() {
+void McfunctionHighlighter::checkProblems(bool checkAll) {
     QSharedPointer<Command::ParseNode> result = nullptr;
 
     QElapsedTimer timer;
 
     timer.start();
-    for (const auto &block: changedBlocks()) {
+    const auto &&changedBlks = changedBlocks();
+    const auto  *doc         = document();
+    Q_ASSERT(doc != nullptr);
+
+    auto block =
+        (!checkAll) ? ((!changedBlks.isEmpty()) ? changedBlks.constFirst() : doc
+                       ->
+                       findBlock(-1)) : doc->firstBlock();
+    const auto &end =
+        (!checkAll) ? ((!changedBlks.isEmpty()) ? changedBlks.constLast() : doc
+                       ->
+                       findBlock(-1)) : doc->lastBlock();
+
+    while (block.isValid() && block.blockNumber() <= end.blockNumber()) {
         if (TextBlockData *data =
                 dynamic_cast<TextBlockData*>(block.userData())) {
             QString lineText = block.text();
@@ -237,6 +250,7 @@ void McfunctionHighlighter::checkProblems() {
                 data->setProblem(error);
             }
         }
+        block = block.next();
     }
     qDebug() << "Size:" << parser.cache().size() << '/' <<
         parser.cache().capacity()

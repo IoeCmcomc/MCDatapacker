@@ -320,8 +320,8 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
       qDebug() << "TabbedCodeEditorInterface::onFileRenamed" << oldName <<
           newName << count();
  */
-    QString oldpath = path + '/' + oldName;
-    QString newpath = path + '/' + newName;
+    const QString &&oldpath = path + '/' + oldName;
+    const QString &&newpath = path + '/' + newName;
 
     for (int i = 0; i < count(); i++) {
         auto *file = &files[i];
@@ -337,6 +337,17 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
             setCurIndex(getCurIndex());
             break;
         }
+    }
+}
+
+void TabbedCodeEditorInterface::onGameVersionChanged(const QString &ver) {
+    Command::MinecraftParser::setSchema(
+        QStringLiteral(":/minecraft/") + ver +
+        QStringLiteral("/mcdata/generated/reports/commands.json"));
+
+    for (const auto &file: qAsConst(files)) {
+        if (file.fileType == CodeFile::Function)
+            file.highlighter->checkProblems(true);
     }
 }
 

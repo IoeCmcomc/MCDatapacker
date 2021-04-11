@@ -14,7 +14,7 @@ public:
 
 protected:
     void highlightBlock(const QString &text) override;
-    void checkProblems() override;
+    void checkProblems(bool checkAll = false) override;
 
 private:
     struct HighlightingRule {

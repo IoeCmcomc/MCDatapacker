@@ -16,7 +16,7 @@ protected slots:
     void rehighlightBlock(const QTextBlock &block,
                           const QVector<QTextLayout::FormatRange> formats);
 
-    void checkProblems() override;
+    void checkProblems(bool checkAll = false) override;
 
 private:
     void setupRules();

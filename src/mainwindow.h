@@ -45,6 +45,7 @@ protected:
 signals:
     void curFileChanged(const QString filepath);
     void curDirChanged(const QDir dir);
+    void gameVersionChanged(const QString &ver);
 
 private slots:
     void open();
