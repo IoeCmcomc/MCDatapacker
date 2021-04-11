@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QScreen>
 
-FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
+FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent, bool backward)
     : QListWidget(parent) {
     this->parent = parent;
     setWindowFlag(Qt::Popup, true);
@@ -30,7 +30,10 @@ FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent)
                              parentRect).topLeft());
 
     setCurrentRow(parent->getCurIndex());
-    onSelectNextItem();
+    if (!backward)
+        onSelectNextItem();
+    else
+        onSelectPrevItem();
     show();
     grabMouse();
     setFocus();
@@ -103,14 +106,14 @@ void FileSwitcher::onSelectPrevItem() {
 }
 
 void FileSwitcher::initFileList() {
-    auto *files = parent->getFiles();
+    const auto *files = parent->getFiles();
 
     if (!files) {
         return;
     }
 
     for (const auto &file: *files) {
-        QFileInfo        finfo(file.fileInfo);
+        const QFileInfo  finfo(file.fileInfo);
         QListWidgetItem *fileItem = new QListWidgetItem(this);
         fileItem->setText
             (QDir::current().relativeFilePath(finfo.filePath()));

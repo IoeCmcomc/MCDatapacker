@@ -42,7 +42,7 @@ public:
 
     bool hasUnsavedChanges() const;
 
-public slots:
+public /*slots*/ :
     void onOpenFile(const QString &filepath);
     bool saveCurFile();
     bool saveCurFile(const QString path);
@@ -59,12 +59,13 @@ signals:
 protected:
     void changeEvent(QEvent *event) override;
 
-private slots:
+private /*slots*/ :
     void onModificationChanged(bool changed);
     void onTabChanged(int index);
     void onTabMoved(int from, int to);
     void onCloseFile(int index);
-    void onSwitchFile();
+    void onSwitchNextFile();
+    void onSwitchPrevFile();
     void onCurTextChanged();
     void onCurTextChangingDone();
     void onCurFileChanged(const QString &path);

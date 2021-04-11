@@ -19,6 +19,7 @@
 #include <QFileInfo>
 #include <QCloseEvent>
 #include <QProcess>
+#include <QShortcut>
 
 
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;

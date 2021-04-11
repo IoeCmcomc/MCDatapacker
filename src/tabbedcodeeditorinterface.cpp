@@ -23,6 +23,7 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     ui->tabBar->setTabsClosable(true);
     ui->tabBar->setMovable(true);
     ui->tabBar->setDocumentMode(true);
+    ui->tabBar->setDrawBase(false);
     ui->tabBar->setExpanding(false);
     ui->tabBar->adjustSize();
 
@@ -54,7 +55,11 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this),
             &QShortcut::activated, this,
-            &TabbedCodeEditorInterface::onSwitchFile);
+            &TabbedCodeEditorInterface::onSwitchNextFile);
+    connect(new QShortcut(QKeySequence(
+                              Qt::CTRL + Qt::SHIFT + Qt::Key_Tab), this),
+            &QShortcut::activated, this,
+            &TabbedCodeEditorInterface::onSwitchPrevFile);
 }
 
 TabbedCodeEditorInterface::~TabbedCodeEditorInterface() {
@@ -408,10 +413,14 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
     }
 }
 
-void TabbedCodeEditorInterface::onSwitchFile() {
-    if (!hasNoFile()) {
-        new FileSwitcher(this);
-    }
+void TabbedCodeEditorInterface::onSwitchNextFile() {
+    if (!hasNoFile())
+        new FileSwitcher(this, false);
+}
+
+void TabbedCodeEditorInterface::onSwitchPrevFile() {
+    if (!hasNoFile())
+        new FileSwitcher(this, true);
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {

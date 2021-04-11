@@ -8,7 +8,8 @@
 class FileSwitcher : public QListWidget
 {
 public:
-    FileSwitcher(TabbedCodeEditorInterface *parent = nullptr);
+    FileSwitcher(TabbedCodeEditorInterface *parent = nullptr,
+                 bool backward                     = false);
     ~FileSwitcher();
 
 protected:
