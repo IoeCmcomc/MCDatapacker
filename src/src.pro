@@ -129,7 +129,6 @@ HEADERS += \
     mcrpredcondition.h \
     modelfunctions.h \
     newdatapackdialog.h \
-    numericinput.cpp.GANRTu \
     numericinput.h \
     optionalspinbox.h \
     parsers/command/nodes/argumentnode.h \
