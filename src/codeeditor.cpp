@@ -8,20 +8,16 @@
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
 
-#include <QDebug>
 #include <QPainter>
-#include <QTextBlock>
-#include <QTextCursor>
 #include <QFileInfo>
-#include <QStringLiteral>
 #include <QSplitter>
-#include <QApplication>
 #include <QMimeData>
-#include <QJsonDocument>
 #include <QFont>
 #include <QShortcut>
 #include <QToolTip>
 #include <QTextDocumentFragment>
+#include <QGuiApplication>
+#include <QTimer>
 
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
@@ -64,8 +60,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 }
 
 void CodeEditor::readPrefSettings() {
-    QSettings settings;
-
     settings.beginGroup("editor");
 
     if (settings.contains("textFont")) {
@@ -73,12 +67,16 @@ void CodeEditor::readPrefSettings() {
     } else {
         monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     }
+    monoFont.setStyleHint(QFont::Monospace);
+    monoFont.setFixedPitch(true);
     monoFont.setPointSize(settings.value("textSize", 13).toInt());
 
     setFont(monoFont);
     setLineWrapMode(settings.value("wrap", false).toBool()
                         ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
-
+    setTabStopDistance(fontMetrics().horizontalAdvance(
+                           QString(' ').repeated(settings.value("tabSize",
+                                                                4).toInt())));
     settings.endGroup();
 }
 
@@ -113,6 +111,34 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
     }
 }
 
+void CodeEditor::keyPressEvent(QKeyEvent *e) {
+    if (settings.value("editor/insertTabAsSpaces", true).toBool()) {
+        const int tabSize = settings.value("editor/tabSize", 4).toInt();
+        auto      cursor  = textCursor();
+        if (e->key() == Qt::Key_Tab) {
+            cursor.insertText(QString(' ').repeated(tabSize));
+            setTextCursor(cursor);
+        } else if (e->key() == Qt::Key_Backtab) {
+            cursor.beginEditBlock();
+            const QString &&line = cursor.block().text();
+            for (int i = tabSize; i > 0; --i) {
+                if (cursor.atBlockStart())
+                    break;
+                const QChar &&curChar = line[cursor.positionInBlock() - 1];
+                if (!curChar.isSpace())
+                    break;
+                cursor.deletePreviousChar();
+            }
+            cursor.endEditBlock();
+            setTextCursor(cursor);
+        } else {
+            QPlainTextEdit::keyPressEvent(e);
+        }
+    } else {
+        QPlainTextEdit::keyPressEvent(e);
+    }
+}
+
 void CodeEditor::dropEvent(QDropEvent *e) {
     QString nspacedID;
 
@@ -127,9 +153,7 @@ void CodeEditor::dropEvent(QDropEvent *e) {
     }
     if (!nspacedID.isEmpty()) {
         QTextCursor cursor = cursorForPosition(e->pos());
-        cursor.beginEditBlock();
         cursor.insertText(nspacedID);
-        cursor.endEditBlock();
         setTextCursor(cursor);
 
         auto *mimeData = new QMimeData();
@@ -275,7 +299,10 @@ void CodeEditor::setFilePath(const QString &path) {
     filepath = path;
 
     document()->setDefaultFont(monoFont);
-    setFont(monoFont);
+    /* The tab stop distance must be reset each time the current document is changed */
+    setTabStopDistance(fontMetrics().horizontalAdvance(
+                           QString(' ').repeated(settings.value("editor/tabSize",
+                                                                4).toInt())));
 }
 
 int CodeEditor::lineNumberAreaWidth() {
@@ -543,13 +570,6 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
         dynamic_cast<TextBlockData *>(currentBlock.userData());
     QVector<BracketInfo *> infos = data->brackets();
 
-
-/*
-      qDebug() << "matchLeftBracket" << chr << corresponder << i <<
-          numLeftParentheses << infos.count();
- */
-
-
     int docPos = currentBlock.position();
 
     for (; i < infos.size(); ++i) {
@@ -587,11 +607,6 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
 
     if (i == -2)
         i = infos.count() - 1;
-
-/*
-      qDebug() << "matchRightBracket" << chr << corresponder << i <<
-          numRightParentheses << infos.count();
- */
 
     int docPos = currentBlock.position();
 

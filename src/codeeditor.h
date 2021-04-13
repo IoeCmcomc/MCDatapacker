@@ -2,6 +2,7 @@
 #define CODEEDITOR_H
 
 #include <QPlainTextEdit>
+#include <QSettings>
 
 #include "codefile.h"
 
@@ -28,14 +29,15 @@ signals:
     void openFile(const QString &filepath);
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
+    void resizeEvent(QResizeEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
+    void keyPressEvent(QKeyEvent *e) override;
     void wheelEvent(QWheelEvent *e) override;
     void dropEvent(QDropEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
     bool event(QEvent *event) override;
 
-private slots:
+private /*slots*/ :
     void updateLineNumberAreaWidth(int newBlockCount);
     void onCursorPositionChanged();
     void updateLineNumberArea(const QRect &rect, int dy);
@@ -54,6 +56,7 @@ private:
     Highlighter *curHighlighter;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;
+    QSettings settings;
 
     void highlightCurrentLine();
     void matchParentheses();

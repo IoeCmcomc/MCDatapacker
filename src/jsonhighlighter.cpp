@@ -37,7 +37,7 @@ void JsonHighlighter::setupRules() {
 }
 
 void JsonHighlighter::highlightBlock(const QString &text) {
-    qDebug() << "JsonHighlighter::highlightBlock" << text;
+    /*qDebug() << "JsonHighlighter::highlightBlock" << text; */
     Highlighter::highlightBlock(text);
     if (this->document()) {
         for (const HighlightingRule &rule : qAsConst(highlightingRules)) {

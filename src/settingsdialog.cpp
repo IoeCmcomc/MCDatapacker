@@ -94,6 +94,9 @@ void SettingsDialog::onAccepted() {
     settings.setValue("wrap", ui->editorWrapCheck->isChecked());
     settings.setValue("toggleComments",
                       ui->commentToggleModeRadio->isChecked());
+    settings.setValue("tabSize", ui->editorTabSizeSpin->value());
+    settings.setValue("insertTabAsSpaces",
+                      ui->editorTabAsSpacesCheck->isChecked());
     settings.endGroup();
 
     qobject_cast<MainWindow*>(parent())->readPrefSettings(settings, true);
@@ -125,6 +128,9 @@ void SettingsDialog::initSettings() {
     ui->editorWrapCheck->setChecked(settings.value("wrap", false).toBool());
     if (settings.value("toggleComments", false).toBool())
         ui->commentToggleModeRadio->setChecked(true);
+    ui->editorTabSizeSpin->setValue(settings.value("tabSize", 4).toInt());
+    if (settings.value("insertTabAsSpaces", true).toBool())
+        ui->editorTabAsSpacesCheck->setChecked(true);
     settings.endGroup();
 }
 

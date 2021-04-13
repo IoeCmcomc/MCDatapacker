@@ -69,7 +69,7 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
 }
 
 void Highlighter::highlightBlock(const QString &text) {
-    qDebug() << "Highlighter::highlightBlock" << text << m_highlightMunually;
+    /*qDebug() << "Highlighter::highlightBlock" << text << m_highlightMunually; */
     if (m_highlightMunually) {
     } else {
         if (m_highlightingFirstBlock) {
@@ -151,7 +151,7 @@ void Highlighter::mergeFormat(int start, int count,
 }
 
 void Highlighter::onDocChanged() {
-    qDebug() << "onDocChanged";
+    /*qDebug() << "onDocChanged"; */
     m_highlightingFirstBlock = true;
     for (const auto &block: m_changedBlocks)
         qDebug() << "Block changed" << block.blockNumber() << block.text();
@@ -162,7 +162,7 @@ QVector<QTextBlock> Highlighter::changedBlocks() const {
 }
 
 void Highlighter::rehighlightBlock(const QTextBlock &block) {
-    qDebug() << "reHighlightblock" << block.blockNumber();
+    /*qDebug() << "reHighlightblock" << block.blockNumber(); */
     m_highlightMunually = true;
     QSyntaxHighlighter::rehighlightBlock(block);
     m_highlightMunually = false;
