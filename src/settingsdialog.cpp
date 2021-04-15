@@ -97,6 +97,8 @@ void SettingsDialog::onAccepted() {
     settings.setValue("tabSize", ui->editorTabSizeSpin->value());
     settings.setValue("insertTabAsSpaces",
                       ui->editorTabAsSpacesCheck->isChecked());
+    settings.setValue("showSpacesAndTabs",
+                      ui->editorShowSpacesCheck->isChecked());
     settings.endGroup();
 
     qobject_cast<MainWindow*>(parent())->readPrefSettings(settings, true);
@@ -129,8 +131,10 @@ void SettingsDialog::initSettings() {
     if (settings.value("toggleComments", false).toBool())
         ui->commentToggleModeRadio->setChecked(true);
     ui->editorTabSizeSpin->setValue(settings.value("tabSize", 4).toInt());
-    if (settings.value("insertTabAsSpaces", true).toBool())
-        ui->editorTabAsSpacesCheck->setChecked(true);
+    if (!settings.value("insertTabAsSpaces", true).toBool())
+        ui->editorTabAsSpacesCheck->setChecked(false);
+    if (settings.value("showSpacesAndTabs", false).toBool())
+        ui->editorShowSpacesCheck->setChecked(true);
     settings.endGroup();
 }
 

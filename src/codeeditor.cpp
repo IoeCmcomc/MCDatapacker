@@ -77,6 +77,13 @@ void CodeEditor::readPrefSettings() {
     setTabStopDistance(fontMetrics().horizontalAdvance(
                            QString(' ').repeated(settings.value("tabSize",
                                                                 4).toInt())));
+
+    QTextOption &&option = document()->defaultTextOption();
+    using Flag = QTextOption::Flag;
+    option.setFlags(settings.value("showSpacesAndTabs", false).toBool()
+                        ? (option.flags() | Flag::ShowTabsAndSpaces)
+                        : option.flags() & ~Flag::ShowTabsAndSpaces);
+    document()->setDefaultTextOption(option);
     settings.endGroup();
 }
 
@@ -297,12 +304,23 @@ void CodeEditor::highlightCurrentLine() {
 
 void CodeEditor::setFilePath(const QString &path) {
     filepath = path;
+    auto *doc = document();
 
-    document()->setDefaultFont(monoFont);
+    doc->setDefaultFont(monoFont);
+    settings.beginGroup("editor");
     /* The tab stop distance must be reset each time the current document is changed */
-    setTabStopDistance(fontMetrics().horizontalAdvance(
-                           QString(' ').repeated(settings.value("editor/tabSize",
-                                                                4).toInt())));
+    if (settings.value("insertTabAsSpaces", true).toBool()) {
+        setTabStopDistance(fontMetrics().horizontalAdvance(
+                               QString(' ').repeated(settings.value("tabSize",
+                                                                    4).toInt())));
+    }
+    QTextOption &&option = doc->defaultTextOption();
+    using Flag = QTextOption::Flag;
+    option.setFlags(settings.value("showSpacesAndTabs", false).toBool()
+                            ? (option.flags() | Flag::ShowTabsAndSpaces)
+                            : option.flags() & ~Flag::ShowTabsAndSpaces);
+    doc->setDefaultTextOption(option);
+    settings.endGroup();
 }
 
 int CodeEditor::lineNumberAreaWidth() {
@@ -484,7 +502,7 @@ void CodeEditor::updateErrorSelections() {
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
     QPainter painter(lineNumberArea);
 
-    painter.fillRect(event->rect(), QColor(210, 210, 210));
+    painter.fillRect(event->rect(), palette().midlight());
     /*
        painter.setPen(QColor(240, 240, 240));
        painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
@@ -498,9 +516,9 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
             if (blockNumber == this->textCursor().blockNumber()) {
-                painter.setPen(QColor(40, 40, 40));
+                painter.setPen(palette().shadow().color());
             } else {
-                painter.setPen(Qt::darkGray);
+                painter.setPen(palette().mid().color());
             }
             painter.drawText(0,
                              top,

@@ -62,6 +62,8 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     bracketPairs.append({ '{', '}' });
     bracketPairs.append({ '[', ']' });
 
+    m_invisSpaceFmt.setForeground(Qt::lightGray);
+
 /*
       connect(parent, &QTextDocument::contentsChanged,
               this, &Highlighter::onDocChanged);
@@ -130,6 +132,8 @@ void Highlighter::highlightBlock(const QString &text) {
                         }
                     }
                 }
+                if (curChar.isSpace() || curChar == '\t')
+                    setFormat(i, 1, m_invisSpaceFmt);
             }
         }
 
@@ -153,8 +157,6 @@ void Highlighter::mergeFormat(int start, int count,
 void Highlighter::onDocChanged() {
     /*qDebug() << "onDocChanged"; */
     m_highlightingFirstBlock = true;
-    for (const auto &block: m_changedBlocks)
-        qDebug() << "Block changed" << block.blockNumber() << block.text();
 }
 
 QVector<QTextBlock> Highlighter::changedBlocks() const {
