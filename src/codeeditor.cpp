@@ -105,11 +105,6 @@ void CodeEditor::resizeEvent(QResizeEvent *e) {
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
-/*
-      qDebug() << "Mouse press event" << QGuiApplication::keyboardModifiers() <<
-          e->modifiers();
- */
-
     QPlainTextEdit::mousePressEvent(e);
 
     if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier

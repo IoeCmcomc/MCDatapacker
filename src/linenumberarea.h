@@ -20,9 +20,28 @@ protected:
     void paintEvent(QPaintEvent *event) override {
         codeEditor->lineNumberAreaPaintEvent(event);
     }
+    void mousePressEvent(QMouseEvent *e) override {
+        QWidget::mousePressEvent(e);
+        txtCursor = codeEditor->cursorForPosition(e->pos());
+        txtCursor.movePosition(QTextCursor::StartOfBlock);
+        txtCursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
+        codeEditor->setTextCursor(txtCursor);
+    };
+    void mouseMoveEvent(QMouseEvent *e) override {
+        QWidget::mouseMoveEvent(e);
+        auto cursor = codeEditor->cursorForPosition(e->pos());
+        cursor.movePosition(QTextCursor::NextBlock);
+        txtCursor.setPosition(cursor.position(), QTextCursor::KeepAnchor);
+        if (!txtCursor.hasSelection()) {
+            txtCursor.movePosition(QTextCursor::NextBlock,
+                                   QTextCursor::KeepAnchor);
+        }
+        codeEditor->setTextCursor(txtCursor);
+    };
 
 private:
     CodeEditor *codeEditor;
+    QTextCursor txtCursor;
 };
 
 #endif /* LINENUMBERAREA_H */
