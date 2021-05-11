@@ -55,7 +55,10 @@ public slots:
     void removeCurrent();
     void onSliderMoved(int value);
     void onScrollAreaScrolled(int value);
-
+    void moveToPrevStep();
+    void moveToNextStep();
+    void moveToPrevPage();
+    void moveToNextPage();
 
 signals:
     void getterCallRequested();

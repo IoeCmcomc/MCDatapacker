@@ -2,6 +2,7 @@
 #include "ui_datawidgetinterface.h"
 
 #include <QJsonObject>
+#include <QShortcut>
 
 DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
     QWidget(parent),
@@ -17,6 +18,17 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
             this, &DataWidgetInterface::onScrollAreaScrolled);
     connect(ui->scrollBar, &QScrollBar::valueChanged,
             this, &DataWidgetInterface::onSliderMoved);
+
+    connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Up), this),
+            &QShortcut::activated, this, &DataWidgetInterface::moveToPrevStep);
+    connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Down), this),
+            &QShortcut::activated, this, &DataWidgetInterface::moveToNextStep);
+    connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_PageUp), this),
+            &QShortcut::activated, this, &DataWidgetInterface::moveToPrevPage);
+    connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_PageDown), this),
+            &QShortcut::activated, this, &DataWidgetInterface::moveToNextPage);
+
+    ui->scrollArea->verticalScrollBar()->hide();
 }
 
 DataWidgetInterface::~DataWidgetInterface() {
@@ -99,6 +111,22 @@ void DataWidgetInterface::onScrollAreaScrolled(int value) {
         ui->scrollBar->setValue(computedValue);
         ui->scrollBar->blockSignals(false);
     }
+}
+
+void DataWidgetInterface::moveToPrevStep() {
+    ui->scrollBar->triggerAction(QScrollBar::SliderSingleStepSub);
+}
+
+void DataWidgetInterface::moveToNextStep() {
+    ui->scrollBar->triggerAction(QScrollBar::SliderSingleStepAdd);
+}
+
+void DataWidgetInterface::moveToPrevPage() {
+    ui->scrollBar->triggerAction(QScrollBar::SliderPageStepSub);
+}
+
+void DataWidgetInterface::moveToNextPage() {
+    ui->scrollBar->triggerAction(QScrollBar::SliderPageStepAdd);
 }
 
 void DataWidgetInterface::loadData(int index) {
