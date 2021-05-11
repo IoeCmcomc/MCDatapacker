@@ -28,6 +28,7 @@ SOURCES += \
     codefile.cpp \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
+    datawidgetinterface.cpp \
     dialogdatabutton.cpp \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
@@ -106,6 +107,7 @@ HEADERS += \
     codefile.h \
     datapackfileiconprovider.h \
     datapacktreeview.h \
+    datawidgetinterface.h \
     dialogdatabutton.h \
     disclaimerdialog.h \
     entityconditiondialog.h \
@@ -180,6 +182,7 @@ HEADERS += \
 FORMS += \
     aboutdialog.ui \
     blockitemselectordialog.ui \
+    datawidgetinterface.ui \
     dialogdatabutton.ui \
     disclaimerdialog.ui \
     entityconditiondialog.ui \

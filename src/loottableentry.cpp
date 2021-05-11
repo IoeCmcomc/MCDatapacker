@@ -45,6 +45,7 @@ LootTableEntry::~LootTableEntry() {
 }
 
 void LootTableEntry::fromJson(const QJsonObject &root) {
+    resetAll();
     if (!root.contains("type"))
         return;
 
@@ -196,6 +197,11 @@ QJsonObject LootTableEntry::toJson() const {
         root.insert("functions", functions);
 
     return root;
+}
+
+void LootTableEntry::resetAll() {
+    for (int i = 0; i < ui->stackedWidget->count(); ++i)
+        reset(i);
 }
 
 void LootTableEntry::onTypeChanged(int index) {

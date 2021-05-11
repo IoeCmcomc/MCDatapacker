@@ -28,6 +28,7 @@ QVersionNumber              MainWindow::curGameVersion = QVersionNumber(1, 15);
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    readSettings();
     Command::MinecraftParser::setSchema(
         QStringLiteral(":/minecraft/") + MainWindow::curGameVersion.toString() +
         QStringLiteral("/mcdata/generated/reports/commands.json"));
@@ -75,8 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::gameVersionChanged,
             ui->codeEditorInterface,
             &TabbedCodeEditorInterface::onGameVersionChanged);
-
-    readSettings();
 
     #ifndef QT_NO_SESSIONMANAGER
     QGuiApplication::setFallbackSessionManagementEnabled(false);

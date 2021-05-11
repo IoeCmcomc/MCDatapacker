@@ -62,6 +62,7 @@ void NumericInput::onMinMaxEdited() {
 }
 
 void NumericInput::fromJson(const QJsonValue &value) {
+    /*unset(); */
     if (value.isDouble()) {
         ui->spinBox->setValue(value.toInt());
         ui->stackedWidget->setCurrentIndex(0);

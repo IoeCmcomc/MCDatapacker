@@ -25,7 +25,7 @@ public:
 
     void setLootTableEditor(QWidget *value);
 
-private slots:
+private /*slots*/ :
     void onTypeChanged(int index);
     void onAddCondition();
     void onAddEntry();

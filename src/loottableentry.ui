@@ -14,7 +14,7 @@
    <enum>QTabWidget::South</enum>
   </property>
   <property name="currentIndex">
-   <number>0</number>
+   <number>2</number>
   </property>
   <widget class="QWidget" name="general">
    <attribute name="title">
@@ -277,8 +277,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>29</width>
-         <height>16</height>
+         <width>494</width>
+         <height>320</height>
         </rect>
        </property>
       </widget>
@@ -350,8 +350,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>59</width>
-         <height>18</height>
+         <width>508</width>
+         <height>334</height>
         </rect>
        </property>
       </widget>
@@ -397,8 +397,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>59</width>
-         <height>18</height>
+         <width>508</width>
+         <height>334</height>
         </rect>
        </property>
       </widget>

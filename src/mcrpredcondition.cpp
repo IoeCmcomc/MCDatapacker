@@ -267,6 +267,8 @@ QJsonObject MCRPredCondition::toJson() const {
 }
 
 void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
+    qDebug() << "MCRPredCondition::fromJson" << root;
+    resetAll();
     if (!root.contains("condition"))
         return;
 
@@ -699,6 +701,7 @@ void MCRPredCondition::setDepth(int value) {
 void MCRPredCondition::resetAll() {
     for (int i = 0; i < ui->stackedWidget->count(); ++i)
         reset(i);
+    ui->conditionTypeCombo->setCurrentIndex(0);
 }
 
 void MCRPredCondition::changeEvent(QEvent *event) {

@@ -436,12 +436,12 @@ void TabbedCodeEditorInterface::onCurTextChanged() {
 
 void TabbedCodeEditorInterface::onCurTextChangingDone() {
     qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone";
-    const auto *curFile     = getCurFile();
-    auto       *highlighter = curFile->highlighter;
-    if (curFile && highlighter) {
-        highlighter->checkProblems();
-        highlighter->onDocChanged();
-        ui->codeEditor->updateErrorSelections();
+    if (const auto *curFile = getCurFile()) {
+        if (auto *highlighter = curFile->highlighter) {
+            highlighter->checkProblems();
+            highlighter->onDocChanged();
+            ui->codeEditor->updateErrorSelections();
+        }
     }
 }
 
