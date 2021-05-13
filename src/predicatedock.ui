@@ -58,7 +58,7 @@
      </widget>
     </item>
     <item row="1" column="0" colspan="3">
-     <widget class="DataWidgetInterface" name="dataInterface" native="true">
+     <widget class="DataWidgetInterface" name="dataInterface">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -71,6 +71,12 @@
         <height>100</height>
        </size>
       </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
      </widget>
     </item>
    </layout>
@@ -79,7 +85,7 @@
  <customwidgets>
   <customwidget>
    <class>DataWidgetInterface</class>
-   <extends>QWidget</extends>
+   <extends>QFrame</extends>
    <header location="global">datawidgetinterface.h</header>
    <container>1</container>
   </customwidget>

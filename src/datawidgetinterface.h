@@ -3,13 +3,15 @@
 
 #include <QJsonArray>
 #include <QVBoxLayout>
-#include <QWidget>
+#include <QFrame>
+
+class QPropertyAnimation;
 
 namespace Ui {
     class DataWidgetInterface;
 }
 
-class DataWidgetInterface : public QWidget
+class DataWidgetInterface : public QFrame
 {
     Q_OBJECT
 
@@ -53,12 +55,6 @@ public:
 public slots:
     void addAfterCurrent();
     void removeCurrent();
-    void onSliderMoved(int value);
-    void onScrollAreaScrolled(int value);
-    void moveToPrevStep();
-    void moveToNextStep();
-    void moveToPrevPage();
-    void moveToNextPage();
 
 signals:
     void getterCallRequested();
@@ -66,17 +62,38 @@ signals:
     void test(int);
 /*    void resetCallRequested(); */
 
+protected:
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void enterEvent(QEvent *e) override;
+    void leaveEvent(QEvent *e) override;
+    void resizeEvent(QResizeEvent *e) override;
+
+private slots:
+    void onSliderMoved(int value);
+    void onScrollAreaScrolled(int value);
+    void moveToPrevStep();
+    void moveToNextStep();
+    void moveToPrevPage();
+    void moveToNextPage();
+    void sidebarAnimFinished();
+
 private:
     QVBoxLayout m_layout;
-    Ui::DataWidgetInterface *ui;
+    QRect m_sidebarRect;
     QJsonArray m_json;
-    QWidget *m_mainWidget = nullptr;
-    int m_currentIndex    = -1;
-    bool m_reactToSignal  = true;
+    Ui::DataWidgetInterface *ui;
+    QWidget *m_mainWidget         = nullptr;
+    QPropertyAnimation *animation = nullptr;
+    int m_currentIndex            = -1;
+    bool m_reactToSignal          = true;
+    bool m_sidebarHiding          = false;
+    const int m_sidebarSlideTime  = 200;
 
     void loadData(int index);
     void saveData(int index);
     void updateStates();
+    void showSidebar();
+    void hideSidebar();
 };
 
 #endif /* DATAWIDGETINTERFACE_H */

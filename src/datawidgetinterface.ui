@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DataWidgetInterface</class>
- <widget class="QWidget" name="DataWidgetInterface">
+ <widget class="QFrame" name="DataWidgetInterface">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,6 +15,12 @@
   </property>
   <property name="windowTitle">
    <string>Edit records</string>
+  </property>
+  <property name="frameShape">
+   <enum>QFrame::StyledPanel</enum>
+  </property>
+  <property name="frameShadow">
+   <enum>QFrame::Sunken</enum>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -34,6 +40,12 @@
    </property>
    <item>
     <widget class="QScrollArea" name="scrollArea">
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
      <property name="widgetResizable">
       <bool>true</bool>
      </property>

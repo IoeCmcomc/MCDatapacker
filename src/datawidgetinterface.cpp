@@ -2,11 +2,12 @@
 #include "ui_datawidgetinterface.h"
 
 #include <QJsonObject>
+#include <QMouseEvent>
 #include <QShortcut>
+#include <QPropertyAnimation>
 
 DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::DataWidgetInterface) {
+    QFrame(parent), ui(new Ui::DataWidgetInterface) {
     ui->setupUi(this);
     ui->scrollAreaWidgetContents->setLayout(&m_layout);
 
@@ -29,10 +30,14 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
             &QShortcut::activated, this, &DataWidgetInterface::moveToNextPage);
 
     ui->scrollArea->verticalScrollBar()->hide();
+    m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
+    animation     = new QPropertyAnimation(ui->sidebar, "maximumWidth");
+    animation->setEasingCurve(QEasingCurve::InCubic);
 }
 
 DataWidgetInterface::~DataWidgetInterface() {
     delete ui;
+    delete animation;
 }
 
 void DataWidgetInterface::setMainWidget(QWidget *widget) {
@@ -72,6 +77,48 @@ void DataWidgetInterface::removeCurrent() {
         loadData(m_currentIndex);
     }
     updateStates();
+}
+
+void DataWidgetInterface::mouseMoveEvent(QMouseEvent *e) {
+    QWidget::mouseMoveEvent(e);
+/*
+      qDebug() << "DataWidgetInterface::mouseMoveEvent" << m_sidebarRect <<
+          e->pos() << m_sidebarRect.contains(e->pos());
+ */
+    if (m_sidebarRect.contains(e->pos()))
+        showSidebar();
+    else
+        hideSidebar();
+}
+
+void DataWidgetInterface::enterEvent(QEvent *e) {
+    QWidget::enterEvent(e);
+    if (const auto *enterEvent = static_cast<QEnterEvent*>(e)) {
+        if (!m_sidebarRect.contains(enterEvent->pos()))
+            hideSidebar();
+    }
+
+    /*qDebug() << "DataWidgetInterface::enterEvent" << e; */
+}
+
+void DataWidgetInterface::leaveEvent(QEvent *e) {
+    QWidget::leaveEvent(e);
+    showSidebar();
+    /*qDebug() << "DataWidgetInterface::leaveEvent" << e; */
+}
+
+void DataWidgetInterface::resizeEvent(QResizeEvent *e) {
+    QWidget::resizeEvent(e);
+
+    animation->stop();
+    ui->sidebar->setMaximumWidth(m_sidebarRect.width());
+
+    /*m_sidebarRect.setTopLeft(ui->sidebar->pos()); */
+    m_sidebarRect =
+        QRect(ui->sidebar->pos(),
+              QSize(m_sidebarRect.size().width(), ui->sidebar->height()));
+
+    /*qDebug() << "DataWidgetInterface::resizeEvent" << m_sidebarRect; */
 }
 
 void DataWidgetInterface::onSliderMoved(int value) {
@@ -129,6 +176,13 @@ void DataWidgetInterface::moveToNextPage() {
     ui->scrollBar->triggerAction(QScrollBar::SliderPageStepAdd);
 }
 
+void DataWidgetInterface::sidebarAnimFinished() {
+    if (m_sidebarHiding) {
+        m_sidebarHiding = false;
+        ui->sidebar->hide();
+    }
+}
+
 void DataWidgetInterface::loadData(int index) {
     if (index < m_json.size() && index >= 0 && index != m_currentIndex) {
         /* Call the mapped setter function with the specified data */
@@ -151,6 +205,29 @@ void DataWidgetInterface::updateStates() {
 
     ui->label->setText(QString("%1/%2").arg(m_currentIndex +
                                             1).arg(m_json.size()));
+}
+
+void DataWidgetInterface::showSidebar() {
+    /*qDebug() << "DataWidgetInterface::showSidebar"; */
+    show();
+
+    animation->stop();
+    animation->setDuration(m_sidebarSlideTime);
+    animation->setStartValue(ui->sidebar->width());
+    animation->setEndValue(m_sidebarRect.width());
+    animation->start();
+
+    m_sidebarHiding = false;
+}
+
+void DataWidgetInterface::hideSidebar() {
+    /*qDebug() << "DataWidgetInterface::hideSidebar"; */
+    animation->stop();
+    animation->setDuration(m_sidebarSlideTime);
+    animation->setStartValue(ui->sidebar->width());
+    animation->setEndValue(0);
+    animation->start();
+    m_sidebarHiding = true;
 }
 
 QJsonArray DataWidgetInterface::json() const {
