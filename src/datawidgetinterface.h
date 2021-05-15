@@ -21,11 +21,18 @@ public:
 
     void setMainWidget(QWidget *widget);
 
-    QJsonArray json() const;
+    QJsonArray json();
     void setJson(const QJsonArray &json);
 
     int getCurrentIndex() const;
     void setCurrentIndex(int currentIndex);
+
+    inline int entriesCount() const {
+        return m_json.size();
+    }
+    inline bool hasEntries() const {
+        return !m_json.isEmpty();
+    }
 
     template<typename Class = QObject, typename Func>
     void mapToSetter(const Class *that, Func funcPtr) {
@@ -87,7 +94,7 @@ private:
     int m_currentIndex            = -1;
     bool m_reactToSignal          = true;
     bool m_sidebarHiding          = false;
-    const int m_sidebarSlideTime  = 200;
+    const int m_sidebarSlideTime  = 150;
 
     void loadData(int index);
     void saveData(int index);

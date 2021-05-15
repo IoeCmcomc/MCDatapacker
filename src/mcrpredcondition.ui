@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>286</height>
+    <width>511</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -148,7 +148,7 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="block_state_property">
-      <layout class="QGridLayout" name="gridLayout_7">
+      <layout class="QFormLayout" name="formLayout_3">
        <property name="leftMargin">
         <number>2</number>
        </property>
@@ -544,8 +544,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>376</width>
-            <height>339</height>
+            <width>378</width>
+            <height>245</height>
            </rect>
           </property>
           <property name="alignment">
@@ -746,8 +746,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>376</width>
-            <height>305</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
          </widget>

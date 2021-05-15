@@ -22,11 +22,9 @@ protected:
 protected slots:
     void onReadBtn();
     void onWriteBtn();
-    void onAdded();
 
 private:
     Ui::PredicateDock *ui;
-    QHBoxLayout conditionsLayout;
 };
 
 #endif /* PREDICATEDOCK_H */

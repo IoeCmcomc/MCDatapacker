@@ -42,8 +42,14 @@ DataWidgetInterface::~DataWidgetInterface() {
 
 void DataWidgetInterface::setMainWidget(QWidget *widget) {
     widget->setParent(this);
+    widget->setMouseTracking(true);
+    for (auto *child :
+         widget->findChildren<QWidget*>(QString(),
+                                        Qt::FindDirectChildrenOnly)) {
+        child->setMouseTracking(true);
+    }
 
-    widget->sizeHint().rheight() = widget->minimumHeight();
+    widget->sizeHint().rheight() = widget->minimumHeight() - 50;
     m_layout.addWidget(widget, 0);
     m_mainWidget = widget;
 
@@ -62,7 +68,8 @@ void DataWidgetInterface::addAfterCurrent() {
     m_json.insert(m_currentIndex + 1, QJsonObject());
     ui->scrollBar->setValue((m_currentIndex + 1) * ui->scrollBar->pageStep());
     onSliderMoved(ui->scrollBar->value());
-    emit setterCallRequested({});
+    /*emit setterCallRequested({}); */
+    loadData(m_currentIndex);
 }
 
 void DataWidgetInterface::removeCurrent() {
@@ -81,10 +88,12 @@ void DataWidgetInterface::removeCurrent() {
 
 void DataWidgetInterface::mouseMoveEvent(QMouseEvent *e) {
     QWidget::mouseMoveEvent(e);
+
 /*
       qDebug() << "DataWidgetInterface::mouseMoveEvent" << m_sidebarRect <<
           e->pos() << m_sidebarRect.contains(e->pos());
  */
+
     if (m_sidebarRect.contains(e->pos()))
         showSidebar();
     else
@@ -122,9 +131,9 @@ void DataWidgetInterface::resizeEvent(QResizeEvent *e) {
 }
 
 void DataWidgetInterface::onSliderMoved(int value) {
-    const auto areaScrollbar = ui->scrollArea->verticalScrollBar();
+    auto *areaScrollbar = ui->scrollArea->verticalScrollBar();
 
-    qDebug() << "onSliderMoved" << value;
+    /*qDebug() << "onSliderMoved" << value; */
     /*areaScrollbar->blockSignals(true); */
     if (const int index = value / ui->scrollBar->pageStep();
         index != m_currentIndex) {
@@ -147,7 +156,11 @@ void DataWidgetInterface::onSliderMoved(int value) {
 
 void DataWidgetInterface::onScrollAreaScrolled(int value) {
     const auto areaScrollbar = ui->scrollArea->verticalScrollBar();
-    const int  computedValue =
+
+    if (areaScrollbar->maximum() <= 0)
+        return;
+
+    const int computedValue =
         m_currentIndex * ui->scrollBar->pageStep() + value *
         (ui->scrollBar->pageStep() / ui->scrollBar->singleStep()) /
         areaScrollbar->maximum();
@@ -184,7 +197,7 @@ void DataWidgetInterface::sidebarAnimFinished() {
 }
 
 void DataWidgetInterface::loadData(int index) {
-    if (index < m_json.size() && index >= 0 && index != m_currentIndex) {
+    if (index < m_json.size() && index >= 0) {
         /* Call the mapped setter function with the specified data */
         emit setterCallRequested(m_json[index].toObject());
     }
@@ -230,12 +243,21 @@ void DataWidgetInterface::hideSidebar() {
     m_sidebarHiding = true;
 }
 
-QJsonArray DataWidgetInterface::json() const {
+QJsonArray DataWidgetInterface::json() {
+    saveData(m_currentIndex);
     return m_json;
 }
 
 void DataWidgetInterface::setJson(const QJsonArray &json) {
     m_json = json;
+
+    m_currentIndex = m_json.size() - 1;
+    const int computedMax = ui->scrollBar->pageStep() * m_json.size() +
+                            (m_json.isEmpty());
+    ui->scrollBar->setMaximum(computedMax);
+    ui->scrollBar->setValue((m_json.size() - 1) * ui->scrollBar->pageStep());
+    onSliderMoved(ui->scrollBar->value());
+    loadData(m_currentIndex);
 }
 
 int DataWidgetInterface::getCurrentIndex() const {

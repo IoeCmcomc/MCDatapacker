@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>144</width>
-    <height>239</height>
+    <width>118</width>
+    <height>194</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -24,7 +24,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
-    <number>0</number>
+    <number>7</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -54,8 +54,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>111</width>
-        <height>237</height>
+        <width>78</width>
+        <height>192</height>
        </rect>
       </property>
      </widget>
