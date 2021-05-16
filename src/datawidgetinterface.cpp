@@ -33,6 +33,8 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
     m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
     animation     = new QPropertyAnimation(ui->sidebar, "maximumWidth");
     animation->setEasingCurve(QEasingCurve::InCubic);
+
+    updateStates();
 }
 
 DataWidgetInterface::~DataWidgetInterface() {
@@ -49,11 +51,15 @@ void DataWidgetInterface::setMainWidget(QWidget *widget) {
         child->setMouseTracking(true);
     }
 
-    widget->sizeHint().rheight() = widget->minimumHeight() - 50;
+    widget->sizeHint().rheight() = widget->minimumHeight();
     m_layout.addWidget(widget, 0);
     m_mainWidget = widget;
 
-    addAfterCurrent();
+    updateStates();
+}
+
+QWidget *DataWidgetInterface::mainWidget() const {
+    return m_mainWidget;
 }
 
 void DataWidgetInterface::addAfterCurrent() {
@@ -214,10 +220,21 @@ void DataWidgetInterface::updateStates() {
     const bool arrEmpty = m_json.isEmpty();
 
     ui->removeBtn->setDisabled(arrEmpty);
-    m_mainWidget->setDisabled(arrEmpty);
+    ui->scrollBar->setDisabled(arrEmpty);
+    if (m_mainWidget) {
+        setEnabled(true);
+        m_mainWidget->setDisabled(arrEmpty);
+    } else {
+        setDisabled(true);
+    }
 
-    ui->label->setText(QString("%1/%2").arg(m_currentIndex +
-                                            1).arg(m_json.size()));
+    ui->label->setText(QString("%1/%2\n%3/%4").arg(m_currentIndex +
+                                                   1).arg(m_json.size()).arg(ui
+                                                                             ->
+                                                                             scrollBar
+                                                                             ->
+                                                                             value()).arg(
+                           ui->scrollBar->maximum()));
 }
 
 void DataWidgetInterface::showSidebar() {
@@ -252,12 +269,17 @@ void DataWidgetInterface::setJson(const QJsonArray &json) {
     m_json = json;
 
     m_currentIndex = m_json.size() - 1;
-    const int computedMax = ui->scrollBar->pageStep() * m_json.size() +
-                            (m_json.isEmpty());
+    const int computedMax = ui->scrollBar->pageStep() * m_json.size() -
+                            ((m_json.size() > 0) * 2 - 1);
     ui->scrollBar->setMaximum(computedMax);
-    ui->scrollBar->setValue((m_json.size() - 1) * ui->scrollBar->pageStep());
-    onSliderMoved(ui->scrollBar->value());
-    loadData(m_currentIndex);
+    if (!m_json.isEmpty()) {
+        ui->scrollBar->setValue((m_json.size() - 1) *
+                                ui->scrollBar->pageStep());
+        onSliderMoved(ui->scrollBar->value());
+        loadData(m_currentIndex);
+    } else {
+        updateStates();
+    }
 }
 
 int DataWidgetInterface::getCurrentIndex() const {

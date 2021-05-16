@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
-    <height>406</height>
+    <width>400</width>
+    <height>310</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-    <horstretch>0</horstretch>
-    <verstretch>1</verstretch>
-   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
@@ -38,17 +32,17 @@
    <property name="bottomMargin">
     <number>8</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Condition:</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0" colspan="3">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Condition:</string>
      </property>
     </widget>
    </item>
@@ -78,11 +72,6 @@
      <item>
       <property name="text">
        <string>Entity scores</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Inverted (NOT)</string>
       </property>
      </item>
      <item>
@@ -140,6 +129,17 @@
        <string>Weather</string>
       </property>
      </item>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QToolButton" name="deleteButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resource/app/app.qrc">
+       <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
+     </property>
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
@@ -270,17 +270,10 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="TrueFalseBox" name="damageSrc_lightningCheck">
+         <item row="3" column="0">
+          <widget class="TrueFalseBox" name="damageSrc_bypassArmorCheck">
            <property name="text">
-            <string>Lightning</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="TrueFalseBox" name="damageSrc_fireCheck">
-           <property name="text">
-            <string>Fire</string>
+            <string>Bypasses armor</string>
            </property>
           </widget>
          </item>
@@ -291,21 +284,28 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="TrueFalseBox" name="damageSrc_fireCheck">
+           <property name="text">
+            <string>Fire</string>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="1">
+          <widget class="TrueFalseBox" name="damageSrc_lightningCheck">
+           <property name="text">
+            <string>Lightning</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
           <widget class="TrueFalseBox" name="damageSrc_magicCheck">
            <property name="text">
             <string>Magic</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="TrueFalseBox" name="damageSrc_bypassArmorCheck">
-           <property name="text">
-            <string>Bypasses armor</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
+         <item row="2" column="1">
           <widget class="TrueFalseBox" name="damageSrc_starvationCheck">
            <property name="text">
             <string>Starvation</string>
@@ -407,7 +407,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="entity_scores">
-      <layout class="QGridLayout" name="gridLayout_11">
+      <layout class="QFormLayout" name="formLayout_4">
        <property name="leftMargin">
         <number>2</number>
        </property>
@@ -516,45 +516,6 @@
            </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="inverted">
-      <layout class="QGridLayout" name="gridLayout_5">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QScrollArea" name="inverted_condArea">
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QLabel" name="inverted_condAreaInner">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>378</width>
-            <height>245</height>
-           </rect>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignHCenter|Qt::AlignTop</set>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
         </widget>
        </item>
       </layout>
@@ -672,20 +633,28 @@
       </layout>
      </widget>
      <widget class="QWidget" name="nested">
-      <layout class="QGridLayout" name="gridLayout_10">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="0" column="1">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>Combination mode:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
         <widget class="QRadioButton" name="nested_orRadio">
          <property name="text">
           <string>OR</string>
@@ -693,9 +662,29 @@
          <property name="checked">
           <bool>true</bool>
          </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup</string>
+         </attribute>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QRadioButton" name="nested_andRadio">
+         <property name="text">
+          <string>AND</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup</string>
+         </attribute>
         </widget>
        </item>
        <item row="0" column="4">
+        <widget class="QCheckBox" name="nested_invertedCheck">
+         <property name="text">
+          <string>Inverted</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -708,55 +697,13 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="2">
-        <widget class="QRadioButton" name="nested_andRadio">
-         <property name="text">
-          <string>AND</string>
+       <item row="1" column="0" colspan="6">
+        <widget class="DataWidgetInterface" name="nested_dataInterface">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_15">
-         <property name="text">
-          <string>Logic type:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="6">
-        <widget class="QPushButton" name="nested_addBtn">
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QCheckBox" name="nested_invertedCheck">
-         <property name="text">
-          <string>Inverted</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="7">
-        <widget class="QScrollArea" name="nested_condArea">
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="nested_condAreaInner">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>98</width>
-            <height>28</height>
-           </rect>
-          </property>
-         </widget>
-        </widget>
-       </item>
-       <item row="0" column="5">
-        <widget class="Line" name="line_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
          </property>
         </widget>
        </item>
@@ -1265,17 +1212,6 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QToolButton" name="deleteButton">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resource/app/app.qrc">
-       <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -1300,9 +1236,18 @@
    <extends>QLabel</extends>
    <header location="global">dialogdatabutton.h</header>
   </customwidget>
+  <customwidget>
+   <class>DataWidgetInterface</class>
+   <extends>QFrame</extends>
+   <header location="global">datawidgetinterface.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../resource/app/app.qrc"/>
  </resources>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

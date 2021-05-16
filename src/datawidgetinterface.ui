@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>118</width>
+    <width>125</width>
     <height>194</height>
    </rect>
   </property>
@@ -49,12 +49,15 @@
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
      <widget class="QWidget" name="scrollAreaWidgetContents">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>78</width>
+        <width>85</width>
         <height>192</height>
        </rect>
       </property>

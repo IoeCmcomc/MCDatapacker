@@ -20,6 +20,7 @@ public:
     ~DataWidgetInterface();
 
     void setMainWidget(QWidget *widget);
+    QWidget *mainWidget() const;
 
     QJsonArray json();
     void setJson(const QJsonArray &json);

@@ -34,13 +34,14 @@ PredicateDock::PredicateDock(QWidget *parent) :
 
     auto *cond = new MCRPredCondition();
     /*cond->setMinimumHeight(500); */
-    cond->setIsModular(true);
     ui->dataInterface->setMainWidget(cond);
 
     ui->dataInterface->mapToSetter(
         cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
 
     ui->dataInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+
+    ui->dataInterface->addAfterCurrent();
 }
 
 PredicateDock::~PredicateDock() {

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>474</height>
+    <width>275</width>
+    <height>183</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>275</width>
+    <height>183</height>
+   </size>
   </property>
   <property name="allowedAreas">
    <set>Qt::AllDockWidgetAreas</set>

@@ -39,7 +39,6 @@ protected:
 protected slots:
     void blockStates_onAdded();
     void entityScores_onAdded();
-    void nested_onAdded();
     void setupRefCombo();
     void tableBonus_onAdded();
     void toolEnchant_onAdded();
@@ -54,11 +53,9 @@ private:
     QStandardItemModel enchantmentsModel;
     QStandardItemModel condRefsModel;
     QStandardItemModel tableBonusModel;
-    QVBoxLayout nestedCondLayout;
-    QVBoxLayout invertedCondLayout;
     const QStringList condTypes =
     { "block_state_property", "damage_source_properties", "entity_properties",
-      "entity_scores",        "inverted",                 "killed_by_player",
+      "entity_scores",        "killed_by_player",
       "location_check",       "alternative",              "match_tool",
       "random_chance",        "reference",                "survives_explosion",
       "table_bonus",          "time_check",               "tool_enchantment",
@@ -71,7 +68,6 @@ private:
 
     void initBlockStatesPage();
     void initEntityScoresPage();
-    void initInvertedCondPage();
     void initNestedCondPage();
     void initRandChancePage();
     void initTableBonusPage();

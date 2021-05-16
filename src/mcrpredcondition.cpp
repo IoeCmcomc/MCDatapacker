@@ -43,8 +43,6 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     ui->damageSrc_directPropBtn->setDialogType(DDBType::EntityCond);
     ui->entity_propBtn->setDialogType(DDBType::EntityCond);
     initEntityScoresPage();
-    initInvertedCondPage();
-    initNestedCondPage();
     ui->matchTool_propBtn->setDialogType(DDBType::ItemCond);
     ui->location_propBtn->setDialogType(DDBType::LocationCond);
     initRandChancePage();
@@ -136,21 +134,13 @@ QJsonObject MCRPredCondition::toJson() const {
         break;
     }
 
-    case 4: { /*Inverted */
-        auto *cond =
-            ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
-        if (cond != nullptr)
-            root.insert("term", cond->toJson());
-        break;
-    }
-
-    case 5: { /*Killed by player */
+    case 4: { /*Killed by player */
         if (ui->playerKill_invertedCheck->isChecked())
             root.insert("inverse", true);
         break;
     }
 
-    case 6: { /*Location */
+    case 5: { /*Location */
         if (!ui->location_xOffset->isUnset())
             root.insert("offsetX", ui->location_xOffset->value());
         if (!ui->location_yOffset->isUnset())
@@ -162,19 +152,15 @@ QJsonObject MCRPredCondition::toJson() const {
         break;
     }
 
-    case 7: { /*Nested conditions */
+    case 6: { /*Nested conditions */
         QJsonArray terms;
-        int        childCount = ui->nested_condAreaInner->children().count();
+        int        childCount = ui->nested_dataInterface->entriesCount();
         if (childCount != 0) {
-            for (auto *child : ui->nested_condAreaInner->children()) {
-                auto *childCond = qobject_cast<MCRPredCondition*>(
-                    child);
-                if (childCond != nullptr) {
-                    QJsonObject cond = childCond->toJson();
-                    if (ui->nested_andRadio->isChecked())
-                        addInvertCondition(cond);
-                    terms.push_back(cond);
-                }
+            for (const auto child : ui->nested_dataInterface->json()) {
+                auto &&cond = child.toObject();
+                if (ui->nested_andRadio->isChecked())
+                    addInvertCondition(cond);
+                terms.push_back(cond);
             }
             root.insert("terms", terms);
             if (ui->nested_invertedCheck->isChecked()) {
@@ -191,13 +177,13 @@ QJsonObject MCRPredCondition::toJson() const {
         break;
     }
 
-    case 8: { /*Match tool */
+    case 7: { /*Match tool */
         if (!ui->matchTool_propBtn->getData().isEmpty())
             root.insert("predicate", ui->matchTool_propBtn->getData());
         break;
     }
 
-    case 9: { /*Random chance (with looting) */
+    case 8: { /*Random chance (with looting) */
         root.insert("chance", ui->randChance_spinBox->value());
         if (ui->randChance_lootingCheck->isChecked()) {
             root.insert("condition", "minecraft:random_chance_with_looting");
@@ -207,17 +193,17 @@ QJsonObject MCRPredCondition::toJson() const {
         break;
     }
 
-    case 10: {/*Reference */
+    case 9: {/*Reference */
         if (!ui->ref_nameCombo->currentText().isEmpty())
             root.insert("name", ui->ref_nameCombo->currentText());
         break;
     }
 
-    case 11: {/*Survives Explosion */
+    case 10: {/*Survives Explosion */
         break;
     }
 
-    case 12: {/*Table bonus */
+    case 11: {/*Table bonus */
         root.insert("enchantment", ui->tableBonus_enchantCombo->currentData(
                         Qt::UserRole + 1).toString());
         QJsonArray chances;
@@ -231,14 +217,14 @@ QJsonObject MCRPredCondition::toJson() const {
         break;
     }
 
-    case 13: {/*Time */
+    case 12: {/*Time */
         root.insert("value", ui->time_valueInput->toJson());
         if (ui->time_periodSpinBox->value() > 0)
             root.insert("period", ui->time_periodSpinBox->value());
         break;
     }
 
-    case 14: {/*Tool enchantment */
+    case 13: {/*Tool enchantment */
         QJsonArray enchantments;
         for (int i = 0; i < ui->toolEnchant_table->rowCount(); ++i) {
             auto id =
@@ -256,7 +242,7 @@ QJsonObject MCRPredCondition::toJson() const {
         break;
     }
 
-    case 15: {/*Weather */
+    case 14: {/*Weather */
         ui->weather_rainingCheck->insertToJsonObject(root, "raining");
         ui->weather_thunderCheck->insertToJsonObject(root, "thundering");
         break;
@@ -280,9 +266,13 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
     Glhp::removePrefix(condType, "minecraft:");
 
     bool isRandChanceWithLoot = false;
+    bool singleInverted       = false;
     if (condType.endsWith("random_chance_with_looting")) {
         condType             = "random_chance";
         isRandChanceWithLoot = true;
+    } else if (condType.endsWith("inverted")) {
+        condType       = "alternative";
+        singleInverted = true;
     }
 
     int condIndex = condTypes.indexOf(condType);
@@ -358,35 +348,13 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 4: { /*Inverted */
-        if (value.contains("term")) {
-            QJsonObject term = value["term"].toObject();
-            if (!term.contains("condition"))
-                return;
-
-            if (term["condition"].toString().endsWith("alternative")) {
-                fromJson(term, true);
-            } else {
-                auto *cond =
-                    ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
-                if (cond == nullptr) {
-                    cond = new MCRPredCondition(ui->nested_condAreaInner);
-                    cond->setMinimumHeight(300);
-                    invertedCondLayout.addWidget(cond, 0);
-                }
-                cond->fromJson(term);
-            }
-        }
-        break;
-    }
-
-    case 5: { /*Killed by player */
+    case 4: { /*Killed by player */
         if (value.contains("inverse"))
             ui->playerKill_invertedCheck->setChecked(value["inverse"].toBool());
         break;
     }
 
-    case 6: { /*Location */
+    case 5: { /*Location */
         if (value.contains("offsetX"))
             ui->location_xOffset->setValue(value["offsetX"].toInt());
         if (value.contains("offsetY"))
@@ -398,20 +366,24 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 7: { /*Nested conditions */
-        if (value.contains("terms")) {
+    case 6: { /*Nested conditions */
+        if (singleInverted && value.contains("term")) {
+            ui->nested_dataInterface->setJson({ value["term"].toObject() });
+            ui->nested_orRadio->setChecked(true);
+            ui->nested_invertedCheck->setChecked(true);
+        } else if (value.contains("terms")) {
             QJsonArray terms            = value["terms"].toArray();
             bool       areTermsInverted = true;
-            for (auto termRef : terms) {
-                QJsonObject term = termRef.toObject();
+            for (const auto termRef : terms) {
+                const QJsonObject &&term = termRef.toObject();
                 if (!(term.contains("condition")
                       && term["condition"].toString().endsWith("inverted")))
                     areTermsInverted = false;
             }
             /*qDebug() << "areTermsInverted" << areTermsInverted; */
 
-            for (auto termRef : terms) {
-                QJsonObject term = termRef.toObject();
+            for (QJsonValueRef && termRef : terms) {
+                QJsonObject &&term = termRef.toObject();
 
                 if (!term.contains("condition"))
                     continue;
@@ -421,12 +393,12 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
                         term = sub;
                 }
 
-                auto *cond = new MCRPredCondition(
-                    ui->nested_condAreaInner);
-                cond->setMinimumHeight(300);
-                nestedCondLayout.addWidget(cond, 0);
-                cond->fromJson(term);
+                termRef = term;
             }
+            if (!ui->nested_dataInterface->mainWidget())
+                initNestedCondPage();
+
+            ui->nested_dataInterface->setJson(terms);
 
             if (redirected) {
                 if (areTermsInverted) {
@@ -449,13 +421,13 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 8: { /*Match tool */
+    case 7: { /*Match tool */
         if (value.contains("predicate"))
             ui->matchTool_propBtn->setData(value["predicate"].toObject());
         break;
     }
 
-    case 9: { /*Random chance (with looting) */
+    case 8: { /*Random chance (with looting) */
         if (value.contains("chance"))
             ui->randChance_spinBox->setValue(value["chance"].toDouble());
         ui->randChance_lootingCheck->setChecked(isRandChanceWithLoot);
@@ -465,17 +437,17 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 10: {/*Reference */
+    case 9: {/*Reference */
         if (value.contains("name"))
             ui->ref_nameCombo->setCurrentText(value["name"].toString());
         break;
     }
 
-    case 11: {/*Survives explosion */
+    case 10: {/*Survives explosion */
         break;
     }
 
-    case 12: {/*Table bonus */
+    case 11: {/*Table bonus */
         if (value.contains("enchantment"))
             setupComboFrom(ui->tableBonus_enchantCombo,
                            value["enchantment"].toString());
@@ -490,7 +462,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 13: {/*Time */
+    case 12: {/*Time */
         if (value.contains("value"))
             ui->time_valueInput->fromJson(value["value"]);
         if (value.contains("period") && value["period"].toInt() > 0)
@@ -498,7 +470,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 14: {/*Tool enchantment */
+    case 13: {/*Tool enchantment */
         if (value.contains("enchantments")) {
             QJsonArray enchantments = value["enchantments"].toArray();
             for (auto enchantment : enchantments) {
@@ -529,7 +501,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
         break;
     }
 
-    case 15: {/*Weather */
+    case 14: {/*Weather */
         ui->weather_rainingCheck->setupFromJsonObject(value, "raining");
         ui->weather_thunderCheck->setupFromJsonObject(value, "thundering");
         break;
@@ -542,21 +514,9 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
 
 void MCRPredCondition::onTypeChanged(const int &i) {
     ui->stackedWidget->setCurrentIndex(i);
-
-    if ((ui->stackedWidget->currentWidget() == ui->inverted) &&
-        invertedCondLayout.isEmpty()) {
-        if (depth < 1) {
-            auto *cond = new MCRPredCondition(
-                ui->nested_condAreaInner);
-            cond->setDepth(depth + 1);
-            cond->sizeHint().rheight() = minimumHeight();
-            /*cond->setIsModular(false); */
-            invertedCondLayout.addWidget(cond, 0);
-        } else {
-            ui->inverted_condAreaInner->setText(
-                tr("Inverting an inverted condition is very silly."));
-        }
-    }
+    const int nestedConditionIndex = 6;
+    if ((i == nestedConditionIndex) && !ui->nested_dataInterface->mainWidget())
+        initNestedCondPage();
 }
 
 void MCRPredCondition::onCurDirChanged(const QDir &dir) {
@@ -601,19 +561,12 @@ void MCRPredCondition::reset(int index) {
         break;
     }
 
-    case 4: { /*Inverted */
-        auto *cond =
-            ui->inverted_condAreaInner->findChild<MCRPredCondition*>();
-        delete cond;
-        break;
-    }
-
-    case 5: { /*Killed by player */
+    case 4: { /*Killed by player */
         ui->playerKill_invertedCheck->setChecked(false);
         break;
     }
 
-    case 6: { /*Location */
+    case 5: { /*Location */
         ui->location_xOffset->unset();
         ui->location_yOffset->unset();
         ui->location_zOffset->unset();
@@ -622,57 +575,51 @@ void MCRPredCondition::reset(int index) {
         break;
     }
 
-    case 7: { /*Nested conditions */
-        auto nestedCondWids =
-            ui->nested_condAreaInner->findChildren<MCRPredCondition*>(
-                QString(),
-                Qt::FindDirectChildrenOnly);
-        for (auto child : nestedCondWids) {
-            child->deleteLater();
-            /*delete child; */
-        }
+    case 6: { /*Nested conditions */
+        if (ui->nested_dataInterface->mainWidget())
+            ui->nested_dataInterface->setJson({});
         break;
     }
 
-    case 8: { /*Match tool */
+    case 7: { /*Match tool */
         ui->matchTool_propBtn->reset();
         break;
     }
 
-    case 9: { /*Random chance (with looting) */
+    case 8: { /*Random chance (with looting) */
         ui->randChance_spinBox->setValue(0);
         ui->randChance_lootingCheck->setChecked(false);
         ui->randChance_lootingInput->setValue(1);
         break;
     }
 
-    case 10: {/*Reference */
+    case 9: {/*Reference */
         ui->ref_nameCombo->setCurrentText("");
         break;
     }
 
-    case 11: {/*Survives Explosion */
+    case 10: {/*Survives Explosion */
         break;
     }
 
-    case 12: {/*Table bonus */
+    case 11: {/*Table bonus */
         ui->tableBonus_enchantCombo->setCurrentIndex(0);
         clearModelExceptHeaders(tableBonusModel);
         break;
     }
 
-    case 13: {/*Time */
+    case 12: {/*Time */
         ui->time_valueInput->unset();
         ui->time_periodSpinBox->setValue(0);
         break;
     }
 
-    case 14: {/*Tool enchantment */
+    case 13: {/*Tool enchantment */
         ui->toolEnchant_table->setRowCount(0);
         break;
     }
 
-    case 15: {/*Weather */
+    case 14: {/*Weather */
         ui->weather_rainingCheck->unset();
         ui->weather_thunderCheck->unset();
         break;
@@ -708,9 +655,6 @@ void MCRPredCondition::changeEvent(QEvent *event) {
     QFrame::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
-        if (!ui->inverted_condAreaInner->text().isEmpty())
-            ui->inverted_condAreaInner->setText(
-                tr("Inverting an inverted condition is very silly."));
     }
 }
 
@@ -737,13 +681,6 @@ void MCRPredCondition::entityScores_onAdded() {
     auto  json      = ui->entityScores_valueInput->toJson();
     valueItem->setData(Qt::DisplayRole, json);
     appendRowToTableWidget(ui->entityScores_table, { objItem, valueItem });
-}
-
-void MCRPredCondition::nested_onAdded() {
-    MCRPredCondition *cond = new MCRPredCondition(ui->nested_condAreaInner);
-
-    cond->sizeHint().rheight() = minimumHeight();
-    nestedCondLayout.addWidget(cond, 0);
 }
 
 void MCRPredCondition::setupRefCombo() {
@@ -827,15 +764,17 @@ void MCRPredCondition::initEntityScoresPage() {
             this, &MCRPredCondition::entityScores_onAdded);
 }
 
-void MCRPredCondition::initInvertedCondPage() {
-    ui->inverted_condAreaInner->setLayout(&invertedCondLayout);
-}
-
 void MCRPredCondition::initNestedCondPage() {
-    ui->nested_condAreaInner->setLayout(&nestedCondLayout);
+    auto *cond = new MCRPredCondition();
 
-    connect(ui->nested_addBtn, &QPushButton::clicked,
-            this, &MCRPredCondition::nested_onAdded);
+    /*cond->setMinimumHeight(500); */
+    /*cond->setIsModular(true); */
+    ui->nested_dataInterface->setMainWidget(cond);
+
+    ui->nested_dataInterface->mapToSetter(
+        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
+
+    ui->nested_dataInterface->mapToGetter(&MCRPredCondition::toJson, cond);
 }
 
 void MCRPredCondition::initRandChancePage() {
@@ -898,8 +837,10 @@ void MCRPredCondition::simplifyCondition(QVariantMap &condMap,
 
     /*qDebug().noquote() << tab << "simplifyCondJson" << depth; */
     if (condMap.contains("condition")) {
-        /*qDebug().noquote() << tab << "main condition:" << */
-        condMap["condition"].toString();
+        /*
+           qDebug().noquote() << tab << "main condition:" <<
+           condMap["condition"].toString();
+         */
         if (condMap["condition"].toString().endsWith("inverted")) {
             auto &subRef = condMap["term"];
             auto  sub    = subRef.toMap();
