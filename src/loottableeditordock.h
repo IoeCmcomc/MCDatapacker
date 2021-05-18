@@ -26,16 +26,6 @@ protected:
     void changeEvent(QEvent *event) override;
 
 protected slots:
-    void onAddPool();
-    void onDeletePool();
-    void onCurrentPoolChanged(const QModelIndex &current,
-                              const QModelIndex &previous);
-    void onAddCondition();
-    void onAddFunction();
-    void onAddEntry();
-
-    void checkPools();
-    void reset();
 
 private:
     Ui::LootTableEditorDock *ui;
@@ -45,18 +35,6 @@ private:
         QStringLiteral("fishing"),            QStringLiteral("gift"),
         QStringLiteral("advancement_reward"), QStringLiteral("generic")
     };
-    QStandardItemModel model;
-    bool poolDeleted = false;
-    QModelIndex indexBeforeDelete;
-    QHBoxLayout conditionsLayout;
-    QHBoxLayout functionsLayout;
-    QHBoxLayout entriesLayout;
-
-    void clearPoolEditor();
-    void getSelectedPool();
-    QJsonObject writePoolJson();
-    void readPoolJson(const QJsonObject &root);
-    void retranslate();
 };
 
 #endif /* LOOTTABLEEDITORDOCK_H */

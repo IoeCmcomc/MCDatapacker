@@ -21,28 +21,21 @@ public:
 
     void resetAll();
 
-    void setIsLuckBased(bool value);
-
-    void setLootTableEditor(QWidget *value);
-
 private /*slots*/ :
     void onTypeChanged(int index);
-    void onAddCondition();
-    void onAddEntry();
-    void onAddFunction();
+    void onTabChanged(int index);
 
 private:
     Ui::LootTableEntry *ui;
-    QWidget *lootTableEditor = nullptr;
-    QHBoxLayout conditionsLayout;
-    QHBoxLayout functionsLayout;
-    QHBoxLayout entriesLayout;
     const QStringList entryTypes =
     { "empty", "item", "loot_table", "tag", "dynamic" };
 
-    const int ENTRIES_TAB = 3;
+    static constexpr const int ENTRIES_TAB = 1;
 
     void reset(int index);
+    void initCondInterface();
+    void initFuncInterface();
+    void initEntryInterface();
 };
 
 #endif /* LOOTTABLEENTRY_H */

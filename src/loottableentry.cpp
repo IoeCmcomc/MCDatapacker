@@ -17,24 +17,17 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     ui->setupUi(this);
     setTabEnabled(ENTRIES_TAB, false);
 
-    ui->conditionsContainer->setLayout(&conditionsLayout);
-    ui->functionsContainer->setLayout(&functionsLayout);
-    ui->entriesContainer->setLayout(&entriesLayout);
-
     connect(ui->deleteButton, &QToolButton::clicked, this,
             &QObject::deleteLater);
     connect(ui->typeCmobo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &LootTableEntry::onTypeChanged);
-    connect(ui->entryGroupLabel, &QLabel::linkActivated,
-            [this]() {
+    connect(this,
+            &QTabWidget::currentChanged,
+            this,
+            &LootTableEntry::onTabChanged);
+    connect(ui->entryGroupLabel, &QLabel::linkActivated, [this]() {
         setCurrentIndex(ENTRIES_TAB);
     });
-    connect(ui->addCondButton, &QToolButton::clicked,
-            this, &LootTableEntry::onAddCondition);
-    connect(ui->addFunctButton, &QToolButton::clicked,
-            this, &LootTableEntry::onAddFunction);
-    connect(ui->addEntryButton, &QToolButton::clicked,
-            this, &LootTableEntry::onAddEntry);
 
     ui->itemSlot->setAcceptMultiItems(false);
     ui->itemSlot->setAcceptTag(false);
@@ -57,22 +50,23 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
         return;
 
     if (root.contains("quality")) {
-        ui->qualitySpin->setEnabled(true);
         ui->qualitySpin->setValue(root.value("quality").toInt());
     }
+    if (root.contains("weight"))
+        ui->weightSpin->setValue(root.value("weight").toInt());
 
     ui->typeCmobo->setCurrentIndex(index);
     switch (index) {
-    case 0:     /*Empty */
+    case 0:     /* Empty */
         break;
 
-    case 1: {      /*Item */
+    case 1: {      /* Item */
         if (root.contains("name"))
             ui->itemSlot->appendItem(MCRInvItem(root.value("name").toString()));
         break;
     }
 
-    case 2: {     /*Loot table */
+    case 2: {     /* Loot table */
         if (root.contains("name"))
             ui->nameEdit->setText(root.value("name").toString());
         break;
@@ -109,9 +103,9 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
         }
 
         if (root.contains("children")) {
-            QJsonArray children = root.value("children").toArray();
-            Glhp::loadJsonToObjectsToLayout<LootTableEntry>(children,
-                                                            entriesLayout);
+            if (!ui->entriesInterface->mainWidget())
+                initEntryInterface();
+            ui->entriesInterface->setJson(root.value("children").toArray());
         }
 
         break;
@@ -119,14 +113,14 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
     }
 
     if (root.contains("conditions")) {
-        QJsonArray conditions = root.value("conditions").toArray();
-        Glhp::loadJsonToObjectsToLayout<MCRPredCondition>(conditions,
-                                                          conditionsLayout);
+        if (!ui->conditionsInterface->mainWidget())
+            initCondInterface();
+        ui->conditionsInterface->setJson(root.value("conditions").toArray());
     }
     if (root.contains("functions")) {
-        QJsonArray functions = root.value("functions").toArray();
-        Glhp::loadJsonToObjectsToLayout<LootTableFunction>(functions,
-                                                           functionsLayout);
+        if (!ui->functionsInterface->mainWidget())
+            initFuncInterface();
+        ui->functionsInterface->setJson(root.value("functions").toArray());
     }
 }
 
@@ -135,8 +129,9 @@ QJsonObject LootTableEntry::toJson() const {
     const int   index = ui->typeCmobo->currentIndex();
 
     root.insert("type", "minecraft:" + entryTypes[index]);
-    if (ui->qualitySpin->isEnabled())
-        root.insert("quality", ui->qualitySpin->value());
+    root.insert("weight", ui->weightSpin->value());
+    if (const int quality = ui->qualitySpin->value(); quality != 0)
+        root.insert("quality", quality);
     if (ui->typeCmobo->currentIndex())
         switch (index) {
         case 0: /*Empty */
@@ -167,8 +162,7 @@ QJsonObject LootTableEntry::toJson() const {
             else if (ui->selectSeqRadio->isChecked())
                 root.insert("type", "minecraft:sequence");
 
-            auto children = Glhp::getJsonFromObjectsFromParent<
-                LootTableEntry>(ui->entriesContainer);
+            auto &&children = ui->entriesInterface->json();
             if (!children.isEmpty())
                 root.insert("children", children);
             break;
@@ -186,13 +180,11 @@ QJsonObject LootTableEntry::toJson() const {
             break;
         }
 
-    auto conditions = Glhp::getJsonFromObjectsFromParent<MCRPredCondition>(
-        ui->conditionsContainer);
+    auto &&conditions = ui->conditionsInterface->json();
     if (!conditions.isEmpty())
         root.insert("conditions", conditions);
 
-    auto functions = Glhp::getJsonFromObjectsFromParent<LootTableFunction>(
-        ui->functionsContainer);
+    auto &&functions = ui->functionsInterface->json();
     if (!functions.isEmpty())
         root.insert("functions", functions);
 
@@ -202,6 +194,8 @@ QJsonObject LootTableEntry::toJson() const {
 void LootTableEntry::resetAll() {
     for (int i = 0; i < ui->stackedWidget->count(); ++i)
         reset(i);
+    ui->functionsInterface->setJson({});
+    ui->conditionsInterface->setJson({});
 }
 
 void LootTableEntry::onTypeChanged(int index) {
@@ -213,26 +207,30 @@ void LootTableEntry::onTypeChanged(int index) {
         break;
     }
 
-    case 1:   /*Item */
-    case 2: { /*Loot table */
+    case 1: {  /*Item */
         ui->stackedWidget->setCurrentIndex(1);
+        break;
+    }
+
+    case 2: { /*Loot table */
+        ui->stackedWidget->setCurrentIndex(2);
         ui->tagExpandCheck->setEnabled(false);
         break;
     }
 
     case 3: {/*Tag */
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(2);
         ui->tagExpandCheck->setEnabled(true);
         break;
     }
 
     case 4: {/*Group */
-        ui->stackedWidget->setCurrentIndex(2);
+        ui->stackedWidget->setCurrentIndex(3);
         break;
     }
 
     case 5: {/*Dynamic */
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(2);
         ui->nameEdit->setPlaceholderText(tr("%1 or %2",
                                             "\"minecraft:contents or minecraft:self\"").
                                          arg(QStringLiteral("minecraft:contents"),
@@ -246,16 +244,29 @@ void LootTableEntry::onTypeChanged(int index) {
     }
 }
 
-void LootTableEntry::onAddCondition() {
-    auto *cond = new MCRPredCondition(ui->conditionsContainer);
+void LootTableEntry::onTabChanged(int index) {
+    switch (index) {
+    case ENTRIES_TAB: {
+        if (!ui->entriesInterface->mainWidget())
+            initEntryInterface();
+        break;
+    }
 
-    conditionsLayout.addWidget(cond, 0);
-}
+    case 2: { /* Functions */
+        if (!ui->functionsInterface->mainWidget())
+            initFuncInterface();
+        break;
+    }
 
-void LootTableEntry::onAddFunction() {
-    auto *funct = new LootTableFunction(ui->functionsArea);
+    case 3: { /* Conditions */
+        if (!ui->conditionsInterface->mainWidget())
+            initCondInterface();
+        break;
+    }
 
-    functionsLayout.addWidget(funct, 0);
+    default:
+        break;
+    }
 }
 
 void LootTableEntry::reset(int index) {
@@ -280,7 +291,7 @@ void LootTableEntry::reset(int index) {
     }
 
     case 4: {    /*Group */
-        /*Glhp::deleteChildrenIn(ui->entriesContainer); */
+        ui->entriesInterface->setJson({});
         break;
     }
 
@@ -292,20 +303,25 @@ void LootTableEntry::reset(int index) {
     default:
         break;
     }
-
-    Glhp::deleteChildrenIn(ui->conditionsContainer);
-    Glhp::deleteChildrenIn(ui->entriesContainer);
-    Glhp::deleteChildrenIn(ui->functionsContainer);
 }
 
-void LootTableEntry::onAddEntry() {
-    auto *entry =
-        new LootTableEntry(ui->entriesContainer);
+void LootTableEntry::initCondInterface() {
+    auto *cond = new MCRPredCondition();
 
-    entry->setLootTableEditor(lootTableEditor);
-    entriesLayout.addWidget(entry, 0);
+    ui->conditionsInterface->setMainWidget(cond);
+    ui->conditionsInterface->mapToSetter(
+        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
+    ui->conditionsInterface->mapToGetter(&MCRPredCondition::toJson, cond);
 }
 
-void LootTableEntry::setLootTableEditor(QWidget *value) {
-    lootTableEditor = value;
+void LootTableEntry::initFuncInterface() {
+    auto *func = new LootTableFunction();
+
+    ui->functionsInterface->setupMainWidget(func);
+}
+
+void LootTableEntry::initEntryInterface() {
+    auto *entry = new LootTableEntry();
+
+    ui->entriesInterface->setupMainWidget(entry);
 }

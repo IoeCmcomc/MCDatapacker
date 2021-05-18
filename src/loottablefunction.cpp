@@ -22,8 +22,8 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     connect(ui->functionTypeCombo,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &LootTableFunction::onTypeChanged);
-    connect(ui->addCondButton, &QPushButton::clicked,
-            this, &LootTableFunction::onAddCondition);
+    connect(this, &QTabWidget::currentChanged, this,
+            &LootTableFunction::onTabChanged);
 
     initComboModelView("enchantment", enchantmentsModel,
                        ui->bonus_enchantCombo, false);
@@ -33,7 +33,6 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
             this, &LootTableFunction::copyNBT_onAdded);
 
     initBlocksModel();
-    ui->conditionsArea->setLayout(&conditionsLayout);
 
     ui->copyState_blockCombo->setModel(&blocksModel);
     ui->copyState_list->installEventFilter(&viewFilter);
@@ -65,10 +64,6 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
 
     connect(ui->setAttr_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::setAttr_onAdded);
-
-    ui->entriesContainer->setLayout(&entriesLayout);
-    connect(ui->addEntryButton, &QPushButton::clicked,
-            this, &LootTableFunction::entries_onAdded);
 
     ui->setName_textEdit->setOneLine(true);
     ui->setName_textEdit->setDarkMode(true);
@@ -109,8 +104,8 @@ QJsonObject LootTableFunction::toJson() const {
         QJsonArray ops;
         for (int i = 0; i < ui->copyNBT_table->rowCount(); ++i) {
             auto source = ui->copyNBT_table->item(i, 0)->text();
-            auto op     = entityTargets[ui->copyNBT_table->item(i, 1)->
-                                        data(Qt::UserRole + 1).toInt()];
+            auto op     = ui->copyNBT_table->item(i, 1)
+                          ->data(Qt::UserRole + 1).toString();
             auto target = ui->copyNBT_table->item(i, 2)->text();
             ops.push_back(
                 QJsonObject({ { QStringLiteral("source"), source },
@@ -185,14 +180,14 @@ QJsonObject LootTableFunction::toJson() const {
     case 9: {   /* Set attributes */
         QJsonArray modifiers;
         for (int i = 0; i < ui->setAttr_table->rowCount(); i++) {
-            auto name = ui->setAttr_table->item(i, 0)->text();
-            auto attr = ui->setAttr_table->item(i, 1)->text();
-            auto op   = ui->setAttr_table->item(i, 2)
-                        ->data(Qt::UserRole + 1).toString();
-            auto amount = ui->setAttr_table->item(i, 3)
-                          ->data(Qt::DisplayRole).toJsonValue();
-            auto id       = ui->setAttr_table->item(i, 5)->text();
-            auto slotList = QJsonArray::fromStringList(
+            auto &&name = ui->setAttr_table->item(i, 0)->text();
+            auto &&attr = ui->setAttr_table->item(i, 1)->text();
+            auto &&op   = ui->setAttr_table->item(i, 2)
+                          ->data(Qt::UserRole + 1).toString();
+            auto &&amount = ui->setAttr_table->item(i, 3)
+                            ->data(Qt::DisplayRole).toJsonValue();
+            auto &&id       = ui->setAttr_table->item(i, 5)->text();
+            auto &&slotList = QJsonArray::fromStringList(
                 ui->setAttr_table->item(i, 4)
                 ->data(Qt::UserRole + 1).toStringList());
             QJsonValue slotValue;
@@ -202,26 +197,26 @@ QJsonObject LootTableFunction::toJson() const {
                 slotValue = slotList;
 
             QJsonObject modifier {
-                { "name", name },
-                { "attribute", attr },
-                { "operation", op },
-                { "amount", amount },
-                { "slot", slotValue },
+                { "name", std::move(name) },
+                { "attribute", std::move(attr) },
+                { "operation", std::move(op) },
+                { "amount", std::move(amount) },
+                { "slot", std::move(slotValue) },
             };
             if (!id.isEmpty())
-                modifier.insert("id", id);
-            modifiers.append(modifier);
+                modifier.insert("id", std::move(id));
+            modifiers.append(std::move(modifier));
         }
         if (!modifiers.isEmpty())
-            root.insert("modifiers", modifiers);
+            root.insert("modifiers", std::move(modifiers));
         break;
     }
 
     case 10: {   /* Set contents */
-        auto entries = Glhp::getJsonFromObjectsFromParent<LootTableEntry>(
-            ui->entriesContainer);
-        if (!entries.isEmpty())
+        const auto entries = ui->entryInterface->json();
+        if (!entries.isEmpty()) {
             root.insert("entries", entries);
+        }
         break;
     }
 
@@ -266,7 +261,7 @@ QJsonObject LootTableFunction::toJson() const {
     }
 
     case 16: {   /* Set NBT string */
-        root.insert("nbt", ui->setNBT_NBTEdit->text());
+        root.insert("tag", ui->setNBT_NBTEdit->text());
         break;
     }
 
@@ -292,10 +287,9 @@ QJsonObject LootTableFunction::toJson() const {
     }
     }
 
-    auto conditions = Glhp::getJsonFromObjectsFromParent<MCRPredCondition>(
-        ui->conditionsContainer);
+    auto conditions = ui->conditionInterface->json();
     if (!conditions.isEmpty())
-        root.insert("entries", conditions);
+        root.insert("conditions", conditions);
 
     return root;
 }
@@ -356,11 +350,11 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                 QTableWidgetItem *srcItem = new QTableWidgetItem(
                     op.value("source").toString());
                 QString opText = op.value("op").toString();
-                if (operationTypes.indexOf(opText) == -1)
+                if (nbtOperationTypes.indexOf(opText) == -1)
                     continue;
                 QTableWidgetItem *opItem = new QTableWidgetItem(
                     ui->copyNBT_opCombo->itemText(
-                        operationTypes.indexOf(opText)));
+                        nbtOperationTypes.indexOf(opText)));
                 opItem->setData(Qt::UserRole + 1, opText);
                 opItem->setFlags(opItem->flags() & ~Qt::ItemIsEditable);
                 QTableWidgetItem *targetItem = new QTableWidgetItem(
@@ -539,9 +533,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
     case 10: {   /* Set contents */
         if (root.contains("entries")) {
-            QJsonArray children = root.value("entries").toArray();
-            Glhp::loadJsonToObjectsToLayout<LootTableEntry>(children,
-                                                            entriesLayout);
+            if (!ui->entryInterface->mainWidget())
+                initEntryInterface();
+            ui->entryInterface->setJson(root["entries"].toArray());
         }
         break;
     }
@@ -606,10 +600,10 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     }
 
     case 16: {   /* Set NBT string */
-        if (!root.contains("nbt"))
+        if (!root.contains("tag"))
             return;
 
-        ui->setNBT_NBTEdit->setText(root.value("nbt").toString());
+        ui->setNBT_NBTEdit->setText(root.value("tag").toString());
         break;
     }
 
@@ -660,9 +654,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     }
 
     if (root.contains("conditions")) {
-        QJsonArray conditions = root.value("conditions").toArray();
-        Glhp::loadJsonToObjectsToLayout<MCRPredCondition>(conditions,
-                                                          conditionsLayout);
+        if (!ui->conditionInterface->mainWidget())
+            initCondInterface();
+        ui->conditionInterface->setJson(root.value("conditions").toArray());
     }
 }
 
@@ -673,12 +667,13 @@ void LootTableFunction::onTypeChanged(int index) {
         ui->stackedWidget->setCurrentIndex(maxIndex);
     else
         ui->stackedWidget->setCurrentIndex(index);
+    if ((index == 10) && !ui->entryInterface->mainWidget())
+        initEntryInterface();
 }
 
-void LootTableFunction::onAddCondition() {
-    auto *cond = new MCRPredCondition(ui->conditionsContainer);
-
-    conditionsLayout.addWidget(cond, 0);
+void LootTableFunction::onTabChanged(int index) {
+    if ((index == 1) && (!ui->conditionInterface->mainWidget()))
+        initCondInterface();
 }
 
 void LootTableFunction::copyNBT_onAdded() {
@@ -765,13 +760,6 @@ void LootTableFunction::setAttr_onAdded() {
                              slotsItem, IDItem });
 }
 
-void LootTableFunction::entries_onAdded() {
-    auto *entry =
-        new LootTableEntry(ui->entriesContainer);
-
-    entriesLayout.addWidget(entry, 0);
-}
-
 void LootTableFunction::effectStew_onAdded() {
     if (ui->stewEffect_effectCombo->currentIndex() == 0
         || ui->stewEffect_durationSpin->value() <= 0)
@@ -811,4 +799,20 @@ void LootTableFunction::initBlocksModel() {
         item->setData(vari, Qt::UserRole + 1);
         blocksModel.appendRow(item);
     }
+}
+
+void LootTableFunction::initCondInterface() {
+    auto *cond = new MCRPredCondition();
+
+    ui->conditionInterface->setMainWidget(cond);
+
+    ui->conditionInterface->mapToSetter(
+        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
+    ui->conditionInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+}
+
+void LootTableFunction::initEntryInterface() {
+    auto *entry = new LootTableFunction();
+
+    ui->entryInterface->setupMainWidget(entry);
 }

@@ -42,6 +42,7 @@ SOURCES += \
     loottableeditordock.cpp \
     loottableentry.cpp \
     loottablefunction.cpp \
+    loottablepool.cpp \
     main.cpp \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
@@ -122,6 +123,7 @@ HEADERS += \
     loottableeditordock.h \
     loottableentry.h \
     loottablefunction.h \
+    loottablepool.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
     mcrinvitem.h \
@@ -191,6 +193,7 @@ FORMS += \
     loottableeditordock.ui \
     loottableentry.ui \
     loottablefunction.ui \
+    loottablepool.ui \
     mainwindow.ui \
     mcrinvsloteditor.ui \
     mcrpredcondition.ui \

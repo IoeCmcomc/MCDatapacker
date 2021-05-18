@@ -15,77 +15,6 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="2">
-     <widget class="QPushButton" name="readLootTableBtn">
-      <property name="text">
-       <string>Read</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="5">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="4">
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="1" column="2">
-       <widget class="QToolButton" name="deletePoolButton">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resource/app/app.qrc">
-          <normaloff>:/icon/list_remove.png</normaloff>:/icon/list_remove.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QListView" name="poolListView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>200</height>
-         </size>
-        </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustToContents</enum>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="resizeMode">
-         <enum>QListView::Adjust</enum>
-        </property>
-        <property name="uniformItemSizes">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QToolButton" name="addPoolButton">
-        <property name="toolTip">
-         <string>Add pool</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resource/app/app.qrc">
-          <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item row="0" column="1">
      <widget class="Line" name="line_3">
       <property name="orientation">
@@ -154,203 +83,24 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="3" colspan="2">
-     <widget class="QPushButton" name="writeLootTableBtn">
+    <item row="0" column="2">
+     <widget class="QPushButton" name="readLootTableBtn">
       <property name="text">
-       <string>Write</string>
+       <string>Read</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="4">
-     <widget class="QTabWidget" name="poolEditor">
+    <item row="1" column="0" colspan="5">
+     <widget class="QTabWidget" name="tabWidget">
       <property name="tabPosition">
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="rollsTab">
+      <widget class="QWidget" name="pools">
        <attribute name="title">
-        <string>Rolls</string>
-       </attribute>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="cursor">
-           <cursorShape>WhatsThisCursor</cursorShape>
-          </property>
-          <property name="toolTip">
-           <string>The number of times the loot table will pick an item from its pool.</string>
-          </property>
-          <property name="text">
-           <string>Rolls:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="NumericInput" name="rollsInput">
-          <property name="minimumSize">
-           <size>
-            <width>130</width>
-            <height>20</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="bonusRollsLabel">
-          <property name="cursor">
-           <cursorShape>WhatsThisCursor</cursorShape>
-          </property>
-          <property name="toolTip">
-           <string>Bonus rolls from luck.</string>
-          </property>
-          <property name="text">
-           <string>Bonus rolls:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="NumericInput" name="bonusRollsInput">
-          <property name="minimumSize">
-           <size>
-            <width>130</width>
-            <height>20</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="conditionsTab">
-       <attribute name="title">
-        <string>Consitions</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <property name="leftMargin">
-         <number>4</number>
-        </property>
-        <property name="topMargin">
-         <number>4</number>
-        </property>
-        <property name="rightMargin">
-         <number>4</number>
-        </property>
-        <property name="bottomMargin">
-         <number>4</number>
-        </property>
-        <item row="2" column="0">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1" rowspan="2">
-         <widget class="QScrollArea" name="conditionsArea">
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="conditionsContainer">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>59</width>
-             <height>18</height>
-            </rect>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QToolButton" name="addCondButton">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../resource/app/app.qrc">
-            <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="functionsTab">
-       <attribute name="title">
-        <string>Functions</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <property name="leftMargin">
-         <number>4</number>
-        </property>
-        <property name="topMargin">
-         <number>4</number>
-        </property>
-        <property name="rightMargin">
-         <number>4</number>
-        </property>
-        <property name="bottomMargin">
-         <number>4</number>
-        </property>
-        <item row="0" column="1" rowspan="2">
-         <widget class="QScrollArea" name="functionsArea">
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="functionsContainer">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>59</width>
-             <height>18</height>
-            </rect>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>246</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="0">
-         <widget class="QToolButton" name="addFunctBtn">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="../resource/app/app.qrc">
-            <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="entriesTab">
-       <attribute name="title">
-        <string>Entries</string>
+        <string>Pools</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <property name="leftMargin">
@@ -365,44 +115,42 @@
         <property name="bottomMargin">
          <number>4</number>
         </property>
-        <item row="1" column="0">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="0">
+         <widget class="DataWidgetInterface" name="poolsInterface">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
           </property>
-         </spacer>
-        </item>
-        <item row="0" column="1" rowspan="2">
-         <widget class="QScrollArea" name="entriesArea">
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="entriesContainer">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>59</width>
-             <height>18</height>
-            </rect>
-           </property>
-          </widget>
          </widget>
         </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="functions">
+       <attribute name="title">
+        <string>Functions</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
         <item row="0" column="0">
-         <widget class="QToolButton" name="addEntryButton">
-          <property name="text">
-           <string/>
+         <widget class="DataWidgetInterface" name="functionsInterface">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="icon">
-           <iconset resource="../resource/app/app.qrc">
-            <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
           </property>
          </widget>
         </item>
@@ -410,19 +158,24 @@
       </widget>
      </widget>
     </item>
+    <item row="0" column="3" colspan="2">
+     <widget class="QPushButton" name="writeLootTableBtn">
+      <property name="text">
+       <string>Write</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NumericInput</class>
+   <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">datawidgetinterface.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resource/app/app.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

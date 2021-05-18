@@ -36,14 +36,9 @@ public:
     }
 
     template<typename Class = QObject, typename Func>
-    void mapToSetter(const Class *that, Func funcPtr) {
+    void mapToSetter(Class *that, Func funcPtr) {
         connect(this, &DataWidgetInterface::setterCallRequested,
                 that, funcPtr);
-    }
-
-    template <typename Sender, typename Func1, typename Func2>
-    void addConnection(const Sender* sender, Func1 signal, Func2 slot) {
-        connect(sender, signal, slot);
     }
 
     template<typename Class = QObject>
@@ -56,7 +51,9 @@ public:
     }
     template<typename Class = QWidget>
     void setupMainWidget(Class *widget) {
-        mapToSetter<Class>(&Class::fromJson, widget);
+        setMainWidget(widget);
+        connect(this, &DataWidgetInterface::setterCallRequested,
+                widget, &Class::fromJson);
         mapToGetter<Class>(&Class::toJson, widget);
     }
 
@@ -75,6 +72,7 @@ protected:
     void enterEvent(QEvent *e) override;
     void leaveEvent(QEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;
+    void changeEvent(QEvent *e) override;
 
 private slots:
     void onSliderMoved(int value);

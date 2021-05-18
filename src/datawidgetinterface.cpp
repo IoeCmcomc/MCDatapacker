@@ -136,6 +136,13 @@ void DataWidgetInterface::resizeEvent(QResizeEvent *e) {
     /*qDebug() << "DataWidgetInterface::resizeEvent" << m_sidebarRect; */
 }
 
+void DataWidgetInterface::changeEvent(QEvent *e) {
+    QFrame::changeEvent(e);
+    if (e->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+    }
+}
+
 void DataWidgetInterface::onSliderMoved(int value) {
     auto *areaScrollbar = ui->scrollArea->verticalScrollBar();
 

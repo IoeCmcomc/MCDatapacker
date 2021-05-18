@@ -24,12 +24,11 @@ public:
 
 private slots:
     void onTypeChanged(int index);
-    void onAddCondition();
+    void onTabChanged(int index);
     void copyNBT_onAdded();
     void copyState_onAdded();
     void enchantRand_onAdded();
     void setAttr_onAdded();
-    void entries_onAdded();
     void effectStew_onAdded();
 
 private:
@@ -57,12 +56,15 @@ private:
                                         "block_entity" };
     const QStringList operationTypes = { "addition", "multiply_base",
                                          "multiply_total" };
-    const QStringList slotTypes = { "mainhand", "offhand", "head",
-                                    "chest",    "legs",    "feet" };
+    const QStringList nbtOperationTypes = { "append", "merge", "replace" };
+    const QStringList slotTypes         = {
+        "mainhand", "offhand", "head", "chest", "legs", "feet" };
 
     ViewEventFilter viewFilter;
 
     void initBlocksModel();
+    void initCondInterface();
+    void initEntryInterface();
 };
 
 #endif /* LOOTTABLEFUNCTION_H */
