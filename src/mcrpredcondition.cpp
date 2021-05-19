@@ -17,10 +17,6 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     ui(new Ui::MCRPredCondition) {
     ui->setupUi(this);
 
-    setIsModular(true);
-
-    connect(ui->deleteButton, &QPushButton::clicked, this,
-            &QObject::deleteLater);
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MCRPredCondition::onTypeChanged);
@@ -54,17 +50,6 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
 
 MCRPredCondition::~MCRPredCondition() {
     delete ui;
-}
-
-bool MCRPredCondition::getIsModular() const {
-    return isModular;
-}
-
-void MCRPredCondition::setIsModular(bool value) {
-    isModular = value;
-    ui->deleteButton->setVisible(isModular);
-    setFrameShape((isModular) ? QFrame::StyledPanel : QFrame::NoFrame);
-    setFrameShadow((isModular) ? QFrame::Raised : QFrame::Plain);
 }
 
 QJsonObject MCRPredCondition::toJson() const {

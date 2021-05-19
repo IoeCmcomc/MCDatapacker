@@ -17,8 +17,6 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     ui->setupUi(this);
     setTabEnabled(ENTRIES_TAB, false);
 
-    connect(ui->deleteButton, &QToolButton::clicked, this,
-            &QObject::deleteLater);
     connect(ui->typeCmobo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &LootTableEntry::onTypeChanged);
     connect(this,

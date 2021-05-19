@@ -101,12 +101,13 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     if (value.isEmpty())
         return;
 
-    if (value.contains(QStringLiteral("item")))
+    if (value.contains(QStringLiteral("item"))) {
         ui->itemSlot->setItem(MCRInvItem(value[QStringLiteral(
                                                    "item")].toString()));
-    else if (value.contains(QStringLiteral("tag")))
+    } else if (value.contains(QStringLiteral("tag"))) {
         ui->itemTagEdit->setText(value[QStringLiteral("tag")].toString());
-
+        ui->tagRadio->setChecked(true);
+    }
     if (value.contains(QStringLiteral("count")))
         ui->countInput->fromJson(value[QStringLiteral("count")]);
     if (value.contains(QStringLiteral("durability")))

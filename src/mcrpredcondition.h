@@ -20,9 +20,6 @@ public:
     explicit MCRPredCondition(QWidget *parent = nullptr);
     ~MCRPredCondition();
 
-    bool getIsModular() const;
-    void setIsModular(bool value);
-
     QJsonObject toJson() const override;
     inline void fromJson(const QJsonObject &value) override {
         fromJson(value, false);
@@ -47,8 +44,7 @@ protected slots:
 
 private:
     Ui::MCRPredCondition *ui;
-    bool isModular = true;
-    int depth      = 0;
+    int depth = 0;
     QStandardItemModel blocksModel;
     QStandardItemModel enchantmentsModel;
     QStandardItemModel condRefsModel;

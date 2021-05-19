@@ -36,143 +36,7 @@
     <property name="bottomMargin">
      <number>7</number>
     </property>
-    <item row="1" column="0" colspan="4">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="Line" name="line_4">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Function:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QComboBox" name="functionTypeCombo">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <item>
-       <property name="text">
-        <string>Apply bonus</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Copy NBT</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Copy state</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Enchant randomly </string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Enchant with levels</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Exploration map</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Fill player head</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Limit count</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Looting enchant</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set attributes</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set contents</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set count</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set damage</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set loot table</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set lore</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set name</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set NBT</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set stew effect</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Copy name</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Explosion decay</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Furnace smelt</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="4">
+    <item row="2" column="0" colspan="3">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
        <number>1</number>
@@ -1065,15 +929,133 @@
       <widget class="QWidget" name="empty"/>
      </widget>
     </item>
-    <item row="0" column="3">
-     <widget class="QToolButton" name="deleteButton">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string/>
+       <string>Function:</string>
       </property>
-      <property name="icon">
-       <iconset resource="../resource/app/app.qrc">
-        <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="3">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="functionTypeCombo">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <item>
+       <property name="text">
+        <string>Apply bonus</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy state</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enchant randomly </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enchant with levels</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Exploration map</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Fill player head</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Limit count</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Looting enchant</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set attributes</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set contents</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set count</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set damage</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set loot table</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set lore</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set name</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set stew effect</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy name</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Explosion decay</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Furnace smelt</string>
+       </property>
+      </item>
      </widget>
     </item>
    </layout>
@@ -1126,20 +1108,18 @@
    <header location="global">optionalspinbox.h</header>
   </customwidget>
   <customwidget>
-   <class>RawJsonTextEdit</class>
-   <extends>QFrame</extends>
-   <header location="global">rawjsontextedit.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
    <header location="global">datawidgetinterface.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>RawJsonTextEdit</class>
+   <extends>QFrame</extends>
+   <header location="global">rawjsontextedit.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resource/app/app.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

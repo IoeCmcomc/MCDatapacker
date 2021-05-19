@@ -131,17 +131,6 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QToolButton" name="deleteButton">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resource/app/app.qrc">
-       <normaloff>:/icon/delete.png</normaloff>:/icon/delete.png</iconset>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
@@ -1243,9 +1232,7 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resource/app/app.qrc"/>
- </resources>
+ <resources/>
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup"/>

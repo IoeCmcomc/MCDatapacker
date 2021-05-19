@@ -17,8 +17,6 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     ui(new Ui::LootTableFunction) {
     ui->setupUi(this);
 
-    connect(ui->deleteButton, &QPushButton::clicked,
-            this, &QObject::deleteLater);
     connect(ui->functionTypeCombo,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &LootTableFunction::onTypeChanged);
