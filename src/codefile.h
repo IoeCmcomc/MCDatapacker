@@ -3,41 +3,38 @@
 
 #include "highlighter.h"
 
-#include <QTextDocument>
 #include <QFileInfo>
 #include <QDebug>
-#include <QTextCursor>
 
 struct CodeFile {
-    enum FileType {
+    enum FileType : char {
+        Unknown = -1,
+        Binary,
+        Structure,
+        Image,
         Text,
         Function,
-        Structure,
         JsonText,
         Advancement,
         LootTable,
         Meta,
         Predicate,
         Recipe,
-        BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag
+        BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag,
     };
 
-    QFileInfo      fileInfo;
-    FileType       fileType = Text;
-    QString        title;
-    QTextDocument *doc         = new QTextDocument();
-    QTextCursor    textCursor  = QTextCursor(doc);
-    Highlighter   *highlighter = nullptr;
+    QVariant  data;
+    QFileInfo fileInfo;
+    QString   title;
+    FileType  fileType   = Unknown;
+    bool      isModified = false;
 
     CodeFile(const QString &path);
 
-    CodeFile();
-
     inline bool isVaild() const {
-        return !fileInfo.filePath().isEmpty();
+        return (!fileInfo.filePath().isEmpty()) && data.isValid();
     };
     void changePath(const QString &path);
-    void initLayout();
 };
 
 QDebug operator<<(QDebug debug, const CodeFile &file);

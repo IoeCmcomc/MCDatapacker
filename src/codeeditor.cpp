@@ -10,7 +10,6 @@
 
 #include <QPainter>
 #include <QFileInfo>
-#include <QSplitter>
 #include <QMimeData>
 #include <QFont>
 #include <QShortcut>
@@ -18,7 +17,15 @@
 #include <QTextDocumentFragment>
 #include <QGuiApplication>
 #include <QTimer>
+#include <QPlainTextDocumentLayout>
 
+
+TextFileData::TextFileData(QTextDocument *doc, CodeFile *parent) {
+    this->parent = parent;
+    this->doc    = doc;
+    doc->setDocumentLayout(new QPlainTextDocumentLayout(doc));
+    this->textCursor = QTextCursor(doc);
+}
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     lineNumberArea = new LineNumberArea(this);
@@ -697,4 +704,3 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
         }
     }
 }
-

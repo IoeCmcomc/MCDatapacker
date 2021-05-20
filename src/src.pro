@@ -36,6 +36,7 @@ SOURCES += \
     fileswitcher.cpp \
     globalhelpers.cpp \
     highlighter.cpp \
+    imgviewer.cpp \
     itemconditiondialog.cpp \
     jsonhighlighter.cpp \
     locationconditiondialog.cpp \
@@ -116,6 +117,7 @@ HEADERS += \
     fileswitcher.h \
     globalhelpers.h \
     highlighter.h \
+    imgviewer.h \
     itemconditiondialog.h \
     jsonhighlighter.h \
     linenumberarea.h \

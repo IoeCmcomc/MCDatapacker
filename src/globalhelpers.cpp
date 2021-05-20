@@ -42,8 +42,9 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    QFileInfo     info       = QFileInfo(filepath);
-    const QString fullSuffix = info.completeSuffix();
+    QFileInfo                info       = QFileInfo(filepath);
+    const QString            fullSuffix = info.completeSuffix();
+    static const QStringList imageExts  = { "png", "jpg", "bmp" };
 
     if (fullSuffix == "mcmeta") {
         return CodeFile::Meta;
@@ -51,6 +52,8 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         return CodeFile::Function;
     } else if (fullSuffix == "nbt") {
         return CodeFile::Structure;
+    } else if (imageExts.contains(fullSuffix)) {
+        return CodeFile::Image;
     } else if (fullSuffix == "json") {
         if (isPathRelativeTo(dirpath, filepath, "advancements")) {
             return CodeFile::Advancement;
@@ -202,7 +205,7 @@ void Glhp::deleteChildrenIn(QWidget *widget) {
 }
 
 bool Glhp::removePrefix(QString &str, const QString &prefix) {
-    bool r = str.startsWith(prefix);
+    bool &&r = str.startsWith(prefix);
 
     if (r)
         str.remove(0, prefix.length());

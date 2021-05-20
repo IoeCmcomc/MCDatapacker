@@ -6,6 +6,20 @@
 
 #include "codefile.h"
 
+struct TextFileData {
+    CodeFile      *parent      = nullptr;
+    QTextDocument *doc         = new QTextDocument();
+    QTextCursor    textCursor  = QTextCursor(doc);
+    Highlighter   *highlighter = nullptr;
+
+    TextFileData(QTextDocument *doc, CodeFile *parent = nullptr);
+
+    TextFileData()                     = default;
+    TextFileData(const TextFileData &) = default;
+    ~TextFileData()                    = default;
+};
+Q_DECLARE_METATYPE(TextFileData)
+
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
