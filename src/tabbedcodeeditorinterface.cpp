@@ -105,13 +105,13 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
     QString errorMessage;
     bool    ok = true;
 
-#ifndef QT_NO_CURSOR
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-
     QSaveFile file(filepath);
     if (curFile.fileType >= CodeFile::Text) {
         auto data = qvariant_cast<TextFileData>(curFile.data);
+
+#ifndef QT_NO_CURSOR
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
 
         if (file.open(QFile::WriteOnly | QFile::Text)) {
             QTextStream out(&file);
@@ -242,6 +242,16 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
             newFile.data.setValue(data);
         }
         file.close();
+    } else if (newFile.fileType == CodeFile::Image) {
+        QString errStr;
+        if (!ui->imgViewer->loadFile(path, errStr)) {
+            QMessageBox::information(this, tr("Error"),
+                                     tr("Cannot read file %1:\n%2.")
+                                     .arg(QDir::toNativeSeparators(path),
+                                          errStr));
+        } else {
+            newFile.data.setValue(ui->imgViewer->getImage());
+        }
     }
 #ifndef QT_NO_CURSOR
     QGuiApplication::restoreOverrideCursor();
@@ -400,10 +410,15 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
             auto data = qvariant_cast<TextFileData>(curFile->data);
             ui->codeEditor->setDocument(data.doc);
             ui->codeEditor->setTextCursor(data.textCursor);
-        }
 
-        if (ui->stackedWidget->currentIndex() != 1)
-            ui->stackedWidget->setCurrentIndex(1);
+            if (ui->stackedWidget->currentIndex() != 1)
+                ui->stackedWidget->setCurrentIndex(1);
+        } else if (curFile->data.canConvert<QImage>()) {
+            ui->imgViewer->loadFile(qvariant_cast<QImage>(curFile->data));
+
+            if (ui->stackedWidget->currentIndex() != 2)
+                ui->stackedWidget->setCurrentIndex(2);
+        }
 
         emit curFileChanged(curFile->fileInfo.filePath());
     } else {
@@ -459,7 +474,7 @@ void TabbedCodeEditorInterface::onCurTextChanged() {
         const auto *highlighter = data.highlighter;
         textChangedTimer->start(
             (highlighter) ? highlighter->changedBlocks().length() : 0);
-    }else{
+    } else {
         textChangedTimer->stop();
     }
 }
