@@ -1,7 +1,6 @@
 #include "codeeditor.h"
 
 #include "linenumberarea.h"
-#include "jsonhighlighter.h"
 #include "datapacktreeview.h"
 #include "mainwindow.h"
 #include "globalhelpers.h"
@@ -12,12 +11,14 @@
 #include <QFileInfo>
 #include <QMimeData>
 #include <QFont>
+#include <QJsonDocument>
 #include <QShortcut>
 #include <QToolTip>
 #include <QTextDocumentFragment>
 #include <QGuiApplication>
 #include <QTimer>
 #include <QPlainTextDocumentLayout>
+#include <QScroller>
 
 
 TextFileData::TextFileData(QTextDocument *doc, CodeFile *parent) {
@@ -49,9 +50,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
-    /*bracketSeclectFmt.setBackground(QColor("#BB00FF00")); */
-    /*bracketSeclectFmt.setBackground(Qt::white); */
     bracketSeclectFmt.setBackground(QColor(102, 227, 102, 170));
+
+    QScroller::grabGesture(viewport(), QScroller::MiddleMouseButtonGesture);
 
     /*
        errorHighlightRule.setUnderlineStyle(

@@ -85,6 +85,7 @@ private:
 
     bool maybeSave(int index);
     void retranslate();
+    void printPanOffsets();
 };
 
 #endif /* TABBEDCODEEDITORINTERFACE_H */

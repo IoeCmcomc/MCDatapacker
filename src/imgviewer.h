@@ -13,9 +13,12 @@
 #include <QImage>
 
 struct ImageFileData {
-    QImage image;
-    QRect  viewRect;
+    QTransform transform;
+    QImage     image;
+    int        offsetX = -1;
+    int        offsetY = -1;
 };
+Q_DECLARE_METATYPE(ImageFileData)
 
 class ImgViewer : public QGraphicsView
 {
@@ -24,8 +27,8 @@ class ImgViewer : public QGraphicsView
 public:
     explicit ImgViewer(QWidget *parent = 0);
 
-    bool loadFile(const QString &strFilePath, QString &strError);
-    bool loadFile(const QImage &image);
+    static ImageFileData fromFile(const QString &strFilePath,
+                                  QString &strError);
 
     void resetView();
     void fitWindow();
@@ -38,28 +41,30 @@ public:
     inline int getRotateAngle() {
         return m_rotateAngle;
     }
-    QString getImageFormat(QString strFileName);
 
+    bool setImage(const QImage &image);
     QImage getImage() const;
 
     void loadData(const ImageFileData &data);
     ImageFileData toData() const;
 
+protected:
+    void wheelEvent(QWheelEvent * event) override;
+    void resizeEvent(QResizeEvent * event) override;
+    void paintEvent(QPaintEvent *e) override;
+    void drawForeground(QPainter *painter, const QRectF &rect) override;
+
 private:
     mutable QImage m_image;
     QPixmap m_pixmap;
-    QGraphicsPixmapItem *m_pixmapItem;
-    QGraphicsScene *m_scene;
+    QPixmap m_bg;
+    QGraphicsPixmapItem *m_pixmapItem = nullptr;
+    QGraphicsScene *m_scene           = nullptr;
     int m_rotateAngle;
     bool m_IsFitWindow;
     bool m_IsViewInitialized;
-    QString m_fileName;
 
-protected:
-    virtual void wheelEvent(QWheelEvent * event) override;
-    virtual void resizeEvent(QResizeEvent * event) override;
-    void paintEvent(QPaintEvent *e) override;
-    void drawForeground(QPainter *painter, const QRectF &rect) override;
+    void redrawBg();
 
 public slots:
     void reactToFitWindowToggle(bool);

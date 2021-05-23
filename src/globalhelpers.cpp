@@ -8,8 +8,8 @@
 using namespace Glhp;
 
 QString Glhp::randStr(int length) {
-    const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
-    QString       r;
+    static const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
+    QString              r;
 
     for (int i = 0; i < (length + 1); ++i) {
         int index = QRandomGenerator::global()->bounded(charset.length());
@@ -30,7 +30,7 @@ QString Glhp::relPath(const QString &dirpath, QString path) {
 QString Glhp::relNamespace(const QString &dirpath, QString path) {
     QString rp = relPath(dirpath, std::move(path));
 
-    if (removePrefix(rp, "data/"))
+    if (removePrefix(rp, QStringLiteral("data/")))
         rp = rp.section('/', 0, 0);
     else
         rp = "";
@@ -44,34 +44,45 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
 
     QFileInfo                info       = QFileInfo(filepath);
     const QString            fullSuffix = info.completeSuffix();
-    static const QStringList imageExts  = { "png", "jpg", "bmp" };
+    static const QStringList imageExts  =
+    { QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
+      QStringLiteral("bmp") };
 
-    if (fullSuffix == "mcmeta") {
+    if (fullSuffix == QStringLiteral("mcmeta")) {
         return CodeFile::Meta;
-    } else if (fullSuffix == "mcfunction") {
+    } else if (fullSuffix == QStringLiteral("mcfunction")) {
         return CodeFile::Function;
-    } else if (fullSuffix == "nbt") {
+    } else if (fullSuffix == QStringLiteral("nbt")) {
         return CodeFile::Structure;
     } else if (imageExts.contains(fullSuffix)) {
         return CodeFile::Image;
-    } else if (fullSuffix == "json") {
-        if (isPathRelativeTo(dirpath, filepath, "advancements")) {
+    } else if (fullSuffix == QStringLiteral("json")) {
+        if (isPathRelativeTo(dirpath, filepath,
+                             QStringLiteral("advancements"))) {
             return CodeFile::Advancement;
-        } else if (isPathRelativeTo(dirpath, filepath, "loot_tables")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("loot_tables"))) {
             return CodeFile::LootTable;
-        } else if (isPathRelativeTo(dirpath, filepath, "predicates")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("predicates"))) {
             return CodeFile::Predicate;
-        } else if (isPathRelativeTo(dirpath, filepath, "recipes")) {
+        } else if (isPathRelativeTo(dirpath, filepath, QStringLiteral(
+                                        "recipes"))) {
             return CodeFile::Recipe;
-        } else if (isPathRelativeTo(dirpath, filepath, "tags/blocks")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("tags/blocks"))) {
             return CodeFile::BlockTag;
-        } else if (isPathRelativeTo(dirpath, filepath, "tags/entity_types")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("tags/entity_types"))) {
             return CodeFile::EntityTypeTag;
-        } else if (isPathRelativeTo(dirpath, filepath, "tags/fluids")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("tags/fluids"))) {
             return CodeFile::FluidTag;
-        } else if (isPathRelativeTo(dirpath, filepath, "tags/functions")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("tags/functions"))) {
             return CodeFile::FunctionTag;
-        } else if (isPathRelativeTo(dirpath, filepath, "tags/items")) {
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("tags/items"))) {
             return CodeFile::ItemTag;
         } else {
             return CodeFile::JsonText;
@@ -84,17 +95,17 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
 QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
     switch (type) {
     case CodeFile::Function:
-        return QIcon(":/file-mcfunction");
+        return QIcon(QStringLiteral(":/file-mcfunction"));
 
     case CodeFile::Structure:
-        return QIcon(":/file-nbt");
+        return QIcon(QStringLiteral(":/file-nbt"));
 
     case CodeFile::Meta:
-        return QIcon(":/file-mcmeta");
+        return QIcon(QStringLiteral(":/file-mcmeta"));
 
     default: {
         if (type >= CodeFile::JsonText)
-            return QIcon(":/file-json");
+            return QIcon(QStringLiteral(":/file-json"));
 
         break;
     }
@@ -105,23 +116,23 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
 bool Glhp::isPathRelativeTo(const QString &dirpath,
                             const QString &path,
                             const QString &catDir) {
-    auto tmpDir = dirpath + "/data/";
+    const auto &&tmpDir = dirpath + QStringLiteral("/data/");
 
     if (!path.startsWith(tmpDir)) return false;
 
     return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
 }
 
-QString Glhp::toNamespacedID(const QString &dirpath,
-                             QString filepath) {
-    auto    datapath = dirpath + "/data/";
-    QString r;
+QString Glhp::toNamespacedID(const QString &dirpath, QString filepath) {
+    const QString &&datapath = dirpath + QStringLiteral("/data/");
+    QString         r;
 
     if (filepath.startsWith(datapath)) {
-        auto finfo = QFileInfo(filepath);
+        const auto &&finfo = QFileInfo(filepath);
         filepath = finfo.dir().path() + '/' + finfo.completeBaseName();
         filepath.remove(0, datapath.length());
-        if (isPathRelativeTo(dirpath, finfo.filePath(), "tags")) {
+        if (isPathRelativeTo(dirpath, finfo.filePath(),
+                             QStringLiteral("tags"))) {
             if (filepath.split('/').count() >= 4)
                 r = "#" + filepath.section('/', 0, 0)
                     + ':' + filepath.section('/', 3);
@@ -162,18 +173,17 @@ QVector<QString> Glhp::fileIDList(const QString &dirpath,
                                   const QString &catDir,
                                   const QString &nspace) {
     QVector<QString> IDList;
-    QString          dataPath = dirpath + QStringLiteral("/data/");
+    const QString  &&dataPath = dirpath + QStringLiteral("/data/");
 
-    auto appendIDToList =
-        [&](const QString &nspace)->void {
+    auto &&appendIDToList =
+        [&dataPath, &catDir, &IDList](const QString &nspace)->void {
             QString tagPath = dataPath + nspace + '/' + catDir;
             QDir    IDDir(tagPath);
 
             if (IDDir.exists() && (!IDDir.isEmpty())) {
-                auto names =
-                    IDDir.entryList(
-                        QDir::Files | QDir::NoDotAndDotDot);
-                for (auto name : names) {
+                auto &&names = IDDir.entryList(
+                    QDir::Files | QDir::NoDotAndDotDot);
+                for (auto &&name : names) {
                     name = name.section('.', 0, 0);
                     IDList.push_back(nspace + ":" + name);
                 }
@@ -181,8 +191,8 @@ QVector<QString> Glhp::fileIDList(const QString &dirpath,
         };
 
     if (nspace.isEmpty()) {
-        QDir dir(dataPath);
-        auto nspaceDirs = dir.entryList(
+        QDir   dir(dataPath);
+        auto &&nspaceDirs = dir.entryList(
             QDir::Dirs | QDir::NoDotAndDotDot);
         for (const auto &nspaceDir : nspaceDirs) {
             auto nspace = nspaceDir.section('.', 0, 0);

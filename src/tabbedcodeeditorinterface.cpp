@@ -205,9 +205,8 @@ void TabbedCodeEditorInterface::onModificationChanged(bool changed) {
 CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
     CodeFile newFile(path);
 
-    QFile file(path);
-
     if (newFile.fileType >= CodeFile::Text) {
+        QFile file(path);
         if (!file.open(QFile::ReadOnly | QFile::Text)) {
             QMessageBox::information(this, tr("Error"),
                                      tr("Cannot read file %1:\n%2.")
@@ -244,13 +243,15 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
         file.close();
     } else if (newFile.fileType == CodeFile::Image) {
         QString errStr;
-        if (!ui->imgViewer->loadFile(path, errStr)) {
+        if (auto &&data = ImgViewer::fromFile(path, errStr);
+            !errStr.isEmpty()) {
             QMessageBox::information(this, tr("Error"),
                                      tr("Cannot read file %1:\n%2.")
                                      .arg(QDir::toNativeSeparators(path),
                                           errStr));
         } else {
-            newFile.data.setValue(ui->imgViewer->getImage());
+            newFile.data.setValue(data);
+            qDebug() << newFile << newFile.data;
         }
     }
 #ifndef QT_NO_CURSOR
@@ -380,7 +381,7 @@ void TabbedCodeEditorInterface::onGameVersionChanged(const QString &ver) {
 
     for (const auto &file: qAsConst(files)) {
         if (file.fileType == CodeFile::Function) {
-            auto data = qvariant_cast<TextFileData>(file.data);
+            auto &&data = qvariant_cast<TextFileData>(file.data);
             data.highlighter->checkProblems(true);
         }
     }
@@ -392,18 +393,38 @@ void TabbedCodeEditorInterface::changeEvent(QEvent *event) {
         retranslate();
 }
 
+void TabbedCodeEditorInterface::printPanOffsets() {
+    QStringList panOffsets;
+
+    for (const auto &file: files) {
+        if (file.data.canConvert<ImageFileData>()) {
+            const auto &data = qvariant_cast<ImageFileData>(file.data);
+            panOffsets <<
+                QString("(%1, %2)").arg(data.offsetX).arg(data.offsetY);
+        } else {
+            panOffsets << "<Not an image>";
+        }
+    }
+    qDebug() << "Pan offsets: " << panOffsets.join(", ");
+}
+
 void TabbedCodeEditorInterface::onTabChanged(int index) {
     qDebug() << "onTabChanged" << prevIndex << getCurIndex() << index <<
         count();
+    /*printPanOffsets(); */
+
     if (index > -1) {
         if (prevIndex > -1)
-            if ((prevIndex < count()) && (prevIndex != index) && !tabMoved)
+            if ((prevIndex < count()) && (prevIndex != index) && !tabMoved) {
                 if (files[prevIndex].data.canConvert<TextFileData>()) {
                     auto &&data = qvariant_cast<TextFileData>(
                         files[prevIndex].data);
                     data.textCursor = ui->codeEditor->textCursor();
                     files[prevIndex].data.setValue(std::move(data));
+                } else if (files[prevIndex].fileType == CodeFile::Image) {
+                    files[prevIndex].data.setValue(ui->imgViewer->toData());
                 }
+            }
 
         auto *curFile = getCurFile();
         if (curFile->data.canConvert<TextFileData>()) {
@@ -413,8 +434,8 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
 
             if (ui->stackedWidget->currentIndex() != 1)
                 ui->stackedWidget->setCurrentIndex(1);
-        } else if (curFile->data.canConvert<QImage>()) {
-            ui->imgViewer->loadFile(qvariant_cast<QImage>(curFile->data));
+        } else if (curFile->data.canConvert<ImageFileData>()) {
+            ui->imgViewer->loadData(qvariant_cast<ImageFileData>(curFile->data));
 
             if (ui->stackedWidget->currentIndex() != 2)
                 ui->stackedWidget->setCurrentIndex(2);
@@ -434,6 +455,8 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
 
     prevIndex = index;
     tabMoved  = false;
+
+    /*printPanOffsets(); */
 }
 
 void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
@@ -449,8 +472,10 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
     Q_ASSERT(count() > 0);
     /*qDebug() << "onCloseFile" << index << count(); */
     if (maybeSave(index)) {
-        disconnect(getCurDoc(), &QTextDocument::modificationChanged,
-                   this, &TabbedCodeEditorInterface::onModificationChanged);
+        if (const auto *doc = getCurDoc()) {
+            disconnect(doc, &QTextDocument::modificationChanged,
+                       this, &TabbedCodeEditorInterface::onModificationChanged);
+        }
         files.remove(index);
         ui->tabBar->removeTab(index);
     }

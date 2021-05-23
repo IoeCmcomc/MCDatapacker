@@ -8,31 +8,39 @@
 #include <QMessageBox>
 #include <QWheelEvent>
 #include <QtMath>
-#include <QMatrix>
+#include <QShortcut>
+#include <QScrollBar>
+#include <QTimer>
 
 ImgViewer::ImgViewer(QWidget *parent) :
     QGraphicsView(parent), m_rotateAngle(0), m_IsFitWindow(false),
     m_IsViewInitialized(false) {
     m_scene = new QGraphicsScene(this);
     this->setScene(m_scene);
-    /*this->setBackgroundBrush(QBrush(Qt::gray, Qt::CrossPattern)); */
     this->setDragMode(NoDrag);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+    redrawBg();
+
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this),
+            &QShortcut::activated, [this]() {
+        loadData(toData());
+    });
 }
 
-bool ImgViewer::loadFile(const QString &strFilePath, QString &strError) {
-    QImage image;
+ImageFileData ImgViewer::fromFile(const QString &strFilePath,
+                                  QString &strError) {
+    ImageFileData data;
 
-    image.load(strFilePath);
-    if (image.isNull()) {
-        strError = QObject::tr("Cannot load %1.").arg(strFilePath);
-        return false;
+    data.image.load(strFilePath);
+    if (data.image.isNull()) {
+        strError = QObject::tr("Cannot load image: %1.").arg(strFilePath);
     }
-    m_fileName = strFilePath;
-    return loadFile(image);
+    return data;
 }
 
-bool ImgViewer::loadFile(const QImage &image) {
+bool ImgViewer::setImage(const QImage &image) {
     resetView();
     m_image      = image;
     m_pixmap     = QPixmap::fromImage(m_image);
@@ -56,8 +64,7 @@ void ImgViewer::resetView() {
     }
 
     m_scene->clear();
-    m_image = QImage();
-    m_fileName.clear();
+    m_image       = QImage();
     m_rotateAngle = 0;
     this->setDragMode(NoDrag);
     this->resetTransform();
@@ -117,6 +124,7 @@ void ImgViewer::rotateView(const int nVal) {
 }
 
 bool ImgViewer::saveViewToDisk(QString &strError) {
+    Q_UNUSED(strError)
 /*
       if (m_image.isNull()) {
           strError = QObject::tr("Save failed.");
@@ -177,22 +185,33 @@ bool ImgViewer::saveViewToDisk(QString &strError) {
     return true;
 }
 
-QString ImgViewer::getImageFormat(QString strFileName) {
-    QString str = strFileName.mid(strFileName.lastIndexOf(".") + 1, -1);
-
-    if (str.toLower() == "tif")
-        str = "tiff";
-    return str;
-}
-
 QImage ImgViewer::getImage() const {
     return m_image;
 }
 
 void ImgViewer::loadData(const ImageFileData &data) {
-    loadFile(data.image);
+    setImage(data.image);
 
-    auto viewRect = mapToScene(viewport()->geometry()).boundingRect();
+    const auto &tform = data.transform;
+    if (!tform.isIdentity())
+        setTransform(tform);
+
+    QTimer::singleShot(0, [data, this]() {
+        if (data.offsetX >= 0)
+            horizontalScrollBar()->setValue(data.offsetX);
+        if (data.offsetY >= 0)
+            verticalScrollBar()->setValue(data.offsetY);
+    });
+}
+
+ImageFileData ImgViewer::toData() const {
+    ImageFileData ret{ transform(), m_image };
+
+    if (horizontalScrollBar()->maximum() > 0)
+        ret.offsetX = horizontalScrollBar()->value();
+    if (verticalScrollBar()->maximum() > 0)
+        ret.offsetY = verticalScrollBar()->value();
+    return ret;
 }
 
 /* preserve fitWindow state on window resize */
@@ -200,6 +219,7 @@ void ImgViewer::resizeEvent(QResizeEvent *event) {
     if (!m_IsViewInitialized)
         return;
 
+    redrawBg();
     if (m_IsFitWindow)
         fitWindow();
     else {
@@ -209,42 +229,37 @@ void ImgViewer::resizeEvent(QResizeEvent *event) {
 }
 
 void ImgViewer::paintEvent(QPaintEvent *e) {
-    { /* Draw the transparency checkerboard as the fixed background */
+    {
         QPainter painter(viewport());
-
-        static QBrush whiteSmokeBrush(QColor(245, 245, 245));
-        static QBrush whiteBrush(Qt::white);
-        int           count = 0;
-
-        painter.setPen(Qt::NoPen);
-        const int cellSize = 31;
-        for (int x = 0; x < viewport()->width(); x += cellSize) {
-            for (int y = 0; y < viewport()->height(); y += cellSize) {
-                painter.setBrush((count % 2 ==
-                                  0) ? whiteSmokeBrush : whiteBrush);
-                painter.drawRect(x, y, cellSize, cellSize);
-                count++;
-            }
-            /* Offset rows by 1 */
-            count++;
-        }
+        painter.drawPixmap(rect(), m_bg);
     }
 
     QGraphicsView::paintEvent(e);
 
-    QPainter painter(viewport());
-    painter.setBrush(Qt::white);
-    painter.setPen(QPen(QBrush(Qt::black), 2));
-    painter.drawRect(16, 16, 384, 96);
-    auto rectToStr = [](const QRectF &rect) -> QString {
-                         return QString("(%1, %2, %3, %4)").arg(rect.x()).arg(
-                             rect.y()).arg(rect.width()).arg(rect.height());
-                     };
-    QString viewRectStr = "View rect: " +
-                          rectToStr(mapToScene(
-                                        viewport()->geometry()).boundingRect());
-    painter.drawText(32, 32, viewRectStr);
-    painter.drawText(32, 64, "Scene rect: " + rectToStr(sceneRect()));
+/*    QPainter painter(viewport()); */
+
+/*    painter.setPen(QPen(QBrush(Qt::black), 2)); */
+
+/*
+      painter.setBrush(Qt::white);
+      QRect debugRect(16, 16, 400, 96);
+      painter.drawRect(debugRect);
+      auto rectToStr = [](const QRectF &rect) -> QString {
+                           return QString("(%1, %2, %3, %4)").arg(rect.x()).arg(
+                               rect.y()).arg(rect.width()).arg(rect.height());
+                       };
+      QString &&str =
+          QString("Viewport rect: %1\n"
+                  "Transformation scaling: %2, %3\n"
+                  "Transformation translation: %4, %5\n"
+                  "Scrollbar offsets: %6. %7"
+                  ).arg(rectToStr(mapToScene(
+                                      viewport()->geometry()).boundingRect()))
+          .arg(transform().m11()).arg(transform().m22())
+          .arg(transform().dx()).arg(transform().dy())
+          .arg(horizontalScrollBar()->value()).arg(verticalScrollBar()->value());
+      painter.drawText(debugRect, Qt::AlignLeft | Qt::AlignTop, str);
+ */
 }
 
 void ImgViewer::drawForeground(QPainter *painter, const QRectF &) {
@@ -256,6 +271,27 @@ void ImgViewer::drawForeground(QPainter *painter, const QRectF &) {
     painter->drawRect(m_pixmapItem->boundingRect());
 
     /*qDebug() << "drawBackground rect:" << rect; */
+}
+
+void ImgViewer::redrawBg() {
+    /* Re:Draw the transparency checkerboard as the fixed background */
+
+    m_bg = QPixmap(size());
+    m_bg.fill(Qt::white);
+    QPainter painter(&m_bg);
+
+    static QBrush whiteSmokeBrush(QColor(245, 245, 245));
+
+    painter.setBrush(whiteSmokeBrush);
+    painter.setPen(Qt::NoPen);
+    const int cellSize = 47;
+    bool      xWhite   = false;
+    for (int x = 0; x < width(); x += cellSize) {
+        for (int y = 0; y < height(); y += cellSize * 2) {
+            painter.drawRect(x, y + cellSize * xWhite, cellSize, cellSize);
+        }
+        xWhite = !xWhite;
+    }
 }
 
 /* scale image on wheelEvent */
