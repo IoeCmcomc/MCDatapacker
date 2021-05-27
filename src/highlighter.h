@@ -41,6 +41,9 @@ class TextBlockData : public QTextBlockUserData
 {
 public:
     TextBlockData() = default;
+    ~TextBlockData() {
+        clear();
+    }
 
     void clear();
 

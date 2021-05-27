@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>372</height>
+    <width>421</width>
+    <height>259</height>
    </rect>
   </property>
   <property name="tabPosition">
@@ -255,7 +255,7 @@
   </widget>
   <widget class="QWidget" name="entries">
    <attribute name="title">
-    <string>Entries</string>
+    <string>Entries (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_4">
     <property name="leftMargin">
@@ -284,7 +284,7 @@
   </widget>
   <widget class="QWidget" name="functions">
    <attribute name="title">
-    <string>Functions</string>
+    <string>Functions (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_5">
     <property name="leftMargin">
@@ -313,7 +313,7 @@
   </widget>
   <widget class="QWidget" name="condtions">
    <attribute name="title">
-    <string>Conditions</string>
+    <string>Conditions (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
@@ -343,12 +343,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MCRInvSlot</class>
-   <extends>QFrame</extends>
-   <header>mcrinvslot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
    <header location="global">truefalsebox.h</header>
@@ -357,6 +351,12 @@
    <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
    <header location="global">datawidgetinterface.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MCRInvSlot</class>
+   <extends>QFrame</extends>
+   <header>mcrinvslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

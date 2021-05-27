@@ -281,7 +281,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
         }
     }
     settings.endGroup();
-    ui->codeEditorInterface->getEditor()->readPrefSettings();
+    ui->codeEditorInterface->getCodeEditor()->readPrefSettings();
 }
 
 void MainWindow::writeSettings() {
@@ -363,7 +363,7 @@ void MainWindow::changeEvent(QEvent* event) {
             break;
         }
 
-        /* this event is send, if the system, language changes */
+        /* this event is send, if the system language changes */
         case QEvent::LocaleChange: {
             /*qDebug() << "QEvent::LocaleChange"; */
             QString locale = QLocale::system().name();
@@ -389,7 +389,7 @@ void MainWindow::updateWindowTitle(bool changed) {
     QStringList titleParts;
 
     if (!ui->codeEditorInterface->hasNoFile()) {
-        if (auto curPath = ui->codeEditorInterface->getCurFilePath();
+        if (const auto &&curPath = ui->codeEditorInterface->getCurFilePath();
             !curPath.isEmpty())
             titleParts << QFileInfo(curPath).fileName() + "[*]";
         else
@@ -407,26 +407,25 @@ QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,
                                     [[maybe_unused]] const int depth) {
     QVariantMap retMap;
 
-    QFileInfo finfo = QFileInfo(
-        ":minecraft/" + ver + "/" + type + ".json");
+    QFileInfo finfo(":minecraft/" + ver + "/" + type + ".json");
 
-    qDebug() << "readMCRInfo" << type << ver << finfo << finfo.exists();
+    /*qDebug() << "readMCRInfo" << type << ver << finfo << finfo.exists(); */
 
     if (!finfo.exists())
-        finfo.setFile(":minecraft/1.15/" + type + ".json");
+        finfo.setFile(QStringLiteral(":minecraft/1.15/") + type + ".json");
 
     if (!(finfo.exists() && finfo.isFile())) {
         qWarning() << "File not exists:" << finfo.path() << "Return empty.";
         return retMap;
     }
-    qDebug() << finfo;
+    /*qDebug() << finfo; */
     QFile inFile(finfo.filePath());
     inFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray data = inFile.readAll();
+    QByteArray &&data = inFile.readAll();
     inFile.close();
 
     QJsonParseError errorPtr;
-    QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
+    QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
         qWarning() << "Parse failed" << errorPtr.error;
         return retMap;
@@ -493,9 +492,9 @@ void MainWindow::newDatapack() {
         if (file.open(QIODevice::ReadWrite)) {
             QJsonObject root;
             QJsonObject pack;
-            pack.insert("description", dialog->getDesc());
-            pack.insert("pack_format", dialog->getFormat());
-            root.insert("pack", pack);
+            pack.insert(QStringLiteral("description"), dialog->getDesc());
+            pack.insert(QStringLiteral("pack_format"), dialog->getFormat());
+            root.insert(QStringLiteral("pack"), pack);
 
             QTextStream stream(&file);
             stream << QJsonDocument(root).toJson();
@@ -607,13 +606,13 @@ void MainWindow::setCodeEditorText(const QString &text) {
         return;
 
     /*ui->codeEditor->setPlainText(text); */
-    QTextCursor cursor = ui->codeEditorInterface->getEditor()->textCursor();
+    QTextCursor cursor = ui->codeEditorInterface->getCodeEditor()->textCursor();
 
     cursor.beginEditBlock();
     cursor.select(QTextCursor::Document);
     cursor.insertText(text);
     cursor.endEditBlock();
-    ui->codeEditorInterface->getEditor()->setTextCursor(cursor);
+    ui->codeEditorInterface->getCodeEditor()->setTextCursor(cursor);
 }
 
 QString MainWindow::getCodeEditorText() {

@@ -9,7 +9,8 @@ Command::ComponentNode::ComponentNode(int pos, int length)
 }
 
 QString Command::ComponentNode::toString() const {
-    return QString("ComponentNode()").arg(QString::fromStdString(m_value.dump()));
+    return QString("ComponentNode(%1)").arg(QString::fromStdString(
+                                                m_value.dump()));
 }
 
 bool Command::ComponentNode::isVaild() const {

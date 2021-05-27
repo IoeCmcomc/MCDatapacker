@@ -22,6 +22,8 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
             this, &LootTableFunction::onTypeChanged);
     connect(this, &QTabWidget::currentChanged, this,
             &LootTableFunction::onTabChanged);
+    connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableFunction::updateConditionsTab);
 
     initComboModelView("enchantment", enchantmentsModel,
                        ui->bonus_enchantCombo, false);
@@ -42,15 +44,19 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     connect(ui->enchantRand_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::enchantRand_onAdded);
 
-    initComboModelView("feature", featuresModel, ui->map_destCombo);
-    initComboModelView("map_icon", mapIconsModel, ui->map_decoCombo);
+    initComboModelView(QStringLiteral("feature"),
+                       featuresModel,
+                       ui->map_destCombo);
+    initComboModelView(QStringLiteral("map_icon"),
+                       mapIconsModel,
+                       ui->map_decoCombo);
 
     ui->limitCount_limitInput->setTypes(NumericInput::ExactAndRange);
 
     ui->lootEnchant_countInput->setTypes(NumericInput::ExactAndRange);
 
     ui->setAttr_amountInput->setTypes(NumericInput::Range);
-    initComboModelView("attribute", attributesModel,
+    initComboModelView(QStringLiteral("attribute"), attributesModel,
                        ui->setAttr_attrCombo, false);
 
     ExtendedDelegate *delegate = new ExtendedDelegate(this);
@@ -66,7 +72,9 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     ui->setName_textEdit->setOneLine(true);
     ui->setName_textEdit->setDarkMode(true);
 
-    initComboModelView("effect", effectsModel, ui->stewEffect_effectCombo);
+    initComboModelView(QStringLiteral("effect"),
+                       effectsModel,
+                       ui->stewEffect_effectCombo);
     connect(ui->stewEffect_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::effectStew_onAdded);
 }
@@ -285,7 +293,7 @@ QJsonObject LootTableFunction::toJson() const {
     }
     }
 
-    auto conditions = ui->conditionInterface->json();
+    auto conditions = ui->conditionsInterface->json();
     if (!conditions.isEmpty())
         root.insert("conditions", conditions);
 
@@ -652,9 +660,17 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     }
 
     if (root.contains("conditions")) {
-        if (!ui->conditionInterface->mainWidget())
+        if (!ui->conditionsInterface->mainWidget())
             initCondInterface();
-        ui->conditionInterface->setJson(root.value("conditions").toArray());
+        ui->conditionsInterface->setJson(root.value("conditions").toArray());
+    }
+}
+
+void LootTableFunction::changeEvent(QEvent *event) {
+    QTabWidget::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        updateConditionsTab(ui->conditionsInterface->entriesCount());
     }
 }
 
@@ -670,7 +686,7 @@ void LootTableFunction::onTypeChanged(int index) {
 }
 
 void LootTableFunction::onTabChanged(int index) {
-    if ((index == 1) && (!ui->conditionInterface->mainWidget()))
+    if ((index == 1) && (!ui->conditionsInterface->mainWidget()))
         initCondInterface();
 }
 
@@ -778,6 +794,10 @@ void LootTableFunction::effectStew_onAdded() {
                            { effectItem, durationItem });
 }
 
+void LootTableFunction::updateConditionsTab(int size) {
+    setTabText(1, tr("Conditions (%1)").arg(size));
+}
+
 void LootTableFunction::initBlocksModel() {
     auto blocksInfo = MainWindow::getMCRInfo("block");
 
@@ -802,11 +822,11 @@ void LootTableFunction::initBlocksModel() {
 void LootTableFunction::initCondInterface() {
     auto *cond = new MCRPredCondition();
 
-    ui->conditionInterface->setMainWidget(cond);
+    ui->conditionsInterface->setMainWidget(cond);
 
-    ui->conditionInterface->mapToSetter(
+    ui->conditionsInterface->mapToSetter(
         cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
-    ui->conditionInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+    ui->conditionsInterface->mapToGetter(&MCRPredCondition::toJson, cond);
 }
 
 void LootTableFunction::initEntryInterface() {

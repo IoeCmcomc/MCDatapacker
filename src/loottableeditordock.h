@@ -25,8 +25,6 @@ public:
 protected:
     void changeEvent(QEvent *event) override;
 
-protected slots:
-
 private:
     Ui::LootTableEditorDock *ui;
     const QStringList types = {
@@ -35,6 +33,10 @@ private:
         QStringLiteral("fishing"),            QStringLiteral("gift"),
         QStringLiteral("advancement_reward"), QStringLiteral("generic")
     };
+
+private /*slots*/ :
+    void updatePoolsTab(int size);
+    void updateFunctionsTab(int size);
 };
 
 #endif /* LOOTTABLEEDITORDOCK_H */

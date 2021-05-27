@@ -1,6 +1,8 @@
 #include "modelfunctions.h"
 #include "mainwindow.h"
 
+#include "globalhelpers.h"
+
 #include <QApplication>
 
 void initModelView(QStandardItemModel &model,
@@ -26,8 +28,8 @@ void initComboModelView(const QString &infoType,
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
                                               "(not set)")));
-    auto info = MainWindow::readMCRInfo(infoType);
-    for (auto key : info.keys()) {
+    const auto &&info = MainWindow::readMCRInfo(infoType);
+    for (QString key : info.keys()) {
         QStandardItem *item = new QStandardItem();
         if (info.value(key).toMap().contains(QStringLiteral("name")))
             item->setText(info.value(key).toMap()[QStringLiteral(
@@ -37,27 +39,39 @@ void initComboModelView(const QString &infoType,
             item->setText(info.value(key).toString());
         else
             item->setText(key);
-        auto iconPath =
+        QString &&iconPath =
             QString(":minecraft/texture/%1/%2.png").arg(infoType, key);
-        auto icon = QIcon(iconPath);
+        QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
         if (!key.contains(QStringLiteral(":")))
-            key = QStringLiteral("minecraft:") + key;
+            key.prepend(QStringLiteral("minecraft:"));
         item->setData(key);
         model.appendRow(item);
     }
     combo->setModel(&model);
 }
 
-void setupComboFrom(QComboBox *combo, const QVariant &vari,
-                    int role) {
-    auto *model = qobject_cast<QStandardItemModel*>(combo->model());
+void setupComboFrom(QComboBox *combo, const QVariant &vari, int role) {
+    const auto *model = qobject_cast<QStandardItemModel*>(combo->model());
 
-    for (int i = 0; i < model->rowCount(); ++i) {
-        if (model->item(i, 0)->data(role) == vari) {
-            combo->setCurrentIndex(i);
-            return;
+    if (vari.canConvert<QString>()) {
+        QString &&str = vari.toString();
+        if (!str.startsWith(QStringLiteral("minecraft:")))
+            str.prepend(QStringLiteral("minecraft:"));
+        for (int i = 0; i < model->rowCount(); ++i) {
+            QString &&val = model->item(i, 0)->data(role).toString();
+            if (val == str) {
+                combo->setCurrentIndex(i);
+                return;
+            }
+        }
+    } else {
+        for (int i = 0; i < model->rowCount(); ++i) {
+            if (model->item(i, 0)->data(role) == vari) {
+                combo->setCurrentIndex(i);
+                return;
+            }
         }
     }
     combo->setCurrentIndex(0);
@@ -68,7 +82,7 @@ void appendRowToTableWidget(QTableWidget *table,
     table->insertRow(table->rowCount());
     int       i   = 0;
     const int row = table->rowCount() - 1;
-    for (auto item : items) {
+    for (const auto &item : items) {
         table->setItem(row, i, item);
         ++i;
     }

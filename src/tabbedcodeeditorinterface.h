@@ -26,20 +26,12 @@ public:
     CodeFile *getCurFile();
     QString getCurFilePath();
     QTextDocument *getCurDoc();
-
     QVector<CodeFile> *getFiles();
+    CodeEditor *getCodeEditor() const;
 
-    CodeEditor *getEditor() const;
-
-    inline int count() const {
-        return files.count();
-    };
-    inline bool hasNoFile() const {
-        return count() == 0;
-    };
-
+    inline int count() const;
+    inline bool hasNoFile() const;
     void clear();
-
     bool hasUnsavedChanges() const;
 
 public /*slots*/ :
@@ -53,7 +45,6 @@ public /*slots*/ :
 
 signals:
     void curFileChanged(const QString &path);
-    /*void curContentsChange(int position, int charsRemoved, int charsAdded); */
     void curModificationChanged(bool changed);
 
 protected:
@@ -74,9 +65,10 @@ private:
     Ui::TabbedCodeEditorInterface *ui;
 
     QVector<CodeFile> files;
-    int prevIndex = -1;
-    QTimer *textChangedTimer;
-    bool tabMoved = false;
+    int prevIndex                 = -1;
+    QTimer *textChangedTimer      = nullptr;
+    QTextDocument *lastRemovedDoc = nullptr;
+    bool tabMovedOrRemoved        = false;
 
     CodeFile readFile(const QString &path);
     void addCodeFile(const CodeFile &file);
@@ -86,6 +78,8 @@ private:
     bool maybeSave(int index);
     void retranslate();
     void printPanOffsets();
+    QTextDocument *getDocAt(int index) const;
+    void saveFileData(int index);
 };
 
 #endif /* TABBEDCODEEDITORINTERFACE_H */

@@ -64,8 +64,7 @@ public slots:
 signals:
     void getterCallRequested();
     void setterCallRequested(const QJsonObject &obj);
-    void test(int);
-/*    void resetCallRequested(); */
+    void entriesCountChanged(int value);
 
 protected:
     void mouseMoveEvent(QMouseEvent *e) override;
@@ -88,12 +87,12 @@ private:
     QRect m_sidebarRect;
     QJsonArray m_json;
     Ui::DataWidgetInterface *ui;
-    QWidget *m_mainWidget         = nullptr;
-    QPropertyAnimation *animation = nullptr;
-    int m_currentIndex            = -1;
-    bool m_reactToSignal          = true;
-    bool m_sidebarHiding          = false;
-    const int m_sidebarSlideTime  = 150;
+    QWidget *m_mainWidget           = nullptr;
+    QPropertyAnimation *m_animation = nullptr;
+    int m_currentIndex              = -1;
+    bool m_reactToSignal            = true;
+    bool m_sidebarHiding            = false;
+    const int m_sidebarSlideTime    = 50;
 
     void loadData(int index);
     void saveData(int index);

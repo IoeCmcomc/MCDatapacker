@@ -140,7 +140,7 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
         if (!data)
             return;
 
-        const auto infos = data->namespacedIds();
+        const auto &infos = data->namespacedIds();
 
         for (const auto info: infos) {
             auto fmt = namespacedIDFormat;
@@ -151,10 +151,10 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 
         if (m_formats.isEmpty()) {
             for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
-                QRegularExpressionMatchIterator matchIterator =
+                QRegularExpressionMatchIterator &&matchIterator =
                     rule.pattern.globalMatch(text);
                 while (matchIterator.hasNext()) {
-                    QRegularExpressionMatch match = matchIterator.next();
+                    QRegularExpressionMatch &&match = matchIterator.next();
 /*
                       qDebug() << "Regex:" << rule.format <<
                           rule.format.background() <<
@@ -165,7 +165,7 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                 }
             }
         } else {
-            for (const auto &range: m_formats) {
+            for (const auto &range: qAsConst(m_formats)) {
 /*
                   qDebug() << "Fmter:" << range.format <<
                       range.format.background() <<

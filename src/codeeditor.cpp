@@ -217,7 +217,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 bool CodeEditor::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
         /*QToolTip::hideText(); */
-        qDebug() << "QEvent::ToolTip";
+        /*qDebug() << "QEvent::ToolTip"; */
 
         auto *helpEvent = static_cast<QHelpEvent*>(event);
         auto  globalPos = mapToGlobal(helpEvent->pos());
@@ -226,12 +226,11 @@ bool CodeEditor::event(QEvent *event) {
 
         pos.rx() -= viewportMargins().left();
         pos.ry() -= viewportMargins().top();
-        auto cursor    = cursorForPosition(pos);
-        auto block     = cursor.block();
-        int  cursorPos = cursor.positionInBlock();
+        auto &&cursor    = cursorForPosition(pos);
+        auto &&block     = cursor.block();
+        int    cursorPos = cursor.positionInBlock();
 
         for (const auto &selection: qAsConst(problemExtraSelections)) {
-            auto selectionCursor = selection.cursor;
             if (selection.cursor.block().contains(cursor.position())) {
                 QToolTip::showText(globalPos,
                                    selection.format.toolTip());
@@ -258,15 +257,17 @@ bool CodeEditor::event(QEvent *event) {
 
         cursor.select(QTextCursor::WordUnderCursor);
         if (!cursor.selectedText().isEmpty()) {
-            QToolTip::showText(globalPos,
-                               QString("%1 %2").arg(cursor.selectedText(),
-                                                    QString::number(cursor.
-                                                                    selectedText()
-                                                                    .length())));
+/*
+              QToolTip::showText(globalPos,
+                                 QString("%1 %2").arg(cursor.selectedText(),
+                                                      QString::number(cursor.
+                                                                      selectedText()
+                                                                      .length())));
+ */
         } else {
             QToolTip::hideText();
         }
-        qDebug() << QToolTip::text() << QToolTip::isVisible();
+        /*qDebug() << QToolTip::text() << QToolTip::isVisible(); */
 
         return true;
     } else {
@@ -453,10 +454,11 @@ void CodeEditor::setCurHighlighter(Highlighter *value) {
 }
 
 void CodeEditor::displayErrors() {
-    qDebug() << "CodeEditor::displayErrors";
+    /*qDebug() << "CodeEditor::displayErrors"; */
     if (!isReadOnly()) {
-        auto selections = extraSelections().mid(0,
-                                                problemSelectionStartIndex + 1);
+        auto &&selections = extraSelections().mid(0,
+                                                  problemSelectionStartIndex +
+                                                  1);
         selections += problemExtraSelections;
 
         setExtraSelections(selections);
@@ -464,7 +466,7 @@ void CodeEditor::displayErrors() {
 }
 
 void CodeEditor::updateErrorSelections() {
-    qDebug() << "CodeEditor::updateErrorSelections";
+    /*qDebug() << "CodeEditor::updateErrorSelections"; */
     if (!isReadOnly()) {
         if (!document() || !curHighlighter)
             return;
@@ -480,7 +482,7 @@ void CodeEditor::updateErrorSelections() {
                   qDebug() << it.blockNumber() << data <<
                       data->problem().has_value();
  */
-                if (std::optional<ProblemInfo> problem =
+                if (std::optional<ProblemInfo> && problem =
                         data->problem(); problem) {
                     QTextEdit::ExtraSelection selection;
                     selection.cursor = textCursor();

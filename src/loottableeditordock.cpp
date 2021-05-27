@@ -21,6 +21,10 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
             this, &LootTableEditorDock::writeJson);
     connect(ui->readLootTableBtn, &QPushButton::clicked,
             this, &LootTableEditorDock::readJson);
+    connect(ui->poolsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableEditorDock::updatePoolsTab);
+    connect(ui->functionsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableEditorDock::updateFunctionsTab);
 
     auto *pool = new LootTablePool();
     ui->poolsInterface->setupMainWidget(pool);
@@ -76,6 +80,17 @@ void LootTableEditorDock::readJson() {
 
 void LootTableEditorDock::changeEvent(QEvent *event) {
     QDockWidget::changeEvent(event);
-    if (event->type() == QEvent::LanguageChange)
+    if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
+        updatePoolsTab(ui->poolsInterface->entriesCount());
+        updateFunctionsTab(ui->functionsInterface->entriesCount());
+    }
+}
+
+void LootTableEditorDock::updatePoolsTab(int size) {
+    ui->tabWidget->setTabText(0, tr("Pools (%1)").arg(size));
+}
+
+void LootTableEditorDock::updateFunctionsTab(int size) {
+    ui->tabWidget->setTabText(1, tr("Functions (%1)").arg(size));
 }

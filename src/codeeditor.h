@@ -2,15 +2,16 @@
 #define CODEEDITOR_H
 
 #include <QPlainTextEdit>
+#include <QPointer>
 #include <QSettings>
 
 #include "codefile.h"
 
 struct TextFileData {
-    CodeFile      *parent      = nullptr;
-    QTextDocument *doc         = new QTextDocument();
-    QTextCursor    textCursor  = QTextCursor(doc);
-    Highlighter   *highlighter = nullptr;
+    CodeFile               *parent      = nullptr;
+    QPointer<QTextDocument> doc         = new QTextDocument();
+    QTextCursor             textCursor  = QTextCursor(doc);
+    Highlighter            *highlighter = nullptr;
 
     TextFileData(QTextDocument *doc, CodeFile *parent = nullptr);
 

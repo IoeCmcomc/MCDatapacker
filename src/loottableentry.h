@@ -21,9 +21,15 @@ public:
 
     void resetAll();
 
+protected:
+    void changeEvent(QEvent *event) override;
+
 private /*slots*/ :
     void onTypeChanged(int index);
     void onTabChanged(int index);
+    void updateEntriesTab(int size);
+    void updateFunctionsTab(int size);
+    void updateConditionsTab(int size);
 
 private:
     Ui::LootTableEntry *ui;

@@ -10,6 +10,8 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
     QFrame(parent), ui(new Ui::DataWidgetInterface) {
     ui->setupUi(this);
     ui->scrollAreaWidgetContents->setLayout(&m_layout);
+    ui->moveUpBtn->hide();
+    ui->moveDownBtn->hide();
 
     connect(ui->addBtn, &QToolButton::clicked,
             this, &DataWidgetInterface::addAfterCurrent);
@@ -31,15 +33,15 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
 
     ui->scrollArea->verticalScrollBar()->hide();
     m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
-    animation     = new QPropertyAnimation(ui->sidebar, "maximumWidth");
-    animation->setEasingCurve(QEasingCurve::InCubic);
+    m_animation   = new QPropertyAnimation(ui->sidebar, "maximumWidth");
+    m_animation->setEasingCurve(QEasingCurve::InCubic);
 
     updateStates();
 }
 
 DataWidgetInterface::~DataWidgetInterface() {
     delete ui;
-    delete animation;
+    delete m_animation;
 }
 
 void DataWidgetInterface::setMainWidget(QWidget *widget) {
@@ -63,19 +65,24 @@ QWidget *DataWidgetInterface::mainWidget() const {
 }
 
 void DataWidgetInterface::addAfterCurrent() {
-    qDebug() << "addAfterCurrent" << ui->scrollBar->maximum() <<
-        (ui->scrollBar->maximum() + ui->scrollBar->pageStep() -
-         (m_json.isEmpty()));
+/*
+      qDebug() << "addAfterCurrent" << ui->scrollBar->maximum() <<
+          (ui->scrollBar->maximum() + ui->scrollBar->pageStep() -
+           (m_json.isEmpty()));
+ */
     const int computedMax = ui->scrollBar->maximum() +
                             ui->scrollBar->pageStep() -
                             (m_json.isEmpty());
+
     ui->scrollBar->setMaximum(computedMax);
-    qDebug() << ui->scrollBar->maximum() << m_json << m_currentIndex;
+    /*qDebug() << ui->scrollBar->maximum() << m_json << m_currentIndex; */
     m_json.insert(m_currentIndex + 1, QJsonObject());
     ui->scrollBar->setValue((m_currentIndex + 1) * ui->scrollBar->pageStep());
     onSliderMoved(ui->scrollBar->value());
     /*emit setterCallRequested({}); */
     loadData(m_currentIndex);
+
+    emit entriesCountChanged(m_json.size());
 }
 
 void DataWidgetInterface::removeCurrent() {
@@ -90,6 +97,8 @@ void DataWidgetInterface::removeCurrent() {
         loadData(m_currentIndex);
     }
     updateStates();
+
+    emit entriesCountChanged(m_json.size());
 }
 
 void DataWidgetInterface::mouseMoveEvent(QMouseEvent *e) {
@@ -125,7 +134,7 @@ void DataWidgetInterface::leaveEvent(QEvent *e) {
 void DataWidgetInterface::resizeEvent(QResizeEvent *e) {
     QWidget::resizeEvent(e);
 
-    animation->stop();
+    m_animation->stop();
     ui->sidebar->setMaximumWidth(m_sidebarRect.width());
 
     /*m_sidebarRect.setTopLeft(ui->sidebar->pos()); */
@@ -178,7 +187,7 @@ void DataWidgetInterface::onScrollAreaScrolled(int value) {
         (ui->scrollBar->pageStep() / ui->scrollBar->singleStep()) /
         areaScrollbar->maximum();
 
-    qDebug() << "onScrollAreaScrolled" << value << computedValue;
+    /*qDebug() << "onScrollAreaScrolled" << value << computedValue; */
     if (m_reactToSignal) {
         ui->scrollBar->blockSignals(true);
         ui->scrollBar->setValue(computedValue);
@@ -235,35 +244,30 @@ void DataWidgetInterface::updateStates() {
         setDisabled(true);
     }
 
-    ui->label->setText(QString("%1/%2\n%3/%4").arg(m_currentIndex +
-                                                   1).arg(m_json.size()).arg(ui
-                                                                             ->
-                                                                             scrollBar
-                                                                             ->
-                                                                             value()).arg(
-                           ui->scrollBar->maximum()));
+    ui->label->setText(QString("%1/%2").arg(m_currentIndex +
+                                            1).arg(m_json.size()));
 }
 
 void DataWidgetInterface::showSidebar() {
     /*qDebug() << "DataWidgetInterface::showSidebar"; */
     show();
 
-    animation->stop();
-    animation->setDuration(m_sidebarSlideTime);
-    animation->setStartValue(ui->sidebar->width());
-    animation->setEndValue(m_sidebarRect.width());
-    animation->start();
+    m_animation->stop();
+    m_animation->setDuration(m_sidebarSlideTime);
+    m_animation->setStartValue(ui->sidebar->width());
+    m_animation->setEndValue(m_sidebarRect.width());
+    m_animation->start();
 
     m_sidebarHiding = false;
 }
 
 void DataWidgetInterface::hideSidebar() {
     /*qDebug() << "DataWidgetInterface::hideSidebar"; */
-    animation->stop();
-    animation->setDuration(m_sidebarSlideTime);
-    animation->setStartValue(ui->sidebar->width());
-    animation->setEndValue(0);
-    animation->start();
+    m_animation->stop();
+    m_animation->setDuration(m_sidebarSlideTime);
+    m_animation->setStartValue(ui->sidebar->width());
+    m_animation->setEndValue(0);
+    m_animation->start();
     m_sidebarHiding = true;
 }
 
@@ -287,6 +291,8 @@ void DataWidgetInterface::setJson(const QJsonArray &json) {
     } else {
         updateStates();
     }
+
+    emit entriesCountChanged(m_json.size());
 }
 
 int DataWidgetInterface::getCurrentIndex() const {
@@ -294,7 +300,7 @@ int DataWidgetInterface::getCurrentIndex() const {
 }
 
 void DataWidgetInterface::setCurrentIndex(int currentIndex) {
-    qDebug() << "setCurrentIndex" << currentIndex;
+    /*qDebug() << "setCurrentIndex" << currentIndex; */
     saveData(m_currentIndex);
     loadData(currentIndex);
     m_currentIndex = currentIndex;

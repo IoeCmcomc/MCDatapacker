@@ -100,7 +100,7 @@
       </property>
       <widget class="QWidget" name="pools">
        <attribute name="title">
-        <string>Pools</string>
+        <string>Pools (%1)</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <property name="leftMargin">
@@ -129,7 +129,7 @@
       </widget>
       <widget class="QWidget" name="functions">
        <attribute name="title">
-        <string>Functions</string>
+        <string>Functions (%1)</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <property name="leftMargin">

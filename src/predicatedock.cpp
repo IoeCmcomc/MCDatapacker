@@ -12,13 +12,12 @@
 
 PredicateDock::PredicateDock(QWidget *parent) :
     QDockWidget(parent), ui(new Ui::PredicateDock) {
-    qDebug() << minimumWidth() << width();
     ui->setupUi(this);
 
     if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
     } else {
     }
-    resize(minimumWidth(), height());
+    /*resize(minimumWidth(), height()); */
 
     connect(ui->readBtn, &QPushButton::clicked,
             this, &PredicateDock::onReadBtn);
@@ -56,7 +55,6 @@ void PredicateDock::changeEvent(QEvent *event) {
 }
 
 void PredicateDock::onReadBtn() {
-    qDebug() << "PredicateDock::onReadBtn";
     QString &&input =
         qobject_cast<MainWindow*>(parent())->getCodeEditorText();
     QJsonDocument &&json_doc = QJsonDocument::fromJson(input.toUtf8());

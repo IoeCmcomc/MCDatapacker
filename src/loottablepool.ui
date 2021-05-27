@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>232</width>
+    <height>99</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,7 @@
   </widget>
   <widget class="QWidget" name="entriesTab">
    <attribute name="title">
-    <string>Entries</string>
+    <string>Entries (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_2">
     <property name="leftMargin">
@@ -103,7 +103,7 @@
   </widget>
   <widget class="QWidget" name="functionsTab">
    <attribute name="title">
-    <string>Functions</string>
+    <string>Functions (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_3">
     <property name="leftMargin">
@@ -132,7 +132,7 @@
   </widget>
   <widget class="QWidget" name="conditionsTab">
    <attribute name="title">
-    <string>Conditions</string>
+    <string>Conditions (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
@@ -162,15 +162,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NumericInput</class>
-   <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
    <header location="global">datawidgetinterface.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NumericInput</class>
+   <extends>QFrame</extends>
+   <header location="global">numericinput.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

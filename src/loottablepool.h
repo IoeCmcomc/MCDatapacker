@@ -25,6 +25,11 @@ private:
     Ui::LootTablePool *ui;
 
     void reset();
+
+private /*slots*/ :
+    void updateEntriesTab(int size);
+    void updateFunctionsTab(int size);
+    void updateConditionsTab(int size);
 };
 
 #endif /* LOOTTABLEPOOL_H */

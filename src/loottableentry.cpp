@@ -19,13 +19,17 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
 
     connect(ui->typeCmobo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &LootTableEntry::onTypeChanged);
-    connect(this,
-            &QTabWidget::currentChanged,
-            this,
-            &LootTableEntry::onTabChanged);
+    connect(this, &QTabWidget::currentChanged,
+            this, &LootTableEntry::onTabChanged);
     connect(ui->entryGroupLabel, &QLabel::linkActivated, [this]() {
         setCurrentIndex(ENTRIES_TAB);
     });
+    connect(ui->entriesInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableEntry::updateEntriesTab);
+    connect(ui->functionsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableEntry::updateFunctionsTab);
+    connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableEntry::updateConditionsTab);
 
     ui->itemSlot->setAcceptMultiItems(false);
     ui->itemSlot->setAcceptTag(false);
@@ -196,8 +200,18 @@ void LootTableEntry::resetAll() {
     ui->conditionsInterface->setJson({});
 }
 
+void LootTableEntry::changeEvent(QEvent *event) {
+    QTabWidget::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        updateEntriesTab(ui->entriesInterface->entriesCount());
+        updateFunctionsTab(ui->functionsInterface->entriesCount());
+        updateConditionsTab(ui->conditionsInterface->entriesCount());
+    }
+}
+
 void LootTableEntry::onTypeChanged(int index) {
-    ui->nameEdit->setPlaceholderText("namespace:id");
+    ui->nameEdit->setPlaceholderText(QStringLiteral("namespace:id"));
     setTabEnabled(ENTRIES_TAB, index == 4);
     switch (index) {
     case 0: { /*Empty */
@@ -265,6 +279,18 @@ void LootTableEntry::onTabChanged(int index) {
     default:
         break;
     }
+}
+
+void LootTableEntry::updateEntriesTab(int size) {
+    setTabText(1, tr("Entries (%1)").arg(size));
+}
+
+void LootTableEntry::updateFunctionsTab(int size) {
+    setTabText(2, tr("Functions (%1)").arg(size));
+}
+
+void LootTableEntry::updateConditionsTab(int size) {
+    setTabText(3, tr("Conditions (%1)").arg(size));
 }
 
 void LootTableEntry::reset(int index) {

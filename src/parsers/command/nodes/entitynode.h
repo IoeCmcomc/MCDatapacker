@@ -59,6 +59,7 @@ public:
         GameProfileNode(EntityNode *other);
         QString toString() const override;
         void accept(NodeVisitor *visitor) override {
+            EntityNode::accept(visitor);
             visitor->visit(this);
         }
     };
@@ -69,6 +70,7 @@ public:
         ScoreHolderNode(EntityNode *other);
         QString toString() const override;
         void accept(NodeVisitor *visitor) override {
+            EntityNode::accept(visitor);
             visitor->visit(this);
         }
         bool isAll() const;

@@ -97,11 +97,14 @@ void ImgViewer::originalSize() {
         return;
 
     this->setDragMode(ScrollHandDrag);
+
     m_pixmap = m_pixmap.scaled(QSize(m_image.width(), m_image.height()),
                                Qt::KeepAspectRatio,
                                Qt::SmoothTransformation);
     m_pixmapItem->setPixmap(m_pixmap);
     m_scene->setSceneRect(m_pixmap.rect());
+
+    /*setTransform(QTransform::fromScale(1, 1)); */
     this->centerOn(m_pixmapItem);
 }
 

@@ -79,7 +79,7 @@ public:
             /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
-            fmt.setForeground(QColor("#2F97C1"));
+            fmt.setForeground(QColor("#2F97B1"));
 
             QTextLayout::FormatRange range{ node->pos(), node->length(),
                                             std::move(fmt) };
@@ -90,7 +90,7 @@ public:
             /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
-            fmt.setForeground(QColor("#2F97C1"));
+            fmt.setForeground(QColor("#2F97A1"));
 
             QTextLayout::FormatRange range{ node->pos(), node->length(),
                                             std::move(fmt) };
@@ -147,7 +147,11 @@ public:
             node->setLength(length);
         }
         virtual void visit(ComponentNode *node) {
-            auto fmt = defaultFormat(node);
+            /*auto fmt = defaultFormat(node); */
+
+            QTextCharFormat fmt;
+
+            fmt.setBackground(QColor("#aaffe8f2"));
 
             QTextLayout::FormatRange range{ node->pos(), node->length(),
                                             std::move(fmt) };
@@ -656,15 +660,6 @@ public:
             /*auto fmt    = m_bgfmt; */
             int length = key.text.length() + (key.isQuote * 2);
 
-/*
-              fmt.setBackground(QColor(QRandomGenerator::global()->bounded(127,
-                                                                           255),
-                                       QRandomGenerator::global()->bounded(127,
-                                                                           255),
-                                       QRandomGenerator::global()->bounded(127,
-                                                                           255),
-                                       220));
- */
             QTextCharFormat fmt;
 
             fmt.setForeground(QColor("#B89C3D"));
@@ -701,6 +696,7 @@ private:
             return fmt;
         }
         virtual void visit(AxisNode *node) {
+            Q_UNUSED(node)
         };
     };
 }

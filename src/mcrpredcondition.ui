@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>310</height>
+    <width>511</width>
+    <height>402</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
@@ -1205,15 +1211,21 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DataWidgetInterface</class>
+   <extends>QFrame</extends>
+   <header location="global">datawidgetinterface.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>NumericInput</class>
    <extends>QFrame</extends>
    <header location="global">numericinput.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>OptionalSpinBox</class>
@@ -1224,12 +1236,6 @@
    <class>DialogDataButton</class>
    <extends>QLabel</extends>
    <header location="global">dialogdatabutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>DataWidgetInterface</class>
-   <extends>QFrame</extends>
-   <header location="global">datawidgetinterface.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

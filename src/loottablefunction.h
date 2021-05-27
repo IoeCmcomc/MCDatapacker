@@ -22,7 +22,10 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject &root);
 
-private slots:
+protected:
+    void changeEvent(QEvent *event) override;
+
+private /*slots*/ :
     void onTypeChanged(int index);
     void onTabChanged(int index);
     void copyNBT_onAdded();
@@ -30,18 +33,18 @@ private slots:
     void enchantRand_onAdded();
     void setAttr_onAdded();
     void effectStew_onAdded();
+    void updateConditionsTab(int size);
 
 private:
-    Ui::LootTableFunction *ui;
-
+    QHBoxLayout conditionsLayout;
+    QHBoxLayout entriesLayout;
     QStandardItemModel blocksModel;
     QStandardItemModel enchantmentsModel;
     QStandardItemModel effectsModel;
     QStandardItemModel featuresModel;
     QStandardItemModel mapIconsModel;
     QStandardItemModel attributesModel;
-    QHBoxLayout conditionsLayout;
-    QHBoxLayout entriesLayout;
+    ViewEventFilter viewFilter;
     const QStringList functTypes =
     { "apply_bonus",      "copy_nbt",            "copy_state",
       "enchant_randomly", "enchant_with_levels", "exploration_map",
@@ -60,7 +63,7 @@ private:
     const QStringList slotTypes         = {
         "mainhand", "offhand", "head", "chest", "legs", "feet" };
 
-    ViewEventFilter viewFilter;
+    Ui::LootTableFunction *ui;
 
     void initBlocksModel();
     void initCondInterface();

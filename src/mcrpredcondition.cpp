@@ -20,8 +20,8 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MCRPredCondition::onTypeChanged);
-    MainWindow *mainWin;
-    for (auto wid : qApp->topLevelWidgets()) {
+    MainWindow *mainWin = nullptr;
+    for (auto *wid : qApp->topLevelWidgets()) {
         if (wid->objectName() == QStringLiteral("MainWindow")) {
             mainWin = qobject_cast<MainWindow*>(wid);
             break;
@@ -44,7 +44,7 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     initRandChancePage();
     setupRefCombo();
     initTableBonusPage();
-    ui->time_valueInput->setTypes(NumericInput::Exact | NumericInput::Range);
+    ui->time_valueInput->setTypes(NumericInput::ExactAndRange);
     initToolEnchantPage();
 }
 
@@ -238,7 +238,6 @@ QJsonObject MCRPredCondition::toJson() const {
 }
 
 void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
-    qDebug() << "MCRPredCondition::fromJson" << root;
     resetAll();
     if (!root.contains("condition"))
         return;

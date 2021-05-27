@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
-    <height>362</height>
+    <width>557</width>
+    <height>455</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
     <item row="2" column="0" colspan="3">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="apply_bonus">
        <layout class="QFormLayout" name="formLayout_2">
@@ -1062,7 +1062,7 @@
   </widget>
   <widget class="QWidget" name="conditions">
    <attribute name="title">
-    <string>Conditions</string>
+    <string>Conditions (%1)</string>
    </attribute>
    <layout class="QGridLayout" name="gridLayout_6">
     <property name="leftMargin">
@@ -1078,7 +1078,7 @@
      <number>4</number>
     </property>
     <item row="0" column="0">
-     <widget class="DataWidgetInterface" name="conditionInterface">
+     <widget class="DataWidgetInterface" name="conditionsInterface">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -1092,26 +1092,26 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NumericInput</class>
-   <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
    <header location="global">truefalsebox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>OptionalSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header location="global">optionalspinbox.h</header>
   </customwidget>
   <customwidget>
    <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
    <header location="global">datawidgetinterface.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>NumericInput</class>
+   <extends>QFrame</extends>
+   <header location="global">numericinput.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>OptionalSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header location="global">optionalspinbox.h</header>
   </customwidget>
   <customwidget>
    <class>RawJsonTextEdit</class>

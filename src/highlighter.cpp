@@ -176,7 +176,7 @@ QTextDocument *Highlighter::getParentDoc() const {
 
 void Highlighter::collectNamespacedIds(const QString &text,
                                        TextBlockData *data) {
-    auto matchIter = namespacedIdRegex.globalMatch(text);
+    auto &&matchIter = namespacedIdRegex.globalMatch(text);
 
     while (matchIter.hasNext()) {
         auto match    = matchIter.next();

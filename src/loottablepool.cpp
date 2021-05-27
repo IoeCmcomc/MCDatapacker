@@ -24,6 +24,13 @@ LootTablePool::LootTablePool(QWidget *parent) :
 
     auto *entry = new LootTableEntry();
     ui->entriesInterface->setupMainWidget(entry);
+
+    connect(ui->entriesInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTablePool::updateEntriesTab);
+    connect(ui->functionsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTablePool::updateFunctionsTab);
+    connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTablePool::updateConditionsTab);
 }
 
 LootTablePool::~LootTablePool() {
@@ -34,6 +41,9 @@ void LootTablePool::changeEvent(QEvent *event) {
     QTabWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange)
         ui->retranslateUi(this);
+    updateEntriesTab(ui->entriesInterface->entriesCount());
+    updateFunctionsTab(ui->functionsInterface->entriesCount());
+    updateConditionsTab(ui->conditionsInterface->entriesCount());
 }
 
 QJsonObject LootTablePool::toJson() const {
@@ -85,4 +95,16 @@ void LootTablePool::reset() {
     ui->entriesInterface->setJson({});
     ui->functionsInterface->setJson({});
     ui->conditionsInterface->setJson({});
+}
+
+void LootTablePool::updateEntriesTab(int size) {
+    setTabText(1, tr("Entries (%1)").arg(size));
+}
+
+void LootTablePool::updateFunctionsTab(int size) {
+    setTabText(2, tr("Functions (%1)").arg(size));
+}
+
+void LootTablePool::updateConditionsTab(int size) {
+    setTabText(3, tr("Conditions (%1)").arg(size));
 }

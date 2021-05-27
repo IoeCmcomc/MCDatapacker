@@ -229,7 +229,7 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
             }
 
             TextFileData data(new QTextDocument(this));
-            auto        *doc = data.doc;
+            auto         doc = data.doc;
             doc->setPlainText(content);
             doc->setMetaInformation(QTextDocument::DocumentTitle,
                                     newFile.title);
@@ -251,7 +251,6 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
                                           errStr));
         } else {
             newFile.data.setValue(data);
-            qDebug() << newFile << newFile.data;
         }
     }
 #ifndef QT_NO_CURSOR
@@ -278,21 +277,23 @@ QString TabbedCodeEditorInterface::getCurFilePath() {
 }
 
 QTextDocument *TabbedCodeEditorInterface::getCurDoc() {
-    if (auto *curFile = getCurFile();
-        curFile->data.canConvert<TextFileData>()) {
-        auto data = qvariant_cast<TextFileData>(curFile->data);
-        return data.doc;
-    } else {
-        return nullptr;
-    }
+    return getDocAt(getCurIndex());
 }
 
 QVector<CodeFile> *TabbedCodeEditorInterface::getFiles() {
     return &files;
 }
 
-CodeEditor *TabbedCodeEditorInterface::getEditor() const {
+CodeEditor *TabbedCodeEditorInterface::getCodeEditor() const {
     return ui->codeEditor;
+}
+
+int TabbedCodeEditorInterface::count() const {
+    return files.count();
+}
+
+bool TabbedCodeEditorInterface::hasNoFile() const {
+    return count() == 0;
 }
 
 void TabbedCodeEditorInterface::clear() {
@@ -408,28 +409,54 @@ void TabbedCodeEditorInterface::printPanOffsets() {
     qDebug() << "Pan offsets: " << panOffsets.join(", ");
 }
 
+void TabbedCodeEditorInterface::saveFileData(int index) {
+    auto &file = files[index];
+
+    if (file.data.canConvert<TextFileData>()) {
+        auto &&data = qvariant_cast<TextFileData>(file.data);
+        data.textCursor = ui->codeEditor->textCursor();
+        file.data.setValue(std::move(data));
+    } else if (files[prevIndex].fileType == CodeFile::Image) {
+        file.data.setValue(ui->imgViewer->toData());
+    }
+}
+
+QTextDocument *TabbedCodeEditorInterface::getDocAt(int index) const {
+    if (const auto &file = files[index];
+        file.data.canConvert<TextFileData>()) {
+        const auto &&data = qvariant_cast<TextFileData>(file.data);
+        return data.doc;
+    } else {
+        return nullptr;
+    }
+}
+
 void TabbedCodeEditorInterface::onTabChanged(int index) {
-    qDebug() << "onTabChanged" << prevIndex << getCurIndex() << index <<
-        count();
+    /*qDebug() << "Change to tab" << index << '/' << count(); */
     /*printPanOffsets(); */
+
+    /*QString &&ptrStrBefore = QString::number((int)lastRemovedDoc, 16); */
 
     if (index > -1) {
         if (prevIndex > -1)
-            if ((prevIndex < count()) && (prevIndex != index) && !tabMoved) {
-                if (files[prevIndex].data.canConvert<TextFileData>()) {
-                    auto &&data = qvariant_cast<TextFileData>(
-                        files[prevIndex].data);
-                    data.textCursor = ui->codeEditor->textCursor();
-                    files[prevIndex].data.setValue(std::move(data));
-                } else if (files[prevIndex].fileType == CodeFile::Image) {
-                    files[prevIndex].data.setValue(ui->imgViewer->toData());
-                }
+            if ((prevIndex < count()) && (prevIndex != index) &&
+                !tabMovedOrRemoved) {
+                saveFileData(prevIndex);
             }
 
         auto *curFile = getCurFile();
+        Q_ASSERT(curFile != nullptr);
         if (curFile->data.canConvert<TextFileData>()) {
-            auto data = qvariant_cast<TextFileData>(curFile->data);
+            auto &&data = qvariant_cast<TextFileData>(curFile->data);
+
+            Q_ASSERT(data.doc != nullptr);
+            Q_ASSERT(data.doc == getDocAt(index));
             ui->codeEditor->setDocument(data.doc);
+            if (lastRemovedDoc) {
+                if (lastRemovedDoc != ui->codeEditor->document())
+                    lastRemovedDoc->deleteLater();
+                lastRemovedDoc = nullptr;
+            }
             ui->codeEditor->setTextCursor(data.textCursor);
 
             if (ui->stackedWidget->currentIndex() != 1)
@@ -446,22 +473,41 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
         if (ui->stackedWidget->currentIndex() != 0)
             ui->stackedWidget->setCurrentIndex(0);
 
-        emit curFileChanged("");
+        emit curFileChanged(QString());
     }
     if (hasNoFile())
         emit curModificationChanged(false);
     else if (getCurDoc())
         emit curModificationChanged(getCurDoc()->isModified());
 
-    prevIndex = index;
-    tabMoved  = false;
+    prevIndex         = index;
+    tabMovedOrRemoved = false;
+
+/*
+      for (int i = 0; i < ui->tabBar->count(); ++i) {
+          const auto &file = files[i];
+          if (file.data.canConvert<TextFileData>()) {
+              const auto &data   = qvariant_cast<TextFileData>(file.data);
+              QString   &&ptrStr = QString::number((int)data.doc.data(), 16);
+              ui->tabBar->setTabText(i, ptrStr);
+          }
+      }
+ */
+
+/*
+      QString &&ptrStrAfter = QString::number((int)lastRemovedDoc, 16);
+      QTimer::singleShot(1, [this, ptrStrAfter, ptrStrBefore]() {
+          window()->setWindowTitle(ptrStrBefore + " -> " + ptrStrAfter);
+      });
+ */
+
 
     /*printPanOffsets(); */
 }
 
 void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
-    /*qDebug() << "onTabMoved" << from << to; */
-    tabMoved = true;
+    /*qDebug() << "Move from tab" << from << "to tab" << to; */
+    tabMovedOrRemoved = true;
     qSwap(files[from], files[to]);
 }
 
@@ -470,13 +516,18 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
         return;
 
     Q_ASSERT(count() > 0);
-    /*qDebug() << "onCloseFile" << index << count(); */
     if (maybeSave(index)) {
-        if (const auto *doc = getCurDoc()) {
+        if (auto *doc = getDocAt(index)) {
             disconnect(doc, &QTextDocument::modificationChanged,
                        this, &TabbedCodeEditorInterface::onModificationChanged);
+            lastRemovedDoc = doc;
         }
         files.remove(index);
+        if ((index < getCurIndex()) && (count() > 1)) {
+            saveFileData(getCurIndex() - 1);
+            tabMovedOrRemoved = true;
+        }
+        /*qDebug() << "Close tab" << index; */
         ui->tabBar->removeTab(index);
     }
 }
@@ -492,7 +543,7 @@ void TabbedCodeEditorInterface::onSwitchPrevFile() {
 }
 
 void TabbedCodeEditorInterface::onCurTextChanged() {
-    qDebug() << "TabbedCodeEditorInterface::onCurTextChanged";
+    /*qDebug() << "TabbedCodeEditorInterface::onCurTextChanged"; */
     if (!hasNoFile() && getCurFile()->data.canConvert<TextFileData>()) {
         auto data =
             qvariant_cast<TextFileData>(getCurFile()->data);
@@ -505,8 +556,8 @@ void TabbedCodeEditorInterface::onCurTextChanged() {
 }
 
 void TabbedCodeEditorInterface::onCurTextChangingDone() {
-    qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone";
-    if (const auto *curFile = getCurFile();
+    /*qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone"; */
+    if (const auto *curFile = getCurFile(); curFile &&
         curFile->data.canConvert<TextFileData>()) {
         auto data = qvariant_cast<TextFileData>(getCurFile()->data);
         if (auto *highlighter = data.highlighter) {
