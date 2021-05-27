@@ -674,7 +674,7 @@ void MCRPredCondition::setupRefCombo() {
     auto predRefIDs = Glhp::fileIDList(QDir::currentPath(),
                                        "predicates");
 
-    for (auto predRef : predRefIDs)
+    for (const auto &predRef : qAsConst(predRefIDs))
         condRefsModel.appendRow(new QStandardItem(predRef));
     ui->ref_nameCombo->setModel(&condRefsModel);
 }
@@ -711,7 +711,7 @@ void MCRPredCondition::initBlockStatesPage() {
     auto blocksInfo = MainWindow::getMCRInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
-    for (auto key : blocksInfo.keys()) {
+    for (const auto &key : blocksInfo.keys()) {
         MCRInvItem     invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
@@ -817,7 +817,7 @@ void MCRPredCondition::addInvertCondition(QJsonObject &json) const {
 
 void MCRPredCondition::simplifyCondition(QVariantMap &condMap,
                                          int depth) const {
-    const QString tab = QString(" ").repeated(depth);
+    /*const QString tab = QString(" ").repeated(depth); */
 
     /*qDebug().noquote() << tab << "simplifyCondJson" << depth; */
     if (condMap.contains("condition")) {

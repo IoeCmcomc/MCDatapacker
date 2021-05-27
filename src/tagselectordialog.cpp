@@ -94,7 +94,7 @@ void TagSelectorDialog::setupTagTreeView(
 
     auto fileIDList =
         Glhp::fileIDList(QDir::currentPath(), tagDir);
-    for (auto id : fileIDList) {
+    for (const auto &id : fileIDList) {
         model.appendRow(new QStandardItem(id));
     }
 

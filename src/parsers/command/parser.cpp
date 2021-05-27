@@ -580,7 +580,7 @@ bool Command::Parser::processCurSchemaNode(int depth,
                     if (curSchemaNode.contains("redirect"))
                         redirect = curSchemaNode["redirect"].toArray();
                     curSchemaNode = m_schema;
-                    for (const auto &nodeNameRef: redirect) {
+                    for (const auto &nodeNameRef: qAsConst(redirect)) {
                         curSchemaNode =
                             curSchemaNode["children"]
                             .toObject()[nodeNameRef.toString()].toObject();

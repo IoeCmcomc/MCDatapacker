@@ -82,11 +82,13 @@ void Highlighter::highlightBlock(const QString &text) {
     }
 
     if (document()) {
-        TextBlockData *data;
+        TextBlockData *data                = nullptr;
+        bool           dataAlereadyExisted = false;
         if (currentBlockUserData()) {
             data =
                 dynamic_cast<TextBlockData*>(currentBlockUserData());
             data->clear();
+            dataAlereadyExisted = true;
         } else {
             data = new TextBlockData();
         }
@@ -141,6 +143,8 @@ void Highlighter::highlightBlock(const QString &text) {
 
         if (!currentBlockUserData()) {
             setCurrentBlockUserData(data);
+        } else if (!dataAlereadyExisted) {
+            delete data;
         }
     }
 }

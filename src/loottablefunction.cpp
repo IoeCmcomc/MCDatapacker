@@ -356,8 +356,10 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                 QTableWidgetItem *srcItem = new QTableWidgetItem(
                     op.value("source").toString());
                 QString opText = op.value("op").toString();
-                if (nbtOperationTypes.indexOf(opText) == -1)
+                if (nbtOperationTypes.indexOf(opText) == -1) {
+                    delete srcItem;
                     continue;
+                }
                 QTableWidgetItem *opItem = new QTableWidgetItem(
                     ui->copyNBT_opCombo->itemText(
                         nbtOperationTypes.indexOf(opText)));
@@ -483,8 +485,10 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
             auto attrId  = modifier.value("attribute").toString();
             int  attrIdx = ui->setAttr_attrCombo->findText(attrId);
-            if (attrIdx == -1)
+            if (attrIdx == -1) {
+                delete nameItem;
                 continue;
+            }
 
             QTableWidgetItem *attrItem = new QTableWidgetItem(
                 ui->setAttr_attrCombo->itemText(attrIdx));

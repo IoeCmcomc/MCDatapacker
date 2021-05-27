@@ -138,7 +138,7 @@ QString MCRInvSlot::toolTipText() {
     if (items.count() > 1) {
         QStringList itemNames;
         int         c = 0;
-        for (const auto &item : items) {
+        for (const auto &item : qAsConst(items)) {
             itemNames.push_back(item.getName());
             if (c > 5) {
                 itemNames.push_back(tr("..."));
@@ -374,7 +374,7 @@ void MCRInvSlot::dropEvent(QDropEvent *event) {
             dataStream >> dropInvItems;
 
             bool hasTag = false;
-            for (const auto &item : dropInvItems)
+            for (const auto &item : qAsConst(dropInvItems))
                 if (item.getIsTag()) {
                     hasTag = true;
                     break;

@@ -397,7 +397,7 @@ void TabbedCodeEditorInterface::changeEvent(QEvent *event) {
 void TabbedCodeEditorInterface::printPanOffsets() {
     QStringList panOffsets;
 
-    for (const auto &file: files) {
+    for (const auto &file: qAsConst(files)) {
         if (file.data.canConvert<ImageFileData>()) {
             const auto &data = qvariant_cast<ImageFileData>(file.data);
             panOffsets <<

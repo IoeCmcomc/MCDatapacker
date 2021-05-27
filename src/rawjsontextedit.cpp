@@ -314,7 +314,7 @@ void RawJsonTextEdit::updateFormatButtons() {
 }
 
 void RawJsonTextEdit::initColorMenu() {
-    for (const auto colorCode : colorHexes) {
+    for (const auto &colorCode : qAsConst(colorHexes)) {
         QPixmap pixmap(16, 16);
         pixmap.fill(colorCode);
         colorMenu.addAction(pixmap, "", this, [ = ]() {

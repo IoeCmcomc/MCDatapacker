@@ -107,33 +107,37 @@ void SettingsDialog::onAccepted() {
 void SettingsDialog::initSettings() {
     QSettings settings;
 
-    settings.beginGroup("general");
+    settings.beginGroup(QStringLiteral("general"));
     ui->reloadExternChangesCombo->setCurrentIndex
-        (settings.value("reloadExternChanges", 0).toInt());
+        (settings.value(QStringLiteral("reloadExternChanges"), 0).toInt());
 
-    for (const auto &finfo: QDir(":/minecraft").entryInfoList({ "1.*" }))
+    for (const auto &finfo:
+         QDir(QStringLiteral(":/minecraft")).entryInfoList({ "1.*" }))
         ui->gameVersionCombo->addItem(finfo.fileName());
-    ui->gameVersionCombo->setCurrentText(settings.value("gameVersion",
+    ui->gameVersionCombo->setCurrentText(settings.value(QStringLiteral(
+                                                            "gameVersion"),
                                                         0).toString());
     settings.endGroup();
 
-    settings.beginGroup("editor");
-    ui->editorTextSizeSpin->setValue(settings.value("textSize", 13).toInt());
-    if (settings.contains("textFont")) {
+    settings.beginGroup(QStringLiteral("editor"));
+    ui->editorTextSizeSpin->setValue(settings.value(QStringLiteral("textSize"),
+                                                    13).toInt());
+    if (settings.contains(QStringLiteral("textFont"))) {
         ui->editorTextFontCombo->setCurrentFont(qvariant_cast<QFont>(settings.
                                                                      value(
-                                                                         "textFont")));
+                                                                         QStringLiteral(
+                                                                             "textFont"))));
     } else {
         ui->editorTextFontCombo->setCurrentFont(QFontDatabase::systemFont(
                                                     QFontDatabase::FixedFont));
     }
     ui->editorWrapCheck->setChecked(settings.value("wrap", false).toBool());
-    if (settings.value("toggleComments", false).toBool())
+    if (settings.value(QStringLiteral("toggleComments"), false).toBool())
         ui->commentToggleModeRadio->setChecked(true);
     ui->editorTabSizeSpin->setValue(settings.value("tabSize", 4).toInt());
-    if (!settings.value("insertTabAsSpaces", true).toBool())
+    if (!settings.value(QStringLiteral("insertTabAsSpaces"), true).toBool())
         ui->editorTabAsSpacesCheck->setChecked(false);
-    if (settings.value("showSpacesAndTabs", false).toBool())
+    if (settings.value(QStringLiteral("showSpacesAndTabs"), false).toBool())
         ui->editorShowSpacesCheck->setChecked(true);
     settings.endGroup();
 }

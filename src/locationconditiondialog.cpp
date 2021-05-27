@@ -207,7 +207,7 @@ void LocationConditionDialog::initBlockGroup() {
 
     /*blocksModel.appendRow(new QStandardItem(tr("(not set)"))); */
     auto blocksInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
-    for (auto key : blocksInfo.keys()) {
+    for (const auto &key : blocksInfo.keys()) {
         MCRInvItem     invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));

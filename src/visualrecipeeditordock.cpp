@@ -137,7 +137,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         QString                             patternStr;
         QString                             patternChars = "123456789";
         int                                 pattCharIdx  = -1;
-        for (auto *slot : craftingSlots) {
+        for (auto *slot : qAsConst(craftingSlots)) {
             const auto &items = slot->getItems();
             if (!items.isEmpty()) {
                 if (!keys.contains(items)) {
@@ -184,7 +184,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
                     }
                 }
                 pattern = tmpPattern;
-                for (auto row : pattern) {
+                for (auto row : qAsConst(pattern)) {
                     row = row.toString().mid(xstart, xend - xstart + 1);
                 }
             }
@@ -192,7 +192,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         root.insert("pattern", pattern);
 
         QJsonObject key;
-        for (auto str : keys.toStdMap()) {
+        for (const auto &str : keys.toStdMap()) {
             auto items = str.first;
             key.insert(str.second, ingredientsToJson(items));
         }
@@ -365,7 +365,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
         if (pattern.count() > 3) return;
 
         int rowlen = pattern[0].toString().length();
-        for (auto row : pattern)
+        for (auto row : qAsConst(pattern))
             if (row.toString().length() != rowlen) return;
 
         if (pattern.count() == 3 && rowlen == 3)
@@ -374,7 +374,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
             ui->craftTypeInput->setCurrentIndex(1);
 
         QString patternStr;
-        for (auto row : pattern)
+        for (auto row : qAsConst(pattern))
             patternStr += row.toString().leftJustified(3, ' ');
         patternStr = patternStr.leftJustified(9, ' ');
 
@@ -519,9 +519,9 @@ QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal) {
 /*    qDebug() << keyVal << keyArray; */
 
     QVector<MCRInvItem> items;
-    for (QJsonValueRef key : keyArray) {
-        QJsonObject keyJson = key.toObject();
-        QString     itemID;
+    for (const auto &key : qAsConst(keyArray)) {
+        QJsonObject &&keyJson = key.toObject();
+        QString       itemID;
 
         if (keyJson.contains(QStringLiteral("item"))) {
             itemID = keyJson[QStringLiteral("item")].toString();

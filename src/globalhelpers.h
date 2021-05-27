@@ -39,7 +39,7 @@ namespace Glhp {
         Q_ASSERT(layout.parentWidget() != nullptr);
         auto *parent = layout.parentWidget();
         /*parent->setUpdatesEnabled(false); */
-        for (auto childRef : arr) {
+        for (const auto &childRef : arr) {
             auto childData = childRef.toObject();
             T   *child     = new T(parent);
             child->setMinimumWidth(300);

@@ -372,7 +372,7 @@ void CodeEditor::openReplaceDialog() {
 
 void CodeEditor::toggleComment() {
     if (!curHighlighter ||
-        curHighlighter->singleCommentHighlightRules.keys().isEmpty())
+        curHighlighter->singleCommentHighlightRules.isEmpty())
         return;
 
     auto       txtCursor    = textCursor();
@@ -407,7 +407,7 @@ void CodeEditor::toggleComment() {
     int         anchorCharAdded     = 0;
     int         posCharAdded        = 0;
     const QChar commentChar         =
-        curHighlighter->singleCommentHighlightRules.keys()[0];
+        curHighlighter->singleCommentHighlightRules.cbegin().key();
 
     for (int i = 0; i < count; i++) {
         txtCursor.movePosition(QTextCursor::StartOfLine);
@@ -565,7 +565,7 @@ void CodeEditor::matchParentheses() {
         bool isOnTheLeftOfChar = info->position == curPos;
 
         if (isOnTheLeftOfChar || (info->position == curPos - 1)) {
-            for (const auto &pair: curHighlighter->bracketPairs) {
+            for (const auto &pair: qAsConst(curHighlighter->bracketPairs)) {
                 if (info->character == pair.left) {
                     if (matchLeftBracket(textCursor().block(), i + 1,
                                          pair.left, pair.right,

@@ -199,7 +199,7 @@ void ImgViewer::loadData(const ImageFileData &data) {
     if (!tform.isIdentity())
         setTransform(tform);
 
-    QTimer::singleShot(0, [data, this]() {
+    QTimer::singleShot(0, this, [data, this]() {
         if (data.offsetX >= 0)
             horizontalScrollBar()->setValue(data.offsetX);
         if (data.offsetY >= 0)

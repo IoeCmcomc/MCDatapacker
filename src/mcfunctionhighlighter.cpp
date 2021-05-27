@@ -14,7 +14,7 @@ McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
 void McfunctionHighlighter::setupRules() {
     auto fmt = QTextCharFormat();
 
-    fmt.setForeground(QColor("#3EC300"));
+    fmt.setForeground(QColor(62, 195, 0));
     singleCommentHighlightRules.insert('#', fmt);
 
     fmt = QTextCharFormat();
@@ -103,26 +103,26 @@ void McfunctionHighlighter::setupRules() {
         highlightingRules.append(rule);
     }
 
-    numberFormat.setForeground(QColor("#2F97C1"));
+    numberFormat.setForeground(QColor(47, 151, 193));
     rule.pattern =
         QRegularExpression(QStringLiteral(
                                "(?<!\\w)-?\\d+(?:\\.\\d+)?[bBsSlLfFdD]?(?!\\w)"));
     rule.format = numberFormat;
     highlightingRules.append(rule);
 
-    posFormat.setForeground(QColor("#AB81CD"));
+    posFormat.setForeground(QColor(171, 129, 205));
     rule.pattern = QRegularExpression(QStringLiteral("[~^]?-?\\d+(?:\\s|$)"));
     rule.format  = posFormat;
     highlightingRules.append(rule);
 
-    namespacedIDFormat.setForeground(QColor("#45503B"));
+    namespacedIDFormat.setForeground(QColor(69, 80, 59));
     rule.pattern =
         QRegularExpression(QStringLiteral("\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
     rule.format = namespacedIDFormat;
     highlightingRules.append(rule);
 
     auto quoteFmt = QTextCharFormat();
-    quoteFmt.setForeground(QColor("#A31621"));
+    quoteFmt.setForeground(QColor(163, 22, 33));
 
     quoteHighlightRules.insert('\'', quoteFmt);
 

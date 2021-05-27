@@ -57,7 +57,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
                                                  Glhp::toNamespacedID(dirPath,
                                                                       finfo.
                                                                       filePath())));
-        connect(cMenuActionInLoadDotJson, &QAction::triggered,
+        connect(cMenuActionInLoadDotJson, &QAction::triggered, this,
                 [ = ](bool checked) {
             this->contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
@@ -74,7 +74,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
                                                  Glhp::toNamespacedID(dirPath,
                                                                       finfo.
                                                                       filePath())));
-        connect(cMenuActionInTickDotJson, &QAction::triggered,
+        connect(cMenuActionInTickDotJson, &QAction::triggered, this,
                 [ = ](bool checked) {
             this->contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/tick.json",
