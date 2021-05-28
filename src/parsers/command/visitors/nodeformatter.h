@@ -431,7 +431,7 @@ public:
             QTextLayout::FormatRange range{ node->pos(), node->length(),
                                             std::move(fmt) };
 
-            /*m_formatRanges << std::move(range); */
+            m_formatRanges << std::move(range);
         }
         virtual void visit(BlockPosNode *node) {
             auto                     fmt = defaultFormat(node);

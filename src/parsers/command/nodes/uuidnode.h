@@ -9,7 +9,8 @@ namespace Command {
     class UuidNode : public ArgumentNode
     {
 public:
-        UuidNode(int pos, QString uuidStr);
+        UuidNode(int pos, int length, const QString &uuidStr);
+        UuidNode(int pos, const QString &uuidStr);
         QString toString() const override;
         bool isVaild() const override;
         void accept(NodeVisitor *visitor) override {

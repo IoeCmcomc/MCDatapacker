@@ -1127,11 +1127,27 @@ QSharedPointer<Command::TimeNode> Command::MinecraftParser::minecraft_time() {
 }
 
 QSharedPointer<Command::UuidNode> Command::MinecraftParser::minecraft_uuid() {
-    int     curPos = pos();
-    QString uuid   = getWithRegex(QStringLiteral(
-                                      R"([\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12})"));
+    int                curPos = pos();
+    QRegularExpression regex(
+        R"(([\da-fA-F]{1,8})-([\da-fA-F]{1,4})-([\da-fA-F]{1,4})-([\da-fA-F]{1,4})-([\da-fA-F]{1,12}))");
+    const auto &&match =
+        regex.match(text(), curPos, QRegularExpression::NormalMatch,
+                    QRegularExpression::AnchoredMatchOption);
 
-    return QSharedPointer<Command::UuidNode>::create(curPos, uuid);
+    if (match.hasMatch()) {
+        advance(match.capturedLength());
+        QStringList hexList;
+        hexList << match.captured(1).rightJustified(8, '0');
+        hexList << match.captured(2).rightJustified(4, '0');
+        hexList << match.captured(3).rightJustified(4, '0');
+        hexList << match.captured(4).rightJustified(4, '0');
+        hexList << match.captured(5).rightJustified(12, '0');
+        return QSharedPointer<Command::UuidNode>::create(curPos,
+                                                         match.capturedLength(),
+                                                         hexList.join('-'));
+    } else {
+        return QSharedPointer<Command::UuidNode>::create(curPos, 0, QString());
+    }
 }
 
 QSharedPointer<Command::Vec2Node> Command::MinecraftParser::minecraft_vec2() {
