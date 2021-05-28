@@ -585,12 +585,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         ui->setLore_replaceCheck->setupFromJsonObject(root, "replace");
 
         if (root.contains("lore")) {
-            auto lore = QVariantList(root.value("lore")
-                                     .toArray().toVariantList()).toVector();
-            auto *textEdit = ui->setLore_textEdit->getTextEdit();
-            textEdit->clear();
-            for (int i = 0; i < lore.count(); i++)
-                textEdit->append(lore[i].toString());
+            ui->setLore_textEdit->fromJson(root.value("lore").toArray());
         }
         break;
     }

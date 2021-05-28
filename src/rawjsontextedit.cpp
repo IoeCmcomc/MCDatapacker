@@ -1,6 +1,8 @@
 #include "rawjsontextedit.h"
 #include "ui_rawjsontextedit.h"
 
+#include "mainwindow.h"
+
 #include <QToolButton>
 #include <QSignalBlocker>
 #include <QPixmap>
@@ -9,11 +11,12 @@
 #include <QKeyEvent>
 #include <QSizePolicy>
 #include <QLineEdit>
-#include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTextBlock>
 #include <QShortcut>
+#include <QColorDialog>
+
 
 RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
     QFrame(parent),
@@ -21,6 +24,12 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
     ui->setupUi(this);
 
     ui->textEdit->installEventFilter(this);
+    QFont font;
+    font.setFamily("monospace [Consolas]");
+    font.setFixedPitch(true);
+    font.setStyleHint(QFont::Monospace);
+    font.setPointSize(10);
+    ui->textEdit->setFont(std::move(font));
 
     initColorMenu();
     QPixmap pixmap(16, 16);
@@ -84,8 +93,8 @@ void RawJsonTextEdit::setOneLine(bool value) {
     ui->textEdit->setVerticalScrollBarPolicy(
         (value) ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
     if (value) {
-        auto *lineEdit = new QLineEdit();
-        ui->textEdit->setFixedHeight(lineEdit->sizeHint().height());
+        QLineEdit lineEdit(this);
+        ui->textEdit->setFixedHeight(lineEdit.height());
     } else {
         ui->textEdit->setMaximumHeight(0);
     }
@@ -129,10 +138,15 @@ QJsonValue RawJsonTextEdit::toJson() const {
                 if (fmt.fontStrikeOut())
                     component.insert("strikethrough", true);
                 if (fmt.foreground().style() == Qt::SolidPattern) {
-                    auto key = colorHexes.key(
+                    const QString &&key = colorHexes.key(
                         fmt.foreground().color().name());
-                    if (!key.isEmpty())
+                    if (!key.isEmpty()) {
                         component.insert("color", key);
+                    } else if (MainWindow::getCurGameVersion() >=
+                               QVersionNumber(1, 16)) {
+                        component.insert("color",
+                                         fmt.foreground().color().name());
+                    }
                 }
 
                 arr << component;
@@ -208,6 +222,15 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
         QString color = colorHexes.value(root.value("color").toString());
         if (!color.isEmpty()) {
             fmt.setForeground(QBrush(QColor(color)));
+        } else if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+            QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
+            const auto       &&match
+                = regex.match(root.value("color").toString(), 0,
+                              QRegularExpression::NormalMatch,
+                              QRegularExpression::AnchoredMatchOption);
+            if (match.hasMatch()) {
+                fmt.setForeground(QBrush(QColor(match.captured())));
+            }
         }
     }
 
@@ -264,9 +287,9 @@ void RawJsonTextEdit::colorBtnToggled(bool checked) {
     if (checked) {
         setColor(currTextColor);
     } else {
-        auto fmt = ui->textEdit->currentCharFormat();
+        auto &&fmt = ui->textEdit->currentCharFormat();
         fmt.clearForeground();
-        ui->textEdit->setCurrentCharFormat(fmt);
+        ui->textEdit->setCurrentCharFormat(std::move(fmt));
     }
     ui->textEdit->setFocus();
 }
@@ -299,8 +322,8 @@ bool RawJsonTextEdit::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void RawJsonTextEdit::updateFormatButtons() {
-    auto cursor = ui->textEdit->textCursor();
-    auto fmt    = cursor.charFormat();
+    auto   cursor = ui->textEdit->textCursor();
+    auto &&fmt    = cursor.charFormat();
     {
         const QSignalBlocker blocker1(ui->boldBtn);
         ui->boldBtn->setChecked(fmt.fontWeight() >= 75);
@@ -313,11 +336,24 @@ void RawJsonTextEdit::updateFormatButtons() {
     }
 }
 
+void RawJsonTextEdit::selectCustomColor() {
+    QColor &&color = QColorDialog::getColor(Qt::green, this);
+
+    if (color.isValid()) {
+        currTextColor = color;
+        if (ui->colorBtn->isChecked()) {
+            colorBtnToggled(true);
+        } else {
+            ui->colorBtn->setChecked(true);
+        }
+    }
+}
+
 void RawJsonTextEdit::initColorMenu() {
     for (const auto &colorCode : qAsConst(colorHexes)) {
         QPixmap pixmap(16, 16);
         pixmap.fill(colorCode);
-        colorMenu.addAction(pixmap, "", this, [ = ]() {
+        colorMenu.addAction(pixmap, QString(), this, [ = ]() {
             currTextColor = QColor(colorCode);
             if (ui->colorBtn->isChecked()) {
                 colorBtnToggled(true);
@@ -326,5 +362,11 @@ void RawJsonTextEdit::initColorMenu() {
             }
         });
     }
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+        colorMenu.addAction(tr("Select color..."),
+                            this,
+                            &RawJsonTextEdit::selectCustomColor);
+    }
+
     ui->colorBtn->setMenu(&colorMenu);
 }

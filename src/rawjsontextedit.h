@@ -37,8 +37,9 @@ protected:
     void mergeCurrentFormat(const QTextCharFormat &format);
     bool eventFilter(QObject *obj, QEvent *event) override;
 
-protected slots:
+private /*slots*/ :
     void updateFormatButtons();
+    void selectCustomColor();
 
 private:
     Ui::RawJsonTextEdit *ui;
