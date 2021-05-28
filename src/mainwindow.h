@@ -51,6 +51,7 @@ private slots:
     void open();
     void newDatapack();
     void openFolder();
+    void openRecentFolder();
     bool save();
     void saveAll();
     void pref_settings();
@@ -69,23 +70,30 @@ private:
     Ui::MainWindow *ui;
 
     static QMap<QString, QVariantMap> MCRInfoMaps;
-    VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
-    QLocale curLocale;
     QFileSystemWatcher fileWatcher;
     QTranslator m_translator;
     QTranslator m_translatorQt;
-    QMessageBox *uniqueMessageBox            = nullptr;
-    LootTableEditorDock *lootTableEditorDock = nullptr;
-    PredicateDock *predicateDock             = nullptr;
+    QMessageBox *uniqueMessageBox                  = nullptr;
+    VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
+    LootTableEditorDock *lootTableEditorDock       = nullptr;
+    PredicateDock *predicateDock                   = nullptr;
+    QLocale curLocale;
+    QVector<QAction*> recentFoldersActions;
     static QVersionNumber curGameVersion;
+    const int maxRecentFoldersActions = 10;
 
+    void initDocks();
+    void initMenu();
     void readSettings();
     void writeSettings();
     bool maybeSave();
+    void loadFolder(const QString &dirPath);
 
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);
     void switchTranslator(QTranslator& translator, const QString& filename);
+    void adjustForCurFolder(const QString &path);
+    void updateRecentFolders();
 };
 
 #endif /* MAINWINDOW_H */

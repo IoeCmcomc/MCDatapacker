@@ -25,22 +25,30 @@
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
 QVersionNumber              MainWindow::curGameVersion = QVersionNumber(1, 15);
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
-    ui->setupUi(this);
-    readSettings();
-    Command::MinecraftParser::setSchema(
-        QStringLiteral(":/minecraft/") + MainWindow::curGameVersion.toString() +
-        QStringLiteral("/mcdata/generated/reports/commands.json"));
+void MainWindow::initDocks() {
+    visualRecipeEditorDock = new VisualRecipeEditorDock(this);
+    addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
+    visualRecipeEditorDock->hide();
 
-    MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
-                                   MainWindow::readMCRInfo(QStringLiteral(
-                                                               "block")));
-    MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
-                                   MainWindow::readMCRInfo(QStringLiteral(
-                                                               "item")));
+    lootTableEditorDock = new LootTableEditorDock(this);
+    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
+    lootTableEditorDock->hide();
 
-    /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
+    predicateDock = new PredicateDock(this);
+    addDockWidget(Qt::RightDockWidgetArea, predicateDock);
+    predicateDock->hide();
+}
+
+void MainWindow::initMenu() {
+    for (auto i = 0; i < maxRecentFoldersActions; ++i) {
+        auto *recentFolderAction = new QAction(this);
+        recentFolderAction->setVisible(false);
+        QObject::connect(recentFolderAction, &QAction::triggered,
+                         this, &MainWindow::openRecentFolder);
+        recentFoldersActions.append(recentFolderAction);
+        ui->menuRecentDatapacks->addAction(recentFolderAction);
+    }
+    updateRecentFolders();
 
     connect(ui->actionNewDatapack, &QAction::triggered,
             this, &MainWindow::newDatapack);
@@ -60,6 +68,26 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->actionDisclaimer, &QAction::triggered,
             this, &MainWindow::disclaimer);
+}
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
+    ui->setupUi(this);
+    readSettings();
+    Command::MinecraftParser::setSchema(
+        QStringLiteral(":/minecraft/") + MainWindow::curGameVersion.toString() +
+        QStringLiteral("/mcdata/generated/reports/commands.json"));
+
+    MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
+                                   MainWindow::readMCRInfo(QStringLiteral(
+                                                               "block")));
+    MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
+                                   MainWindow::readMCRInfo(QStringLiteral(
+                                                               "item")));
+
+    /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
+
+    initMenu();
     connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
             this, &MainWindow::onSystemWatcherFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::fileRenamed,
@@ -73,8 +101,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
             ui->codeEditorInterface, &TabbedCodeEditorInterface::onOpenFile);
-    connect(this, &MainWindow::gameVersionChanged,
-            ui->codeEditorInterface,
+    connect(this, &MainWindow::gameVersionChanged, ui->codeEditorInterface,
             &TabbedCodeEditorInterface::onGameVersionChanged);
 
     #ifndef QT_NO_SESSIONMANAGER
@@ -86,17 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
     QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/icon");
     /*qDebug() << QIcon::fallbackSearchPaths(); */
 
-    visualRecipeEditorDock = new VisualRecipeEditorDock(this);
-    addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
-    visualRecipeEditorDock->hide();
-
-    lootTableEditorDock = new LootTableEditorDock(this);
-    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
-    lootTableEditorDock->hide();
-
-    predicateDock = new PredicateDock(this);
-    addDockWidget(Qt::RightDockWidgetArea, predicateDock);
-    predicateDock->hide();
+    initDocks();
 }
 
 void MainWindow::open() {
@@ -321,6 +338,78 @@ bool MainWindow::maybeSave() {
     return true;
 }
 
+void MainWindow::loadFolder(const QString &dirPath) {
+    const QString &&pack_mcmeta = dirPath + QStringLiteral("/pack.mcmeta");
+
+    if (QFile::exists(pack_mcmeta)) {
+        if (pack_mcmeta.isEmpty())
+            return;
+        else {
+            QFile file(pack_mcmeta);
+            if (!file.open(QIODevice::ReadOnly)) {
+                QMessageBox::information(this, tr("Error"), file.errorString());
+            } else {
+                QTextStream     in(&file);
+                const QString &&json_string = in.readAll();
+                file.close();
+
+                QJsonDocument &&json_doc = QJsonDocument::fromJson(
+                    json_string.toUtf8());
+
+                if (json_doc.isNull()) {
+                    QMessageBox::information(this,
+                                             "pack.mcmeta error",
+                                             tr(
+                                                 "Failed to parse the pack.mcmeta file."));
+                    return;
+                }
+                if (!json_doc.isObject()) {
+                    QMessageBox::information(this,
+                                             "pack.mcmeta error",
+                                             tr(
+                                                 "The pack.mcmeta file is not a JSON object."));
+                    return;
+                }
+
+                QJsonObject json_obj = json_doc.object();
+
+                if (json_obj.isEmpty()) {
+                    QMessageBox::information(this,
+                                             "pack.mcmeta error",
+                                             tr(
+                                                 "The pack.mcmeta file's contents is empty."));
+                    return;
+                }
+
+                QVariantMap json_map = json_obj.toVariantMap();
+
+                auto curDir = QDir::current();
+                if (json_map.contains("pack")) {
+                    QVariantMap &&pack = json_map["pack"].toMap();
+                    if (pack.contains(QStringLiteral("description")) &&
+                        pack.contains(QStringLiteral("pack_format"))) {
+                        QDir dir(dirPath);
+                        QDir::setCurrent(dir.absolutePath());
+                        ui->datapackTreeView->load(dir);
+
+                        if (!curDir.path().isEmpty()) {
+                            this->fileWatcher.removePath(curDir.path());
+                            this->fileWatcher.addPath(curDir.path());
+                        }
+                        ui->codeEditorInterface->clear();
+                        emit curDirChanged(dirPath);
+                        adjustForCurFolder(dirPath);
+                    }
+                }
+            }
+        }
+    } else {
+        QMessageBox::information(this, tr("Error"),
+                                 tr("Invaild datapack folder."));
+        return;
+    }
+}
+
 QString MainWindow::getCurLocale() {
     return this->curLocale.name();
 }
@@ -345,11 +434,49 @@ void MainWindow::switchTranslator(QTranslator& translator,
                                   const QString& filename) {
     qApp->removeTranslator(&translator);
 
-    QString path = QApplication::applicationDirPath() + "/translations/";
+    QString path = QApplication::applicationDirPath() + QStringLiteral(
+        "/translations/");
     if (translator.load(path + filename))
         qApp->installTranslator(&translator);
-    else if (translator.load(":/i18n/" + filename))
+    else if (translator.load(QStringLiteral(":/i18n/") + filename))
         qApp->installTranslator(&translator);
+}
+
+void MainWindow::adjustForCurFolder(const QString &path) {
+    QSettings   settings;
+    QStringList recentPaths =
+        settings.value(QStringLiteral("recentFolders")).toStringList();
+
+    recentPaths.removeAll(path);
+    recentPaths.prepend(path);
+    while (recentPaths.size() > maxRecentFoldersActions)
+        recentPaths.removeLast();
+    settings.setValue(QStringLiteral("recentFolders"), recentPaths);
+
+    updateRecentFolders();
+}
+
+void MainWindow::updateRecentFolders() {
+    QSettings     settings;
+    QStringList &&recentPaths =
+        settings.value(QStringLiteral("recentFolders")).toStringList();
+
+    auto itEnd = 0u;
+
+    if (recentPaths.size() <= maxRecentFoldersActions)
+        itEnd = recentPaths.size();
+    else
+        itEnd = maxRecentFoldersActions;
+
+    for (auto i = 0u; i < itEnd; ++i) {
+        auto *action = recentFoldersActions.at(i);
+        action->setText(QString("&%1 | %2").arg(i).arg(recentPaths.at(i)));
+        action->setData(recentPaths.at(i));
+        action->setVisible(true);
+    }
+
+    for (int i = itEnd; i < maxRecentFoldersActions; ++i)
+        recentFoldersActions.at(i)->setVisible(false);
 }
 
 
@@ -514,90 +641,22 @@ void MainWindow::newDatapack() {
 }
 
 void MainWindow::openFolder() {
-    QString dirPath;
+    if (maybeSave()) {
+        const QString &&dirPath =
+            QFileDialog::getExistingDirectory(this, tr("Open datapack folder"),
+                                              QString(),
+                                              QFileDialog::ShowDirsOnly |
+                                              QFileDialog::DontResolveSymlinks);
+        if (!dirPath.isEmpty())
+            loadFolder(dirPath);
+    }
+}
 
-    if (maybeSave())
-        dirPath = QFileDialog::getExistingDirectory(this,
-                                                    tr(
-                                                        "Open datapack folder"),
-                                                    "",
-                                                    QFileDialog::ShowDirsOnly |
-                                                    QFileDialog::DontResolveSymlinks);
-    else
-        return;
-
-    if (dirPath.isEmpty()) return;
-
-    QString pack_mcmeta = dirPath + "/pack.mcmeta";
-
-    if (QFile::exists(pack_mcmeta)) {
-        if (pack_mcmeta.isEmpty())
-            return;
-        else {
-            QFile file(pack_mcmeta);
-            if (!file.open(QIODevice::ReadOnly)) {
-                QMessageBox::information(this, tr("Error"), file.errorString());
-            } else {
-                QTextStream in(&file);
-                QString     json_string;
-                json_string = in.readAll();
-                file.close();
-
-                QJsonDocument json_doc = QJsonDocument::fromJson(
-                    json_string.toUtf8());
-
-                /*qDebug() << json_doc; */
-
-                if (json_doc.isNull()) {
-                    QMessageBox::information(this,
-                                             "pack.mcmeta error",
-                                             tr(
-                                                 "Failed to parse the pack.mcmeta file."));
-                    return;
-                }
-                if (!json_doc.isObject()) {
-                    QMessageBox::information(this,
-                                             "pack.mcmeta error",
-                                             tr(
-                                                 "The pack.mcmeta file is not a JSON object."));
-                    return;
-                }
-
-                QJsonObject json_obj = json_doc.object();
-
-                if (json_obj.isEmpty()) {
-                    QMessageBox::information(this,
-                                             "pack.mcmeta error",
-                                             tr(
-                                                 "The pack.mcmeta file's contents is empty."));
-                    return;
-                }
-
-                QVariantMap json_map = json_obj.toVariantMap();
-
-                auto curDir = QDir::current();
-                if (json_map.contains("pack")) {
-                    QVariantMap pack = json_map["pack"].toMap();
-                    if (pack.contains("description") &&
-                        pack.contains("pack_format")) {
-                        QDir dir(dirPath);
-                        QDir::setCurrent(dir.absolutePath());
-                        ui->datapackTreeView->load(dir);
-
-                        if (!curDir.path().isEmpty()) {
-                            this->fileWatcher.removePath(curDir.path());
-                            this->fileWatcher.addPath(curDir.path());
-                        }
-                        ui->codeEditorInterface->clear();
-                        emit curDirChanged(dirPath);
-                    }
-                }
-            }
-        }
-    } else {
-        QMessageBox::information(this, tr("Error"),
-                                 tr("Invaild datapack folder."));
-        return;
+void MainWindow::openRecentFolder() {
+    if (maybeSave()) {
+        QAction *action = qobject_cast<QAction *>(sender());
+        if (action)
+            loadFolder(action->data().toString());
     }
 }
 
