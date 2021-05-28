@@ -2,9 +2,10 @@
 #define ABOUTDIALOG_H
 
 #include <QDialog>
+#include <QPropertyAnimation>
 
 namespace Ui {
-class AboutDialog;
+    class AboutDialog;
 }
 
 class AboutDialog : public QDialog
@@ -15,8 +16,14 @@ public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog();
 
+public slots:
+    void done(int r) override;
+
 private:
     Ui::AboutDialog *ui;
+    QVector<QPropertyAnimation*> m_animes;
+    QPropertyAnimation *m_winAnime = nullptr;
+    bool m_isClosing               = false;
 };
 
-#endif // ABOUTDIALOG_H
+#endif /* ABOUTDIALOG_H */
