@@ -20,55 +20,11 @@
 #include <QCloseEvent>
 #include <QProcess>
 #include <QShortcut>
+#include <QClipboard>
 
 
 QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
 QVersionNumber              MainWindow::curGameVersion = QVersionNumber(1, 15);
-
-void MainWindow::initDocks() {
-    visualRecipeEditorDock = new VisualRecipeEditorDock(this);
-    addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
-    visualRecipeEditorDock->hide();
-
-    lootTableEditorDock = new LootTableEditorDock(this);
-    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
-    lootTableEditorDock->hide();
-
-    predicateDock = new PredicateDock(this);
-    addDockWidget(Qt::RightDockWidgetArea, predicateDock);
-    predicateDock->hide();
-}
-
-void MainWindow::initMenu() {
-    for (auto i = 0; i < maxRecentFoldersActions; ++i) {
-        auto *recentFolderAction = new QAction(this);
-        recentFolderAction->setVisible(false);
-        QObject::connect(recentFolderAction, &QAction::triggered,
-                         this, &MainWindow::openRecentFolder);
-        recentFoldersActions.append(recentFolderAction);
-        ui->menuRecentDatapacks->addAction(recentFolderAction);
-    }
-    updateRecentFolders();
-
-    connect(ui->actionNewDatapack, &QAction::triggered,
-            this, &MainWindow::newDatapack);
-    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
-    connect(ui->actionOpenFolder, &QAction::triggered,
-            this, &MainWindow::openFolder);
-    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
-    connect(ui->actionSaveAll, &QAction::triggered,
-            this, &MainWindow::saveAll);
-    connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
-    connect(ui->actionSettings, &QAction::triggered,
-            this, &MainWindow::pref_settings);
-    connect(ui->actionAboutApp, &QAction::triggered,
-            this, &MainWindow::about);
-    connect(ui->actionAboutQt, &QAction::triggered, [this]() {
-        QMessageBox::aboutQt(this);
-    });
-    connect(ui->actionDisclaimer, &QAction::triggered,
-            this, &MainWindow::disclaimer);
-}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -114,6 +70,80 @@ MainWindow::MainWindow(QWidget *parent)
     /*qDebug() << QIcon::fallbackSearchPaths(); */
 
     initDocks();
+
+
+    connect(ui->codeEditorInterface->getStackedWidget(),
+            &QStackedWidget::currentChanged, this, &MainWindow::updateEditMenu);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &QPlainTextEdit::copyAvailable, this, &MainWindow::updateEditMenu);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &QPlainTextEdit::undoAvailable, this, &MainWindow::updateEditMenu);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &QPlainTextEdit::redoAvailable, this, &MainWindow::updateEditMenu);
+    connect(qApp->clipboard(), &QClipboard::changed, this,
+            &MainWindow::updateEditMenu);
+    ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+}
+
+void MainWindow::initDocks() {
+    visualRecipeEditorDock = new VisualRecipeEditorDock(this);
+    addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
+    visualRecipeEditorDock->hide();
+
+    lootTableEditorDock = new LootTableEditorDock(this);
+    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
+    lootTableEditorDock->hide();
+
+    predicateDock = new PredicateDock(this);
+    addDockWidget(Qt::RightDockWidgetArea, predicateDock);
+    predicateDock->hide();
+}
+
+void MainWindow::initMenu() {
+    for (int i = 0; i < maxRecentFoldersActions; ++i) {
+        auto *recentFolderAction = new QAction(this);
+        recentFolderAction->setVisible(false);
+        QObject::connect(recentFolderAction, &QAction::triggered,
+                         this, &MainWindow::openRecentFolder);
+        recentFoldersActions.append(recentFolderAction);
+        ui->menuRecentDatapacks->addAction(recentFolderAction);
+    }
+    updateRecentFolders();
+
+    /* File menu */
+    connect(ui->actionNewDatapack, &QAction::triggered,
+            this, &MainWindow::newDatapack);
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
+    connect(ui->actionOpenFolder, &QAction::triggered,
+            this, &MainWindow::openFolder);
+    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
+    connect(ui->actionSaveAll, &QAction::triggered, this, &MainWindow::saveAll);
+    connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
+    /* Edit menu */
+
+    connect(ui->actionUndo, &QAction::triggered,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::undo);
+    connect(ui->actionRedo, &QAction::triggered,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::redo);
+    connect(ui->actionSelectAll, &QAction::triggered,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::selectAll);
+    connect(ui->actionCut, &QAction::triggered,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::cut);
+    connect(ui->actionCopy, &QAction::triggered,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::copy);
+    connect(ui->actionPaste, &QAction::triggered,
+            ui->codeEditorInterface, &TabbedCodeEditorInterface::paste);
+
+    /* Preferences menu */
+    connect(ui->actionSettings, &QAction::triggered,
+            this, &MainWindow::pref_settings);
+    /* Help menu */
+    connect(ui->actionAboutApp, &QAction::triggered, this, &MainWindow::about);
+    connect(ui->actionAboutQt, &QAction::triggered, [this]() {
+        QMessageBox::aboutQt(this);
+    });
+    connect(ui->actionDisclaimer, &QAction::triggered, this,
+            &MainWindow::disclaimer);
 }
 
 void MainWindow::open() {
@@ -250,6 +280,15 @@ void MainWindow::readSettings() {
     readPrefSettings(settings);
 }
 
+void MainWindow::restartApp() {
+    const int restartExitCode = 2020;
+
+    qApp->exit(restartExitCode);
+
+    QProcess process;
+    process.startDetached(qApp->arguments()[0], qApp->arguments());
+}
+
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     settings.beginGroup("general");
     /*qDebug() << settings.value("locale", "").toString(); */
@@ -272,11 +311,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
 
             msgBox.exec();
             if (msgBox.clickedButton() == restartBtn) {
-                const int restartExitCode = 2020;
-                qApp->exit(restartExitCode);
-
-                QProcess process;
-                process.startDetached(qApp->arguments()[0], qApp->arguments());
+                restartApp();
             } else {
                 settings.setValue("gameVersion",
                                   getCurGameVersion().toString());
@@ -285,13 +320,11 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
             qDebug() << "Game version was changed to" << gameVer;
             MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                            MainWindow::readMCRInfo(
-                                               QStringLiteral(
-                                                   "block"),
+                                               QStringLiteral("block"),
                                                gameVer));
             MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
                                            MainWindow::readMCRInfo(
-                                               QStringLiteral(
-                                                   "item"),
+                                               QStringLiteral("item"),
                                                gameVer));
             MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
             emit gameVersionChanged(gameVer);
@@ -342,9 +375,13 @@ void MainWindow::loadFolder(const QString &dirPath) {
     const QString &&pack_mcmeta = dirPath + QStringLiteral("/pack.mcmeta");
 
     if (QFile::exists(pack_mcmeta)) {
-        if (pack_mcmeta.isEmpty())
+        if (pack_mcmeta.isEmpty()) {
             return;
-        else {
+        } else {
+#ifndef QT_NO_CURSOR
+            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
             QFile file(pack_mcmeta);
             if (!file.open(QIODevice::ReadOnly)) {
                 QMessageBox::information(this, tr("Error"), file.errorString());
@@ -357,6 +394,9 @@ void MainWindow::loadFolder(const QString &dirPath) {
                     json_string.toUtf8());
 
                 if (json_doc.isNull()) {
+#ifndef QT_NO_CURSOR
+                    QGuiApplication::restoreOverrideCursor();
+#endif
                     QMessageBox::information(this,
                                              "pack.mcmeta error",
                                              tr(
@@ -364,6 +404,9 @@ void MainWindow::loadFolder(const QString &dirPath) {
                     return;
                 }
                 if (!json_doc.isObject()) {
+#ifndef QT_NO_CURSOR
+                    QGuiApplication::restoreOverrideCursor();
+#endif
                     QMessageBox::information(this,
                                              "pack.mcmeta error",
                                              tr(
@@ -374,6 +417,9 @@ void MainWindow::loadFolder(const QString &dirPath) {
                 QJsonObject json_obj = json_doc.object();
 
                 if (json_obj.isEmpty()) {
+#ifndef QT_NO_CURSOR
+                    QGuiApplication::restoreOverrideCursor();
+#endif
                     QMessageBox::information(this,
                                              "pack.mcmeta error",
                                              tr(
@@ -399,6 +445,9 @@ void MainWindow::loadFolder(const QString &dirPath) {
                         ui->codeEditorInterface->clear();
                         emit curDirChanged(dirPath);
                         adjustForCurFolder(dirPath);
+#ifndef QT_NO_CURSOR
+                        QGuiApplication::restoreOverrideCursor();
+#endif
                     }
                 }
             }
@@ -479,6 +528,28 @@ void MainWindow::updateRecentFolders() {
         recentFoldersActions.at(i)->setVisible(false);
 }
 
+void MainWindow::updateEditMenu() {
+    if (ui->codeEditorInterface->getStackedWidget()->currentIndex() == 1) {
+        ui->actionUndo->setEnabled(
+            ui->codeEditorInterface->getCodeEditor()->getCanUndo());
+        ui->actionRedo->setEnabled(
+            ui->codeEditorInterface->getCodeEditor()->getCanRedo());
+        ui->actionSelectAll->setEnabled(true);
+        const bool hasSelection =
+            ui->codeEditorInterface->getCodeEditor()->textCursor().hasSelection();
+        ui->actionCut->setEnabled(hasSelection);
+        ui->actionCopy->setEnabled(hasSelection);
+        ui->actionPaste->setEnabled(
+            ui->codeEditorInterface->getCodeEditor()->canPaste());
+    } else {
+        ui->actionUndo->setEnabled(false);
+        ui->actionRedo->setEnabled(false);
+        ui->actionSelectAll->setEnabled(false);
+        ui->actionCut->setEnabled(false);
+        ui->actionCopy->setEnabled(false);
+        ui->actionPaste->setEnabled(false);
+    }
+}
 
 void MainWindow::changeEvent(QEvent* event) {
     if (event != nullptr) {

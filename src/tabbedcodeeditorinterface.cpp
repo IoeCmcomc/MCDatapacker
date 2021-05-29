@@ -288,6 +288,10 @@ CodeEditor *TabbedCodeEditorInterface::getCodeEditor() const {
     return ui->codeEditor;
 }
 
+QStackedWidget *TabbedCodeEditorInterface::getStackedWidget() {
+    return ui->stackedWidget;
+}
+
 int TabbedCodeEditorInterface::count() const {
     return files.count();
 }
@@ -385,6 +389,42 @@ void TabbedCodeEditorInterface::onGameVersionChanged(const QString &ver) {
             auto &&data = qvariant_cast<TextFileData>(file.data);
             data.highlighter->checkProblems(true);
         }
+    }
+}
+
+void TabbedCodeEditorInterface::undo() {
+    if (ui->stackedWidget->currentIndex() == 1) {
+        ui->codeEditor->undo();
+    }
+}
+
+void TabbedCodeEditorInterface::redo() {
+    if (ui->stackedWidget->currentIndex() == 1) {
+        ui->codeEditor->redo();
+    }
+}
+
+void TabbedCodeEditorInterface::selectAll() {
+    if (ui->stackedWidget->currentIndex() == 1) {
+        ui->codeEditor->selectAll();
+    }
+}
+
+void TabbedCodeEditorInterface::cut() {
+    if (ui->stackedWidget->currentIndex() == 1) {
+        ui->codeEditor->cut();
+    }
+}
+
+void TabbedCodeEditorInterface::copy() {
+    if (ui->stackedWidget->currentIndex() == 1) {
+        ui->codeEditor->copy();
+    }
+}
+
+void TabbedCodeEditorInterface::paste() {
+    if (ui->stackedWidget->currentIndex() == 1) {
+        ui->codeEditor->paste();
     }
 }
 

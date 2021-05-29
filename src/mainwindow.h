@@ -48,15 +48,20 @@ signals:
     void gameVersionChanged(const QString &ver);
 
 private slots:
+    /* File menu */
     void open();
     void newDatapack();
     void openFolder();
     void openRecentFolder();
     bool save();
     void saveAll();
+    /* Edit menu */
+    /* Preferences menu */
     void pref_settings();
+    /* Help menu */
     void about();
     void disclaimer();
+    /* Internal slots */
     void onSystemWatcherFileChanged(const QString &filepath);
     void onCurFileChanged(const QString &path);
     void onDatapackChanged();
@@ -94,6 +99,8 @@ private:
     void switchTranslator(QTranslator& translator, const QString& filename);
     void adjustForCurFolder(const QString &path);
     void updateRecentFolders();
+    void updateEditMenu();
+    void restartApp();
 };
 
 #endif /* MAINWINDOW_H */

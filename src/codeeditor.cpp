@@ -38,6 +38,10 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
             this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
+    connect(this, &CodeEditor::undoAvailable,
+            this, &CodeEditor::onUndoAvailable);
+    connect(this, &CodeEditor::redoAvailable,
+            this, &CodeEditor::onRedoAvailable);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
@@ -447,6 +451,22 @@ void CodeEditor::toggleComment() {
                           QTextCursor::KeepAnchor);
     txtCursor.endEditBlock();
     setTextCursor(txtCursor);
+}
+
+void CodeEditor::onUndoAvailable(bool value) {
+    canUndo = value;
+}
+
+void CodeEditor::onRedoAvailable(bool value) {
+    canRedo = value;
+}
+
+bool CodeEditor::getCanRedo() const {
+    return canRedo;
+}
+
+bool CodeEditor::getCanUndo() const {
+    return canUndo;
 }
 
 void CodeEditor::setCurHighlighter(Highlighter *value) {

@@ -40,6 +40,9 @@ public:
 
     void readPrefSettings();
 
+    bool getCanUndo() const;
+    bool getCanRedo() const;
+
 signals:
     void openFile(const QString &filepath);
 
@@ -59,19 +62,23 @@ private /*slots*/ :
     void openFindDialog();
     void openReplaceDialog();
     void toggleComment();
+    void onUndoAvailable(bool value);
+    void onRedoAvailable(bool value);
 
 private:
     QFont monoFont;
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
+    QSettings settings;
     QWidget *lineNumberArea;
     CodeFile::FileType curFileType = CodeFile::Text;
     QString filepath;
     Highlighter *curHighlighter;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;
-    QSettings settings;
+    bool canUndo = false;
+    bool canRedo = false;
 
     void highlightCurrentLine();
     void matchParentheses();

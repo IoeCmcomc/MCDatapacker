@@ -4,7 +4,8 @@
 #include "codeeditor.h"
 
 #include <QFrame>
-#include <QTimer>
+#include <QStackedWidget>
+#include <QTabBar>
 
 namespace Ui {
     class TabbedCodeEditorInterface;
@@ -28,6 +29,7 @@ public:
     QTextDocument *getCurDoc();
     QVector<CodeFile> *getFiles();
     CodeEditor *getCodeEditor() const;
+    QStackedWidget *getStackedWidget();
 
     inline int count() const;
     inline bool hasNoFile() const;
@@ -42,6 +44,12 @@ public /*slots*/ :
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);
     void onGameVersionChanged(const QString &ver);
+    void undo();
+    void redo();
+    void selectAll();
+    void cut();
+    void copy();
+    void paste();
 
 signals:
     void curFileChanged(const QString &path);
