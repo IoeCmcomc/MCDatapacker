@@ -118,9 +118,9 @@ void MainWindow::initMenu() {
             this, &MainWindow::openFolder);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
     connect(ui->actionSaveAll, &QAction::triggered, this, &MainWindow::saveAll);
+    connect(ui->actionRestart, &QAction::triggered, this, &MainWindow::restart);
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
     /* Edit menu */
-
     connect(ui->actionUndo, &QAction::triggered,
             ui->codeEditorInterface, &TabbedCodeEditorInterface::undo);
     connect(ui->actionRedo, &QAction::triggered,
@@ -133,7 +133,6 @@ void MainWindow::initMenu() {
             ui->codeEditorInterface, &TabbedCodeEditorInterface::copy);
     connect(ui->actionPaste, &QAction::triggered,
             ui->codeEditorInterface, &TabbedCodeEditorInterface::paste);
-
     /* Preferences menu */
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
@@ -280,8 +279,8 @@ void MainWindow::readSettings() {
     readPrefSettings(settings);
 }
 
-void MainWindow::restartApp() {
-    const int restartExitCode = 2020;
+void MainWindow::restart() {
+    static const int restartExitCode = 2020;
 
     qApp->exit(restartExitCode);
 
@@ -311,7 +310,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
 
             msgBox.exec();
             if (msgBox.clickedButton() == restartBtn) {
-                restartApp();
+                restart();
             } else {
                 settings.setValue("gameVersion",
                                   getCurGameVersion().toString());

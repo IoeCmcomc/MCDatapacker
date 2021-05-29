@@ -27,7 +27,7 @@ public slots:
 
 private:
     Ui::NewDatapackDialog *ui;
-    QPushButton *createButton;
+    QPushButton *createButton = nullptr;
 };
 
-#endif // NEWDATAPACKDIALOG_H
+#endif /* NEWDATAPACKDIALOG_H */

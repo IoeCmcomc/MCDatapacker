@@ -1,6 +1,8 @@
 #include "newdatapackdialog.h"
 #include "ui_newdatapackdialog.h"
 
+#include "mainwindow.h"
+
 #include <QDebug>
 #include <QFileDialog>
 #include <QDir>
@@ -12,27 +14,28 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->locationInput->setText(QDir::currentPath());
 
-    connect(ui->browseBtn,
-            &QAbstractButton::clicked,
-            this,
-            &NewDatapackDialog::browse);
+    const auto &&gameVer = MainWindow::getCurGameVersion();
 
-    connect(ui->formatInput,
-            QOverload<int>::of(&QSpinBox::valueChanged),
-            this,
-            &NewDatapackDialog::checkOK);
-    connect(ui->nameInput,
-            &QLineEdit::textChanged,
-            this,
-            &NewDatapackDialog::checkOK);
-    connect(ui->descInput,
-            &QLineEdit::textChanged,
-            this,
-            &NewDatapackDialog::checkOK);
-    connect(ui->locationInput,
-            &QLineEdit::textChanged,
-            this,
-            &NewDatapackDialog::checkOK);
+    if (gameVer >= QVersionNumber(1, 17))
+        ui->formatInput->setValue(7);
+    else if (gameVer >= QVersionNumber(1, 16, 2))
+        ui->formatInput->setValue(6);
+    else if (gameVer >= QVersionNumber(1, 15))
+        ui->formatInput->setValue(5);
+    else if (gameVer >= QVersionNumber(1, 13))
+        ui->formatInput->setValue(4);
+
+    connect(ui->browseBtn, &QAbstractButton::clicked,
+            this, &NewDatapackDialog::browse);
+
+    connect(ui->formatInput, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &NewDatapackDialog::checkOK);
+    connect(ui->nameInput, &QLineEdit::textChanged,
+            this, &NewDatapackDialog::checkOK);
+    connect(ui->descInput, &QLineEdit::textChanged,
+            this, &NewDatapackDialog::checkOK);
+    connect(ui->locationInput, &QLineEdit::textChanged,
+            this, &NewDatapackDialog::checkOK);
 
     createButton = new QPushButton(tr("Create"), this);
     ui->dialogBox->addButton(createButton, QDialogButtonBox::ActionRole);
@@ -46,11 +49,11 @@ NewDatapackDialog::~NewDatapackDialog() {
 }
 
 void NewDatapackDialog::browse() {
-    QString dir =
+    QString &&dir =
         QFileDialog::getExistingDirectory(this,
                                           tr(
                                               "Choose folder to create new datapack"),
-                                          "",
+                                          QString(),
                                           QFileDialog::ShowDirsOnly |
                                           QFileDialog::DontResolveSymlinks);
 
@@ -59,10 +62,7 @@ void NewDatapackDialog::browse() {
 }
 
 void NewDatapackDialog::checkOK() {
-    if (getName().isEmpty() || getDirPath().isEmpty())
-        createButton->setEnabled(false);
-    else
-        createButton->setEnabled(true);
+    createButton->setDisabled(getName().isEmpty() || getDirPath().isEmpty());
 }
 
 QString NewDatapackDialog::getDesc() {

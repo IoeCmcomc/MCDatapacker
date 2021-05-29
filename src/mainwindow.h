@@ -55,6 +55,7 @@ private slots:
     void openRecentFolder();
     bool save();
     void saveAll();
+    void restart();
     /* Edit menu */
     /* Preferences menu */
     void pref_settings();
@@ -100,7 +101,6 @@ private:
     void adjustForCurFolder(const QString &path);
     void updateRecentFolders();
     void updateEditMenu();
-    void restartApp();
 };
 
 #endif /* MAINWINDOW_H */

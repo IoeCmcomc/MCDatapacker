@@ -13,6 +13,7 @@
 #include <QSaveFile>
 #include <QShortcut>
 #include <QJsonDocument>
+#include <QTimer>
 
 
 TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>425</width>
-    <height>383</height>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,7 @@
      <item>
       <widget class="QLabel" name="mainInfoLabel">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current application version: %1&lt;/p&gt;&lt;p&gt;Author: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current application version: %1&lt;/p&gt;&lt;p&gt;Author: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href=&quot;https://github.com/IoeCmcomc/MCDatapacker&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/IoeCmcomc/MCDatapacker&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
