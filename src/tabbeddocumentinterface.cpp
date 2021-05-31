@@ -1,4 +1,4 @@
-#include "tabbedcodeeditorinterface.h"
+#include "tabbeddocumentinterface.h"
 #include "ui_tabbedcodeeditorinterface.h"
 
 #include "globalhelpers.h"
@@ -16,7 +16,7 @@
 #include <QTimer>
 
 
-TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
+TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::TabbedCodeEditorInterface) {
     ui->setupUi(this);
@@ -29,25 +29,25 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     ui->tabBar->adjustSize();
 
     connect(ui->tabBar, &QTabBar::currentChanged,
-            this, &TabbedCodeEditorInterface::onTabChanged);
+            this, &TabbedDocumentInterface::onTabChanged);
     connect(ui->tabBar, &QTabBar::tabCloseRequested,
-            this, &TabbedCodeEditorInterface::onCloseFile);
+            this, &TabbedDocumentInterface::onCloseFile);
     connect(ui->tabBar, &QTabBar::tabMoved,
-            this, &TabbedCodeEditorInterface::onTabMoved);
+            this, &TabbedDocumentInterface::onTabMoved);
 
     connect(ui->codeEditor->document(), &QTextDocument::modificationChanged,
-            this, &TabbedCodeEditorInterface::onModificationChanged);
-    connect(this, &TabbedCodeEditorInterface::curFileChanged,
-            this, &TabbedCodeEditorInterface::onCurFileChanged);
+            this, &TabbedDocumentInterface::onModificationChanged);
+    connect(this, &TabbedDocumentInterface::curFileChanged,
+            this, &TabbedDocumentInterface::onCurFileChanged);
     connect(ui->codeEditor, &CodeEditor::openFileRequest,
-            this, &TabbedCodeEditorInterface::onOpenFile);
+            this, &TabbedDocumentInterface::onOpenFile);
     connect(ui->codeEditor, &CodeEditor::textChanged,
-            this, &TabbedCodeEditorInterface::onCurTextChanged);
+            this, &TabbedDocumentInterface::onCurTextChanged);
 
     textChangedTimer = new QTimer(this);
     textChangedTimer->setSingleShot(true);
     connect(textChangedTimer, &QTimer::timeout,
-            this, &TabbedCodeEditorInterface::onCurTextChangingDone);
+            this, &TabbedDocumentInterface::onCurTextChangingDone);
 
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
@@ -56,18 +56,18 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this),
             &QShortcut::activated, this,
-            &TabbedCodeEditorInterface::onSwitchNextFile);
+            &TabbedDocumentInterface::onSwitchNextFile);
     connect(new QShortcut(QKeySequence(
                               Qt::CTRL + Qt::SHIFT + Qt::Key_Tab), this),
             &QShortcut::activated, this,
-            &TabbedCodeEditorInterface::onSwitchPrevFile);
+            &TabbedDocumentInterface::onSwitchPrevFile);
 }
 
-TabbedCodeEditorInterface::~TabbedCodeEditorInterface() {
+TabbedDocumentInterface::~TabbedDocumentInterface() {
     delete ui;
 }
 
-void TabbedCodeEditorInterface::addCodeFile(const CodeFile &file) {
+void TabbedDocumentInterface::addCodeFile(const CodeFile &file) {
     /*qDebug() << "addCodeFile"; */
     files << file;
     ui->tabBar->addTab(file.title);
@@ -80,7 +80,7 @@ void TabbedCodeEditorInterface::addCodeFile(const CodeFile &file) {
     setCurIndex(count() - 1);
 }
 
-void TabbedCodeEditorInterface::openFile(const QString &filepath, bool reload) {
+void TabbedDocumentInterface::openFile(const QString &filepath, bool reload) {
     if (filepath.isEmpty()
         || ((getCurFilePath() == filepath) && (!reload)))
         return;
@@ -92,14 +92,14 @@ void TabbedCodeEditorInterface::openFile(const QString &filepath, bool reload) {
                 fileData.doc->setModified(false);
                 connect(fileData.doc, &QTextDocument::modificationChanged,
                         this,
-                        &TabbedCodeEditorInterface::onModificationChanged);
+                        &TabbedDocumentInterface::onModificationChanged);
             }
             addCodeFile(newFile);
         }
     }
 }
 
-bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
+bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
     Q_ASSERT(index < files.count());
     auto &curFile = files[index];
     /*qDebug() << "saveFile" << index << filepath << count(); */
@@ -150,7 +150,7 @@ bool TabbedCodeEditorInterface::saveFile(int index, const QString &filepath) {
     return false;
 }
 
-void TabbedCodeEditorInterface::updateTabTitle(int index, bool changed) {
+void TabbedDocumentInterface::updateTabTitle(int index, bool changed) {
     auto newTitle = getCurFile()->title;
 
     if (changed)
@@ -158,7 +158,7 @@ void TabbedCodeEditorInterface::updateTabTitle(int index, bool changed) {
     ui->tabBar->setTabText(index, newTitle);
 }
 
-bool TabbedCodeEditorInterface::maybeSave(int index) {
+bool TabbedDocumentInterface::maybeSave(int index) {
     if (!(&files[index])->isModified)
         return true;
 
@@ -182,19 +182,19 @@ bool TabbedCodeEditorInterface::maybeSave(int index) {
     return true;
 }
 
-void TabbedCodeEditorInterface::retranslate() {
+void TabbedDocumentInterface::retranslate() {
     ui->retranslateUi(this);
 }
 
-int TabbedCodeEditorInterface::getCurIndex() const {
+int TabbedDocumentInterface::getCurIndex() const {
     return ui->tabBar->currentIndex();
 }
 
-void TabbedCodeEditorInterface::setCurIndex(int i) {
+void TabbedDocumentInterface::setCurIndex(int i) {
     ui->tabBar->setCurrentIndex(i);
 }
 
-void TabbedCodeEditorInterface::onModificationChanged(bool changed) {
+void TabbedDocumentInterface::onModificationChanged(bool changed) {
     /*qDebug() << "onModificationChanged" << changed; */
     Q_ASSERT(!hasNoFile());
 
@@ -203,7 +203,7 @@ void TabbedCodeEditorInterface::onModificationChanged(bool changed) {
     emit curModificationChanged(changed);
 }
 
-CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
+CodeFile TabbedDocumentInterface::readFile(const QString &path) {
     CodeFile newFile(path);
 
     if (newFile.fileType >= CodeFile::Text) {
@@ -261,7 +261,7 @@ CodeFile TabbedCodeEditorInterface::readFile(const QString &path) {
     return newFile;
 }
 
-CodeFile *TabbedCodeEditorInterface::getCurFile() {
+CodeFile *TabbedDocumentInterface::getCurFile() {
     /*qDebug() << "getCurFile" << count() << getCurIndex(); */
     if (hasNoFile() || (getCurIndex() == -1))
         return nullptr;
@@ -269,7 +269,7 @@ CodeFile *TabbedCodeEditorInterface::getCurFile() {
         return &files[getCurIndex()];
 }
 
-QString TabbedCodeEditorInterface::getCurFilePath() {
+QString TabbedDocumentInterface::getCurFilePath() {
     /*qDebug() << "getCurFilePath"; */
     if (auto *curFile = getCurFile())
         return curFile->fileInfo.filePath();
@@ -277,39 +277,39 @@ QString TabbedCodeEditorInterface::getCurFilePath() {
         return "";
 }
 
-QTextDocument *TabbedCodeEditorInterface::getCurDoc() {
+QTextDocument *TabbedDocumentInterface::getCurDoc() {
     return getDocAt(getCurIndex());
 }
 
-QVector<CodeFile> *TabbedCodeEditorInterface::getFiles() {
+QVector<CodeFile> *TabbedDocumentInterface::getFiles() {
     return &files;
 }
 
-CodeEditor *TabbedCodeEditorInterface::getCodeEditor() const {
+CodeEditor *TabbedDocumentInterface::getCodeEditor() const {
     return ui->codeEditor;
 }
 
-ImgViewer *TabbedCodeEditorInterface::getImgViewer() const {
+ImgViewer *TabbedDocumentInterface::getImgViewer() const {
     return ui->imgViewer;
 }
 
-QTabBar *TabbedCodeEditorInterface::getTabBar() const {
+QTabBar *TabbedDocumentInterface::getTabBar() const {
     return ui->tabBar;
 }
 
-QStackedWidget *TabbedCodeEditorInterface::getStackedWidget() {
+QStackedWidget *TabbedDocumentInterface::getStackedWidget() {
     return ui->stackedWidget;
 }
 
-int TabbedCodeEditorInterface::count() const {
+int TabbedDocumentInterface::count() const {
     return files.count();
 }
 
-bool TabbedCodeEditorInterface::hasNoFile() const {
+bool TabbedDocumentInterface::hasNoFile() const {
     return count() == 0;
 }
 
-void TabbedCodeEditorInterface::clear() {
+void TabbedDocumentInterface::clear() {
     if (!hasNoFile()) {
         for (int i = count() - 1; i >= 0; --i) {
             onCloseFile(i);
@@ -319,7 +319,7 @@ void TabbedCodeEditorInterface::clear() {
     Q_ASSERT(hasNoFile());
 }
 
-bool TabbedCodeEditorInterface::hasUnsavedChanges() const {
+bool TabbedDocumentInterface::hasUnsavedChanges() const {
     for (const auto &file: files) {
         if (file.isModified)
             return true;
@@ -327,7 +327,7 @@ bool TabbedCodeEditorInterface::hasUnsavedChanges() const {
     return false;
 }
 
-void TabbedCodeEditorInterface::onOpenFile(const QString &filepath) {
+void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
     for (int i = 0; i < count(); i++) {
         if (files[i].fileInfo.filePath() == filepath) {
             setCurIndex(i);
@@ -337,11 +337,11 @@ void TabbedCodeEditorInterface::onOpenFile(const QString &filepath) {
     openFile(filepath);
 }
 
-bool TabbedCodeEditorInterface::saveCurFile(const QString path) {
+bool TabbedDocumentInterface::saveCurFile(const QString path) {
     return saveFile(getCurIndex(), path);
 }
 
-bool TabbedCodeEditorInterface::saveCurFile() {
+bool TabbedDocumentInterface::saveCurFile() {
     /*qDebug() << "saveCurFile" << getCurIndex(); */
     if (auto *curFile = getCurFile()) {
         return saveFile(getCurIndex(), curFile->fileInfo.filePath());
@@ -349,7 +349,7 @@ bool TabbedCodeEditorInterface::saveCurFile() {
     return false;
 }
 
-bool TabbedCodeEditorInterface::saveAllFile() {
+bool TabbedDocumentInterface::saveAllFile() {
     bool r = true;
 
     if (!hasNoFile()) {
@@ -361,9 +361,9 @@ bool TabbedCodeEditorInterface::saveAllFile() {
     return r;
 }
 
-void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
-                                              const QString &oldName,
-                                              const QString &newName) {
+void TabbedDocumentInterface::onFileRenamed(const QString &path,
+                                            const QString &oldName,
+                                            const QString &newName) {
 /*
       qDebug() << "TabbedCodeEditorInterface::onFileRenamed" << oldName <<
           newName << count();
@@ -388,7 +388,7 @@ void TabbedCodeEditorInterface::onFileRenamed(const QString &path,
     }
 }
 
-void TabbedCodeEditorInterface::onGameVersionChanged(const QString &ver) {
+void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
     Command::MinecraftParser::setSchema(
         QStringLiteral(":/minecraft/") + ver +
         QStringLiteral("/mcdata/generated/reports/commands.json"));
@@ -401,49 +401,49 @@ void TabbedCodeEditorInterface::onGameVersionChanged(const QString &ver) {
     }
 }
 
-void TabbedCodeEditorInterface::undo() {
+void TabbedDocumentInterface::undo() {
     if (ui->stackedWidget->currentIndex() == 1) {
         ui->codeEditor->undo();
     }
 }
 
-void TabbedCodeEditorInterface::redo() {
+void TabbedDocumentInterface::redo() {
     if (ui->stackedWidget->currentIndex() == 1) {
         ui->codeEditor->redo();
     }
 }
 
-void TabbedCodeEditorInterface::selectAll() {
+void TabbedDocumentInterface::selectAll() {
     if (ui->stackedWidget->currentIndex() == 1) {
         ui->codeEditor->selectAll();
     }
 }
 
-void TabbedCodeEditorInterface::cut() {
+void TabbedDocumentInterface::cut() {
     if (ui->stackedWidget->currentIndex() == 1) {
         ui->codeEditor->cut();
     }
 }
 
-void TabbedCodeEditorInterface::copy() {
+void TabbedDocumentInterface::copy() {
     if (ui->stackedWidget->currentIndex() == 1) {
         ui->codeEditor->copy();
     }
 }
 
-void TabbedCodeEditorInterface::paste() {
+void TabbedDocumentInterface::paste() {
     if (ui->stackedWidget->currentIndex() == 1) {
         ui->codeEditor->paste();
     }
 }
 
-void TabbedCodeEditorInterface::changeEvent(QEvent *event) {
+void TabbedDocumentInterface::changeEvent(QEvent *event) {
     QWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange)
         retranslate();
 }
 
-void TabbedCodeEditorInterface::printPanOffsets() {
+void TabbedDocumentInterface::printPanOffsets() {
     QStringList panOffsets;
 
     for (const auto &file: qAsConst(files)) {
@@ -458,7 +458,7 @@ void TabbedCodeEditorInterface::printPanOffsets() {
     qDebug() << "Pan offsets: " << panOffsets.join(", ");
 }
 
-void TabbedCodeEditorInterface::saveFileData(int index) {
+void TabbedDocumentInterface::saveFileData(int index) {
     auto &file = files[index];
 
     if (file.data.canConvert<TextFileData>()) {
@@ -470,7 +470,7 @@ void TabbedCodeEditorInterface::saveFileData(int index) {
     }
 }
 
-QTextDocument *TabbedCodeEditorInterface::getDocAt(int index) const {
+QTextDocument *TabbedDocumentInterface::getDocAt(int index) const {
     if (const auto &file = files[index];
         file.data.canConvert<TextFileData>()) {
         const auto &&data = qvariant_cast<TextFileData>(file.data);
@@ -480,7 +480,7 @@ QTextDocument *TabbedCodeEditorInterface::getDocAt(int index) const {
     }
 }
 
-void TabbedCodeEditorInterface::onTabChanged(int index) {
+void TabbedDocumentInterface::onTabChanged(int index) {
     /*qDebug() << "Change to tab" << index << '/' << count(); */
     /*printPanOffsets(); */
 
@@ -554,13 +554,13 @@ void TabbedCodeEditorInterface::onTabChanged(int index) {
     /*printPanOffsets(); */
 }
 
-void TabbedCodeEditorInterface::onTabMoved(int from, int to) {
+void TabbedDocumentInterface::onTabMoved(int from, int to) {
     /*qDebug() << "Move from tab" << from << "to tab" << to; */
     tabMovedOrRemoved = true;
     qSwap(files[from], files[to]);
 }
 
-void TabbedCodeEditorInterface::onCloseFile(int index) {
+void TabbedDocumentInterface::onCloseFile(int index) {
     if (index == -1)
         return;
 
@@ -568,7 +568,7 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
     if (maybeSave(index)) {
         if (auto *doc = getDocAt(index)) {
             disconnect(doc, &QTextDocument::modificationChanged,
-                       this, &TabbedCodeEditorInterface::onModificationChanged);
+                       this, &TabbedDocumentInterface::onModificationChanged);
             lastRemovedDoc = doc;
         }
         files.remove(index);
@@ -581,17 +581,17 @@ void TabbedCodeEditorInterface::onCloseFile(int index) {
     }
 }
 
-void TabbedCodeEditorInterface::onSwitchNextFile() {
+void TabbedDocumentInterface::onSwitchNextFile() {
     if (!hasNoFile())
         new FileSwitcher(this, false);
 }
 
-void TabbedCodeEditorInterface::onSwitchPrevFile() {
+void TabbedDocumentInterface::onSwitchPrevFile() {
     if (!hasNoFile())
         new FileSwitcher(this, true);
 }
 
-void TabbedCodeEditorInterface::onCurTextChanged() {
+void TabbedDocumentInterface::onCurTextChanged() {
     /*qDebug() << "TabbedCodeEditorInterface::onCurTextChanged"; */
     if (!hasNoFile() && getCurFile()->data.canConvert<TextFileData>()) {
         auto data =
@@ -604,7 +604,7 @@ void TabbedCodeEditorInterface::onCurTextChanged() {
     }
 }
 
-void TabbedCodeEditorInterface::onCurTextChangingDone() {
+void TabbedDocumentInterface::onCurTextChangingDone() {
     /*qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone"; */
     if (const auto *curFile = getCurFile(); curFile &&
         curFile->data.canConvert<TextFileData>()) {
@@ -617,7 +617,7 @@ void TabbedCodeEditorInterface::onCurTextChangingDone() {
     }
 }
 
-void TabbedCodeEditorInterface::onCurFileChanged(const QString &path) {
+void TabbedDocumentInterface::onCurFileChanged(const QString &path) {
     ui->codeEditor->setFilePath(path);
     if (path.isEmpty())
         return;

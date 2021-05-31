@@ -46,6 +46,7 @@ public:
 signals:
     void openFileRequest(const QString &filepath);
     void updateStatusBarRequest(CodeEditor *editor);
+    void showMessageRequest(const QString &msg, int timeout);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

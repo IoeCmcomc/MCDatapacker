@@ -20,8 +20,9 @@ AboutDialog::AboutDialog(QWidget *parent) :
             QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
             setAttribute(Qt::WA_TranslucentBackground, true);
             setAttribute(Qt::WA_NoSystemBackground, false);
-            setStyleSheet(QStringLiteral(
-                              "AboutDialog, QLabel { background: transparent; }"));
+            setStyleSheet(
+                QStringLiteral(
+                    "AboutDialog,QLabel{background:transparent;}"));
         } else {
             QtWin::resetExtendedFrame(this);
             setAttribute(Qt::WA_TranslucentBackground, false);
@@ -36,7 +37,6 @@ AboutDialog::AboutDialog(QWidget *parent) :
     anime->setEndValue(1);
     anime->setEasingCurve(QEasingCurve::InQuint);
     anime->start(QPropertyAnimation::DeleteWhenStopped);
-    m_animes << anime;
 
     effect = new QGraphicsOpacityEffect(ui->nameLabel);
     effect->setOpacity(0);
@@ -49,7 +49,6 @@ AboutDialog::AboutDialog(QWidget *parent) :
     QTimer::singleShot(1100, anime, [anime]() {
         anime->start(QPropertyAnimation::DeleteWhenStopped);
     });
-    m_animes << anime;
 
     effect = new QGraphicsOpacityEffect(ui->mainInfoLabel);
     effect->setOpacity(0);
@@ -62,7 +61,6 @@ AboutDialog::AboutDialog(QWidget *parent) :
     QTimer::singleShot(1500, anime, [anime]() {
         anime->start(QPropertyAnimation::DeleteWhenStopped);
     });
-    m_animes << anime;
 
     effect = new QGraphicsOpacityEffect(ui->buttonBox);
     effect->setOpacity(0);
@@ -75,20 +73,17 @@ AboutDialog::AboutDialog(QWidget *parent) :
     QTimer::singleShot(1750, anime, [anime]() {
         anime->start(QPropertyAnimation::DeleteWhenStopped);
     });
-    m_animes << anime;
 
     m_winAnime = new QPropertyAnimation(this, "windowOpacity");
     m_winAnime->setDuration(1000);
     m_winAnime->setStartValue(0);
     m_winAnime->setEndValue(1);
-    m_winAnime->setEasingCurve(QEasingCurve::Linear);
+    m_winAnime->setEasingCurve(QEasingCurve::InOutCirc);
     m_winAnime->start();
 }
 
 AboutDialog::~AboutDialog() {
     delete ui;
-    for (auto *anime: m_animes)
-        anime->deleteLater();
 }
 
 void AboutDialog::done(int r) {

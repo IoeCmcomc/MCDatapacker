@@ -13,13 +13,13 @@ namespace Ui {
     class TabbedCodeEditorInterface;
 }
 
-class TabbedCodeEditorInterface : public QFrame
+class TabbedDocumentInterface : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit TabbedCodeEditorInterface(QWidget *parent = nullptr);
-    ~TabbedCodeEditorInterface();
+    explicit TabbedDocumentInterface(QWidget *parent = nullptr);
+    ~TabbedDocumentInterface();
 
     void openFile(const QString &filepath, bool reload = false);
 

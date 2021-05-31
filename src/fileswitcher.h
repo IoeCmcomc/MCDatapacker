@@ -1,14 +1,14 @@
 #ifndef FILESWITCHER_H
 #define FILESWITCHER_H
 
-#include "tabbedcodeeditorinterface.h"
+#include "tabbeddocumentinterface.h"
 
 #include <QListWidget>
 
 class FileSwitcher : public QListWidget
 {
 public:
-    FileSwitcher(TabbedCodeEditorInterface *parent = nullptr,
+    FileSwitcher(TabbedDocumentInterface *parent = nullptr,
                  bool backward                     = false);
     ~FileSwitcher();
 
@@ -21,7 +21,7 @@ private slots:
     void onSelectPrevItem();
 
 private:
-    TabbedCodeEditorInterface *parent = nullptr;
+    TabbedDocumentInterface *parent = nullptr;
     void initFileList();
     void show();
 };

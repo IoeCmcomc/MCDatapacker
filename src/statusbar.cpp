@@ -2,7 +2,7 @@
 
 #include "mainwindow.h"
 #include "globalhelpers.h"
-#include "tabbedcodeeditorinterface.h"
+#include "tabbeddocumentinterface.h"
 #include "imgviewer.h"
 
 #include <QScrollBar>
@@ -10,7 +10,7 @@
 #include <cmath>
 
 StatusBar::StatusBar(MainWindow *parent,
-                     TabbedCodeEditorInterface *tabInterface) : QStatusBar(
+                     TabbedDocumentInterface *tabInterface) : QStatusBar(
         parent) {
     m_mainWin         = parent;
     m_tabbedInterface = tabInterface;
@@ -37,6 +37,9 @@ StatusBar::StatusBar(MainWindow *parent,
         addWidget(m_editorLabels.last(), 1);
     }
     Q_ASSERT(m_editorLabels.size() == 3);
+}
+
+StatusBar::~StatusBar() {
 }
 
 void StatusBar::onCurDirChanged() {
@@ -74,7 +77,7 @@ void StatusBar::updateCodeEditorStatus(CodeEditor *editor) {
         const int line = editor->textCursor().blockNumber() + 1;
         const int row  = editor->textCursor().positionInBlock();
 
-        m_editorLabels[0]->setText(QString("Line %1, row %2").arg(line).arg(row));
+        m_editorLabels[0]->setText(tr("Line %1, row %2").arg(line).arg(row));
         m_editorLabels[1]->setText(tr("%n problem(s)", nullptr,
                                       editor->problemCount()));
         m_editorLabels[2]->setText((editor->overwriteMode()) ? "OVR" : "INS");
@@ -86,7 +89,7 @@ void StatusBar::updateImgViewerStatus(ImgViewer *viewer) {
         m_tabbedInterface->getCurFile()->fileType == CodeFile::Image) {
         const auto &&img = viewer->getImage();
 
-        m_editorLabels[0]->setText(QString("%1 x %2")
+        m_editorLabels[0]->setText(QString("%1 x %2 px")
                                    .arg(img.width()).arg(img.height()));
         m_editorLabels[1]->setText(QString("%1, %2")
                                    .arg(viewer->horizontalScrollBar()->value())
@@ -94,6 +97,14 @@ void StatusBar::updateImgViewerStatus(ImgViewer *viewer) {
         m_editorLabels[2]->setText(tr("Zoom: %1%")
                                    .arg(std::round(viewer->transform().m11() *
                                                    10000) / 100));
+    }
+}
+
+void StatusBar::changeEvent(QEvent *e) {
+    QStatusBar::changeEvent(e);
+    if (e->type() == QEvent::LanguageChange) {
+        onCurDirChanged();
+        onCurFileChanged();
     }
 }
 

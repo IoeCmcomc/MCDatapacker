@@ -7,7 +7,7 @@
 #include "aboutdialog.h"
 #include "disclaimerdialog.h"
 #include "globalhelpers.h"
-#include "tabbedcodeeditorinterface.h"
+#include "tabbeddocumentinterface.h"
 #include "parsers/command/minecraftparser.h"
 #include "mainwindow.h"
 
@@ -45,29 +45,32 @@ MainWindow::MainWindow(QWidget *parent)
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
-    m_statusBar = new StatusBar(this, ui->codeEditorInterface);
+    m_statusBar = new StatusBar(this, ui->tabbedInterface);
     setStatusBar(m_statusBar);
 
     initMenu();
     connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
             this, &MainWindow::onSystemWatcherFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::fileRenamed,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::onFileRenamed);
-    connect(ui->codeEditorInterface,
-            &TabbedCodeEditorInterface::curModificationChanged,
+            ui->tabbedInterface, &TabbedDocumentInterface::onFileRenamed);
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::curModificationChanged,
             this, &MainWindow::updateWindowTitle);
     connect(ui->datapackTreeView, &DatapackTreeView::datapackChanged,
             this, &MainWindow::onDatapackChanged);
-    connect(ui->codeEditorInterface, &TabbedCodeEditorInterface::curFileChanged,
+    connect(ui->tabbedInterface, &TabbedDocumentInterface::curFileChanged,
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::onOpenFile);
-    connect(this, &MainWindow::gameVersionChanged, ui->codeEditorInterface,
-            &TabbedCodeEditorInterface::onGameVersionChanged);
-    connect(ui->codeEditorInterface->getCodeEditor(),
+            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+    connect(this, &MainWindow::gameVersionChanged, ui->tabbedInterface,
+            &TabbedDocumentInterface::onGameVersionChanged);
+    connect(ui->tabbedInterface->getCodeEditor(),
             &CodeEditor::updateStatusBarRequest,
             m_statusBar, &StatusBar::updateCodeEditorStatus);
-    connect(ui->codeEditorInterface->getImgViewer(),
+    connect(ui->tabbedInterface->getCodeEditor(),
+            &CodeEditor::showMessageRequest,
+            m_statusBar, &StatusBar::showMessage);
+    connect(ui->tabbedInterface->getImgViewer(),
             &ImgViewer::updateStatusBarRequest,
             m_statusBar, &StatusBar::updateImgViewerStatus);
 
@@ -120,17 +123,17 @@ void MainWindow::initMenu() {
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
     /* Edit menu */
     connect(ui->actionUndo, &QAction::triggered,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::undo);
+            ui->tabbedInterface, &TabbedDocumentInterface::undo);
     connect(ui->actionRedo, &QAction::triggered,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::redo);
+            ui->tabbedInterface, &TabbedDocumentInterface::redo);
     connect(ui->actionSelectAll, &QAction::triggered,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::selectAll);
+            ui->tabbedInterface, &TabbedDocumentInterface::selectAll);
     connect(ui->actionCut, &QAction::triggered,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::cut);
+            ui->tabbedInterface, &TabbedDocumentInterface::cut);
     connect(ui->actionCopy, &QAction::triggered,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::copy);
+            ui->tabbedInterface, &TabbedDocumentInterface::copy);
     connect(ui->actionPaste, &QAction::triggered,
-            ui->codeEditorInterface, &TabbedCodeEditorInterface::paste);
+            ui->tabbedInterface, &TabbedDocumentInterface::paste);
     /* Preferences menu */
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
@@ -143,13 +146,13 @@ void MainWindow::initMenu() {
             &MainWindow::disclaimer);
 
     /* Menu items status update connections */
-    connect(ui->codeEditorInterface->getStackedWidget(),
+    connect(ui->tabbedInterface->getStackedWidget(),
             &QStackedWidget::currentChanged, this, &MainWindow::updateEditMenu);
-    connect(ui->codeEditorInterface->getCodeEditor(),
+    connect(ui->tabbedInterface->getCodeEditor(),
             &QPlainTextEdit::copyAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->codeEditorInterface->getCodeEditor(),
+    connect(ui->tabbedInterface->getCodeEditor(),
             &QPlainTextEdit::undoAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->codeEditorInterface->getCodeEditor(),
+    connect(ui->tabbedInterface->getCodeEditor(),
             &QPlainTextEdit::redoAvailable, this, &MainWindow::updateEditMenu);
     connect(qApp->clipboard(), &QClipboard::changed, this,
             &MainWindow::updateEditMenu);
@@ -161,29 +164,29 @@ void MainWindow::open() {
         QString fileName
             = QFileDialog::getOpenFileName(this, tr("Open file"), "");
         if (!fileName.isEmpty())
-            ui->codeEditorInterface->openFile(fileName);
+            ui->tabbedInterface->openFile(fileName);
     }
 }
 
 bool MainWindow::save() {
-    if (ui->codeEditorInterface->hasNoFile())
+    if (ui->tabbedInterface->hasNoFile())
         return false;
 
-    if (auto *curFile = ui->codeEditorInterface->getCurFile();
+    if (auto *curFile = ui->tabbedInterface->getCurFile();
         curFile->fileInfo.fileName().isEmpty()) {
         QString filepath
             = QFileDialog::getSaveFileName(this, tr("Save File"), "");
         if (!filepath.isEmpty())
-            return ui->codeEditorInterface->saveCurFile(filepath);
+            return ui->tabbedInterface->saveCurFile(filepath);
         else
             return false;
     } else {
-        return ui->codeEditorInterface->saveCurFile();
+        return ui->tabbedInterface->saveCurFile();
     }
 }
 
 void MainWindow::saveAll() {
-    ui->codeEditorInterface->saveAllFile();
+    ui->tabbedInterface->saveAllFile();
 }
 
 void MainWindow::pref_settings() {
@@ -206,7 +209,7 @@ void MainWindow::disclaimer() {
 
 void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     qDebug() << "onSystemWatcherFileChanged" << filepath;
-    if ((filepath != ui->codeEditorInterface->getCurFilePath())) return;
+    if ((filepath != ui->tabbedInterface->getCurFilePath())) return;
 
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
                                                  0);
@@ -242,7 +245,7 @@ void MainWindow::onCurFileChanged(const QString &path) {
     }
 
     auto curFileType = CodeFile::Text;
-    if (auto *curFile = ui->codeEditorInterface->getCurFile())
+    if (auto *curFile = ui->tabbedInterface->getCurFile())
         curFileType = curFile->fileType;
     lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable);
     visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
@@ -251,7 +254,7 @@ void MainWindow::onCurFileChanged(const QString &path) {
 }
 
 void MainWindow::onDatapackChanged() {
-    ui->codeEditorInterface->clear();
+    ui->tabbedInterface->clear();
     updateWindowTitle(false);
     m_statusBar->onCurDirChanged();
 }
@@ -343,7 +346,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
         }
     }
     settings.endGroup();
-    ui->codeEditorInterface->getCodeEditor()->readPrefSettings();
+    ui->tabbedInterface->getCodeEditor()->readPrefSettings();
 }
 
 void MainWindow::writeSettings() {
@@ -360,7 +363,7 @@ void MainWindow::writeSettings() {
 }
 
 bool MainWindow::maybeSave() {
-    if (!ui->codeEditorInterface->hasUnsavedChanges())
+    if (!ui->tabbedInterface->hasUnsavedChanges())
         return true;
 
     const QMessageBox::StandardButton ret
@@ -372,7 +375,7 @@ bool MainWindow::maybeSave() {
                                QMessageBox::Cancel);
     switch (ret) {
     case QMessageBox::Save:
-        return ui->codeEditorInterface->saveAllFile();
+        return ui->tabbedInterface->saveAllFile();
 
     case QMessageBox::Cancel:
         return false;
@@ -457,7 +460,7 @@ void MainWindow::loadFolder(const QString &dirPath) {
                             this->fileWatcher.removePath(curDir.path());
                             this->fileWatcher.addPath(curDir.path());
                         }
-                        ui->codeEditorInterface->clear();
+                        ui->tabbedInterface->clear();
                         emit curDirChanged(dirPath);
                         adjustForCurFolder(dirPath);
 #ifndef QT_NO_CURSOR
@@ -534,7 +537,7 @@ void MainWindow::updateRecentFolders() {
 
     for (auto i = 0u; i < itEnd; ++i) {
         auto *action = recentFoldersActions.at(i);
-        action->setText(QString("&%1 | %2").arg(i).arg(recentPaths.at(i)));
+        action->setText(QString("&%1 | %2").arg(i + 1).arg(recentPaths.at(i)));
         action->setData(recentPaths.at(i));
         action->setVisible(true);
     }
@@ -544,18 +547,18 @@ void MainWindow::updateRecentFolders() {
 }
 
 void MainWindow::updateEditMenu() {
-    if (ui->codeEditorInterface->getStackedWidget()->currentIndex() == 1) {
+    if (ui->tabbedInterface->getStackedWidget()->currentIndex() == 1) {
         ui->actionUndo->setEnabled(
-            ui->codeEditorInterface->getCodeEditor()->getCanUndo());
+            ui->tabbedInterface->getCodeEditor()->getCanUndo());
         ui->actionRedo->setEnabled(
-            ui->codeEditorInterface->getCodeEditor()->getCanRedo());
+            ui->tabbedInterface->getCodeEditor()->getCanRedo());
         ui->actionSelectAll->setEnabled(true);
         const bool hasSelection =
-            ui->codeEditorInterface->getCodeEditor()->textCursor().hasSelection();
+            ui->tabbedInterface->getCodeEditor()->textCursor().hasSelection();
         ui->actionCut->setEnabled(hasSelection);
         ui->actionCopy->setEnabled(hasSelection);
         ui->actionPaste->setEnabled(
-            ui->codeEditorInterface->getCodeEditor()->canPaste());
+            ui->tabbedInterface->getCodeEditor()->canPaste());
     } else {
         ui->actionUndo->setEnabled(false);
         ui->actionRedo->setEnabled(false);
@@ -605,8 +608,8 @@ QVersionNumber MainWindow::getCurGameVersion() {
 void MainWindow::updateWindowTitle(bool changed) {
     QStringList titleParts;
 
-    if (!ui->codeEditorInterface->hasNoFile()) {
-        if (const auto &&curPath = ui->codeEditorInterface->getCurFilePath();
+    if (!ui->tabbedInterface->hasNoFile()) {
+        if (const auto &&curPath = ui->tabbedInterface->getCurFilePath();
             !curPath.isEmpty())
             titleParts << QFileInfo(curPath).fileName() + "[*]";
         else
@@ -683,12 +686,13 @@ void MainWindow::newDatapack() {
 
     if (dialogCode == 1) {
         if (maybeSave()) {
-            ui->codeEditorInterface->clear();
+            ui->tabbedInterface->clear();
         } else {
             return;
         }
-        QString dirPath = dialog->getDirPath() + "/" + dialog->getName();
-        QDir    dir(dirPath);
+        const QString &&dirPath = dialog->getDirPath() + "/" +
+                                  dialog->getName();
+        QDir dir(dirPath);
         if (!dir.exists()) {
             dir.mkpath(dirPath);
         } else if (!dir.isEmpty()) {
@@ -705,27 +709,31 @@ void MainWindow::newDatapack() {
             }
         }
 
-        QFile file(dirPath + "/pack.mcmeta");
+        QFile file(dirPath + QStringLiteral("/pack.mcmeta"));
         if (file.open(QIODevice::ReadWrite)) {
-            QJsonObject root;
-            QJsonObject pack;
-            pack.insert(QStringLiteral("description"), dialog->getDesc());
-            pack.insert(QStringLiteral("pack_format"), dialog->getFormat());
-            root.insert(QStringLiteral("pack"), pack);
+            QJsonObject root {
+                { "pack", QJsonObject {
+                      { "description", dialog->getDesc() },
+                      { "pack_format", dialog->getFormat() }
+                  }
+                },
+            };
 
             QTextStream stream(&file);
+            stream.setCodec("UTF-8");
             stream << QJsonDocument(root).toJson();
         }
         file.close();
 
-        dir.mkpath(dirPath + "/data");
+        dir.mkpath(dirPath + QStringLiteral("/data"));
         QString namesp = dialog->getName()
                          .toLower()
                          .replace(" ", "_").replace("/", "_")
                          .replace(".", "_").replace(":", "_");
-        dir.mkpath(dirPath + "/data/" + namesp);
+        dir.mkpath(dirPath + QStringLiteral("/data/") + namesp);
 
-        ui->datapackTreeView->load(dir);
+        loadFolder(dirPath);
+        ui->tabbedInterface->openFile("pack.mcmeta");
     }
     delete dialog;
 }
@@ -751,22 +759,22 @@ void MainWindow::openRecentFolder() {
 }
 
 void MainWindow::setCodeEditorText(const QString &text) {
-    if (ui->codeEditorInterface->hasNoFile())
+    if (ui->tabbedInterface->hasNoFile())
         return;
 
     /*ui->codeEditor->setPlainText(text); */
-    QTextCursor cursor = ui->codeEditorInterface->getCodeEditor()->textCursor();
+    QTextCursor cursor = ui->tabbedInterface->getCodeEditor()->textCursor();
 
     cursor.beginEditBlock();
     cursor.select(QTextCursor::Document);
     cursor.insertText(text);
     cursor.endEditBlock();
-    ui->codeEditorInterface->getCodeEditor()->setTextCursor(cursor);
+    ui->tabbedInterface->getCodeEditor()->setTextCursor(cursor);
 }
 
 QString MainWindow::getCodeEditorText() {
-    if (auto *doc = ui->codeEditorInterface->getCurDoc())
-        return ui->codeEditorInterface->getCurDoc()->toPlainText();
+    if (auto *doc = ui->tabbedInterface->getCurDoc())
+        return ui->tabbedInterface->getCurDoc()->toPlainText();
     else
         return QString();
 }

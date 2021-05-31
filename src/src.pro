@@ -97,7 +97,7 @@ SOURCES += \
     settingsdialog.cpp \
     stackedwidget.cpp \
     statusbar.cpp \
-    tabbedcodeeditorinterface.cpp \
+    tabbeddocumentinterface.cpp \
     tagselectordialog.cpp \
     truefalsebox.cpp \
     vieweventfilter.cpp \
@@ -180,7 +180,7 @@ HEADERS += \
     settingsdialog.h \
     stackedwidget.h \
     statusbar.h \
-    tabbedcodeeditorinterface.h \
+    tabbeddocumentinterface.h \
     tagselectordialog.h \
     truefalsebox.h \
     vieweventfilter.h \
@@ -207,7 +207,7 @@ FORMS += \
     predicatedock.ui \
     rawjsontextedit.ui \
     settingsdialog.ui \
-    tabbedcodeeditorinterface.ui \
+    tabbeddocumentinterface.ui \
     tagselectordialog.ui \
     visualrecipeeditordock.ui
 

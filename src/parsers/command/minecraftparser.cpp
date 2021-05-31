@@ -476,7 +476,7 @@ parseEntityArguments() {
                                                    -> QSharedPointer<IntRangeNode>
             {
                 return minecraft_intRange();
-            });
+            }, false, R"(0-9a-zA-Z-_.)");
         } else if (key == "advancements") {
             return parseEntityAdvancements();
         } else{

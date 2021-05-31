@@ -112,7 +112,7 @@
          <number>3</number>
         </property>
         <item row="0" column="0">
-         <widget class="TabbedCodeEditorInterface" name="codeEditorInterface">
+         <widget class="TabbedDocumentInterface" name="tabbedInterface">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -362,9 +362,9 @@
    <header>datapacktreeview.h</header>
   </customwidget>
   <customwidget>
-   <class>TabbedCodeEditorInterface</class>
+   <class>TabbedDocumentInterface</class>
    <extends>QFrame</extends>
-   <header location="global">tabbedcodeeditorinterface.h</header>
+   <header location="global">tabbeddocumentinterface.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

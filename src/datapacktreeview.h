@@ -38,6 +38,7 @@ private slots:
     void contextMenuOnOpen();
     void contextMenuOnRename();
     void contextMenuOnDelete();
+    void resizeFirstColumn();
 
 private:
     QFileSystemModel dirModel;

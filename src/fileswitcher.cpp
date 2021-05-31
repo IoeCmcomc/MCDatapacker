@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QScreen>
 
-FileSwitcher::FileSwitcher(TabbedCodeEditorInterface *parent, bool backward)
+FileSwitcher::FileSwitcher(TabbedDocumentInterface *parent, bool backward)
     : QListWidget(parent) {
     this->parent = parent;
     setWindowFlag(Qt::Popup, true);

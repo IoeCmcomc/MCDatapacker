@@ -21,7 +21,6 @@ public slots:
 
 private:
     Ui::AboutDialog *ui;
-    QVector<QPropertyAnimation*> m_animes;
     QPropertyAnimation *m_winAnime = nullptr;
     bool m_isClosing               = false;
 };

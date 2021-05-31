@@ -9,14 +9,17 @@
         <translation>Về MCDatapacker</translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="39"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:36pt;&quot;&gt;MCDatapacker&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:36pt;&quot;&gt;MCDatapacker&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="aboutdialog.ui" line="77"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current application version: %1&lt;/p&gt;&lt;p&gt;Author: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href=&quot;https://github.com/IoeCmcomc/MCDatapacker&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/IoeCmcomc/MCDatapacker&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Phiên bản ứng dụng hiện tại: %1&lt;/p&gt;&lt;p&gt;Tác giả: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Trang nhà: &lt;a href=&quot;https://github.com/IoeCmcomc/MCDatapacker&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/IoeCmcomc/MCDatapacker&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="aboutdialog.ui" line="46"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:36pt;&quot;&gt;MCDatapacker&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:36pt;&quot;&gt;MCDatapacker&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Author: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Current application version: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tác giả: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Phiên bản ứng dụng hiện tại: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tác giả: &lt;a href=&quot;https://github.com/IoeCmcomc&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;IoeCmcomc&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Phiên bản ứng dụng hiện tại: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -69,7 +72,12 @@
 <context>
     <name>CodeEditor</name>
     <message>
-        <location filename="codeeditor.cpp" line="191"/>
+        <location filename="codeeditor.cpp" line="107"/>
+        <source>Zoom: %1%</source>
+        <translation>Thu phóng: %1%</translation>
+    </message>
+    <message>
+        <location filename="codeeditor.cpp" line="207"/>
         <source>Format</source>
         <translation>Định dạng</translation>
     </message>
@@ -251,57 +259,57 @@
 <context>
     <name>DatapackTreeView</name>
     <message>
-        <location filename="datapacktreeview.cpp" line="41"/>
+        <location filename="datapacktreeview.cpp" line="47"/>
         <source>Open</source>
         <translation>Mở</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="52"/>
+        <location filename="datapacktreeview.cpp" line="59"/>
         <source>Run this function when loaded</source>
         <translation>Chạy hàm này khi nạp</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="69"/>
+        <location filename="datapacktreeview.cpp" line="73"/>
         <source>Run this function every tick</source>
         <translation>Chạy hàm này mỗi tíc</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="87"/>
+        <location filename="datapacktreeview.cpp" line="90"/>
         <source>Rename</source>
         <translation>Đổi tên</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="94"/>
+        <location filename="datapacktreeview.cpp" line="95"/>
         <source>Delete</source>
         <translation>Xoá</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="104"/>
+        <location filename="datapacktreeview.cpp" line="103"/>
         <source>New</source>
         <translation>Mới</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="106"/>
+        <location filename="datapacktreeview.cpp" line="105"/>
         <source>Folder</source>
         <translation>Thư mục</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="108"/>
+        <location filename="datapacktreeview.cpp" line="107"/>
         <source>Namespace</source>
         <translation>Không gian tên</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="118"/>
+        <location filename="datapacktreeview.cpp" line="115"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="126"/>
+        <location filename="datapacktreeview.cpp" line="124"/>
         <source>Function</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="134"/>
+        <location filename="datapacktreeview.cpp" line="133"/>
         <source>Loot table</source>
         <translation>Bảng lợi phẩm</translation>
     </message>
@@ -311,66 +319,66 @@
         <translation>Xác lập</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="148"/>
+        <location filename="datapacktreeview.cpp" line="149"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="155"/>
+        <location filename="datapacktreeview.cpp" line="157"/>
         <source>Structure</source>
         <translation>Cấu trúc</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="164"/>
+        <location filename="datapacktreeview.cpp" line="167"/>
         <source>Tag</source>
         <translation>Nhãn</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="166"/>
+        <location filename="datapacktreeview.cpp" line="169"/>
         <source>Blocks</source>
         <translation>Khối</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="173"/>
+        <location filename="datapacktreeview.cpp" line="177"/>
         <source>Entity types</source>
         <translation>Loại thực thể</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="180"/>
+        <location filename="datapacktreeview.cpp" line="185"/>
         <source>Fluids</source>
         <translation>Chất lỏng</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="187"/>
+        <location filename="datapacktreeview.cpp" line="193"/>
         <source>Functions</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="194"/>
+        <location filename="datapacktreeview.cpp" line="201"/>
         <source>Items</source>
         <translation>Vật phẩm</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="204"/>
+        <location filename="datapacktreeview.cpp" line="212"/>
         <source>File</source>
         <translation>Tệp</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="433"/>
+        <location filename="datapacktreeview.cpp" line="442"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="438"/>
+        <location filename="datapacktreeview.cpp" line="447"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
 %2.</translation>
     </message>
     <message>
-        <location filename="datapacktreeview.cpp" line="444"/>
+        <location filename="datapacktreeview.cpp" line="453"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
@@ -1683,7 +1691,7 @@
     </message>
     <message>
         <location filename="loottablefunction.ui" line="1065"/>
-        <location filename="loottablefunction.cpp" line="798"/>
+        <location filename="loottablefunction.cpp" line="797"/>
         <source>Conditions (%1)</source>
         <translation>Các điều kiện (%1)</translation>
     </message>
@@ -1692,7 +1700,7 @@
         <translation type="vanished">Các điều kiện</translation>
     </message>
     <message>
-        <location filename="loottablefunction.cpp" line="804"/>
+        <location filename="loottablefunction.cpp" line="803"/>
         <source>(not set)</source>
         <translation>(không đặt)</translation>
     </message>
@@ -2201,146 +2209,279 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="mainwindow.ui" line="138"/>
         <source>File</source>
-        <translation>Tệp</translation>
+        <translation type="vanished">Tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="150"/>
         <source>Preferences</source>
-        <translation>Sở thích</translation>
+        <translation type="vanished">Sở thích</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="156"/>
         <source>Help</source>
-        <translation>Trợ giúp</translation>
+        <translation type="vanished">Trợ giúp</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="169"/>
         <source>Open</source>
-        <translation>Mở</translation>
+        <translation type="vanished">Mở</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="172"/>
+        <location filename="mainwindow.ui" line="196"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="177"/>
         <source>Open datapack</source>
-        <translation>Mở gói dữ liệu</translation>
+        <translation type="vanished">Mở gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="180"/>
+        <location filename="mainwindow.ui" line="141"/>
+        <source>&amp;File</source>
+        <translation>&amp;Tệp</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="145"/>
+        <source>&amp;Recent datapacks</source>
+        <translation>&amp;Gói dữ liệu gần đây</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="161"/>
+        <source>&amp;Preferences</source>
+        <translation>&amp;Sở thích</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="167"/>
+        <source>&amp;Help</source>
+        <translation>&amp;Trợ giúp</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="175"/>
+        <source>&amp;Edit</source>
+        <translation>&amp;Chỉnh sửa</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="193"/>
+        <source>Open &amp;file</source>
+        <translation>Mở &amp;tệp</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="201"/>
+        <source>&amp;Open datapack</source>
+        <translation>&amp;Mở gói dữ liệu</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="204"/>
         <source>Open a datapack for editing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="183"/>
+        <location filename="mainwindow.ui" line="207"/>
         <source>Ctrl+Shift+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="188"/>
-        <source>Save</source>
-        <translation>Lưu</translation>
+        <location filename="mainwindow.ui" line="212"/>
+        <source>&amp;Save</source>
+        <translation>&amp;Lưu</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="191"/>
+        <location filename="mainwindow.ui" line="223"/>
+        <source>E&amp;xit</source>
+        <translation>&amp;Thoát</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="231"/>
+        <source>&amp;New datapack</source>
+        <translation>Gói dữ liệu &amp;mới</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="237"/>
+        <source>Ctrl+N</source>
+        <translation>Ctrl+N</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="242"/>
+        <source>&amp;Options...</source>
+        <translation>&amp;Tuỳ chọn...</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="245"/>
+        <source>Open the settings dialog</source>
+        <translation>Mở hộp thoại thiết đặt</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="253"/>
+        <source>Save &amp;all</source>
+        <translation>Lưu &amp;hết</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="264"/>
+        <source>&amp;About MCDatapacker</source>
+        <translation>&amp;Về MCDatapacker</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="272"/>
+        <source>About &amp;Qt</source>
+        <translation>Về &amp;Qt</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="280"/>
+        <source>&amp;Disclaimer</source>
+        <translation>&amp;Lời từ chối</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="288"/>
+        <source>&amp;Undo</source>
+        <translation>&amp;Hoàn tác</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="291"/>
+        <source>Ctrl+Z</source>
+        <translation>Ctrl+Z</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="299"/>
+        <source>&amp;Redo</source>
+        <translation>&amp;Làm lại</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="302"/>
+        <source>Ctrl+Y</source>
+        <translation>Ctrl+Y</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="310"/>
+        <source>Select &amp;all</source>
+        <translation>C&amp;họn tất cả</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="313"/>
+        <source>Ctrl+A</source>
+        <translation>Ctrl+A</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="321"/>
+        <source>Cut</source>
+        <translation>&amp;Cắt</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="324"/>
+        <source>Ctrl+X</source>
+        <translation>Ctrl+X</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="332"/>
+        <source>&amp;Copy</source>
+        <translation>&amp;Sao chép</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="335"/>
+        <source>Ctrl+C</source>
+        <translation>Ctrl+C</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="343"/>
+        <source>&amp;Paste</source>
+        <translation>&amp;Dán</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="346"/>
+        <source>Ctrl+V</source>
+        <translation>Ctrl+V</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="351"/>
+        <source>R&amp;estart</source>
+        <translation>&amp;Khởi động lại</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="vanished">Lưu</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="215"/>
         <source>Save the currently editing file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="194"/>
+        <location filename="mainwindow.ui" line="218"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="199"/>
         <source>Exit</source>
-        <translation>Thoát</translation>
+        <translation type="vanished">Thoát</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="202"/>
+        <location filename="mainwindow.ui" line="354"/>
         <source>Shift+Esc</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="210"/>
         <source>New datapack</source>
-        <translation>Gói dữ liệu mới</translation>
+        <translation type="vanished">Gói dữ liệu mới</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="213"/>
+        <location filename="mainwindow.ui" line="234"/>
         <source>Create a new datapack</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="216"/>
-        <source>Ctrl+Shift+N</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.ui" line="221"/>
         <source>Settings...</source>
-        <translation>Thiết đặt...</translation>
+        <translation type="vanished">Thiết đặt...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="229"/>
+        <location filename="mainwindow.ui" line="256"/>
         <source>Save all unsaved files</source>
         <translation>Lưu tất cả các tệp chưa được lưu</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="247"/>
         <source>Disclaimer...</source>
-        <translation>Lời từ chối...</translation>
+        <translation type="vanished">Lời từ chối...</translation>
     </message>
     <message>
         <source>Save all</source>
         <translation type="vanished">Lưu tất cả</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="232"/>
+        <location filename="mainwindow.ui" line="259"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="237"/>
         <source>About MCDatapacker...</source>
-        <translation>Về MCDatapacker...</translation>
+        <translation type="vanished">Về MCDatapacker...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="242"/>
         <source>About Qt...</source>
-        <translation>Về Qt...</translation>
+        <translation type="vanished">Về Qt...</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="105"/>
+        <location filename="mainwindow.cpp" line="165"/>
         <source>Open file</source>
         <translation>Mở tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="118"/>
+        <location filename="mainwindow.cpp" line="178"/>
         <source>Save File</source>
         <translation>Lưu tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="161"/>
+        <location filename="mainwindow.cpp" line="221"/>
         <source>Reload file</source>
         <translation>Tải lại tệp</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="162"/>
+        <location filename="mainwindow.cpp" line="222"/>
         <source>The file %1 has been changed exernally.</source>
         <translation>Tệp %1 đã được thay đổi từ bên ngoài.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="164"/>
+        <location filename="mainwindow.cpp" line="224"/>
         <source>Do you want to reload this file?</source>
         <translation>Bạn có muốn tải lại tệp này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="306"/>
+        <location filename="mainwindow.cpp" line="371"/>
         <source>Unsaved changes</source>
         <translation>Thay đổi chưa lưu</translation>
     </message>
@@ -2369,73 +2510,73 @@ Bạn có muốn lưu các thay đổi không?</translation>
 %2.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="521"/>
+        <location filename="mainwindow.cpp" line="744"/>
         <source>Open datapack folder</source>
         <translation>Mở thư mục gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="599"/>
+        <location filename="mainwindow.cpp" line="475"/>
         <source>Invaild datapack folder.</source>
         <translation>Thư mục gói dữ liệu không hợp lệ.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="539"/>
-        <location filename="mainwindow.cpp" line="598"/>
+        <location filename="mainwindow.cpp" line="402"/>
+        <location filename="mainwindow.cpp" line="474"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="245"/>
+        <location filename="mainwindow.cpp" line="316"/>
         <source>Changing game version</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="246"/>
+        <location filename="mainwindow.cpp" line="317"/>
         <source>The game version has been changed from %1 to %2
 The program need to restart to apply the changes.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="251"/>
+        <location filename="mainwindow.cpp" line="322"/>
         <source>Restart</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="254"/>
+        <location filename="mainwindow.cpp" line="325"/>
         <source>Keep</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="307"/>
+        <location filename="mainwindow.cpp" line="372"/>
         <source>Some document(s) has been modified.
 Do you want to save your changes?</source>
         <translation>Một vài tài liệu đã được thay đổi.
 Bạn có muốn lưu các thay đổi của bạn không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="478"/>
+        <location filename="mainwindow.cpp" line="699"/>
         <source>Folder not empty</source>
         <translation>Thư mục không rỗng</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="479"/>
+        <location filename="mainwindow.cpp" line="700"/>
         <source>The folder is not empty.
 Do you want to recreate this folder?</source>
         <translation>Thư mục này không trống.
 Bạn có muốn tạo lại thư mục này không?</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="554"/>
+        <location filename="mainwindow.cpp" line="417"/>
         <source>Failed to parse the pack.mcmeta file.</source>
         <translation>Không thể phân tích cú pháp của tệp pack.mcmeta.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="561"/>
+        <location filename="mainwindow.cpp" line="427"/>
         <source>The pack.mcmeta file is not a JSON object.</source>
         <translation>Tệp pack.mcmeta không phải là một đối tương JSON.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="571"/>
+        <location filename="mainwindow.cpp" line="440"/>
         <source>The pack.mcmeta file&apos;s contents is empty.</source>
         <translation>Tệp pack.mcmeta rỗng.</translation>
     </message>
@@ -2497,12 +2638,12 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <translation type="vanished">Mở thư mục</translation>
     </message>
     <message>
-        <location filename="newdatapackdialog.cpp" line="37"/>
+        <location filename="newdatapackdialog.cpp" line="40"/>
         <source>Create</source>
         <translation>Tạo</translation>
     </message>
     <message>
-        <location filename="newdatapackdialog.cpp" line="51"/>
+        <location filename="newdatapackdialog.cpp" line="54"/>
         <source>Choose folder to create new datapack</source>
         <translation>Chọn thư mục để tạo gói dữ liệu mới</translation>
     </message>
@@ -2571,7 +2712,7 @@ Bạn có muốn tạo lại thư mục này không?</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="imgviewer.cpp" line="38"/>
+        <location filename="imgviewer.cpp" line="44"/>
         <source>Cannot load image: %1.</source>
         <translation>Không thể tải ảnh: %1.</translation>
     </message>
@@ -2579,13 +2720,18 @@ Bạn có muốn tạo lại thư mục này không?</translation>
 <context>
     <name>RawJsonTextEdit</name>
     <message>
-        <location filename="rawjsontextedit.ui" line="139"/>
+        <location filename="rawjsontextedit.ui" line="142"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="rawjsontextedit.cpp" line="366"/>
+        <source>Select color...</source>
+        <translation>Chọn màu...</translation>
     </message>
 </context>
 <context>
@@ -2682,11 +2828,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="settingsdialog.ui" line="222"/>
-        <source>CheckBox</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="settingsdialog.ui" line="242"/>
         <source>Show spaces and tab characters</source>
         <translation>Hiện các kí tự tab và dấu cách</translation>
     </message>
@@ -2697,48 +2838,199 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>StatusBar</name>
+    <message>
+        <location filename="statusbar.cpp" line="21"/>
+        <source>Minecraft %1</source>
+        <comment>Example: &quot;Minecraft 1.16&quot;</comment>
+        <translation>Minecraft %1</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="46"/>
+        <source>Pack format: %1</source>
+        <translation>Định dạng gói: %1</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="53"/>
+        <source>Tab %1 / %2</source>
+        <translation>Thẻ %1 / %2</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="77"/>
+        <source>Line %1, row %2</source>
+        <translation>Dòng %1, cột %2</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="statusbar.cpp" line="78"/>
+        <source>%n problem(s)</source>
+        <translation>
+            <numerusform>%n vấn đề</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="94"/>
+        <source>Zoom: %1%</source>
+        <translation>Thu phóng: %1%</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="110"/>
+        <source>Binary</source>
+        <translation>Nhị phân</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="110"/>
+        <source>Structure</source>
+        <translation>Cấu trúc</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="111"/>
+        <source>Image</source>
+        <translation>Ảnh</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="111"/>
+        <source>Text</source>
+        <translation>Văn bản</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="112"/>
+        <source>Function</source>
+        <translation>Hàm</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="112"/>
+        <source>JSON</source>
+        <translation>JSON</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="113"/>
+        <source>Advancement</source>
+        <translation>Tiến trình</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="113"/>
+        <source>Loot table</source>
+        <translation>Bảng lợi phẩm</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="114"/>
+        <source>Information</source>
+        <translation>Thông tin</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="114"/>
+        <source>Predicate</source>
+        <translation>Xác lập</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="115"/>
+        <source>Recipe</source>
+        <translation>Công thức</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="115"/>
+        <source>Block tag</source>
+        <translation>Nhãn khối</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="116"/>
+        <source>Entity type tag</source>
+        <translation>Nhãn loại thực thể</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="116"/>
+        <source>Fluid tag</source>
+        <translation>Nhãn chất lỏng</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="117"/>
+        <source>Function tag</source>
+        <translation>Nhãn hàm</translation>
+    </message>
+    <message>
+        <location filename="statusbar.cpp" line="117"/>
+        <source>Item tag</source>
+        <translation>Nhãn vật phẩm</translation>
+    </message>
+</context>
+<context>
     <name>TabbedCodeEditorInterface</name>
     <message>
-        <location filename="tabbedcodeeditorinterface.ui" line="54"/>
+        <location filename="tabbeddocumentinterface.ui" line="54"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No file is opened.&lt;/p&gt;&lt;p&gt;First, open a datapack; then open a file from the left-side tree view.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chưa có tệp nào được mở.&lt;/p&gt;&lt;p&gt;Đầu tiên, mở một gói dữ liệu; sau đó mở một tệp từ khung nhìn cây phía bên trái.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="121"/>
+        <source>Cannot write file %1:
+%2.</source>
+        <translation type="vanished">Không thể ghi tệp %1:
+%2.</translation>
+    </message>
+    <message>
+        <source>Cannot open file %1 for writing:
+%2.</source>
+        <translation type="vanished">Không thể mở tệp %1 để ghi:
+%2.</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="vanished">Lỗi</translation>
+    </message>
+    <message>
+        <source>Unsaved file</source>
+        <translation type="vanished">Tệp chưa được lưu</translation>
+    </message>
+    <message>
+        <source>This document has been modified.
+Do you want to save it?</source>
+        <translation type="vanished">Tài liệu này đã được chỉnh sửa.
+Bạn có muốn lưu nó không?</translation>
+    </message>
+    <message>
+        <source>Cannot read file %1:
+%2.</source>
+        <translation type="vanished">Không thể đọc tệp %1:
+%2.</translation>
+    </message>
+</context>
+<context>
+    <name>TabbedDocumentInterface</name>
+    <message>
+        <location filename="tabbeddocumentinterface.cpp" line="122"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="127"/>
+        <location filename="tabbeddocumentinterface.cpp" line="128"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
 %2.</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="138"/>
-        <location filename="tabbedcodeeditorinterface.cpp" line="211"/>
-        <location filename="tabbedcodeeditorinterface.cpp" line="248"/>
+        <location filename="tabbeddocumentinterface.cpp" line="139"/>
+        <location filename="tabbeddocumentinterface.cpp" line="212"/>
+        <location filename="tabbeddocumentinterface.cpp" line="249"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="166"/>
+        <location filename="tabbeddocumentinterface.cpp" line="167"/>
         <source>Unsaved file</source>
         <translation>Tệp chưa được lưu</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="167"/>
+        <location filename="tabbeddocumentinterface.cpp" line="168"/>
         <source>This document has been modified.
 Do you want to save it?</source>
         <translation>Tài liệu này đã được chỉnh sửa.
 Bạn có muốn lưu nó không?</translation>
     </message>
     <message>
-        <location filename="tabbedcodeeditorinterface.cpp" line="212"/>
-        <location filename="tabbedcodeeditorinterface.cpp" line="249"/>
+        <location filename="tabbeddocumentinterface.cpp" line="213"/>
+        <location filename="tabbeddocumentinterface.cpp" line="250"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>Không thể đọc tệp %1:

@@ -102,10 +102,14 @@ void CodeEditor::readPrefSettings() {
 void CodeEditor::wheelEvent(QWheelEvent *e) {
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         int delta = e->angleDelta().y() / 120;
-        monoFont.setPointSize(monoFont.pointSize() + delta);
-        this->setFont(monoFont);
+        if (delta != 0)
+            zoomIn(delta); /* Zoom out when delta < 0 */
+        emit showMessageRequest(tr("Zoom: %1%").arg(fontInfo().pointSize() * 100
+                                                    / monoFont.pointSize()),
+                                1500);
+    } else {
+        QPlainTextEdit::wheelEvent(e);
     }
-    QPlainTextEdit::wheelEvent(e);
 }
 
 void CodeEditor::resizeEvent(QResizeEvent *e) {
@@ -148,9 +152,15 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
             cursor.endEditBlock();
             setTextCursor(cursor);
         } else {
-            QPlainTextEdit::keyPressEvent(e);
+            goto base;
         }
     } else {
+ base:
+        if ((e->key() == Qt::Key_Insert) &&
+            (e->modifiers() == Qt::NoModifier)) {
+            setOverwriteMode(!overwriteMode());
+            emit updateStatusBarRequest(this);
+        }
         QPlainTextEdit::keyPressEvent(e);
     }
 }
@@ -317,7 +327,7 @@ void CodeEditor::setFilePath(const QString &path) {
     filepath = path;
     auto *doc = document();
 
-    doc->setDefaultFont(monoFont);
+    doc->setDefaultFont(font());
     settings.beginGroup("editor");
     /* The tab stop distance must be reset each time the current document is changed */
     if (settings.value("insertTabAsSpaces", true).toBool()) {
@@ -343,7 +353,7 @@ int CodeEditor::lineNumberAreaWidth() {
         ++digits;
     }
 
-    int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+    int space = 6 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
 
     return space;
 }
@@ -540,25 +550,21 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
        painter.setPen(QColor(240, 240, 240));
        painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
      */
-    QTextBlock block       = firstVisibleBlock();
-    int        blockNumber = block.blockNumber();
-    int        top         =
+    QTextBlock &&block       = firstVisibleBlock();
+    int          blockNumber = block.blockNumber();
+    int          top         =
         qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(blockNumber + 1);
+            QString &&number = QString::number(blockNumber + 1);
             if (blockNumber == this->textCursor().blockNumber()) {
                 painter.setPen(palette().shadow().color());
             } else {
                 painter.setPen(palette().mid().color());
             }
-            painter.drawText(0,
-                             top,
-                             lineNumberArea->width(),
-                             fontMetrics().height(),
-                             Qt::AlignRight,
-                             number);
+            painter.drawText(0, top, lineNumberArea->width() - 3,
+                             fontMetrics().height(), Qt::AlignRight, number);
         }
 
         block  = block.next();
@@ -577,7 +583,7 @@ void CodeEditor::matchParentheses() {
     if (!data || !curHighlighter)
         return;
 
-    QVector<BracketInfo*> infos = data->brackets();
+    QVector<BracketInfo*> && infos = data->brackets();
 
     int pos = textCursor().block().position();
 
@@ -619,7 +625,8 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
                                   int numLeftParentheses, bool isPrimary) {
     auto *data =
         dynamic_cast<TextBlockData *>(currentBlock.userData());
-    QVector<BracketInfo *> infos = data->brackets();
+
+    QVector<BracketInfo *> && infos = data->brackets();
 
     int docPos = currentBlock.position();
 
@@ -654,7 +661,8 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
                                    int numRightParentheses, bool isPrimary) {
     auto *data =
         dynamic_cast<TextBlockData *>(currentBlock.userData());
-    QVector<BracketInfo *> infos = data->brackets();
+
+    QVector<BracketInfo *> && infos = data->brackets();
 
     if (i == -2)
         i = infos.count() - 1;
@@ -688,7 +696,7 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
 
 void CodeEditor::createBracketSelection(int pos, bool isPrimary) {
     /*qDebug() << "createBracketSelection" << pos; */
-    QList<QTextEdit::ExtraSelection> selections = extraSelections();
+    QList<QTextEdit::ExtraSelection> && selections = extraSelections();
 
     QTextEdit::ExtraSelection selection;
 
@@ -697,14 +705,13 @@ void CodeEditor::createBracketSelection(int pos, bool isPrimary) {
         selection.format.setBackground(
             selection.format.background().color().lighter());
 
-    QTextCursor cursor = textCursor();
+    QTextCursor &&cursor = textCursor();
     cursor.setPosition(pos);
     cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
-    selection.cursor = cursor;
+    selection.cursor = std::move(cursor);
 
-    selections.append(selection);
-
-    setExtraSelections(selections);
+    selections << selection;
+    setExtraSelections(std::move(selections));
 }
 
 void CodeEditor::followNamespacedId(const QMouseEvent *event) {
@@ -718,18 +725,12 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
 
     /*qDebug() << "followNamespacedId" << infos.count(); */
 
-    auto cursor         = cursorForPosition(event->pos());
-    auto cursorBlockPos = cursor.positionInBlock();
+    const auto &&cursor         = cursorForPosition(event->pos());
+    const auto &&cursorBlockPos = cursor.positionInBlock();
 
-    for (const auto info: infos) {
+    for (const auto &info: infos) {
         if (cursorBlockPos >= info->start &&
             cursorBlockPos <= (info->start + info->length)) {
-/*
-              qDebug() << cursor.position() <<
-                  (cursor.position() - cursorBlockPos + info->start) <<
-                  cursor.positionInBlock() <<
-                  info->start << (info->start + info->length);
- */
             emit openFileRequest(info->link);
             break;
         }
