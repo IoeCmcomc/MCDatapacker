@@ -2,15 +2,14 @@
 #define TABBEDCODEEDITORINTERFACE_H
 
 #include "codeeditor.h"
+#include "imgviewer.h"
 
 #include <QFrame>
 #include <QStackedWidget>
 #include <QTabBar>
 
-class ImgViewer;
-
 namespace Ui {
-    class TabbedCodeEditorInterface;
+    class TabbedDocumentInterface;
 }
 
 class TabbedDocumentInterface : public QFrame
@@ -35,8 +34,8 @@ public:
     QTabBar *getTabBar() const;
     QStackedWidget *getStackedWidget();
 
-    inline int count() const;
-    inline bool hasNoFile() const;
+    int count() const;
+    bool hasNoFile() const;
     void clear();
     bool hasUnsavedChanges() const;
 
@@ -74,7 +73,7 @@ private /*slots*/ :
     void onCurFileChanged(const QString &path);
 
 private:
-    Ui::TabbedCodeEditorInterface *ui;
+    Ui::TabbedDocumentInterface *ui;
 
     QVector<CodeFile> files;
     int prevIndex                 = -1;

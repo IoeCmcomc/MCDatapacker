@@ -59,13 +59,6 @@ void SettingsDialog::setupLanguageSetting() {
         ui->languageCombo->addItem(lang, locale);
     }
 
-
-    ui->languageCombo->addItem(QString("%1 (%2)").arg(
-                                   QLocale::languageToString(QLocale("en_US").
-                                                             language()),
-                                   QLocale("en_US").nativeLanguageName()),
-                               "en_US");
-
     auto curLocale =
         QLocale(qobject_cast<MainWindow*>(parent())->getCurLocale());
     auto currLang = QString("%1 (%2)").arg(

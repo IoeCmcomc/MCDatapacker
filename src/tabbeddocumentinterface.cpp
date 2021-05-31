@@ -1,5 +1,5 @@
 #include "tabbeddocumentinterface.h"
-#include "ui_tabbedcodeeditorinterface.h"
+#include "ui_tabbeddocumentinterface.h"
 
 #include "globalhelpers.h"
 #include "mainwindow.h"
@@ -18,7 +18,7 @@
 
 TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::TabbedCodeEditorInterface) {
+    ui(new Ui::TabbedDocumentInterface) {
     ui->setupUi(this);
 
     ui->tabBar->setTabsClosable(true);
@@ -365,7 +365,7 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
                                             const QString &oldName,
                                             const QString &newName) {
 /*
-      qDebug() << "TabbedCodeEditorInterface::onFileRenamed" << oldName <<
+      qDebug() << "TabbedDocumentInterface::onFileRenamed" << oldName <<
           newName << count();
  */
     const QString &&oldpath = path + '/' + oldName;
@@ -592,7 +592,7 @@ void TabbedDocumentInterface::onSwitchPrevFile() {
 }
 
 void TabbedDocumentInterface::onCurTextChanged() {
-    /*qDebug() << "TabbedCodeEditorInterface::onCurTextChanged"; */
+    /*qDebug() << "TabbedDocumentInterface::onCurTextChanged"; */
     if (!hasNoFile() && getCurFile()->data.canConvert<TextFileData>()) {
         auto data =
             qvariant_cast<TextFileData>(getCurFile()->data);
@@ -605,7 +605,7 @@ void TabbedDocumentInterface::onCurTextChanged() {
 }
 
 void TabbedDocumentInterface::onCurTextChangingDone() {
-    /*qDebug() << "TabbedCodeEditorInterface::onCurTextChangingDone"; */
+    /*qDebug() << "TabbedDocumentInterface::onCurTextChangingDone"; */
     if (const auto *curFile = getCurFile(); curFile &&
         curFile->data.canConvert<TextFileData>()) {
         auto data = qvariant_cast<TextFileData>(getCurFile()->data);

@@ -212,6 +212,7 @@ FORMS += \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \
+    MCDatapacker_en_US.ts \
     MCDatapacker_vi_VN.ts
 
 # Default rules for deployment.
@@ -227,7 +228,7 @@ RESOURCES += \
 
 RC_ICONS = ../resource/app/icon/favicon.ico
 
-VERSION = 0.3.0
+VERSION = 0.4.0
 QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker

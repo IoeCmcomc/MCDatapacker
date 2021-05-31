@@ -57,7 +57,12 @@ public:
             /*m_formatRanges << std::move(range); */
         }
         virtual void visit(BoolNode *node) {
-            auto fmt = defaultFormat(node);
+            /*auto fmt = defaultFormat(node); */
+            QTextCharFormat fmt;
+
+            fmt.setFontWeight(QFont::DemiBold);
+            fmt.setForeground(
+                (node->value()) ? QColor(0, 190, 0) : QColor(190, 0, 0));
 
             QTextLayout::FormatRange range{ node->pos(), node->length(),
                                             std::move(fmt) };

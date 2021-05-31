@@ -2846,115 +2846,115 @@ p, li { white-space: pre-wrap; }
         <translation>Minecraft %1</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="46"/>
+        <location filename="statusbar.cpp" line="49"/>
         <source>Pack format: %1</source>
         <translation>Định dạng gói: %1</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="53"/>
+        <location filename="statusbar.cpp" line="56"/>
         <source>Tab %1 / %2</source>
         <translation>Thẻ %1 / %2</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="77"/>
+        <location filename="statusbar.cpp" line="80"/>
         <source>Line %1, row %2</source>
         <translation>Dòng %1, cột %2</translation>
     </message>
     <message numerus="yes">
-        <location filename="statusbar.cpp" line="78"/>
+        <location filename="statusbar.cpp" line="81"/>
         <source>%n problem(s)</source>
         <translation>
             <numerusform>%n vấn đề</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="94"/>
+        <location filename="statusbar.cpp" line="97"/>
         <source>Zoom: %1%</source>
         <translation>Thu phóng: %1%</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="110"/>
+        <location filename="statusbar.cpp" line="113"/>
         <source>Binary</source>
         <translation>Nhị phân</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="110"/>
+        <location filename="statusbar.cpp" line="113"/>
         <source>Structure</source>
         <translation>Cấu trúc</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="111"/>
+        <location filename="statusbar.cpp" line="114"/>
         <source>Image</source>
         <translation>Ảnh</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="111"/>
+        <location filename="statusbar.cpp" line="114"/>
         <source>Text</source>
         <translation>Văn bản</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="112"/>
+        <location filename="statusbar.cpp" line="115"/>
         <source>Function</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="112"/>
+        <location filename="statusbar.cpp" line="115"/>
         <source>JSON</source>
         <translation>JSON</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="113"/>
+        <location filename="statusbar.cpp" line="116"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="113"/>
+        <location filename="statusbar.cpp" line="116"/>
         <source>Loot table</source>
         <translation>Bảng lợi phẩm</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="114"/>
+        <location filename="statusbar.cpp" line="117"/>
         <source>Information</source>
         <translation>Thông tin</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="114"/>
+        <location filename="statusbar.cpp" line="117"/>
         <source>Predicate</source>
         <translation>Xác lập</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="115"/>
+        <location filename="statusbar.cpp" line="118"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="115"/>
+        <location filename="statusbar.cpp" line="118"/>
         <source>Block tag</source>
         <translation>Nhãn khối</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="116"/>
+        <location filename="statusbar.cpp" line="119"/>
         <source>Entity type tag</source>
         <translation>Nhãn loại thực thể</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="116"/>
+        <location filename="statusbar.cpp" line="119"/>
         <source>Fluid tag</source>
         <translation>Nhãn chất lỏng</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="117"/>
+        <location filename="statusbar.cpp" line="120"/>
         <source>Function tag</source>
         <translation>Nhãn hàm</translation>
     </message>
     <message>
-        <location filename="statusbar.cpp" line="117"/>
+        <location filename="statusbar.cpp" line="120"/>
         <source>Item tag</source>
         <translation>Nhãn vật phẩm</translation>
     </message>
 </context>
 <context>
-    <name>TabbedCodeEditorInterface</name>
+    <name>TabbedDocumentInterface</name>
     <message>
         <location filename="tabbeddocumentinterface.ui" line="54"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;No file is opened.&lt;/p&gt;&lt;p&gt;First, open a datapack; then open a file from the left-side tree view.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
