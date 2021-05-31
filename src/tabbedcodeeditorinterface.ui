@@ -82,9 +82,6 @@
        </property>
        <item>
         <widget class="CodeEditor" name="codeEditor">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
          <property name="lineWrapMode">
           <enum>QPlainTextEdit::NoWrap</enum>
          </property>

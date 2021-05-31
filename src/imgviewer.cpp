@@ -27,6 +27,12 @@ ImgViewer::ImgViewer(QWidget *parent) :
             &QShortcut::activated, [this]() {
         loadData(toData());
     });
+    connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, [this]() {
+        emit updateStatusBarRequest(this);
+    });
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, [this]() {
+        emit updateStatusBarRequest(this);
+    });
 }
 
 ImageFileData ImgViewer::fromFile(const QString &strFilePath,
@@ -55,6 +61,7 @@ bool ImgViewer::setImage(const QImage &image) {
         this->setDragMode(ScrollHandDrag);
 
     m_IsViewInitialized = true;
+    emit updateStatusBarRequest(this);
     return true;
 }
 
@@ -315,4 +322,6 @@ void ImgViewer::wheelEvent(QWheelEvent *event) {
     /* scale  the View */
     this->scale(factor, factor);
     event->accept();
+
+    emit updateStatusBarRequest(this);
 }

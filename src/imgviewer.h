@@ -48,6 +48,9 @@ public:
     void loadData(const ImageFileData &data);
     ImageFileData toData() const;
 
+signals:
+    void updateStatusBarRequest(ImgViewer *viewer);
+
 protected:
     void wheelEvent(QWheelEvent * event) override;
     void resizeEvent(QResizeEvent * event) override;

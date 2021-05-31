@@ -96,6 +96,7 @@ SOURCES += \
     rawjsontextedit.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
+    statusbar.cpp \
     tabbedcodeeditorinterface.cpp \
     tagselectordialog.cpp \
     truefalsebox.cpp \
@@ -178,6 +179,7 @@ HEADERS += \
     rawjsontextedit.h \
     settingsdialog.h \
     stackedwidget.h \
+    statusbar.h \
     tabbedcodeeditorinterface.h \
     tagselectordialog.h \
     truefalsebox.h \

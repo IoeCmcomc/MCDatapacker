@@ -39,7 +39,7 @@ TabbedCodeEditorInterface::TabbedCodeEditorInterface(QWidget *parent) :
             this, &TabbedCodeEditorInterface::onModificationChanged);
     connect(this, &TabbedCodeEditorInterface::curFileChanged,
             this, &TabbedCodeEditorInterface::onCurFileChanged);
-    connect(ui->codeEditor, &CodeEditor::openFile,
+    connect(ui->codeEditor, &CodeEditor::openFileRequest,
             this, &TabbedCodeEditorInterface::onOpenFile);
     connect(ui->codeEditor, &CodeEditor::textChanged,
             this, &TabbedCodeEditorInterface::onCurTextChanged);
@@ -287,6 +287,14 @@ QVector<CodeFile> *TabbedCodeEditorInterface::getFiles() {
 
 CodeEditor *TabbedCodeEditorInterface::getCodeEditor() const {
     return ui->codeEditor;
+}
+
+ImgViewer *TabbedCodeEditorInterface::getImgViewer() const {
+    return ui->imgViewer;
+}
+
+QTabBar *TabbedCodeEditorInterface::getTabBar() const {
+    return ui->tabBar;
 }
 
 QStackedWidget *TabbedCodeEditorInterface::getStackedWidget() {

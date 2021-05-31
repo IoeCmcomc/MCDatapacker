@@ -83,7 +83,6 @@ AboutDialog::AboutDialog(QWidget *parent) :
     m_winAnime->setEndValue(1);
     m_winAnime->setEasingCurve(QEasingCurve::Linear);
     m_winAnime->start();
-    m_animes << anime;
 }
 
 AboutDialog::~AboutDialog() {

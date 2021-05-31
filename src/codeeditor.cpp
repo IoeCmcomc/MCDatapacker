@@ -126,9 +126,11 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
-    if (settings.value("editor/insertTabAsSpaces", true).toBool()) {
-        const int tabSize = settings.value("editor/tabSize", 4).toInt();
-        auto      cursor  = textCursor();
+    if (settings.value(QStringLiteral("editor/insertTabAsSpaces"),
+                       true).toBool()) {
+        const int tabSize =
+            settings.value(QStringLiteral("editor/tabSize"), 4).toInt();
+        auto cursor = textCursor();
         if (e->key() == Qt::Key_Tab) {
             cursor.insertText(QString(' ').repeated(tabSize));
             setTextCursor(cursor);
@@ -288,6 +290,7 @@ void CodeEditor::onCursorPositionChanged() {
     if (!problemExtraSelections.isEmpty()) {
         setExtraSelections(extraSelections() << problemExtraSelections);
     }
+    emit updateStatusBarRequest(this);
 }
 
 
@@ -465,6 +468,10 @@ bool CodeEditor::getCanRedo() const {
     return canRedo;
 }
 
+int CodeEditor::problemCount() const {
+    return problemExtraSelections.size();
+}
+
 bool CodeEditor::getCanUndo() const {
     return canUndo;
 }
@@ -482,6 +489,7 @@ void CodeEditor::displayErrors() {
         selections += problemExtraSelections;
 
         setExtraSelections(selections);
+        emit updateStatusBarRequest(this);
     }
 }
 
@@ -722,7 +730,7 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
                   cursor.positionInBlock() <<
                   info->start << (info->start + info->length);
  */
-            emit openFile(info->link);
+            emit openFileRequest(info->link);
             break;
         }
     }

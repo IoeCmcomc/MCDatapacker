@@ -32,7 +32,6 @@ public:
     int lineNumberAreaWidth();
 
     void setFilePath(const QString &path);
-
     void setCurHighlighter(Highlighter *value);
 
     void displayErrors();
@@ -42,9 +41,11 @@ public:
 
     bool getCanUndo() const;
     bool getCanRedo() const;
+    int problemCount() const;
 
 signals:
-    void openFile(const QString &filepath);
+    void openFileRequest(const QString &filepath);
+    void updateStatusBarRequest(CodeEditor *editor);
 
 protected:
     void resizeEvent(QResizeEvent *e) override;

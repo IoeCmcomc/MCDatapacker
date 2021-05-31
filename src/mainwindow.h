@@ -15,6 +15,13 @@
 #include <QDir>
 #include <QVersionNumber>
 
+class StatusBar;
+
+struct PackMetaInfo {
+    QString description;
+    int     packFormat = 0;
+};
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -37,14 +44,15 @@ public:
                                    const int depth             = 0);
 
     static QVersionNumber getCurGameVersion();
+    PackMetaInfo getPackInfo() const;
 
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent* event) override;
 
 signals:
-    void curFileChanged(const QString filepath);
-    void curDirChanged(const QDir dir);
+    void curFileChanged(const QString &filepath);
+    void curDirChanged(const QDir &dir);
     void gameVersionChanged(const QString &ver);
 
 private slots:
@@ -79,7 +87,9 @@ private:
     QFileSystemWatcher fileWatcher;
     QTranslator m_translator;
     QTranslator m_translatorQt;
+    PackMetaInfo m_packInfo;
     QMessageBox *uniqueMessageBox                  = nullptr;
+    StatusBar *m_statusBar                         = nullptr;
     VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
     LootTableEditorDock *lootTableEditorDock       = nullptr;
     PredicateDock *predicateDock                   = nullptr;

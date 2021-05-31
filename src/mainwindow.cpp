@@ -1,6 +1,7 @@
-#include "mainwindow.h"
+#include "imgviewer.h"
 #include "ui_mainwindow.h"
 
+#include "statusbar.h"
 #include "newdatapackdialog.h"
 #include "settingsdialog.h"
 #include "aboutdialog.h"
@@ -8,6 +9,7 @@
 #include "globalhelpers.h"
 #include "tabbedcodeeditorinterface.h"
 #include "parsers/command/minecraftparser.h"
+#include "mainwindow.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -43,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
+    m_statusBar = new StatusBar(this, ui->codeEditorInterface);
+    setStatusBar(m_statusBar);
+
     initMenu();
     connect(&fileWatcher, &QFileSystemWatcher::fileChanged,
             this, &MainWindow::onSystemWatcherFileChanged);
@@ -59,6 +64,12 @@ MainWindow::MainWindow(QWidget *parent)
             ui->codeEditorInterface, &TabbedCodeEditorInterface::onOpenFile);
     connect(this, &MainWindow::gameVersionChanged, ui->codeEditorInterface,
             &TabbedCodeEditorInterface::onGameVersionChanged);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &CodeEditor::updateStatusBarRequest,
+            m_statusBar, &StatusBar::updateCodeEditorStatus);
+    connect(ui->codeEditorInterface->getImgViewer(),
+            &ImgViewer::updateStatusBarRequest,
+            m_statusBar, &StatusBar::updateImgViewerStatus);
 
     #ifndef QT_NO_SESSIONMANAGER
     QGuiApplication::setFallbackSessionManagementEnabled(false);
@@ -70,19 +81,6 @@ MainWindow::MainWindow(QWidget *parent)
     /*qDebug() << QIcon::fallbackSearchPaths(); */
 
     initDocks();
-
-
-    connect(ui->codeEditorInterface->getStackedWidget(),
-            &QStackedWidget::currentChanged, this, &MainWindow::updateEditMenu);
-    connect(ui->codeEditorInterface->getCodeEditor(),
-            &QPlainTextEdit::copyAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->codeEditorInterface->getCodeEditor(),
-            &QPlainTextEdit::undoAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->codeEditorInterface->getCodeEditor(),
-            &QPlainTextEdit::redoAvailable, this, &MainWindow::updateEditMenu);
-    connect(qApp->clipboard(), &QClipboard::changed, this,
-            &MainWindow::updateEditMenu);
-    ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
 }
 
 void MainWindow::initDocks() {
@@ -143,6 +141,19 @@ void MainWindow::initMenu() {
     });
     connect(ui->actionDisclaimer, &QAction::triggered, this,
             &MainWindow::disclaimer);
+
+    /* Menu items status update connections */
+    connect(ui->codeEditorInterface->getStackedWidget(),
+            &QStackedWidget::currentChanged, this, &MainWindow::updateEditMenu);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &QPlainTextEdit::copyAvailable, this, &MainWindow::updateEditMenu);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &QPlainTextEdit::undoAvailable, this, &MainWindow::updateEditMenu);
+    connect(ui->codeEditorInterface->getCodeEditor(),
+            &QPlainTextEdit::redoAvailable, this, &MainWindow::updateEditMenu);
+    connect(qApp->clipboard(), &QClipboard::changed, this,
+            &MainWindow::updateEditMenu);
+    ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
 }
 
 void MainWindow::open() {
@@ -194,7 +205,7 @@ void MainWindow::disclaimer() {
 }
 
 void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
-    /*qDebug() << "onSystemWatcherFileChanged"; */
+    qDebug() << "onSystemWatcherFileChanged" << filepath;
     if ((filepath != ui->codeEditorInterface->getCurFilePath())) return;
 
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
@@ -236,11 +247,13 @@ void MainWindow::onCurFileChanged(const QString &path) {
     lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable);
     visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
+    m_statusBar->onCurFileChanged();
 }
 
 void MainWindow::onDatapackChanged() {
     ui->codeEditorInterface->clear();
     updateWindowTitle(false);
+    m_statusBar->onCurDirChanged();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -428,12 +441,15 @@ void MainWindow::loadFolder(const QString &dirPath) {
 
                 QVariantMap json_map = json_obj.toVariantMap();
 
-                auto curDir = QDir::current();
+                auto &&curDir = QDir::current();
                 if (json_map.contains("pack")) {
                     QVariantMap &&pack = json_map["pack"].toMap();
                     if (pack.contains(QStringLiteral("description")) &&
                         pack.contains(QStringLiteral("pack_format"))) {
                         QDir dir(dirPath);
+                        m_packInfo = PackMetaInfo{
+                            pack["description"].toString(),
+                            pack["pack_format"].toInt() };
                         QDir::setCurrent(dir.absolutePath());
                         ui->datapackTreeView->load(dir);
 
@@ -576,6 +592,10 @@ void MainWindow::changeEvent(QEvent* event) {
 }
 
 void MainWindow::commitData(QSessionManager &) {
+}
+
+PackMetaInfo MainWindow::getPackInfo() const {
+    return m_packInfo;
 }
 
 QVersionNumber MainWindow::getCurGameVersion() {

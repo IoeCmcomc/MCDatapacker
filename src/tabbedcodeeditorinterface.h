@@ -7,6 +7,8 @@
 #include <QStackedWidget>
 #include <QTabBar>
 
+class ImgViewer;
+
 namespace Ui {
     class TabbedCodeEditorInterface;
 }
@@ -29,6 +31,8 @@ public:
     QTextDocument *getCurDoc();
     QVector<CodeFile> *getFiles();
     CodeEditor *getCodeEditor() const;
+    ImgViewer *getImgViewer() const;
+    QTabBar *getTabBar() const;
     QStackedWidget *getStackedWidget();
 
     inline int count() const;
