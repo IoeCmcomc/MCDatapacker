@@ -25,7 +25,7 @@ This program can be used for making a new datapack, opening existing datapack, a
 - View images (such as the pack.png) directly in the program 
  
 ## Download
-The program currently supports 1.15 and 1.16 data packs, and it only runs on Windows (tested on Windows 7 and Windows).
+The program currently supports 1.15 and 1.16 data packs, and it only runs on Windows (tested on Windows 7 and Windows 10).
 
 Warning: This is currently an under-development program, which may contain errors. Use it with your own risk.
 
