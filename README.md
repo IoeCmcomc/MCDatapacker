@@ -1,11 +1,11 @@
 ![GitHub](https://img.shields.io/github/license/IoeCmcomc/MCDatapacker)
 ![GitHub repo size](https://img.shields.io/github/repo-size/IoeCmcomc/MCDatapacker)
 ![Lines of code](https://img.shields.io/tokei/lines/github/IoeCmcomc/MCDatapacker)
-[![Hits](https:/hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FIoeCmcomc%2FMCDatapacker&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FIoeCmcomc%2FMCDatapacker&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 <br />
 <p align="center">
-<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png?token=AMZ6227FGWS3BYPMKOT5HFC73X5R2">
+<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png">
   <p align="center">
     <b>MCDatapacker is a Minecraft datapack editor which supports datapacks for Minecraft 1.15+.</b>
   </p>
