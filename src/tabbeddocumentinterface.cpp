@@ -465,8 +465,10 @@ void TabbedDocumentInterface::saveFileData(int index) {
         auto &&data = qvariant_cast<TextFileData>(file.data);
         data.textCursor = ui->codeEditor->textCursor();
         file.data.setValue(std::move(data));
-    } else if (files[prevIndex].fileType == CodeFile::Image) {
-        file.data.setValue(ui->imgViewer->toData());
+    } else if (prevIndex < count()) {
+        if (files[prevIndex].fileType == CodeFile::Image) {
+            file.data.setValue(ui->imgViewer->toData());
+        }
     }
 }
 
@@ -571,11 +573,11 @@ void TabbedDocumentInterface::onCloseFile(int index) {
                        this, &TabbedDocumentInterface::onModificationChanged);
             lastRemovedDoc = doc;
         }
-        files.remove(index);
         if ((index < getCurIndex()) && (count() > 1)) {
-            saveFileData(getCurIndex() - 1);
+            saveFileData(getCurIndex());
             tabMovedOrRemoved = true;
         }
+        files.remove(index);
         /*qDebug() << "Close tab" << index; */
         ui->tabBar->removeTab(index);
     }

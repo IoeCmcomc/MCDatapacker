@@ -22,7 +22,7 @@ QString Glhp::relPath(const QString &dirpath, QString path) {
     QString dataDir = dirpath + "/";
 
     if (!removePrefix(path, dataDir))
-        return "";
+        return QString();
 
     return path;
 }
@@ -43,7 +43,7 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         return CodeFile::Text;
 
     QFileInfo                info       = QFileInfo(filepath);
-    const QString            fullSuffix = info.completeSuffix();
+    const QString            fullSuffix = info.suffix();
     static const QStringList imageExts  =
     { QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
       QStringLiteral("bmp") };

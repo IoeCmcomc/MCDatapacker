@@ -71,7 +71,7 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
 }
 
 void Highlighter::highlightBlock(const QString &text) {
-    /*qDebug() << "Highlighter::highlightBlock" << text << m_highlightMunually; */
+    /*qDebug() << "Highlighter::highlightBlock" << text << currentBlockState(); */
     if (m_highlightMunually) {
     } else {
         if (m_highlightingFirstBlock) {
@@ -107,7 +107,8 @@ void Highlighter::highlightBlock(const QString &text) {
                 if (quoteHighlightRules.contains(curChar)) {
                     if (!backslash && (currentBlockState() == QuotedString)) {
                         setCurrentBlockState(Normal);
-                        setFormat(quoteStart, quoteLength + 2,
+                        setFormat(quoteStart,
+                                  quoteLength + 1,
                                   quoteHighlightRules[curQuoteChar]);
                     } else {
                         setCurrentBlockState(QuotedString);
@@ -137,6 +138,10 @@ void Highlighter::highlightBlock(const QString &text) {
                 if (curChar.isSpace() || curChar == '\t')
                     setFormat(i, 1, m_invisSpaceFmt);
             }
+        }
+        if (currentBlockState() == QuotedString
+            || currentBlockState() == Comment) {
+            setCurrentBlockState(-1);
         }
 
         collectNamespacedIds(text, data);

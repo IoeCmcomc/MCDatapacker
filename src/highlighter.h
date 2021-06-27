@@ -70,7 +70,8 @@ public:
     enum BlockState {
         Normal,
         QuotedString,
-        Comment
+        Comment,
+        MultilineComment,
     };
     Highlighter(QTextDocument *parent);
 
