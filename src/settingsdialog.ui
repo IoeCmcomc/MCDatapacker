@@ -97,9 +97,9 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="editorTab">
+     <widget class="QWidget" name="codeEditorTab">
       <attribute name="title">
-       <string>Editor</string>
+       <string>Code editor</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">

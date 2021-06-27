@@ -1,5 +1,5 @@
 /****
- * Taken from "https://github.com/vitality82/QIV/blob/master/imgviewer.cpp"
+ * Based on "https://github.com/vitality82/QIV/blob/master/imgviewer.cpp"
  * (MIT license)
  ***/
 
@@ -10,7 +10,6 @@
 #include <QtMath>
 #include <QShortcut>
 #include <QScrollBar>
-#include <QTimer>
 
 ImgViewer::ImgViewer(QWidget *parent) :
     QGraphicsView(parent), m_rotateAngle(0), m_IsFitWindow(false),
@@ -33,6 +32,13 @@ ImgViewer::ImgViewer(QWidget *parent) :
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this, [this]() {
         emit updateStatusBarRequest(this);
     });
+
+    m_timer.setParent(this);
+    m_timer.setInterval(100);
+    connect(&m_timer, &QTimer::timeout, [this]() {
+        updateScene({ m_scene->sceneRect() });
+    });
+    m_timer.start();
 }
 
 ImageFileData ImgViewer::fromFile(const QString &strFilePath,
@@ -239,9 +245,17 @@ void ImgViewer::resizeEvent(QResizeEvent *event) {
 }
 
 void ImgViewer::paintEvent(QPaintEvent *e) {
+    static int progress = 0;
     {
         QPainter painter(viewport());
-        painter.drawPixmap(rect(), m_bg);
+
+        if (progress >= 47)
+            progress = 0;
+        else
+            progress += 1;
+        painter.translate(-progress, -progress);
+
+        painter.drawPixmap(QPoint(0, 0), m_bg, m_bg.rect());
     }
 
     QGraphicsView::paintEvent(e);
@@ -286,7 +300,9 @@ void ImgViewer::drawForeground(QPainter *painter, const QRectF &) {
 void ImgViewer::redrawBg() {
     /* Re:Draw the transparency checkerboard as the fixed background */
 
-    m_bg = QPixmap(size());
+    const int cellSize = 47;
+
+    m_bg = QPixmap(size() + QSize(cellSize, cellSize));
     m_bg.fill(Qt::white);
     QPainter painter(&m_bg);
 
@@ -294,10 +310,9 @@ void ImgViewer::redrawBg() {
 
     painter.setBrush(whiteSmokeBrush);
     painter.setPen(Qt::NoPen);
-    const int cellSize = 47;
-    bool      xWhite   = false;
-    for (int x = 0; x < width(); x += cellSize) {
-        for (int y = 0; y < height(); y += cellSize * 2) {
+    bool xWhite = false;
+    for (int x = 0; x - cellSize < width(); x += cellSize) {
+        for (int y = 0; y - cellSize < height(); y += cellSize * 2) {
             painter.drawRect(x, y + cellSize * xWhite, cellSize, cellSize);
         }
         xWhite = !xWhite;
@@ -319,7 +334,7 @@ void ImgViewer::wheelEvent(QWheelEvent *event) {
     if (event->angleDelta().y() < 0)
         factor = 1.0 / factor;
 
-    /* scale  the View */
+    /* scale the View */
     this->scale(factor, factor);
     event->accept();
 

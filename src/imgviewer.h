@@ -1,5 +1,5 @@
 /****
- * Taken from "https://github.com/vitality82/QIV/blob/master/imgviewer.h"
+ * Based on "https://github.com/vitality82/QIV/blob/master/imgviewer.h"
  * (MIT license)
  ***/
 
@@ -11,6 +11,7 @@
 #include <QPixmap>
 #include <QGraphicsPixmapItem>
 #include <QImage>
+#include <QTimer>
 
 struct ImageFileData {
     QTransform transform;
@@ -58,6 +59,7 @@ protected:
     void drawForeground(QPainter *painter, const QRectF &rect) override;
 
 private:
+    QTimer m_timer;
     mutable QImage m_image;
     QPixmap m_pixmap;
     QPixmap m_bg;
@@ -66,6 +68,7 @@ private:
     int m_rotateAngle;
     bool m_IsFitWindow;
     bool m_IsViewInitialized;
+    bool m_isBgAnimated = false;
 
     void redrawBg();
 
