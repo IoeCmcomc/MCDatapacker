@@ -38,4 +38,4 @@ for tr_tag in tr_tags:
     summary = get_html(sum_tr.find_all("td")[1])
     info[id] = {"name" : name, "summary" : summary}
 with open("enchantment.json", "w+") as f:
-    f.write(json.dumps({"added" : info}))
+    f.write(json.dumps({"added" : info}, sort_keys=True))

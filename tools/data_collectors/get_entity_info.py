@@ -2,7 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Java_Edition_data_values/Entities') 
+req = urllib.request.urlopen("https://minecraft.gamepedia.com/Java_Edition_data_values/Entities") 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 def find_tr_tags(tag):
@@ -24,5 +24,8 @@ for table in tables:
         name = td_tags[0].get_text(strip=True)
         id = td_tags[1].get_text(strip=True)
         info[id] = name
+
+info['player'] = "Player"
+
 with open("entity.json", "w+") as f:
-    f.write(json.dumps({"added" : info}))
+    f.write(json.dumps({"added" : info}, sort_keys=True))

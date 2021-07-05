@@ -32,9 +32,17 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     readSettings();
-    Command::MinecraftParser::setSchema(
-        QStringLiteral(":/minecraft/") + MainWindow::curGameVersion.toString() +
-        QStringLiteral("/mcdata/generated/reports/commands.json"));
+    if (curGameVersion >= QVersionNumber(1, 17)) {
+        Command::MinecraftParser::setSchema(
+            QStringLiteral(
+                ":/minecraft/") + MainWindow::curGameVersion.toString() +
+            QStringLiteral("/mcdata/processed/reports/commands/data.min.json"));
+    } else {
+        Command::MinecraftParser::setSchema(
+            QStringLiteral(
+                ":/minecraft/") + MainWindow::curGameVersion.toString() +
+            QStringLiteral("/mcdata/generated/reports/commands.json"));
+    }
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                    MainWindow::readMCRInfo(QStringLiteral(
@@ -663,12 +671,14 @@ QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,
         retMap.insert(std::move(tmpMap));
         root.remove("base");
     }
-    if (root.contains("removed"))
+    if (root.contains("removed")) {
         for (const auto &keyRef: root["removed"].toArray()) {
             const QString &key = keyRef.toString();
             if (retMap.contains(key))
                 retMap.remove(key);
         }
+        root.remove("removed");
+    }
     if (root.contains("added"))
         retMap.insert(root["added"].toVariant().toMap());
     else

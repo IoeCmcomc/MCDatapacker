@@ -71,4 +71,4 @@ for element in icons:
             out_file.write(data)
     
 with open("block.json", "w+") as f:
-    f.write(json.dumps({"added" : info}))
+    f.write(json.dumps({"added" : info}, sort_keys=True))

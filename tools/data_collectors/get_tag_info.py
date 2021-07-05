@@ -36,4 +36,4 @@ while (h3 := h3.find_next_sibling("h3")) != None:
     print(filename)
     Path("tag").mkdir(parents=True, exist_ok=True)
     with open(filename, "w+") as f:
-        f.write(json.dumps({"added" : info}))
+        f.write(json.dumps({"added" : info}, sort_keys=True))

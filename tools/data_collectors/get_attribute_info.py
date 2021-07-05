@@ -36,4 +36,4 @@ get_per_h3("Attributes_for_bees_and_parrots")
 get_per_h3("Attributes_for_zombies")
 
 with open("attribute.json", "w+") as f:
-    f.write(json.dumps({"added" : info}))
+    f.write(json.dumps({"added" : info}, sort_keys=True))

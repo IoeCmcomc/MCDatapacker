@@ -47,6 +47,3 @@ SOURCES += \
 
 INCLUDEPATH += lru-cache/include
 INCLUDEPATH += nbt-cpp/include
-
-
-message($$INCLUDEPATH)

@@ -21,7 +21,7 @@ def get_icon_info(id, alt_name=None):
         pos = (int(i) for i in pos_match.groups())
         icons.append((alt_name if alt_name else id, pos,))
 
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Java_Edition_data_values/Items') 
+req = urllib.request.urlopen("https://minecraft.fandom.com/wiki/Java_Edition_data_values/Items")
 ids_soup = BeautifulSoup(req.read(), "lxml")
 req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Template:ItemSprite') 
 icons_soup = BeautifulSoup(req.read(), "lxml")
@@ -40,7 +40,7 @@ for tr_tag in tr_tags:
     first_td = td_tags[0]
     name = first_td.get_text(strip=True)
     id = td_tags[1].get_text(strip=True)
-    #print(id, name)
+    print(id, name)
     entry = {"name": name}
     info[id] = entry
     #get_icon_info(id)
@@ -63,4 +63,4 @@ for element in icons:
     icon.save("texture/item/{}.png".format(id))
     
 with open("item.json", "w+") as f:
-    f.write(json.dumps({"added" : info}))
+    f.write(json.dumps({"added" : info}, sort_keys=True))

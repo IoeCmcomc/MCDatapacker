@@ -1,1 +1,0 @@
-{"added": {"ignore_vibrations_stepping_carefully": "<ul><li>Game events in this tag will be ignore by sculk sensors if the source entity is sneaking.</li></ul>", "vibrations": "<ul><li>Game events in this tag will trigger sculk sensors.</li></ul>"}}

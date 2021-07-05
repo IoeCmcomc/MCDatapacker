@@ -30,4 +30,4 @@ for tr_tag in tr_tags:
     id = td_tags[1].get_text(strip=True)
     info[id] = name
 with open("feature.json", "w+") as f:
-    f.write(json.dumps({"added" : info}))
+    f.write(json.dumps({"added" : info}, sort_keys=True))
