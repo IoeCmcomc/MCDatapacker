@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 
 #include "../../../../../src/parsers/command/parser.h"
-#include <lru/lru.hpp>
+#include "lru-cache/include/lru/lru.hpp"
 
 using namespace Command;
 

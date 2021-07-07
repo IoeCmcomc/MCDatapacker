@@ -3,6 +3,7 @@
 #include "json/single_include/nlohmann/json.hpp"
 
 #include <QMetaEnum>
+
 using json = nlohmann::json;
 
 Command::MinecraftParser::MinecraftParser(QObject *parent,

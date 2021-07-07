@@ -3,7 +3,7 @@
 
 #include "argumentnode.h"
 #include "mapnode.h"
-#include "nbt-cpp/include/nbt.hpp"
+#include "nbt.hpp"
 
 #include <iostream>
 #include <sstream>

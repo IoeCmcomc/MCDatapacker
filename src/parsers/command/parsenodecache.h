@@ -2,7 +2,7 @@
 #define PARSENODECACHE_H
 
 #include "nodes/parsenode.h"
-#include <lru-cache/include/lru/lru.hpp>
+#include "lru/lru.hpp"
 
 namespace Command {
     struct CacheKey {

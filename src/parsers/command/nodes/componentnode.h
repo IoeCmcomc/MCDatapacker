@@ -3,7 +3,7 @@
 
 #include "argumentnode.h"
 
-#include "json/single_include/nlohmann/json.hpp"
+#include "nlohmann/json.hpp"
 
 namespace Command {
     class ComponentNode final : public ArgumentNode

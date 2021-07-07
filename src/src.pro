@@ -238,17 +238,37 @@ DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
     MCDatapacker_vi_VN.ts
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/release/ -llib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/debug/ -lliblib
-else:unix: LIBS += -L$$OUT_PWD/../lib/ -llib
 
-INCLUDEPATH += $$PWD/../lib
-DEPENDPATH += $$PWD/../lib
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/json/release/ -ljson
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/json/debug/ -ljson
+else:unix: LIBS += -L$$OUT_PWD/../lib/json/ -ljson
 
-INCLUDEPATH += $$PWD/../lib/lru-cache/include
+INCLUDEPATH += $$PWD/../lib/json \
+    $$PWD/../lib/json/json/single_include
+DEPENDPATH += $$PWD/../lib/json
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/release/liblib.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/debug/liblib.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/release/lib.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/debug/lib.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/liblib.a
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/lru-cache/release/ -llru-cache
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/lru-cache/debug/ -llru-cache
+else:unix: LIBS += -L$$OUT_PWD/../lib/lru-cache/ -llru-cache
+
+INCLUDEPATH += $$PWD/../lib/lru-cache \
+    $$PWD/../lib/lru-cache/lru-cache/include
+DEPENDPATH += $$PWD/../lib/lru-cache
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/debug/ -lnbt
+else:unix: LIBS += -L$$OUT_PWD/../lib/nbt/ -lnbt
+
+INCLUDEPATH += $$PWD/../lib/nbt \
+    $$PWD/../lib/nbt/nbt-cpp/include
+DEPENDPATH += $$PWD/../lib/nbt
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/QFindDialogs/release/ -lQFindDialogs
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/QFindDialogs/debug/ -lQFindDialogs
+else:unix: LIBS += -L$$OUT_PWD/../lib/QFindDialogs/ -lQFindDialogs
+
+INCLUDEPATH += $$PWD/../lib/QFindDialogs
+DEPENDPATH += $$PWD/../lib/QFindDialogs
+
+message($$INCLUDEPATH)
