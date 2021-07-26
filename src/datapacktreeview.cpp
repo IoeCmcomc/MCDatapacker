@@ -14,6 +14,8 @@
 #include <QStringList>
 #include <QSaveFile>
 #include <QToolTip>
+#include <QApplication>
+#include <QClipboard>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
@@ -51,39 +53,55 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenu->addAction(cMenuActionOpen);
     }
 
-    if (Glhp::pathToFileType(dirPath, finfo.filePath()) == CodeFile::Function) {
+    const auto &&fileType = Glhp::pathToFileType(dirPath, finfo.filePath());
+    if ((fileType == CodeFile::Function || fileType >= CodeFile::JsonText) &&
+        path.startsWith(QStringLiteral("data/"))) {
         const QString &&filePathId = Glhp::toNamespacedID(dirPath,
                                                           finfo.filePath());
 
-        QAction *cMenuActionInLoadDotJson
-            = new QAction(tr("Run this function when loaded"), cMenu);
-        cMenuActionInLoadDotJson->setCheckable(true);
-        cMenuActionInLoadDotJson->setChecked(isStringInTagFile(dirPath +
-                                                               "/data/minecraft/tags/functions/load.json",
-                                                               filePathId));
-        connect(cMenuActionInLoadDotJson, &QAction::triggered, this,
-                [this, filePathId](bool checked) {
-            this->contextMenuModifyTagFile
-                (dirPath + "/data/minecraft/tags/functions/load.json",
-                filePathId, checked);
-        });
-        cMenu->addAction(cMenuActionInLoadDotJson);
+        QAction *cMenuActionCopyId =
+            new QAction(tr("Copy namespaced ID"), cMenu);
+        if (filePathId.isEmpty())
+            cMenuActionCopyId->setDisabled(true);
+        connect(cMenuActionCopyId, &QAction::triggered,
+                this, &DatapackTreeView::contextMenuOnCopyId);
+        cMenu->addAction(cMenuActionCopyId);
 
-        QAction *cMenuActionInTickDotJson
-            = new QAction(tr("Run this function every tick"), cMenu);
-        cMenuActionInTickDotJson->setCheckable(true);
-        cMenuActionInTickDotJson->setChecked(isStringInTagFile
-                                                 (dirPath +
-                                                 "/data/minecraft/tags/functions/tick.json",
-                                                 filePathId));
-        connect(cMenuActionInTickDotJson, &QAction::triggered, this,
-                [this, filePathId](bool checked) {
-            this->contextMenuModifyTagFile
-                (dirPath + "/data/minecraft/tags/functions/tick.json",
-                filePathId, checked);
-        });
-        cMenu->addAction(cMenuActionInTickDotJson);
+        if (fileType == CodeFile::Function) {
+            QAction *cMenuActionInLoadDotJson
+                = new QAction(tr("Run this function when loaded"), cMenu);
+            cMenuActionInLoadDotJson->setCheckable(true);
+            cMenuActionInLoadDotJson->setChecked(isStringInTagFile(dirPath +
+                                                                   "/data/minecraft/tags/functions/load.json",
+                                                                   filePathId));
+            connect(cMenuActionInLoadDotJson, &QAction::triggered, this,
+                    [this, filePathId](bool checked) {
+                this->contextMenuModifyTagFile
+                    (dirPath +
+                    QStringLiteral("/data/minecraft/tags/functions/load.json"),
+                    filePathId, checked);
+            });
+            cMenu->addAction(cMenuActionInLoadDotJson);
+
+            QAction *cMenuActionInTickDotJson
+                = new QAction(tr("Run this function every tick"), cMenu);
+            cMenuActionInTickDotJson->setCheckable(true);
+            cMenuActionInTickDotJson->setChecked(
+                isStringInTagFile(dirPath +
+                                  QStringLiteral(
+                                      "/data/minecraft/tags/functions/tick.json"),
+                                  filePathId));
+            connect(cMenuActionInTickDotJson, &QAction::triggered, this,
+                    [this, filePathId](bool checked) {
+                this->contextMenuModifyTagFile
+                    (dirPath +
+                    QStringLiteral("/data/minecraft/tags/functions/tick.json"),
+                    filePathId, checked);
+            });
+            cMenu->addAction(cMenuActionInTickDotJson);
+        }
     }
+
 
     if (path != QStringLiteral("data") &&
         path != QStringLiteral("pack.mcmeta")) {
@@ -488,10 +506,10 @@ void DatapackTreeView::contextMenuOnRename() {
 
 void DatapackTreeView::contextMenuOnDelete() {
     /*QModelIndex selected = getSelected(); */
-    QModelIndex selected = indexAt(cMenuPos);
+    QModelIndex &&selected = indexAt(cMenuPos);
 
     if (selected.isValid()) {
-        auto filepath = dirModel.filePath(selected);
+        QString &&filepath = dirModel.filePath(selected);
         dirModel.remove(selected);
         if (isStringInTagFile(dirPath +
                               "/data/minecraft/tags/functions/load.json",
@@ -506,6 +524,15 @@ void DatapackTreeView::contextMenuOnDelete() {
                 (dirPath + "/data/minecraft/tags/functions/tick.json",
                 Glhp::toNamespacedID(dirPath, filepath), false);
         emit fileDeteted(filepath);
+    }
+}
+
+void DatapackTreeView::contextMenuOnCopyId() {
+    QModelIndex &&selected = indexAt(cMenuPos);
+
+    if (selected.isValid()) {
+        QString &&filepath = dirModel.filePath(selected);
+        qApp->clipboard()->setText(Glhp::toNamespacedID(dirPath, filepath));
     }
 }
 
