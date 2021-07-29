@@ -14,11 +14,11 @@ int main(int argc, char *argv[]) {
     /*qDebug() << "Starting application..."; */
     QApplication a(argc, argv);
 
-    /*qDebug() << QStyleFactory::keys(); */
-    /*
+    /*qDebug() << QStyleFactory::keys();
+     *
        a.setStyle("windowsvista");
        a.setStyle("Windows");
-        a.setStyle("Fusion");
+       a.setStyle("fusion");
      */
 
     QCoreApplication::setOrganizationName("IoeCmcomc");

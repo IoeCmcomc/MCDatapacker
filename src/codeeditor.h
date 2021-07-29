@@ -4,8 +4,13 @@
 #include <QPlainTextEdit>
 #include <QPointer>
 #include <QSettings>
+#include <QStringList>
 
 #include "codefile.h"
+
+QT_BEGIN_NAMESPACE
+class QCompleter;
+QT_END_NAMESPACE
 
 struct TextFileData {
     CodeFile               *parent      = nullptr;
@@ -43,6 +48,10 @@ public:
     bool getCanRedo() const;
     int problemCount() const;
 
+    void setCompleter(QCompleter *c);
+    QCompleter *completer() const;
+
+
 signals:
     void openFileRequest(const QString &filepath);
     void updateStatusBarRequest(CodeEditor *editor);
@@ -56,6 +65,7 @@ protected:
     void dropEvent(QDropEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
     bool event(QEvent *event) override;
+    void focusInEvent(QFocusEvent *e) override;
 
 private /*slots*/ :
     void updateLineNumberAreaWidth(int newBlockCount);
@@ -66,14 +76,17 @@ private /*slots*/ :
     void toggleComment();
     void onUndoAvailable(bool value);
     void onRedoAvailable(bool value);
+    void insertCompletion(const QString &completion);
 
 private:
     QFont monoFont;
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
+    QStringList minecraftCompletionInfo;
     QSettings settings;
     QWidget *lineNumberArea;
+    QCompleter *m_completer        = nullptr;
     CodeFile::FileType curFileType = CodeFile::Text;
     QString filepath;
     Highlighter *curHighlighter;
@@ -92,6 +105,9 @@ private:
                            int numRightParentheses, bool isPrimary);
     void createBracketSelection(int pos, bool isPrimary);
     void followNamespacedId(const QMouseEvent *event);
+
+    QString textUnderCursor() const;
+    void handleKeyPressEvent(QKeyEvent *e);
 };
 
 

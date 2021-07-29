@@ -544,6 +544,9 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
     return m_parsingResult;
 }
 
+/*!
+ * \brief Try to cast a void pointer in \c vari to a QSharedPointer of ParseNode's subclass.
+ */
 QSharedPointer<Command::ParseNode> Command::Parser::
 QVariantToParseNodeSharedPointer(
     const QVariant &vari) {

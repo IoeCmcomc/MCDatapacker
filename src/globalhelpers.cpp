@@ -169,26 +169,43 @@ QString Glhp::variantToStr(const QVariant &vari) {
         return vari.toString();
 }
 
-QVector<QString> Glhp::fileIDList(const QString &dirpath,
-                                  const QString &catDir,
+QVector<QString> Glhp::fileIDList(const QString &dirpath, const QString &catDir,
                                   const QString &nspace) {
     QVector<QString> IDList;
     const QString  &&dataPath = dirpath + QStringLiteral("/data/");
 
-    auto &&appendIDToList =
-        [&dataPath, &catDir, &IDList](const QString &nspace)->void {
-            QString tagPath = dataPath + nspace + '/' + catDir;
-            QDir    IDDir(tagPath);
+    auto &&appendPerCategory =
+        [&dataPath, &IDList](const QString &nspace,
+                             const QString &catDir)->void {
+            QString dirPath = dataPath + nspace + '/' +
+                              catDir;
+            QDir IDDir(dirPath);
 
             if (IDDir.exists() && (!IDDir.isEmpty())) {
                 auto &&names = IDDir.entryList(
                     QDir::Files | QDir::NoDotAndDotDot);
                 for (auto &&name : names) {
                     name = name.section('.', 0, 0);
-                    IDList.push_back(nspace + ":" + name);
+                    IDList.push_back(nspace + ":" +
+                                     name);
                 }
             }
         };
+
+    auto &&appendIDToList =
+        [appendPerCategory](const QString &nspace,
+                            const QString &catDir)->void {
+            if (!catDir.isEmpty()) {
+                appendPerCategory(nspace, catDir);
+            } else {
+                appendPerCategory(nspace, "advancements");
+                appendPerCategory(nspace, "functions");
+                appendPerCategory(nspace, "loot_tables");
+                appendPerCategory(nspace, "predicates");
+                appendPerCategory(nspace, "recipes");
+            }
+        };
+
 
     if (nspace.isEmpty()) {
         QDir   dir(dataPath);
@@ -196,10 +213,10 @@ QVector<QString> Glhp::fileIDList(const QString &dirpath,
             QDir::Dirs | QDir::NoDotAndDotDot);
         for (const auto &nspaceDir : nspaceDirs) {
             auto nspace = nspaceDir.section('.', 0, 0);
-            appendIDToList(nspace);
+            appendIDToList(nspace, catDir);
         }
     } else {
-        appendIDToList(nspace);
+        appendIDToList(nspace, catDir);
     }
     return IDList;
 }
