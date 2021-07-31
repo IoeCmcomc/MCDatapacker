@@ -5,7 +5,7 @@
 
 TEMPLATE = lib
 
-CONFIG += c++17
+CONFIG += c++17 staticlib
 
 HEADERS = \
    $$PWD/nbt-cpp/include/nbt.hpp \

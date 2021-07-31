@@ -88,7 +88,6 @@ private:
 
     bool maybeSave(int index);
     void retranslate();
-    void printPanOffsets();
     QTextDocument *getDocAt(int index) const;
     void saveFileData(int index);
 };

@@ -350,7 +350,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
 
     if (completionPrefix != m_completer->completionPrefix()) {
         QStringList completionInfo = minecraftCompletionInfo;
-        completionInfo += Glhp::fileIDList(QDir::currentPath()).toList();
+        completionInfo += Glhp::fileIdList(QDir::currentPath()).toList();
         completionInfo.removeDuplicates();
         completionInfo.sort(Qt::CaseInsensitive);
         if (auto *model =

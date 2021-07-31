@@ -1,5 +1,8 @@
 #include "globalhelpers.h"
 
+#include "mainwindow.h"
+#include "vieweventfilter.h"
+
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
@@ -169,24 +172,23 @@ QString Glhp::variantToStr(const QVariant &vari) {
         return vari.toString();
 }
 
-QVector<QString> Glhp::fileIDList(const QString &dirpath, const QString &catDir,
+QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
                                   const QString &nspace) {
-    QVector<QString> IDList;
+    QVector<QString> idList;
     const QString  &&dataPath = dirpath + QStringLiteral("/data/");
 
     auto &&appendPerCategory =
-        [&dataPath, &IDList](const QString &nspace,
+        [&dataPath, &idList](const QString &nspace,
                              const QString &catDir)->void {
-            QString dirPath = dataPath + nspace + '/' +
-                              catDir;
-            QDir IDDir(dirPath);
+            ;
+            QDir IDDir(dataPath + nspace + '/' + catDir);
 
             if (IDDir.exists() && (!IDDir.isEmpty())) {
                 auto &&names = IDDir.entryList(
                     QDir::Files | QDir::NoDotAndDotDot);
                 for (auto &&name : names) {
                     name = name.section('.', 0, 0);
-                    IDList.push_back(nspace + ":" +
+                    idList.push_back(nspace + ":" +
                                      name);
                 }
             }
@@ -218,17 +220,7 @@ QVector<QString> Glhp::fileIDList(const QString &dirpath, const QString &catDir,
     } else {
         appendIDToList(nspace, catDir);
     }
-    return IDList;
-}
-
-void Glhp::deleteChildrenIn(QWidget *widget) {
-    /*widget->setUpdatesEnabled(false); */
-    auto children = widget->findChildren<QWidget*>
-                        (QString(), Qt::FindDirectChildrenOnly);
-
-    for (auto child : children)
-        child->deleteLater();
-    /*widget->setUpdatesEnabled(true); */
+    return idList;
 }
 
 bool Glhp::removePrefix(QString &str, const QString &prefix) {

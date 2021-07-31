@@ -7,6 +7,8 @@ QT = core gui widgets
 
 TEMPLATE = lib
 
+CONFIG += staticlib
+
 HEADERS = \
    $$PWD/QFindDialogs/src/finddialog.h \
    $$PWD/QFindDialogs/src/findreplacedialog.h

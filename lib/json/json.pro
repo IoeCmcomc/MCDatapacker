@@ -5,6 +5,8 @@
 
 TEMPLATE = lib
 
+CONFIG += staticlib
+
 HEADERS = \
    $$PWD/json/single_include/nlohmann/json.hpp
 

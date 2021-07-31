@@ -671,7 +671,7 @@ void MCRPredCondition::setupRefCombo() {
     /*qDebug() << "setupRefCombo"; */
     if (condRefsModel.rowCount() > 0)
         condRefsModel.clear();
-    auto predRefIDs = Glhp::fileIDList(QDir::currentPath(),
+    auto predRefIDs = Glhp::fileIdList(QDir::currentPath(),
                                        "predicates");
 
     for (const auto &predRef : qAsConst(predRefIDs))

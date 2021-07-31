@@ -143,6 +143,9 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
         if (ok) {
             curFile.changePath(filepath);
             data.doc->setModified(false);
+            if (index != getCurIndex())
+                updateTabTitle(index, false);
+            files[index].isModified = false;
         }
 
         return ok;
@@ -225,7 +228,8 @@ CodeFile TabbedDocumentInterface::readFile(const QString &path) {
             QString content;
             while (!in.atEnd()) {
                 content += in.readLine();
-                if (!in.atEnd()) content += '\n';
+                if (!in.atEnd())
+                    content += '\n';
                 ++c;
             }
 
@@ -443,21 +447,6 @@ void TabbedDocumentInterface::changeEvent(QEvent *event) {
         retranslate();
 }
 
-void TabbedDocumentInterface::printPanOffsets() {
-    QStringList panOffsets;
-
-    for (const auto &file: qAsConst(files)) {
-        if (file.data.canConvert<ImageFileData>()) {
-            const auto &data = qvariant_cast<ImageFileData>(file.data);
-            panOffsets <<
-                QString("(%1, %2)").arg(data.offsetX).arg(data.offsetY);
-        } else {
-            panOffsets << "<Not an image>";
-        }
-    }
-    qDebug() << "Pan offsets: " << panOffsets.join(", ");
-}
-
 void TabbedDocumentInterface::saveFileData(int index) {
     auto &file = files[index];
 
@@ -484,9 +473,6 @@ QTextDocument *TabbedDocumentInterface::getDocAt(int index) const {
 
 void TabbedDocumentInterface::onTabChanged(int index) {
     /*qDebug() << "Change to tab" << index << '/' << count(); */
-    /*printPanOffsets(); */
-
-    /*QString &&ptrStrBefore = QString::number((int)lastRemovedDoc, 16); */
 
     if (index > -1) {
         if (prevIndex > -1)
@@ -533,27 +519,6 @@ void TabbedDocumentInterface::onTabChanged(int index) {
 
     prevIndex         = index;
     tabMovedOrRemoved = false;
-
-/*
-      for (int i = 0; i < ui->tabBar->count(); ++i) {
-          const auto &file = files[i];
-          if (file.data.canConvert<TextFileData>()) {
-              const auto &data   = qvariant_cast<TextFileData>(file.data);
-              QString   &&ptrStr = QString::number((int)data.doc.data(), 16);
-              ui->tabBar->setTabText(i, ptrStr);
-          }
-      }
- */
-
-/*
-      QString &&ptrStrAfter = QString::number((int)lastRemovedDoc, 16);
-      QTimer::singleShot(1, [this, ptrStrAfter, ptrStrBefore]() {
-          window()->setWindowTitle(ptrStrBefore + " -> " + ptrStrAfter);
-      });
- */
-
-
-    /*printPanOffsets(); */
 }
 
 void TabbedDocumentInterface::onTabMoved(int from, int to) {

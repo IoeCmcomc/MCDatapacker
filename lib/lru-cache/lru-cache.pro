@@ -5,6 +5,8 @@
 
 TEMPLATE = lib
 
+CONFIG += staticlib
+
 HEADERS = \
    $$PWD/lru-cache/include/lru/internal/base-cache.hpp \
    $$PWD/lru-cache/include/lru/internal/base-iterator.hpp \
