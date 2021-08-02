@@ -31,7 +31,8 @@ Command::EntityNode::EntityNode(
     case Variable::E:
         break;
 
-    case Variable::P: {
+    case Variable::P:
+    case Variable::R: {
         m_playerOnly = true;
         m_singleOnly = true;
         break;
@@ -71,7 +72,7 @@ QString Command::EntityNode::toString() const {
                 m_PtrVari.value<QSharedPointer<UuidNode> >());
         } else {
             qFatal(
-                "Cannot cast value in EntityNode to QSharedPointer<ParseNode>");
+                "Cannot cast value in EntityNode to a QSharedPointer<ParseNode>");
         }
         ret += argNode->toString();
     }

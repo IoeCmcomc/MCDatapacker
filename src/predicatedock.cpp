@@ -14,9 +14,6 @@ PredicateDock::PredicateDock(QWidget *parent) :
     QDockWidget(parent), ui(new Ui::PredicateDock) {
     ui->setupUi(this);
 
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
-    } else {
-    }
     /*resize(minimumWidth(), height()); */
 
     connect(ui->readBtn, &QPushButton::clicked,
@@ -25,7 +22,6 @@ PredicateDock::PredicateDock(QWidget *parent) :
             this, &PredicateDock::onWriteBtn);
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
         adjustSize();
-        qDebug() << minimumWidth() << width() << floating;
         if (floating) {
             resize(minimumWidth(), height());
         }

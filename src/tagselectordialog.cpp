@@ -6,7 +6,6 @@
 #include "mainwindow.h"
 
 #include <QDebug>
-#include <QElapsedTimer>
 #include <QDir>
 #include <QFileInfo>
 
@@ -15,9 +14,6 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
     QDialog(parent),
     ui(new Ui::TagSelectorDialog) {
     ui->setupUi(this);
-
-    QElapsedTimer timer;
-    timer.start();
 
     filterModel.setParent(ui->tagListView);
     model.setParent(this);
@@ -46,7 +42,6 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
             &TagSelectorDialog::accept);
 
     checkOK();
-    qDebug() << timer.elapsed();
 }
 
 TagSelectorDialog::~TagSelectorDialog() {

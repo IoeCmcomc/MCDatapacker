@@ -9,10 +9,17 @@
 #include <QStyleFactory>
 
 int main(int argc, char *argv[]) {
+    qSetMessagePattern(
+        "%{time}%{if-debug} (%{file}:%{line})%{endif} - %{type}%{if-category} - [%{category}]%{endif}: %{message}");
+
+    QCoreApplication::setOrganizationName("IoeCmcomc");
+    QCoreApplication::setApplicationName("MCDatapacker");
+    QCoreApplication::setApplicationVersion("0.4.0");
+
     /*Q_INIT_RESOURCE(application); */
 
-    /*qDebug() << "Starting application..."; */
     QApplication a(argc, argv);
+    qInfo() << "Appication started.";
 
     /*qDebug() << QStyleFactory::keys();
      *
@@ -21,9 +28,6 @@ int main(int argc, char *argv[]) {
        a.setStyle("fusion");
      */
 
-    QCoreApplication::setOrganizationName("IoeCmcomc");
-    QCoreApplication::setApplicationName("MCDatapacker");
-    QCoreApplication::setApplicationVersion("0.4.0");
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();

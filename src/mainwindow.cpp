@@ -314,10 +314,11 @@ void MainWindow::restart() {
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
-    settings.beginGroup("general");
-    /*qDebug() << settings.value("locale", "").toString(); */
-    loadLanguage(settings.value("locale", "").toString(), true);
-    const QString gameVer = settings.value("gameVersion", "1.15").toString();
+    settings.beginGroup(QStringLiteral("general"));
+    loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
+                 true);
+    const QString gameVer = settings.value(QStringLiteral("gameVersion"),
+                                           QStringLiteral("1.15")).toString();
 
     if (gameVer != getCurGameVersion().toString()) {
         if (fromDialog) {
@@ -341,7 +342,6 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                                   getCurGameVersion().toString());
             }
         } else {
-            qDebug() << "Game version was changed to" << gameVer;
             MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                            MainWindow::readMCRInfo(
                                                QStringLiteral("block"),
@@ -351,6 +351,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                                                QStringLiteral("item"),
                                                gameVer));
             MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
+            qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);
         }
     }
@@ -490,32 +491,37 @@ QString MainWindow::getCurLocale() {
     return this->curLocale.name();
 }
 
-void MainWindow::loadLanguage(const QString& rLanguage, bool atStartup) {
+void MainWindow::loadLanguage(const QString &rLanguage, bool atStartup) {
     if ((curLocale.name() != rLanguage) || atStartup) {
         curLocale = QLocale(rLanguage);
         QLocale::setDefault(curLocale);
-        /*qDebug() << QLocale::system(); */
-        QString transfile;
-        if (rLanguage.isEmpty())
-            transfile = QString("MCDatapacker_%1.qm").arg(
-                QLocale::system().name());
-        else
-            transfile = QString("MCDatapacker_%1.qm").arg(rLanguage);
-        switchTranslator(m_translator, transfile);
+        QString &&translationFile = QString("MCDatapacker_%1.qm").arg(
+            (rLanguage.isEmpty()) ? QLocale::system().name() : rLanguage);
+        switchTranslator(m_translator, translationFile);
         switchTranslator(m_translatorQt, QString("qt_%1.qm").arg(rLanguage));
     }
 }
 
-void MainWindow::switchTranslator(QTranslator& translator,
-                                  const QString& filename) {
+void MainWindow::switchTranslator(QTranslator &translator,
+                                  const QString &filename) {
     qApp->removeTranslator(&translator);
 
     QString path = QApplication::applicationDirPath() + QStringLiteral(
         "/translations/");
-    if (translator.load(path + filename))
+    if (translator.load(path + filename)) {
         qApp->installTranslator(&translator);
-    else if (translator.load(QStringLiteral(":/i18n/") + filename))
+        qInfo() << "External translation file has been loaded successully:" <<
+        filename;
+    } else if (translator.load(QStringLiteral(":/i18n/") + filename)) {
+        qWarning() << "Cannot load external translation file:" <<
+            filename <<
+            "Attempting to load the corresponding internal translation instead.";
         qApp->installTranslator(&translator);
+        qInfo() << "Internal translation file has been loaded successully:" <<
+        filename;
+    } else {
+        qWarning() << "Cannot load internal translation file:" << filename;
+    }
 }
 
 void MainWindow::adjustForCurFolder(const QString &path) {

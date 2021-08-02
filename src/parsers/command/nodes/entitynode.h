@@ -30,7 +30,7 @@ public:
                     m_PtrVari.value<QSharedPointer<UuidNode> >());
             } else {
                 qFatal(
-                    "Cannot cast value in EntityNode to QSharedPointer<ParseNode>");
+                    "Cannot cast value in EntityNode to a QSharedPointer<ParseNode>");
             }
             argNode->accept(visitor);
             visitor->visit(this);

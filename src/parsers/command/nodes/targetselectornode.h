@@ -13,7 +13,7 @@ public:
             E,
             P,
             R,
-            S
+            S,
         };
 
         TargetSelectorNode(int pos);
