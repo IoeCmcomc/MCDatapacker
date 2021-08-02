@@ -5,6 +5,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QRandomGenerator>
 
@@ -22,7 +23,7 @@ QString Glhp::randStr(int length) {
 }
 
 QString Glhp::relPath(const QString &dirpath, QString path) {
-    QString dataDir = dirpath + "/";
+    const QString &&dataDir = dirpath + "/";
 
     if (!removePrefix(path, dataDir))
         return QString();
@@ -31,13 +32,13 @@ QString Glhp::relPath(const QString &dirpath, QString path) {
 }
 
 QString Glhp::relNamespace(const QString &dirpath, QString path) {
-    QString rp = relPath(dirpath, std::move(path));
+    QString &&rp = relPath(dirpath, std::move(path));
 
     if (removePrefix(rp, QStringLiteral("data/")))
         rp = rp.section('/', 0, 0);
     else
-        rp = "";
-    return rp;
+        rp.clear();
+    return std::move(rp);
 }
 
 CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
@@ -45,11 +46,12 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    QFileInfo                info       = QFileInfo(filepath);
-    const QString            fullSuffix = info.suffix();
-    static const QStringList imageExts  =
+    static const QStringList imageExts =
     { QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
       QStringLiteral("bmp") };
+
+    QFileInfo       info(filepath);
+    const QString &&fullSuffix = info.suffix();
 
     if (fullSuffix == QStringLiteral("mcmeta")) {
         return CodeFile::Meta;
@@ -126,7 +128,9 @@ bool Glhp::isPathRelativeTo(const QString &dirpath,
     return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
 }
 
-QString Glhp::toNamespacedID(const QString &dirpath, QString filepath) {
+QString Glhp::toNamespacedID(const QString &dirpath,
+                             QString filepath,
+                             bool noTagForm) {
     const QString &&datapath = dirpath + QStringLiteral("/data/");
     QString         r;
 
@@ -134,15 +138,17 @@ QString Glhp::toNamespacedID(const QString &dirpath, QString filepath) {
         const auto &&finfo = QFileInfo(filepath);
         filepath = finfo.dir().path() + '/' + finfo.completeBaseName();
         filepath.remove(0, datapath.length());
-        if (isPathRelativeTo(dirpath, finfo.filePath(),
-                             QStringLiteral("tags"))) {
-            if (filepath.split('/').count() >= 4)
+        if (!noTagForm && isPathRelativeTo(dirpath, finfo.filePath(),
+                                           QStringLiteral("tags"))) {
+            if (filepath.split('/').count() >= 4) {
                 r = "#" + filepath.section('/', 0, 0)
                     + ':' + filepath.section('/', 3);
+            }
         } else {
-            if (filepath.split('/').count() >= 3)
+            if (filepath.split('/').count() >= 3) {
                 r = filepath.section('/', 0, 0)
                     + ':' + filepath.section('/', 2);
+            }
         }
     }
     return r;
@@ -173,23 +179,22 @@ QString Glhp::variantToStr(const QVariant &vari) {
 }
 
 QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
-                                  const QString &nspace) {
+                                  const QString &nspace, bool noTagForm) {
     QVector<QString> idList;
     const QString  &&dataPath = dirpath + QStringLiteral("/data/");
 
     auto &&appendPerCategory =
-        [&dataPath, &idList](const QString &nspace,
-                             const QString &catDir)->void {
-            ;
-            QDir IDDir(dataPath + nspace + '/' + catDir);
+        [noTagForm, &dirpath, &dataPath, &idList](const QString &nspace,
+                                                  const QString &catDir)->void {
+            QDir idDir(dataPath + nspace + '/' + catDir);
 
-            if (IDDir.exists() && (!IDDir.isEmpty())) {
-                auto &&names = IDDir.entryList(
-                    QDir::Files | QDir::NoDotAndDotDot);
-                for (auto &&name : names) {
-                    name = name.section('.', 0, 0);
-                    idList.push_back(nspace + ":" +
-                                     name);
+            if (idDir.exists() && (!idDir.isEmpty())) {
+                QDirIterator it(idDir.path(),
+                                { "*.mcfunction", "*.json", "*.nbt" },
+                                QDir::Files | QDir::NoDotAndDotDot,
+                                QDirIterator::Subdirectories);
+                while (it.hasNext()) {
+                    idList << toNamespacedID(dirpath, it.next(), noTagForm);
                 }
             }
         };
@@ -211,11 +216,9 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
 
     if (nspace.isEmpty()) {
         QDir   dir(dataPath);
-        auto &&nspaceDirs = dir.entryList(
-            QDir::Dirs | QDir::NoDotAndDotDot);
+        auto &&nspaceDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for (const auto &nspaceDir : nspaceDirs) {
-            auto nspace = nspaceDir.section('.', 0, 0);
-            appendIDToList(nspace, catDir);
+            appendIDToList(nspaceDir.section('.', 0, 0), catDir);
         }
     } else {
         appendIDToList(nspace, catDir);

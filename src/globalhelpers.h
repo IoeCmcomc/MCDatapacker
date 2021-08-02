@@ -18,12 +18,14 @@ namespace Glhp {
                                       const QString &filepath);
     QIcon fileTypeToIcon(const CodeFile::FileType type);
 
-    QString toNamespacedID(const QString &dirpath, QString filepath);
+    QString toNamespacedID(const QString &dirpath, QString filepath,
+                           bool noTagForm = false);
     QVariant strToVariant(const QString &str);
     QString variantToStr(const QVariant &vari);
     QVector<QString> fileIdList(const QString &dirpath,
                                 const QString &catDir = QString(),
-                                const QString &nspace = QString());
+                                const QString &nspace = QString(),
+                                bool noTagForm        = true);
 
     bool removePrefix(QString &str, const QString &prefix);
 }

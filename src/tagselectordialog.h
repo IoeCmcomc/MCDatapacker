@@ -32,7 +32,7 @@ private:
     Ui::TagSelectorDialog *ui;
     QStandardItemModel model;
     QSortFilterProxyModel filterModel;
-    QPushButton *selectButton;
+    QPushButton *selectButton = nullptr;
     QMap<QString, QVariant> MCRTagInfo;
 
     void setupTagTreeView(CodeFile::FileType type);

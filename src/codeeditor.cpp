@@ -44,9 +44,11 @@ QStringList getMinecraftInfoKeys(const QString &key) {
     } else {
         infoMap = MainWindow::readMCRInfo(key);
     }
-    qDebug() << key << infoMap.size();
-    qDebug() << "getMinecraftInfoKeys() exec time:" << timer.nsecsElapsed() /
-        1e6;
+/*
+      qDebug() << key << infoMap.size();
+      qDebug() << "getMinecraftInfoKeys() exec time:" << timer.nsecsElapsed() /
+          1e6;
+ */
     return infoMap.keys();
 }
 
@@ -89,16 +91,18 @@ QStringList loadMinecraftCommandLiterals(const QJsonObject &obj = QJsonObject(),
         const QString &nodeType = node[QStringLiteral("type")].toString();
         if (nodeType == QStringLiteral("literal")) {
             ret << it.key();
-            qDebug() << "literal:" << it.key() << "depth:" << depth;
+            /*qDebug() << "literal:" << it.key() << "depth:" << depth; */
             ret += loadMinecraftCommandLiterals(node, depth + 1);
         } else if (nodeType == QStringLiteral("argument")) {
-            qDebug() << "argument:" << it.key() << "depth:" << depth;
+            /*qDebug() << "argument:" << it.key() << "depth:" << depth; */
             ret += loadMinecraftCommandLiterals(node, depth + 1);
         }
     }
-    qDebug() << "function literals" << ret.size();
-    qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
-        timer.nsecsElapsed() / 1e6;
+/*
+      qDebug() << "function literals" << ret.size();
+      qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
+          timer.nsecsElapsed() / 1e6;
+ */
     return ret;
 }
 
@@ -245,18 +249,17 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
 }
 
 void startOfWordExtended(QTextCursor &tc) {
-    static const QString extendedAcceptedCharsset(".:");
+    static const QString extendedAcceptedCharsset("#.:/");
 
     while (true) {
         /* Move cursor to the left of the word */
         tc.select(QTextCursor::WordUnderCursor);
-        /*qDebug() << "WordUnderCursor" << tc.selectedText(); */
         tc.setPosition(tc.anchor());
 
         /* Get the character to the left of the cursor */
         tc.movePosition(QTextCursor::PreviousCharacter,
                         QTextCursor::KeepAnchor);
-        QChar &&curChar = tc.selectedText()[0];
+        const QChar &curChar = *tc.selectedText().constBegin();
 
         if (extendedAcceptedCharsset.contains(curChar)) {
             tc.movePosition(QTextCursor::PreviousCharacter);
@@ -336,7 +339,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (!m_completer || (ctrlOrShift && e->text().isEmpty()))
         return;
 
-    const static QString eow("~@#$%^&*()+{}|\"<>?,./;'[]\\-="); /* end of word */
+    const static QString eow("~@$%^&*()+{}|\"<>?,;'[]\\-="); /* end of word */
     const bool           hasModifier =
         (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     const QString &&completionPrefix = textUnderCursor();
@@ -349,17 +352,20 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     }
 
     if (completionPrefix != m_completer->completionPrefix()) {
-        QStringList completionInfo = minecraftCompletionInfo;
-        completionInfo += Glhp::fileIdList(QDir::currentPath()).toList();
-        completionInfo.removeDuplicates();
-        completionInfo.sort(Qt::CaseInsensitive);
-        if (auto *model =
-                qobject_cast<QStringListModel*>(m_completer->model())) {
-            model->setStringList(completionInfo);
+        if (m_completer->popup()->isHidden()) {
+            QStringList completionInfo = minecraftCompletionInfo;
+            completionInfo += Glhp::fileIdList(QDir::currentPath(), QString(),
+                                               QString(), false).toList();
+            completionInfo.removeDuplicates();
+            completionInfo.sort(Qt::CaseInsensitive);
+            if (auto *model =
+                    qobject_cast<QStringListModel*>(m_completer->model())) {
+                model->setStringList(completionInfo);
+            }
+            qDebug() << minecraftCompletionInfo.size() <<
+                m_completer->model()->rowCount() <<
+                m_completer->completionModel()->rowCount();
         }
-        qDebug() << minecraftCompletionInfo.size() <<
-            m_completer->model()->rowCount() <<
-            m_completer->completionModel()->rowCount();
 
         m_completer->setCompletionPrefix(completionPrefix);
         m_completer->popup()->setCurrentIndex(

@@ -92,8 +92,7 @@ void TagSelectorDialog::setupTagTreeView(
         tagStrSub += 's';
     auto tagDir = tagStrSplited.join('/');
 
-    auto fileIDList =
-        Glhp::fileIdList(QDir::currentPath(), tagDir);
+    auto fileIDList = Glhp::fileIdList(QDir::currentPath(), tagDir);
     for (const auto &id : fileIDList) {
         model.appendRow(new QStandardItem(id));
     }
@@ -102,12 +101,10 @@ void TagSelectorDialog::setupTagTreeView(
 
     QMap<QString,
          QVariant>::const_iterator tagIter = MCRTagInfo.constBegin();
-    int                            c       = 0;
     while ((tagIter != MCRTagInfo.constEnd())) {
-        QStandardItem *item = new QStandardItem();
-        item->setText("minecraft:" + tagIter.key());
+        auto *item = new QStandardItem(
+            QStringLiteral("minecraft:") + tagIter.key());
         model.appendRow(item);
-        ++c;
         ++tagIter;
     }
 }
