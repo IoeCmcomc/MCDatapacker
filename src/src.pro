@@ -34,6 +34,7 @@ SOURCES += \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
     extendeddelegate.cpp \
+    filenamedelegate.cpp \
     fileswitcher.cpp \
     globalhelpers.cpp \
     highlighter.cpp \
@@ -116,6 +117,7 @@ HEADERS += \
     disclaimerdialog.h \
     entityconditiondialog.h \
     extendeddelegate.h \
+    filenamedelegate.h \
     fileswitcher.h \
     globalhelpers.h \
     highlighter.h \

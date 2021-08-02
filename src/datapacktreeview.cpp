@@ -1,9 +1,10 @@
 #include "datapacktreeview.h"
 
+#include "filenamedelegate.h"
+
 #include "mainwindow.h"
 #include "globalhelpers.h"
 
-#include <QDebug>
 #include <QModelIndex>
 #include <QFile>
 #include <QDropEvent>
@@ -21,10 +22,8 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
     dirModel.setIconProvider(&iconProvider);
 
-/*
-      connect(this, SIGNAL(doubleClicked(QModelIndex)), this,
-              SLOT(onDoubleClicked(QModelIndex)));
- */
+    setItemDelegateForColumn(0, new FileNameDelegate(this));
+
     connect(this, &QTreeView::doubleClicked,
             this, &DatapackTreeView::onDoubleClicked);
     connect(this, &QTreeView::expanded,
@@ -366,11 +365,11 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
 
         QDir tmpDir;
         if (!catDir.isEmpty()) {
-            QString pathWithNspace = dirPath + "/data/"
+            QString pathWithNspace = dirPath + QStringLiteral("/data/")
                                      + ((nspace.isEmpty()) ? Glhp::relNamespace(
                                             dirPath,
                                             finfo.filePath()) : nspace);
-            tmpDir = QDir(pathWithNspace);
+            tmpDir.setPath(pathWithNspace);
             if (!tmpDir.exists())
                 return QModelIndex();
 
