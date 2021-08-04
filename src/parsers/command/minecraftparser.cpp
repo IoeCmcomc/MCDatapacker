@@ -10,9 +10,11 @@ Command::MinecraftParser::MinecraftParser(QObject *parent,
                                           const QString &input)
     : Command::Parser(parent, input) {
     /*printMethods(); */
-    connect(this, &QObject::destroyed, [ = ](QObject *obj) {
-        qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
-    });
+/*
+      connect(this, &QObject::destroyed, [ = ](QObject *obj) {
+          qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
+      });
+ */
 }
 
 QSharedPointer<Command::ParseNode> Command::MinecraftParser::
@@ -78,7 +80,7 @@ QVariantToParseNodeSharedPointer(const QVariant &vari) {
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ParticleNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ParticleColorNode)
     QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ItemPredicateNode)
-    qWarning() << "cannot cast" << vari << "to QSharedPointer<ParseNode>>";
+    qWarning() << "Cannot cast" << vari << "to QSharedPointer<ParseNode>>";
     return nullptr;
 }
 
@@ -94,8 +96,8 @@ QString Command::MinecraftParser::oneOf(QStringList strArr) {
             return str;
         }
     }
-    this->error(QT_TR_NOOP(
-                    "Only accept one of the following: %1"),
+    this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                  "Only accept one of the following: %1"),
                 { strArr.join(',') }, start, peekLiteral().length());
     return QString();
 }
@@ -108,8 +110,8 @@ QSharedPointer<Command::AxisNode> Command::MinecraftParser::parseAxis(
     const bool    canBeLocal     = options & AxisParseOption::CanBeLocal;
     const bool    onlyInt        = options & AxisParseOption::OnlyInteger;
     const QString mixCoordErrMsg =
-        QT_TR_NOOP(QStringLiteral(
-                       "Cannot mix world & local coordinates (everything must either use ^ or not)."));
+        QT_TRANSLATE_NOOP("Command:Parser::Error",
+                          "Cannot mix world & local coordinates (everything must either use ^ or not).");
     const auto axisVal = [ = ](const QSharedPointer<AxisNode> &axis) {
                              if (onlyInt) {
                                  const auto intNode = brigadier_integer();
@@ -238,7 +240,8 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
             const QString value =
                 getWithCharset(QStringLiteral("a-zA-Z0-9-_."));
             if (value.isEmpty())
-                error(QT_TR_NOOP("Invaild empty tag value"));
+                error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                        "Invaild empty tag value"));
             return QSharedPointer<Command::NbtStringNode>::create(
                 startPos, value);
         }
@@ -263,7 +266,8 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
                                                                 number->length(),
                                                                 (int8_t)integer);
         else
-            error(QT_TR_NOOP("%1 is not a vaild SNBT byte tag"),
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "%1 is not a vaild SNBT byte tag"),
                   { literal.toString() }, number->pos(), number->length());
     }
 
@@ -282,8 +286,8 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
                                                                  number->length(),
                                                                  value);
         else
-            error(QT_TR_NOOP(
-                      "%1 is not a vaild SNBT float tag"),
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "%1 is not a vaild SNBT float tag"),
                   { literal.toString() }, number->pos(), number->length());
     }
 
@@ -295,8 +299,8 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
                                                                 number->length(),
                                                                 value);
         else
-            error(QT_TR_NOOP(
-                      "%1 is not a vaild SNBT long tag"),
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "%1 is not a vaild SNBT long tag"),
                   { literal.toString() }, number->pos(), number->length());
     }
 
@@ -308,8 +312,8 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
                                                                  number->length(),
                                                                  value);
         else
-            error(QT_TR_NOOP(
-                      "%1 is not a vaild SNBT short tag"),
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "%1 is not a vaild SNBT short tag"),
                   { literal.toString() },
                   number->pos(),
                   number->length());
@@ -328,7 +332,8 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
                     number->length(),
                     value);
             else
-                error(QT_TR_NOOP("%1 is not a vaild SNBT integer tag"),
+                error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                        "%1 is not a vaild SNBT integer tag"),
                       { literal.toString() }, number->pos(), number->length());
         }
     }
@@ -347,7 +352,8 @@ QSharedPointer<Command::NbtListNode> Command::MinecraftParser::parseListTag() {
             ret->append(elem);
             first = false;
         } else {
-            error(QT_TR_NOOP("Type of elements in a list tag must be the same"));
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "Type of elements in a list tag must be the same"));
         }
         skipWs(false);
         if (this->curChar() != ']') {
@@ -375,7 +381,8 @@ parseEntityAdvancements() {
                 if (ret->isVaild())
                     return ret;
                 else
-                    this->error(QT_TR_NOOP("Argument value must be boolean"));
+                    this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                                  "Argument value must be boolean"));
                 return nullptr;
             }, false, R"(a-zA-z0-9-_:/)");
         } else {
@@ -481,8 +488,9 @@ parseEntityArguments() {
         } else if (key == "advancements") {
             return parseEntityAdvancements();
         } else{
-            this->error(QT_TR_NOOP(
-                            "Unknown entity argument name: %1"), { key });
+            this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                          "Unknown entity argument name: %1"),
+                        { key });
         }
         return nullptr;
     });
@@ -521,8 +529,9 @@ parseTargetSelector() {
     }
 
     default: {
-        error(QT_TR_NOOP(
-                  "Invaild target selector variable: %1"), { '@' + curChar() });
+        error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                "Invaild target selector variable: %1"),
+              { '@' + curChar() });
     }
     }
     advance();
@@ -576,7 +585,8 @@ parseNbtPathStep() {
                                                                      "a-zA-Z0-9_")));
         /*qDebug() << "After key" << ret->name()->value(); */
         if (ret->name()->value().isEmpty())
-            error(QT_TR_NOOP("Invaild empty NBT path key"));
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "Invaild empty NBT path key"));
         if (curChar() == '{')
             ret->setFilter(minecraft_nbtCompoundTag());
     };
@@ -724,7 +734,8 @@ QSharedPointer<Command::EntityNode> Command::MinecraftParser::minecraft_entity(
                                          QStringLiteral(
                                              "charset")].toString() : "0-9a-zA-Z_");
             if (literal.isEmpty()) {
-                this->error(QT_TR_NOOP("Invaild empty player name"));
+                this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                              "Invaild empty player name"));
             }
             auto playerName = QSharedPointer<Command::StringNode>::create(
                 curPos,
@@ -733,7 +744,8 @@ QSharedPointer<Command::EntityNode> Command::MinecraftParser::minecraft_entity(
         }
     }
     if (!ret)
-        error(QT_TR_NOOP("Cannot parse entity"));
+        error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                "Cannot parse entity"));
     return ret;
 }
 
@@ -919,7 +931,9 @@ QSharedPointer<Command::NbtPathNode> Command::MinecraftParser::minecraft_nbtPath
  */
         if ((step->type() == Command::NbtPathStepNode::Type::Key)
             && (!last->hasTrailingDot())) {
-            error(QT_TR_NOOP("Missing character '.' before a named tag"), {},
+            error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                    "Missing character '.' before a named tag"),
+                  {},
                   last->pos() + last->length() - 1);
         }
         ret->append(step);
@@ -942,9 +956,11 @@ minecraft_objective() {
     QString objname = this->getWithCharset("0-9a-zA-Z-+_.#");
 
     if (objname.length() > 16)
-        this->error(QT_TR_NOOP(
-                        "Objective '%1' must be less than 16 characters"),
-                    { objname }, curPos, objname.length());
+        this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                      "Objective '%1' must be less than 16 characters"),
+                    { objname },
+                    curPos,
+                    objname.length());
     return QSharedPointer<Command::ObjectiveNode>::create(curPos, objname);
 }
 
@@ -1009,13 +1025,14 @@ minecraft_resourceLocation() {
         id     = this->getWithCharset(charset);
     }
     if (nspace.contains('/'))
-        this->error(QT_TR_NOOP(
-                        "The character '/' is not allowed in the namespace"),
+        this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                      "The character '/' is not allowed in the namespace"),
                     {},
                     curPos,
                     nspace.length());
     if (id.isEmpty())
-        this->error(QT_TR_NOOP("Invaild empty namespaced ID"));
+        this->error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                                      "Invaild empty namespaced ID"));
 
     auto ret = QSharedPointer<ResourceLocationNode>::create(curPos, nspace, id);
     return ret;

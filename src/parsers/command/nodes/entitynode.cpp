@@ -147,7 +147,7 @@ QString Command::ScoreHolderNode::toString() const {
     if (isAll())
         return "ScoreHolderNode(*)";
     else
-        return EntityNode::toString().replace(0, 9, "ScoreHolderNode");
+        return EntityNode::toString().replace(0, 10, "ScoreHolderNode");
 }
 
 bool Command::ScoreHolderNode::isAll() const {

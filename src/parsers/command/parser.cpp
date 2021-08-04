@@ -505,13 +505,12 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
  * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invaild \c ParseNode if an error occured.
  */
 QSharedPointer<Command::ParseNode> Command::Parser::parse() {
-    qDebug() << "Command::Parser::parse" << m_text;
     m_parsingResult = QSharedPointer<RootNode>::create(pos());
     QElapsedTimer timer;
     timer.start();
 
     if (m_schema.isEmpty()) {
-        qWarning() << "The parser schema hasn't been initialized";
+        qWarning() << "The parser schema hasn't been initialized yet.";
     } else if (text().trimmed().isEmpty() || text().at(0) == '#') {
         m_parsingResult->setPos(0);
         return m_parsingResult;
@@ -522,16 +521,20 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
 
     if (m_cache.contains(key)) {
         m_parsingResult = qSharedPointerCast<RootNode>(m_cache[key]);
-        qDebug() << "Got cached" << m_parsingResult << "in ms:" <<
-            timer.elapsed();
+/*
+          qDebug() << "Got cached" << m_parsingResult << "in ms:" <<
+              timer.elapsed();
+ */
         setPos(m_text.length());
     } else {
         try {
             if (parseResursively(m_schema)) {
                 m_parsingResult->setPos(0);
                 m_parsingResult->setLength(pos() - 1);
-                qDebug() << "Parsed line" << m_parsingResult << "in ms:" <<
-                    timer.elapsed();
+/*
+                  qDebug() << "Parsed line" << m_parsingResult << "in ms:" <<
+                      timer.elapsed();
+ */
 
                 m_cache.emplace(typeId, m_text, m_parsingResult);
             }
@@ -626,7 +629,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
     int     startPos = m_pos;
     bool    success  = false;
     QString literal  = peekLiteral();
-    qDebug() << "literal:" << literal;
+    /*qDebug() << "literal:" << literal; */
     bool found    = false;
     auto children = curSchemaNode[QStringLiteral("children")].toObject();
     for (auto it = children.constBegin(); it != children.constEnd(); ++it) {
@@ -653,7 +656,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     parserIdToMethodName(parserId).toLatin1() + "()");
             }
             if (methodIndex != -1) {
-                qDebug() << "Argument parser ID:" << parserId;
+                /*qDebug() << "Argument parser ID:" << parserId; */
                 auto          method     = metaObject()->method(methodIndex);
                 int           returnType = method.returnType();
                 QElapsedTimer timer;
@@ -664,17 +667,21 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     if (m_cache.contains(key)) {
                         found = true;
                         ret   = m_cache[key];
-                        qDebug() << "Cached: " << ret << found << ret->pos() <<
-                            ret->length() << "elapsed time:" << timer.elapsed();
+/*
+                          qDebug() << "Cached: " << ret << found << ret->pos() <<
+                              ret->length() << "elapsed time:" << timer.elapsed();
+ */
                     } else if (key.pos = -1; m_cache.contains(key)) { /* Not taking position into account */
                         /* Make a copy of the cached object */
                         ret = QSharedPointer<ParseNode>::create(*m_cache[key]);
                         /* Change its pos to the start pos */
                         ret->setPos(startPos);
 
-                        qDebug() << "Detached from cache: " << ret << found <<
-                            ret->pos() <<
-                            ret->length() << "elapsed time:" << timer.elapsed();
+/*
+                          qDebug() << "Detached from cache: " << ret << found <<
+                              ret->pos() <<
+                              ret->length() << "elapsed time:" << timer.elapsed();
+ */
                     }
                     if (found) {
                         Q_ASSERT(ret != nullptr);
@@ -699,12 +706,14 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                                        const_cast<void*>(returnVari.constData()));
                     bool invoked = method.invoke(this, returnArgument,
                                                  Q_ARG(QVariantMap, props));
-                    qDebug() << invoked << returnVari;
+                    /*qDebug() << invoked << returnVari; */
                     if (invoked) {
                         found = true;
                         ret   = QVariantToParseNodeSharedPointer(returnVari);
-                        qDebug() << ret << found << "elapsed time:" <<
-                            timer.elapsed();
+/*
+                          qDebug() << ret << found << "elapsed time:" <<
+                              timer.elapsed();
+ */
                         Q_ASSERT(ret != nullptr);
                         if ((literal.length() == ret->length()) &&
                             ret->isVaild())

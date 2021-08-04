@@ -106,7 +106,7 @@ void McfunctionHighlighter::setupRules() {
     numberFormat.setForeground(QColor(47, 151, 193));
     rule.pattern =
         QRegularExpression(QStringLiteral(
-                               "(?<!\\w)-?\\d+(?:\\.\\d+)?[bBsSlLfFdD]?(?!\\w)"));
+                               R"((?<!\w)-?\d+(?:\.\d+)?[bBsSlLfFdD]?(?!\w))"));
     rule.format = numberFormat;
     highlightingRules.append(rule);
 
@@ -117,7 +117,7 @@ void McfunctionHighlighter::setupRules() {
 
     namespacedIDFormat.setForeground(QColor(69, 80, 59));
     rule.pattern =
-        QRegularExpression(QStringLiteral("\\b[a-z0-9-_]+:[a-z0-9-_/.]+\\b"));
+        QRegularExpression(QStringLiteral(R"(\b[a-z0-9-_]+:[a-z0-9-_/.]+\b)"));
     rule.format = namespacedIDFormat;
     highlightingRules.append(rule);
 

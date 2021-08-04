@@ -13,13 +13,11 @@ QString Command::ParticleColorNode::toString() const {
             m_r->toString(), m_g->toString(),
             m_b->toString(), m_size->toString());
     } else {
-        return "ParticleColorNode(Invaild)";
+        return QStringLiteral("ParticleColorNode(Invaild)");
     }
 }
 
 bool Command::ParticleColorNode::isVaild() const {
-    qDebug() << "ParticleColorNode::isVaild" << ParseNode::isVaild() << m_r <<
-        m_g << m_b << m_size;
     return ParseNode::isVaild() && m_r && m_g && m_b && m_size;
 }
 
@@ -58,8 +56,7 @@ void Command::ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
 static const int _ParticleNode =
     qRegisterMetaType<QSharedPointer<Command::ParticleNode> >();
 
-Command::ParticleNode::ParticleNode(int pos,
-                                    const QString &nspace,
+Command::ParticleNode::ParticleNode(int pos, const QString &nspace,
                                     const QString &id)
     : Command::ResourceLocationNode(pos, nspace, id) {
     setParserId("minecraft:particle");
@@ -75,7 +72,7 @@ QString Command::ParticleNode::toString() const {
     QString ret = QString("ParticleNode(%1").arg(fullId());
 
     if (m_params)
-        ret += ", " + m_params->toString();
+        ret += QStringLiteral(", ") + m_params->toString();
     return ret + ')';
 }
 
