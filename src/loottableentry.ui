@@ -79,6 +79,9 @@
       <property name="text">
        <string>Quality:</string>
       </property>
+      <property name="buddy">
+       <cstring>qualitySpin</cstring>
+      </property>
      </widget>
     </item>
     <item row="2" column="1" colspan="2">
@@ -112,6 +115,9 @@
      <widget class="QLabel" name="label_3">
       <property name="text">
        <string>Weight:</string>
+      </property>
+      <property name="buddy">
+       <cstring>weightSpin</cstring>
       </property>
      </widget>
     </item>

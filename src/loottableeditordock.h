@@ -31,7 +31,10 @@ private:
         QStringLiteral("empty"),              QStringLiteral("entity"),
         QStringLiteral("block"),              QStringLiteral("chest"),
         QStringLiteral("fishing"),            QStringLiteral("gift"),
-        QStringLiteral("advancement_reward"), QStringLiteral("generic")
+        QStringLiteral("advancement_reward"), QStringLiteral("generic"),
+        QStringLiteral("barter"),             QStringLiteral("command"),
+        QStringLiteral("selector"),           QStringLiteral(
+            "advancement_entity")
     };
 
 private /*slots*/ :

@@ -17,6 +17,14 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
+    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 16)) {
+        if (auto *view =
+                qobject_cast<QListView *>(ui->lootTableTypeCombo->view())) {
+            for (int i = 8; i < view->model()->rowCount(); ++i)
+                view->setRowHidden(i, true);
+        }
+    }
+
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
             this, &LootTableEditorDock::writeJson);
     connect(ui->readLootTableBtn, &QPushButton::clicked,

@@ -44,18 +44,18 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
     if (!root.contains("type"))
         return;
 
-    QString type = root.value("type").toString();
-    Glhp::removePrefix(type, "minecraft:");
+    QString type = root.value(QLatin1String("type")).toString();
+    Glhp::removePrefix(type, QLatin1String("minecraft:"));
 
     const int index = entryTypes.indexOf(type);
     if (index == -1)
         return;
 
-    if (root.contains("quality")) {
-        ui->qualitySpin->setValue(root.value("quality").toInt());
+    if (root.contains(QLatin1String("quality"))) {
+        ui->qualitySpin->setValue(root.value(QLatin1String("quality")).toInt());
     }
-    if (root.contains("weight"))
-        ui->weightSpin->setValue(root.value("weight").toInt());
+    if (root.contains(QLatin1String("weight")))
+        ui->weightSpin->setValue(root.value(QLatin1String("weight")).toInt());
 
     ui->typeCmobo->setCurrentIndex(index);
     switch (index) {
@@ -63,30 +63,31 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
         break;
 
     case 1: {      /* Item */
-        if (root.contains("name"))
-            ui->itemSlot->appendItem(MCRInvItem(root.value("name").toString()));
+        if (root.contains(QLatin1String("name")))
+            ui->itemSlot->appendItem(MCRInvItem(root.value(QLatin1String("name"))
+                                                .toString()));
         break;
     }
 
     case 2: {     /* Loot table */
-        if (root.contains("name"))
-            ui->nameEdit->setText(root.value("name").toString());
+        if (root.contains(QLatin1String("name")))
+            ui->nameEdit->setText(root.value(QLatin1String("name")).toString());
         break;
     }
 
     case 3: {    /*Tag */
-        if (root.contains("name"))
-            ui->nameEdit->setText(root.value("name").toString());
-        ui->tagExpandCheck->setupFromJsonObject(root, "expand");
+        if (root.contains(QLatin1String("name")))
+            ui->nameEdit->setText(root.value(QLatin1String("name")).toString());
+        ui->tagExpandCheck->setupFromJsonObject(root, QStringLiteral("expand"));
         break;
     }
 
 
     case 4: {    /*Dynamic */
-        if (root.contains("name")) {
-            auto name = root.value("name").toString();
-            if (name == QStringLiteral("minecraft:contents")
-                || name == QStringLiteral("minecraft:self")) {
+        if (root.contains(QLatin1String("name"))) {
+            auto name = root.value(QLatin1String("name")).toString();
+            if (name == QLatin1String("minecraft:contents")
+                || name == QLatin1String("minecraft:self")) {
                 ui->nameEdit->setText(name);
             }
         }
@@ -94,35 +95,36 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
     }
 
     default: {     /*Group */
-        if (type == "alternatives") {
+        if (type == QLatin1String("alternatives")) {
             ui->selectAltRadio->setChecked(true);
-        } else if (type == "group") {
+        } else if (type == QLatin1String("group")) {
             ui->selectAllRadio->setChecked(true);
-        } else if (type == "sequence") {
+        } else if (type == QLatin1String("sequence")) {
             ui->selectAltRadio->setChecked(true);
         } else {
             break;
         }
 
-        if (root.contains("children")) {
+        if (root.contains(QLatin1String("children"))) {
             if (!ui->entriesInterface->mainWidget())
                 initEntryInterface();
-            ui->entriesInterface->setJson(root.value("children").toArray());
+            ui->entriesInterface->setJson(
+                root.value(QLatin1String("children")).toArray());
         }
-
-        break;
     }
     }
 
-    if (root.contains("conditions")) {
+    if (root.contains(QLatin1String("conditions"))) {
         if (!ui->conditionsInterface->mainWidget())
             initCondInterface();
-        ui->conditionsInterface->setJson(root.value("conditions").toArray());
+        ui->conditionsInterface->setJson(
+            root.value(QLatin1String("conditions")).toArray());
     }
-    if (root.contains("functions")) {
+    if (root.contains(QLatin1String("functions"))) {
         if (!ui->functionsInterface->mainWidget())
             initFuncInterface();
-        ui->functionsInterface->setJson(root.value("functions").toArray());
+        ui->functionsInterface->setJson(
+            root.value(QLatin1String("functions")).toArray());
     }
 }
 
@@ -171,8 +173,8 @@ QJsonObject LootTableEntry::toJson() const {
         }
 
         case 5: {/*Dynamic */
-            if ((ui->nameEdit->text() == QStringLiteral("minecraft:contents"))
-                || (ui->nameEdit->text() == QStringLiteral("minecraft:self"))) {
+            if ((ui->nameEdit->text() == QLatin1String("minecraft:contents"))
+                || (ui->nameEdit->text() == QLatin1String("minecraft:self"))) {
                 root.insert("name", ui->nameEdit->text());
             }
             break;
@@ -245,8 +247,8 @@ void LootTableEntry::onTypeChanged(int index) {
         ui->stackedWidget->setCurrentIndex(2);
         ui->nameEdit->setPlaceholderText(tr("%1 or %2",
                                             "\"minecraft:contents or minecraft:self\"").
-                                         arg(QStringLiteral("minecraft:contents"),
-                                             QStringLiteral("minecraft:self")));
+                                         arg(QLatin1String("minecraft:contents"),
+                                             QLatin1String("minecraft:self")));
         ui->tagExpandCheck->setEnabled(false);
         break;
     }

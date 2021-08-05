@@ -79,6 +79,26 @@
           <string>Generic (none of the above)</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Bartering with piglins</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Command</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Target selector</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Predicates in advancements</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

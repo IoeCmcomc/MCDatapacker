@@ -32,6 +32,9 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
             &QShortcut::activated, this, &DataWidgetInterface::moveToNextPage);
 
     ui->scrollArea->verticalScrollBar()->hide();
+    ui->scrollArea->verticalScrollBar()->setStyleSheet(QStringLiteral(
+                                                           "QScrollBar{width:0px;}"));
+
     m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
     m_animation   = new QPropertyAnimation(ui->sidebar, "maximumWidth");
     m_animation->setEasingCurve(QEasingCurve::InCubic);
@@ -149,6 +152,7 @@ void DataWidgetInterface::changeEvent(QEvent *e) {
     QFrame::changeEvent(e);
     if (e->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
+        updateStates();
     }
 }
 
