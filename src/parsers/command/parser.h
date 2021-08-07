@@ -24,7 +24,7 @@ public:
 
         class Error : public std::runtime_error {
 public:
-            explicit Error(const QString &whatArg   = "", int pos = -1,
+            explicit Error(const QString &whatArg   = QString(), int pos = -1,
                            int length               = 0,
                            const QVariantList &args = {});
             int pos           = 0;
@@ -80,6 +80,7 @@ protected:
         bool expect(const QChar &chr, bool acceptNull = false);
         void eat(const QChar &chr, bool acceptNull    = false);
         QString getUntil(const QChar &chr);
+        QString getRest();
         QString getWithCharset(const QString &charset);
         QString getWithRegex(const QString &pattern);
         QString getWithRegex(const QRegularExpression &regex);
@@ -158,9 +159,9 @@ private:
         ParseNodeCache m_cache;
         Error m_lastError;
         QSharedPointer<Command::RootNode> m_parsingResult = nullptr;
-        QRegularExpression m_literalStrRegex              = QRegularExpression(
+        const QRegularExpression m_literalStrRegex        = QRegularExpression(
             R"([a-zA-Z0-9-_.*<=>]+)");
-        QRegularExpression m_decimalNumRegex = QRegularExpression(
+        const QRegularExpression m_decimalNumRegex = QRegularExpression(
             R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+)(?:[eE]\d+)?)");
         static QJsonObject m_schema;
         QString m_text;

@@ -7,9 +7,7 @@
 #include <QMetaMethod>
 #include <QElapsedTimer>
 
-Command::Parser::Error::Error(const QString &whatArg,
-                              int pos,
-                              int length,
+Command::Parser::Error::Error(const QString &whatArg, int pos, int length,
                               const QVariantList &args)
     : std::runtime_error(whatArg.toStdString()) {
     this->pos    = pos;
@@ -18,12 +16,23 @@ Command::Parser::Error::Error(const QString &whatArg,
 }
 
 QString Command::Parser::Error::toLocalizedMessage() const {
-    QString ret = QCoreApplication::translate("Command::Parser::Error", what());
+    QString &&errMsg =
+        QCoreApplication::translate("Command::Parser::Error", what());
+
+    if (errMsg == what())
+        errMsg = QCoreApplication::translate("Command::Parser", what());
+
+    qDebug() << what() << errMsg;
 
     for (int i = 0; i < args.size(); ++i) {
-        ret = ret.arg(args.at(i).toString());
+        errMsg = errMsg.arg(args.at(i).toString());
     }
-    return ret;
+
+    const QString &&ret =
+        QCoreApplication::translate("Command::Parser",
+                                    "Syntax error at position %1: %2")
+        .arg(pos).arg(errMsg);
+    return std::move(ret);
 }
 
 QJsonObject Command::Parser::m_schema   = {};
@@ -66,7 +75,7 @@ void Command::Parser::setSchema(const QJsonObject &schema) {
  * \brief Opens a JSON file and loads it into the static schema.
  */
 void Command::Parser::setSchema(const QString &filepath) {
-    QFileInfo finfo = QFileInfo(filepath);
+    QFileInfo finfo(filepath);
 
     if (!(finfo.exists() && finfo.isFile())) {
         qWarning() << "File not exists:" << finfo.filePath();
@@ -74,16 +83,16 @@ void Command::Parser::setSchema(const QString &filepath) {
     }
     QFile inFile(finfo.filePath());
     inFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray data = inFile.readAll();
+    QByteArray &&data = inFile.readAll();
     inFile.close();
 
     QJsonParseError errorPtr{};
-    QJsonDocument   doc = QJsonDocument::fromJson(data, &errorPtr);
+    QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
         qWarning() << "Parsing failed" << errorPtr.error;
         return;
     }
-    QJsonObject root = doc.object();
+    QJsonObject &&root = doc.object();
     if (root.isEmpty()) {
         qWarning() << "Root is empty.";
         return;
@@ -124,11 +133,7 @@ void Command::Parser::setPos(int pos) {
     if (pos >= m_text.length())
         m_curChar = QChar();
     else
-        m_curChar = m_text[pos];
-/*
-      if (m_pos < 500)
-          qDebug() << "Command::Parser::setPos" << m_pos << m_curChar;
- */
+        m_curChar = m_text.at(pos);
 }
 
 /*!
@@ -163,9 +168,7 @@ void Command::Parser::error(const QString &msg, const QVariantList &args,
           QString::number(m_text.length()));
  */
 
-    throw Command::Parser::Error(
-              /*QStringLiteral("Input: %1\nParser error at pos %2: %3"). */
-              msg, pos, length, args);
+    throw Command::Parser::Error(msg, pos, length, args);
 }
 
 /*!
@@ -200,11 +203,11 @@ bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
     if (cond) {
         return true;
     } else {
-        QString curCharTxt =
-            (m_curChar.isNull()) ? QStringLiteral("end of line") : '\'' +
-            m_curChar + '\'';
-        QString charTxt =
-            (chr.isNull()) ? QStringLiteral("end of line") : '\'' + chr + '\'';
+        const QString &&curCharTxt =
+            (m_curChar.isNull()) ? QLatin1String("EOL") : '\'' + m_curChar +
+            '\'';
+        const QString &&charTxt =
+            (chr.isNull()) ? QLatin1String("EOL") : '\'' + chr + '\'';
         error(QT_TR_NOOP("Unexpected %1, expecting %2"),
               { curCharTxt, charTxt });
         return false;
@@ -224,15 +227,30 @@ void Command::Parser::eat(const QChar &chr, bool acceptNull) {
  * \brief Returns the substring from the current character until it meets the character \a chr (exclusive).
  */
 QString Command::Parser::getUntil(const QChar &chr) {
-    QString ret;
+/*    QString ret; */
 
-    while (m_curChar != chr) {
-        if (m_curChar.isNull())
+    const int pos     = m_pos;
+    const int textLen = m_text.length();
+    int       len     = -1;
+
+    do {
+        ++len;
+        if ((pos + len) >= textLen)
             break;
-        ret += m_curChar;
-        advance();
-    }
-    return ret;
+    } while (m_text.at(pos + len) != chr);
+
+    advance(len);
+    return m_text.mid(pos, len);
+}
+
+/*!
+ * \brief Returns the remaining substring from the current character.
+ */
+QString Command::Parser::getRest() {
+    const QString &&rest = m_text.mid(m_pos);
+
+    advance(rest.length());
+    return rest;
 }
 
 /*!
@@ -240,7 +258,7 @@ QString Command::Parser::getUntil(const QChar &chr) {
  */
 QString Command::Parser::getWithCharset(const QString &charset) {
     QString            ret;
-    QRegularExpression regex("[" + charset + "]");
+    QRegularExpression regex('[' + charset + ']');
 
     while (regex.match(m_curChar).hasMatch()) {
         if (m_curChar.isNull())
@@ -291,7 +309,7 @@ void Command::Parser::skipWs(bool once) {
  * \brief Returns the next literal string (word) without advancing the current pos.
  */
 QString Command::Parser::peekLiteral() {
-    QRegularExpression regex(R"([\S]+)");
+    const static QRegularExpression regex(R"([\S]+)");
 
     if (auto match =
             regex.match(m_text, m_pos, QRegularExpression::NormalMatch,
@@ -299,7 +317,7 @@ QString Command::Parser::peekLiteral() {
         match.hasMatch()) {
         return match.captured();
     }
-    return "";
+    return QString();
 }
 
 /*!
@@ -317,7 +335,7 @@ QString Command::Parser::getQuotedString() {
     bool    backslash = false;
     while ((m_curChar != curQuoteChar) || backslash) {
         if (m_pos >= m_text.length())
-            error(QT_TR_NOOP("Incomplete quoted string: %1"), { value });
+            error(QT_TR_NOOP("Incomplete quoted string"));
         if (backslash) {
             if (m_curChar == curQuoteChar) {
                 value += curQuoteChar;
@@ -329,27 +347,27 @@ QString Command::Parser::getQuotedString() {
                 }
 
                 case 'b': {
-                    value += 'b';
+                    value += '\b';
                     break;
                 }
 
                 case 'f': {
-                    value += 'f';
+                    value += '\f';
                     break;
                 }
 
                 case 'n': {
-                    value += 'n';
+                    value += '\n';
                     break;
                 }
 
                 case 't': {
-                    value += 't';
+                    value += '\t';
                     break;
                 }
 
                 case 'r': {
-                    value += 'r';
+                    value += '\r';
                     break;
                 }
 
@@ -374,25 +392,23 @@ QString Command::Parser::getQuotedString() {
  */
 QString Command::Parser::parserIdToMethodName(const QString &str) {
     if (str.contains(':')) {
-        QStringList splited = str.split(':');
-        QStringList words   = splited[1].split('_');
-        QString     ret     = splited[0] + '_' + words[0];
+        QStringList &&splited = str.split(':');
+        QStringList &&words   = splited[1].split('_');
         for (int i = 1; i < words.size(); ++i) {
-            const QString &word = words[i];
-            ret += word[0].toUpper() + word.midRef(1);
+            words[i].replace(0, 1, words[i][0].toUpper());
         }
-        return ret;
+        return splited[0] + '_' + words.join(QString());
     }
-    return "";
+    return QString();
 }
 
 QSharedPointer<Command::BoolNode> Command::Parser::brigadier_bool() {
     int start = m_pos;
 
-    if (peek(4) == "true") {
+    if (peek(4) == QLatin1String("true")) {
         advance(4);
         return QSharedPointer<Command::BoolNode>::create(start, true);
-    } else if (peek(5) == "false") {
+    } else if (peek(5) == QLatin1String("false")) {
         advance(5);
         return QSharedPointer<Command::BoolNode>::create(start, false);
     } else {
@@ -404,75 +420,84 @@ QSharedPointer<Command::DoubleNode> Command::Parser::brigadier_double(
     const QVariantMap &props) {
     int start = m_pos;
 
-    QString raw =
-        getWithRegex(m_decimalNumRegex);
-    bool   ok    = false;
-    double value = raw.toDouble(&ok);
+    QString &&raw   = getWithRegex(m_decimalNumRegex);
+    bool      ok    = false;
+    double    value = raw.toDouble(&ok);
 
     if (!ok)
         error(QT_TR_NOOP("%1 is not a vaild double number"), { raw });
-    if (QVariant vari = props.value("min"); vari.isValid())
+    if (const QVariant &vari = props.value(QStringLiteral(
+                                               "min")); vari.isValid()) {
         checkMin(value, vari.toDouble());
-    if (QVariant vari = props.value("max"); vari.isValid())
+    }
+    if (const QVariant &vari = props.value(QStringLiteral(
+                                               "max")); vari.isValid()) {
         checkMax(value, vari.toDouble());
-    return QSharedPointer<Command::DoubleNode>::create(start,
-                                                       raw.length(),
+    }
+    return QSharedPointer<Command::DoubleNode>::create(start, raw.length(),
                                                        value);
 }
 
 QSharedPointer<Command::FloatNode> Command::Parser::brigadier_float(
     const QVariantMap &props) {
-    int     start = m_pos;
-    QString raw   =
-        getWithRegex(m_decimalNumRegex);
-    bool  ok    = false;
-    float value = raw.toFloat(&ok);
+    int       start = m_pos;
+    QString &&raw   = getWithRegex(m_decimalNumRegex);
+    bool      ok    = false;
+    float     value = raw.toFloat(&ok);
 
     if (!ok)
         error(QT_TR_NOOP("%1 is not a vaild float number"), { raw });
-    if (QVariant vari = props.value("min"); vari.isValid())
+    if (const QVariant &vari = props.value(QStringLiteral(
+                                               "min")); vari.isValid()) {
         checkMin(value, vari.toFloat());
-    if (QVariant vari = props.value("max"); vari.isValid())
+    }
+    if (const QVariant &vari = props.value(QStringLiteral(
+                                               "max")); vari.isValid()) {
         checkMax(value, vari.toFloat());
+    }
     return QSharedPointer<Command::FloatNode>::create(start, raw.length(),
                                                       value);
 }
 
 QSharedPointer<Command::IntegerNode> Command::Parser::brigadier_integer(
     const QVariantMap &props) {
-    int     start = m_pos;
-    QString raw   = getWithRegex(R"([+-]?\d+)");
-    bool    ok    = false;
-    int     value = raw.toFloat(&ok);
+    int       start = m_pos;
+    QString &&raw   = getWithRegex(R"([+-]?\d+)");
+    bool      ok    = false;
+    int       value = raw.toFloat(&ok);
 
     if (!ok)
         error(QT_TR_NOOP("%1 is not a vaild integer number"), { raw });
-    if (QVariant vari = props.value("min"); vari.isValid())
+    if (const QVariant &vari = props.value(QStringLiteral(
+                                               "min")); vari.isValid()) {
         checkMin(value, vari.toInt());
-    if (QVariant vari = props.value("max"); vari.isValid())
+    }
+    if (const QVariant &vari = props.value(QStringLiteral(
+                                               "max")); vari.isValid()) {
         checkMax(value, vari.toInt());
-    return QSharedPointer<Command::IntegerNode>::create(start,
-                                                        raw.length(),
-                                                        value);
+    }
+    return QSharedPointer<Command::IntegerNode>::create(
+        start, raw.length(), value);
 }
 
 QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal() {
-    int           start   = m_pos;
-    const QString literal = getWithRegex(m_literalStrRegex);
-    const int     typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
-    CacheKey      key{ typeId, literal, start };
+    int             start   = m_pos;
+    const QString &&literal = getWithRegex(m_literalStrRegex);
+    const int       typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
+    CacheKey        key{ typeId, literal, start };
 
     if (m_cache.contains(key)) {
         return qSharedPointerCast<LiteralNode>(m_cache[key]);
     } else if (key.pos = -1; m_cache.contains(key)) {
-        auto ret = QSharedPointer<LiteralNode>::create(*qSharedPointerCast<LiteralNode>(
-                                                           m_cache[key]));
+        auto &&ret = QSharedPointer<LiteralNode>::create(*qSharedPointerCast<LiteralNode>(
+                                                             m_cache[key]));
         ret->setPos(start);
-        return ret;
+        return std::move(ret);
     } else {
-        auto ret = QSharedPointer<Command::LiteralNode>::create(start, literal);
+        auto &&ret =
+            QSharedPointer<Command::LiteralNode>::create(start, literal);
         m_cache.emplace(typeId, literal, ret);
-        return ret;
+        return std::move(ret);
     }
 }
 
@@ -480,21 +505,18 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
     const QVariantMap &props) {
     auto defaultRet = QSharedPointer<Command::StringNode>::create(m_pos);
 
-    if (!props.contains("type"))
+    if (!props.contains(QLatin1String("type")))
         return defaultRet;
 
-    QString type = props["type"].toString();
-    if (type == "greedy") {
-        auto ret = QSharedPointer<Command::StringNode>::create(m_pos,
-                                                               m_text.mid(m_pos));
-        setPos(m_text.length());
-        return ret;
-    } else if (type == "phrase") {
+    QString &&type = props[QLatin1String("type")].toString();
+    if (type == QLatin1String("greedy")) {
+        return QSharedPointer<Command::StringNode>::create(
+            m_pos, getRest());;
+    } else if (type == QLatin1String("phrase")) {
         if (m_curChar == '"' || m_curChar == '\'')
-            return QSharedPointer<Command::StringNode>::create(m_pos,
-                                                               getQuotedString(),
-                                                               true);
-    } else if (type == "word") {
+            return QSharedPointer<Command::StringNode>::create(
+                m_pos, getQuotedString(), true);
+    } else if (type == QLatin1String("word")) {
         const auto &literal = brigadier_literal();
         return Command::StringNode::fromLiteralNode(literal.get());
     }
@@ -577,21 +599,21 @@ bool Command::Parser::processCurSchemaNode(int depth,
           qDebug() << "has executable:" << curSchemaNode.contains("executable");
           qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
  */
-        if (!curSchemaNode.contains("children")) {
-            if (!curSchemaNode.contains("executable")
-                || (curSchemaNode.contains("executable")
-                    && curSchemaNode.contains("redirect"))) {
+        if (!curSchemaNode.contains(QLatin1String("children"))) {
+            if (!curSchemaNode.contains(QLatin1String("executable"))
+                || (curSchemaNode.contains(QLatin1String("executable"))
+                    && curSchemaNode.contains(QLatin1String("redirect")))) {
                 if (!m_curChar.isNull()) {
                     QJsonArray redirect;
-                    if (curSchemaNode.contains("redirect"))
-                        redirect = curSchemaNode["redirect"].toArray();
+                    if (curSchemaNode.contains(QLatin1String("redirect")))
+                        redirect =
+                            curSchemaNode[QLatin1String("redirect")].toArray();
                     curSchemaNode = m_schema;
                     for (const auto &nodeNameRef: qAsConst(redirect)) {
                         curSchemaNode =
-                            curSchemaNode["children"]
+                            curSchemaNode[QLatin1String("children")]
                             .toObject()[nodeNameRef.toString()].toObject();
                     }
-                    ;
                 } else {
                     error(QT_TR_NOOP("Incompleted command"));
                 }
@@ -600,13 +622,13 @@ bool Command::Parser::processCurSchemaNode(int depth,
                 return true;
             }
         } else {
-            if (curSchemaNode.contains("executable")) {
+            if (curSchemaNode.contains(QLatin1String("executable"))) {
                 if (m_curChar.isNull())
                     return true;
             }
         }
         if (curChar().isNull())
-            error("Incompleted command");
+            error(QT_TR_NOOP("Incompleted command"));
         eat(' ');
     }
     return false; /* Should continue parsing */
@@ -626,16 +648,18 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
     if (processCurSchemaNode(depth, curSchemaNode))
         return true;
 
-    int     startPos = m_pos;
-    bool    success  = false;
-    QString literal  = peekLiteral();
+    bool isRoot = curSchemaNode[QLatin1String("type")] ==
+                  QStringLiteral("root");
+
+    int       startPos = m_pos;
+    bool      success  = false;
+    QString &&literal  = peekLiteral();
     /*qDebug() << "literal:" << literal; */
-    bool found    = false;
-    auto children = curSchemaNode[QStringLiteral("children")].toObject();
+    bool         found    = false;
+    const auto &&children = curSchemaNode[QLatin1String("children")].toObject();
     for (auto it = children.constBegin(); it != children.constEnd(); ++it) {
         curSchemaNode = it.value().toObject();
-        if (curSchemaNode[QStringLiteral("type")] ==
-            QStringLiteral("literal")) {
+        if (curSchemaNode[QLatin1String("type")] == QStringLiteral("literal")) {
             if (literal == it.key()) {
                 found   = true;
                 ret     = brigadier_literal();
@@ -643,21 +667,21 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                 m_parsingResult->prepend(ret);
                 break;
             }
-        } else if (curSchemaNode[QStringLiteral("type")] ==
+        } else if (curSchemaNode[QLatin1String("type")] ==
                    QStringLiteral("argument")) {
-            QString parserId = curSchemaNode["parser"].toString();
-            int     methodIndex;
-            if (curSchemaNode.contains("properties")) {
+            QString &&parserId = curSchemaNode["parser"].toString();
+            int       methodIndex;
+            if (curSchemaNode.contains(QLatin1String("properties"))) {
                 methodIndex = metaObject()->indexOfMethod(
-                    parserIdToMethodName(parserId).toLatin1()
-                    + QStringLiteral("(QVariantMap)").toLatin1());
+                    parserIdToMethodName(parserId).toLatin1() +
+                    "(QVariantMap)");
             } else {
                 methodIndex = metaObject()->indexOfMethod(
                     parserIdToMethodName(parserId).toLatin1() + "()");
             }
             if (methodIndex != -1) {
                 /*qDebug() << "Argument parser ID:" << parserId; */
-                auto          method     = metaObject()->method(methodIndex);
+                auto        &&method     = metaObject()->method(methodIndex);
                 int           returnType = method.returnType();
                 QElapsedTimer timer;
                 timer.start();
@@ -695,7 +719,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     }
 
                     auto props =
-                        curSchemaNode[QStringLiteral("properties")].toObject().
+                        curSchemaNode[QLatin1String("properties")].toObject().
                         toVariantMap();
 
                     auto     typeName = method.typeName();
@@ -722,7 +746,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                         m_parsingResult->prepend(ret);
                         break;
                     } else {
-                        qWarning() << QStringLiteral(
+                        qWarning() << QLatin1String(
                             "Method not invoked: %1 (%2)").arg(parserIdToMethodName(
                                                                    parserId),
                                                                parserId);
@@ -736,7 +760,8 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     argLengths << argLength;
                 }
             } else {
-                error(QT_TR_NOOP("Unknown parser '%1'"), { parserId });
+                error(QT_TR_NOOP("Unknown argument parser: '%1'"),
+                      { parserId });
             }
         }
     }
@@ -752,15 +777,15 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             return v == argLengths[0];
         });
         if (sameAll) {
-            throw Command::Parser::Error("Incorrect argument");
+            throw Command::Parser::Error(QT_TR_NOOP("Incorrect argument"));
         } else {
             throw errors[*std::max_element(argLengths.cbegin(),
                                            argLengths.cend())];
         }
     }
     if (!found) {
-        if (curSchemaNode[QStringLiteral("type")] != QStringLiteral("root")) {
-            error(QT_TR_NOOP("Unknown word '%1'"), { literal });
+        if (!isRoot) {
+            error(QT_TR_NOOP("Unknown subcommand '%1'"), { literal });
         } else {
             error(QT_TR_NOOP("Unknown command '%1'"), { literal });
         }

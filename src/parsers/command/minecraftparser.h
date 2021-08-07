@@ -37,7 +37,7 @@ protected:
             const QVariant &vari);
 
 private:
-        QString oneOf(QStringList strArr);
+        QString oneOf(const QStringList &strArr);
 
         template<class Container, class Type>
         QSharedPointer<Container> parseMap(const QChar &beginChar,
