@@ -35,12 +35,12 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 }
 
 void SettingsDialog::setupLanguageSetting() {
-    ui->languageCombo->addItem(tr("<Default>"), "");
+    ui->languageCombo->addItem(tr("<Default>"), QString());
 
     QDir dir(QStringLiteral(":/i18n"));
-    dir.setNameFilters({ QStringLiteral("*.qm") });
+    dir.setNameFilters({ QStringLiteral("MCDatapacker_*.qm") });
 
-    QStringList fileNames = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+    QStringList &&fileNames = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
 
     dir.setPath(QApplication::applicationDirPath() +
                 QStringLiteral("/translations"));
@@ -48,20 +48,20 @@ void SettingsDialog::setupLanguageSetting() {
     fileNames += dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
     fileNames.removeDuplicates();
 
-    for (int i = 0; i < fileNames.size(); ++i) {
-        QString locale = fileNames[i].section('.', 0, 0).section('_', 1);
+    for (const QString &fileName: qAsConst(fileNames)) {
+        QString &&localeCode = fileName.section('.', 0, 0).section('_', 1);
+        QLocale   locale(localeCode);
 
-        QString lang = QString("%1 (%2)").arg(
-            QLocale::languageToString(QLocale(locale).language()),
-            QLocale(locale).nativeLanguageName());
-        /*QIcon ico(QString("%1_%2.png").arg(m_langPath).arg(locale)); */
+        QString &&lang = QString("%1 (%2)").arg(
+            QLocale::languageToString(locale.language()),
+            locale.nativeLanguageName());
 
-        ui->languageCombo->addItem(lang, locale);
+        ui->languageCombo->addItem(lang, localeCode);
     }
 
-    auto curLocale =
+    auto &&curLocale =
         QLocale(qobject_cast<MainWindow*>(parent())->getCurLocale());
-    auto currLang = QString("%1 (%2)").arg(
+    auto &&currLang = QString("%1 (%2)").arg(
         curLocale.languageToString(curLocale.language()),
         curLocale.nativeLanguageName());
     if (currLang.isEmpty())

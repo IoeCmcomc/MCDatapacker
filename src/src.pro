@@ -214,8 +214,13 @@ FORMS += \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \
-    MCDatapacker_en_US.ts \
-    MCDatapacker_vi_VN.ts
+    ../translations/MCDatapacker_en.ts \
+    ../translations/MCDatapacker_vi.ts \
+    ../translations/qt_vi.ts \
+    ../translations/qtbase_vi.ts \
+    ../translations/qtmultimedia_vi.ts \
+    ../translations/qtscript_vi.ts \
+    ../translations/qtxmlpatterns_vi.ts
 
 RESOURCES += \
     ../resource/app/app.qrc \
@@ -225,8 +230,7 @@ RESOURCES += \
     ../resource/minecraft/minecraft.qrc
 
 DISTFILES += \
-    ../lib/QFindDialogs/LICENSE \
-    MCDatapacker_vi_VN.ts
+    ../lib/QFindDialogs/LICENSE
 
 RC_ICONS = ../resource/app/icon/favicon.ico
 

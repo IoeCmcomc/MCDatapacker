@@ -492,13 +492,15 @@ QString MainWindow::getCurLocale() {
 }
 
 void MainWindow::loadLanguage(const QString &rLanguage, bool atStartup) {
-    if ((curLocale.name() != rLanguage) || atStartup) {
-        curLocale = QLocale(rLanguage);
+    if ((curLocale.bcp47Name() != rLanguage) || atStartup) {
+        curLocale = (rLanguage.isEmpty()) ? QLocale::system() : QLocale(
+            rLanguage);
         QLocale::setDefault(curLocale);
-        QString &&translationFile = QString("MCDatapacker_%1.qm").arg(
-            (rLanguage.isEmpty()) ? QLocale::system().name() : rLanguage);
+        const QString &&langCode        = curLocale.bcp47Name();
+        QString       &&translationFile = QString("MCDatapacker_%1").arg(
+            langCode);
+        switchTranslator(m_translatorQt, QString("qt_%1").arg(langCode));
         switchTranslator(m_translator, translationFile);
-        switchTranslator(m_translatorQt, QString("qt_%1.qm").arg(rLanguage));
     }
 }
 
@@ -506,21 +508,23 @@ void MainWindow::switchTranslator(QTranslator &translator,
                                   const QString &filename) {
     qApp->removeTranslator(&translator);
 
-    QString path = QApplication::applicationDirPath() + QStringLiteral(
-        "/translations/");
-    if (translator.load(path + filename)) {
+    const QString &&filepath = QApplication::applicationDirPath() +
+                               QStringLiteral("/translations/") + filename;
+    if (translator.load(filepath)) {
         qApp->installTranslator(&translator);
-        qInfo() << "External translation file has been loaded successully:" <<
-        filename;
-    } else if (translator.load(QStringLiteral(":/i18n/") + filename)) {
-        qWarning() << "Cannot load external translation file:" <<
-            filename <<
-            "Attempting to load the corresponding internal translation instead.";
-        qApp->installTranslator(&translator);
-        qInfo() << "Internal translation file has been loaded successully:" <<
-        filename;
+        qInfo() << "External translation file has been loaded successfully:" <<
+            filename;
     } else {
-        qWarning() << "Cannot load internal translation file:" << filename;
+        qWarning() << "Cannot load external translation file:" << filename <<
+            "Attempting to load the corresponding internal translation instead.";
+        if (translator.load(filename, QStringLiteral(":/i18n/"))) {
+            qApp->installTranslator(&translator);
+            qInfo() <<
+                "Internal translation file has been loaded successfully:" <<
+                filename;
+        } else {
+            qWarning() << "Cannot load internal translation file:" << filename;
+        }
     }
 }
 
