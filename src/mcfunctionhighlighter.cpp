@@ -235,11 +235,12 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
                            << "Time elapsed:" << timer.elapsed();
  */
             } else {
-                auto parseErr = parser.lastError();
-                auto error    = ProblemInfo(true);
-                error.start   = block.position() + parseErr.pos;
-                error.length  = parseErr.length;
-                error.message = parseErr.toLocalizedMessage();
+                auto      &&parseErr = parser.lastError();
+                ProblemInfo error{ ProblemInfo::Type::Error,
+                                   block.position() + parseErr.pos,
+                                   parseErr.length,
+                                   parseErr.toLocalizedMessage(),
+                };
 /*
                   qDebug() << "A problem found at line"
                            << block.blockNumber()

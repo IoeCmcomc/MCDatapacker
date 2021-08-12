@@ -98,6 +98,7 @@ SOURCES += \
     settingsdialog.cpp \
     stackedwidget.cpp \
     statusbar.cpp \
+    stripedscrollbar.cpp \
     tabbeddocumentinterface.cpp \
     tagselectordialog.cpp \
     truefalsebox.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     settingsdialog.h \
     stackedwidget.h \
     statusbar.h \
+    stripedscrollbar.h \
     tabbeddocumentinterface.h \
     tagselectordialog.h \
     truefalsebox.h \

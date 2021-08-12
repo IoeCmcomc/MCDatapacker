@@ -18,7 +18,7 @@ public:
         void accept(NodeVisitor *visitor) override {
             QSharedPointer<ParseNode> argNode = nullptr;
 
-            qDebug() << m_PtrVari;
+            /*qDebug() << m_PtrVari; */
             if (m_PtrVari.canConvert<QSharedPointer<TargetSelectorNode> >()) {
                 argNode = qSharedPointerCast<ParseNode>(
                     m_PtrVari.value<QSharedPointer<TargetSelectorNode> >());

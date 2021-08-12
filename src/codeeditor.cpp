@@ -6,6 +6,7 @@
 #include "globalhelpers.h"
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
+#include "stripedscrollbar.h"
 
 #include <QPainter>
 #include <QFileInfo>
@@ -129,6 +130,7 @@ QStringList loadMinecraftCompletionInfo() {
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     lineNumberArea = new LineNumberArea(this);
     setAttribute(Qt::WA_Hover);
+    setVerticalScrollBar(new StripedScrollBar(Qt::Vertical, this));
 
     connect(this, &CodeEditor::blockCountChanged,
             this, &CodeEditor::updateLineNumberAreaWidth);
@@ -156,14 +158,14 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
     QScroller::grabGesture(viewport(), QScroller::MiddleMouseButtonGesture);
 
-    /*
-       errorHighlightRule.setUnderlineStyle(
-          QTextCharFormat::SpellCheckUnderline);
-       errorHighlightRule.setUnderlineColor(Qt::red);
-     */
-    errorHighlightRule.setBackground(QColor(255, 127, 127, 63));
-    errorHighlightRule.setProperty(QTextFormat::FullWidthSelection,
-                                   true);
+    errorHighlightRule.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+    errorHighlightRule.setUnderlineColor(Qt::red);
+
+/*
+      errorHighlightRule.setBackground(QColor(255, 127, 127, 63));
+      errorHighlightRule.setProperty(QTextFormat::FullWidthSelection,
+                                     true);
+ */
 
     updateLineNumberAreaWidth(0);
     onCursorPositionChanged();
@@ -524,6 +526,7 @@ void CodeEditor::onCursorPositionChanged() {
     if (!problemExtraSelections.isEmpty()) {
         setExtraSelections(extraSelections() << problemExtraSelections);
     }
+    verticalScrollBar()->update();
     emit updateStatusBarRequest(this);
 }
 
@@ -756,6 +759,11 @@ void CodeEditor::displayErrors() {
         selections += problemExtraSelections;
 
         setExtraSelections(selections);
+        if (auto *scrollbar =
+                qobject_cast<StripedScrollBar*>(verticalScrollBar())) {
+            scrollbar->redrawStripes();
+            scrollbar->update();
+        }
         emit updateStatusBarRequest(this);
     }
     QToolTip::hideText();
@@ -778,13 +786,21 @@ void CodeEditor::updateErrorSelections() {
                   qDebug() << it.blockNumber() << data <<
                       data->problem().has_value();
  */
-                if (std::optional<ProblemInfo> && problem =
-                        data->problem(); problem) {
+                if (auto &&problem = data->problem(); problem) {
                     QTextEdit::ExtraSelection selection;
                     selection.cursor = textCursor();
                     selection.cursor.setPosition(problem->start);
-                    /*selection.cursor.select(QTextCursor::LineUnderCursor); */
-                    selection.cursor.clearSelection();
+                    if (problem->length > 0) {
+                        if (selection.cursor.atBlockEnd()) {
+                            selection.cursor.select(QTextCursor::LineUnderCursor);
+                        } else {
+                            selection.cursor.setPosition(
+                                problem->start + problem->length,
+                                QTextCursor::KeepAnchor);
+                        }
+                    } else {
+                        selection.cursor.select(QTextCursor::WordUnderCursor);
+                    }
                     selection.format = errorHighlightRule;
                     selection.format.setToolTip(problem->message);
                     problemExtraSelections << selection;
@@ -854,22 +870,22 @@ void CodeEditor::matchParentheses() {
          *     the text cursor is on the left of the character
          * info->position == curPos - 1
          *     the text cursor is on the right of the character */
-        bool isOnTheLeftOfChar = info->position == curPos;
+        bool isOnTheLeftOfChar = info->pos == curPos;
 
-        if (isOnTheLeftOfChar || (info->position == curPos - 1)) {
+        if (isOnTheLeftOfChar || (info->pos == curPos - 1)) {
             for (const auto &pair: qAsConst(curHighlighter->bracketPairs)) {
                 if (info->character == pair.left) {
                     if (matchLeftBracket(textCursor().block(), i + 1,
                                          pair.left, pair.right,
                                          0, isOnTheLeftOfChar)) {
-                        createBracketSelection(pos + info->position,
+                        createBracketSelection(pos + info->pos,
                                                isOnTheLeftOfChar);
                     }
                 } else if (info->character == pair.right) {
                     if (matchRightBracket(textCursor().block(), i - 1,
                                           pair.right, pair.left,
                                           0, !isOnTheLeftOfChar)) {
-                        createBracketSelection(pos + info->position,
+                        createBracketSelection(pos + info->pos,
                                                !isOnTheLeftOfChar);
                     }
                 }
@@ -898,7 +914,7 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
 
         if (info->character == corresponder) {
             if (numLeftParentheses == 0) {
-                createBracketSelection(docPos + info->position, isPrimary);
+                createBracketSelection(docPos + info->pos, isPrimary);
                 return true;
             } else {
                 --numLeftParentheses;
@@ -936,7 +952,7 @@ bool CodeEditor::matchRightBracket(QTextBlock currentBlock,
 
         if (info->character == corresponder) {
             if (numRightParentheses == 0) {
-                createBracketSelection(docPos + info->position, isPrimary);
+                createBracketSelection(docPos + info->pos, isPrimary);
                 return true;
             } else {
                 --numRightParentheses;

@@ -65,10 +65,8 @@ void JsonHighlighter::checkProblems(bool) {
             if (!(jsonDoc.isNull() && block.contains(jsonErr.offset))) {
                 data->setProblem(std::nullopt);
             } else {
-                auto error = ProblemInfo(true);
-                error.start   = jsonErr.offset;
-                error.length  = 1;
-                error.message = jsonErr.errorString();
+                ProblemInfo error{ ProblemInfo::Type::Error, jsonErr.offset, 1,
+                                   jsonErr.errorString() };
 
                 qDebug() << "A problem found at line"
                          << block.blockNumber()

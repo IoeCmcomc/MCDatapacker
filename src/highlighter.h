@@ -7,32 +7,32 @@
 #include <optional>
 
 struct BracketInfo {
-    int  position;
-    char character;
+    int  pos       = 0;
+    char character = '\0';
 };
 
 struct BracketPair {
-    char left;
-    char right;
+    char left  = '\0';
+    char right = '\0';
 };
 
 struct NamespacedIdInfo {
-    int     start;
-    int     length;
+    int     start  = 0;
+    int     length = 1;
     QString link;
 };
 
 struct ProblemInfo {
-    int     start;
-    int     length;
-    QString message;
-    bool    isError   = false;
-    bool    isWarning = false;
+    enum class Type {
+        Invaild,
+        Warning,
+        Error,
+    };
 
-    ProblemInfo(bool isError = false) {
-        this->isError   = isError;
-        this->isWarning = !isError;
-    }
+    Type    type   = Type::Invaild;
+    int     start  = 0;
+    int     length = 1;
+    QString message;
 };
 
 class CodeEditor;
@@ -57,9 +57,9 @@ public:
     void setProblem(const std::optional<ProblemInfo> &problem);
 
 private:
+    std::optional<ProblemInfo> m_problem;
     QVector<BracketInfo*> m_brackets;
     QVector<NamespacedIdInfo*> m_namespaceIds;
-    std::optional<ProblemInfo> m_problem;
 };
 
 class Highlighter : public QSyntaxHighlighter

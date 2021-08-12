@@ -27,7 +27,7 @@ void TextBlockData::insert(BracketInfo *info) {
     int i = 0;
 
     while (i < m_brackets.size() &&
-           info->position > m_brackets.at(i)->position)
+           info->pos > m_brackets.at(i)->pos)
         ++i;
 
     m_brackets.insert(i, info);
@@ -130,7 +130,7 @@ void Highlighter::highlightBlock(const QString &text) {
                             curChar == bracketPair.right) {
                             auto *info = new BracketInfo;
                             info->character = curChar.toLatin1();
-                            info->position  = i;
+                            info->pos  = i;
                             data->insert(info);
                         }
                     }
