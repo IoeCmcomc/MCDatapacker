@@ -12,6 +12,8 @@ QT_BEGIN_NAMESPACE
 class QCompleter;
 QT_END_NAMESPACE
 
+class CodeGutter;
+
 struct TextFileData {
     CodeFile               *parent      = nullptr;
     QPointer<QTextDocument> doc         = new QTextDocument();
@@ -32,9 +34,6 @@ class CodeEditor : public QPlainTextEdit
 
 public:
     CodeEditor(QWidget *parent = nullptr);
-
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
 
     void setFilePath(const QString &path);
     void setCurHighlighter(Highlighter *value);
@@ -58,6 +57,8 @@ signals:
     void showMessageRequest(const QString &msg, int timeout);
 
 protected:
+    friend class LineNumberArea;
+
     void resizeEvent(QResizeEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
     void keyPressEvent(QKeyEvent *e) override;
@@ -68,9 +69,9 @@ protected:
     void focusInEvent(QFocusEvent *e) override;
 
 private /*slots*/ :
-    void updateLineNumberAreaWidth(int newBlockCount);
+    void updateGutterWidth(int newBlockCount);
     void onCursorPositionChanged();
-    void updateLineNumberArea(const QRect &rect, int dy);
+    void updateGutter(const QRect &rect, int dy);
     void openFindDialog();
     void openReplaceDialog();
     void toggleComment();
@@ -83,17 +84,17 @@ private:
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
-    QStringList minecraftCompletionInfo;
     QSettings settings;
-    QWidget *lineNumberArea;
-    QCompleter *m_completer        = nullptr;
-    CodeFile::FileType curFileType = CodeFile::Text;
+    QStringList minecraftCompletionInfo;
+    CodeGutter *m_gutter;
+    QCompleter *m_completer = nullptr;
     QString filepath;
     Highlighter *curHighlighter;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;
-    bool canUndo = false;
-    bool canRedo = false;
+    CodeFile::FileType curFileType = CodeFile::Text;
+    bool canUndo                   = false;
+    bool canRedo                   = false;
 
     void highlightCurrentLine();
     void matchParentheses();

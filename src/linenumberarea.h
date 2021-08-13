@@ -4,43 +4,25 @@
 #include "codeeditor.h"
 
 #include <QWidget>
-#include <QPaintEvent>
+
+class CodeGutter;
 
 class LineNumberArea : public QWidget
 {
 public:
-    LineNumberArea(CodeEditor *editor) : QWidget(editor), codeEditor(editor) {
-    }
+    LineNumberArea(CodeGutter *parent);
 
-    QSize sizeHint() const override {
-        return QSize(codeEditor->lineNumberAreaWidth(), 0);
-    }
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
+
 
 protected:
-    void paintEvent(QPaintEvent *event) override {
-        codeEditor->lineNumberAreaPaintEvent(event);
-    }
-    void mousePressEvent(QMouseEvent *e) override {
-        QWidget::mousePressEvent(e);
-        txtCursor = codeEditor->cursorForPosition(e->pos());
-        txtCursor.movePosition(QTextCursor::StartOfBlock);
-        txtCursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
-        codeEditor->setTextCursor(txtCursor);
-    };
-    void mouseMoveEvent(QMouseEvent *e) override {
-        QWidget::mouseMoveEvent(e);
-        auto cursor = codeEditor->cursorForPosition(e->pos());
-        cursor.movePosition(QTextCursor::NextBlock);
-        txtCursor.setPosition(cursor.position(), QTextCursor::KeepAnchor);
-        if (!txtCursor.hasSelection()) {
-            txtCursor.movePosition(QTextCursor::NextBlock,
-                                   QTextCursor::KeepAnchor);
-        }
-        codeEditor->setTextCursor(txtCursor);
-    };
+    void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
 
 private:
-    CodeEditor *codeEditor;
+    CodeGutter *m_gutter = nullptr;
     QTextCursor txtCursor;
 };
 

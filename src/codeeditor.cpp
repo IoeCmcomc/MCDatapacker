@@ -1,6 +1,6 @@
 #include "codeeditor.h"
 
-#include "linenumberarea.h"
+#include "codegutter.h"
 #include "datapacktreeview.h"
 #include "mainwindow.h"
 #include "globalhelpers.h"
@@ -128,14 +128,14 @@ QStringList loadMinecraftCompletionInfo() {
 }
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
-    lineNumberArea = new LineNumberArea(this);
+    m_gutter = new CodeGutter(this);
     setAttribute(Qt::WA_Hover);
     setVerticalScrollBar(new StripedScrollBar(Qt::Vertical, this));
 
     connect(this, &CodeEditor::blockCountChanged,
-            this, &CodeEditor::updateLineNumberAreaWidth);
+            this, &CodeEditor::updateGutterWidth);
     connect(this, &CodeEditor::updateRequest,
-            this, &CodeEditor::updateLineNumberArea);
+            this, &CodeEditor::updateGutter);
     connect(this, &CodeEditor::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
     connect(this, &CodeEditor::undoAvailable,
@@ -167,7 +167,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
                                      true);
  */
 
-    updateLineNumberAreaWidth(0);
+    updateGutterWidth(0);
     onCursorPositionChanged();
 }
 
@@ -203,6 +203,9 @@ void CodeEditor::readPrefSettings() {
     if (m_completer)
         m_completer->popup()->setFont(monoFont);
 
+    if (m_gutter)
+        m_gutter->setFont(font());
+
     setLineWrapMode(settings.value("wrap", false).toBool()
                         ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
     setTabStopDistance(fontMetrics().horizontalAdvance(
@@ -225,6 +228,8 @@ void CodeEditor::wheelEvent(QWheelEvent *e) {
             zoomIn(delta); /* Zoom out when delta < 0 */
         if (m_completer)
             m_completer->popup()->setFont(font());
+        if (m_gutter)
+            m_gutter->setFont(font());
         emit showMessageRequest(tr("Zoom: %1%").arg(fontInfo().pointSize() * 100
                                                     / monoFont.pointSize()),
                                 1500);
@@ -236,9 +241,12 @@ void CodeEditor::wheelEvent(QWheelEvent *e) {
 void CodeEditor::resizeEvent(QResizeEvent *e) {
     QPlainTextEdit::resizeEvent(e);
 
+    m_gutter->adjustSize();
+
     QRect cr = contentsRect();
-    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(),
-                                      lineNumberAreaWidth(), cr.height()));
+    m_gutter->setGeometry(QRect(cr.left(), cr.top(),
+                                m_gutter->size().width(), cr.height()));
+    m_gutter->setFixedHeight(cr.height());
 }
 
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
@@ -571,33 +579,20 @@ void CodeEditor::setFilePath(const QString &path) {
     settings.endGroup();
 }
 
-int CodeEditor::lineNumberAreaWidth() {
-    int digits = 1;
-    int max    = qMax(1, blockCount());
-
-    while (max >= 10) {
-        max /= 10;
-        ++digits;
-    }
-
-    int space = 6 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
-
-    return space;
+void CodeEditor::updateGutterWidth(int /* newBlockCount */) {
+    m_gutter->updateChildrenGeometries();
+    m_gutter->adjustSize();
+    setViewportMargins(m_gutter->size().width(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */) {
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
-}
-
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
+void CodeEditor::updateGutter(const QRect &rect, int dy) {
     if (dy)
-        lineNumberArea->scroll(0, dy);
+        m_gutter->scroll(0, dy, rect);
     else
-        lineNumberArea->update(0, rect.y(), lineNumberArea->width(),
-                               rect.height());
+        m_gutter->update();
 
     if (rect.contains(viewport()->rect()))
-        updateLineNumberAreaWidth(0);
+        updateGutterWidth(0);
 }
 
 void CodeEditor::openFindDialog() {
@@ -814,38 +809,6 @@ void CodeEditor::updateErrorSelections() {
         }
     }
     displayErrors();
-}
-
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
-    QPainter painter(lineNumberArea);
-
-    painter.fillRect(event->rect(), palette().midlight());
-    /*
-       painter.setPen(QColor(240, 240, 240));
-       painter.drawLine(event->rect().topRight(), event->rect().bottomRight());
-     */
-    QTextBlock &&block       = firstVisibleBlock();
-    int          blockNumber = block.blockNumber();
-    int          top         =
-        qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
-    int bottom = top + qRound(blockBoundingRect(block).height());
-    while (block.isValid() && top <= event->rect().bottom()) {
-        if (block.isVisible() && bottom >= event->rect().top()) {
-            QString &&number = QString::number(blockNumber + 1);
-            if (blockNumber == this->textCursor().blockNumber()) {
-                painter.setPen(palette().shadow().color());
-            } else {
-                painter.setPen(palette().mid().color());
-            }
-            painter.drawText(0, top, lineNumberArea->width() - 3,
-                             fontMetrics().height(), Qt::AlignRight, number);
-        }
-
-        block  = block.next();
-        top    = bottom;
-        bottom = top + qRound(blockBoundingRect(block).height());
-        ++blockNumber;
-    }
 }
 
 void CodeEditor::matchParentheses() {

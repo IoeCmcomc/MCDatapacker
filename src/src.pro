@@ -27,6 +27,7 @@ SOURCES += \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
     codefile.cpp \
+    codegutter.cpp \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
     datawidgetinterface.cpp \
@@ -41,6 +42,7 @@ SOURCES += \
     imgviewer.cpp \
     itemconditiondialog.cpp \
     jsonhighlighter.cpp \
+    linenumberarea.cpp \
     locationconditiondialog.cpp \
     loottableeditordock.cpp \
     loottableentry.cpp \
@@ -111,6 +113,7 @@ HEADERS += \
     blockitemselectordialog.h \
     codeeditor.h \
     codefile.h \
+    codegutter.h \
     datapackfileiconprovider.h \
     datapacktreeview.h \
     datawidgetinterface.h \
