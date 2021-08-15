@@ -11,7 +11,11 @@ void TextBlockData::clear() {
     m_brackets.clear();
     qDeleteAll(m_namespaceIds);
     m_namespaceIds.clear();
-    m_problem = std::nullopt;
+    m_problems.clear();
+}
+
+void TextBlockData::clearProblems() {
+    m_problems.clear();
 }
 
 QVector<BracketInfo *> TextBlockData::brackets() {
@@ -43,12 +47,12 @@ void TextBlockData::insert(NamespacedIdInfo *info) {
     m_namespaceIds.insert(i, info);
 }
 
-std::optional<ProblemInfo> TextBlockData::problem() const {
-    return m_problem;
+QVector<ProblemInfo> TextBlockData::problems() const {
+    return m_problems;
 }
 
-void TextBlockData::setProblem(const std::optional<ProblemInfo> &problem) {
-    m_problem = problem;
+void TextBlockData::setProblems(const QVector<ProblemInfo> &problems) {
+    m_problems = problems;
 }
 
 Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
@@ -130,7 +134,7 @@ void Highlighter::highlightBlock(const QString &text) {
                             curChar == bracketPair.right) {
                             auto *info = new BracketInfo;
                             info->character = curChar.toLatin1();
-                            info->pos  = i;
+                            info->pos       = i;
                             data->insert(info);
                         }
                     }

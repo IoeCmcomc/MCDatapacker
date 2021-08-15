@@ -772,39 +772,31 @@ void CodeEditor::updateErrorSelections() {
 
         problemExtraSelections.clear();
 
-        for (auto it = document()->firstBlock();
-             it != document()->end(); it = it.next()) {
-            /*qDebug() << it.blockNumber(); */
+        for (auto it = document()->firstBlock(); it != document()->end();
+             it = it.next()) {
             if (TextBlockData *data =
                     dynamic_cast<TextBlockData *>(it.userData())) {
-/*
-                  qDebug() << it.blockNumber() << data <<
-                      data->problem().has_value();
- */
-                if (auto &&problem = data->problem(); problem) {
+                for (const auto &problem: data->problems()) {
                     QTextEdit::ExtraSelection selection;
-                    selection.cursor = textCursor();
-                    selection.cursor.setPosition(problem->start);
-                    if (problem->length > 0) {
-                        if (selection.cursor.atBlockEnd()) {
-                            selection.cursor.select(QTextCursor::LineUnderCursor);
+                    /* Point the cursor to the beginning of the current line */
+                    QTextCursor selCursor(it);
+                    selCursor.setPosition(selCursor.position() + problem.col);
+                    if (problem.length > 0) {
+                        if (selCursor.atBlockEnd()) {
+                            selCursor.select(QTextCursor::LineUnderCursor);
                         } else {
-                            selection.cursor.setPosition(
-                                problem->start + problem->length,
+                            selCursor.setPosition(
+                                selCursor.position() + problem.length,
                                 QTextCursor::KeepAnchor);
                         }
                     } else {
-                        selection.cursor.select(QTextCursor::WordUnderCursor);
+                        selCursor.select(QTextCursor::WordUnderCursor);
                     }
+                    selection.cursor = selCursor;
                     selection.format = errorHighlightRule;
-                    selection.format.setToolTip(problem->message);
+                    selection.format.setToolTip(problem.message);
                     problemExtraSelections << selection;
                 }
-/*
-              qDebug() << "Line" << it.blockNumber()
-                       << ", has error:"
-                       << (data->problem() != std::nullopt);
- */
             }
         }
     }
@@ -827,8 +819,7 @@ void CodeEditor::matchParentheses() {
     for (int i = 0; i < infos.size(); ++i) {
         const BracketInfo *info = infos.at(i);
 
-        int curPos = textCursor().position() -
-                     textCursor().block().position();
+        int curPos = textCursor().positionInBlock();
         /* info->position == curPos:
          *     the text cursor is on the left of the character
          * info->position == curPos - 1

@@ -28,8 +28,8 @@ void StripedScrollBar::resizeEvent(QResizeEvent *event) {
 }
 
 void StripedScrollBar::redrawStripes() {
-    static const QColor errorColor(255, 0, 0, 127);
-    static const QColor warningColor(255, 255, 0, 127);
+    static const QColor errorColor(255, 0, 0, 100);
+    static const QColor warningColor(255, 255, 0, 100);
 
     m_stripes = QPixmap(size());
     m_stripes.fill(Qt::transparent);
@@ -53,12 +53,17 @@ void StripedScrollBar::redrawStripes() {
             const int stripeY = y + (h * it.blockNumber() / lines);
             if (const auto *data =
                     dynamic_cast<TextBlockData *>(it.userData())) {
-                if (const auto &&problem = data->problem(); problem) {
-                    p.setBrush(
-                        (problem->type == ProblemInfo::Type::Error)
+                for (int i = 0; i < data->problems().size(); ++i) {
+                    const auto &problem = data->problems()[i];
+                    if (problem.type != ProblemInfo::Type::Invaild) {
+                        p.setBrush((problem.type == ProblemInfo::Type::Error)
                             ? errorColor : warningColor);
-                    const int stripeThickness = qMin(qMax((h / lines), 1), 32);
-                    p.drawRect(x, stripeY, w, stripeThickness);
+                        const int stripeThickness = qMin(qMax((h / lines), 1),
+                                                         32);
+                        p.drawRect(x, stripeY, w, stripeThickness);
+                    }
+                    if (i >= 3)
+                        break;
                 }
             }
         }

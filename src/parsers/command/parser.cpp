@@ -209,7 +209,7 @@ bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
         const QString &&charTxt =
             (chr.isNull()) ? QLatin1String("EOL") : '\'' + chr + '\'';
         error(QT_TR_NOOP("Unexpected %1, expecting %2"),
-              { curCharTxt, charTxt });
+              { curCharTxt, charTxt }, m_pos, 1);
         return false;
     }
 }

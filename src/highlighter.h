@@ -11,16 +11,19 @@ struct BracketInfo {
     char character = '\0';
 };
 
+
 struct BracketPair {
     char left  = '\0';
     char right = '\0';
 };
+
 
 struct NamespacedIdInfo {
     int     start  = 0;
     int     length = 1;
     QString link;
 };
+
 
 struct ProblemInfo {
     enum class Type {
@@ -30,12 +33,12 @@ struct ProblemInfo {
     };
 
     Type    type   = Type::Invaild;
-    int     start  = 0;
-    int     length = 1;
+    uint    line   = 0;
+    uint    col    = 0;
+    uint    length = 1;
     QString message;
 };
 
-class CodeEditor;
 
 class TextBlockData : public QTextBlockUserData
 {
@@ -46,6 +49,7 @@ public:
     }
 
     void clear();
+    void clearProblems();
 
     QVector<BracketInfo *> brackets();
     QVector<NamespacedIdInfo *> namespacedIds();
@@ -53,14 +57,18 @@ public:
     void insert(BracketInfo *info);
     void insert(NamespacedIdInfo *info);
 
-    std::optional<ProblemInfo> problem() const;
-    void setProblem(const std::optional<ProblemInfo> &problem);
+    QVector<ProblemInfo> problems() const;
+    void setProblems(const QVector<ProblemInfo> &problems);
 
 private:
-    std::optional<ProblemInfo> m_problem;
+    QVector<ProblemInfo> m_problems;
     QVector<BracketInfo*> m_brackets;
     QVector<NamespacedIdInfo*> m_namespaceIds;
 };
+
+
+class CodeEditor;
+
 
 class Highlighter : public QSyntaxHighlighter
 {

@@ -63,18 +63,15 @@ void JsonHighlighter::checkProblems(bool) {
         if (TextBlockData *data =
                 dynamic_cast<TextBlockData*>(block.userData())) {
             if (!(jsonDoc.isNull() && block.contains(jsonErr.offset))) {
-                data->setProblem(std::nullopt);
+                data->clearProblems();
             } else {
-                ProblemInfo error{ ProblemInfo::Type::Error, jsonErr.offset, 1,
+                QTextCursor tc(getParentDoc());
+                tc.setPosition(jsonErr.offset);
+                ProblemInfo error{ ProblemInfo::Type::Error,
+                                   (uint)tc.blockNumber(),
+                                   (uint)tc.positionInBlock(), 1,
                                    jsonErr.errorString() };
-
-                qDebug() << "A problem found at line"
-                         << block.blockNumber()
-                         << ", row"
-                         << error.start - block.position()
-                         << ":" << error.message;
-
-                data->setProblem(error);
+                data->setProblems({ error });
             }
         }
         /*emit document()->documentLayout()->updateBlock(block); */

@@ -74,7 +74,7 @@ protected:
 
         void error(const QString &msg, const QVariantList &args = {});
         void error(const QString &msg, const QVariantList &args,
-                   int pos, int length                = 1);
+                   int pos, int length                = 0);
         void advance(int n                            = 1);
         void recede(int n                             = 1);
         bool expect(const QChar &chr, bool acceptNull = false);

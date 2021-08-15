@@ -215,7 +215,7 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
             timer.start();
             result = parser.parse();
             if (result->isVaild()) {
-                data->setProblem(std::nullopt);
+                data->clearProblems();
 
                 Command::NodeFormatter formatter;
                 result->accept(&formatter);
@@ -237,18 +237,12 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
             } else {
                 auto      &&parseErr = parser.lastError();
                 ProblemInfo error{ ProblemInfo::Type::Error,
-                                   block.position() + parseErr.pos,
-                                   parseErr.length,
+                                   (uint)block.blockNumber(),
+                                   (uint)parseErr.pos,
+                                   (uint)parseErr.length,
                                    parseErr.toLocalizedMessage(),
                 };
-/*
-                  qDebug() << "A problem found at line"
-                           << block.blockNumber()
-                           << ", row"
-                           << error.start - block.position()
-                           << ":" << error.message;
- */
-                data->setProblem(error);
+                data->setProblems({ error });
             }
         }
         block = block.next();
