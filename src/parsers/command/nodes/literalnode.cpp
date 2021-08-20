@@ -18,3 +18,8 @@ QString Command::LiteralNode::text() const {
 void Command::LiteralNode::setText(const QString &text) {
     m_text = text;
 }
+
+void Command::LiteralNode::accept(Command::NodeVisitor *visitor,
+                                  Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}

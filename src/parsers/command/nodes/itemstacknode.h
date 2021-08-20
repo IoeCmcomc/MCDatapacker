@@ -11,11 +11,7 @@ public:
         ItemStackNode(int pos, const QString &nspace, const QString &id);
         virtual QString toString() const override;
         bool isVaild() const override;
-        void accept(NodeVisitor *visitor) override {
-            if (m_nbt)
-                m_nbt->accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
@@ -30,11 +26,7 @@ public:
                           const QString &id);
         ItemPredicateNode(ItemStackNode *other);
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            if (nbt())
-                nbt()->accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
     };
 }
 

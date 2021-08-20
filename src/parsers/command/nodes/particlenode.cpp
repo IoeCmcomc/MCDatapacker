@@ -21,6 +21,18 @@ bool Command::ParticleColorNode::isVaild() const {
     return ParseNode::isVaild() && m_r && m_g && m_b && m_size;
 }
 
+void Command::ParticleColorNode::accept(Command::NodeVisitor *visitor,
+                                        Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    m_r->accept(visitor);
+    m_g->accept(visitor);
+    m_b->accept(visitor);
+    m_size->accept(visitor);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
+}
+
 QSharedPointer<Command::FloatNode> Command::ParticleColorNode::size() const {
     return m_size;
 }
@@ -74,6 +86,16 @@ QString Command::ParticleNode::toString() const {
     if (m_params)
         ret += QStringLiteral(", ") + m_params->toString();
     return ret + ')';
+}
+
+void Command::ParticleNode::accept(Command::NodeVisitor *visitor,
+                                   Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (m_params)
+        m_params->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 QSharedPointer<Command::ParseNode> Command::ParticleNode::params() const {

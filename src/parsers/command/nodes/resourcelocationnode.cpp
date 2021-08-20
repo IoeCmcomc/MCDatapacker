@@ -15,6 +15,12 @@ Command::ResourceLocationNode::ResourceLocationNode(int pos,
 QString Command::ResourceLocationNode::toString() const {
     return QString("ResourceLocationNode(%1)").arg(format());
 }
+
+void Command::ResourceLocationNode::accept(Command::NodeVisitor *visitor,
+                                           Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 QString Command::ResourceLocationNode::format() const {
     QString fmtStr;
 

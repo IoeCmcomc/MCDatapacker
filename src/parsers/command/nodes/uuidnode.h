@@ -13,9 +13,9 @@ public:
         UuidNode(int pos, const QString &uuidStr);
         QString toString() const override;
         bool isVaild() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
 
         QUuid uuid() const;
         void setUuid(const QUuid &uuid);

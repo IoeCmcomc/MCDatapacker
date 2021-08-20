@@ -35,6 +35,10 @@ namespace Command {
 public:
         NodeFormatter();
 
+        void startVisiting(ParseNode *node) {
+            node->accept(this, Order::Preorder);
+        }
+
         virtual void visit(ParseNode *node) {
             auto                     fmt = defaultFormat(node);
             QTextLayout::FormatRange range{ node->pos(), node->length(),
@@ -42,19 +46,9 @@ public:
 
             m_formatRanges << std::move(range);
         }
-        virtual void visit(RootNode *node) {
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit(RootNode *) {
         }
-        virtual void visit(ArgumentNode *node) {
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit(ArgumentNode *) {
         }
         virtual void visit(BoolNode *node) {
             /*auto fmt = defaultFormat(node); */
@@ -126,7 +120,7 @@ public:
 
             m_formatRanges << std::move(range);
         }
-        virtual void visit(AxesNode *node) {
+        virtual void visit(AngleNode *node) {
             /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
@@ -136,6 +130,8 @@ public:
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
+        }
+        virtual void visit([[maybe_unused]] AxesNode *node) {
         }
         virtual void visit(BlockStateNode *node) {
             const int length = node->length();
@@ -163,32 +159,14 @@ public:
 
             m_formatRanges << std::move(range);
         }
-        virtual void visit(EntityNode *node) {
-            auto fmt = defaultFormat(node);
-
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit(EntityNode *) {
         }
 
-        virtual void visit(GameProfileNode *node) {
-            auto fmt = defaultFormat(node);
-
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit([[maybe_unused]] GameProfileNode *node) {
         }
-        virtual void visit(ScoreHolderNode *node) {
-            auto fmt = defaultFormat(node);
-
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit([[maybe_unused]] ScoreHolderNode *node) {
         }
-        virtual void visit(FloatRangeNode *node) {
+        virtual void visit([[maybe_unused]] FloatRangeNode *node) {
             /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
@@ -246,21 +224,9 @@ public:
 
             m_formatRanges << std::move(range);
         }
-        virtual void visit(EntityArgumentValueNode *node) {
-            auto fmt = defaultFormat(node);
-
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit([[maybe_unused]] EntityArgumentValueNode *node) {
         }
-        virtual void visit(NbtNode *node) {
-            auto fmt = defaultFormat(node);
-
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit(NbtNode *) {
         }
         virtual void visit(NbtByteArrayNode *node) {
             /*auto fmt = defaultFormat(node); */
@@ -388,40 +354,12 @@ public:
 
             /*m_formatRanges << std::move(range); */
         }
-        virtual void visit(NbtPathNode *node) {
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit([[maybe_unused]] NbtPathNode *node) {
         }
         virtual void visit(NbtPathStepNode *node) {
-            using Type = Command::NbtPathStepNode::Type;
-            switch (node->type()) {
-            case Type::Root: {
-                if (const auto filter = node->filter())
-                    filter->accept(this);
-                break;
-            }
-
-            case Type::Key: {
-                node->name()->accept(this);
-                if (const auto filter = node->filter())
-                    filter->accept(this);
-                break;
-            }
-
-            case Type::Index: {
-                if (const auto filter = node->filter())
-                    filter->accept(this);
-                if (const auto index = node->index())
-                    index->accept(this);
-                break;
-            }
-            }
-
             /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
+
             fmt.setBackground(QColor("#aafff4e8"));
             QTextLayout::FormatRange range{ node->pos(), node->length(),
                                             std::move(fmt) };
@@ -542,12 +480,7 @@ public:
 
             m_formatRanges << std::move(range);
         }
-        virtual void visit(MessageNode *node) {
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit([[maybe_unused]] MessageNode *node) {
         }
         virtual void visit(ObjectiveNode *node) {
             auto                     fmt = defaultFormat(node);
@@ -595,17 +528,14 @@ public:
             m_formatRanges << std::move(range);
         }
         virtual void visit(TargetSelectorNode *node) {
-            const int length = node->length();
-
-            node->setLength(2);
-            /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
+
             fmt.setForeground(QColor("#276321"));
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
+            /* Only colorize the '@x' part */
+            QTextLayout::FormatRange range{ node->pos(), 5,
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
-            node->setLength(length);
         }
         virtual void visit(TimeNode *node) {
             /*auto                     fmt = defaultFormat(node); */
@@ -641,12 +571,7 @@ public:
             m_formatRanges << std::move(range);
             node->setLength(length);
         }
-        virtual void visit(ParticleColorNode *node) {
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ node->pos(), node->length(),
-                                            std::move(fmt) };
-
-            /*m_formatRanges << std::move(range); */
+        virtual void visit([[maybe_unused]] ParticleColorNode *node) {
         }
         virtual void visit(ItemPredicateNode *node) {
             /*auto fmt = defaultFormat(node); */

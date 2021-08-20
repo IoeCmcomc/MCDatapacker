@@ -15,26 +15,7 @@ public:
         EntityNode(QSharedPointer<UuidNode> other);
         virtual QString toString() const override;
         bool isVaild() const override;
-        void accept(NodeVisitor *visitor) override {
-            QSharedPointer<ParseNode> argNode = nullptr;
-
-            /*qDebug() << m_PtrVari; */
-            if (m_PtrVari.canConvert<QSharedPointer<TargetSelectorNode> >()) {
-                argNode = qSharedPointerCast<ParseNode>(
-                    m_PtrVari.value<QSharedPointer<TargetSelectorNode> >());
-            } else if (m_PtrVari.canConvert<QSharedPointer<StringNode> >()) {
-                argNode = qSharedPointerCast<ParseNode>(
-                    m_PtrVari.value<QSharedPointer<StringNode> >());
-            } else if (m_PtrVari.canConvert<QSharedPointer<UuidNode> >()) {
-                argNode = qSharedPointerCast<ParseNode>(
-                    m_PtrVari.value<QSharedPointer<UuidNode> >());
-            } else {
-                qFatal(
-                    "Cannot cast value in EntityNode to a QSharedPointer<ParseNode>");
-            }
-            argNode->accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
         bool singleOnly() const;
         void setSingleOnly(bool singleOnly);
@@ -42,13 +23,14 @@ public:
         bool playerOnly() const;
         void setPlayerOnly(bool playerOnly);
 
-        QVariant PtrVari() const;
+        QVariant ptrVari() const;
 
 protected:
         void setPtrVari(const QVariant &PtrVari);
+        QSharedPointer<ParseNode> castPtrVari() const;
 
 private:
-        QVariant m_PtrVari;
+        QVariant m_ptrVari;
         bool m_singleOnly = false;
         bool m_playerOnly = false;
     };
@@ -58,10 +40,7 @@ public:
         GameProfileNode(int pos);
         GameProfileNode(EntityNode *other);
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            EntityNode::accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
     };
 
     class ScoreHolderNode final : public EntityNode {
@@ -69,10 +48,7 @@ public:
         ScoreHolderNode(int pos);
         ScoreHolderNode(EntityNode *other);
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            EntityNode::accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
         bool isAll() const;
         void setAll(bool all);
 
@@ -86,9 +62,7 @@ public:
                                 bool negative = false);
         QString toString() const override;
         bool isVaild() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
         bool isNegative() const;
         void setNegative(bool negative);

@@ -7,11 +7,11 @@ static const int _ =
 
 const QMap<Command::TargetSelectorNode::Variable, char>
 Command::TargetSelectorNode::variableMap =
-{   { Command::TargetSelectorNode::Variable::A, 'a' },
-    { Command::TargetSelectorNode::Variable::E, 'e' },
-    { Command::TargetSelectorNode::Variable::P, 'p' },
-    { Command::TargetSelectorNode::Variable::R, 'r' },
-    { Command::TargetSelectorNode::Variable::S, 's' } };
+{   { Variable::A, 'a' },
+    { Variable::E, 'e' },
+    { Variable::P, 'p' },
+    { Variable::R, 'r' },
+    { Variable::S, 's' } };
 
 Command::TargetSelectorNode::TargetSelectorNode(int pos)
     : Command::ParseNode(pos) {
@@ -23,6 +23,17 @@ QString Command::TargetSelectorNode::toString() const {
     if (m_args)
         ret += '{' + m_args->toString() + '}';
     return ret;
+}
+
+void Command::TargetSelectorNode::accept(Command::NodeVisitor *visitor,
+                                         Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (m_args) {
+        m_args->accept(visitor, order);
+    }
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 QSharedPointer<Command::MultiMapNode> Command::TargetSelectorNode::args() const

@@ -18,6 +18,11 @@ bool Command::ComponentNode::isVaild() const {
            !(m_value.is_null() || m_value.is_discarded());
 }
 
+void Command::ComponentNode::accept(Command::NodeVisitor *visitor,
+                                    Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 nlohmann::json Command::ComponentNode::value() const {
     return m_value;
 }

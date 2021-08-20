@@ -69,6 +69,33 @@ bool Command::NbtPathStepNode::isVaild() const {
     }
 }
 
+void Command::NbtPathStepNode::accept(Command::NodeVisitor *visitor,
+                                      Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    switch (m_type) {
+    case Type::Root: {
+        m_filter->accept(visitor, order);
+        break;
+    }
+
+    case Type::Key: {
+        return m_name->accept(visitor);
+
+        break;
+    }
+
+    case Type::Index: {
+        if (m_filter)
+            m_filter->accept(visitor, order);
+        else if (m_index)
+            m_index->accept(visitor);
+    }
+    }
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
+}
+
 QSharedPointer<Command::StringNode> Command::NbtPathStepNode::name() const {
     return m_name;
 }
@@ -130,6 +157,16 @@ QString Command::NbtPathNode::toString() const {
 
 bool Command::NbtPathNode::isVaild() const {
     return ArgumentNode::isVaild() && !m_steps.isEmpty();
+}
+
+void Command::NbtPathNode::accept(Command::NodeVisitor *visitor,
+                                  Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    for (const auto &step: qAsConst(m_steps))
+        step->accept(visitor);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 void Command::NbtPathNode::append(QSharedPointer<NbtPathStepNode> node) {

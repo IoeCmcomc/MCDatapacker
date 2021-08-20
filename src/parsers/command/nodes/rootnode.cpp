@@ -19,11 +19,15 @@ QString Command::RootNode::toString() const {
     return ret + ')';
 }
 
-void Command::RootNode::accept(Command::NodeVisitor *visitor) {
+void Command::RootNode::accept(Command::NodeVisitor *visitor,
+                               NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
     for (const auto &child: qAsConst(m_children)) {
-        child->accept(visitor);
+        child->accept(visitor, order);
     }
-    visitor->visit(this);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 bool Command::RootNode::isEmpty() {

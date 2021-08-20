@@ -10,9 +10,9 @@ public:
         explicit BoolNode(int pos = -1, bool value = false);
 
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         bool value() const;
         void setValue(bool value);
 

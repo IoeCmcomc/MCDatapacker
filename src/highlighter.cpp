@@ -163,7 +163,7 @@ void Highlighter::mergeFormat(int start, int count,
     for (int i = 0; i < count; ++i) {
         QTextCharFormat newFmt = format(start + i);
         newFmt.merge(fmt);
-        setFormat(start + i, 1, std::move(newFmt));
+        setFormat(start + i, 1, newFmt);
     }
 }
 

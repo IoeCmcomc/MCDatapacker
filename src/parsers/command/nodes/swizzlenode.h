@@ -19,9 +19,9 @@ public:
 
         QString toString() const override;
         bool isVaild() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
 
         Axes axes() const;
         void setAxes(const Axes &axes);

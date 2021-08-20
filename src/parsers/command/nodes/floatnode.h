@@ -10,9 +10,9 @@ public:
         explicit FloatNode(int pos = -1, int length = 0, float value = 0);
 
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         float value() const;
         void setValue(float value);
 

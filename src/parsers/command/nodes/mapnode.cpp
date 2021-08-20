@@ -23,6 +23,18 @@ QString Command::MapNode::toString() const {
     return "MapNode(" + itemReprs.join(", ") + ')';
 }
 
+void Command::MapNode::accept(Command::NodeVisitor *visitor,
+                              Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
+        visitor->visit(i.key());
+        i.value()->accept(visitor, order);
+    }
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
+}
+
 int Command::MapNode::size() const {
     return m_map.size();
 }

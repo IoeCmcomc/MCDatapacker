@@ -11,6 +11,11 @@ QString Command::IntegerNode::toString() const {
     return QString("IntegerNode(%1)").arg(m_value);
 }
 
+void Command::IntegerNode::accept(Command::NodeVisitor *visitor,
+                                  Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 int Command::IntegerNode::value() const {
     return m_value;
 }

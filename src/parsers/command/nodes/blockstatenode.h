@@ -11,13 +11,7 @@ namespace Command {
 public:
         BlockStateNode(int pos, const QString &nspace, const QString &id);
         virtual QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            if (m_states)
-                m_states->accept(visitor);
-            if (m_nbt)
-                m_nbt->accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
         bool isVaild() const override;
 
         QSharedPointer<MapNode> states() const;
@@ -37,13 +31,7 @@ public:
                            const QString &id);
         BlockPredicateNode(BlockStateNode *other);
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            if (states())
-                states()->accept(visitor);
-            if (nbt())
-                nbt()->accept(visitor);
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
     };
 }
 

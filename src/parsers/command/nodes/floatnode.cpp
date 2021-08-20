@@ -11,6 +11,11 @@ QString Command::FloatNode::toString() const {
     return QString("FloatNode(%1)").arg(m_value);
 }
 
+void Command::FloatNode::accept(Command::NodeVisitor *visitor,
+                                Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 float Command::FloatNode::value() const {
     return m_value;
 }

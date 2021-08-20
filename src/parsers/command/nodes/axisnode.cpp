@@ -28,6 +28,11 @@ QString Command::AxisNode::toString() const {
     return QString("AxisNode(%1)").arg(format());
 }
 
+void Command::AxisNode::accept(Command::NodeVisitor *visitor,
+                               Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 QString Command::AxisNode::format() const {
     QString type2char[] = { "", "~", "^" };
     QString number      =
@@ -85,4 +90,9 @@ Command::AngleNode::AngleNode(Command::AxisNode *other)
 
 QString Command::AngleNode::toString() const {
     return AxisNode::toString().replace(0, 8, "AngleNode");
+}
+
+void Command::AngleNode::accept(Command::NodeVisitor *visitor,
+                                Command::NodeVisitor::Order) {
+    visitor->visit(this);
 }
