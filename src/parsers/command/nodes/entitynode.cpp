@@ -5,13 +5,13 @@ static const int _EntityNode =
 
 Command::EntityNode::EntityNode(int pos)
     : Command::ArgumentNode(pos, -1, "minecraft:entity") {
-    m_PtrVari.setValue(nullptr);
+    m_ptrVari.setValue(nullptr);
 }
 
 Command::EntityNode::EntityNode(QSharedPointer<Command::StringNode> other)
     : Command::ArgumentNode(other->pos(),
                             other->length(), "minecraft:entity") {
-    m_PtrVari.setValue(other);
+    m_ptrVari.setValue(other);
     m_singleOnly = true;
 }
 
@@ -19,7 +19,7 @@ Command::EntityNode::EntityNode(
     QSharedPointer<Command::TargetSelectorNode> other)
     : Command::ArgumentNode(other->pos(),
                             other->length(), "minecraft:entity") {
-    m_PtrVari.setValue(other);
+    m_ptrVari.setValue(other);
 
     using Variable = Command::TargetSelectorNode::Variable;
     switch (other->variable()) {
@@ -47,7 +47,7 @@ Command::EntityNode::EntityNode(
 
 Command::EntityNode::EntityNode(QSharedPointer<Command::UuidNode> other)
     : Command::ArgumentNode(other->pos(), other->length(), "minecraft:entity") {
-    m_PtrVari.setValue(other);
+    m_ptrVari.setValue(other);
     m_singleOnly = true;
 }
 
@@ -59,28 +59,24 @@ QString Command::EntityNode::toString() const {
     if (m_playerOnly)
         items << "player";
     QString ret = QString("EntityNode[%1](").arg(items.join(", "));
-    if (m_PtrVari.isValid() && !m_PtrVari.isNull()) {
-        QSharedPointer<ParseNode> argNode = nullptr;
-        if (m_PtrVari.canConvert<QSharedPointer<TargetSelectorNode> >()) {
-            argNode = qSharedPointerCast<ParseNode>(
-                m_PtrVari.value<QSharedPointer<TargetSelectorNode> >());
-        } else if (m_PtrVari.canConvert<QSharedPointer<StringNode> >()) {
-            argNode = qSharedPointerCast<ParseNode>(
-                m_PtrVari.value<QSharedPointer<StringNode> >());
-        } else if (m_PtrVari.canConvert<QSharedPointer<UuidNode> >()) {
-            argNode = qSharedPointerCast<ParseNode>(
-                m_PtrVari.value<QSharedPointer<UuidNode> >());
-        } else {
-            qFatal(
-                "Cannot cast value in EntityNode to a QSharedPointer<ParseNode>");
-        }
-        ret += argNode->toString();
+    if (m_ptrVari.isValid() && !m_ptrVari.isNull()) {
+        ret += castPtrVari()->toString();
     }
     return ret + ')';
 }
 
 bool Command::EntityNode::isVaild() const {
-    return ParseNode::isVaild() && m_PtrVari.isValid();
+    return ParseNode::isVaild() && m_ptrVari.isValid();
+}
+
+void Command::EntityNode::accept(Command::NodeVisitor *visitor,
+                                 Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (m_ptrVari.isValid() && !m_ptrVari.isNull())
+        castPtrVari()->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 bool Command::EntityNode::playerOnly() const {
@@ -91,12 +87,31 @@ void Command::EntityNode::setPlayerOnly(bool playerOnly) {
     m_playerOnly = playerOnly;
 }
 
-QVariant Command::EntityNode::PtrVari() const {
-    return m_PtrVari;
+QVariant Command::EntityNode::ptrVari() const {
+    return m_ptrVari;
 }
 
 void Command::EntityNode::setPtrVari(const QVariant &PtrVari) {
-    m_PtrVari = PtrVari;
+    m_ptrVari = PtrVari;
+}
+
+/*!
+ * \brief Cast the shared pointer stored in the QVariant
+ * to a QSharedPointer<ParseNode>.
+ */
+QSharedPointer<Command::ParseNode> Command::EntityNode::castPtrVari() const {
+    if (m_ptrVari.canConvert<QSharedPointer<TargetSelectorNode> >()) {
+        return qSharedPointerCast<ParseNode>(
+            m_ptrVari.value<QSharedPointer<TargetSelectorNode> >());
+    } else if (m_ptrVari.canConvert<QSharedPointer<StringNode> >()) {
+        return qSharedPointerCast<ParseNode>(
+            m_ptrVari.value<QSharedPointer<StringNode> >());
+    } else if (m_ptrVari.canConvert<QSharedPointer<UuidNode> >()) {
+        return qSharedPointerCast<ParseNode>(
+            m_ptrVari.value<QSharedPointer<UuidNode> >());
+    } else {
+        qFatal("Cannot cast value in EntityNode to a QSharedPointer<ParseNode>");
+    }
 }
 
 bool Command::EntityNode::singleOnly() const {
@@ -118,12 +133,22 @@ Command::GameProfileNode::GameProfileNode(int pos)
 Command::GameProfileNode::GameProfileNode(Command::EntityNode *other)
     : Command::EntityNode(other->pos()) {
     setLength(other->length());
-    setPtrVari(other->PtrVari());
+    setPtrVari(other->ptrVari());
     setParserId("minecraft:game_profile");
 }
 
 QString Command::GameProfileNode::toString() const {
     return EntityNode::toString().replace(0, 9, "GameProfileNode");
+}
+
+void Command::GameProfileNode::accept(Command::NodeVisitor *visitor,
+                                      Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (ptrVari().isValid() && !ptrVari().isNull())
+        castPtrVari()->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 static const int _ScoreHolderNode =
@@ -137,7 +162,7 @@ Command::ScoreHolderNode::ScoreHolderNode(int pos)
 Command::ScoreHolderNode::ScoreHolderNode(Command::EntityNode *other)
     : Command::EntityNode(other->pos()) {
     setLength(other->length());
-    setPtrVari(other->PtrVari());
+    setPtrVari(other->ptrVari());
     setSingleOnly(other->singleOnly());
     setPlayerOnly(other->playerOnly());
     setParserId("minecraft:score_holder");
@@ -148,6 +173,16 @@ QString Command::ScoreHolderNode::toString() const {
         return "ScoreHolderNode(*)";
     else
         return EntityNode::toString().replace(0, 10, "ScoreHolderNode");
+}
+
+void Command::ScoreHolderNode::accept(Command::NodeVisitor *visitor,
+                                      Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (ptrVari().isValid() && !ptrVari().isNull())
+        castPtrVari()->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 bool Command::ScoreHolderNode::isAll() const {
@@ -176,6 +211,17 @@ QString Command::EntityArgumentValueNode::toString() const {
 
 bool Command::EntityArgumentValueNode::isVaild() const {
     return ParseNode::isVaild() && m_value;
+}
+
+void Command::EntityArgumentValueNode::accept(Command::NodeVisitor *visitor,
+                                              Command::NodeVisitor::Order order)
+{
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (m_value)
+        m_value->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 
 bool Command::EntityArgumentValueNode::isNegative() const {

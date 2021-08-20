@@ -15,23 +15,25 @@ public:
         NbtNode(int pos, int length,
                 const QString &parserId = "minecraft:nbt_tag");
         virtual QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         virtual tag_id id() const noexcept {
             return tag_id::tag_end;
         };
     };
 
-#define DECLARE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)  \
-    class Class : public NbtNode, public tags::Tag {          \
-public:                                                       \
-        explicit Class(int pos, int length, ValueType value); \
-        QString toString() const override;                    \
-        void accept(NodeVisitor * visitor) override {         \
-            visitor->visit(this);                             \
-        }                                                     \
-        nbt::tag_id id() const noexcept override;             \
+#define DECLARE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)      \
+    class Class : public NbtNode, public tags::Tag {              \
+public:                                                           \
+        explicit Class(int pos, int length, ValueType value);     \
+        QString toString() const override;                        \
+        void accept(NodeVisitor * visitor,                        \
+                    NodeVisitor::Order =                          \
+                        NodeVisitor::Order::Postorder) override { \
+            visitor->visit(this);                                 \
+        }                                                         \
+        nbt::tag_id id() const noexcept override;                 \
     };
 
     DECLARE_PRIMITIVE_TAG_NBTNODE(NbtByteNode, byte_tag, char)
@@ -75,15 +77,23 @@ protected:
         QVector<QSharedPointer<T> > m_vector;
     };
 
-#define DECLARE_ARRAY_NBTNODE(Class, ValueType)                       \
-    class Class : public NbtNode, public NbtListlikeNode<ValueType> { \
-public:                                                               \
-        explicit Class(int pos, int length = 0);                      \
-        QString toString() const override;                            \
-        void accept(NodeVisitor * visitor) override {                 \
-            visitor->visit(this);                                     \
-        }                                                             \
-        nbt::tag_id id() const noexcept override;                     \
+#define DECLARE_ARRAY_NBTNODE(Class, ValueType)                                 \
+    class Class : public NbtNode, public NbtListlikeNode<ValueType> {           \
+public:                                                                         \
+        explicit Class(int pos, int length = 0);                                \
+        QString toString() const override;                                      \
+        void accept(NodeVisitor * visitor, NodeVisitor::Order order) override { \
+            if (order == NodeVisitor::Order::Preorder) {                        \
+                visitor->visit(this);                                           \
+            }                                                                   \
+            for (const auto &elem: qAsConst(m_vector)) {                        \
+                elem->accept(visitor, order);                                   \
+            }                                                                   \
+            if (order == NodeVisitor::Order::Postorder) {                       \
+                visitor->visit(this);                                           \
+            }                                                                   \
+        }                                                                       \
+        nbt::tag_id id() const noexcept override;                               \
     };
 
     DECLARE_ARRAY_NBTNODE(NbtByteArrayNode, NbtByteNode)
@@ -98,9 +108,9 @@ public:
                                const QString &value,
                                bool isQuote = false);
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         QString value() const;
         void setValue(const QString &v);
         nbt::tag_id id() const noexcept override;
@@ -112,12 +122,9 @@ private:
 public:
         explicit NbtListNode(int pos, int length = 0);
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            for (const auto &node: qAsConst(m_vector)) {
-                node->accept(visitor);
-            }
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         void append(QSharedPointer<NbtNode> node) override;
         nbt::tag_id id() const noexcept override;
         nbt::tag_id prefix() const;
@@ -134,13 +141,8 @@ public:
         NbtCompoundNode(int pos, int length = 0);
 
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
-                visitor->visit(i.key());
-                i.value()->accept(visitor);
-            }
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order)
+        override;
 
         int size() const;
         bool contains(const QString &key) const;

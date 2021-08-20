@@ -33,6 +33,11 @@ bool Command::SwizzleNode::isVaild() const {
     return ArgumentNode::isVaild() && (length() > 0);
 }
 
+void Command::SwizzleNode::accept(Command::NodeVisitor *visitor,
+                                  Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 Command::SwizzleNode::Axes Command::SwizzleNode::axes() const {
     return m_axes;
 }

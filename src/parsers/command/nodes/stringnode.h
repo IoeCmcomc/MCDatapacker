@@ -13,9 +13,9 @@ public:
                             bool isQuote         = false);
 
         virtual QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         QString value() const;
         void setValue(const QString &value);
 

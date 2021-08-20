@@ -20,6 +20,11 @@ bool Command::UuidNode::isVaild() const {
     return ArgumentNode::isVaild() && !m_uuid.isNull();
 }
 
+void Command::UuidNode::accept(Command::NodeVisitor *visitor,
+                               Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 QUuid Command::UuidNode::uuid() const {
     return m_uuid;
 }

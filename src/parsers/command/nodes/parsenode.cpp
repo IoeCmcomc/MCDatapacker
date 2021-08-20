@@ -19,7 +19,8 @@ void Command::ParseNode::setLength(int length) {
     m_length = length;
 }
 
-void Command::ParseNode::accept(Command::NodeVisitor *visitor) {
+void Command::ParseNode::accept(Command::NodeVisitor *visitor,
+                                Command::NodeVisitor::Order) {
     visitor->visit(this);
 }
 

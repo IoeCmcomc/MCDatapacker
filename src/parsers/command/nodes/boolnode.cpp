@@ -12,6 +12,11 @@ QString Command::BoolNode::toString() const {
     return QString("BoolNode(%1)").arg(QVariant(m_value).toString());
 }
 
+void Command::BoolNode::accept(Command::NodeVisitor *visitor,
+                               Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 bool Command::BoolNode::value() const {
     return m_value;
 }

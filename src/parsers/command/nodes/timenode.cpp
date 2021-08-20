@@ -15,6 +15,11 @@ QString Command::TimeNode::toString() const {
                                        type2char[m_unit]);
 }
 
+void Command::TimeNode::accept(Command::NodeVisitor *visitor,
+                               Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 Command::TimeNode::Unit Command::TimeNode::unit() const {
     return m_unit;
 }

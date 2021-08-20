@@ -13,6 +13,11 @@ QString Command::StringNode::toString() const {
     return QString("StringNode(\"%1\")").arg(m_value);
 }
 
+void Command::StringNode::accept(Command::NodeVisitor *visitor,
+                                 Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 QString Command::StringNode::value() const {
     return m_value;
 }

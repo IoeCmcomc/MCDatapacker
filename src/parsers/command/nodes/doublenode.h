@@ -10,9 +10,9 @@ public:
         explicit DoubleNode(int pos = -1, int length = 0, double value = 0);
 
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         double value() const;
         void setValue(double value);
 

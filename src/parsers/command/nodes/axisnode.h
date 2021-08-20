@@ -24,9 +24,9 @@ public:
         AxisNode(int pos);
 
         virtual QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         QString format() const;
 
         AxisType type() const;
@@ -53,10 +53,12 @@ private:
         bool m_useInteger = false;
     };
 
+
     class AngleNode : public AxisNode {
 public:
         AngleNode(AxisNode *other);
         virtual QString toString() const override;
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
     };
 }
 

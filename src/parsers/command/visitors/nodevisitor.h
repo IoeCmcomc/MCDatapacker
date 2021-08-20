@@ -11,6 +11,7 @@ namespace Command {
     class IntegerNode;
     class StringNode;
     class LiteralNode;
+    class AngleNode;
     class AxisNode;
     class AxesNode;
     class BlockStateNode;
@@ -72,8 +73,11 @@ namespace Command {
     class NodeVisitor
     {
 public:
+        enum class Order { Preorder, Postorder, };
+
         NodeVisitor();
 
+        virtual void startVisiting(ParseNode *node)       = 0;
         virtual void visit(ParseNode *node)               = 0;
         virtual void visit(RootNode *node)                = 0;
         virtual void visit(ArgumentNode *node)            = 0;
@@ -83,6 +87,7 @@ public:
         virtual void visit(IntegerNode *node)             = 0;
         virtual void visit(StringNode *node)              = 0;
         virtual void visit(LiteralNode *node)             = 0;
+        virtual void visit(AngleNode *node)               = 0;
         virtual void visit(AxisNode *node)                = 0;
         virtual void visit(AxesNode *node)                = 0;
         virtual void visit(BlockStateNode *node)          = 0;
@@ -140,6 +145,8 @@ public:
         virtual void visit(ParticleColorNode *node)       = 0;
         virtual void visit(ItemPredicateNode *node)       = 0;
         virtual void visit(const MapKey &key)             = 0;
+protected:
+        Order m_visitOrder = Order::Postorder;
     };
 }
 

@@ -155,22 +155,12 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                     rule.pattern.globalMatch(text);
                 while (matchIterator.hasNext()) {
                     QRegularExpressionMatch &&match = matchIterator.next();
-/*
-                      qDebug() << "Regex:" << rule.format <<
-                          rule.format.background() <<
-                          rule.format.foreground();
- */
                     setFormat(match.capturedStart(), match.capturedLength(),
                               rule.format);
                 }
             }
         } else {
             for (const auto &range: qAsConst(m_formats)) {
-/*
-                  qDebug() << "Fmter:" << range.format <<
-                      range.format.background() <<
-                      range.format.toolTip();
- */
                 mergeFormat(range.start, range.length, range.format);
             }
         }
@@ -218,7 +208,7 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
                 data->clearProblems();
 
                 Command::NodeFormatter formatter;
-                result->accept(&formatter);
+                formatter.startVisiting(result.get());
                 /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
                 document()->blockSignals(true);
                 rehighlightBlock(block, formatter.formatRanges());
@@ -251,7 +241,7 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
         parser.cache().capacity()
              << "Total access:" << parser.cache().stats().total_accesses()
              << "Total hit:" << parser.cache().stats().total_hits()
-             << "Total miss:" << parser.cache().stats().total_hits()
+             << "Total miss:" << parser.cache().stats().total_misses()
              << "Hit rate:" << parser.cache().stats().hit_rate()
              << "Time elapsed:" << timer.elapsed();
 }

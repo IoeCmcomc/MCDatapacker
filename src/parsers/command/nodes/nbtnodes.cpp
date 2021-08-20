@@ -11,6 +11,11 @@ QString Command::NbtNode::toString() const {
     return "NbtNode()";
 }
 
+void Command::NbtNode::accept(Command::NodeVisitor *visitor,
+                              Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 #define DEFINE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)              \
     static const int _ ## Class =                                        \
         qRegisterMetaType<QSharedPointer<Command::Class> >();            \
@@ -28,9 +33,9 @@ QString Command::NbtNode::toString() const {
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtByteNode, byte_tag, char)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtDoubleNode, double_tag, double)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtFloatNode, float_tag, float)
-DEFINE_PRIMITIVE_TAG_NBTNODE(NbtIntNode, int_tag, int)
+DEFINE_PRIMITIVE_TAG_NBTNODE(NbtIntNode, int_tag, int32_t)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtLongNode, long_tag, int64_t)
-DEFINE_PRIMITIVE_TAG_NBTNODE(NbtShortNode, short_tag, short)
+DEFINE_PRIMITIVE_TAG_NBTNODE(NbtShortNode, short_tag, int16_t)
 
 #define DEFINE_ARRAY_NBTNODE(Class, TagId)                     \
     static const int _ ## Class =                              \
@@ -63,6 +68,11 @@ Command::NbtStringNode::NbtStringNode(int pos,
 QString Command::NbtStringNode::toString() const {
     return QString("NbtStringNode(%1)").arg(m_value);
 }
+
+void Command::NbtStringNode::accept(Command::NodeVisitor *visitor,
+                                    Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
 QString Command::NbtStringNode::value() const {
     return m_value;
 }
@@ -86,6 +96,17 @@ QString Command::NbtListNode::toString() const {
         items << node->toString();
     }
     return QString("NbtListNode(%1)").arg(items.join(", "));
+}
+
+void Command::NbtListNode::accept(Command::NodeVisitor *visitor,
+                                  Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    for (const auto &node: qAsConst(m_vector)) {
+        node->accept(visitor, order);
+    }
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 nbt::tag_id Command::NbtListNode::id() const noexcept {
     return nbt::tag_id::tag_list;
@@ -119,6 +140,18 @@ QString Command::NbtCompoundNode::toString() const {
                                            i.value()->toString());
     }
     return "MapNode(" + itemReprs.join(", ") + ')';
+}
+
+void Command::NbtCompoundNode::accept(Command::NodeVisitor *visitor,
+                                      Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
+        visitor->visit(i.key());
+        i.value()->accept(visitor, order);
+    }
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }
 int Command::NbtCompoundNode::size() const {
     return m_map.size();

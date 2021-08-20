@@ -21,6 +21,16 @@ bool Command::ItemStackNode::isVaild() const {
     return ResourceLocationNode::isVaild() && m_nbt;
 }
 
+void Command::ItemStackNode::accept(Command::NodeVisitor *visitor,
+                                    Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (m_nbt)
+        m_nbt->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
+}
+
 QSharedPointer<Command::NbtCompoundNode> Command::ItemStackNode::nbt() const {
     return m_nbt;
 }
@@ -46,4 +56,14 @@ Command::ItemPredicateNode::ItemPredicateNode(Command::ItemStackNode *other)
 
 QString Command::ItemPredicateNode::toString() const {
     return ItemStackNode::toString().replace(0, 12, "ItemPredicateNode");
+}
+
+void Command::ItemPredicateNode::accept(Command::NodeVisitor *visitor,
+                                        Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (nbt())
+        nbt()->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }

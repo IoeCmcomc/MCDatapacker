@@ -12,6 +12,11 @@ QString Command::DoubleNode::toString() const {
     return QString("DoubleNode(%1)").arg(m_value);
 }
 
+void Command::DoubleNode::accept(Command::NodeVisitor *visitor,
+                                 Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 double Command::DoubleNode::value() const {
     return m_value;
 }

@@ -15,6 +15,11 @@ QString Command::ArgumentNode::parserId() const {
     return m_parserId;
 }
 
+void Command::ArgumentNode::accept(Command::NodeVisitor *visitor,
+                                   Command::NodeVisitor::Order) {
+    visitor->visit(this);
+}
+
 void Command::ArgumentNode::setParserId(const QString &parserId) {
     m_parserId = parserId;
 }

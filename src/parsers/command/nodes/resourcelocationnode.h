@@ -10,10 +10,10 @@ public:
         explicit ResourceLocationNode(int pos               = -1,
                                       const QString &nspace = "",
                                       const QString &id     = "");
-        virtual QString toString() const;
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        virtual QString toString() const override;
+        void accept(NodeVisitor *visitor,
+                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        override;
         QString format() const;
 
         QString nspace() const;

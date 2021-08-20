@@ -65,7 +65,7 @@ void TextNodeFormatter::test_case1() {
     }
 
     NodeFormatter formatter;
-    result->accept(&formatter);
+    formatter.startVisiting(result.get());
     auto ranges = formatter.formatRanges();
     qDebug() << ranges.length();
 }

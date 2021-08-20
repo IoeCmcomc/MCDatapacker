@@ -13,9 +13,7 @@ public:
         QString text() const;
         void setText(const QString &text);
 
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
 private:
         QString m_text;

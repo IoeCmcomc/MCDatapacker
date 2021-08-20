@@ -12,9 +12,7 @@ public:
         virtual QString toString() const override;
         QString parserId() const;
 
-        void accept(NodeVisitor *visitor) override {
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 protected:
         void setParserId(const QString &parserId);
 

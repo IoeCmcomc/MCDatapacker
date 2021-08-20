@@ -22,6 +22,18 @@ QString Command::BlockStateNode::toString() const {
     return ret;
 }
 
+void Command::BlockStateNode::accept(Command::NodeVisitor *visitor,
+                                     Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (m_states)
+        m_states->accept(visitor, order);
+    if (m_nbt)
+        m_nbt->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
+}
+
 bool Command::BlockStateNode::isVaild() const {
     return ResourceLocationNode::isVaild() && m_states && m_nbt;
 }
@@ -59,4 +71,16 @@ Command::BlockPredicateNode::BlockPredicateNode(Command::BlockStateNode *other)
 
 QString Command::BlockPredicateNode::toString() const {
     return BlockStateNode::toString().replace(0, 13, "BlockPredicateNode");
+}
+
+void Command::BlockPredicateNode::accept(Command::NodeVisitor *visitor,
+                                         Command::NodeVisitor::Order order) {
+    if (order == NodeVisitor::Order::Preorder)
+        visitor->visit(this);
+    if (states())
+        states()->accept(visitor, order);
+    if (nbt())
+        nbt()->accept(visitor, order);
+    if (order == NodeVisitor::Order::Postorder)
+        visitor->visit(this);
 }

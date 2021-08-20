@@ -11,7 +11,8 @@ public:
         explicit AxesNode(int pos = -1, int length = 0);
         virtual QString toString() const override;
         bool isVaild() const override;
-        virtual void accept(NodeVisitor *visitor) override;
+        virtual void accept(NodeVisitor *visitor,
+                            NodeVisitor::Order order) override;
 
         QSharedPointer<AxisNode> y();
         void setY(QSharedPointer<AxisNode> y);

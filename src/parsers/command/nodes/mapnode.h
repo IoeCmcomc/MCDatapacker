@@ -32,13 +32,7 @@ public:
         MapNode(int pos, int length = 0);
 
         QString toString() const override;
-        void accept(NodeVisitor *visitor) override {
-            for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
-                visitor->visit(i.key());
-                i.value()->accept(visitor);
-            }
-            visitor->visit(this);
-        }
+        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
         int size() const;
         bool contains(const QString &key) const;

@@ -748,9 +748,8 @@ void CodeEditor::setCurHighlighter(Highlighter *value) {
 void CodeEditor::displayErrors() {
     /*qDebug() << "CodeEditor::displayErrors"; */
     if (!isReadOnly()) {
-        auto &&selections = extraSelections().mid(0,
-                                                  problemSelectionStartIndex +
-                                                  1);
+        auto selections = extraSelections().
+                          mid(0, problemSelectionStartIndex + 1);
         selections += problemExtraSelections;
 
         setExtraSelections(selections);
@@ -869,6 +868,7 @@ bool CodeEditor::matchLeftBracket(QTextBlock currentBlock,
         if (info->character == corresponder) {
             if (numLeftParentheses == 0) {
                 createBracketSelection(docPos + info->pos, isPrimary);
+
                 return true;
             } else {
                 --numLeftParentheses;
@@ -939,7 +939,7 @@ void CodeEditor::createBracketSelection(int pos, bool isPrimary) {
     selection.cursor = std::move(cursor);
 
     selections << selection;
-    setExtraSelections(std::move(selections));
+    setExtraSelections(selections);
 }
 
 void CodeEditor::followNamespacedId(const QMouseEvent *event) {
