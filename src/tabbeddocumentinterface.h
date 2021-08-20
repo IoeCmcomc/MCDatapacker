@@ -61,7 +61,7 @@ signals:
 protected:
     void changeEvent(QEvent *event) override;
 
-private /*slots*/ :
+private slots:
     void onModificationChanged(bool changed);
     void onTabChanged(int index);
     void onTabMoved(int from, int to);
@@ -77,7 +77,6 @@ private:
 
     QVector<CodeFile> files;
     int prevIndex                 = -1;
-    QTimer *textChangedTimer      = nullptr;
     QTextDocument *lastRemovedDoc = nullptr;
     bool tabMovedOrRemoved        = false;
 

@@ -13,7 +13,6 @@
 #include <QSaveFile>
 #include <QShortcut>
 #include <QJsonDocument>
-#include <QTimer>
 
 
 TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
@@ -43,12 +42,6 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
             this, &TabbedDocumentInterface::onOpenFile);
     connect(ui->codeEditor, &CodeEditor::textChanged,
             this, &TabbedDocumentInterface::onCurTextChanged);
-
-    textChangedTimer = new QTimer(this);
-    textChangedTimer->setSingleShot(true);
-    connect(textChangedTimer, &QTimer::timeout,
-            this, &TabbedDocumentInterface::onCurTextChangingDone);
-
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
             &QShortcut::activated, [this]() {
@@ -560,15 +553,8 @@ void TabbedDocumentInterface::onSwitchPrevFile() {
 
 void TabbedDocumentInterface::onCurTextChanged() {
     /*qDebug() << "TabbedDocumentInterface::onCurTextChanged"; */
-    if (!hasNoFile() && getCurFile()->data.canConvert<TextFileData>()) {
-        auto data =
-            qvariant_cast<TextFileData>(getCurFile()->data);
-        const auto *highlighter = data.highlighter;
-        textChangedTimer->start(
-            (highlighter) ? highlighter->changedBlocks().length() : 0);
-    } else {
-        textChangedTimer->stop();
-    }
+    /* TODO: Delay the following method after 150ms without QTimer */
+    onCurTextChangingDone();
 }
 
 void TabbedDocumentInterface::onCurTextChangingDone() {
