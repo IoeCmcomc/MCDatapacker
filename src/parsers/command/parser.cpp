@@ -22,8 +22,6 @@ QString Command::Parser::Error::toLocalizedMessage() const {
     if (errMsg == what())
         errMsg = QCoreApplication::translate("Command::Parser", what());
 
-    qDebug() << what() << errMsg;
-
     for (int i = 0; i < args.size(); ++i) {
         errMsg = errMsg.arg(args.at(i).toString());
     }

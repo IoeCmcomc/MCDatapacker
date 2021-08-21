@@ -1,6 +1,7 @@
 #include "codegutter.h"
 
 #include "linenumberarea.h"
+#include "problemarea.h"
 
 #include <QPainter>
 #include <QGridLayout>
@@ -18,8 +19,11 @@ CodeGutter::CodeGutter(CodeEditor *parent) : QWidget(parent),
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+    m_problemArea = new ProblemArea(this);
+    layout->addWidget(m_problemArea, 0, 0);
+
     m_lineNumberArea = new LineNumberArea(this);
-    layout->addWidget(m_lineNumberArea, 0, 0);
+    layout->addWidget(m_lineNumberArea, 0, 1);
 
     adjustSize();
 }

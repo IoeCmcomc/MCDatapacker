@@ -7,6 +7,7 @@
 
 class CodeEditor;
 class LineNumberArea;
+class ProblemArea;
 
 class CodeGutter : public QWidget
 {
@@ -24,6 +25,7 @@ protected:
 private:
     CodeEditor *m_editor             = nullptr;
     LineNumberArea *m_lineNumberArea = nullptr;
+    ProblemArea *m_problemArea       = nullptr;
 };
 
 #endif /* CODEGUTTER_H */

@@ -3,7 +3,7 @@ TEMPLATE = app
 
 TARGET = MCDatapacker
 
-QT += core gui uitools winextras
+QT += core gui uitools winextras svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -96,6 +96,7 @@ SOURCES += \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/nodevisitor.cpp \
     predicatedock.cpp \
+    problemarea.cpp \
     rawjsontextedit.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/nodevisitor.h \
     predicatedock.h \
+    problemarea.h \
     rawjsontextedit.h \
     settingsdialog.h \
     stackedwidget.h \

@@ -12,7 +12,6 @@ class LineNumberArea : public QWidget
 public:
     LineNumberArea(CodeGutter *parent);
 
-    QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
 

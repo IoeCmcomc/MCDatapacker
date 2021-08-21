@@ -8,9 +8,6 @@ LineNumberArea::LineNumberArea(CodeGutter *parent) : QWidget(parent), m_gutter(
         parent) {
 }
 
-QSize LineNumberArea::minimumSizeHint() const {
-    return QSize(sizeHint().width(), 100);
-}
 
 QSize LineNumberArea::sizeHint() const {
     int digits = 1;

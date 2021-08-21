@@ -58,6 +58,7 @@ signals:
 
 protected:
     friend class LineNumberArea;
+    friend class ProblemArea;
 
     void resizeEvent(QResizeEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;

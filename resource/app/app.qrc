@@ -14,5 +14,8 @@
         <file>icon/format-text-strikethrough.png</file>
         <file>icon/format-text-underline.png</file>
         <file>icon/favicon_big.png</file>
+        <file>icon/gutter/error.svg</file>
+        <file>icon/gutter/warning.svg</file>
+        <file>icon/gutter/error-and-warning.svg</file>
     </qresource>
 </RCC>

@@ -6,6 +6,12 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
+win32 {
+QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage -O0
+QMAKE_LFLAGS += -g -fprofile-arcs -ftest-coverage -lgcov
+QMAKE_LFLAGS_WINDOWS += -g -fprofile-arcs -ftest-coverage -lgcov
+}
+
 SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/minecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/argumentnode.cpp \
