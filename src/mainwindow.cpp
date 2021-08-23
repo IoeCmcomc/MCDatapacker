@@ -26,8 +26,8 @@
 #include <QClipboard>
 
 
-QMap<QString, QVariantMap > MainWindow::MCRInfoMaps;
-QVersionNumber              MainWindow::curGameVersion = QVersionNumber(1, 15);
+QMap<QString, QVariantMap> MainWindow::MCRInfoMaps;
+QVersionNumber             MainWindow::curGameVersion = QVersionNumber(1, 15);
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -125,7 +125,7 @@ void MainWindow::initMenu() {
             this, &MainWindow::newDatapack);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
     connect(ui->actionOpenFolder, &QAction::triggered,
-            this, &MainWindow::openFolder);
+            this, qOverload<>(&MainWindow::openFolder));
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
     connect(ui->actionSaveAll, &QAction::triggered, this, &MainWindow::saveAll);
     connect(ui->actionRestart, &QAction::triggered, this, &MainWindow::restart);
@@ -171,9 +171,20 @@ void MainWindow::initMenu() {
 void MainWindow::open() {
     if (maybeSave()) {
         QString fileName
-            = QFileDialog::getOpenFileName(this, tr("Open file"), "");
-        if (!fileName.isEmpty())
+            = QFileDialog::getOpenFileName(this, tr("Open file"), QString());
+        if (!fileName.isEmpty()) {
+            QFileInfo finfo(fileName);
+            if (finfo.fileName() == QLatin1String("pack.mcmeta")) {
+                QString      errMsg;
+                const auto &&packInfo = readPackMcmeta(fileName, errMsg);
+                const auto &&dir      = finfo.dir();
+                if (folderIsVaild(dir, false) && (packInfo.packFormat > 0)
+                    && (QDir::current() != dir)) {
+                    loadFolder(dir.path(), packInfo);
+                }
+            }
             ui->tabbedInterface->openFile(fileName);
+        }
     }
 }
 
@@ -184,7 +195,7 @@ bool MainWindow::save() {
     if (auto *curFile = ui->tabbedInterface->getCurFile();
         curFile->fileInfo.fileName().isEmpty()) {
         QString filepath
-            = QFileDialog::getSaveFileName(this, tr("Save File"), "");
+            = QFileDialog::getSaveFileName(this, tr("Save File"), QString());
         if (!filepath.isEmpty())
             return ui->tabbedInterface->saveCurFile(filepath);
         else
@@ -396,95 +407,126 @@ bool MainWindow::maybeSave() {
     return true;
 }
 
-void MainWindow::loadFolder(const QString &dirPath) {
-    const QString &&pack_mcmeta = dirPath + QStringLiteral("/pack.mcmeta");
+void MainWindow::openFolder(const QString &dirpath) {
+    QDir dir(dirpath);
 
-    if (QFile::exists(pack_mcmeta)) {
-        if (pack_mcmeta.isEmpty()) {
-            return;
-        } else {
-#ifndef QT_NO_CURSOR
-            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-
-            QFile file(pack_mcmeta);
-            if (!file.open(QIODevice::ReadOnly)) {
-                QMessageBox::information(this, tr("Error"), file.errorString());
-            } else {
-                QTextStream     in(&file);
-                const QString &&json_string = in.readAll();
-                file.close();
-
-                QJsonDocument &&json_doc = QJsonDocument::fromJson(
-                    json_string.toUtf8());
-
-                if (json_doc.isNull()) {
-#ifndef QT_NO_CURSOR
-                    QGuiApplication::restoreOverrideCursor();
-#endif
-                    QMessageBox::information(this,
-                                             "pack.mcmeta error",
-                                             tr(
-                                                 "Failed to parse the pack.mcmeta file."));
-                    return;
-                }
-                if (!json_doc.isObject()) {
-#ifndef QT_NO_CURSOR
-                    QGuiApplication::restoreOverrideCursor();
-#endif
-                    QMessageBox::information(this,
-                                             "pack.mcmeta error",
-                                             tr(
-                                                 "The pack.mcmeta file is not a JSON object."));
-                    return;
-                }
-
-                QJsonObject json_obj = json_doc.object();
-
-                if (json_obj.isEmpty()) {
-#ifndef QT_NO_CURSOR
-                    QGuiApplication::restoreOverrideCursor();
-#endif
-                    QMessageBox::information(this,
-                                             "pack.mcmeta error",
-                                             tr(
-                                                 "The pack.mcmeta file's contents is empty."));
-                    return;
-                }
-
-                QVariantMap json_map = json_obj.toVariantMap();
-
-                auto &&curDir = QDir::current();
-                if (json_map.contains("pack")) {
-                    QVariantMap &&pack = json_map["pack"].toMap();
-                    if (pack.contains(QStringLiteral("description")) &&
-                        pack.contains(QStringLiteral("pack_format"))) {
-                        QDir dir(dirPath);
-                        m_packInfo = PackMetaInfo{
-                            pack["description"].toString(),
-                            pack["pack_format"].toInt() };
-                        QDir::setCurrent(dir.absolutePath());
-                        ui->datapackTreeView->load(dir);
-
-                        if (!curDir.path().isEmpty()) {
-                            this->fileWatcher.removePath(curDir.path());
-                            this->fileWatcher.addPath(curDir.path());
-                        }
-                        ui->tabbedInterface->clear();
-                        emit curDirChanged(dirPath);
-                        adjustForCurFolder(dirPath);
-#ifndef QT_NO_CURSOR
-                        QGuiApplication::restoreOverrideCursor();
-#endif
-                    }
-                }
-            }
+    if (folderIsVaild(dir)) {
+        const QString &&packMcmetaPath = dirpath + QStringLiteral(
+            "/pack.mcmeta");
+        QString      errMsg;
+        const auto &&metaInfo = readPackMcmeta(packMcmetaPath, errMsg);
+        if (metaInfo.packFormat > 0) {
+            loadFolder(dirpath, metaInfo);
         }
-    } else {
-        QMessageBox::information(this, tr("Error"),
-                                 tr("Invaild datapack folder."));
-        return;
     }
+}
+
+void MainWindow::loadFolder(const QString &dirPath,
+                            const PackMetaInfo &packInfo) {
+#ifndef QT_NO_CURSOR
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+    auto &&curDir = QDir::current();
+
+    QDir dir(dirPath);
+    QDir::setCurrent(dir.absolutePath());
+    ui->datapackTreeView->load(dir);
+
+    if (!curDir.path().isEmpty()) {
+        this->fileWatcher.removePath(curDir.path());
+        this->fileWatcher.addPath(curDir.path());
+    }
+    ui->tabbedInterface->clear();
+    m_packInfo = std::move(packInfo);
+    emit curDirChanged(dirPath);
+    adjustForCurFolder(dirPath);
+
+#ifndef QT_NO_CURSOR
+    QGuiApplication::restoreOverrideCursor();
+#endif
+}
+
+bool MainWindow::folderIsVaild(const QDir &dir, bool reportError) {
+    QDir datadir = dir;
+
+    if (datadir.cd(QStringLiteral("data"))) {
+        datadir.cdUp();
+        if (datadir.exists(QStringLiteral("pack.mcmeta"))) {
+            return true;
+        } else if (reportError) {
+            QMessageBox::critical(
+                this, tr("Can't load datapack"),
+                tr("The specified datapack must have a pack.mcmeta file."));
+        }
+    } else if (reportError) {
+        QMessageBox::critical(
+            this, tr("Can't load datapack"),
+            tr("The specified datapack must contain a /data folder."));
+    }
+    return false;
+}
+
+PackMetaInfo MainWindow::readPackMcmeta(const QString &filepath,
+                                        QString &errorMsg) const {
+    QFile        file(filepath);
+    PackMetaInfo ret;
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        errorMsg = file.errorString();
+        return ret;
+    } else {
+        QTextStream     in(&file);
+        const QString &&json_string = in.readAll();
+        file.close();
+
+        QJsonDocument &&json_doc = QJsonDocument::fromJson(
+            json_string.toUtf8());
+
+        if (json_doc.isNull()) {
+            errorMsg = QT_TR_NOOP("The file is not a vaild JSON file.");
+            return ret;
+        }
+        if (!json_doc.isObject()) {
+            errorMsg = QT_TR_NOOP("The file must contain a JSON object.");
+            return ret;
+        }
+
+        const QJsonObject &&json_obj = json_doc.object();
+
+        if (json_obj.isEmpty()) {
+            errorMsg = QT_TR_NOOP("The file contents is empty.");
+            return ret;
+        }
+
+        const QVariantMap &&json_map = json_obj.toVariantMap();
+
+        if (json_map.contains(QLatin1String("pack"))) {
+            const QVariantMap &&pack = json_map[QLatin1String("pack")].toMap();
+            if (pack.contains(QLatin1String("description")) &&
+                pack.contains(QLatin1String("pack_format"))) {
+                const int packFormat =
+                    pack[QLatin1String("pack_format")].toInt();
+                if (packFormat > 0) {
+                    ret.description =
+                        pack[QLatin1String("description")].toString();
+                    ret.packFormat = packFormat;
+                } else {
+                    errorMsg = QT_TR_NOOP(
+                        "The pack format number must be greater than 0.");
+                }
+            } else {
+                errorMsg = QT_TR_NOOP(
+                    "The %1 object must have the %2 and %3 keys");
+                errorMsg = errorMsg.arg(R"("pack")",
+                                        R"("description")",
+                                        R"("pack_format")");
+            }
+        } else {
+            errorMsg = QT_TR_NOOP("The root object must have the %1 section.");
+            errorMsg = errorMsg.arg(R"("pack")");
+        }
+    }
+    return ret;
 }
 
 QString MainWindow::getCurLocale() {
@@ -753,7 +795,8 @@ void MainWindow::newDatapack() {
                          .replace(".", "_").replace(":", "_");
         dir.mkpath(dirPath + QStringLiteral("/data/") + namesp);
 
-        loadFolder(dirPath);
+        loadFolder(dirPath,
+                   PackMetaInfo{ dialog->getDesc(), dialog->getFormat() });
         ui->tabbedInterface->openFile("pack.mcmeta");
     }
     delete dialog;
@@ -766,8 +809,9 @@ void MainWindow::openFolder() {
                                               QString(),
                                               QFileDialog::ShowDirsOnly |
                                               QFileDialog::DontResolveSymlinks);
-        if (!dirPath.isEmpty())
-            loadFolder(dirPath);
+        if (!dirPath.isEmpty()) {
+            openFolder(dirPath);
+        }
     }
 }
 
@@ -775,7 +819,7 @@ void MainWindow::openRecentFolder() {
     if (maybeSave()) {
         QAction *action = qobject_cast<QAction *>(sender());
         if (action)
-            loadFolder(action->data().toString());
+            openFolder(action->data().toString());
     }
 }
 

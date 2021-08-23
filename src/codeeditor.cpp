@@ -729,7 +729,7 @@ void CodeEditor::setCompleter(QCompleter *c) {
     m_completer->setCompletionMode(QCompleter::PopupCompletion);
     m_completer->setCaseSensitivity(Qt::CaseInsensitive);
     QObject::connect(m_completer,
-                     QOverload<const QString &>::of(&QCompleter::activated),
+                     qOverload<const QString &>(&QCompleter::activated),
                      this, &CodeEditor::insertCompletion);
 }
 

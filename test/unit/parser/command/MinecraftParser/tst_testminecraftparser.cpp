@@ -64,6 +64,7 @@ void TestMinecraftParser::initTestCase() {
      */
 
     timer.start();
+    /*QThread::sleep(5); */
 }
 
 void TestMinecraftParser::cleanupTestCase() {

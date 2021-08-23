@@ -18,7 +18,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->functionTypeCombo,
-            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            qOverload<int>(&QComboBox::currentIndexChanged),
             this, &LootTableFunction::onTypeChanged);
     connect(this, &QTabWidget::currentChanged, this,
             &LootTableFunction::onTabChanged);

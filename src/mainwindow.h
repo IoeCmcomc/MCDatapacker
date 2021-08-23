@@ -103,7 +103,11 @@ private:
     void readSettings();
     void writeSettings();
     bool maybeSave();
-    void loadFolder(const QString &dirPath);
+    void openFolder(const QString &dirpath);
+    void loadFolder(const QString &dirPath, const PackMetaInfo &packInfo);
+    bool folderIsVaild(const QDir &dir, bool reportError = true);
+    PackMetaInfo readPackMcmeta(const QString &filepath,
+                                QString &errorMsg) const;
 
     bool isPathRelativeTo(const QString &path, const QString &catDir);
     void loadLanguage(const QString& rLanguage, bool atStartup = false);

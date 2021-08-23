@@ -148,7 +148,8 @@ void Highlighter::highlightBlock(const QString &text) {
             setCurrentBlockState(-1);
         }
 
-        collectNamespacedIds(text, data);
+        if (QDir::current().exists())
+            collectNamespacedIds(text, data);
 
         if (!currentBlockUserData()) {
             setCurrentBlockUserData(data);
@@ -192,8 +193,8 @@ void Highlighter::collectNamespacedIds(const QString &text,
     auto &&matchIter = namespacedIdRegex.globalMatch(text);
 
     while (matchIter.hasNext()) {
-        auto match    = matchIter.next();
-        auto filepath = locateNamespacedId(match.captured());
+        auto            match    = matchIter.next();
+        const QString &&filepath = locateNamespacedId(match.captured());
         if (!filepath.isEmpty()) {
             auto *info = new NamespacedIdInfo();
             info->start  = match.capturedStart();
@@ -206,8 +207,8 @@ void Highlighter::collectNamespacedIds(const QString &text,
 }
 
 QString Highlighter::locateNamespacedId(QString id) {
-    Q_ASSERT(QDir::current().exists());
     bool isTag = false;
+
     if (Glhp::removePrefix(id, QStringLiteral("#")))
         isTag = true;
     auto dir = QDir::current();

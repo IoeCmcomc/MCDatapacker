@@ -28,7 +28,7 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
     connect(ui->browseBtn, &QAbstractButton::clicked,
             this, &NewDatapackDialog::browse);
 
-    connect(ui->formatInput, QOverload<int>::of(&QSpinBox::valueChanged),
+    connect(ui->formatInput, qOverload<int>(&QSpinBox::valueChanged),
             this, &NewDatapackDialog::checkOK);
     connect(ui->nameInput, &QLineEdit::textChanged,
             this, &NewDatapackDialog::checkOK);

@@ -17,7 +17,7 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     ui->setupUi(this);
     setTabEnabled(ENTRIES_TAB, false);
 
-    connect(ui->typeCmobo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    connect(ui->typeCmobo, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &LootTableEntry::onTypeChanged);
     connect(this, &QTabWidget::currentChanged,
             this, &LootTableEntry::onTabChanged);
