@@ -29,11 +29,11 @@ protected slots:
     void showDetails();
 
 private:
-    Ui::TagSelectorDialog *ui;
-    QStandardItemModel model;
     QSortFilterProxyModel filterModel;
+    QStandardItemModel model;
+    QVariantMap MCRTagInfo;
+    Ui::TagSelectorDialog *ui;
     QPushButton *selectButton = nullptr;
-    QMap<QString, QVariant> MCRTagInfo;
 
     void setupTagTreeView(CodeFile::FileType type);
     QString getInternalSelectedID();

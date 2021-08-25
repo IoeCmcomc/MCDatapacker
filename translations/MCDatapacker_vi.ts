@@ -1806,84 +1806,84 @@
     </message>
 </context>
 <context>
-    <name>MCRInvItem</name>
+    <name>InventoryItem</name>
     <message>
-        <location filename="mcrinvitem.cpp" line="218"/>
+        <location filename="inventoryitem.cpp" line="218"/>
         <source>Item tag: </source>
         <translation>Nhãn vật phẩm: </translation>
     </message>
     <message>
-        <location filename="mcrinvitem.cpp" line="253"/>
+        <location filename="inventoryitem.cpp" line="253"/>
         <source>Empty item</source>
         <translation>Vật phẩm trống</translation>
     </message>
     <message>
-        <location filename="mcrinvitem.cpp" line="261"/>
+        <location filename="inventoryitem.cpp" line="261"/>
         <source>Unknown item: </source>
         <translation>Vật phẩm không rõ: </translation>
     </message>
 </context>
 <context>
-    <name>MCRInvSlot</name>
+    <name>InventorySlot</name>
     <message>
-        <location filename="mcrinvslot.cpp" line="144"/>
+        <location filename="inventoryslot.cpp" line="144"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="mcrinvslot.cpp" line="149"/>
+        <location filename="inventoryslot.cpp" line="149"/>
         <source>%1 items: </source>
         <translation>%1 vật phẩm: </translation>
     </message>
     <message>
-        <location filename="mcrinvslot.cpp" line="163"/>
+        <location filename="inventoryslot.cpp" line="163"/>
         <source>Remove</source>
         <translation>Loại bỏ</translation>
     </message>
     <message>
-        <location filename="mcrinvslot.cpp" line="172"/>
+        <location filename="inventoryslot.cpp" line="172"/>
         <source>Select tag...</source>
         <translation>Chọn nhãn...</translation>
     </message>
 </context>
 <context>
-    <name>MCRInvSlotEditor</name>
+    <name>InventorySlotEditor</name>
     <message>
-        <location filename="mcrinvsloteditor.ui" line="14"/>
+        <location filename="inventorysloteditor.ui" line="14"/>
         <source>Items in slot</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="mcrinvsloteditor.ui" line="35"/>
-        <location filename="mcrinvsloteditor.cpp" line="43"/>
-        <location filename="mcrinvsloteditor.cpp" line="103"/>
-        <location filename="mcrinvsloteditor.cpp" line="120"/>
-        <location filename="mcrinvsloteditor.cpp" line="154"/>
+        <location filename="inventorysloteditor.ui" line="35"/>
+        <location filename="inventorysloteditor.cpp" line="43"/>
+        <location filename="inventorysloteditor.cpp" line="103"/>
+        <location filename="inventorysloteditor.cpp" line="120"/>
+        <location filename="inventorysloteditor.cpp" line="154"/>
         <source>Items</source>
         <translation>Vật phẩm</translation>
     </message>
     <message>
-        <location filename="mcrinvsloteditor.ui" line="77"/>
+        <location filename="inventorysloteditor.ui" line="77"/>
         <source>Remove</source>
         <translation>Loại bỏ</translation>
     </message>
     <message>
-        <location filename="mcrinvsloteditor.ui" line="84"/>
+        <location filename="inventorysloteditor.ui" line="84"/>
         <source>New</source>
         <translation>Mới</translation>
     </message>
     <message>
-        <location filename="mcrinvsloteditor.cpp" line="25"/>
+        <location filename="inventorysloteditor.cpp" line="25"/>
         <source>Item...</source>
         <translation>Vật phẩm...</translation>
     </message>
     <message>
-        <location filename="mcrinvsloteditor.cpp" line="27"/>
+        <location filename="inventorysloteditor.cpp" line="27"/>
         <source>Item tag...</source>
         <translation>Nhãn vật phẩm...</translation>
     </message>
     <message>
-        <location filename="mcrinvsloteditor.cpp" line="32"/>
+        <location filename="inventorysloteditor.cpp" line="32"/>
         <source>New item...</source>
         <translation>Vật phẩm mới...</translation>
     </message>

@@ -1,12 +1,13 @@
 #ifndef BLOCKITEMSELECTORDIALOG_H
 #define BLOCKITEMSELECTORDIALOG_H
 
-#include "mcrinvitem.h"
+#include "inventoryslot.h"
+#include "inventoryitemfiltermodel.h"
 
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QPushButton>
-#include "mcritemsortfilterproxymodel.h"
+
 
 namespace Ui {
     class BlockItemSelectorDialog;
@@ -17,25 +18,30 @@ class BlockItemSelectorDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit BlockItemSelectorDialog(QWidget *parent = nullptr);
+    using SelectCategory = InventorySlot::SelectCategory;
+    using FilterModel    = InventoryItemFilterModel;
+
+    explicit BlockItemSelectorDialog(QWidget *parent         = nullptr,
+                                     SelectCategory category = SelectCategory::ObtainableItems);
     ~BlockItemSelectorDialog();
 
     QString getSelectedID();
-    QVector<MCRInvItem> getSelectedItems();
+    QVector<InventoryItem> getSelectedItems();
 
+    void setAllowMultiple(bool value);
 
-    bool getAllowMultiItems() const;
-    void setAllowMultiItems(bool value);
+    void setCategory(const SelectCategory &category);
 
-protected slots:
+private slots:
     void checkOK();
 
 private:
-    Ui::BlockItemSelectorDialog *ui;
+    InventoryItemFilterModel filterModel;
     QStandardItemModel model;
-    MCRItemSortFilterProxyModel filterModel;
-    QPushButton *selectButton;
-    bool allowMultiItems = true;
+    Ui::BlockItemSelectorDialog *ui;
+    QPushButton *selectButton = nullptr;
+    SelectCategory m_category = SelectCategory::ObtainableItems;
+    bool allowMultiple        = true;
 
     void setupListView();
 };

@@ -1,7 +1,7 @@
 #include "tagselectordialog.h"
 #include "ui_tagselectordialog.h"
 
-#include "mcrinvitem.h"
+#include "inventoryitem.h"
 #include "globalhelpers.h"
 #include "mainwindow.h"
 
@@ -36,9 +36,7 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
     selectButton = new QPushButton(tr("Select"), this);
     ui->buttonBox->removeButton(ui->buttonBox->button(QDialogButtonBox::Ok));
     ui->buttonBox->addButton(selectButton, QDialogButtonBox::ActionRole);
-    connect(selectButton,
-            &QPushButton::clicked,
-            this,
+    connect(selectButton, &QPushButton::clicked, this,
             &TagSelectorDialog::accept);
 
     checkOK();
@@ -59,23 +57,23 @@ void TagSelectorDialog::setupTagTreeView(
     QString tagStr = QStringLiteral("tag/");
     switch (type) {
     case CodeFile::BlockTag:
-        tagStr += "block";
+        tagStr += QStringLiteral("block");
         break;
 
     case CodeFile::EntityTypeTag:
-        tagStr += "entity_type";
+        tagStr += QStringLiteral("entity_type");
         break;
 
     case CodeFile::FluidTag:
-        tagStr += "fluid";
+        tagStr += QStringLiteral("fluid");
         break;
 
     case CodeFile::FunctionTag:
-        tagStr += "function";
+        tagStr += QStringLiteral("function");
         break;
 
     case CodeFile::ItemTag:
-        tagStr += "item";
+        tagStr += QStringLiteral("item");
         break;
 
     default:
@@ -94,8 +92,7 @@ void TagSelectorDialog::setupTagTreeView(
 
     MCRTagInfo = MainWindow::readMCRInfo(tagStr);
 
-    QMap<QString,
-         QVariant>::const_iterator tagIter = MCRTagInfo.constBegin();
+    auto tagIter = MCRTagInfo.constBegin();
     while ((tagIter != MCRTagInfo.constEnd())) {
         auto *item = new QStandardItem(
             QStringLiteral("minecraft:") + tagIter.key());
@@ -107,7 +104,7 @@ void TagSelectorDialog::setupTagTreeView(
 QString TagSelectorDialog::getInternalSelectedID() {
     auto indexes = ui->tagListView->selectionModel()->selectedIndexes();
 
-    if (indexes.isEmpty()) return "";
+    if (indexes.isEmpty()) return QString();
 
     QStandardItem *item =
         model.itemFromIndex(filterModel.mapToSource(indexes[0]));
@@ -116,26 +113,23 @@ QString TagSelectorDialog::getInternalSelectedID() {
 }
 
 QString TagSelectorDialog::getSelectedID() {
-    auto internalID = getInternalSelectedID();
-    auto id         = internalID;
+    const auto &&internalID = getInternalSelectedID();
+    const auto  &id         = internalID;
 
-    return QStringLiteral("#") + id;
+    return '#' + id;
 }
 
 void TagSelectorDialog::checkOK() {
-    if (getInternalSelectedID().isEmpty())
-        selectButton->setEnabled(false);
-    else
-        selectButton->setEnabled(true);
+    selectButton->setEnabled(!getInternalSelectedID().isEmpty());
 }
 
 void TagSelectorDialog::showDetails() {
     auto id = getInternalSelectedID();
 
     if (!id.isEmpty()) {
-        Glhp::removePrefix(id, "minecraft:");
+        Glhp::removePrefix(id, QStringLiteral("minecraft:"));
         if (MCRTagInfo.contains(id)) {
-            auto details = MCRTagInfo[id].toString();
+            const auto details = MCRTagInfo[id].toString();
             ui->tagDetailsLabel->setText(details);
             return;
         }

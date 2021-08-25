@@ -4,8 +4,8 @@
 #include "mcrpredcondition.h"
 #include "loottablefunction.h"
 #include "loottableeditordock.h"
-#include "mcrinvslot.h"
-#include "mcrinvitem.h"
+#include "inventoryslot.h"
+#include "inventoryitem.h"
 #include "globalhelpers.h"
 
 #include <QDebug>
@@ -31,7 +31,7 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTableEntry::updateConditionsTab);
 
-    ui->itemSlot->setAcceptMultiItems(false);
+    ui->itemSlot->setAcceptMultiple(false);
     ui->itemSlot->setAcceptTag(false);
 }
 
@@ -64,7 +64,7 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
 
     case 1: {      /* Item */
         if (root.contains(QLatin1String("name")))
-            ui->itemSlot->appendItem(MCRInvItem(root.value(QLatin1String("name"))
+            ui->itemSlot->appendItem(InventoryItem(root.value(QLatin1String("name"))
                                                 .toString()));
         break;
     }
@@ -142,7 +142,7 @@ QJsonObject LootTableEntry::toJson() const {
             break;
 
         case 1: {  /*Item */
-            if (ui->itemSlot->size() == 1)
+            if (ui->itemSlot->itemCount() == 1)
                 root.insert("name", ui->itemSlot->itemNamespacedID(0));
             break;
         }

@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="1" rowspan="2">
-    <widget class="MCRInvSlot" name="itemSlot">
+    <widget class="InventorySlot" name="itemSlot">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -327,9 +327,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MCRInvSlot</class>
+   <class>InventorySlot</class>
    <extends>QFrame</extends>
-   <header>mcrinvslot.h</header>
+   <header>inventoryslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

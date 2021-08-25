@@ -1,6 +1,6 @@
-#include "mcrinvitem.h"
+#include "inventoryitem.h"
 
-#include "mcrinvslot.h"
+#include "inventoryslot.h"
 #include "mainwindow.h"
 
 #include "globalhelpers.h"
@@ -10,14 +10,14 @@
 #include <QGraphicsColorizeEffect>
 
 char _init() {
-    qRegisterMetaType<MCRInvItem>();
-    qRegisterMetaTypeStreamOperators<MCRInvItem>("MCRInvItem");
-    QMetaType::registerComparators<MCRInvItem>();
+    qRegisterMetaType<InventoryItem>();
+    qRegisterMetaTypeStreamOperators<InventoryItem>("InventoryItem");
+    QMetaType::registerComparators<InventoryItem>();
     return 0;
 };
 const auto _ = _init();
 
-MCRInvItem::MCRInvItem(const QString &id) {
+InventoryItem::InventoryItem(const QString &id) {
 /*    qDebug() << "Calling normal constructor" << this; */
     setEmpty(id.isEmpty());
     if (!isEmpty()) {
@@ -25,12 +25,12 @@ MCRInvItem::MCRInvItem(const QString &id) {
     }
 }
 
-MCRInvItem::MCRInvItem() {
+InventoryItem::InventoryItem() {
     /*qDebug() << "Calling void constructor" << this; */
     setEmpty(true);
 }
 
-MCRInvItem::MCRInvItem(const MCRInvItem &other) {
+InventoryItem::InventoryItem(const InventoryItem &other) {
 /*    qDebug() << "Calling copy constructor" << this; */
     setEmpty(other.isEmpty());
     if (!isEmpty()) {
@@ -39,11 +39,11 @@ MCRInvItem::MCRInvItem(const MCRInvItem &other) {
     }
 }
 
-MCRInvItem::~MCRInvItem() {
+InventoryItem::~InventoryItem() {
     /*qDebug() << this << "is going to be deleted."; */
 }
 
-void MCRInvItem::setupItem(QString id) {
+void InventoryItem::setupItem(QString id) {
     QString iconpath;
     QPixmap iconpix;
 
@@ -101,36 +101,44 @@ void MCRInvItem::setupItem(QString id) {
     }
     setPixmap(iconpix);
 
-    const auto MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
-    const auto MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+    const auto &MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
+    const auto &MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
     if (MCRItemInfo.contains(id)) {
         setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
                                                         "name")).toString());
-        setHasBlockForm(false);
+        m_flags = Item;
     } else if (MCRBlockInfo.contains(id)) {
-        auto blockMap = MCRBlockInfo.value(id).toMap();
-        if (!blockMap.contains(QStringLiteral("unobtainable")))
-            setName(blockMap.value(QStringLiteral("name")).toString());
-        setHasBlockForm(true);
+        const auto blockMap = MCRBlockInfo.value(id).toMap();
+        setIsItem(!blockMap.contains(QStringLiteral("unobtainable")));
+        setName(blockMap.value(QStringLiteral("name")).toString());
+        setIsBlock(true);
     }
 }
 
-bool MCRInvItem::isEmpty() const {
+bool InventoryItem::isEmpty() const {
     return m_isEmpty;
 }
 
-void MCRInvItem::setEmpty(const bool &value) {
+InventoryItem::Flags InventoryItem::getFlags() const {
+    return m_flags;
+}
+
+void InventoryItem::setFlags(const Flags &flags) {
+    m_flags = flags;
+}
+
+void InventoryItem::setEmpty(const bool &value) {
     m_isEmpty = value;
     if (isEmpty()) {
-        namespacedID.clear();
+        m_namespacedId.clear();
         setName(QString());
-        setHasBlockForm(false);
-        isTag  = false;
-        pixmap = QPixmap();
+        setIsBlock(false);
+        m_flags &= ~Flag::Tag;
+        m_pixmap = QPixmap();
     }
 }
 
-MCRInvItem &MCRInvItem::operator=(const MCRInvItem &other) {
+InventoryItem &InventoryItem::operator=(const InventoryItem &other) {
 /*    qDebug() << "Calling operator ="; */
 
     if (&other == this)
@@ -145,52 +153,52 @@ MCRInvItem &MCRInvItem::operator=(const MCRInvItem &other) {
     return *this;
 }
 
-bool MCRInvItem::operator==(const MCRInvItem &other) {
+bool InventoryItem::operator==(const InventoryItem &other) {
     auto r = (getNamespacedID() == other.getNamespacedID());
 
     r = r && (getName() == other.getName());
     return r;
 }
 
-bool MCRInvItem::operator==(const MCRInvItem &other) const {
+bool InventoryItem::operator==(const InventoryItem &other) const {
     auto r = (getNamespacedID() == other.getNamespacedID());
 
     r = r && (getName() == other.getName());
     return r;
 }
 
-bool MCRInvItem::operator!=(const MCRInvItem &other) {
+bool InventoryItem::operator!=(const InventoryItem &other) {
     return !(*this == other);
 }
 
-bool MCRInvItem::operator!=(const MCRInvItem &other) const {
+bool InventoryItem::operator!=(const InventoryItem &other) const {
     return !(*this == other);
 }
 
-bool MCRInvItem::operator<(const MCRInvItem &other) const {
+bool InventoryItem::operator<(const InventoryItem &other) const {
     if (getNamespacedID() == other.getNamespacedID())
         return getName() < other.getName();
     else
         return getNamespacedID() < other.getNamespacedID();
 }
 
-QString MCRInvItem::getName() const {
-    return this->name;
+QString InventoryItem::getName() const {
+    return this->m_name;
 }
 
-void MCRInvItem::setName(const QString &name) {
-    this->name = name;
+void InventoryItem::setName(const QString &name) {
+    this->m_name = name;
 }
 
-QString MCRInvItem::getNamespacedID() const {
+QString InventoryItem::getNamespacedID() const {
 /*    qDebug() << "getNamespacedID" << namespacedID; */
-    return namespacedID;
+    return m_namespacedId;
 }
 
-void MCRInvItem::setNamespacedID(const QString &id) {
+void InventoryItem::setNamespacedID(const QString &id) {
 /*    qDebug() << "setNamespacedID" << id; */
     if (id.isEmpty()) {
-        qWarning() << "Can't set namespacedID to en empty MCRInvItem";
+        qWarning() << "Can't set namespacedID to en empty InventoryItem";
         return;
     }
 
@@ -212,75 +220,85 @@ void MCRInvItem::setNamespacedID(const QString &id) {
         setPixmap(iconpix);
         auto idNoTag = id.mid(1);
         if (!idNoTag.contains(QStringLiteral(":")))
-            this->namespacedID = QStringLiteral("#minecraft:") + idNoTag;
+            this->m_namespacedId = QStringLiteral("#minecraft:") + idNoTag;
         else
-            this->namespacedID = QStringLiteral("#") + idNoTag;
-        setName(QCoreApplication::translate("MCRInvItem",
+            this->m_namespacedId = QStringLiteral("#") + idNoTag;
+        setName(QCoreApplication::translate("InventoryItem",
                                             "Item tag: ") + id.midRef(1));
-        isTag = true;
+        m_flags |= Tag;
     } else {
-        isTag = false;
+        m_flags &= ~Tag;
         setupItem(id);
-        if (!id.contains(":"))
-            this->namespacedID = QStringLiteral("minecraft:") + id;
+        if (!id.contains(':'))
+            this->m_namespacedId = QStringLiteral("minecraft:") + id;
         else
-            this->namespacedID = id;
+            this->m_namespacedId = id;
     }
 }
 
-bool MCRInvItem::getHasBlockForm() const {
-    return hasBlockForm;
+bool InventoryItem::isBlock() const {
+    return m_flags.testFlag(Block);
 }
 
-void MCRInvItem::setHasBlockForm(const bool &value) {
-    hasBlockForm = value;
+void InventoryItem::setIsBlock(const bool &value) {
+    m_flags.setFlag(Block, value);
 }
 
-bool MCRInvItem::getIsTag() const {
-    return isTag;
+bool InventoryItem::isItem() const {
+    return m_flags.testFlag(Item);
 }
 
-QPixmap MCRInvItem::getPixmap() const {
-    return pixmap;
+void InventoryItem::setIsItem(const bool &value) {
+    m_flags.setFlag(Item, value);
 }
 
-void MCRInvItem::setPixmap(const QPixmap &value) {
-    pixmap = value;
+bool InventoryItem::isTag() const {
+    return m_flags.testFlag(Tag);
 }
 
-QString MCRInvItem::toolTip() const {
+QPixmap InventoryItem::getPixmap() const {
+    return m_pixmap;
+}
+
+void InventoryItem::setPixmap(const QPixmap &value) {
+    m_pixmap = value;
+}
+
+QString InventoryItem::toolTip() const {
     if (isEmpty()) {
-        return QCoreApplication::translate("MCRInvItem", "Empty item");
-    } else if (!name.isEmpty()) {
-        if (getIsTag())
-            return name;
+        return QCoreApplication::translate("InventoryItem", "Empty item");
+    } else if (!m_name.isEmpty()) {
+        if (isTag())
+            return m_name;
         else
-            return name + "<br>" + QString("<br><code>%1</code>").arg(
-                namespacedID);
+            return m_name + "<br>" + QString("<br><code>%1</code>").arg(
+                m_namespacedId);
     } else {
-        return QCoreApplication::translate("MCRInvItem",
-                                           "Unknown item: ") + namespacedID;
+        return QCoreApplication::translate("InventoryItem",
+                                           "Unknown item: ") + m_namespacedId;
     }
 }
 
-QDataStream &operator<<(QDataStream &out, const MCRInvItem &obj) {
-    out << obj.getNamespacedID() << obj.getName();
+QDataStream &operator<<(QDataStream &out, const InventoryItem &obj) {
+    out << obj.m_flags << obj.getNamespacedID() << obj.getName();
     return out;
 }
-QDataStream &operator>>(QDataStream &in, MCRInvItem &obj) {
-    QString namespacedID;
-    QString name;
+QDataStream &operator>>(QDataStream &in, InventoryItem &obj) {
+    InventoryItem::Flags flags;
+    QString              namespacedID;
+    QString              name;
 
-    in >> namespacedID >> name;
+    in >> flags >> namespacedID >> name;
+    obj.m_flags = flags;
     obj.setNamespacedID(namespacedID);
     obj.setName(name);
     return in;
 }
 
-QDebug operator<<(QDebug debug, const MCRInvItem &item) {
+QDebug operator<<(QDebug debug, const InventoryItem &item) {
     QDebugStateSaver saver(debug);
 
-    debug.nospace() << "MCRInvItem(";
+    debug.nospace() << "InventoryItem(";
     if (!item.isEmpty()) {
         debug.nospace() << item.getNamespacedID();
         if (!item.getName().isEmpty())

@@ -157,7 +157,7 @@
                <enum>QFrame::NoFrame</enum>
               </property>
               <property name="currentIndex">
-               <number>3</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="craftingPage">
                <property name="sizePolicy">
@@ -206,7 +206,7 @@
                    <number>0</number>
                   </property>
                   <item row="0" column="1">
-                   <widget class="MCRInvSlot" name="craftingSlot_2">
+                   <widget class="InventorySlot" name="craftingSlot_2">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -237,7 +237,7 @@
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="MCRInvSlot" name="craftingSlot_4">
+                   <widget class="InventorySlot" name="craftingSlot_4">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -265,7 +265,7 @@
                    </widget>
                   </item>
                   <item row="1" column="2">
-                   <widget class="MCRInvSlot" name="craftingSlot_6">
+                   <widget class="InventorySlot" name="craftingSlot_6">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -293,7 +293,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="MCRInvSlot" name="craftingSlot_5">
+                   <widget class="InventorySlot" name="craftingSlot_5">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -321,7 +321,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="MCRInvSlot" name="craftingSlot_8">
+                   <widget class="InventorySlot" name="craftingSlot_8">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -349,7 +349,7 @@
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="MCRInvSlot" name="craftingSlot_3">
+                   <widget class="InventorySlot" name="craftingSlot_3">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -377,7 +377,7 @@
                    </widget>
                   </item>
                   <item row="2" column="0">
-                   <widget class="MCRInvSlot" name="craftingSlot_7">
+                   <widget class="InventorySlot" name="craftingSlot_7">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -405,7 +405,7 @@
                    </widget>
                   </item>
                   <item row="0" column="0">
-                   <widget class="MCRInvSlot" name="craftingSlot_1">
+                   <widget class="InventorySlot" name="craftingSlot_1">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -433,7 +433,7 @@
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="MCRInvSlot" name="craftingSlot_9">
+                   <widget class="InventorySlot" name="craftingSlot_9">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -502,7 +502,7 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="MCRInvSlot" name="smeltingSlot_0">
+                   <widget class="InventorySlot" name="smeltingSlot_0">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -555,7 +555,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="MCRInvSlot" name="smeltingSlot_1">
+                   <widget class="InventorySlot" name="smeltingSlot_1">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -592,7 +592,7 @@
               <widget class="QWidget" name="stonecutPage">
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
-                 <widget class="MCRInvSlot" name="stonecuttingSlot">
+                 <widget class="InventorySlot" name="stonecuttingSlot">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -638,7 +638,7 @@
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_4">
                   <item>
-                   <widget class="MCRInvSlot" name="smithingSlot_0">
+                   <widget class="InventorySlot" name="smithingSlot_0">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -691,7 +691,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="MCRInvSlot" name="smithingSlot_1">
+                   <widget class="InventorySlot" name="smithingSlot_1">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                       <horstretch>0</horstretch>
@@ -758,7 +758,7 @@
                <number>32</number>
               </property>
               <item>
-               <widget class="MCRInvSlot" name="outputSlot">
+               <widget class="InventorySlot" name="outputSlot">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
                   <horstretch>0</horstretch>
@@ -1122,9 +1122,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MCRInvSlot</class>
+   <class>InventorySlot</class>
    <extends>QFrame</extends>
-   <header>mcrinvslot.h</header>
+   <header>inventoryslot.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

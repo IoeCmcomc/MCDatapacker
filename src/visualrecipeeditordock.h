@@ -1,7 +1,7 @@
 #ifndef VISUALRECIPEEDITORDOCK_H
 #define VISUALRECIPEEDITORDOCK_H
 
-#include "mcrinvslot.h"
+#include "inventoryslot.h"
 
 #include <QDockWidget>
 #include <QStandardItemModel>
@@ -34,7 +34,7 @@ private slots:
 private:
     Ui::VisualRecipeEditorDock *ui;
 
-    QVector<MCRInvSlot*> craftingSlots;
+    QVector<InventorySlot*> craftingSlots;
     bool isResizing    = false;
     int lastTabIndex   = 0;
     int lastStackIndex = 0;
@@ -51,7 +51,7 @@ private:
     void readSmithingJson(const QJsonObject &root);
 };
 
-QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items);
-QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal);
+QJsonValue ingredientsToJson(const QVector<InventoryItem> &items);
+QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal);
 
 #endif /* VISUALRECIPEEDITORDOCK_H */

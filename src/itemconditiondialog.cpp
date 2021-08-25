@@ -3,7 +3,7 @@
 
 #include "mainwindow.h"
 #include "extendeddelegate.h"
-#include "mcrinvslot.h"
+#include "inventoryslot.h"
 
 ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
@@ -17,7 +17,7 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui->enchant_levelInput->setTypes(typeFlags);
     ui->stored_levelInput->setTypes(typeFlags);
     ui->itemSlot->setAcceptTag(false);
-    ui->itemSlot->setAcceptMultiItems(false);
+    ui->itemSlot->setAcceptMultiple(false);
 
     initComboModelView("effect", potionsModel, ui->potionCombo);
     initComboModelView("enchantment",
@@ -30,7 +30,7 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     initTable(ui->stored_table);
 
     connect(ui->itemRadio, &QRadioButton::toggled,
-            ui->itemSlot, &MCRInvSlot::setEnabled);
+            ui->itemSlot, &InventorySlot::setEnabled);
     connect(ui->tagRadio, &QRadioButton::toggled,
             ui->itemTagEdit, &QLineEdit::setEnabled);
     connect(ui->enchant_addBtn, &QPushButton::clicked,
@@ -102,7 +102,7 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
         return;
 
     if (value.contains(QStringLiteral("item"))) {
-        ui->itemSlot->setItem(MCRInvItem(value[QStringLiteral(
+        ui->itemSlot->setItem(InventoryItem(value[QStringLiteral(
                                                    "item")].toString()));
     } else if (value.contains(QStringLiteral("tag"))) {
         ui->itemTagEdit->setText(value[QStringLiteral("tag")].toString());

@@ -182,9 +182,12 @@ void CodeEditor::readPrefSettings() {
         completer->setWrapAround(false);
         setCompleter(completer);
 
-        qDebug() << minecraftCompletionInfo.size() <<
-            m_completer->model()->rowCount() <<
-            m_completer->completionModel()->rowCount();
+
+/*
+          qDebug() << minecraftCompletionInfo.size() <<
+              m_completer->model()->rowCount() <<
+              m_completer->completionModel()->rowCount();
+ */
     }
 
     settings.beginGroup("editor");

@@ -226,7 +226,7 @@ CodeFile TabbedDocumentInterface::readFile(const QString &path) {
                 ++c;
             }
 
-            TextFileData data(new QTextDocument(this));
+            TextFileData data(new QTextDocument(this), &newFile);
             auto         doc = data.doc;
             doc->setPlainText(content);
             doc->setMetaInformation(QTextDocument::DocumentTitle,

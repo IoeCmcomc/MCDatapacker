@@ -72,7 +72,7 @@ QJsonObject LocationConditionDialog::toJson() const {
         QJsonObject block;
         if (ui->block_blockRadio->isChecked()) {
             auto invItem = ui->blockCombo->currentData(Qt::UserRole + 1)
-                           .value<MCRInvItem>();
+                           .value<InventoryItem>();
             block.insert(QStringLiteral("block"), invItem.getNamespacedID());
         } else if (!ui->blockTagEdit->text().isEmpty()) {
             block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
@@ -130,7 +130,7 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         QJsonObject block = value[QStringLiteral("block")].toObject();
         ui->block_tagRadio->setChecked(block.contains(QStringLiteral("tag")));
         if (block.contains(QStringLiteral("block"))) {
-            MCRInvItem invItem(block[QStringLiteral("block")].toString());
+            InventoryItem invItem(block[QStringLiteral("block")].toString());
             /*qDebug() << invItem; */
             setupComboFrom(ui->blockCombo, QVariant::fromValue(invItem));
         } else if (block.contains(QStringLiteral("tag"))) {
@@ -150,7 +150,7 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         QJsonObject fluid = value[QStringLiteral("fluid")].toObject();
         ui->fluid_tagRadio->setChecked(fluid.contains(QStringLiteral("tag")));
         if (fluid.contains(QStringLiteral("fluid"))) {
-            MCRInvItem invItem(fluid[QStringLiteral("fluid")].toString());
+            InventoryItem invItem(fluid[QStringLiteral("fluid")].toString());
             setupComboFrom(ui->fluidCombo, QVariant::fromValue(invItem));
         } else if (fluid.contains(QStringLiteral("tag"))) {
             ui->blockTagEdit->setText(fluid[QStringLiteral("tag")].toString());
@@ -208,7 +208,7 @@ void LocationConditionDialog::initBlockGroup() {
     /*blocksModel.appendRow(new QStandardItem(tr("(not set)"))); */
     auto blocksInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
     for (const auto &key : blocksInfo.keys()) {
-        MCRInvItem     invItem(key);
+        InventoryItem     invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {

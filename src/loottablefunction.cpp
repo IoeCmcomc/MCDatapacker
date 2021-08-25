@@ -3,7 +3,7 @@
 
 #include "mcrpredcondition.h"
 #include "ui_loottablefunction.h"
-#include "mcrinvitem.h"
+#include "inventoryitem.h"
 #include "mainwindow.h"
 #include "extendeddelegate.h"
 #include "globalhelpers.h"
@@ -125,7 +125,7 @@ QJsonObject LootTableFunction::toJson() const {
 
     case 2: { /* Copy states */
         root.insert("block",
-                    qvariant_cast<MCRInvItem>(
+                    qvariant_cast<InventoryItem>(
                         ui->copyState_blockCombo->currentData(
                             Qt::UserRole + 1)).getNamespacedID());
         QJsonArray properties;
@@ -379,7 +379,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             return;
 
         QVariant vari;
-        vari.setValue(MCRInvItem(root.value("block").toString()));
+        vari.setValue(InventoryItem(root.value("block").toString()));
 
         setupComboFrom(ui->copyState_blockCombo, vari);
 
@@ -802,7 +802,7 @@ void LootTableFunction::initBlocksModel() {
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
     for (const auto &key : blocksInfo.keys()) {
-        MCRInvItem invItem(key);
+        InventoryItem invItem(key);
         auto      *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {

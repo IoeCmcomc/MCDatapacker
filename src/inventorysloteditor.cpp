@@ -1,7 +1,7 @@
-#include "mcrinvsloteditor.h"
-#include "ui_mcrinvsloteditor.h"
+#include "inventorysloteditor.h"
+#include "ui_inventorysloteditor.h"
 
-#include "mcrinvslot.h"
+#include "inventoryslot.h"
 #include "blockitemselectordialog.h"
 #include "tagselectordialog.h"
 #include "mainwindow.h"
@@ -10,10 +10,10 @@
 #include <QMenu>
 #include <QScreen>
 
-MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
+InventorySlotEditor::InventorySlotEditor(InventorySlot *parent) :
     QFrame(parent),
-    ui(new Ui::MCRInvSlotEditor) {
-/*    qDebug() << "MCRInvSlotEditor::MCRInvSlotEditor"; */
+    ui(new Ui::InventorySlotEditor) {
+/*    qDebug() << "InventorySlotEditor::InventorySlotEditor"; */
     ui->setupUi(this);
     this->slot    = parent;
     this->initPos = QCursor::pos();
@@ -23,17 +23,17 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     if (slot->getAcceptTag()) {
         auto *newBtnMenu = new QMenu(ui->newButton);
         newBtnMenu->addAction(tr("Item..."), this,
-                              &MCRInvSlotEditor::onNewItem);
+                              &InventorySlotEditor::onNewItem);
         newBtnMenu->addAction(tr("Item tag..."),
                               this,
-                              &MCRInvSlotEditor::onNewItemTag);
+                              &InventorySlotEditor::onNewItemTag);
         ui->newButton->setMenu(newBtnMenu);
     } else {
         ui->newButton->setText(tr("New item..."));
         auto connection = connect(ui->newButton,
                                   &QPushButton::clicked,
                                   this,
-                                  &MCRInvSlotEditor::onNewItem);
+                                  &InventorySlotEditor::onNewItem);
     }
 
     for (const auto &invItem : slot->getItems()) {
@@ -46,18 +46,18 @@ MCRInvSlotEditor::MCRInvSlotEditor(MCRInvSlot *parent) :
     connect(ui->listView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
             this,
-            &MCRInvSlotEditor::checkRemove);
+            &InventorySlotEditor::checkRemove);
     connect(ui->removeButton, &QPushButton::clicked,
-            this, &MCRInvSlotEditor::onRemoveItem);
+            this, &InventorySlotEditor::onRemoveItem);
 
     checkRemove();
 }
 
-MCRInvSlotEditor::~MCRInvSlotEditor() {
+InventorySlotEditor::~InventorySlotEditor() {
     delete ui;
 }
 
-void MCRInvSlotEditor::show() {
+void InventorySlotEditor::show() {
     adjustSize();
     resize(width() * qMin((model.rowCount() / 8) + 1, 3),
            height() * qMin((model.rowCount() / 32) + 1, 3));
@@ -75,10 +75,12 @@ void MCRInvSlotEditor::show() {
 
     move(newPoint);
 
+    ui->groupBox->setTitle(tr("Items (%1)").arg(model.rowCount()));
+
     QFrame::show();
 }
 
-void MCRInvSlotEditor::mousePressEvent(QMouseEvent *event) {
+void InventorySlotEditor::mousePressEvent(QMouseEvent *event) {
 /*    qDebug() << "mousePressEvent" << event; */
     if ((!rect().contains(event->pos()))
         || (event->buttons() ^ Qt::LeftButton)) {
@@ -87,29 +89,27 @@ void MCRInvSlotEditor::mousePressEvent(QMouseEvent *event) {
     QFrame::mousePressEvent(event);
 }
 
-void MCRInvSlotEditor::onNewItem() {
+void InventorySlotEditor::onNewItem() {
     BlockItemSelectorDialog dialog(this);
 
     if (dialog.exec()) {
         auto newItems = dialog.getSelectedItems();
         for (const auto &newItem : newItems) {
-            /*qDebug() << newItem << slot->getItems().contains(newItem); */
-            if (!slot->getItems().contains(newItem)) {
+            if (!slot->getItems().contains(newItem)
+                && slot->checkAcceptableItem(newItem)) {
                 slot->appendItem(newItem);
                 appendItem(newItem);
             }
         }
     }
-    ui->groupBox->setTitle(tr("Items") +
-                           QString(" (%1)").arg(model.rowCount()));
     show();
 }
 
-void MCRInvSlotEditor::onNewItemTag() {
+void InventorySlotEditor::onNewItemTag() {
     TagSelectorDialog dialog(this, CodeFile::ItemTag);
 
     if (dialog.exec()) {
-        auto invItem = MCRInvItem(dialog.getSelectedID());
+        auto invItem = InventoryItem(dialog.getSelectedID());
         if ((!slot->getItems().contains(invItem)) && slot->getAcceptTag()) {
             slot->appendItem(invItem);
             if (!slot->getItems().contains(invItem)) return;
@@ -117,32 +117,30 @@ void MCRInvSlotEditor::onNewItemTag() {
             appendItem(invItem);
         }
     }
-    ui->groupBox->setTitle(tr("Items") +
-                           QString(" (%1)").arg(model.rowCount()));
     show();
 }
 
-void MCRInvSlotEditor::checkRemove() {
+void InventorySlotEditor::checkRemove() {
     const auto indexes = ui->listView->selectionModel()->selectedIndexes();
 
     ui->removeButton->setDisabled(indexes.isEmpty());
 }
 
-void MCRInvSlotEditor::onRemoveItem() {
+void InventorySlotEditor::onRemoveItem() {
     auto indexes = ui->listView->selectionModel()->selectedIndexes();
 
     if (indexes.isEmpty()) return;
 
     std::sort(indexes.begin(), indexes.end(),
-              [](const QModelIndex& a, const QModelIndex& b)->bool {
+              [](const QModelIndex &a, const QModelIndex &b)->bool {
         return a.row() > b.row();
     }); /* sort from bottom to top */
 
-    for (auto index : indexes) {
-        auto           i       = index.row();
+    for (const auto &index : qAsConst(indexes)) {
+        int            i       = index.row();
         QStandardItem *item    = model.itemFromIndex(index);
-        auto           invItem =
-            item->data(Qt::UserRole + 1).value<MCRInvItem>();
+        const auto   &&invItem =
+            item->data(Qt::UserRole + 1).value<InventoryItem>();
 
         if (!slot->getItems().contains(invItem)) continue;
         slot->removeItem(invItem);
@@ -151,16 +149,14 @@ void MCRInvSlotEditor::onRemoveItem() {
     }
 
     show();
-    ui->groupBox->setTitle(tr("Items") +
-                           QString(" (%1)").arg(model.rowCount()));
 }
 
-void MCRInvSlotEditor::close() {
+void InventorySlotEditor::close() {
     slot->update();
     deleteLater();
 }
 
-void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {
+void InventorySlotEditor::appendItem(const InventoryItem &invItem) {
     auto *item = new QStandardItem();
 
     item->setIcon(QIcon(invItem.getPixmap()));
@@ -170,6 +166,4 @@ void MCRInvSlotEditor::appendItem(const MCRInvItem &invItem) {
     item->setData(vari, Qt::UserRole + 1);
     item->setToolTip(invItem.toolTip());
     model.appendRow(item);
-
-    /*qDebug() << item << invItem << model.rowCount(); */
 }

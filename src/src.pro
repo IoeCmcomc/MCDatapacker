@@ -40,6 +40,10 @@ SOURCES += \
     globalhelpers.cpp \
     highlighter.cpp \
     imgviewer.cpp \
+    inventoryitem.cpp \
+    inventoryitemfiltermodel.cpp \
+    inventoryslot.cpp \
+    inventorysloteditor.cpp \
     itemconditiondialog.cpp \
     jsonhighlighter.cpp \
     linenumberarea.cpp \
@@ -51,10 +55,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
-    mcrinvitem.cpp \
-    mcrinvslot.cpp \
-    mcrinvsloteditor.cpp \
-    mcritemsortfilterproxymodel.cpp \
     mcrpredcondition.cpp \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
@@ -127,6 +127,10 @@ HEADERS += \
     globalhelpers.h \
     highlighter.h \
     imgviewer.h \
+    inventoryitem.h \
+    inventoryitemfiltermodel.h \
+    inventoryslot.h \
+    inventorysloteditor.h \
     itemconditiondialog.h \
     jsonhighlighter.h \
     linenumberarea.h \
@@ -137,10 +141,6 @@ HEADERS += \
     loottablepool.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
-    mcrinvitem.h \
-    mcrinvslot.h \
-    mcrinvsloteditor.h \
-    mcritemsortfilterproxymodel.h \
     mcrpredcondition.h \
     modelfunctions.h \
     newdatapackdialog.h \
@@ -209,7 +209,7 @@ FORMS += \
     loottablefunction.ui \
     loottablepool.ui \
     mainwindow.ui \
-    mcrinvsloteditor.ui \
+    inventorysloteditor.ui \
     mcrpredcondition.ui \
     newdatapackdialog.ui \
     numericinput.ui \

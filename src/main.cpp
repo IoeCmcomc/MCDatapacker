@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
 
     MainWindow w;
     w.show();
+    qInfo() << "Appication startup completed.";
 
     return QApplication::exec();
 }

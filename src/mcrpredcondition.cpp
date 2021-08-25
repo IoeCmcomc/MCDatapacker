@@ -2,7 +2,7 @@
 #include "ui_mcrpredcondition.h"
 
 #include "mainwindow.h"
-#include "mcrinvitem.h"
+#include "inventoryitem.h"
 #include "extendeddelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
@@ -62,7 +62,7 @@ QJsonObject MCRPredCondition::toJson() const {
     case 0: { /*Block states */
         if (ui->blockState_blockCombo->currentIndex() != 0) {
             auto invItem = ui->blockState_blockCombo->currentData(
-                Qt::UserRole + 1).value<MCRInvItem>();
+                Qt::UserRole + 1).value<InventoryItem>();
             root.insert("block", invItem.getNamespacedID());
         }
         QJsonObject states = LocationConditionDialog::jsonFromStateTable(
@@ -266,7 +266,7 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
     case 0: { /*Block states */
         if (value.contains("block"))
             setupComboFrom(ui->blockState_blockCombo, QVariant::fromValue
-                               (MCRInvItem(value["block"].toString())));
+                               (InventoryItem(value["block"].toString())));
         if (value.contains("properties")) {
             QJsonObject states = value["properties"].toObject();
             LocationConditionDialog::setupStateTableFromJson(
@@ -712,7 +712,7 @@ void MCRPredCondition::initBlockStatesPage() {
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
     for (const auto &key : blocksInfo.keys()) {
-        MCRInvItem     invItem(key);
+        InventoryItem  invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {

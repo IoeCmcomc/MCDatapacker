@@ -1,7 +1,7 @@
 #include "visualrecipeeditordock.h"
 #include "ui_visualrecipeeditordock.h"
 
-#include "mcrinvitem.h"
+#include "inventoryitem.h"
 
 #include "mainwindow.h"
 #include "globalhelpers.h"
@@ -23,10 +23,10 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     ui->setupUi(this);
 
     ui->outputSlot->setAcceptTag(false);
-    ui->outputSlot->setAcceptMultiItems(false);
+    ui->outputSlot->setAcceptMultiple(false);
 
     this->craftingSlots =
-        QVector<MCRInvSlot*>({ ui->craftingSlot_1, ui->craftingSlot_2,
+        QVector<InventorySlot*>({ ui->craftingSlot_1, ui->craftingSlot_2,
                                ui->craftingSlot_3, ui->craftingSlot_4,
                                ui->craftingSlot_5, ui->craftingSlot_6,
                                ui->craftingSlot_7, ui->craftingSlot_8,
@@ -133,10 +133,10 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         root.insert(QStringLiteral("type"),
                     QStringLiteral("minecraft:crafting_shaped"));
 
-        QMap< QVector<MCRInvItem>, QString> keys;
-        QString                             patternStr;
-        QString                             patternChars = "123456789";
-        int                                 pattCharIdx  = -1;
+        QMap< QVector<InventoryItem>, QString> keys;
+        QString                                patternStr;
+        QString                                patternChars = "123456789";
+        int                                    pattCharIdx  = -1;
         for (auto *slot : qAsConst(craftingSlots)) {
             const auto &items = slot->getItems();
             if (!items.isEmpty()) {
@@ -272,7 +272,7 @@ QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
     return root;
 }
 
-QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items) {
+QJsonValue ingredientsToJson(const QVector<InventoryItem> &items) {
     QJsonArray keyItems;
 
     for (const auto &item : items) {
@@ -282,7 +282,7 @@ QJsonValue ingredientsToJson(const QVector<MCRInvItem> &items) {
               itemID = QStringLiteral("minecraft:") + itemID;
  */
         QJsonObject keyItem;
-        if (item.getIsTag())
+        if (item.isTag())
             keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
         else
             keyItem.insert(QStringLiteral("item"), itemID);
@@ -390,7 +390,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
                 if (!keys.contains(key)) continue;
                 QJsonValue keyVal = keys[key];
 
-                craftingSlots[i]->setItem(JsonToIngredients(keyVal));
+                craftingSlots[i]->setItems(JsonToIngredients(keyVal));
             }
         }
     } else if (type.endsWith(QStringLiteral("crafting_shapeless"))) {
@@ -404,7 +404,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
                 craftingSlots[i]->clearItems();
             } else {
                 QJsonValue ingredient = ingredients[i];
-                craftingSlots[i]->setItem(JsonToIngredients(ingredient));
+                craftingSlots[i]->setItems(JsonToIngredients(ingredient));
             }
         }
     }
@@ -416,7 +416,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
 
     QString itemID = result[QStringLiteral("item")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID));
+        ui->outputSlot->setItem(InventoryItem(itemID));
     else
         ui->outputSlot->clearItems();
     if (result.contains(QStringLiteral("count")))
@@ -442,12 +442,12 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
 
     QJsonValue ingredient = root[QStringLiteral("ingredient")];
 
-    ui->smeltingSlot_0->setItem(JsonToIngredients(ingredient));
+    ui->smeltingSlot_0->setItems(JsonToIngredients(ingredient));
     if (!root.contains(QStringLiteral("result"))) return;
 
     QString itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID));
+        ui->outputSlot->setItem(InventoryItem(itemID));
     else
         ui->outputSlot->clearItems();
 
@@ -469,13 +469,13 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
     if (!root.contains(QStringLiteral("ingredient"))) return;
 
     QJsonValue ingredient = root[QStringLiteral("ingredient")];
-    ui->stonecuttingSlot->setItem(JsonToIngredients(ingredient));
+    ui->stonecuttingSlot->setItems(JsonToIngredients(ingredient));
 
     if (!root.contains(QStringLiteral("result"))) return;
 
     QString itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID));
+        ui->outputSlot->setItem(InventoryItem(itemID));
     else
         ui->outputSlot->clearItems();
 
@@ -488,18 +488,18 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
     if (!root.contains(QStringLiteral("base"))) return;
 
     const QJsonValue base = root[QStringLiteral("base")];
-    ui->smithingSlot_0->setItem(JsonToIngredients(base));
+    ui->smithingSlot_0->setItems(JsonToIngredients(base));
 
     if (!root.contains(QStringLiteral("addition"))) return;
 
     QJsonValue addition = root[QStringLiteral("addition")];
-    ui->smithingSlot_1->setItem(JsonToIngredients(addition));
+    ui->smithingSlot_1->setItems(JsonToIngredients(addition));
 
     if (!root.contains(QStringLiteral("result"))) return;
 
     QString itemID = root[QStringLiteral("result")].toString();
     if (!itemID.isEmpty())
-        ui->outputSlot->setItem(MCRInvItem(itemID));
+        ui->outputSlot->setItem(InventoryItem(itemID));
     else
         ui->outputSlot->clearItems();
 
@@ -508,7 +508,7 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
     ui->resultCountInput->setValue(root[QStringLiteral("count")].toInt());
 }
 
-QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal) {
+QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {
     QJsonArray keyArray;
 
     if (keyVal.isObject()) {
@@ -518,7 +518,7 @@ QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal) {
     }
 /*    qDebug() << keyVal << keyArray; */
 
-    QVector<MCRInvItem> items;
+    QVector<InventoryItem> items;
     for (const auto &key : qAsConst(keyArray)) {
         QJsonObject &&keyJson = key.toObject();
         QString       itemID;
@@ -534,8 +534,8 @@ QVector<MCRInvItem> JsonToIngredients(const QJsonValue &keyVal) {
         }
         /*qDebug() << keyJson << keyJson.contains("item") << itemID; */
         if (!itemID.isEmpty() &&
-            (!items.contains(MCRInvItem(itemID)))) {
-            items.push_back(MCRInvItem(itemID));
+            (!items.contains(InventoryItem(itemID)))) {
+            items.push_back(InventoryItem(itemID));
         }
     }
     return items;
