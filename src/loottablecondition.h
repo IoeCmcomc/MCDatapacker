@@ -1,5 +1,5 @@
-#ifndef MCRPREDCONDITION_H
-#define MCRPREDCONDITION_H
+#ifndef LOOTTABLECONDITION_H
+#define LOOTTABLECONDITION_H
 
 #include "basecondition.h"
 
@@ -9,16 +9,16 @@
 #include <QDir>
 
 namespace Ui {
-    class MCRPredCondition;
+    class LootTableCondition;
 }
 
-class MCRPredCondition : public QFrame, public BaseCondition
+class LootTableCondition : public QFrame, public BaseCondition
 {
     Q_OBJECT
 
 public:
-    explicit MCRPredCondition(QWidget *parent = nullptr);
-    ~MCRPredCondition();
+    explicit LootTableCondition(QWidget *parent = nullptr);
+    ~LootTableCondition();
 
     QJsonObject toJson() const override;
     inline void fromJson(const QJsonObject &value) override {
@@ -43,7 +43,7 @@ protected slots:
     void onCurDirChanged(const QDir &dir);
 
 private:
-    Ui::MCRPredCondition *ui;
+    Ui::LootTableCondition *ui;
     int depth = 0;
     QStandardItemModel blocksModel;
     QStandardItemModel enchantmentsModel;
@@ -73,4 +73,4 @@ private:
     void simplifyCondition(QVariantMap &condMap, int depth = 0) const;
 };
 
-#endif /* MCRPREDCONDITION_H */
+#endif /* LOOTTABLECONDITION_H */

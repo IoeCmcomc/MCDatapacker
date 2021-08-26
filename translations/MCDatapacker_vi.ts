@@ -1889,35 +1889,35 @@
     </message>
 </context>
 <context>
-    <name>MCRPredCondition</name>
+    <name>LootTableCondition</name>
     <message>
-        <location filename="mcrpredcondition.ui" line="26"/>
+        <location filename="loottablecondition.ui" line="26"/>
         <source>Condition</source>
         <translation>Điều kiện</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="51"/>
+        <location filename="loottablecondition.ui" line="51"/>
         <source>Condition:</source>
         <translation>Điều kiện:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="65"/>
-        <location filename="mcrpredcondition.ui" line="178"/>
+        <location filename="loottablecondition.ui" line="65"/>
+        <location filename="loottablecondition.ui" line="178"/>
         <source>Block states</source>
         <translation>Các trạng thái khối</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="70"/>
+        <location filename="loottablecondition.ui" line="70"/>
         <source>Damage source</source>
         <translation>Nguồn sát thương</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="75"/>
+        <location filename="loottablecondition.ui" line="75"/>
         <source>Entity properties</source>
         <translation>Thuộc tính thực thể</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="80"/>
+        <location filename="loottablecondition.ui" line="80"/>
         <source>Entity scores</source>
         <translation>Điểm của thực thể</translation>
     </message>
@@ -1926,57 +1926,57 @@
         <translation type="vanished">Đảo ngược (KHÔNG)</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="85"/>
+        <location filename="loottablecondition.ui" line="85"/>
         <source>Killed by player</source>
         <translation>Bị người chơi giết</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="90"/>
+        <location filename="loottablecondition.ui" line="90"/>
         <source>Location</source>
         <translation>Địa điểm</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="95"/>
+        <location filename="loottablecondition.ui" line="95"/>
         <source>Nested conditions</source>
         <translation>Các điều kiện lồng vào nhau</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="100"/>
+        <location filename="loottablecondition.ui" line="100"/>
         <source>Tool properties</source>
         <translation>Thuộc tính công cụ</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="105"/>
+        <location filename="loottablecondition.ui" line="105"/>
         <source>Random chance</source>
         <translation>Cơ hội ngẫu nhiên</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="110"/>
+        <location filename="loottablecondition.ui" line="110"/>
         <source>Reference</source>
         <translation>Tham chiếu</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="115"/>
+        <location filename="loottablecondition.ui" line="115"/>
         <source>Survives explosion</source>
         <translation>Sống sót khỏi vụ nổ</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="120"/>
+        <location filename="loottablecondition.ui" line="120"/>
         <source>Table bonus</source>
         <translation>Thưởng thêm từ bảng</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="125"/>
+        <location filename="loottablecondition.ui" line="125"/>
         <source>Time</source>
         <translation>Thời gian</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="130"/>
+        <location filename="loottablecondition.ui" line="130"/>
         <source>Tool enchantment</source>
         <translation>Phù phép công cụ</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="135"/>
+        <location filename="loottablecondition.ui" line="135"/>
         <source>Weather</source>
         <translation>Thời tiết</translation>
     </message>
@@ -1985,193 +1985,193 @@
         <translation type="vanished">Xoá</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="162"/>
+        <location filename="loottablecondition.ui" line="162"/>
         <source>Block:</source>
         <translation>Khối:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="170"/>
-        <location filename="mcrpredcondition.cpp" line="713"/>
+        <location filename="loottablecondition.ui" line="170"/>
+        <location filename="loottablecondition.cpp" line="713"/>
         <source>(not set)</source>
         <translation>(không đặt)</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="184"/>
+        <location filename="loottablecondition.ui" line="184"/>
         <source>State:</source>
         <translation>Trạng thái:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="194"/>
-        <location filename="mcrpredcondition.ui" line="460"/>
-        <location filename="mcrpredcondition.ui" line="1046"/>
+        <location filename="loottablecondition.ui" line="194"/>
+        <location filename="loottablecondition.ui" line="460"/>
+        <location filename="loottablecondition.ui" line="1046"/>
         <source>Value:</source>
         <translation>Giá trị:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="204"/>
-        <location filename="mcrpredcondition.ui" line="999"/>
+        <location filename="loottablecondition.ui" line="204"/>
+        <location filename="loottablecondition.ui" line="999"/>
         <source>Add</source>
         <translation>Thêm</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="211"/>
-        <location filename="mcrpredcondition.ui" line="487"/>
-        <location filename="mcrpredcondition.ui" line="1008"/>
-        <location filename="mcrpredcondition.ui" line="1150"/>
+        <location filename="loottablecondition.ui" line="211"/>
+        <location filename="loottablecondition.ui" line="487"/>
+        <location filename="loottablecondition.ui" line="1008"/>
+        <location filename="loottablecondition.ui" line="1150"/>
         <source>Right click a row to delete it.</source>
         <translation>Nháy chuột phải vào một hàng để xoá.</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="230"/>
+        <location filename="loottablecondition.ui" line="230"/>
         <source>State</source>
         <translation>Trạng thái</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="264"/>
+        <location filename="loottablecondition.ui" line="264"/>
         <source>Explosion</source>
         <translation>Vụ nổ</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="292"/>
+        <location filename="loottablecondition.ui" line="292"/>
         <source>Lightning</source>
         <translation>Sét</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="285"/>
+        <location filename="loottablecondition.ui" line="285"/>
         <source>Fire</source>
         <translation>Lửa</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="278"/>
+        <location filename="loottablecondition.ui" line="278"/>
         <source>Projectile</source>
         <translation>Vật được bắn</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="299"/>
+        <location filename="loottablecondition.ui" line="299"/>
         <source>Magic</source>
         <translation>Phép thuật</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="271"/>
+        <location filename="loottablecondition.ui" line="271"/>
         <source>Bypasses armor</source>
         <translation>Xuyên giáp</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="306"/>
+        <location filename="loottablecondition.ui" line="306"/>
         <source>Starvation</source>
         <translation>Chết đói</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="317"/>
+        <location filename="loottablecondition.ui" line="317"/>
         <source>Source entity:</source>
         <translation>Thực thể nguồn:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="324"/>
+        <location filename="loottablecondition.ui" line="324"/>
         <source>Direct entity:</source>
         <translation>Thực thể trực tiếp:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="331"/>
-        <location filename="mcrpredcondition.ui" line="341"/>
-        <location filename="mcrpredcondition.ui" line="395"/>
+        <location filename="loottablecondition.ui" line="331"/>
+        <location filename="loottablecondition.ui" line="341"/>
+        <location filename="loottablecondition.ui" line="395"/>
         <source>Entity properties...</source>
         <translation>Thuộc tính thực thể...</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="369"/>
-        <location filename="mcrpredcondition.ui" line="421"/>
+        <location filename="loottablecondition.ui" line="369"/>
+        <location filename="loottablecondition.ui" line="421"/>
         <source>Entity type:</source>
         <translation>Loại thực thể:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="377"/>
-        <location filename="mcrpredcondition.ui" line="429"/>
+        <location filename="loottablecondition.ui" line="377"/>
+        <location filename="loottablecondition.ui" line="429"/>
         <source>This (itself)</source>
         <translation>Chính nó</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="382"/>
-        <location filename="mcrpredcondition.ui" line="434"/>
+        <location filename="loottablecondition.ui" line="382"/>
+        <location filename="loottablecondition.ui" line="434"/>
         <source>Killer</source>
         <translation>Vật giết</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="387"/>
-        <location filename="mcrpredcondition.ui" line="439"/>
+        <location filename="loottablecondition.ui" line="387"/>
+        <location filename="loottablecondition.ui" line="439"/>
         <source>Killer player</source>
         <translation>Người giết</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="447"/>
+        <location filename="loottablecondition.ui" line="447"/>
         <source>Scores</source>
         <translation>Các điểm</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="453"/>
+        <location filename="loottablecondition.ui" line="453"/>
         <source>Objective:</source>
         <translation>Mục tiêu:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="477"/>
+        <location filename="loottablecondition.ui" line="477"/>
         <source>Add score</source>
         <translation>Thêm điểm</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="503"/>
+        <location filename="loottablecondition.ui" line="503"/>
         <source>Objective</source>
         <translation>Mục tiêu</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="235"/>
-        <location filename="mcrpredcondition.ui" line="508"/>
-        <location filename="mcrpredcondition.ui" line="1171"/>
+        <location filename="loottablecondition.ui" line="235"/>
+        <location filename="loottablecondition.ui" line="508"/>
+        <location filename="loottablecondition.ui" line="1171"/>
         <source>Value</source>
         <translation>Giá trị</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="535"/>
-        <location filename="mcrpredcondition.ui" line="678"/>
+        <location filename="loottablecondition.ui" line="535"/>
+        <location filename="loottablecondition.ui" line="678"/>
         <source>Inverted</source>
         <translation>Đảo ngược</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="558"/>
+        <location filename="loottablecondition.ui" line="558"/>
         <source>Offsets</source>
         <translation>Độ lệch (phần bù)</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="564"/>
+        <location filename="loottablecondition.ui" line="564"/>
         <source>X:</source>
         <translation>X:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="584"/>
+        <location filename="loottablecondition.ui" line="584"/>
         <source>Y:</source>
         <translation>Y:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="601"/>
+        <location filename="loottablecondition.ui" line="601"/>
         <source>Z:</source>
         <translation>Z:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="621"/>
+        <location filename="loottablecondition.ui" line="621"/>
         <source>Location properties...</source>
         <translation>Thuộc tính địa điểm...</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="648"/>
+        <location filename="loottablecondition.ui" line="648"/>
         <source>Combination mode:</source>
         <translation>Chế độ kết hợp:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="655"/>
+        <location filename="loottablecondition.ui" line="655"/>
         <source>OR</source>
         <translation>HOẶC</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="668"/>
+        <location filename="loottablecondition.ui" line="668"/>
         <source>AND</source>
         <translation>VÀ</translation>
     </message>
@@ -2180,74 +2180,74 @@
         <translation type="vanished">Loại luận lý:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="724"/>
+        <location filename="loottablecondition.ui" line="724"/>
         <source>Item properties...</source>
         <translation>Thuộc tính vật phẩm...</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="755"/>
+        <location filename="loottablecondition.ui" line="755"/>
         <source>Looting multiplier:</source>
         <translation>Hệ số nhân nhặt:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="783"/>
+        <location filename="loottablecondition.ui" line="783"/>
         <source>With looting</source>
         <translation>Với nhặt</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="799"/>
-        <location filename="mcrpredcondition.ui" line="951"/>
+        <location filename="loottablecondition.ui" line="799"/>
+        <location filename="loottablecondition.ui" line="951"/>
         <source>Chance:</source>
         <translation>Cơ hội:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="885"/>
+        <location filename="loottablecondition.ui" line="885"/>
         <source>Name:</source>
         <translation>Tên:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="925"/>
-        <location filename="mcrpredcondition.ui" line="1109"/>
+        <location filename="loottablecondition.ui" line="925"/>
+        <location filename="loottablecondition.ui" line="1109"/>
         <source>Enchantment:</source>
         <translation>Phù phép:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1063"/>
+        <location filename="loottablecondition.ui" line="1063"/>
         <source>Period:</source>
         <translation>Chu kì:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1070"/>
+        <location filename="loottablecondition.ui" line="1070"/>
         <source>-</source>
         <translation>-</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1080"/>
+        <location filename="loottablecondition.ui" line="1080"/>
         <source>If present, time gets modulo-divided by this period (for example, if set to 24000, value operates on a time period of days).</source>
         <translation>Nêu có, thời gian sẽ được chia cho chu kì rồi lấy dư (ví dụ, nếu đặt là 2400, giá trị sẽ chạy trong chu kì là ngày).</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1126"/>
+        <location filename="loottablecondition.ui" line="1126"/>
         <source>Levels:</source>
         <translation>Cấp:</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1143"/>
+        <location filename="loottablecondition.ui" line="1143"/>
         <source>Add enchantment</source>
         <translation>Thêm phù phép</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1166"/>
+        <location filename="loottablecondition.ui" line="1166"/>
         <source>Enchantment</source>
         <translation>Phù phép</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1195"/>
+        <location filename="loottablecondition.ui" line="1195"/>
         <source>Raining</source>
         <translation>Mưa</translation>
     </message>
     <message>
-        <location filename="mcrpredcondition.ui" line="1202"/>
+        <location filename="loottablecondition.ui" line="1202"/>
         <source>Thundering</source>
         <translation>Bão</translation>
     </message>

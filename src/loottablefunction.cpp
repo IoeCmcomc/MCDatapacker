@@ -1,7 +1,7 @@
 #include "loottablefunction.h"
 #include "loottableentry.h"
 
-#include "mcrpredcondition.h"
+#include "loottablecondition.h"
 #include "ui_loottablefunction.h"
 #include "inventoryitem.h"
 #include "mainwindow.h"
@@ -819,13 +819,13 @@ void LootTableFunction::initBlocksModel() {
 }
 
 void LootTableFunction::initCondInterface() {
-    auto *cond = new MCRPredCondition();
+    auto *cond = new LootTableCondition();
 
     ui->conditionsInterface->setMainWidget(cond);
 
     ui->conditionsInterface->mapToSetter(
-        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
-    ui->conditionsInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+        cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
+    ui->conditionsInterface->mapToGetter(&LootTableCondition::toJson, cond);
 }
 
 void LootTableFunction::initEntryInterface() {

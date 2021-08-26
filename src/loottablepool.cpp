@@ -1,7 +1,7 @@
 #include "loottablepool.h"
 #include "ui_loottablepool.h"
 
-#include "mcrpredcondition.h"
+#include "loottablecondition.h"
 #include "loottableentry.h"
 #include "loottablefunction.h"
 
@@ -12,12 +12,12 @@ LootTablePool::LootTablePool(QWidget *parent) :
     ui(new Ui::LootTablePool) {
     ui->setupUi(this);
 
-    auto *cond = new MCRPredCondition();
+    auto *cond = new LootTableCondition();
     ui->conditionsInterface->setMainWidget(cond);
 
     ui->conditionsInterface->mapToSetter(
-        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
-    ui->conditionsInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+        cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
+    ui->conditionsInterface->mapToGetter(&LootTableCondition::toJson, cond);
 
     auto *func = new LootTableFunction();
     ui->functionsInterface->setupMainWidget(func);

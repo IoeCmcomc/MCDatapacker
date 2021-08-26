@@ -2,7 +2,7 @@
 #include "ui_predicatedock.h"
 
 #include "mainwindow.h"
-#include "mcrpredcondition.h"
+#include "loottablecondition.h"
 
 #include "globalhelpers.h"
 
@@ -27,14 +27,14 @@ PredicateDock::PredicateDock(QWidget *parent) :
         }
     });
 
-    auto *cond = new MCRPredCondition();
+    auto *cond = new LootTableCondition();
     /*cond->setMinimumHeight(500); */
     ui->dataInterface->setMainWidget(cond);
 
     ui->dataInterface->mapToSetter(
-        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
+        cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
 
-    ui->dataInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+    ui->dataInterface->mapToGetter(&LootTableCondition::toJson, cond);
 
     ui->dataInterface->addAfterCurrent();
 }

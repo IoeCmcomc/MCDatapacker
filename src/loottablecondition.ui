@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MCRPredCondition</class>
- <widget class="QFrame" name="MCRPredCondition">
+ <class>LootTableCondition</class>
+ <widget class="QFrame" name="LootTableCondition">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
+    <width>400</width>
     <height>402</height>
    </rect>
   </property>

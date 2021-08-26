@@ -48,6 +48,7 @@ SOURCES += \
     jsonhighlighter.cpp \
     linenumberarea.cpp \
     locationconditiondialog.cpp \
+    loottablecondition.cpp \
     loottableeditordock.cpp \
     loottableentry.cpp \
     loottablefunction.cpp \
@@ -55,7 +56,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
-    mcrpredcondition.cpp \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
     numericinput.cpp \
@@ -135,13 +135,13 @@ HEADERS += \
     jsonhighlighter.h \
     linenumberarea.h \
     locationconditiondialog.h \
+    loottablecondition.h \
     loottableeditordock.h \
     loottableentry.h \
     loottablefunction.h \
     loottablepool.h \
     mainwindow.h \
     mcfunctionhighlighter.h \
-    mcrpredcondition.h \
     modelfunctions.h \
     newdatapackdialog.h \
     numericinput.h \
@@ -204,13 +204,13 @@ FORMS += \
     entityconditiondialog.ui \
     itemconditiondialog.ui \
     locationconditiondialog.ui \
+    loottablecondition.ui \
     loottableeditordock.ui \
     loottableentry.ui \
     loottablefunction.ui \
     loottablepool.ui \
     mainwindow.ui \
     inventorysloteditor.ui \
-    mcrpredcondition.ui \
     newdatapackdialog.ui \
     numericinput.ui \
     predicatedock.ui \

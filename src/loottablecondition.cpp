@@ -1,5 +1,5 @@
-#include "mcrpredcondition.h"
-#include "ui_mcrpredcondition.h"
+#include "loottablecondition.h"
+#include "ui_loottablecondition.h"
 
 #include "mainwindow.h"
 #include "inventoryitem.h"
@@ -12,14 +12,14 @@
 #include <QDialog>
 #include <QDoubleSpinBox>
 
-MCRPredCondition::MCRPredCondition(QWidget *parent) :
+LootTableCondition::LootTableCondition(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::MCRPredCondition) {
+    ui(new Ui::LootTableCondition) {
     ui->setupUi(this);
 
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
-            this, &MCRPredCondition::onTypeChanged);
+            this, &LootTableCondition::onTypeChanged);
     MainWindow *mainWin = nullptr;
     for (auto *wid : qApp->topLevelWidgets()) {
         if (wid->objectName() == QStringLiteral("MainWindow")) {
@@ -29,18 +29,18 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     }
     if (mainWin) {
         connect(mainWin, &MainWindow::curDirChanged,
-                this, &MCRPredCondition::onCurDirChanged);
+                this, &LootTableCondition::onCurDirChanged);
     }
     connect(&predRefWatcher, &QFileSystemWatcher::directoryChanged,
-            this, &MCRPredCondition::setupRefCombo);
+            this, &LootTableCondition::setupRefCombo);
 
     initBlockStatesPage();
-    ui->damageSrc_entityPropBtn->setDialogType(DDBType::EntityCond);
-    ui->damageSrc_directPropBtn->setDialogType(DDBType::EntityCond);
-    ui->entity_propBtn->setDialogType(DDBType::EntityCond);
+    ui->damageSrc_entityPropBtn->assignDialogClass<EntityConditionDialog>();
+    ui->damageSrc_directPropBtn->assignDialogClass<EntityConditionDialog>();
+    ui->entity_propBtn->assignDialogClass<EntityConditionDialog>();
     initEntityScoresPage();
-    ui->matchTool_propBtn->setDialogType(DDBType::ItemCond);
-    ui->location_propBtn->setDialogType(DDBType::LocationCond);
+    ui->matchTool_propBtn->assignDialogClass<ItemConditionDialog>();
+    ui->location_propBtn->assignDialogClass<LocationConditionDialog>();
     initRandChancePage();
     setupRefCombo();
     initTableBonusPage();
@@ -48,11 +48,11 @@ MCRPredCondition::MCRPredCondition(QWidget *parent) :
     initToolEnchantPage();
 }
 
-MCRPredCondition::~MCRPredCondition() {
+LootTableCondition::~LootTableCondition() {
     delete ui;
 }
 
-QJsonObject MCRPredCondition::toJson() const {
+QJsonObject LootTableCondition::toJson() const {
     QJsonObject root;
 
     root.insert("condition", "minecraft:" +
@@ -237,7 +237,7 @@ QJsonObject MCRPredCondition::toJson() const {
     return root;
 }
 
-void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
+void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     resetAll();
     if (!root.contains("condition"))
         return;
@@ -496,14 +496,14 @@ void MCRPredCondition::fromJson(const QJsonObject &root, bool redirected) {
     }
 }
 
-void MCRPredCondition::onTypeChanged(const int &i) {
+void LootTableCondition::onTypeChanged(const int &i) {
     ui->stackedWidget->setCurrentIndex(i);
     const int nestedConditionIndex = 6;
     if ((i == nestedConditionIndex) && !ui->nested_dataInterface->mainWidget())
         initNestedCondPage();
 }
 
-void MCRPredCondition::onCurDirChanged(const QDir &dir) {
+void LootTableCondition::onCurDirChanged(const QDir &dir) {
     if (!predRefWatcher.directories().isEmpty())
         predRefWatcher.removePaths(predRefWatcher.directories());
     predRefWatcher.addPath(dir.path());
@@ -511,7 +511,7 @@ void MCRPredCondition::onCurDirChanged(const QDir &dir) {
     setupRefCombo();
 }
 
-void MCRPredCondition::reset(int index) {
+void LootTableCondition::reset(int index) {
     switch (index) {
     case 0: { /*Block states */
         ui->blockState_blockCombo->setCurrentIndex(0);
@@ -614,7 +614,7 @@ void MCRPredCondition::reset(int index) {
     }
 }
 
-void MCRPredCondition::clearModelExceptHeaders(QStandardItemModel &model) {
+void LootTableCondition::clearModelExceptHeaders(QStandardItemModel &model) {
     QVector<QStandardItem*> headers;
 
     for (int i = 0; i < model.columnCount(); ++i) {
@@ -625,24 +625,24 @@ void MCRPredCondition::clearModelExceptHeaders(QStandardItemModel &model) {
         model.setHorizontalHeaderItem(i, headers[i]);
 }
 
-void MCRPredCondition::setDepth(int value) {
+void LootTableCondition::setDepth(int value) {
     depth = value;
 }
 
-void MCRPredCondition::resetAll() {
+void LootTableCondition::resetAll() {
     for (int i = 0; i < ui->stackedWidget->count(); ++i)
         reset(i);
     ui->conditionTypeCombo->setCurrentIndex(0);
 }
 
-void MCRPredCondition::changeEvent(QEvent *event) {
+void LootTableCondition::changeEvent(QEvent *event) {
     QFrame::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
     }
 }
 
-void MCRPredCondition::blockStates_onAdded() {
+void LootTableCondition::blockStates_onAdded() {
     if (ui->blockState_stateEdit->text().isEmpty()
         || ui->blockState_valueEdit->text().isEmpty())
         return;
@@ -655,7 +655,7 @@ void MCRPredCondition::blockStates_onAdded() {
     appendRowToTableWidget(ui->blockState_table, { stateItem, valueItem });
 }
 
-void MCRPredCondition::entityScores_onAdded() {
+void LootTableCondition::entityScores_onAdded() {
     if (ui->entityScores_objectiveEdit->text().isEmpty())
         return;
 
@@ -667,7 +667,7 @@ void MCRPredCondition::entityScores_onAdded() {
     appendRowToTableWidget(ui->entityScores_table, { objItem, valueItem });
 }
 
-void MCRPredCondition::setupRefCombo() {
+void LootTableCondition::setupRefCombo() {
     /*qDebug() << "setupRefCombo"; */
     if (condRefsModel.rowCount() > 0)
         condRefsModel.clear();
@@ -679,7 +679,7 @@ void MCRPredCondition::setupRefCombo() {
     ui->ref_nameCombo->setModel(&condRefsModel);
 }
 
-void MCRPredCondition::tableBonus_onAdded() {
+void LootTableCondition::tableBonus_onAdded() {
     QStandardItem *chanceItem = new QStandardItem();
 
     chanceItem->setData(ui->tableBonus_chanceSpinBox->value(),
@@ -687,7 +687,7 @@ void MCRPredCondition::tableBonus_onAdded() {
     tableBonusModel.appendRow(chanceItem);
 }
 
-void MCRPredCondition::toolEnchant_onAdded() {
+void LootTableCondition::toolEnchant_onAdded() {
     if (ui->toolEnchant_levelsInput->getMinimum() == 0
         || ui->toolEnchant_levelsInput->getMaximum() == 0) {
         return;
@@ -707,7 +707,7 @@ void MCRPredCondition::toolEnchant_onAdded() {
     appendRowToTableWidget(ui->toolEnchant_table, { enchantItem, levelsItem });
 }
 
-void MCRPredCondition::initBlockStatesPage() {
+void LootTableCondition::initBlockStatesPage() {
     auto blocksInfo = MainWindow::getMCRInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
@@ -730,10 +730,10 @@ void MCRPredCondition::initBlockStatesPage() {
     ui->blockState_table->installEventFilter(&viewFilter);
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,
-            this, &MCRPredCondition::blockStates_onAdded);
+            this, &LootTableCondition::blockStates_onAdded);
 }
 
-void MCRPredCondition::initEntityScoresPage() {
+void LootTableCondition::initEntityScoresPage() {
     ui->entityScores_valueInput->setTypes(
         NumericInput::Exact | NumericInput::Range);
 
@@ -745,23 +745,23 @@ void MCRPredCondition::initEntityScoresPage() {
     ui->entityScores_table->installEventFilter(new ViewEventFilter(this));
 
     connect(ui->entityScores_addBtn, &QPushButton::clicked,
-            this, &MCRPredCondition::entityScores_onAdded);
+            this, &LootTableCondition::entityScores_onAdded);
 }
 
-void MCRPredCondition::initNestedCondPage() {
-    auto *cond = new MCRPredCondition();
+void LootTableCondition::initNestedCondPage() {
+    auto *cond = new LootTableCondition();
 
     /*cond->setMinimumHeight(500); */
     /*cond->setIsModular(true); */
     ui->nested_dataInterface->setMainWidget(cond);
 
     ui->nested_dataInterface->mapToSetter(
-        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
+        cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
 
-    ui->nested_dataInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+    ui->nested_dataInterface->mapToGetter(&LootTableCondition::toJson, cond);
 }
 
-void MCRPredCondition::initRandChancePage() {
+void LootTableCondition::initRandChancePage() {
     connect(ui->randChance_slider, &QSlider::valueChanged, [ = ](int value) {
         ui->randChance_spinBox->setValue((double)value / 100);
     });
@@ -777,7 +777,7 @@ void MCRPredCondition::initRandChancePage() {
     });
 }
 
-void MCRPredCondition::initTableBonusPage() {
+void LootTableCondition::initTableBonusPage() {
     initComboModelView("enchantment", enchantmentsModel,
                        ui->tableBonus_enchantCombo);
     ui->toolEnchant_enchantCombo->setModel(&enchantmentsModel);
@@ -795,10 +795,10 @@ void MCRPredCondition::initTableBonusPage() {
         ui->tableBonus_chanceSlider->setValue(qRound(value * 100));
     });
     connect(ui->tableBonus_addBtn, &QPushButton::clicked,
-            this, &MCRPredCondition::tableBonus_onAdded);
+            this, &LootTableCondition::tableBonus_onAdded);
 }
 
-void MCRPredCondition::initToolEnchantPage() {
+void LootTableCondition::initToolEnchantPage() {
     ui->toolEnchant_levelsInput->setTypes(NumericInput::Range);
 
     auto *delegate = new ExtendedDelegate(this);
@@ -807,15 +807,15 @@ void MCRPredCondition::initToolEnchantPage() {
     ui->toolEnchant_table->installEventFilter(&viewFilter);
 
     connect(ui->toolEnchant_addBtn, &QPushButton::clicked,
-            this, &MCRPredCondition::toolEnchant_onAdded);
+            this, &LootTableCondition::toolEnchant_onAdded);
 }
 
-void MCRPredCondition::addInvertCondition(QJsonObject &json) const {
+void LootTableCondition::addInvertCondition(QJsonObject &json) const {
     json = QJsonObject({ { "condition", "minecraft:inverted" },
                            { "term", json } });
 }
 
-void MCRPredCondition::simplifyCondition(QVariantMap &condMap,
+void LootTableCondition::simplifyCondition(QVariantMap &condMap,
                                          int depth) const {
     /*const QString tab = QString(" ").repeated(depth); */
 

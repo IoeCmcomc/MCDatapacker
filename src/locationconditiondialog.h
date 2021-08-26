@@ -3,7 +3,7 @@
 
 #include "numericinput.h"
 #include "basecondition.h"
-#include "mcrpredcondition.h"
+#include "loottablecondition.h"
 
 #include <QDialog>
 #include <QVariant>
@@ -15,7 +15,7 @@ namespace Ui {
 class LocationConditionDialog : public QDialog, public BaseCondition
 {
     Q_OBJECT
-    friend class MCRPredCondition;
+    friend class LootTableCondition;
 
 public:
     explicit LocationConditionDialog(QWidget *parent = nullptr);

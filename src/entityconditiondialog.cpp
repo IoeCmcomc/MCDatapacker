@@ -3,6 +3,8 @@
 
 #include "extendeddelegate.h"
 #include "mainwindow.h"
+#include "itemconditiondialog.h"
+#include "locationconditiondialog.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -34,13 +36,14 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     initComboModelView(QStringLiteral("stat_type"), statTypeModel,
                        ui->statTypeCombo, false);
 
-    ui->headPropBtn->setDialogType(DDBType::ItemCond);
-    ui->chestPropBtn->setDialogType(DDBType::ItemCond);
-    ui->legsPropBtn->setDialogType(DDBType::ItemCond);
-    ui->feetPropBtn->setDialogType(DDBType::ItemCond);
-    ui->mainhandPropBtn->setDialogType(DDBType::ItemCond);
-    ui->offhandPropBtn->setDialogType(DDBType::ItemCond);
-    ui->locatPropBtn->setDialogType(DDBType::LocationCond);
+    /*ui->headPropBtn->setDialogType(DDBType::ItemCond); */
+    ui->headPropBtn->assignDialogClass<ItemConditionDialog>();
+    ui->chestPropBtn->assignDialogClass<ItemConditionDialog>();
+    ui->legsPropBtn->assignDialogClass<ItemConditionDialog>();
+    ui->feetPropBtn->assignDialogClass<ItemConditionDialog>();
+    ui->mainhandPropBtn->assignDialogClass<ItemConditionDialog>();
+    ui->offhandPropBtn->assignDialogClass<ItemConditionDialog>();
+    ui->locatPropBtn->assignDialogClass<LocationConditionDialog>();
 
     initEffectsPage();
     initPlayerAdv();

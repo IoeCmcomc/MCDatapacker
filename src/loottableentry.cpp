@@ -1,7 +1,7 @@
 #include "loottableentry.h"
 #include "ui_loottableentry.h"
 
-#include "mcrpredcondition.h"
+#include "loottablecondition.h"
 #include "loottablefunction.h"
 #include "loottableeditordock.h"
 #include "inventoryslot.h"
@@ -332,12 +332,12 @@ void LootTableEntry::reset(int index) {
 }
 
 void LootTableEntry::initCondInterface() {
-    auto *cond = new MCRPredCondition();
+    auto *cond = new LootTableCondition();
 
     ui->conditionsInterface->setMainWidget(cond);
     ui->conditionsInterface->mapToSetter(
-        cond, qOverload<const QJsonObject &>(&MCRPredCondition::fromJson));
-    ui->conditionsInterface->mapToGetter(&MCRPredCondition::toJson, cond);
+        cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
+    ui->conditionsInterface->mapToGetter(&LootTableCondition::toJson, cond);
 }
 
 void LootTableEntry::initFuncInterface() {
