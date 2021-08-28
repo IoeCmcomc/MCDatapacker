@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NumericInput</class>
- <widget class="QFrame" name="NumericInput">
+ <class>NumberProvider</class>
+ <widget class="QFrame" name="NumberProvider">
   <property name="geometry">
    <rect>
     <x>0</x>

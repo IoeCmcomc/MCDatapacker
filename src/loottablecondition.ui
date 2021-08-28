@@ -327,18 +327,12 @@
            <property name="text">
             <string>Entity properties...</string>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
           </widget>
          </item>
          <item row="1" column="1">
           <widget class="DialogDataButton" name="damageSrc_directPropBtn">
            <property name="text">
             <string>Entity properties...</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -393,9 +387,6 @@
         <widget class="DialogDataButton" name="entity_propBtn">
          <property name="text">
           <string>Entity properties...</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -462,7 +453,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="NumericInput" name="entityScores_valueInput">
+           <widget class="NumberProvider" name="entityScores_valueInput">
             <property name="minimumSize">
              <size>
               <width>125</width>
@@ -620,9 +611,6 @@
          <property name="text">
           <string>Location properties...</string>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
         </widget>
        </item>
       </layout>
@@ -722,9 +710,6 @@
         <widget class="DialogDataButton" name="matchTool_propBtn">
          <property name="text">
           <string>Item properties...</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1048,7 +1033,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="NumericInput" name="time_valueInput">
+        <widget class="NumberProvider" name="time_valueInput">
          <property name="minimumSize">
           <size>
            <width>150</width>
@@ -1128,7 +1113,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="NumericInput" name="toolEnchant_levelsInput">
+        <widget class="NumberProvider" name="toolEnchant_levelsInput">
          <property name="minimumSize">
           <size>
            <width>125</width>
@@ -1222,9 +1207,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>NumericInput</class>
+   <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">numberprovider.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

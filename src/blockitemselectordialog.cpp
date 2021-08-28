@@ -165,13 +165,13 @@ void BlockItemSelectorDialog::setCategory(const SelectCategory &category) {
     using Filter = InventoryItemFilterModel::Filter;
     switch (m_category) {
     case SelectCategory::Blocks: {
-        filterModel.setFilters({ Filter::ObtainableBlocks,
-                                 Filter::ObtainableBlocks });
+        filterModel.setFilters(Filter::ObtainableBlocks
+                               | Filter::ObtainableBlocks);
         break;
     }
 
     case SelectCategory::ObtainableItems: {
-        filterModel.setFilters({ Filter::BlockItems, Filter::NonblockItem });
+        filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
     }
     }
     ui->stackedWidget->setCurrentIndex((int)m_category);

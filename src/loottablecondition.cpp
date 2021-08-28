@@ -3,7 +3,7 @@
 
 #include "mainwindow.h"
 #include "inventoryitem.h"
-#include "extendeddelegate.h"
+#include "numberproviderdelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
 #include "entityconditiondialog.h"
@@ -44,7 +44,7 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     initRandChancePage();
     setupRefCombo();
     initTableBonusPage();
-    ui->time_valueInput->setTypes(NumericInput::ExactAndRange);
+    ui->time_valueInput->setModes(NumberProvider::ExactAndRange);
     initToolEnchantPage();
 }
 
@@ -688,8 +688,8 @@ void LootTableCondition::tableBonus_onAdded() {
 }
 
 void LootTableCondition::toolEnchant_onAdded() {
-    if (ui->toolEnchant_levelsInput->getMinimum() == 0
-        || ui->toolEnchant_levelsInput->getMaximum() == 0) {
+    if (ui->toolEnchant_levelsInput->minValue() == 0
+        || ui->toolEnchant_levelsInput->maxValue() == 0) {
         return;
     }
     QString enchantmentText = ui->toolEnchant_enchantCombo->currentText();
@@ -734,12 +734,12 @@ void LootTableCondition::initBlockStatesPage() {
 }
 
 void LootTableCondition::initEntityScoresPage() {
-    ui->entityScores_valueInput->setTypes(
-        NumericInput::Exact | NumericInput::Range);
+    ui->entityScores_valueInput->setModes(
+        NumberProvider::Exact | NumberProvider::Range);
 
-    auto *delegate = new ExtendedDelegate(this);
-    delegate->setExNumInputTypes(NumericInput::Exact
-                                 | NumericInput::Range);
+    auto *delegate = new NumberProviderDelegate(this);
+    delegate->setInputModes(NumberProvider::Exact
+                                 | NumberProvider::Range);
 
     ui->entityScores_table->setItemDelegate(delegate);
     ui->entityScores_table->installEventFilter(new ViewEventFilter(this));
@@ -799,10 +799,10 @@ void LootTableCondition::initTableBonusPage() {
 }
 
 void LootTableCondition::initToolEnchantPage() {
-    ui->toolEnchant_levelsInput->setTypes(NumericInput::Range);
+    ui->toolEnchant_levelsInput->setModes(NumberProvider::Range);
 
-    auto *delegate = new ExtendedDelegate(this);
-    delegate->setExNumInputTypes(NumericInput::Exact | NumericInput::Range);
+    auto *delegate = new NumberProviderDelegate(this);
+    delegate->setInputModes(NumberProvider::Exact | NumberProvider::Range);
     ui->toolEnchant_table->setItemDelegate(delegate);
     ui->toolEnchant_table->installEventFilter(&viewFilter);
 
@@ -816,7 +816,7 @@ void LootTableCondition::addInvertCondition(QJsonObject &json) const {
 }
 
 void LootTableCondition::simplifyCondition(QVariantMap &condMap,
-                                         int depth) const {
+                                           int depth) const {
     /*const QString tab = QString(" ").repeated(depth); */
 
     /*qDebug().noquote() << tab << "simplifyCondJson" << depth; */

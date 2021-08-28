@@ -1,7 +1,7 @@
 #ifndef LOCATIONCONDITIONDIALOG_H
 #define LOCATIONCONDITIONDIALOG_H
 
-#include "numericinput.h"
+#include "numberprovider.h"
 #include "basecondition.h"
 #include "loottablecondition.h"
 

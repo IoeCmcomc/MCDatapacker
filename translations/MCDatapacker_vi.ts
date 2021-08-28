@@ -2703,44 +2703,44 @@ Bạn có muốn tạo lại thư mục này không?</translation>
     </message>
 </context>
 <context>
-    <name>NumericInput</name>
+    <name>NumberProvider</name>
     <message>
-        <location filename="numericinput.ui" line="99"/>
+        <location filename="numberprovider.ui" line="99"/>
         <source>from</source>
         <translation>từ</translation>
     </message>
     <message>
-        <location filename="numericinput.ui" line="122"/>
+        <location filename="numberprovider.ui" line="122"/>
         <source>to</source>
         <translation>đến</translation>
     </message>
     <message>
-        <location filename="numericinput.ui" line="158"/>
+        <location filename="numberprovider.ui" line="158"/>
         <source>Number of tries</source>
         <translation>Số lần thử</translation>
     </message>
     <message>
-        <location filename="numericinput.ui" line="161"/>
+        <location filename="numberprovider.ui" line="161"/>
         <source>Tries:</source>
         <translation>Thử:</translation>
     </message>
     <message>
-        <location filename="numericinput.ui" line="184"/>
+        <location filename="numberprovider.ui" line="184"/>
         <source>Probability:</source>
         <translation>Xác suất:</translation>
     </message>
     <message>
-        <location filename="numericinput.cpp" line="149"/>
+        <location filename="numberprovider.cpp" line="149"/>
         <source>Exactly</source>
         <translation>Chính xác</translation>
     </message>
     <message>
-        <location filename="numericinput.cpp" line="153"/>
+        <location filename="numberprovider.cpp" line="153"/>
         <source>Range</source>
         <translation>Khoảng</translation>
     </message>
     <message>
-        <location filename="numericinput.cpp" line="157"/>
+        <location filename="numberprovider.cpp" line="157"/>
         <source>Binomial</source>
         <translation>Nhị thức</translation>
     </message>

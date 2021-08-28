@@ -1,30 +1,30 @@
-#include "numericinput.h"
-#include "ui_numericinput.h"
+#include "numberprovider.h"
+#include "ui_numberprovider.h"
 
 #include <QJsonObject>
 #include <QDebug>
 #include <QVector>
 #include <QResizeEvent>
 
-NumericInput::NumericInput(QWidget *parent) :
+NumberProvider::NumberProvider(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::NumericInput) {
+    ui(new Ui::NumberProvider) {
     ui->setupUi(this);
 
-    setTypes(Exact | Range | Binomial);
+    setModes(Exact | Range | Binomial);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
-            this, &NumericInput::onMinMaxEdited);
+            this, &NumberProvider::onMinMaxEdited);
     connect(ui->maxSpinBox, &QSpinBox::editingFinished,
-            this, &NumericInput::onMinMaxEdited);
+            this, &NumberProvider::onMinMaxEdited);
 }
 
-NumericInput::~NumericInput() {
+NumberProvider::~NumberProvider() {
     delete ui;
 }
 
-void NumericInput::resizeEvent(QResizeEvent *event) {
-    int eventWidth = event->size().width();
+void NumberProvider::resizeEvent(QResizeEvent *event) {
+    const int eventWidth = event->size().width();
 
     ui->minLabel->setHidden(eventWidth < 200);
     ui->maxLabel->setHidden(eventWidth < 180);
@@ -34,7 +34,7 @@ void NumericInput::resizeEvent(QResizeEvent *event) {
     QFrame::resizeEvent(event);
 }
 
-void NumericInput::mouseReleaseEvent(QMouseEvent *event) {
+void NumberProvider::mouseReleaseEvent(QMouseEvent *event) {
     auto cursorWidget = qApp->widgetAt(mapToGlobal(event->pos()));
 
     if (cursorWidget != nullptr
@@ -47,7 +47,7 @@ void NumericInput::mouseReleaseEvent(QMouseEvent *event) {
     QFrame::mouseReleaseEvent(event);
 }
 
-void NumericInput::onMinMaxEdited() {
+void NumberProvider::onMinMaxEdited() {
     if (ui->minSpinBox->value() > ui->maxSpinBox->value()) {
         if (!(ui->minSpinBox->isUnset() || ui->maxSpinBox->isUnset())) {
             auto tmp = ui->minSpinBox->value();
@@ -55,13 +55,13 @@ void NumericInput::onMinMaxEdited() {
             ui->maxSpinBox->setValue(tmp);
         }
     } else if (ui->minSpinBox->value() == ui->maxSpinBox->value()) {
-        setExactly(ui->minSpinBox->value());
+        setExactValue(ui->minSpinBox->value());
         if (ui->minSpinBox->isUnset())
             ui->spinBox->unset();
     }
 }
 
-void NumericInput::fromJson(const QJsonValue &value) {
+void NumberProvider::fromJson(const QJsonValue &value) {
     /*unset(); */
     if (value.isDouble()) {
         ui->spinBox->setValue(value.toInt());
@@ -77,18 +77,18 @@ void NumericInput::fromJson(const QJsonValue &value) {
             ui->stackedWidget->setCurrentIndex(2);
         } else {
             if (obj.contains(QStringLiteral("min")))
-                setMinimum(obj.value(QStringLiteral("min")).toInt());
+                setMinValue(obj.value(QStringLiteral("min")).toInt());
             else
                 ui->minSpinBox->unset();
             if (obj.contains(QStringLiteral("max")))
-                setMaximum(obj.value(QStringLiteral("max")).toInt());
+                setMaxValue(obj.value(QStringLiteral("max")).toInt());
             else
                 ui->maxSpinBox->unset();
         }
     }
 }
 
-QJsonValue NumericInput::toJson() {
+QJsonValue NumberProvider::toJson() {
     QJsonValue value;
 
     switch (ui->stackedWidget->currentIndex()) {
@@ -105,19 +105,19 @@ QJsonValue NumericInput::toJson() {
               ui->maxSpinBox->isUnset();
  */
         if (!ui->minSpinBox->isUnset())
-            root.insert(QStringLiteral("min"), ui->minSpinBox->value());
+            root.insert(QLatin1String("min"), ui->minSpinBox->value());
         if (!ui->maxSpinBox->isUnset())
-            root.insert(QStringLiteral("max"), ui->maxSpinBox->value());
+            root.insert(QLatin1String("max"), ui->maxSpinBox->value());
         value = root;
         break;
     }
 
     case 2: { /*Binomial */
         QJsonObject root;
-        root.insert(QStringLiteral("type"),
-                    QStringLiteral("minecraft:binomial"));
-        root.insert(QStringLiteral("n"), ui->numSpinBox->value());
-        root.insert(QStringLiteral("p"), ui->probSpinBox->value());
+        root.insert(QLatin1String("type"),
+                    QLatin1String("minecraft:binomial"));
+        root.insert("n", ui->numSpinBox->value());
+        root.insert("p", ui->probSpinBox->value());
         value = root;
         break;
     }
@@ -127,108 +127,98 @@ QJsonValue NumericInput::toJson() {
     return value;
 }
 
-NumericInput::Types NumericInput::getTypes() const {
-    return types;
+NumberProvider::Modes NumberProvider::getModes() const {
+    return m_modes;
 }
 
-void NumericInput::setTypes(const NumericInput::Types &value) {
-    types = value;
+void NumberProvider::setModes(const NumberProvider::Modes &value) {
+    m_modes = value;
     setMenu();
-    if (!types.testFlag(Exact)) {
+    if (!m_modes.testFlag(Exact)) {
         ui->stackedWidget->setCurrentIndex(1);
-        if (!types.testFlag(Range))
+        if (!m_modes.testFlag(Range))
             ui->stackedWidget->setCurrentIndex(2);
     }
     ui->inputTypeButton->setHidden(value != 0 && (value & (value - 1)) == 0);
 }
 
-void NumericInput::setMenu() {
-    typeMenu.clear();
+void NumberProvider::setMenu() {
+    m_menu.clear();
 
-    if (types.testFlag(Exact))
-        typeMenu.addAction(tr("Exactly"), this, [ = ]() {
+    if (m_modes.testFlag(Exact))
+        m_menu.addAction(tr("Exactly"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(0);
         });
-    if (types.testFlag(Range))
-        typeMenu.addAction(tr("Range"), this, [ = ]() {
+    if (m_modes.testFlag(Range))
+        m_menu.addAction(tr("Range"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(1);
         });
-    if (types.testFlag(Binomial))
-        typeMenu.addAction(tr("Binomial"), this, [ = ]() {
+    if (m_modes.testFlag(Binomial))
+        m_menu.addAction(tr("Binomial"), this, [ = ]() {
             ui->stackedWidget->setCurrentIndex(2);
         });
-    ui->inputTypeButton->setMenu(&typeMenu);
+    ui->inputTypeButton->setMenu(&m_menu);
     ui->inputTypeButton->setPopupMode(QToolButton::InstantPopup);
 }
 
-NumericInput::Type NumericInput::getCurrentType() const {
-    return currentType;
+NumberProvider::Mode NumberProvider::currentMode() const {
+    return m_currentMode;
 }
 
-void NumericInput::setCurrentType(const Type &value) {
-    currentType = value;
-    const QVector<Type> typeVec = { Exact, Range, Binomial };
-    ui->stackedWidget->setCurrentIndex(typeVec.indexOf(value));
+void NumberProvider::setCurrentMode(const Mode &value) {
+    m_currentMode = value;
+    const static QMap<Mode, uint8_t> modeMap =
+    { { Exact, 0 }, { Range, 1 }, { Binomial, 2 } };
+    ui->stackedWidget->setCurrentIndex(modeMap.value(value));
 }
 
-int NumericInput::getExactly() const {
+int NumberProvider::exactValue() const {
     return ui->spinBox->value();
 }
 
-void NumericInput::setExactly(const int value) {
+void NumberProvider::setExactValue(const int value) {
     ui->spinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-int NumericInput::getMinimum() const {
+int NumberProvider::minValue() const {
     return ui->minSpinBox->value();
 }
 
-void NumericInput::setMinimum(const int value) {
+void NumberProvider::setMinValue(const int value) {
     ui->minSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
 }
 
-int NumericInput::getMaximum() const {
+int NumberProvider::maxValue() const {
     return ui->maxSpinBox->value();
 }
 
-void NumericInput::setMaximum(const int value) {
+void NumberProvider::setMaxValue(const int value) {
     ui->maxSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
 }
 
-void NumericInput::setExactMinimum(const int &min) {
+void NumberProvider::setMinLimit(const int &min) {
     ui->spinBox->setMinimum(min);
-}
-
-void NumericInput::setExactMaximum(const int &max) {
-    ui->spinBox->setMaximum(max);
-}
-
-void NumericInput::setRangeMinimum(const int &min) {
     ui->minSpinBox->setMinimum(min);
     ui->maxSpinBox->setMinimum(min);
 }
 
-void NumericInput::setRangeMaximum(const int &max) {
+void NumberProvider::setMaxLimit(const int &max) {
+    ui->spinBox->setMaximum(max);
     ui->minSpinBox->setMaximum(max);
     ui->maxSpinBox->setMaximum(max);
 }
 
-void NumericInput::setGeneralMinimum(const int &min) {
-    setExactMinimum(min);
-    setRangeMinimum(min);
+/*! Set the minimum limit to the minimum interger value */
+void NumberProvider::minimizeMinLimit() {
+    setMinLimit(INT_MIN);
 }
 
-void NumericInput::setGeneralMaximum(const int &max) {
-    setExactMaximum(max);
-    setRangeMaximum(max);
-}
-
-bool NumericInput::isCurrentlyUnset() const {
+bool NumberProvider::isCurrentlyUnset() const {
     switch (ui->stackedWidget->currentIndex()) {
     case 0: /* Exactly */
         return ui->spinBox->isUnset();
@@ -244,20 +234,16 @@ bool NumericInput::isCurrentlyUnset() const {
     }
 }
 
-void NumericInput::unset() const {
+void NumberProvider::unset() const {
     ui->spinBox->unset();
     ui->minSpinBox->unset();
     ui->maxSpinBox->unset();
 }
 
-void NumericInput::interpretText() {
+void NumberProvider::interpretText() {
     ui->spinBox->interpretText();
     ui->minSpinBox->interpretText();
     ui->maxSpinBox->interpretText();
     ui->numSpinBox->interpretText();
     ui->probSpinBox->interpretText();
-}
-
-void NumericInput::retranslate() {
-    ui->retranslateUi(this);
 }

@@ -2,7 +2,7 @@
 #include "ui_itemconditiondialog.h"
 
 #include "mainwindow.h"
-#include "extendeddelegate.h"
+#include "numberproviderdelegate.h"
 #include "inventoryslot.h"
 
 ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
@@ -10,12 +10,12 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
 
-    auto typeFlags = NumericInput::Exact
-                     | NumericInput::Range;
-    ui->countInput->setTypes(typeFlags);
-    ui->durabilityInput->setTypes(typeFlags);
-    ui->enchant_levelInput->setTypes(typeFlags);
-    ui->stored_levelInput->setTypes(typeFlags);
+    auto typeFlags = NumberProvider::Exact
+                     | NumberProvider::Range;
+    ui->countInput->setModes(typeFlags);
+    ui->durabilityInput->setModes(typeFlags);
+    ui->enchant_levelInput->setModes(typeFlags);
+    ui->stored_levelInput->setModes(typeFlags);
     ui->itemSlot->setAcceptTag(false);
     ui->itemSlot->setAcceptMultiple(false);
 
@@ -103,7 +103,7 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
 
     if (value.contains(QStringLiteral("item"))) {
         ui->itemSlot->setItem(InventoryItem(value[QStringLiteral(
-                                                   "item")].toString()));
+                                                      "item")].toString()));
     } else if (value.contains(QStringLiteral("tag"))) {
         ui->itemTagEdit->setText(value[QStringLiteral("tag")].toString());
         ui->tagRadio->setChecked(true);
@@ -130,9 +130,9 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
 }
 
 void ItemConditionDialog::onAddedEnchant() {
-    if ((ui->enchant_levelInput->getMinimum() == 0 &&
+    if ((ui->enchant_levelInput->minValue() == 0 &&
          !ui->enchant_levelInput->isCurrentlyUnset())
-        || (ui->enchant_levelInput->getMaximum() == 0 &&
+        || (ui->enchant_levelInput->maxValue() == 0 &&
             !ui->enchant_levelInput->isCurrentlyUnset())) {
         return;
     }
@@ -153,9 +153,9 @@ void ItemConditionDialog::onAddedEnchant() {
 }
 
 void ItemConditionDialog::onAddedStoredEnchant() {
-    if ((ui->stored_levelInput->getMinimum() == 0 &&
+    if ((ui->stored_levelInput->minValue() == 0 &&
          !ui->stored_levelInput->isCurrentlyUnset())
-        || (ui->stored_levelInput->getMaximum() == 0 &&
+        || (ui->stored_levelInput->maxValue() == 0 &&
             !ui->stored_levelInput->isCurrentlyUnset())) {
         return;
     }
@@ -176,11 +176,11 @@ void ItemConditionDialog::onAddedStoredEnchant() {
 }
 
 void ItemConditionDialog::initTable(QTableWidget *table) {
-    auto *delegate = new ExtendedDelegate();
+    auto *delegate = new NumberProviderDelegate();
 
-    delegate->setExNumInputTypes(NumericInput::Exact
-                                 | NumericInput::Range);
-    delegate->setExNumInputGeneralMin(0);
+    delegate->setInputModes(NumberProvider::Exact
+                                 | NumberProvider::Range);
+    delegate->setMinLimit(0);
     table->setItemDelegate(delegate);
     table->installEventFilter(new ViewEventFilter(this));
 }

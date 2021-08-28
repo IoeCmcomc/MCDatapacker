@@ -38,7 +38,7 @@
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="NumericInput" name="rollsInput">
+     <widget class="NumberProvider" name="rollsInput">
       <property name="minimumSize">
        <size>
         <width>130</width>
@@ -61,7 +61,7 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="NumericInput" name="bonusRollsInput">
+     <widget class="NumberProvider" name="bonusRollsInput">
       <property name="minimumSize">
        <size>
         <width>130</width>
@@ -168,9 +168,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>NumericInput</class>
+   <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">numberprovider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

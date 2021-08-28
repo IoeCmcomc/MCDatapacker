@@ -1,17 +1,16 @@
-#ifndef EXTENDEDNUMERICDELEGATE_H
-#define EXTENDEDNUMERICDELEGATE_H
+#ifndef NUMBERPROVIDERDELEGATE_H
+#define NUMBERPROVIDERDELEGATE_H
 
-#include "numericinput.h"
+#include "numberprovider.h"
 
-#include <QMetaType>
 #include <QStandardItem>
 #include <QStyledItemDelegate>
 
-class ExtendedDelegate : public QStyledItemDelegate
+class NumberProviderDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    ExtendedDelegate(QObject *parent = nullptr);
+    NumberProviderDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
@@ -28,19 +27,19 @@ public:
                               const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
 
-    NumericInput::Types getExNumInputTypes() const;
-    void setExNumInputTypes(const NumericInput::Types &value);
+    NumberProvider::Modes inputModes() const;
+    void setInputModes(const NumberProvider::Modes &value);
 
-    void setExNumInputGeneralMin(int value);
-    void setExNumInputGeneralMax(int value);
+    void setMinLimit(int value);
+    void setMaxLimit(int value);
 
 private slots:
     void commitAndCloseEditor();
 
 private:
-    NumericInput::Types ExNumInputTypes;
-    int NumInputGeneralMin = 0;
-    int NumInputGeneralMax = INT_MAX;
+    NumberProvider::Modes m_inputModes;
+    int m_minLimit = 0;
+    int m_maxLimit = INT_MAX;
 };
 
-#endif /* EXTENDEDNUMERICDELEGATE_H */
+#endif /* NUMBERPROVIDERDELEGATE_H */

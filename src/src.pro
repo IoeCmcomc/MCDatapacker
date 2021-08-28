@@ -34,7 +34,6 @@ SOURCES += \
     dialogdatabutton.cpp \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
-    extendeddelegate.cpp \
     filenamedelegate.cpp \
     fileswitcher.cpp \
     globalhelpers.cpp \
@@ -58,7 +57,8 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
-    numericinput.cpp \
+    numberprovider.cpp \
+    numberproviderdelegate.cpp \
     optionalspinbox.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/argumentnode.cpp \
@@ -121,7 +121,6 @@ HEADERS += \
     dialogdatabutton.h \
     disclaimerdialog.h \
     entityconditiondialog.h \
-    extendeddelegate.h \
     filenamedelegate.h \
     fileswitcher.h \
     globalhelpers.h \
@@ -144,7 +143,8 @@ HEADERS += \
     mcfunctionhighlighter.h \
     modelfunctions.h \
     newdatapackdialog.h \
-    numericinput.h \
+    numberprovider.h \
+    numberproviderdelegate.h \
     optionalspinbox.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
@@ -212,7 +212,7 @@ FORMS += \
     mainwindow.ui \
     inventorysloteditor.ui \
     newdatapackdialog.ui \
-    numericinput.ui \
+    numberprovider.ui \
     predicatedock.ui \
     rawjsontextedit.ui \
     settingsdialog.ui \

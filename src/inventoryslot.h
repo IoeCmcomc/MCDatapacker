@@ -101,4 +101,6 @@ private:
     bool checkAcceptableItems(const QVector<InventoryItem> &items);
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(InventorySlot::AcceptPolicies)
+
 #endif /* INVENTORYSLOT_H */

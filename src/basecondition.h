@@ -1,7 +1,7 @@
 #ifndef BASECONDITION_H
 #define BASECONDITION_H
 
-#include "numericinput.h"
+#include "numberprovider.h"
 #include "vieweventfilter.h"
 #include "modelfunctions.h"
 

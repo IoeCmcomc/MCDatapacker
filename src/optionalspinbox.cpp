@@ -7,7 +7,7 @@ OptionalSpinBox::OptionalSpinBox(QWidget *parent) : QSpinBox(parent) {
 }
 
 QValidator::State OptionalSpinBox::validate(QString &text, int &pos) const {
-    if (text == unsetDisplayStr || text == QStringLiteral("-"))
+    if (text == m_unsetDisplayStr)
         return QValidator::Acceptable;
     else
         return QSpinBox::validate(text, pos);
@@ -15,7 +15,7 @@ QValidator::State OptionalSpinBox::validate(QString &text, int &pos) const {
 
 int OptionalSpinBox::valueFromText(const QString &text) const {
     /*qDebug() << "valueFromText" << text << isUnset << minimum() << maximum(); */
-    if (text == unsetDisplayStr || text == QStringLiteral("-")) {
+    if (text == m_unsetDisplayStr) {
         m_isUnset = true;
         return 0;
     } else {
@@ -27,7 +27,7 @@ int OptionalSpinBox::valueFromText(const QString &text) const {
 QString OptionalSpinBox::textFromValue(int value) const {
     /*qDebug() << "textFromValue" << value << isUnset << minimum() << maximum(); */
     if (m_isUnset && (value == 0))
-        return unsetDisplayStr;
+        return m_unsetDisplayStr;
     else {
         m_isUnset = false;
         return QSpinBox::textFromValue(value);
@@ -36,7 +36,7 @@ QString OptionalSpinBox::textFromValue(int value) const {
 
 void OptionalSpinBox::fixup(QString &input) const {
     if (input.isEmpty())
-        input = unsetDisplayStr;
+        input = m_unsetDisplayStr;
     else
         QSpinBox::fixup(input);
 }

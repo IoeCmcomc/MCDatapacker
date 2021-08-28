@@ -18,10 +18,10 @@ protected:
     void fixup(QString &input) const override;
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
-    QString unsetDisplayStr = "-";
 
 private:
-    bool mutable m_isUnset = true;
+    QString m_unsetDisplayStr = "-";
+    bool mutable m_isUnset    = true;
 };
 
 #endif /* OPTIONALSPINBOX_H */

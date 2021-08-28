@@ -1,7 +1,7 @@
 #include "entityconditiondialog.h"
 #include "ui_entityconditiondialog.h"
 
-#include "extendeddelegate.h"
+#include "numberproviderdelegate.h"
 #include "mainwindow.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
@@ -12,22 +12,22 @@
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
-    const auto typeFlag = NumericInput::ExactAndRange;
-    ui->absDistanceInput->setTypes(typeFlag);
-    ui->horizDistanceInput->setTypes(typeFlag);
-    ui->xDistanceInput->setTypes(typeFlag);
-    ui->yDistanceInput->setTypes(typeFlag);
-    ui->zDistanceInput->setTypes(typeFlag);
-    ui->effectAmpInput->setTypes(typeFlag);
-    ui->effectDuraInput->setTypes(typeFlag);
-    ui->playerLevelInput->setTypes(typeFlag);
-    ui->statValueInput->setTypes(typeFlag);
+    const auto typeFlag = NumberProvider::ExactAndRange;
+    ui->absDistanceInput->setModes(typeFlag);
+    ui->horizDistanceInput->setModes(typeFlag);
+    ui->xDistanceInput->setModes(typeFlag);
+    ui->yDistanceInput->setModes(typeFlag);
+    ui->zDistanceInput->setModes(typeFlag);
+    ui->effectAmpInput->setModes(typeFlag);
+    ui->effectDuraInput->setModes(typeFlag);
+    ui->playerLevelInput->setModes(typeFlag);
+    ui->statValueInput->setModes(typeFlag);
 
-    ui->absDistanceInput->setGeneralMinimum(-999999999);
-    ui->horizDistanceInput->setGeneralMinimum(-999999999);
-    ui->xDistanceInput->setGeneralMinimum(-999999999);
-    ui->yDistanceInput->setGeneralMinimum(-999999999);
-    ui->zDistanceInput->setGeneralMinimum(-999999999);
+    ui->absDistanceInput->minimizeMinLimit();
+    ui->horizDistanceInput->minimizeMinLimit();
+    ui->xDistanceInput->minimizeMinLimit();
+    ui->yDistanceInput->minimizeMinLimit();
+    ui->zDistanceInput->minimizeMinLimit();
 
     initComboModelView(QStringLiteral("entity"), entityModel,
                        ui->entityTypeCombo);
@@ -453,11 +453,11 @@ void EntityConditionDialog::initEffectsPage() {
     QStandardItem *ambientItem   = new QStandardItem(tr("Ambient"));
     QStandardItem *visibleItem   = new QStandardItem(tr("Visible"));
 
-    auto *delegate = new ExtendedDelegate(this);
+    auto *delegate = new NumberProviderDelegate(this);
 
-    delegate->setExNumInputTypes(NumericInput::Exact
-                                 | NumericInput::Range);
-    delegate->setExNumInputGeneralMin(1);
+    delegate->setInputModes(NumberProvider::Exact
+                            | NumberProvider::Range);
+    delegate->setMinLimit(1);
 
     initModelView(entityEffectModel, ui->effectTableView,
                   { effectItem, amplifierItem, durationItem, ambientItem,
@@ -497,10 +497,10 @@ void EntityConditionDialog::initPlayerStat() {
     QStandardItem *statItem  = new QStandardItem(tr("Stat"));
     QStandardItem *valueItem = new QStandardItem(tr("Value"));
 
-    auto *delegate = new ExtendedDelegate(this);
+    auto *delegate = new NumberProviderDelegate(this);
 
-    delegate->setExNumInputTypes(NumericInput::Exact
-                                 | NumericInput::Range);
+    delegate->setInputModes(NumberProvider::Exact
+                            | NumberProvider::Range);
 
     initModelView(playerStatModel, ui->statsTableView,
                   { typeItem, statItem, valueItem }, viewFilter, delegate);

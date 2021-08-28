@@ -29,4 +29,6 @@ private:
     Filters m_filters = { BlockItems, NonblockItem };
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(InventoryItemFilterModel::Filters)
+
 #endif /* INVENTORYITEMFILTERMODEL_H */

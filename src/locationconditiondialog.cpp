@@ -12,17 +12,17 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     ui(new Ui::LocationConditionDialog) {
     ui->setupUi(this);
 
-    const auto typeFlags = NumericInput::Exact
-                           | NumericInput::Range;
+    const auto typeFlags = NumberProvider::Exact
+                           | NumberProvider::Range;
 
-    ui->xInput->setTypes(typeFlags);
-    ui->xInput->setGeneralMinimum(-999999999);
-    ui->yInput->setTypes(typeFlags);
-    ui->yInput->setGeneralMinimum(-999999999);
-    ui->zInput->setTypes(typeFlags);
-    ui->zInput->setGeneralMinimum(-999999999);
-    ui->lightInput->setTypes(typeFlags);
-    ui->lightInput->setGeneralMaximum(15);
+    ui->xInput->setModes(typeFlags);
+    ui->xInput->minimizeMinLimit();
+    ui->yInput->setModes(typeFlags);
+    ui->yInput->minimizeMinLimit();
+    ui->zInput->setModes(typeFlags);
+    ui->zInput->minimizeMinLimit();
+    ui->lightInput->setModes(typeFlags);
+    ui->lightInput->setMaxLimit(15);
 
     initComboModelView("biome", biomesModel, ui->biomeCombo);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
@@ -46,11 +46,11 @@ QJsonObject LocationConditionDialog::toJson() const {
     QJsonObject position;
 
     if (!ui->xInput->isCurrentlyUnset())
-        position.insert(QStringLiteral("x"), ui->xInput->toJson());
+        position.insert("x", ui->xInput->toJson());
     if (!ui->yInput->isCurrentlyUnset())
-        position.insert(QStringLiteral("y"), ui->yInput->toJson());
+        position.insert("y", ui->yInput->toJson());
     if (!ui->zInput->isCurrentlyUnset())
-        position.insert(QStringLiteral("z"), ui->zInput->toJson());
+        position.insert("z", ui->zInput->toJson());
     if (!position.isEmpty())
         root.insert(QStringLiteral("position"), position);
 
@@ -208,7 +208,7 @@ void LocationConditionDialog::initBlockGroup() {
     /*blocksModel.appendRow(new QStandardItem(tr("(not set)"))); */
     auto blocksInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
     for (const auto &key : blocksInfo.keys()) {
-        InventoryItem     invItem(key);
+        InventoryItem  invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {

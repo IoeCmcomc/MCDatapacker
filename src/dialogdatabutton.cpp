@@ -9,9 +9,8 @@
 #include <QDebug>
 
 DialogDataButton::DialogDataButton(QWidget *parent) :
-    QLabel(parent), ui(new Ui::DialogDataButton) {
+    QWidget(parent), ui(new Ui::DialogDataButton) {
     ui->setupUi(this);
-    setMargin(30);
 
     connect(ui->secondButton, &QToolButton::clicked,
             this, &DialogDataButton::reset);
@@ -24,9 +23,10 @@ DialogDataButton::~DialogDataButton() {
 
 void DialogDataButton::setText(const QString &str) {
     ui->button->setText(str);
-    ui->button->adjustSize();
-    adjustSize();
-    QLabel::setText(str);
+    /*
+       ui->button->adjustSize();
+       adjustSize();
+     */
 }
 
 void DialogDataButton::reset() {

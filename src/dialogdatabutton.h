@@ -15,7 +15,7 @@ namespace Ui {
     class DialogDataButton;
 }
 
-class DialogDataButton : public QLabel
+class DialogDataButton : public QWidget
 {
     Q_OBJECT
 

@@ -5,7 +5,7 @@
 #include "ui_loottablefunction.h"
 #include "inventoryitem.h"
 #include "mainwindow.h"
-#include "extendeddelegate.h"
+#include "numberproviderdelegate.h"
 #include "globalhelpers.h"
 #include "modelfunctions.h"
 
@@ -51,17 +51,17 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
                        mapIconsModel,
                        ui->map_decoCombo);
 
-    ui->limitCount_limitInput->setTypes(NumericInput::ExactAndRange);
+    ui->limitCount_limitInput->setModes(NumberProvider::ExactAndRange);
 
-    ui->lootEnchant_countInput->setTypes(NumericInput::ExactAndRange);
+    ui->lootEnchant_countInput->setModes(NumberProvider::ExactAndRange);
 
-    ui->setAttr_amountInput->setTypes(NumericInput::Range);
+    ui->setAttr_amountInput->setModes(NumberProvider::Range);
     initComboModelView(QStringLiteral("attribute"), attributesModel,
                        ui->setAttr_attrCombo, false);
 
-    ExtendedDelegate *delegate = new ExtendedDelegate(this);
-    delegate->setExNumInputTypes(NumericInput::Exact
-                                 | NumericInput::Range);
+    NumberProviderDelegate *delegate = new NumberProviderDelegate(this);
+    delegate->setInputModes(NumberProvider::Exact
+                                 | NumberProvider::Range);
 
     ui->setAttr_table->setItemDelegate(delegate);
     ui->setAttr_table->installEventFilter(&viewFilter);

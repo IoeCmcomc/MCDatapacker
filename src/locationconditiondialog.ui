@@ -191,7 +191,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="NumericInput" name="lightInput">
+      <widget class="NumberProvider" name="lightInput">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -290,7 +290,7 @@
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="0" column="1">
-       <widget class="NumericInput" name="xInput">
+       <widget class="NumberProvider" name="xInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -306,7 +306,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="NumericInput" name="yInput">
+       <widget class="NumberProvider" name="yInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -322,7 +322,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="NumericInput" name="zInput">
+       <widget class="NumberProvider" name="zInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -365,9 +365,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NumericInput</class>
+   <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">numberprovider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

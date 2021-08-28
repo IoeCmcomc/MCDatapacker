@@ -84,7 +84,7 @@
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <item row="0" column="1">
-           <widget class="NumericInput" name="absDistanceInput">
+           <widget class="NumberProvider" name="absDistanceInput">
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -94,7 +94,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="NumericInput" name="horizDistanceInput">
+           <widget class="NumberProvider" name="horizDistanceInput">
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -104,7 +104,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="NumericInput" name="xDistanceInput">
+           <widget class="NumberProvider" name="xDistanceInput">
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -114,7 +114,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="NumericInput" name="yDistanceInput">
+           <widget class="NumberProvider" name="yDistanceInput">
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -124,7 +124,7 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="NumericInput" name="zDistanceInput">
+           <widget class="NumberProvider" name="zDistanceInput">
             <property name="minimumSize">
              <size>
               <width>130</width>
@@ -366,7 +366,7 @@
         </widget>
        </item>
        <item row="4" column="1" colspan="2">
-        <widget class="NumericInput" name="effectDuraInput">
+        <widget class="NumberProvider" name="effectDuraInput">
          <property name="minimumSize">
           <size>
            <width>130</width>
@@ -386,7 +386,7 @@
         </widget>
        </item>
        <item row="3" column="1" colspan="2">
-        <widget class="NumericInput" name="effectAmpInput">
+        <widget class="NumberProvider" name="effectAmpInput">
          <property name="minimumSize">
           <size>
            <width>130</width>
@@ -522,7 +522,7 @@
           </widget>
          </item>
          <item>
-          <widget class="NumericInput" name="playerLevelInput">
+          <widget class="NumberProvider" name="playerLevelInput">
            <property name="minimumSize">
             <size>
              <width>130</width>
@@ -719,7 +719,7 @@
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="NumericInput" name="statValueInput">
+             <widget class="NumberProvider" name="statValueInput">
               <property name="minimumSize">
                <size>
                 <width>130</width>
@@ -805,9 +805,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>NumericInput</class>
+   <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">numberprovider.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

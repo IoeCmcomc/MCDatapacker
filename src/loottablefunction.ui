@@ -313,7 +313,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumericInput" name="levelEnchant_levelInput">
+         <widget class="NumberProvider" name="levelEnchant_levelInput">
           <property name="minimumSize">
            <size>
             <width>50</width>
@@ -436,7 +436,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumericInput" name="limitCount_limitInput"/>
+         <widget class="NumberProvider" name="limitCount_limitInput"/>
         </item>
        </layout>
       </widget>
@@ -450,7 +450,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumericInput" name="lootEnchant_countInput"/>
+         <widget class="NumberProvider" name="lootEnchant_countInput"/>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_20">
@@ -567,7 +567,7 @@
          </widget>
         </item>
         <item row="5" column="1" colspan="3">
-         <widget class="NumericInput" name="setAttr_amountInput">
+         <widget class="NumberProvider" name="setAttr_amountInput">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -694,7 +694,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumericInput" name="setCount_countInput"/>
+         <widget class="NumberProvider" name="setCount_countInput"/>
         </item>
        </layout>
       </widget>
@@ -708,7 +708,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumericInput" name="setDamage_damageInput"/>
+         <widget class="NumberProvider" name="setDamage_damageInput"/>
         </item>
        </layout>
       </widget>
@@ -1103,9 +1103,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>NumericInput</class>
+   <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">numericinput.h</header>
+   <header location="global">numberprovider.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
