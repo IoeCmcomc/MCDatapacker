@@ -12,22 +12,6 @@
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
-    const auto typeFlag = NumberProvider::ExactAndRange;
-    ui->absDistanceInput->setModes(typeFlag);
-    ui->horizDistanceInput->setModes(typeFlag);
-    ui->xDistanceInput->setModes(typeFlag);
-    ui->yDistanceInput->setModes(typeFlag);
-    ui->zDistanceInput->setModes(typeFlag);
-    ui->effectAmpInput->setModes(typeFlag);
-    ui->effectDuraInput->setModes(typeFlag);
-    ui->playerLevelInput->setModes(typeFlag);
-    ui->statValueInput->setModes(typeFlag);
-
-    ui->absDistanceInput->minimizeMinLimit();
-    ui->horizDistanceInput->minimizeMinLimit();
-    ui->xDistanceInput->minimizeMinLimit();
-    ui->yDistanceInput->minimizeMinLimit();
-    ui->zDistanceInput->minimizeMinLimit();
 
     initComboModelView(QStringLiteral("entity"), entityModel,
                        ui->entityTypeCombo);
@@ -36,7 +20,6 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     initComboModelView(QStringLiteral("stat_type"), statTypeModel,
                        ui->statTypeCombo, false);
 
-    /*ui->headPropBtn->setDialogType(DDBType::ItemCond); */
     ui->headPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->chestPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->legsPropBtn->assignDialogClass<ItemConditionDialog>();

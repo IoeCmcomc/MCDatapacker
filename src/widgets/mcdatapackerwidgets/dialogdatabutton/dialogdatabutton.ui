@@ -41,15 +41,15 @@
       <string>Click to reset</string>
      </property>
      <property name="icon">
-      <iconset resource="../resource/app/app.qrc">
-       <normaloff>:/icon/reset.png</normaloff>:/icon/reset.png</iconset>
+      <iconset resource="../resource/mcdatapackerwidgets.qrc">
+       <normaloff>:/dialogbuttonbutton/dialogdatabutton/reset.png</normaloff>:/dialogbuttonbutton/dialogdatabutton/reset.png</iconset>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="../resource/app/app.qrc"/>
+  <include location="../resource/mcdatapackerwidgets.qrc"/>
  </resources>
  <connections/>
 </ui>

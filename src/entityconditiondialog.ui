@@ -91,6 +91,12 @@
               <height>22</height>
              </size>
             </property>
+            <property name="modes">
+             <set>NumberProvider::ExactAndRange</set>
+            </property>
+            <property name="minLimit">
+             <number>-2147483647</number>
+            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -100,6 +106,12 @@
               <width>130</width>
               <height>22</height>
              </size>
+            </property>
+            <property name="modes">
+             <set>NumberProvider::ExactAndRange</set>
+            </property>
+            <property name="minLimit">
+             <number>-2147483647</number>
             </property>
            </widget>
           </item>
@@ -111,6 +123,12 @@
               <height>22</height>
              </size>
             </property>
+            <property name="modes">
+             <set>NumberProvider::ExactAndRange</set>
+            </property>
+            <property name="minLimit">
+             <number>-2147483647</number>
+            </property>
            </widget>
           </item>
           <item row="3" column="1">
@@ -121,6 +139,12 @@
               <height>22</height>
              </size>
             </property>
+            <property name="modes">
+             <set>NumberProvider::ExactAndRange</set>
+            </property>
+            <property name="minLimit">
+             <number>-2147483647</number>
+            </property>
            </widget>
           </item>
           <item row="4" column="1">
@@ -130,6 +154,12 @@
               <width>130</width>
               <height>22</height>
              </size>
+            </property>
+            <property name="modes">
+             <set>NumberProvider::ExactAndRange</set>
+            </property>
+            <property name="minLimit">
+             <number>-2147483647</number>
             </property>
            </widget>
           </item>
@@ -373,6 +403,9 @@
            <height>22</height>
           </size>
          </property>
+         <property name="modes">
+          <set>NumberProvider::ExactAndRange</set>
+         </property>
         </widget>
        </item>
        <item row="0" column="1" colspan="2">
@@ -392,6 +425,9 @@
            <width>130</width>
            <height>22</height>
           </size>
+         </property>
+         <property name="modes">
+          <set>NumberProvider::ExactAndRange</set>
          </property>
         </widget>
        </item>
@@ -528,6 +564,9 @@
              <width>130</width>
              <height>22</height>
             </size>
+           </property>
+           <property name="modes">
+            <set>NumberProvider::ExactAndRange</set>
            </property>
           </widget>
          </item>
@@ -726,6 +765,9 @@
                 <height>22</height>
                </size>
               </property>
+              <property name="modes">
+               <set>NumberProvider::ExactAndRange</set>
+              </property>
              </widget>
             </item>
             <item row="3" column="0" colspan="2">
@@ -807,18 +849,18 @@
   <customwidget>
    <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">numberprovider.h</header>
+   <header>numberprovider.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DialogDataButton</class>
+   <extends>QWidget</extends>
+   <header>dialogdatabutton.h</header>
   </customwidget>
   <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
    <header location="global">truefalsebox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>DialogDataButton</class>
-   <extends>QLabel</extends>
-   <header location="global">dialogdatabutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

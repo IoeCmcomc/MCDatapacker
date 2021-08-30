@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/dialogbuttonbutton">
+        <file>dialogdatabutton/reset.png</file>
+    </qresource>
+</RCC>

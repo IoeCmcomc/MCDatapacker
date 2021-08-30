@@ -13,6 +13,12 @@ class NumberProvider : public QFrame
 {
     Q_OBJECT
 
+    Q_PROPERTY(Modes modes READ getModes WRITE setModes)
+    Q_PROPERTY(Mode currentMode READ currentMode WRITE setCurrentMode)
+    Q_PROPERTY(int minLimit READ minLimit WRITE setMinLimit)
+    Q_PROPERTY(int maxLimit READ maxLimit WRITE setMaxLimit)
+    Q_PROPERTY(bool isUnset READ isCurrentlyUnset)
+
 public:
     explicit NumberProvider(QWidget *parent = nullptr);
     ~NumberProvider();
@@ -23,7 +29,9 @@ public:
         ExactAndRange = Exact | Range,
         Binomial      = 4,
     };
+    Q_ENUM(Mode);
     Q_DECLARE_FLAGS(Modes, Mode)
+    Q_FLAG(Modes)
 
     void fromJson(const QJsonValue &value);
     QJsonValue toJson();
@@ -40,7 +48,9 @@ public:
     int maxValue() const;
     void setMaxValue(const int value);
 
+    int minLimit() const;
     void setMinLimit(const int &min);
+    int maxLimit() const;
     void setMaxLimit(const int &max);
 
     void minimizeMinLimit();

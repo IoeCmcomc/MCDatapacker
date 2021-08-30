@@ -201,10 +201,18 @@ void NumberProvider::setMaxValue(const int value) {
     onMinMaxEdited();
 }
 
+int NumberProvider::minLimit() const {
+    return ui->minSpinBox->minimum();
+}
+
 void NumberProvider::setMinLimit(const int &min) {
     ui->spinBox->setMinimum(min);
     ui->minSpinBox->setMinimum(min);
     ui->maxSpinBox->setMinimum(min);
+}
+
+int NumberProvider::maxLimit() const {
+    return ui->maxSpinBox->maximum();
 }
 
 void NumberProvider::setMaxLimit(const int &max) {

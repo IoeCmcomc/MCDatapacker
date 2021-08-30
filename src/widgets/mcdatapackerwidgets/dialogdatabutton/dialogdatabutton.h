@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QLabel>
 
+#include <type_traits>
 
 QT_BEGIN_NAMESPACE
 class QDialog;
@@ -19,11 +20,15 @@ class DialogDataButton : public QWidget
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString text READ text WRITE setText)
+    Q_PROPERTY(QJsonObject data READ getData WRITE setData NOTIFY dataChanged)
+
 public:
     explicit DialogDataButton(QWidget *parent = nullptr);
     ~DialogDataButton();
 
     void setText(const QString &str);
+    QString text() const;
 
     QJsonObject getData() const;
     void setData(const QJsonObject &value);
@@ -34,7 +39,7 @@ public:
         if (!m_dialogClassAssigned) {
             connect(ui->button, &QPushButton::clicked, this, [this]() {
                 T dialog(this);
-                dialog.fromJson(data);
+                dialog.fromJson(m_data);
                 if (dialog.exec())
                     setData(dialog.toJson());
             }, Qt::UniqueConnection);
@@ -44,11 +49,14 @@ public:
         }
     }
 
+signals:
+    void dataChanged(const QJsonValue &value);
+
 public slots:
     void reset();
 
 private:
-    QJsonObject data;
+    QJsonObject m_data;
     Ui::DialogDataButton *ui;
     bool m_dialogClassAssigned = false;
 

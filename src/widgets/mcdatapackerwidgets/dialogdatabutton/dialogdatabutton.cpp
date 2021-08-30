@@ -1,11 +1,6 @@
 #include "dialogdatabutton.h"
 #include "ui_dialogdatabutton.h"
 
-#include "basecondition.h"
-#include "itemconditiondialog.h"
-#include "locationconditiondialog.h"
-#include "entityconditiondialog.h"
-
 #include <QDebug>
 
 DialogDataButton::DialogDataButton(QWidget *parent) :
@@ -23,10 +18,10 @@ DialogDataButton::~DialogDataButton() {
 
 void DialogDataButton::setText(const QString &str) {
     ui->button->setText(str);
-    /*
-       ui->button->adjustSize();
-       adjustSize();
-     */
+}
+
+QString DialogDataButton::text() const {
+    return ui->button->text();
 }
 
 void DialogDataButton::reset() {
@@ -34,14 +29,15 @@ void DialogDataButton::reset() {
 }
 
 void DialogDataButton::checkSecondary() {
-    ui->secondButton->setDisabled(data.isEmpty());
+    ui->secondButton->setDisabled(m_data.isEmpty());
 }
 
 QJsonObject DialogDataButton::getData() const {
-    return data;
+    return m_data;
 }
 
 void DialogDataButton::setData(const QJsonObject &value) {
-    data = value;
+    m_data = value;
     checkSecondary();
+    emit dataChanged(value);
 }

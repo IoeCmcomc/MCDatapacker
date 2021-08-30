@@ -31,7 +31,6 @@ SOURCES += \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
     datawidgetinterface.cpp \
-    dialogdatabutton.cpp \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
     filenamedelegate.cpp \
@@ -57,9 +56,7 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
-    numberprovider.cpp \
     numberproviderdelegate.cpp \
-    optionalspinbox.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/argumentnode.cpp \
     parsers/command/nodes/axesnode.cpp \
@@ -118,7 +115,6 @@ HEADERS += \
     datapackfileiconprovider.h \
     datapacktreeview.h \
     datawidgetinterface.h \
-    dialogdatabutton.h \
     disclaimerdialog.h \
     entityconditiondialog.h \
     filenamedelegate.h \
@@ -143,9 +139,7 @@ HEADERS += \
     mcfunctionhighlighter.h \
     modelfunctions.h \
     newdatapackdialog.h \
-    numberprovider.h \
     numberproviderdelegate.h \
-    optionalspinbox.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
     parsers/command/nodes/axisnode.h \
@@ -199,7 +193,6 @@ FORMS += \
     aboutdialog.ui \
     blockitemselectordialog.ui \
     datawidgetinterface.ui \
-    dialogdatabutton.ui \
     disclaimerdialog.ui \
     entityconditiondialog.ui \
     itemconditiondialog.ui \
@@ -212,7 +205,6 @@ FORMS += \
     mainwindow.ui \
     inventorysloteditor.ui \
     newdatapackdialog.ui \
-    numberprovider.ui \
     predicatedock.ui \
     rawjsontextedit.ui \
     settingsdialog.ui \
@@ -240,6 +232,8 @@ DISTFILES += \
     ../lib/QFindDialogs/LICENSE
 
 RC_ICONS = ../resource/app/icon/favicon.ico
+
+include(widgets/mcdatapackerwidgets/mcdatapackerwidgets.pri)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
