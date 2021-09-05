@@ -56,7 +56,6 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
-    numberproviderdelegate.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/argumentnode.cpp \
     parsers/command/nodes/axesnode.cpp \
@@ -103,7 +102,7 @@ SOURCES += \
     tagselectordialog.cpp \
     truefalsebox.cpp \
     vieweventfilter.cpp \
-    visualrecipeeditordock.cpp \
+    visualrecipeeditordock.cpp
 
 HEADERS += \
     aboutdialog.h \
@@ -139,7 +138,6 @@ HEADERS += \
     mcfunctionhighlighter.h \
     modelfunctions.h \
     newdatapackdialog.h \
-    numberproviderdelegate.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
     parsers/command/nodes/axisnode.h \

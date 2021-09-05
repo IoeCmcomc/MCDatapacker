@@ -33,17 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     readSettings();
-    if (curGameVersion >= QVersionNumber(1, 17)) {
-        Command::MinecraftParser::setSchema(
-            QStringLiteral(
-                ":/minecraft/") + MainWindow::curGameVersion.toString() +
-            QStringLiteral("/mcdata/processed/reports/commands/data.min.json"));
-    } else {
-        Command::MinecraftParser::setSchema(
-            QStringLiteral(
-                ":/minecraft/") + MainWindow::curGameVersion.toString() +
-            QStringLiteral("/mcdata/generated/reports/commands.json"));
-    }
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
                                    MainWindow::readMCRInfo(QStringLiteral(
@@ -362,6 +351,19 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                                                QStringLiteral("item"),
                                                gameVer));
             MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
+            if (curGameVersion >= QVersionNumber(1, 17)) {
+                Command::MinecraftParser::setSchema(
+                    QStringLiteral(
+                        ":/minecraft/") + gameVer +
+                    QStringLiteral(
+                        "/mcdata/processed/reports/commands/data.min.json"));
+            } else {
+                Command::MinecraftParser::setSchema(
+                    QStringLiteral(
+                        ":/minecraft/") + gameVer +
+                    QStringLiteral("/mcdata/generated/reports/commands.json"));
+            }
+
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);
         }
@@ -417,6 +419,11 @@ void MainWindow::openFolder(const QString &dirpath) {
         const auto &&metaInfo = readPackMcmeta(packMcmetaPath, errMsg);
         if (metaInfo.packFormat > 0) {
             loadFolder(dirpath, metaInfo);
+        } else {
+            QMessageBox::critical(this,
+                                  tr("Invaild datapack"),
+                                  tr(
+                                      "The pack format in the pack.memeta file must be greater than zero."));
         }
     }
 }

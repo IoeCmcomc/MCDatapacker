@@ -38,17 +38,17 @@
    <property name="bottomMargin">
     <number>8</number>
    </property>
-   <item row="1" column="0" colspan="3">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Condition:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -133,6 +133,11 @@
      <item>
       <property name="text">
        <string>Weather</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Value check</string>
       </property>
      </item>
     </widget>
@@ -1190,11 +1195,66 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="value_check">
+      <layout class="QFormLayout" name="formLayout_12">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_24">
+         <property name="toolTip">
+          <string>The value to check</string>
+         </property>
+         <property name="text">
+          <string>Value:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="NumberProvider" name="value_valueInput">
+         <property name="modes">
+          <set>NumberProvider::ExactAndRange</set>
+         </property>
+         <property name="minLimit">
+          <number>-2147483647</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>Range:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="NumberProvider" name="value_rangeInput">
+         <property name="modes">
+          <set>NumberProvider::ExactAndRange</set>
+         </property>
+         <property name="currentMode">
+          <enum>NumberProvider::Range</enum>
+         </property>
+         <property name="minLimit">
+          <number>-2147483647</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>NumberProvider</class>
+   <extends>QFrame</extends>
+   <header>numberprovider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>DialogDataButton</class>
+   <extends>QWidget</extends>
+   <header>dialogdatabutton.h</header>
+  </customwidget>
   <customwidget>
    <class>TrueFalseBox</class>
    <extends>QCheckBox</extends>
@@ -1207,20 +1267,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>NumberProvider</class>
-   <extends>QFrame</extends>
-   <header location="global">numberprovider.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>OptionalSpinBox</class>
    <extends>QSpinBox</extends>
    <header location="global">optionalspinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>DialogDataButton</class>
-   <extends>QLabel</extends>
-   <header location="global">dialogdatabutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

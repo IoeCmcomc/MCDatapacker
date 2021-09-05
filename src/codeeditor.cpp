@@ -7,6 +7,7 @@
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
 #include "stripedscrollbar.h"
+#include "parsers/command/minecraftparser.h"
 
 #include <QPainter>
 #include <QFileInfo>
@@ -62,25 +63,7 @@ QStringList loadMinecraftCommandLiterals(const QJsonObject &obj = QJsonObject(),
     QJsonObject root;
 
     if (obj.isEmpty()) {
-        if (depth == 0) {
-            QFile file(QStringLiteral(":/minecraft/")
-                       + MainWindow::getCurGameVersion().toString()
-                       + QStringLiteral(
-                           "/mcdata/generated/reports/commands.json"));
-            file.open(QIODevice::ReadOnly | QIODevice::Text);
-            QJsonParseError errorPtr{};
-            QJsonDocument &&doc =
-                QJsonDocument::fromJson(file.readAll(), &errorPtr);
-            file.close();
-            if (doc.isNull()) {
-                qWarning() << "Cannot read file" << file.fileName() << ':' <<
-                    errorPtr.errorString();
-                return QStringList();
-            }
-            root = doc.object();
-        } else {
-            return QStringList();
-        }
+        root = Command::MinecraftParser::getSchema();
     } else {
         root = obj;
     }

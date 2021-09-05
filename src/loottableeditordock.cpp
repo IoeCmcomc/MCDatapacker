@@ -20,8 +20,12 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     if (MainWindow::getCurGameVersion() < QVersionNumber(1, 16)) {
         if (auto *view =
                 qobject_cast<QListView *>(ui->lootTableTypeCombo->view())) {
-            for (int i = 8; i < view->model()->rowCount(); ++i)
+            const auto &&model =
+                static_cast<QStandardItemModel*>(ui->lootTableTypeCombo->model());
+            for (int i = 8; i < view->model()->rowCount(); ++i) {
                 view->setRowHidden(i, true);
+                model->item(i, 0)->setEnabled(false);
+            }
         }
     }
 
@@ -79,8 +83,16 @@ void LootTableEditorDock::readJson() {
     QString type = root.value("type").toString();
     Glhp::removePrefix(type, "minecraft:");
 
-    if (types.indexOf(type) > -1)
-        ui->lootTableTypeCombo->setCurrentIndex(types.indexOf(type));
+    const int index = types.indexOf(type);
+    if (index > -1) {
+        const auto &&model =
+            static_cast<QStandardItemModel*>(ui->lootTableTypeCombo->model());
+        const auto &&item = model->item(index, 0);
+        if (!item->isEnabled())
+            return;
+
+        ui->lootTableTypeCombo->setCurrentIndex(index);
+    }
 
     ui->poolsInterface->setJson(root.value("pools").toArray());
     ui->functionsInterface->setJson(root.value("functions").toArray());

@@ -33,7 +33,7 @@ public:
 protected:
     void changeEvent(QEvent *) override;
 
-protected slots:
+private slots:
     void blockStates_onAdded();
     void entityScores_onAdded();
     void setupRefCombo();
@@ -55,7 +55,7 @@ private:
       "location_check",       "alternative",              "match_tool",
       "random_chance",        "reference",                "survives_explosion",
       "table_bonus",          "time_check",               "tool_enchantment",
-      "weather_check" };
+      "weather_check",        "value_check" };
     const QStringList entityTargets = { "this", "killer", "killer_player" };
     QFileSystemWatcher predRefWatcher;
 

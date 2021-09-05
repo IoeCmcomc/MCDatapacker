@@ -60,8 +60,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
                        ui->setAttr_attrCombo, false);
 
     NumberProviderDelegate *delegate = new NumberProviderDelegate(this);
-    delegate->setInputModes(NumberProvider::Exact
-                                 | NumberProvider::Range);
+    delegate->setInputModes(NumberProvider::ExactAndRange);
 
     ui->setAttr_table->setItemDelegate(delegate);
     ui->setAttr_table->installEventFilter(&viewFilter);
@@ -190,8 +189,8 @@ QJsonObject LootTableFunction::toJson() const {
             auto &&attr = ui->setAttr_table->item(i, 1)->text();
             auto &&op   = ui->setAttr_table->item(i, 2)
                           ->data(Qt::UserRole + 1).toString();
-            auto &&amount = ui->setAttr_table->item(i, 3)
-                            ->data(Qt::DisplayRole).toJsonValue();
+            auto &&amount = ui->setAttr_table->item(i, 3)->data(
+                ExtendedRole::NumberProviderRole).toJsonValue();
             auto &&id       = ui->setAttr_table->item(i, 5)->text();
             auto &&slotList = QJsonArray::fromStringList(
                 ui->setAttr_table->item(i, 4)
@@ -468,6 +467,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         if (!root.contains("modifiers"))
             return;
 
+        ui->setAttr_table->clearContents();
+        ui->setAttr_table->setRowCount(0);
+
         QJsonArray modifiers = root.value("modifiers").toArray();
         for (auto modifierRef: modifiers) {
             auto modifier = modifierRef.toObject();
@@ -509,7 +511,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     ? modifier.value("id").toString() : "");
 
             auto *amountItem = new QTableWidgetItem();
-            amountItem->setData(Qt::DisplayRole,
+            amountItem->setData(ExtendedRole::NumberProviderRole,
                                 modifier.value("amount"));
             amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
 
@@ -615,6 +617,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     case 17: {   /* Set stew effects */
         if (!root.contains("effects"))
             return;
+
+        ui->stewEffect_table->clearContents();
+        ui->stewEffect_table->setRowCount(0);
 
         QJsonArray effects = root.value("effects").toArray();
         for (auto effectRef: effects) {
@@ -746,7 +751,7 @@ void LootTableFunction::setAttr_onAdded() {
         ui->setAttr_IDEdit->text());
 
     auto *amountItem = new QTableWidgetItem();
-    amountItem->setData(Qt::DisplayRole,
+    amountItem->setData(ExtendedRole::NumberProviderRole,
                         ui->setAttr_amountInput->toJson());
     amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
 
@@ -803,7 +808,7 @@ void LootTableFunction::initBlocksModel() {
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
     for (const auto &key : blocksInfo.keys()) {
         InventoryItem invItem(key);
-        auto      *item = new QStandardItem();
+        auto         *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {
             auto name = blocksInfo.value(key).toMap().value("name").toString();

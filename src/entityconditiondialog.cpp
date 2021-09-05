@@ -102,10 +102,11 @@ QJsonObject EntityConditionDialog::toJson() const {
     for (int i = 0; i < entityEffectModel.rowCount(); ++i) {
         auto effect =
             entityEffectModel.item(i, 0)->data(Qt::UserRole + 1).toString();
-        auto amplifier =
-            entityEffectModel.item(i, 1)->data(Qt::DisplayRole).toJsonValue();
+        auto amplifier = entityEffectModel.item(i, 1)
+                         ->data(ExtendedRole::NumberProviderRole).toJsonValue();
         auto duration =
-            entityEffectModel.item(i, 2)->data(Qt::DisplayRole).toJsonValue();
+            entityEffectModel.item(i, 2)
+            ->data(ExtendedRole::NumberProviderRole).toJsonValue();
         auto ambient =
             entityEffectModel.item(i, 3)->data(Qt::DisplayRole).toBool();
         auto visible =
@@ -161,8 +162,8 @@ QJsonObject EntityConditionDialog::toJson() const {
                 playerStatModel.item(i, 0)->data(Qt::UserRole + 1).toString();
             auto stat =
                 playerStatModel.item(i, 1)->data(Qt::DisplayRole).toString();
-            auto value =
-                playerStatModel.item(i, 2)->data(Qt::DisplayRole).toJsonValue();
+            auto value = playerStatModel.item(i, 2)->data(
+                ExtendedRole::NumberProviderRole).toJsonValue();
             stats.push_back(QJsonObject({ { QStringLiteral("type"), type },
                                             { QStringLiteral("stat"), stat },
                                             { QStringLiteral(
@@ -257,10 +258,10 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
             QJsonObject effect        = effects[effectID].toObject();
             auto       *amplifierItem = new QStandardItem();
             amplifierItem->setData(effect["amplifier"].toVariant(),
-                                   Qt::DisplayRole);
+                                   ExtendedRole::NumberProviderRole);
             auto *durationItem = new QStandardItem();
             durationItem->setData(effect["duration"].toVariant(),
-                                  Qt::DisplayRole);
+                                  ExtendedRole::NumberProviderRole);
             auto *ambientItem = new QStandardItem();
             ambientItem->setData(effect["ambient"].toBool(),
                                  Qt::DisplayRole);
@@ -311,7 +312,7 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                 statItem->setText(statObj[QStringLiteral("stat")].toString());
                 auto *valueItem = new QStandardItem();
                 valueItem->setData(statObj.value(QStringLiteral("value")),
-                                   Qt::DisplayRole);
+                                   ExtendedRole::NumberProviderRole);
 
                 playerStatModel.appendRow({ typeItem, statItem, valueItem });
             }
@@ -337,9 +338,11 @@ void EntityConditionDialog::onAddedEntityEffect() {
     effectItem->setData(ui->effectCombo->currentData(Qt::UserRole + 1));
     effectItem->setEditable(false);
     auto *amplifierItem = new QStandardItem();
-    amplifierItem->setData(ui->effectAmpInput->toJson(), Qt::DisplayRole);
+    amplifierItem->setData(ui->effectAmpInput->toJson(),
+                           ExtendedRole::NumberProviderRole);
     auto *durationItem = new QStandardItem();
-    durationItem->setData(ui->effectDuraInput->toJson(), Qt::DisplayRole);
+    durationItem->setData(ui->effectDuraInput->toJson(),
+                          ExtendedRole::NumberProviderRole);
     auto *ambientItem = new QStandardItem();
     ambientItem->setData(ui->effectAmbientCheck->isChecked(), Qt::DisplayRole);
     auto *visibleItem = new QStandardItem();
@@ -387,7 +390,8 @@ void EntityConditionDialog::onAddedPlayerStat() {
     auto *statItem = new QStandardItem();
     statItem->setText(ui->statEdit->text());
     auto *valueItem = new QStandardItem();
-    valueItem->setData(ui->statValueInput->toJson(), Qt::DisplayRole);
+    valueItem->setData(ui->statValueInput->toJson(),
+                       ExtendedRole::NumberProviderRole);
 
     playerStatModel.appendRow({ typeItem, statItem, valueItem });
 }
@@ -438,8 +442,7 @@ void EntityConditionDialog::initEffectsPage() {
 
     auto *delegate = new NumberProviderDelegate(this);
 
-    delegate->setInputModes(NumberProvider::Exact
-                            | NumberProvider::Range);
+    delegate->setInputModes(NumberProvider::ExactAndRange);
     delegate->setMinLimit(1);
 
     initModelView(entityEffectModel, ui->effectTableView,

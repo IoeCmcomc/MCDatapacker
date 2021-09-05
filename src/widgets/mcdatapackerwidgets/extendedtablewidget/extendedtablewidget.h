@@ -1,15 +1,18 @@
+#define __clang_major__    11
+
+
 #ifndef EXTENDEDTABLEWIDGET_H
 #define EXTENDEDTABLEWIDGET_H
 
 #include <QWidget>
-#include <QVBoxLayout>
+#include <QVersionNumber>
 
-#include "../plugin/extendedtablewidget/extendedtablewidgetplugin.h"
 
 QT_BEGIN_NAMESPACE
 class QTableWidget;
 class QFrame;
 class QToolButton;
+class QVBoxLayout;
 QT_END_NAMESPACE
 
 namespace Ui {
@@ -21,16 +24,30 @@ class ExtendedTableWidget : public QWidget
     Q_OBJECT
     Q_PROPERTY(QTableWidget * tableWidget READ tableWidget WRITE setTableWidget)
     Q_PROPERTY(QFrame * container READ container WRITE setContainer)
-    Q_PROPERTY(bool isAddingItem READ isAddingItem WRITE setAddingItem)
+    Q_PROPERTY(
+        bool isAddingItem READ isAddingItem WRITE setAddingItem STORED false)
     Q_PROPERTY(
         QStringList columnTitles READ columnTitles WRITE setColumnTitles)
 
-    struct ColumnMapping {
-        QString  jsonKey;
-        QWidget *editor = nullptr;
+public:
+    enum class JsonMode {
+        SimpleMap,
+        ComplexMap,
     };
 
-public:
+    enum ItemRole {
+        ComboboxDataRole = Qt::UserRole + 1,
+        ComboboxIndexRole,
+        NumberProviderRole,
+    };
+
+    using VersionPair = QPair<QVersionNumber, QVersionNumber>;
+
+    struct ColumnMapping {
+        QString     jsonKey;
+        QWidget    *editor        = nullptr;
+        VersionPair gameVerLimits = {};
+    };
 
     ExtendedTableWidget(QWidget *parent = 0);
 
@@ -40,13 +57,20 @@ public:
     bool isAddingItem() const;
     QStringList columnTitles() const;
 
-    void appendColumnMapping(const QString &jsonKey, QWidget *editor);
+    void appendColumnMapping(const QString &jsonKey, QWidget *editor,
+                             VersionPair gameVerLim = {});
+
+    JsonMode jsonMode() const;
+    QJsonObject toJson() const;
+
 
 public slots:
     void setContainer(QFrame *widget);
     void setTableWidget(QTableWidget *widget);
     void setAddingItem(bool isAddingItem);
     void setColumnTitles(const QStringList &columnTitles);
+    void setJsonMode(const JsonMode &jsonMode);
+    void setGameVersion(const QVersionNumber &version);
 
 protected:
     void changeEvent(QEvent *e) override;
@@ -56,10 +80,13 @@ private:
 
     QStringList m_columnTitles;
     QVector<ColumnMapping> m_columnMappings;
+    QVersionNumber m_gameVersion;
     QVBoxLayout *m_layout = nullptr;
+    JsonMode m_jsonMode   = JsonMode::SimpleMap;
     bool m_isAddingItem   = false;
 
     void retranslateUi();
+    QJsonValue itemDataToJson(int row, int col) const;
 
 private slots:
     void onAddBtn();
@@ -68,5 +95,7 @@ private slots:
     void onCancelBtn();
     void updateRemoveBtn();
 };
+
+typedef ExtendedTableWidget::ItemRole ExtendedRole;
 
 #endif /* EXTENDEDTABLEWIDGET_H */

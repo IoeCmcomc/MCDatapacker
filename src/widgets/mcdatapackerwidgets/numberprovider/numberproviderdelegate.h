@@ -2,6 +2,7 @@
 #define NUMBERPROVIDERDELEGATE_H
 
 #include "numberprovider.h"
+#include "extendedtablewidget.h"
 
 #include <QStandardItem>
 #include <QStyledItemDelegate>

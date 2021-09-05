@@ -27,10 +27,10 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
 
     this->craftingSlots =
         QVector<InventorySlot*>({ ui->craftingSlot_1, ui->craftingSlot_2,
-                               ui->craftingSlot_3, ui->craftingSlot_4,
-                               ui->craftingSlot_5, ui->craftingSlot_6,
-                               ui->craftingSlot_7, ui->craftingSlot_8,
-                               ui->craftingSlot_9 });
+                                  ui->craftingSlot_3, ui->craftingSlot_4,
+                                  ui->craftingSlot_5, ui->craftingSlot_6,
+                                  ui->craftingSlot_7, ui->craftingSlot_8,
+                                  ui->craftingSlot_9 });
 
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this,
@@ -43,7 +43,7 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
             &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this,
             &VisualRecipeEditorDock::readRecipe);
-    connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
+    connect(this, &QDockWidget::topLevelChanged, [ = ](bool) {
         adjustSize();
     });
 
@@ -223,7 +223,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
 QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
     int index = ui->smeltBlockInput->currentIndex();
 
-    const QString smeltingTypes[] = {
+    static const QString smeltingTypes[] = {
         QStringLiteral("smelting"), QStringLiteral("blasting"),
         QStringLiteral("smoking"),  QStringLiteral("campfire_cooking")
     };
@@ -313,11 +313,11 @@ void VisualRecipeEditorDock::readRecipe() {
     if (root.contains(QStringLiteral("group")))
         ui->recipeGroupInput->setText(root[QStringLiteral("group")].toString());
 
-    const QString craftingTypes[] = {
+    static const QString craftingTypes[] = {
         QStringLiteral("crafting_shaped"), QStringLiteral("crafting_shapeless")
     };
 
-    const QString smeltingTypes[] = {
+    static const QString smeltingTypes[] = {
         QStringLiteral("smelting"), QStringLiteral("blasting"),
         QStringLiteral("smoking"),  QStringLiteral("campfire_cooking")
     };
@@ -424,8 +424,9 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
 }
 
 void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
-    QString       type            = root[QStringLiteral("type")].toString();
-    const QString smeltingTypes[] = {
+    QString type =
+        root[QStringLiteral("type")].toString();
+    static const QString smeltingTypes[] = {
         QStringLiteral("smelting"), QStringLiteral("blasting"),
         QStringLiteral("smoking"),  QStringLiteral("campfire_cooking")
     };

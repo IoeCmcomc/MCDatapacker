@@ -1,5 +1,7 @@
 #include "numberproviderdelegate.h"
 
+#include "extendedtablewidget.h"
+
 #include <QDebug>
 #include <QJsonValue>
 #include <QJsonObject>
@@ -22,30 +24,31 @@ void NumberProviderDelegate::paint(QPainter *painter,
                                    const QStyleOptionViewItem &option,
                                    const QModelIndex &index) const {
     if (index.isValid()) {
-        if (isExtendedNumeric(index)) {
-            QJsonValue value = index.data().toJsonValue();
+        if (!index.data(ExtendedTableWidget::NumberProviderRole).isNull()) {
+            QJsonValue value = index.data(
+                ExtendedTableWidget::NumberProviderRole).toJsonValue();
 
             auto opt = option;
             initStyleOption(&opt, index);
 
             if (value.isDouble()) {
-                int ExactInt = value.toInt();
-                opt.text = QString::number(ExactInt);
+                const int exactInt = value.toInt();
+                opt.text = QString::number(exactInt);
             } else if (value.isObject()) {
-                auto obj  = value.toObject();
-                auto type = obj[QStringLiteral("type")].toString();
+                const auto    &&obj  = value.toObject();
+                const QString &&type = obj[QLatin1String("type")].toString();
                 if (type == QStringLiteral("minecraft:binomial")) {
-                    int    num  = obj.value(QStringLiteral("n")).toInt();
-                    double prob = obj.value(QStringLiteral("p")).toInt();
+                    int    num  = obj.value(QLatin1String("n")).toInt();
+                    double prob = obj.value(QLatin1String("p")).toInt();
                     opt.text = QString("n: %1; p: %2").arg(num).arg(prob);
                 } else {
-                    QString min = (obj.contains(QStringLiteral("min")))
+                    const QString &&min = (obj.contains(QLatin1String("min")))
                               ? QString::number(
-                        obj.value(QStringLiteral("min")).toInt())
-                              : QLatin1String("");
-                    QString max = (obj.contains(QStringLiteral("max")))
+                        obj.value(QLatin1String("min")).toInt())
+                                      : QString();
+                    const QString &&max = (obj.contains(QLatin1String("max")))
                                   ? QString::number(
-                        obj.value(QStringLiteral("max")).toInt())
+                        obj.value(QLatin1String("max")).toInt())
                                       : QString();
                     opt.text = QString("%1..%2").arg(min, max);
                 }
@@ -71,7 +74,7 @@ void NumberProviderDelegate::paint(QPainter *painter,
 QWidget *NumberProviderDelegate::createEditor(QWidget *parent,
                                               const QStyleOptionViewItem &option,
                                               const QModelIndex &index) const {
-    if (isExtendedNumeric(index)) {
+    if (!index.data(ExtendedTableWidget::NumberProviderRole).isNull()) {
         auto *editor = new NumberProvider(parent);
         editor->setAutoFillBackground(true);
         editor->setModes(m_inputModes);
@@ -87,9 +90,10 @@ QWidget *NumberProviderDelegate::createEditor(QWidget *parent,
 
 void NumberProviderDelegate::setEditorData(QWidget *editor,
                                            const QModelIndex &index) const {
-    if (isExtendedNumeric(index)) {
-        QJsonValue jsonVal   = index.data().toJsonValue();
-        auto      *numEditor = qobject_cast<NumberProvider*>(editor);
+    if (!index.data(ExtendedTableWidget::NumberProviderRole).isNull()) {
+        QJsonValue jsonVal = index.data(
+            ExtendedTableWidget::NumberProviderRole).toJsonValue();
+        auto *numEditor = qobject_cast<NumberProvider*>(editor);
         numEditor->fromJson(jsonVal);
     } else {
         QStyledItemDelegate::setEditorData(editor, index);
@@ -99,10 +103,12 @@ void NumberProviderDelegate::setEditorData(QWidget *editor,
 void NumberProviderDelegate::setModelData(QWidget *editor,
                                           QAbstractItemModel *model,
                                           const QModelIndex &index) const {
-    if (isExtendedNumeric(index)) {
+    if (!index.data(ExtendedTableWidget::NumberProviderRole).isNull()) {
         auto *numEditor = qobject_cast<NumberProvider*>(editor);
         numEditor->interpretText();
-        model->setData(index, numEditor->toJson(), Qt::EditRole);
+        model->setData(index,
+                       numEditor->toJson(),
+                       ExtendedTableWidget::NumberProviderRole);
     } else {
         QStyledItemDelegate::setModelData(editor, model, index);
     }

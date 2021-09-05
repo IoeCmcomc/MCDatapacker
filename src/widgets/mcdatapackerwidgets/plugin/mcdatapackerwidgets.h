@@ -1,8 +1,6 @@
 #ifndef PLUGIN_MCDATAPACKERWIDGETS_H
 #define PLUGIN_MCDATAPACKERWIDGETS_H
 
-#define __clang_major__    11
-
 #include <QtDesigner>
 #include <qplugin.h>
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>307</width>
-    <height>22</height>
+    <height>26</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -58,6 +58,9 @@
      </property>
      <widget class="QWidget" name="single">
       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
        <property name="topMargin">
         <number>0</number>
        </property>
@@ -84,6 +87,9 @@
      </widget>
      <widget class="QWidget" name="range">
       <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>7</number>
+       </property>
        <property name="topMargin">
         <number>0</number>
        </property>
@@ -143,6 +149,9 @@
      </widget>
      <widget class="QWidget" name="binomial">
       <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>7</number>
+       </property>
        <property name="topMargin">
         <number>0</number>
        </property>

@@ -10,19 +10,11 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
 
-    auto typeFlags = NumberProvider::Exact
-                     | NumberProvider::Range;
-    ui->countInput->setModes(typeFlags);
-    ui->durabilityInput->setModes(typeFlags);
-    ui->enchant_levelInput->setModes(typeFlags);
-    ui->stored_levelInput->setModes(typeFlags);
     ui->itemSlot->setAcceptTag(false);
     ui->itemSlot->setAcceptMultiple(false);
 
     initComboModelView("effect", potionsModel, ui->potionCombo);
-    initComboModelView("enchantment",
-                       enchantmentsModel,
-                       ui->enchant_combo,
+    initComboModelView("enchantment", enchantmentsModel, ui->enchant_combo,
                        false);
     ui->stored_combo->setModel(&enchantmentsModel);
 
@@ -72,7 +64,7 @@ QJsonObject ItemConditionDialog::toJson() const {
         auto id =
             ui->enchant_table->item(row, 0)->data(Qt::UserRole + 1).toString();
         auto levels = ui->enchant_table->item(row, 1)->
-                      data(Qt::DisplayRole).toJsonValue();
+                      data(ExtendedRole::NumberProviderRole).toJsonValue();
         enchantments.push_back(QJsonObject({ { QStringLiteral("enchantment"),
                                                id },
                                                { QStringLiteral("levels"),
@@ -86,7 +78,7 @@ QJsonObject ItemConditionDialog::toJson() const {
         auto id =
             ui->stored_table->item(row, 0)->data(Qt::UserRole + 1).toString();
         auto levels = ui->stored_table->item(row, 1)->
-                      data(Qt::DisplayRole).toJsonValue();
+                      data(ExtendedRole::NumberProviderRole).toJsonValue();
         stored_enchantments.push_back
             (QJsonObject({ { QStringLiteral("enchantment"), id },
                              { QStringLiteral("levels"), levels } }));
@@ -148,7 +140,7 @@ void ItemConditionDialog::onAddedEnchant() {
 
     auto *levelsItem = new QTableWidgetItem();
     auto  json       = ui->enchant_levelInput->toJson();
-    levelsItem->setData(Qt::DisplayRole, json);
+    levelsItem->setData(ExtendedRole::NumberProviderRole, json);
     appendRowToTableWidget(ui->enchant_table, { enchantItem, levelsItem });
 }
 
@@ -171,17 +163,15 @@ void ItemConditionDialog::onAddedStoredEnchant() {
 
     auto *levelsItem = new QTableWidgetItem();
     auto  json       = ui->stored_levelInput->toJson();
-    levelsItem->setData(Qt::DisplayRole, json);
+    levelsItem->setData(ExtendedRole::NumberProviderRole, json);
     appendRowToTableWidget(ui->stored_table, { enchantItem, levelsItem });
 }
 
 void ItemConditionDialog::initTable(QTableWidget *table) {
-    auto *delegate = new NumberProviderDelegate();
+    auto *delegate = new NumberProviderDelegate(this);
 
-    delegate->setInputModes(NumberProvider::Exact
-                                 | NumberProvider::Range);
-    delegate->setMinLimit(0);
-    table->setItemDelegate(delegate);
+    delegate->setInputModes(NumberProvider::ExactAndRange);
+    table->setItemDelegateForColumn(1, delegate);
     table->installEventFilter(new ViewEventFilter(this));
 }
 
@@ -207,7 +197,7 @@ void ItemConditionDialog::tableFromJson(const QJsonArray &jsonArr,
 
         auto *levelsItem = new QTableWidgetItem();
         auto  json       = ui->stored_levelInput->toJson();
-        levelsItem->setData(Qt::DisplayRole,
+        levelsItem->setData(ExtendedRole::NumberProviderRole,
                             enchantObj.value(QStringLiteral("levels")));
         appendRowToTableWidget(table, { enchantItem, levelsItem });
     }

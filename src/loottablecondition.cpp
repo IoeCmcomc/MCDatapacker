@@ -17,6 +17,13 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     ui(new Ui::LootTableCondition) {
     ui->setupUi(this);
 
+    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 17)) {
+        qobject_cast<QListView*>(ui->conditionTypeCombo->view())
+        ->setRowHidden(15, true);
+        static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model())->item(
+            15, 0)->setEnabled(false);
+    }
+
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &LootTableCondition::onTypeChanged);
@@ -111,7 +118,7 @@ QJsonObject LootTableCondition::toJson() const {
         for (auto row = 0; row < ui->entityScores_table->rowCount(); ++row) {
             auto objective = ui->entityScores_table->item(row, 0)->text();
             auto value     = ui->entityScores_table->item(row, 1)->
-                             data(Qt::DisplayRole).toJsonValue();
+                             data(ExtendedRole::NumberProviderRole).toJsonValue();
             scores.insert(objective, value);
         }
         if (!scores.isEmpty())
@@ -217,7 +224,7 @@ QJsonObject LootTableCondition::toJson() const {
                                             0)->data(Qt::UserRole +
                                                      1).toString();
             auto levels = ui->toolEnchant_table->item(i, 1)->
-                          data(Qt::DisplayRole).toJsonValue();
+                          data(ExtendedRole::NumberProviderRole).toJsonValue();
             enchantments.push_back(
                 QJsonObject({ { QStringLiteral("enchantment"), id },
                                 { QStringLiteral("levels"), levels } }));
@@ -232,6 +239,16 @@ QJsonObject LootTableCondition::toJson() const {
         ui->weather_thunderCheck->insertToJsonObject(root, "thundering");
         break;
     }
+
+    case 15: { /* Value check */
+        if (ui->value_valueInput->isCurrentlyUnset())
+            break;
+        if (ui->value_rangeInput->isCurrentlyUnset())
+            break;
+        root.insert(QLatin1String("value"), ui->value_valueInput->toJson());
+        root.insert(QLatin1String("range"), ui->value_rangeInput->toJson());
+        break;
+    }
     }
 
     return root;
@@ -239,7 +256,7 @@ QJsonObject LootTableCondition::toJson() const {
 
 void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     resetAll();
-    if (!root.contains("condition"))
+    if (!root.contains(QLatin1String("condition")))
         return;
 
     auto valueMap = root.toVariantMap();
@@ -259,7 +276,13 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         singleInverted = true;
     }
 
-    int condIndex = condTypes.indexOf(condType);
+    int          condIndex = condTypes.indexOf(condType);
+    const auto &&model     =
+        static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model());
+    const auto &&item = model->item(condIndex, 0);
+    if (!item->isEnabled())
+        return;
+
     ui->conditionTypeCombo->setCurrentIndex(condIndex);
     reset(condIndex);
     switch (condIndex) {
@@ -323,7 +346,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                 auto *objectiveItem =
                     new QTableWidgetItem(objective);
                 auto *valueItem = new QTableWidgetItem();
-                valueItem->setData(Qt::DisplayRole,
+                valueItem->setData(ExtendedRole::NumberProviderRole,
                                    scores[objective].toVariant());
                 appendRowToTableWidget(ui->entityScores_table,
                                        { objectiveItem, valueItem });
@@ -476,7 +499,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                 enchantItem->setFlags(enchantItem->flags() &
                                       ~Qt::ItemIsEditable);
                 auto *levelsItem = new QTableWidgetItem();
-                levelsItem->setData(Qt::DisplayRole,
+                levelsItem->setData(ExtendedRole::NumberProviderRole,
                                     enchantObj.value(QStringLiteral("levels")));
                 appendRowToTableWidget(ui->toolEnchant_table,
                                        { enchantItem, levelsItem });
@@ -488,6 +511,16 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     case 14: {/*Weather */
         ui->weather_rainingCheck->setupFromJsonObject(value, "raining");
         ui->weather_thunderCheck->setupFromJsonObject(value, "thundering");
+        break;
+    }
+
+    case 15: { /* Value check */
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            if (value.contains(QLatin1String("value")))
+                ui->value_valueInput->fromJson(value[QLatin1String("value")]);
+            if (value.contains(QLatin1String("range")))
+                ui->value_rangeInput->fromJson(value[QLatin1String("range")]);
+        }
         break;
     }
 
@@ -609,6 +642,12 @@ void LootTableCondition::reset(int index) {
         break;
     }
 
+    case 15: { /* Value check */
+        ui->value_valueInput->unset();
+        ui->value_rangeInput->unset();
+        break;
+    }
+
     default:
         break;
     }
@@ -663,7 +702,7 @@ void LootTableCondition::entityScores_onAdded() {
         ui->entityScores_objectiveEdit->text());
     auto *valueItem = new QTableWidgetItem();
     auto  json      = ui->entityScores_valueInput->toJson();
-    valueItem->setData(Qt::DisplayRole, json);
+    valueItem->setData(ExtendedRole::NumberProviderRole, json);
     appendRowToTableWidget(ui->entityScores_table, { objItem, valueItem });
 }
 
@@ -703,7 +742,7 @@ void LootTableCondition::toolEnchant_onAdded() {
     enchantItem->setFlags(enchantItem->flags() & ~Qt::ItemIsEditable);
     QTableWidgetItem *levelsItem = new QTableWidgetItem();
     auto              json       = ui->toolEnchant_levelsInput->toJson();
-    levelsItem->setData(Qt::DisplayRole, json);
+    levelsItem->setData(ExtendedRole::NumberProviderRole, json);
     appendRowToTableWidget(ui->toolEnchant_table, { enchantItem, levelsItem });
 }
 
@@ -735,11 +774,10 @@ void LootTableCondition::initBlockStatesPage() {
 
 void LootTableCondition::initEntityScoresPage() {
     ui->entityScores_valueInput->setModes(
-        NumberProvider::Exact | NumberProvider::Range);
+        NumberProvider::ExactAndRange);
 
     auto *delegate = new NumberProviderDelegate(this);
-    delegate->setInputModes(NumberProvider::Exact
-                                 | NumberProvider::Range);
+    delegate->setInputModes(NumberProvider::ExactAndRange);
 
     ui->entityScores_table->setItemDelegate(delegate);
     ui->entityScores_table->installEventFilter(new ViewEventFilter(this));
@@ -802,7 +840,7 @@ void LootTableCondition::initToolEnchantPage() {
     ui->toolEnchant_levelsInput->setModes(NumberProvider::Range);
 
     auto *delegate = new NumberProviderDelegate(this);
-    delegate->setInputModes(NumberProvider::Exact | NumberProvider::Range);
+    delegate->setInputModes(NumberProvider::ExactAndRange);
     ui->toolEnchant_table->setItemDelegate(delegate);
     ui->toolEnchant_table->installEventFilter(&viewFilter);
 
