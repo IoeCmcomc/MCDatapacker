@@ -33,6 +33,7 @@ public:
     enum class JsonMode {
         SimpleMap,
         ComplexMap,
+        List,
     };
 
     enum ItemRole {
@@ -62,6 +63,7 @@ public:
 
     JsonMode jsonMode() const;
     QJsonObject toJson() const;
+    void fromJson(const QJsonObject &root);
 
 
 public slots:
@@ -69,8 +71,9 @@ public slots:
     void setTableWidget(QTableWidget *widget);
     void setAddingItem(bool isAddingItem);
     void setColumnTitles(const QStringList &columnTitles);
-    void setJsonMode(const JsonMode &jsonMode);
+    void setJsonMode(const ExtendedTableWidget::JsonMode &jsonMode);
     void setGameVersion(const QVersionNumber &version);
+    void clear();
 
 protected:
     void changeEvent(QEvent *e) override;
@@ -87,6 +90,8 @@ private:
 
     void retranslateUi();
     QJsonValue itemDataToJson(int row, int col) const;
+    int indexOfKeyInMapping(const QString &key) const;
+    void loadItemFromJson(int row, int col, const QJsonValue &value);
 
 private slots:
     void onAddBtn();

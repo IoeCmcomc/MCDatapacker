@@ -242,6 +242,8 @@ VERSION = 0.4.0
 QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
+QMAKE_TARGET_DESCRIPTION = MCDatapacker - Minecraft datapack editor
+QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2021 IoeCmcomc
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/json/release/ -ljson

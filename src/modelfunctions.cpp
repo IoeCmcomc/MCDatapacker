@@ -1,7 +1,8 @@
 #include "modelfunctions.h"
-#include "mainwindow.h"
 
+#include "mainwindow.h"
 #include "globalhelpers.h"
+#include "extendedtablewidget.h"
 
 #include <QApplication>
 
@@ -29,7 +30,7 @@ void initComboModelView(const QString &infoType,
                                               "BaseCondition",
                                               "(not set)")));
     const auto &&info = MainWindow::readMCRInfo(infoType);
-    for (QString key : info.keys()) {
+    for (QString &key : info.keys()) {
         QStandardItem *item = new QStandardItem();
         if (info.value(key).toMap().contains(QStringLiteral("name")))
             item->setText(info.value(key).toMap()[QStringLiteral(
@@ -44,9 +45,10 @@ void initComboModelView(const QString &infoType,
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
-        if (!key.contains(QStringLiteral(":")))
-            key.prepend(QStringLiteral("minecraft:"));
+        if (!key.contains(':'))
+            key.prepend(QLatin1String("minecraft:"));
         item->setData(key);
+        item->setData(key, ExtendedRole::ComboboxDataRole);
         model.appendRow(item);
     }
     combo->setModel(&model);

@@ -817,7 +817,7 @@ void LootTableCondition::initRandChancePage() {
 
 void LootTableCondition::initTableBonusPage() {
     initComboModelView("enchantment", enchantmentsModel,
-                       ui->tableBonus_enchantCombo);
+                       ui->tableBonus_enchantCombo, false);
     ui->toolEnchant_enchantCombo->setModel(&enchantmentsModel);
 
     ui->tableBonus_listView->setModel(&tableBonusModel);

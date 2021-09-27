@@ -2,6 +2,7 @@
 #include "ui_extendedtablewidget.h"
 
 #include "../numberprovider/numberproviderdelegate.h"
+#include "comboboxdelegate.h"
 
 #include <QTableWidget>
 #include <QVBoxLayout>
@@ -79,12 +80,44 @@ QJsonObject ExtendedTableWidget::toJson() const {
     return ret;
 }
 
+void ExtendedTableWidget::fromJson(const QJsonObject &root) {
+    clear();
+
+    int row = 0;
+    for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
+        const int cols = ui->__qt__passive_table->columnCount();
+
+        if ((m_jsonMode == JsonMode::SimpleMap) && (cols == 2)) {
+            loadItemFromJson(row, 0, it.key());
+            loadItemFromJson(row, 1, it.value());
+        } else {
+            loadItemFromJson(row, 0, it.key());
+            const QJsonObject &&obj = it.value().toObject();
+            for (auto objIt = obj.constBegin();
+                 objIt != obj.constEnd(); ++objIt) {
+                const QString &&key   = objIt.key();
+                const int       index = indexOfKeyInMapping(key);
+                if (index != -1)
+                    loadItemFromJson(row, index, objIt.value());
+                else if (!key.isEmpty())
+                    qWarning() << "Undefined JSON key:" << key;
+            }
+        }
+        ++row;
+    }
+}
+
 void ExtendedTableWidget::setJsonMode(const JsonMode &jsonMode) {
     m_jsonMode = jsonMode;
 }
 
 void ExtendedTableWidget::setGameVersion(const QVersionNumber &version) {
     m_gameVersion = version;
+}
+
+void ExtendedTableWidget::clear() {
+    ui->__qt__passive_table->clearContents();
+    ui->__qt__passive_table->setRowCount(0);
 }
 
 QFrame *ExtendedTableWidget::container() const {
@@ -103,6 +136,8 @@ void ExtendedTableWidget::setContainer(QFrame *widget) {
     m_layout->addWidget(widget);
 
     ui->container = widget;
+
+    setAddingItem(m_isAddingItem);
 }
 
 void ExtendedTableWidget::setTableWidget(QTableWidget *widget) {
@@ -152,10 +187,19 @@ void ExtendedTableWidget::appendColumnMapping(const QString &jsonKey,
                                               QWidget *editor,
                                               VersionPair gameVerLim) {
     m_columnMappings << ColumnMapping{ jsonKey, editor, gameVerLim };
+    const int curCol = m_columnMappings.size() - 1;
     if (!gameVerLim.first.isNull() && gameVerLim.first > m_gameVersion) {
         editor->hide();
-        ui->__qt__passive_table->setColumnHidden(m_columnMappings.size() - 1,
+        ui->__qt__passive_table->setColumnHidden(curCol,
                                                  true);
+    } else {
+        if (qobject_cast<NumberProvider*>(editor)) {
+            ui->__qt__passive_table->setItemDelegateForColumn(
+                curCol, new NumberProviderDelegate(this));
+        } else if (auto *combobox = qobject_cast<QComboBox*>(editor)) {
+            ui->__qt__passive_table->setItemDelegateForColumn(
+                curCol, new ComboboxDelegate(combobox, this));
+        }
     }
 }
 
@@ -174,18 +218,69 @@ QJsonValue ExtendedTableWidget::itemDataToJson(int row, int col) const {
 
     auto *widget = m_columnMappings[col].editor;
 
-    if (const auto *editor = qobject_cast<NumberProvider*>(widget)) {
-        return item->data(Qt::EditRole).toJsonValue();
-    } else if (auto *editor = qobject_cast<QSpinBox*>(widget)) {
-        return item->data(Qt::EditRole).toJsonValue();
-    } else if (auto *editor = qobject_cast<QLineEdit*>(widget)) {
+    if (qobject_cast<NumberProvider*>(widget)) {
+        return item->data(NumberProviderRole).toJsonValue();
+    } else if (qobject_cast<QSpinBox*>(widget)) {
+        return item->data(Qt::EditRole).toInt();
+    } else if (qobject_cast<QLineEdit*>(widget)) {
         return item->text();
-    } else if (auto *editor = qobject_cast<QComboBox*>(widget)) {
-        return item->data(ComboboxDataRole).toJsonValue();
-    } else if (auto *editor = qobject_cast<QCheckBox*>(widget)) {
-        return item->checkState() == Qt::Checked;
+    } else if (const auto *editor = qobject_cast<QComboBox*>(widget)) {
+        const int    index = item->data(ComboboxIndexRole).toInt();
+        const auto &&vari  = editor->itemData(index, ComboboxDataRole);
+        if (!vari.isNull()) {
+            return vari.toJsonValue();
+        } else {
+            return editor->itemData(index, Qt::DisplayRole).toJsonValue();
+        }
+    } else if (qobject_cast<QCheckBox*>(widget)) {
+        return item->data(Qt::EditRole).toBool();
     }
     return QJsonValue::Null;
+}
+
+int ExtendedTableWidget::indexOfKeyInMapping(const QString &key) const {
+    auto it = std::find_if(
+        m_columnMappings.constBegin(), m_columnMappings.constEnd(),
+        [&key](const ColumnMapping &mapping) -> bool {
+        return key == mapping.jsonKey;
+    });
+    const int index = (it != m_columnMappings.constEnd())
+                          ? (it - m_columnMappings.constBegin()) : -1;
+
+    return index;
+}
+
+void ExtendedTableWidget::loadItemFromJson(int row, int col,
+                                           const QJsonValue &value) {
+    if (row >= ui->__qt__passive_table->rowCount())
+        ui->__qt__passive_table->insertRow(row);
+
+    auto *item = new QTableWidgetItem();
+
+    auto *widget = m_columnMappings[col].editor;
+    if (qobject_cast<NumberProvider*>(widget)) {
+        item->setData(NumberProviderRole, value);
+    } else if (qobject_cast<QSpinBox*>(widget)) {
+        item->setData(Qt::DisplayRole, value.toInt());
+    } else if (qobject_cast<QLineEdit*>(widget)) {
+        item->setText(value.toString());
+    } else if (auto *editor = qobject_cast<QComboBox*>(widget)) {
+        int index = editor->findData(value.toVariant(),
+                                     ExtendedRole::ComboboxDataRole);
+        if (index == -1)
+            index = editor->findText(value.toString());
+        if (index == -1)
+            return;
+
+        item->setText(editor->itemData(index, Qt::DisplayRole).toString());
+        item->setData(Qt::DecorationRole,
+                      editor->itemData(index, Qt::DecorationRole));
+        item->setData(ComboboxIndexRole, index);
+    } else if (qobject_cast<QCheckBox*>(widget)) {
+        item->setData(Qt::EditRole, value);
+    }
+
+    ui->__qt__passive_table->setItem(row, col, item);
 }
 
 
@@ -206,6 +301,13 @@ void ExtendedTableWidget::onRemoveBtn() {
 }
 
 void ExtendedTableWidget::onApplyBtn() {
+    for (const auto &mapping : qAsConst(m_columnMappings)) {
+        if (auto lineEdit = qobject_cast<QLineEdit*>(mapping.editor)) {
+            if (lineEdit->text().isEmpty())
+                return;
+        }
+    }
+
     setAddingItem(false);
 
     const int row = ui->__qt__passive_table->rowCount();
@@ -225,11 +327,9 @@ void ExtendedTableWidget::onApplyBtn() {
             item->setText(editor->currentText());
             item->setData(Qt::DecorationRole,
                           editor->currentData(Qt::DecorationRole));
-            item->setData(ComboboxDataRole,
-                          editor->currentData(ComboboxDataRole));
             item->setData(ComboboxIndexRole, editor->currentIndex());
         } else if (auto *editor = qobject_cast<QCheckBox*>(widget)) {
-            item->setCheckState(editor->checkState());
+            item->setData(Qt::EditRole, editor->isChecked());
         }
 
         ui->__qt__passive_table->setItem(row, col, item);

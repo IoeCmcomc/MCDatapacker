@@ -85,6 +85,9 @@ LootTableFunction::~LootTableFunction() {
 QJsonObject LootTableFunction::toJson() const {
     QJsonObject root;
 
+    if (ui->functionTypeCombo->currentIndex() == -1)
+        return root;
+
     root.insert("function", "minecraft:" +
                 functTypes[ui->functionTypeCombo->currentIndex()]);
 
