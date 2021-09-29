@@ -7,8 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>666</width>
-    <height>400</height>
+    <height>468</height>
    </rect>
+  </property>
+  <property name="allowedAreas">
+   <set>Qt::AllDockWidgetAreas</set>
   </property>
   <property name="windowTitle">
    <string>Loot table editor</string>

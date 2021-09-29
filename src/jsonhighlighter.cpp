@@ -30,8 +30,7 @@ void JsonHighlighter::setupRules() {
     numberFormat.setForeground(QColor(220, 150, 30));
     numberFormat.setToolTip("number");
     rule.pattern =
-        QRegularExpression(QStringLiteral(
-                               "-?(?:[1-9]\\d*|0)(?:\\.\\d+)?(:?[eE][+-]?\\d+)?"));
+        QRegularExpression(R"(\b-?(?:[1-9]\d*|0)(?:\.\d+)?(:?[eE][+-]?\d+)?\b)");
     rule.format = numberFormat;
     highlightingRules.append(rule);
 }

@@ -19,7 +19,7 @@ QWidget *ComboboxDelegate::createEditor(QWidget *parent,
                                         const QModelIndex &index) const {
     if (!index.data(ExtendedRole::ComboboxIndexRole).isNull()) {
         auto *combobox = new QComboBox(parent);
-        qDebug() << combobox;
+        /*qDebug() << combobox; */
         combobox->setFrame(false);
         combobox->setModel(m_editor->model());
         connect(combobox, qOverload<int>(&QComboBox::activated),
@@ -39,7 +39,7 @@ void ComboboxDelegate::setEditorData(QWidget *editor,
 
         const int comboIndex =
             index.data(ExtendedRole::ComboboxIndexRole).toInt();
-        qDebug() << editor << comboIndex;
+        /*qDebug() << editor << comboIndex; */
 
         auto *combobox = qobject_cast<QComboBox*>(editor);
         combobox->setCurrentIndex(comboIndex);
@@ -62,8 +62,10 @@ void ComboboxDelegate::setModelData(QWidget *editor,
                        Qt::DecorationRole);
         model->setData(index, combobox->currentIndex(),
                        ExtendedRole::ComboboxIndexRole);
-        qDebug() << combobox << combobox->currentIndex() << index.data(
-            ExtendedRole::ComboboxIndexRole);
+        /*
+           qDebug() << combobox << combobox->currentIndex() << index.data(
+              ExtendedRole::ComboboxIndexRole);
+         */
         m_isPopulated = false;
     } else {
         QStyledItemDelegate::setModelData(editor, model, index);
@@ -78,7 +80,7 @@ const {
 }
 
 void ComboboxDelegate::emitCommitData() {
-    qDebug() << "commit";
+    /*qDebug() << "commit"; */
     auto *w = qobject_cast<QComboBox*>(sender());
     emit  commitData(w);
     emit  closeEditor(w);

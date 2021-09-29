@@ -50,7 +50,8 @@ private:
       "enchant_randomly", "enchant_with_levels", "exploration_map",
       "fill_player_head", "limit_count",         "looting_enchant",
       "set_attributes",   "set_contents",        "set_count",
-      "set_damage",       "set_loot_table",      "set_lore",
+      "set_damage",       "set_enchantments",
+      "set_loot_table",   "set_lore",
       "set_name",         "set_nbt",             "set_stew_effect",
       "copy_name",        "explosion_decay",     "furnace_smelt" };
     const QStringList formulaTypes = { "binomial_with_bonus_count",

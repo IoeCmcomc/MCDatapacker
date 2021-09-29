@@ -13,6 +13,7 @@ class QTableWidget;
 class QFrame;
 class QToolButton;
 class QVBoxLayout;
+class QComboBox;
 QT_END_NAMESPACE
 
 namespace Ui {
@@ -36,6 +37,15 @@ public:
         List,
     };
 
+    enum class EditorClass {
+        Unknown = 0x0,
+        NumberProvider,
+        QSpinBox,
+        QLineEdit,
+        QComboBox,
+        QCheckBox,
+    };
+
     enum ItemRole {
         ComboboxDataRole = Qt::UserRole + 1,
         ComboboxIndexRole,
@@ -47,6 +57,7 @@ public:
     struct ColumnMapping {
         QString     jsonKey;
         QWidget    *editor        = nullptr;
+        EditorClass editorClass   = EditorClass::Unknown;
         VersionPair gameVerLimits = {};
     };
 
@@ -65,6 +76,7 @@ public:
     QJsonObject toJson() const;
     void fromJson(const QJsonObject &root);
 
+    /*static void initComboBoxData(QComboBox *widget, ) */
 
 public slots:
     void setContainer(QFrame *widget);
