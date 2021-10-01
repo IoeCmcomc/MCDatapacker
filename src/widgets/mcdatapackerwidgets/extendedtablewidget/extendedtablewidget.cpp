@@ -13,6 +13,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QJsonObject>
+#include <QJsonArray>
 
 
 ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
@@ -54,7 +55,10 @@ ExtendedTableWidget::JsonMode ExtendedTableWidget::jsonMode() const {
     return m_jsonMode;
 }
 
-QJsonObject ExtendedTableWidget::toJson() const {
+QJsonObject ExtendedTableWidget::toJsonObject() const {
+    if (m_jsonMode == JsonMode::List)
+        return QJsonObject();
+
     QJsonObject ret;
 
     for (int row = 0; row < ui->__qt__passive_table->rowCount(); ++row) {
@@ -75,6 +79,26 @@ QJsonObject ExtendedTableWidget::toJson() const {
             if (!obj.isEmpty())
                 ret[key] = obj;
         }
+    }
+    return ret;
+}
+
+QJsonArray ExtendedTableWidget::toJsonArray() const {
+    if (m_jsonMode != JsonMode::List)
+        return QJsonArray();
+
+    QJsonArray ret;
+    const int  cols = ui->__qt__passive_table->columnCount();
+
+    for (int row = 0; row < ui->__qt__passive_table->rowCount(); ++row) {
+        QJsonObject obj;
+        for (int col = 0; col < cols; ++col) {
+            const auto &&value = itemDataToJson(row, col);
+            if (!value.isNull())
+                obj[m_columnMappings[col].jsonKey] = value;
+        }
+        if (!obj.isEmpty())
+            ret << obj;
     }
     return ret;
 }
@@ -103,6 +127,26 @@ void ExtendedTableWidget::fromJson(const QJsonObject &root) {
             }
         }
         ++row;
+    }
+}
+
+void ExtendedTableWidget::fromJson(const QJsonArray &root) {
+    clear();
+
+    if (m_jsonMode == JsonMode::List) {
+        int row = 0;
+        for (const auto jsonRef : root) {
+            const QJsonObject &&obj = jsonRef.toObject();
+            for (auto objIt = obj.constBegin();
+                 objIt != obj.constEnd(); ++objIt) {
+                const QString &&key   = objIt.key();
+                const int       index = indexOfKeyInMapping(key);
+                loadItemFromJson(row, index, objIt.value());
+                if (!key.isEmpty())
+                    qWarning() << "Undefined JSON key:" << key;
+            }
+            ++row;
+        }
     }
 }
 

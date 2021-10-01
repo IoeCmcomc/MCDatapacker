@@ -49,8 +49,8 @@ private:
     { "apply_bonus",      "copy_nbt",            "copy_state",
       "enchant_randomly", "enchant_with_levels", "exploration_map",
       "fill_player_head", "limit_count",         "looting_enchant",
-      "set_attributes",   "set_contents",        "set_count",
-      "set_damage",       "set_enchantments",
+      "set_attributes",   "set_banner_pattern",  "set_contents",
+      "set_count",        "set_damage",          "set_enchantments",
       "set_loot_table",   "set_lore",
       "set_name",         "set_nbt",             "set_stew_effect",
       "copy_name",        "explosion_decay",     "furnace_smelt" };
@@ -69,6 +69,7 @@ private:
     void initBlocksModel();
     void initCondInterface();
     void initEntryInterface();
+    void initBannerPatterns();
 };
 
 #endif /* LOOTTABLEFUNCTION_H */

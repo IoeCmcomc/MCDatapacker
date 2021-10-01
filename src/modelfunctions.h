@@ -14,7 +14,7 @@ void initModelView(QStandardItemModel &model, QTableView *tableView,
                    QAbstractItemDelegate *delegate = nullptr);
 void initComboModelView(const QString &infoType,
                         QStandardItemModel &model, QComboBox *combo,
-                        bool optional = true);
+                        bool optional = true, bool append = true);
 void setupComboFrom(QComboBox *combo, const QVariant &vari,
                     int role = Qt:: UserRole + 1);
 

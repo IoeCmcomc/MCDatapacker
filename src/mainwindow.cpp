@@ -598,11 +598,14 @@ void MainWindow::updateRecentFolders() {
 
     auto itEnd = 0u;
 
-    if (recentPaths.size() <= maxRecentFoldersActions)
-        itEnd = recentPaths.size();
+    const auto recentPathsSize = recentPaths.size();
+
+    if (recentPathsSize <= maxRecentFoldersActions)
+        itEnd = recentPathsSize;
     else
         itEnd = maxRecentFoldersActions;
 
+    ui->menuRecentDatapacks->setEnabled(recentPathsSize > 0);
     for (auto i = 0u; i < itEnd; ++i) {
         auto *action = recentFoldersActions.at(i);
         action->setText(QString("&%1 | %2").arg(i + 1).arg(recentPaths.at(i)));

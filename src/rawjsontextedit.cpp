@@ -2,6 +2,7 @@
 #include "ui_rawjsontextedit.h"
 
 #include "mainwindow.h"
+#include "globalhelpers.h"
 
 #include <QToolButton>
 #include <QSignalBlocker>
@@ -138,7 +139,7 @@ QJsonValue RawJsonTextEdit::toJson() const {
                 if (fmt.fontStrikeOut())
                     component.insert("strikethrough", true);
                 if (fmt.foreground().style() == Qt::SolidPattern) {
-                    const QString &&key = colorHexes.key(
+                    const QString &&key = Glhp::colorHexes.key(
                         fmt.foreground().color().name());
                     if (!key.isEmpty()) {
                         component.insert("color", key);
@@ -219,7 +220,8 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
     if (root.contains("strikethrough"))
         fmt.setFontStrikeOut(root.value("strikethrough").toBool());
     if (root.contains("color")) {
-        QString color = colorHexes.value(root.value("color").toString());
+        const QString &&color = Glhp::colorHexes.value(root.value(
+                                                           "color").toString());
         if (!color.isEmpty()) {
             fmt.setForeground(QBrush(QColor(color)));
         } else if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
@@ -236,13 +238,13 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
 
     cursor.beginEditBlock();
 
-    if (root.contains("text")) {
+    if (root.contains(QLatin1String("text"))) {
         cursor.setCharFormat(fmt);
-        cursor.insertText(root.value("text").toString());
+        cursor.insertText(root.value(QLatin1String("text")).toString());
     }
 
-    if (root.contains("extra")) {
-        auto extra = root.value("extra").toArray();
+    if (root.contains(QLatin1String("extra"))) {
+        auto extra = root.value(QLatin1String("extra")).toArray();
         for (auto compRef: extra) {
             appendJsonObject(JsonToComponent(compRef), fmt);
         }
@@ -307,7 +309,7 @@ bool RawJsonTextEdit::eventFilter(QObject *obj, QEvent *event) {
             auto *key = dynamic_cast<QKeyEvent*>(event);
             if ((key->key() == Qt::Key_Enter) ||
                 (key->key() == Qt::Key_Return)) {
-                /* */
+                /* Do nothing */
             } else {
                 return QObject::eventFilter(obj, event);
             }
@@ -350,7 +352,7 @@ void RawJsonTextEdit::selectCustomColor() {
 }
 
 void RawJsonTextEdit::initColorMenu() {
-    for (const auto &colorCode : qAsConst(colorHexes)) {
+    for (const auto &colorCode : qAsConst(Glhp::colorHexes)) {
         QPixmap pixmap(16, 16);
         pixmap.fill(colorCode);
         colorMenu.addAction(pixmap, QString(), this, [ = ]() {

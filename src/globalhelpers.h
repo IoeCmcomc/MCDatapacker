@@ -28,6 +28,8 @@ namespace Glhp {
                                 bool noTagForm        = true);
 
     bool removePrefix(QString &str, const QString &prefix);
+
+    extern const QMap<QString, QString> colorHexes;
 }
 
 #endif /* GLOBALHELPERS_H */

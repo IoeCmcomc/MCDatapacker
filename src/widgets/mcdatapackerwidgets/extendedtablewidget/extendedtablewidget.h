@@ -1,5 +1,6 @@
+#ifdef _MSC_VER
 #define __clang_major__    11
-
+#endif
 
 #ifndef EXTENDEDTABLEWIDGET_H
 #define EXTENDEDTABLEWIDGET_H
@@ -38,7 +39,7 @@ public:
     };
 
     enum class EditorClass {
-        Unknown = 0x0,
+        Unknown = 0,
         NumberProvider,
         QSpinBox,
         QLineEdit,
@@ -73,8 +74,10 @@ public:
                              VersionPair gameVerLim = {});
 
     JsonMode jsonMode() const;
-    QJsonObject toJson() const;
+    QJsonObject toJsonObject() const;
+    QJsonArray toJsonArray() const;
     void fromJson(const QJsonObject &root);
+    void fromJson(const QJsonArray &root);
 
     /*static void initComboBoxData(QComboBox *widget, ) */
 

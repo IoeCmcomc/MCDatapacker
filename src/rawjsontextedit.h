@@ -48,25 +48,6 @@ private:
     bool isOneLine       = false;
     QColor currTextColor = QColor(85, 255, 85);
 
-    const QMap<QString, QString> colorHexes = {
-        { QStringLiteral("black"),        "#000000" },
-        { QStringLiteral("dark_blue"),    "#0000aa" },
-        { QStringLiteral("dark_green"),   "#00aa00" },
-        { QStringLiteral("dark_aqua"),    "#00aaaa" },
-        { QStringLiteral("dark_red"),     "#aa0000" },
-        { QStringLiteral("dark_purple"),  "#aa00aa" },
-        { QStringLiteral("glod"),         "#ffAA00" },
-        { QStringLiteral("gray"),         "#aaaaaa" },
-        { QStringLiteral("dark_gray"),    "#555555" },
-        { QStringLiteral("blue"),         "#5555ff" },
-        { QStringLiteral("green"),        "#55ff55" },
-        { QStringLiteral("aqua"),         "#55ffff" },
-        { QStringLiteral("red"),          "#ff5555" },
-        { QStringLiteral("light_purple"), "#ff55ff" },
-        { QStringLiteral("yellow"),       "#ffff55" },
-        { QStringLiteral("white"),        "#ffffff" }
-    };
-
     void initColorMenu();
     QJsonObject JsonToComponent(const QJsonValue &root);
     void appendJsonObject(const QJsonObject &root,

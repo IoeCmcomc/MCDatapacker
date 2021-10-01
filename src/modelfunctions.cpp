@@ -24,8 +24,8 @@ void initModelView(QStandardItemModel &model,
 
 void initComboModelView(const QString &infoType,
                         QStandardItemModel &model,
-                        QComboBox *combo, bool optinal) {
-    if (optinal)
+                        QComboBox *combo, bool optional, bool append) {
+    if (optional)
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
                                               "(not set)")));
@@ -45,7 +45,7 @@ void initComboModelView(const QString &infoType,
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
-        if (!key.contains(':'))
+        if (!key.contains(':') && append)
             key.prepend(QLatin1String("minecraft:"));
         item->setData(key);
         item->setData(key, ExtendedRole::ComboboxDataRole);
