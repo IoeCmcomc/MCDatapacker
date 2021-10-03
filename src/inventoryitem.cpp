@@ -49,16 +49,17 @@ void InventoryItem::setupItem(QString id) {
 
     Glhp::removePrefix(id, QStringLiteral("minecraft:"));
 
-    if (id.endsWith(QStringLiteral("banner_pattern"))) {
+    const auto &MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
+    const auto &MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+
+    if (id.endsWith(QLatin1String("banner_pattern"))) {
         iconpath = ":/minecraft/texture/item/banner_pattern.png";
         iconpix  = QPixmap(iconpath);
-    } else {
+    } else if (MCRItemInfo.contains(id)) {
         iconpath = QStringLiteral(":minecraft/texture/item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
-    }
-
-    if (!iconpix) {
+    } else {
         iconpath = QStringLiteral(":minecraft/texture/inv_item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
@@ -72,37 +73,33 @@ void InventoryItem::setupItem(QString id) {
 
     if (!iconpix) {
         /*qWarning() << "unknown ID: " + id; */
+        const static QColor magenta(100, 0, 86);
         iconpix = QPixmap(16, 16);
-        iconpix.fill(QStringLiteral("#FF00DC"));
+        iconpix.fill(magenta);
         {
-            QPainter painter(&iconpix);
-            /*
-               painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
-               QBrush brush(QColor("#FF00DC"));
-               painter.fillRect(iconpix.rect(), brush);
-             */
-            QBrush brush = QBrush(QColor(QStringLiteral("#000")));
+            QPainter            painter(&iconpix);
+            const static QBrush brush(Qt::black);
             painter.fillRect(8, 0, 8, 8, brush);
             painter.fillRect(0, 8, 8, 8, brush);
             painter.end();
         }
     }
-    iconpix = iconpix.scaled(32, 32, Qt::KeepAspectRatio);
-    if (iconpix.size() != QSize(32, 32)) {
-        QPixmap centeredPix(32, 32);
+    static const int   pixmapLength = 32;
+    static const QSize pixmapSize(pixmapLength, pixmapLength);
+    iconpix = iconpix.scaled(pixmapLength, pixmapLength, Qt::KeepAspectRatio);
+    if (iconpix.size() != pixmapSize) {
+        QPixmap centeredPix(pixmapLength, pixmapLength);
         centeredPix.fill(Qt::transparent);
         {
             QPainter painter(&centeredPix);
-            painter.drawPixmap((32 - iconpix.width()) / 2,
-                               (32 - iconpix.height()) / 2, iconpix);
+            painter.drawPixmap((pixmapLength - iconpix.width()) / 2,
+                               (pixmapLength - iconpix.height()) / 2, iconpix);
             painter.end();
         }
         iconpix = centeredPix;
     }
     setPixmap(iconpix);
 
-    const auto &MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
-    const auto &MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
     if (MCRItemInfo.contains(id)) {
         setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
                                                         "name")).toString());
@@ -204,7 +201,7 @@ void InventoryItem::setNamespacedID(const QString &id) {
 
     setEmpty(id.isEmpty());
 
-    if (id.startsWith("#")) {
+    if (id.startsWith('#')) {
         QPixmap iconpix(32, 32);
         iconpix.fill(Qt::transparent);
         {
@@ -219,7 +216,7 @@ void InventoryItem::setNamespacedID(const QString &id) {
         }
         setPixmap(iconpix);
         auto idNoTag = id.mid(1);
-        if (!idNoTag.contains(QStringLiteral(":")))
+        if (!idNoTag.contains(':'))
             this->m_namespacedId = QStringLiteral("#minecraft:") + idNoTag;
         else
             this->m_namespacedId = QStringLiteral("#") + idNoTag;
@@ -304,7 +301,7 @@ QDebug operator<<(QDebug debug, const InventoryItem &item) {
         if (!item.getName().isEmpty())
             debug.nospace() << ", " << item.getName();
     }
-    debug.nospace() << ")";
+    debug.nospace() << ')';
 
     return debug;
 }

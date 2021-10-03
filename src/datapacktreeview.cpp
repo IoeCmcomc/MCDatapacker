@@ -40,9 +40,9 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
 
 QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     /*Right click context menu */
-    auto       *cMenu = new QMenu(this);
-    QString     path  = Glhp::relPath(dirPath, dirModel.filePath(index));
-    QFileInfo &&finfo = dirModel.fileInfo(index);
+    auto           *cMenu = new QMenu(this);
+    const QString &&path  = Glhp::relPath(dirPath, dirModel.filePath(index));
+    QFileInfo     &&finfo = dirModel.fileInfo(index);
 
     if (finfo.isFile()) {
         QAction *cMenuActionOpen = new QAction(tr("Open"), cMenu);
@@ -54,7 +54,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
     const auto &&fileType = Glhp::pathToFileType(dirPath, finfo.filePath());
     if ((fileType == CodeFile::Function || fileType >= CodeFile::JsonText) &&
-        path.startsWith(QStringLiteral("data/"))) {
+        path.startsWith(QLatin1String("data/"))) {
         const QString &&filePathId = Glhp::toNamespacedID(dirPath,
                                                           finfo.filePath());
 
@@ -102,8 +102,8 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     }
 
 
-    if (path != QStringLiteral("data") &&
-        path != QStringLiteral("pack.mcmeta")) {
+    if (path != QLatin1String("data") &&
+        path != QLatin1String("pack.mcmeta")) {
         QAction *cMenuActionRename = new QAction(tr("Rename"), cMenu);
         connect(cMenuActionRename, &QAction::triggered,
                 this, &DatapackTreeView::contextMenuOnRename);
@@ -115,127 +115,112 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenu->addAction(cMenuActionDelete);
     }
 
-    if (path != QStringLiteral("pack.mcmeta")) {
+    if (path != QLatin1String("pack.mcmeta")) {
         cMenu->addSeparator();
         QMenu *newMenu = new QMenu(tr("New"), cMenu); /*"New" menu */
 
         QAction *newMenuNewFolder = new QAction(tr("Folder"), newMenu);
-        if (path == QStringLiteral("data"))
+        if (path == QLatin1String("data"))
             newMenuNewFolder->setText(tr("Namespace"));
         connect(newMenuNewFolder, &QAction::triggered,
                 this, &DatapackTreeView::contextMenuOnNewFolder);
         newMenu->addAction(newMenuNewFolder);
 
-        if (path != QStringLiteral("data")) {
+        if (path.contains('/')) {
+            const static QLatin1String jsonExt(".json");
             newMenu->addSeparator();
 
-            QAction *newMenuNewAdv = new QAction(tr("Advancement"), newMenu);
-            connect(newMenuNewAdv, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                (
-                    "advancement_" + Glhp::randStr() + ".json",
-                    QStringLiteral("advancements"));
-            });
-            newMenu->addAction(newMenuNewAdv);
-
-            QAction *newMenuNewFunct = new QAction(tr("Function"), newMenu);
-            connect(newMenuNewFunct, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                (
-                    "function_" + Glhp::randStr() + ".mcfunction",
-                    QStringLiteral("functions"));
-            });
-            newMenu->addAction(newMenuNewFunct);
-
-            QAction *newMenuNewLoot = new QAction(tr("Loot table"), newMenu);
-            connect(newMenuNewLoot, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("loot_table_" + Glhp::randStr() + ".json",
-                    QStringLiteral("loot_tables"));
-            });
-            newMenu->addAction(newMenuNewLoot);
-
-            QAction *newMenuNewPred = new QAction(tr("Predicate"), newMenu);
-            connect(newMenuNewPred, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("predicate_" + Glhp::randStr() + ".json",
-                    QLatin1String("predicates"));
-            });
-            newMenu->addAction(newMenuNewPred);
-
-            QAction *newMenuNewRecipe = new QAction(tr("Recipe"), newMenu);
-            connect(newMenuNewRecipe, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("recipe_" + Glhp::randStr() + ".json",
-                    QStringLiteral("recipes"));
-            });
-            newMenu->addAction(newMenuNewRecipe);
-
-            QAction *newMenuNewStruct = new QAction(tr("Structure"), newMenu);
-            newMenuNewStruct->setDisabled(true);
-            connect(newMenuNewStruct, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("structure_" + Glhp::randStr() + ".nbt",
-                    QStringLiteral("structures"));
-            });
-            newMenu->addAction(newMenuNewStruct);
+            addNewFileAction(newMenu, tr("Advancement"), jsonExt,
+                             QLatin1String("advancements"));
+            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+                addNewFileAction(newMenu, tr("Dimension"), jsonExt,
+                                 QLatin1String("dimension"));
+                addNewFileAction(newMenu, tr("Dimension type"), jsonExt,
+                                 QLatin1String("type"));
+            }
+            addNewFileAction(newMenu, tr("Function"),
+                             QLatin1String(".mcfunction"),
+                             QLatin1String("functions"));
+            addNewFileAction(newMenu, tr("Loot table"), jsonExt,
+                             QLatin1String("loot_tables"));
+            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+                addNewFileAction(newMenu, tr("Item modifier"), jsonExt,
+                                 QLatin1String("item_modifiers"));
+            }
+            addNewFileAction(newMenu, tr("Predicate"), jsonExt,
+                             QLatin1String("predicates"));
+            addNewFileAction(newMenu, tr("Recipe"), jsonExt,
+                             QLatin1String("recipes"));
+            addNewFileAction(newMenu, tr("Structure"),
+                             QLatin1String(".nbt"),
+                             QLatin1String("structures"));
 
             /*"Tag" menu */
             QMenu *tagMenu = new QMenu(tr("Tag"), newMenu);
 
-            QAction *newBlockTag = new QAction(tr("Blocks"), tagMenu);
-            connect(newBlockTag, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("tag_" + Glhp::randStr() + ".json",
-                    QStringLiteral("tags/blocks"));
-            });
-            tagMenu->addAction(newBlockTag);
-
-            QAction *newEntityTag = new QAction(tr("Entity types"), tagMenu);
-            connect(newEntityTag, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("tag_" + Glhp::randStr() + ".json",
-                    QStringLiteral("tags/entity_types"));
-            });
-            tagMenu->addAction(newEntityTag);
-
-            QAction *newFluidTag = new QAction(tr("Fluids"), tagMenu);
-            connect(newFluidTag, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("tag_" + Glhp::randStr() + ".json",
-                    QStringLiteral("tags/fluids"));
-            });
-            tagMenu->addAction(newFluidTag);
-
-            QAction *newFunctTag = new QAction(tr("Functions"), tagMenu);
-            connect(newFunctTag, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("tag_" + Glhp::randStr() + ".json",
-                    QStringLiteral("tags/functions"));
-            });
-            tagMenu->addAction(newFunctTag);
-
-            QAction *newItemTag = new QAction(tr("Items"), tagMenu);
-            connect(newItemTag, &QAction::triggered, [this]() {
-                this->contextMenuOnNew
-                    ("tag_" + Glhp::randStr() + ".json",
-                    QStringLiteral("tags/items"));
-            });
-            tagMenu->addAction(newItemTag);
+            addNewFileAction(tagMenu, tr("Blocks"), jsonExt,
+                             QLatin1String("tags/blocks"));
+            addNewFileAction(tagMenu, tr("Entity types"), jsonExt,
+                             QLatin1String("tags/entity_types"));
+            addNewFileAction(tagMenu, tr("Fluids"), jsonExt,
+                             QLatin1String("tags/fluids"));
+            addNewFileAction(tagMenu, tr("Functions"), jsonExt,
+                             QLatin1String("tags/functions"));
+            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+                addNewFileAction(tagMenu, tr("Game events"), jsonExt,
+                                 QLatin1String("tags/game_events"));
+            }
+            addNewFileAction(tagMenu, tr("Items"), jsonExt,
+                             QLatin1String("tags/items"));
 
             newMenu->addMenu(tagMenu);
+
+            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+                /*"World generation" menu */
+                QMenu *worldMenu = new QMenu(tr("World generation"), newMenu);
+
+                addNewFileAction(worldMenu, tr("Biome"), jsonExt,
+                                 QLatin1String("worldgen/biome"));
+                addNewFileAction(worldMenu, tr("Carver"), jsonExt,
+                                 QLatin1String("worldgen/configured_carver"));
+                addNewFileAction(worldMenu, tr("Feature"), jsonExt,
+                                 QLatin1String("worldgen/configured_feature"));
+                addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
+                                 QLatin1String(
+                                     "worldgen/configured_structure_feature"));
+                addNewFileAction(worldMenu, tr("Surface builder"), jsonExt,
+                                 QLatin1String(
+                                     "worldgen/configured_surface_builder"));
+                addNewFileAction(worldMenu, tr("Noise settings"), jsonExt,
+                                 QLatin1String("worldgen/noise_settings"));
+                addNewFileAction(worldMenu, tr("Processor list"), jsonExt,
+                                 QLatin1String("worldgen/processor_list"));
+                addNewFileAction(worldMenu, tr("Jigsaw pool"), jsonExt,
+                                 QLatin1String("worldgen/template_pool"));
+
+                newMenu->addMenu(worldMenu);
+            }
+
             newMenu->addSeparator();
 
-            QAction *newMenuNewFile = new QAction(tr("File"), tagMenu);
-            connect(newMenuNewFile, &QAction::triggered, [this]() {
-                this->contextMenuOnNew("file" + Glhp::randStr() + ".txt");
-            });
-            newMenu->addAction(newMenuNewFile);
+            addNewFileAction(newMenu, tr("Text file"), QLatin1String(".txt"));
         }
         cMenu->addMenu(newMenu);
     }
 
     return cMenu;
+}
+
+QAction *DatapackTreeView::addNewFileAction(QMenu *menu, const QString &name,
+                                            QLatin1String ext,
+                                            QLatin1String catDir) {
+    QAction *action = new QAction(name, menu);
+
+    connect(action, &QAction::triggered, [this, ext, catDir]() {
+        this->contextMenuOnNew(ext, catDir);
+    });
+    menu->addAction(action);
+    return action;
 }
 
 QModelIndex DatapackTreeView::getSelected() {
@@ -356,7 +341,7 @@ void DatapackTreeView::contextMenuOnNewFolder() {
 
 QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
                                           const QString &name,
-                                          const QString &catDir,
+                                          QLatin1String catDir,
                                           const QString &nspace) {
     if (index.isValid()) {
         QFileInfo finfo = dirModel.fileInfo(index);
@@ -394,13 +379,12 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
     }
 }
 
-void DatapackTreeView::contextMenuOnNew(const QString &name,
-                                        const QString &catDir) {
+void DatapackTreeView::contextMenuOnNew(const QString &ext,
+                                        QLatin1String catDir) {
     QModelIndex selected = indexAt(cMenuPos);
-    QModelIndex index    = makeNewFile(selected, name, catDir);
+    QModelIndex index    = makeNewFile(selected, Glhp::randStr() + ext, catDir);
 
     if (index.isValid()) {
-        /*onDoubleClicked(index); */
         setCurrentIndex(index);
         edit(index);
     }

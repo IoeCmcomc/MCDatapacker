@@ -34,7 +34,8 @@ private slots:
                        const QString &newName);
     void onCustomContextMenu(const QPoint &point);
     void contextMenuOnNewFolder();
-    void contextMenuOnNew(const QString &name, const QString &catDir = "");
+    void contextMenuOnNew(const QString &name,
+                          QLatin1String catDir = QLatin1String());
     void contextMenuOnOpen();
     void contextMenuOnRename();
     void contextMenuOnDelete();
@@ -48,10 +49,12 @@ private:
     DatapackFileIconProvider iconProvider;
 
     QMenu *mkContextMenu(QModelIndex index);
-    QModelIndex makeNewFile(QModelIndex index,
-                            const QString &name,
-                            const QString &catDir = "",
-                            const QString &nspace = "");
+    QAction *addNewFileAction(QMenu *menu,
+                              const QString &name, QLatin1String ext,
+                              QLatin1String catDir = QLatin1String());
+    QModelIndex makeNewFile(QModelIndex index, const QString &name,
+                            QLatin1String catDir  = QLatin1String(),
+                            const QString &nspace = QString());
     QModelIndex getSelected();
     bool isStringInTagFile(const QString &filepath, const QString &str);
     void contextMenuModifyTagFile(const QString &filepath, const QString &str,
