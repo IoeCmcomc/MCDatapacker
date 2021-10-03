@@ -12,11 +12,11 @@
 using namespace Glhp;
 
 QString Glhp::randStr(int length) {
-    static const QString charset("abcdefghijklmnopqrstuvwxyz0123456789");
-    QString              r;
+    static const QLatin1String charset("abcdefghijklmnopqrstuvwxyz0123456789");
+    QString                    r;
 
     for (int i = 0; i < (length + 1); ++i) {
-        int index = QRandomGenerator::global()->bounded(charset.length());
+        int index = QRandomGenerator::global()->bounded(charset.size());
         r.append(charset.at(index));
     }
     return r;
@@ -53,15 +53,15 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     QFileInfo       info(filepath);
     const QString &&fullSuffix = info.suffix();
 
-    if (fullSuffix == QStringLiteral("mcmeta")) {
+    if (fullSuffix == QLatin1String("mcmeta")) {
         return CodeFile::Meta;
-    } else if (fullSuffix == QStringLiteral("mcfunction")) {
+    } else if (fullSuffix == QLatin1String("mcfunction")) {
         return CodeFile::Function;
-    } else if (fullSuffix == QStringLiteral("nbt")) {
+    } else if (fullSuffix == QLatin1String("nbt")) {
         return CodeFile::Structure;
     } else if (imageExts.contains(fullSuffix)) {
         return CodeFile::Image;
-    } else if (fullSuffix == QStringLiteral("json")) {
+    } else if (fullSuffix == QLatin1String("json")) {
         if (isPathRelativeTo(dirpath, filepath,
                              QStringLiteral("advancements"))) {
             return CodeFile::Advancement;
@@ -71,6 +71,9 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         } else if (isPathRelativeTo(dirpath, filepath,
                                     QStringLiteral("predicates"))) {
             return CodeFile::Predicate;
+        } else if (isPathRelativeTo(dirpath, filepath,
+                                    QStringLiteral("item_modifiers"))) {
+            return CodeFile::ItemModifier;
         } else if (isPathRelativeTo(dirpath, filepath, QStringLiteral(
                                         "recipes"))) {
             return CodeFile::Recipe;
@@ -161,8 +164,8 @@ QVariant Glhp::strToVariant(const QString &str) {
     if (isInt) {
         return intValue;
     } else {
-        if (str == QStringLiteral("true") || str == QStringLiteral("false")) {
-            return str == QStringLiteral("true");
+        if (str == QLatin1String("true") || str == QLatin1String("false")) {
+            return str == QLatin1String("true");
         } else {
             return str;
         }
@@ -209,6 +212,7 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
                 appendPerCategory(nspace, "functions");
                 appendPerCategory(nspace, "loot_tables");
                 appendPerCategory(nspace, "predicates");
+                appendPerCategory(nspace, "item_modifiers");
                 appendPerCategory(nspace, "recipes");
             }
         };

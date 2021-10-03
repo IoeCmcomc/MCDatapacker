@@ -1,10 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "visualrecipeeditordock.h"
-#include "loottableeditordock.h"
-#include "predicatedock.h"
-
 #include <QMainWindow>
 #include <QSessionManager>
 #include <QMap>
@@ -14,17 +10,24 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QVersionNumber>
+#include <QLocale>
+#include <QJsonObject>
 
+
+QT_BEGIN_NAMESPACE
+namespace Ui { class MainWindow; }
+QT_END_NAMESPACE
+
+class VisualRecipeEditorDock;
+class LootTableEditorDock;
+class PredicateDock;
+class ItemModifierDock;
 class StatusBar;
 
 struct PackMetaInfo {
     QString description;
     int     packFormat = 0;
 };
-
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
@@ -93,6 +96,7 @@ private:
     VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
     LootTableEditorDock *lootTableEditorDock       = nullptr;
     PredicateDock *predicateDock                   = nullptr;
+    ItemModifierDock *itemModifierDock             = nullptr;
     QLocale curLocale;
     QVector<QAction*> recentFoldersActions;
     static QVersionNumber curGameVersion;

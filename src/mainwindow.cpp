@@ -1,4 +1,4 @@
-#include "imgviewer.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include "statusbar.h"
@@ -9,16 +9,19 @@
 #include "globalhelpers.h"
 #include "tabbeddocumentinterface.h"
 #include "parsers/command/minecraftparser.h"
-#include "mainwindow.h"
+#include "imgviewer.h"
+#include "visualrecipeeditordock.h"
+#include "loottableeditordock.h"
+#include "predicatedock.h"
+#include "itemmodifierdock.h"
 
 #include <QDebug>
 #include <QFileDialog>
 #include <QJsonDocument>
-#include <QJsonObject>
 #include <QJsonArray>
 #include <QSettings>
 #include <QScreen>
-#include <QGuiApplication>
+/*#include <QGuiApplication> */
 #include <QFileInfo>
 #include <QCloseEvent>
 #include <QProcess>
@@ -96,6 +99,12 @@ void MainWindow::initDocks() {
     predicateDock = new PredicateDock(this);
     addDockWidget(Qt::RightDockWidgetArea, predicateDock);
     predicateDock->hide();
+
+    if (MainWindow::curGameVersion >= QVersionNumber(1, 17)) {
+        itemModifierDock = new ItemModifierDock(this);
+        addDockWidget(Qt::RightDockWidgetArea, itemModifierDock);
+        itemModifierDock->hide();
+    }
 }
 
 void MainWindow::initMenu() {
@@ -259,6 +268,8 @@ void MainWindow::onCurFileChanged(const QString &path) {
     lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable);
     visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
+    if (itemModifierDock)
+        itemModifierDock->setVisible(curFileType == CodeFile::ItemModifier);
     m_statusBar->onCurFileChanged();
 }
 

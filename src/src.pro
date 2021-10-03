@@ -43,6 +43,7 @@ SOURCES += \
     inventoryslot.cpp \
     inventorysloteditor.cpp \
     itemconditiondialog.cpp \
+    itemmodifierdock.cpp \
     jsonhighlighter.cpp \
     linenumberarea.cpp \
     locationconditiondialog.cpp \
@@ -126,6 +127,7 @@ HEADERS += \
     inventoryslot.h \
     inventorysloteditor.h \
     itemconditiondialog.h \
+    itemmodifierdock.h \
     jsonhighlighter.h \
     linenumberarea.h \
     locationconditiondialog.h \
@@ -194,6 +196,7 @@ FORMS += \
     disclaimerdialog.ui \
     entityconditiondialog.ui \
     itemconditiondialog.ui \
+    itemmodifierdock.ui \
     locationconditiondialog.ui \
     loottablecondition.ui \
     loottableeditordock.ui \

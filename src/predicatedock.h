@@ -2,7 +2,6 @@
 #define PREDICATEDOCK_H
 
 #include <QDockWidget>
-#include <QHBoxLayout>
 
 namespace Ui {
     class PredicateDock;

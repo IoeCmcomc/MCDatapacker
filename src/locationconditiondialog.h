@@ -6,7 +6,6 @@
 #include "loottablecondition.h"
 
 #include <QDialog>
-#include <QVariant>
 
 namespace Ui {
     class LocationConditionDialog;

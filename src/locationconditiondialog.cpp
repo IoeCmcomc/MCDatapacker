@@ -3,7 +3,9 @@
 
 #include "mainwindow.h"
 #include "globalhelpers.h"
+#include "inventoryitem.h"
 
+#include <QVariant>
 #include <QJsonObject>
 #include <QJsonArray>
 

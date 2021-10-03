@@ -19,6 +19,7 @@ struct CodeFile {
         LootTable,
         Meta,
         Predicate,
+        ItemModifier,
         Recipe,
         BlockTag, EntityTypeTag, FluidTag, FunctionTag, ItemTag,
     };

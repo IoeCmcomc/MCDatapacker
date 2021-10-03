@@ -1,24 +1,23 @@
-#include "predicatedock.h"
-#include "ui_predicatedock.h"
+#include "itemmodifierdock.h"
+#include "ui_itemmodifierdock.h"
 
 #include "mainwindow.h"
-#include "loottablecondition.h"
+#include "loottablefunction.h"
 
 #include "globalhelpers.h"
 
-#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-PredicateDock::PredicateDock(QWidget *parent) :
-    QDockWidget(parent), ui(new Ui::PredicateDock) {
+
+ItemModifierDock::ItemModifierDock(QWidget *parent) :
+    QDockWidget(parent), ui(new Ui::ItemModifierDock) {
     ui->setupUi(this);
 
-
     connect(ui->readBtn, &QPushButton::clicked,
-            this, &PredicateDock::onReadBtn);
+            this, &ItemModifierDock::onReadBtn);
     connect(ui->writeBtn, &QPushButton::clicked,
-            this, &PredicateDock::onWriteBtn);
+            this, &ItemModifierDock::onWriteBtn);
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
         adjustSize();
         if (floating) {
@@ -26,29 +25,29 @@ PredicateDock::PredicateDock(QWidget *parent) :
         }
     });
 
-    auto *cond = new LootTableCondition();
-    ui->dataInterface->setMainWidget(cond);
+    auto *func = new LootTableFunction();
+    ui->dataInterface->setMainWidget(func);
 
     ui->dataInterface->mapToSetter(
-        cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
+        func, qOverload<const QJsonObject &>(&LootTableFunction::fromJson));
 
-    ui->dataInterface->mapToGetter(&LootTableCondition::toJson, cond);
+    ui->dataInterface->mapToGetter(&LootTableFunction::toJson, func);
 
     ui->dataInterface->addAfterCurrent();
 }
 
-PredicateDock::~PredicateDock() {
+ItemModifierDock::~ItemModifierDock() {
     delete ui;
 }
 
-void PredicateDock::changeEvent(QEvent *event) {
+void ItemModifierDock::changeEvent(QEvent *event) {
     QDockWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
     }
 }
 
-void PredicateDock::onReadBtn() {
+void ItemModifierDock::onReadBtn() {
     QString &&input =
         qobject_cast<MainWindow*>(parent())->getCodeEditorText();
     QJsonDocument &&json_doc = QJsonDocument::fromJson(input.toUtf8());
@@ -68,7 +67,7 @@ void PredicateDock::onReadBtn() {
     }
 }
 
-void PredicateDock::onWriteBtn() {
+void ItemModifierDock::onWriteBtn() {
     QJsonDocument jsonDoc;
 
     if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)

@@ -11,6 +11,7 @@
 #include <QAction>
 #include <QItemSelection>
 #include <QJsonDocument>
+#include <QListView>
 
 LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     QDockWidget(parent),

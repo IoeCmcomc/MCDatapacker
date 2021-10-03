@@ -6,6 +6,7 @@
 #include "imgviewer.h"
 
 #include <QScrollBar>
+#include <QLabel>
 
 #include <cmath>
 
@@ -115,6 +116,7 @@ QString StatusBar::fileTypeToString(CodeFile::FileType type) {
         QT_TR_NOOP("Function"),        QT_TR_NOOP("JSON"),
         QT_TR_NOOP("Advancement"),     QT_TR_NOOP("Loot table"),
         QT_TR_NOOP("Information"),     QT_TR_NOOP("Predicate"),
+        QT_TR_NOOP("Item modifier"),
         QT_TR_NOOP("Recipe"),          QT_TR_NOOP("Block tag"),
         QT_TR_NOOP("Entity type tag"), QT_TR_NOOP("Fluid tag"),
         QT_TR_NOOP("Function tag"),    QT_TR_NOOP("Item tag"),
