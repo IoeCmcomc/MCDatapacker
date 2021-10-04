@@ -37,6 +37,10 @@ ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
 
     updateRemoveBtn();
     setAddingItem(false);
+/*
+      QHeaderView* headerView = ui->__qt__passive_table->horizontalHeader();
+      headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
+ */
 }
 
 QTableWidget *ExtendedTableWidget::tableWidget() const {

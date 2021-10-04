@@ -622,6 +622,8 @@ void MainWindow::updateRecentFolders() {
         action->setText(QString("&%1 | %2").arg(i + 1).arg(recentPaths.at(i)));
         action->setData(recentPaths.at(i));
         action->setVisible(true);
+        QDir dir(recentPaths.at(i));
+        action->setEnabled(dir.exists() && dir.isReadable());
     }
 
     for (int i = itEnd; i < maxRecentFoldersActions; ++i)

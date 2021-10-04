@@ -113,11 +113,11 @@
         </property>
         <item row="0" column="0">
          <widget class="TabbedDocumentInterface" name="tabbedInterface">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+          <property name="sizeIncrement">
+           <size>
+            <width>3</width>
+            <height>0</height>
+           </size>
           </property>
          </widget>
         </item>

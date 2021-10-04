@@ -27,6 +27,8 @@ public:
     void updateEditorGeometry(QWidget *editor,
                               const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index) const override;
 
     NumberProvider::Modes inputModes() const;
     void setInputModes(const NumberProvider::Modes &value);
@@ -41,6 +43,8 @@ private:
     NumberProvider::Modes m_inputModes;
     int m_minLimit = 0;
     int m_maxLimit = INT_MAX;
+
+    QString textRepr(const QJsonValue &value) const;
 };
 
 #endif /* NUMBERPROVIDERDELEGATE_H */

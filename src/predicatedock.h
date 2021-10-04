@@ -18,6 +18,7 @@ public:
 protected:
     void changeEvent(QEvent *event) override;
 
+
 protected slots:
     void onReadBtn();
     void onWriteBtn();

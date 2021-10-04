@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QComboBox>
 #include <QTimer>
+#include <QApplication>
 
 ComboboxDelegate::ComboboxDelegate(QComboBox *editor, QObject *parent)
     : QStyledItemDelegate(parent) {
@@ -71,6 +72,28 @@ void ComboboxDelegate::setModelData(QWidget *editor,
         QStyledItemDelegate::setModelData(editor, model, index);
     }
 }
+
+QSize ComboboxDelegate::sizeHint(const QStyleOptionViewItem& option,
+                                 const QModelIndex& index) const {
+    auto hint = QStyledItemDelegate::sizeHint(option, index);
+
+    const QFontMetrics   fm(option.font);
+    QStyleOptionComboBox comboOption;
+
+    comboOption.rect  = option.rect;
+    comboOption.state = option.state | QStyle::State_Enabled;
+
+    for (int i = 0; i < m_editor->count(); ++i) {
+        const auto value = m_editor->itemData(i, Qt::DisplayRole).toString();
+        hint = hint.expandedTo(
+            qApp->style()->sizeFromContents(QStyle::CT_ComboBox, &comboOption,
+                                            QSize(fm.horizontalAdvance(value),
+                                                  hint.height())));
+    }
+
+    return hint;
+}
+
 
 void ComboboxDelegate::updateEditorGeometry(QWidget *editor,
                                             const QStyleOptionViewItem &option,

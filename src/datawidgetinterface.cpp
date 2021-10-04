@@ -56,11 +56,12 @@ void DataWidgetInterface::setMainWidget(QWidget *widget) {
         child->setMouseTracking(true);
     }
 
-    widget->sizeHint().rheight() = widget->minimumHeight();
+    /*widget->sizeHint().rheight() = widget->minimumHeight(); */
     m_layout.addWidget(widget, 0);
     m_mainWidget = widget;
 
     updateStates();
+    adjustSize();
 }
 
 QWidget *DataWidgetInterface::mainWidget() const {

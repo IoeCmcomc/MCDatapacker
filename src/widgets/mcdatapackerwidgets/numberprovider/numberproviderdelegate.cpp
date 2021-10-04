@@ -25,34 +25,13 @@ void NumberProviderDelegate::paint(QPainter *painter,
                                    const QModelIndex &index) const {
     if (index.isValid()) {
         if (!index.data(ExtendedTableWidget::NumberProviderRole).isNull()) {
-            QJsonValue value = index.data(
+            const QJsonValue &&value = index.data(
                 ExtendedTableWidget::NumberProviderRole).toJsonValue();
 
             auto opt = option;
             initStyleOption(&opt, index);
 
-            if (value.isDouble()) {
-                const int exactInt = value.toInt();
-                opt.text = QString::number(exactInt);
-            } else if (value.isObject()) {
-                const auto    &&obj  = value.toObject();
-                const QString &&type = obj[QLatin1String("type")].toString();
-                if (type == QStringLiteral("minecraft:binomial")) {
-                    int    num  = obj.value(QLatin1String("n")).toInt();
-                    double prob = obj.value(QLatin1String("p")).toInt();
-                    opt.text = QString("n: %1; p: %2").arg(num).arg(prob);
-                } else {
-                    const QString &&min = (obj.contains(QLatin1String("min")))
-                              ? QString::number(
-                        obj.value(QLatin1String("min")).toInt())
-                                      : QString();
-                    const QString &&max = (obj.contains(QLatin1String("max")))
-                                  ? QString::number(
-                        obj.value(QLatin1String("max")).toInt())
-                                      : QString();
-                    opt.text = QString("%1..%2").arg(min, max);
-                }
-            }
+            opt.text = textRepr(value);
 
             const auto   *w     = option.widget;
             const QStyle *style = w ? w->style() : qApp->style();
@@ -114,6 +93,20 @@ void NumberProviderDelegate::setModelData(QWidget *editor,
     }
 }
 
+QSize NumberProviderDelegate::sizeHint(const QStyleOptionViewItem &option,
+                                       const QModelIndex &index) const {
+    auto hint = QStyledItemDelegate::sizeHint(option, index);
+
+    const QFontMetrics fm(option.font);
+    const QString    &&text =
+        textRepr(index.data(ExtendedRole::NumberProviderRole).toJsonValue());
+
+    hint = hint.expandedTo(QSize(qMax(fm.horizontalAdvance(text), 160),
+                                 hint.height()));
+
+    return hint;
+}
+
 void NumberProviderDelegate::updateEditorGeometry(QWidget *editor,
                                                   const QStyleOptionViewItem &option,
                                                   [[maybe_unused]] const QModelIndex &index)
@@ -125,6 +118,33 @@ void NumberProviderDelegate::commitAndCloseEditor() {
     auto *editor = qobject_cast<NumberProvider*>(sender());
     emit  commitData(editor);
     emit  closeEditor(editor);
+}
+
+QString NumberProviderDelegate::textRepr(const QJsonValue &value) const {
+    if (value.isDouble()) {
+        const int exactInt = value.toInt();
+        return QString::number(exactInt);
+    } else if (value.isObject()) {
+        const auto    &&obj  = value.toObject();
+        const QString &&type = obj[QLatin1String("type")].toString();
+        if (type == QLatin1String("minecraft:binomial")) {
+            int    num  = obj.value(QLatin1String("n")).toInt();
+            double prob = obj.value(QLatin1String("p")).toInt();
+            return QString("n: %1; p: %2").arg(num).arg(prob);
+        } else {
+            const QString &&min = (obj.contains(QLatin1String("min")))
+                                      ? QString::number(
+                obj.value(QLatin1String("min")).toInt())
+                                      : QString();
+            const QString &&max = (obj.contains(QLatin1String("max")))
+                                      ? QString::number(
+                obj.value(QLatin1String("max")).toInt())
+                                      : QString();
+            return QString("%1..%2").arg(min, max);
+        }
+    } else {
+        return QString();
+    }
 }
 
 void NumberProviderDelegate::setMaxLimit(int value) {

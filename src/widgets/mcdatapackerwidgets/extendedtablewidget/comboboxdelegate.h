@@ -28,7 +28,8 @@ public:
                               const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
 
-protected:
+    QSize sizeHint(const QStyleOptionViewItem &option,
+                   const QModelIndex &index) const override;
 
 private slots:
     void emitCommitData();
