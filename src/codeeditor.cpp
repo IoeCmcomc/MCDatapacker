@@ -268,6 +268,46 @@ void startOfWordExtended(QTextCursor &tc) {
     }
 }
 
+void CodeEditor::indentOnNewLine(QKeyEvent *e) {
+    auto tc = textCursor();
+
+    tc.removeSelectedText();
+    setTextCursor(tc);
+    const int linePos = tc.positionInBlock();
+
+    tc.select(QTextCursor::LineUnderCursor);
+    const QString &&lineText  = tc.selectedText();
+    int             curIndent = 0;
+    for (const auto &chr: lineText) {
+        if (chr == ' ') ++curIndent;
+        else break;
+    }
+
+    const int destIndent = qMin(curIndent, linePos);
+
+    tc = textCursor();
+    bool shouldJoinEdit = true;
+    if ((linePos - 1) > -1) {
+        const QChar &&prevChar = lineText.at(linePos - 1);
+        shouldJoinEdit = prevChar == ' ';
+    }
+
+    if (shouldJoinEdit) {
+        tc.joinPreviousEditBlock();
+        if ((linePos - 1) <= curIndent) {
+            /* Avoid inserting redundant spaces */
+            tc.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+            tc.removeSelectedText();
+        }
+    } else {
+        tc.beginEditBlock();
+    }
+    tc.insertText('\n' + QString(' ').repeated(destIndent));
+    tc.endEditBlock();
+    setTextCursor(tc);
+    e->accept();
+}
+
 void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
     if (settings.value(QStringLiteral("editor/insertTabAsSpaces"), true)
         .toBool()) {
@@ -297,12 +337,17 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
         }
     } else {
  base:
-        if ((e->key() == Qt::Key_Insert) &&
-            (e->modifiers() == Qt::NoModifier)) {
-            setOverwriteMode(!overwriteMode());
-            emit updateStatusBarRequest(this);
+        if (e->key() == Qt::Key_Return) {
+            indentOnNewLine(e);
+        } else {
+            if ((e->key() == Qt::Key_Insert) &&
+                (e->modifiers() == Qt::NoModifier)) {
+                setOverwriteMode(!overwriteMode());
+                emit updateStatusBarRequest(this);
+            }
+
+            QPlainTextEdit::keyPressEvent(e);
         }
-        QPlainTextEdit::keyPressEvent(e);
     }
 }
 
@@ -325,7 +370,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
 
     const bool isShortcut =
         (e->modifiers().testFlag(Qt::ControlModifier) &&
-         e->key() == Qt::Key_Space);                                                                     /* CTRL+Space */
+         e->key() == Qt::Key_Space);  /* CTRL+Space */
     /* Do not process the shortcut when we have a completer */
     if (!m_completer || !isShortcut)
         handleKeyPressEvent(e);
@@ -371,8 +416,8 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     QRect     cr = cursorRect();
     const int prefixOffset
         = fontMetrics().horizontalAdvance(completionPrefix,
-                                          completionPrefix.size() - 1);
-    cr.translate(-prefixOffset + cr.width(), 2);
+                                          completionPrefix.size());
+    cr.translate(-prefixOffset + cr.width() + viewportMargins().left(), 2);
     cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
                 + m_completer->popup()->verticalScrollBar()->sizeHint().width());
 

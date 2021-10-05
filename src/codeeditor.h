@@ -26,6 +26,7 @@ struct TextFileData {
     TextFileData(const TextFileData &) = default;
     ~TextFileData()                    = default;
 };
+
 Q_DECLARE_METATYPE(TextFileData)
 
 class CodeEditor : public QPlainTextEdit
@@ -110,6 +111,7 @@ private:
 
     QString textUnderCursor() const;
     void handleKeyPressEvent(QKeyEvent *e);
+    void indentOnNewLine(QKeyEvent *e);
 };
 
 
