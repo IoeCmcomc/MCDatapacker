@@ -57,8 +57,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tabbedInterface,
             &TabbedDocumentInterface::curModificationChanged,
             this, &MainWindow::updateWindowTitle);
-    connect(ui->datapackTreeView, &DatapackTreeView::datapackChanged,
-            this, &MainWindow::onDatapackChanged);
     connect(ui->tabbedInterface, &TabbedDocumentInterface::curFileChanged,
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
@@ -228,6 +226,17 @@ void MainWindow::disclaimer() {
 void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
     qDebug() << "onSystemWatcherFileChanged" << filepath;
     if ((filepath != ui->tabbedInterface->getCurFilePath())) return;
+
+    const QString &&packMcmetaPath = QDir::currentPath() + QStringLiteral(
+        "/pack.mcmeta");
+    if (filepath == packMcmetaPath) {
+        QString      errMsg;
+        const auto &&metaInfo = readPackMcmeta(packMcmetaPath, errMsg);
+        if (metaInfo.packFormat > 0) {
+            m_packInfo = metaInfo;
+            m_statusBar->onCurDirChanged(); /* Update pack format */
+        }
+    }
 
     auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
                                                  0);
@@ -454,9 +463,11 @@ void MainWindow::loadFolder(const QString &dirPath,
         this->fileWatcher.removePath(curDir.path());
         this->fileWatcher.addPath(curDir.path());
     }
-    ui->tabbedInterface->clear();
-    m_packInfo = std::move(packInfo);
     emit curDirChanged(dirPath);
+    ui->tabbedInterface->clear();
+    updateWindowTitle(false);
+    m_packInfo = packInfo;
+    m_statusBar->onCurDirChanged();
     adjustForCurFolder(dirPath);
 
 #ifndef QT_NO_CURSOR
@@ -682,6 +693,7 @@ void MainWindow::commitData(QSessionManager &) {
 }
 
 PackMetaInfo MainWindow::getPackInfo() const {
+    qDebug() << m_packInfo.packFormat;
     return m_packInfo;
 }
 

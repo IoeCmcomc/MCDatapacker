@@ -9,7 +9,6 @@
 #include "../nodes/floatnode.h"
 #include "../nodes/integernode.h"
 #include "../nodes/stringnode.h"
-#include "../nodes/rootnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
 #include "../nodes/entitynode.h"
@@ -51,7 +50,6 @@ public:
         virtual void visit(ArgumentNode *) {
         }
         virtual void visit(BoolNode *node) {
-            /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
             fmt.setFontWeight(QFont::DemiBold);
@@ -64,7 +62,6 @@ public:
             m_formatRanges << std::move(range);
         }
         virtual void visit(DoubleNode *node) {
-            /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
             fmt.setForeground(QColor("#2F97C1"));
@@ -75,7 +72,6 @@ public:
             m_formatRanges << std::move(range);
         }
         virtual void visit(FloatNode *node) {
-            /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
             fmt.setForeground(QColor("#2F97B1"));
@@ -86,7 +82,6 @@ public:
             m_formatRanges << std::move(range);
         }
         virtual void visit(IntegerNode *node) {
-            /*auto                     fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
             fmt.setForeground(QColor("#2F97A1"));
@@ -97,8 +92,6 @@ public:
             m_formatRanges << std::move(range);
         }
         virtual void visit(StringNode *node) {
-            /*auto fmt = defaultFormat(node); */
-
             if (node->length() - node->value().length() != 2) {
                 QTextCharFormat fmt;
                 fmt.setForeground(QColor("#a33016"));
@@ -109,7 +102,6 @@ public:
             }
         }
         virtual void visit(LiteralNode *node) {
-            /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
             fmt.setForeground(Qt::blue);
@@ -121,7 +113,6 @@ public:
             m_formatRanges << std::move(range);
         }
         virtual void visit(AngleNode *node) {
-            /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
 
             fmt.setForeground(QColor("#AB81CD"));
@@ -131,13 +122,20 @@ public:
 
             m_formatRanges << std::move(range);
         }
-        virtual void visit([[maybe_unused]] AxesNode *node) {
+        virtual void visit(AxesNode *node) {
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#7404cf"));
+
+            QTextLayout::FormatRange range{ node->pos(), node->length(),
+                                            std::move(fmt) };
+
+            m_formatRanges << std::move(range);
         }
         virtual void visit(BlockStateNode *node) {
             const int length = node->length();
 
             node->setLength(node->format().length());
-            /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
             fmt.setForeground(QColor("#7d7b55"));
 
