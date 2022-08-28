@@ -537,7 +537,7 @@ Press ESC to cancel</source>
         <location line="+17"/>
         <source>%1: ftok failed</source>
         <comment>QSystemSemaphore</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1: ftok thất bại</translation>
     </message>
 </context>
 <context>
@@ -1736,7 +1736,7 @@ Do you want to delete it anyway?</source>
         <location line="-1173"/>
         <location line="+1165"/>
         <source>Black</source>
-        <translation type="unfinished"></translation>
+        <translation>Đen</translation>
     </message>
     <message>
         <location line="-1163"/>
@@ -1784,7 +1784,7 @@ Do you want to delete it anyway?</source>
         <location line="-1070"/>
         <location line="+1072"/>
         <source>Oblique</source>
-        <translation type="unfinished"></translation>
+        <translation>Xiên</translation>
     </message>
     <message>
         <location line="+746"/>

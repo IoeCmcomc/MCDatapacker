@@ -4,11 +4,18 @@
 <context>
     <name>StatusBar</name>
     <message numerus="yes">
-        <location filename="statusbar.cpp" line="81"/>
         <source>%n problem(s)</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>%n problem</numerusform>
             <numerusform>%n problems</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/statusbar.cpp" line="82"/>
+        <source>%Ln problem(s)</source>
+        <translation>
+            <numerusform>%Ln problem</numerusform>
+            <numerusform>%Ln problems</numerusform>
         </translation>
     </message>
 </context>
