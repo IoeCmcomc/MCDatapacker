@@ -75,7 +75,7 @@ namespace Command {
 public:
         enum class Order { Preorder, Postorder, };
 
-        NodeVisitor();
+        NodeVisitor() = default;
 
         virtual void startVisiting(ParseNode *node)       = 0;
         virtual void visit(ParseNode *node)               = 0;

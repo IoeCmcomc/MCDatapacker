@@ -182,8 +182,18 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionStatistics"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuTools"/>
    <addaction name="menuPreferences"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -352,6 +362,11 @@
    </property>
    <property name="shortcut">
     <string>Shift+Esc</string>
+   </property>
+  </action>
+  <action name="actionStatistics">
+   <property name="text">
+    <string>&amp;Statistics</string>
    </property>
   </action>
  </widget>

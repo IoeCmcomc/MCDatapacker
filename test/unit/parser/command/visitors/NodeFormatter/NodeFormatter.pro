@@ -39,8 +39,7 @@ SOURCES +=  tst_textnodeformatter.cpp \
     ../../../../../../src/parsers/command/nodes/uuidnode.cpp \
     ../../../../../../src/parsers/command/parsenodecache.cpp \
     ../../../../../../src/parsers/command/parser.cpp \
-    ../../../../../../src/parsers/command/visitors/nodeformatter.cpp \
-    ../../../../../../src/parsers/command/visitors/nodevisitor.cpp
+    ../../../../../../src/parsers/command/visitors/nodeformatter.cpp
 
 HEADERS += \
     ../../../../../../src/parsers/command/minecraftparser.h \

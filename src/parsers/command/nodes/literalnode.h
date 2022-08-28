@@ -15,8 +15,12 @@ public:
 
         void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
+        bool isCommand() const;
+        void setIsCommand(bool isCommand);
+
 private:
         QString m_text;
+        bool m_isCommand = false;
     };
 }
 

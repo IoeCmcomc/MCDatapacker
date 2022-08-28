@@ -139,7 +139,7 @@ QString Command::NbtCompoundNode::toString() const {
         itemReprs << QString("%1: %2").arg(i.key().text,
                                            i.value()->toString());
     }
-    return "MapNode(" + itemReprs.join(", ") + ')';
+    return "NbtCompoundNode(" + itemReprs.join(", ") + ')';
 }
 
 void Command::NbtCompoundNode::accept(Command::NodeVisitor *visitor,

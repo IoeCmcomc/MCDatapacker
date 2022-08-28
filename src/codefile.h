@@ -7,7 +7,7 @@
 #include <QDebug>
 
 struct CodeFile {
-    enum FileType : char {
+    enum FileType : int8_t {
         Unknown = -1,
         Binary,
         Structure,

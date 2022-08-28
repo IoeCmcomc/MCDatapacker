@@ -14,6 +14,7 @@
 #include "loottableeditordock.h"
 #include "predicatedock.h"
 #include "itemmodifierdock.h"
+#include "statisticsdialog.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -139,6 +140,9 @@ void MainWindow::initMenu() {
             ui->tabbedInterface, &TabbedDocumentInterface::copy);
     connect(ui->actionPaste, &QAction::triggered,
             ui->tabbedInterface, &TabbedDocumentInterface::paste);
+    /* Tools menu */
+    connect(ui->actionStatistics, &QAction::triggered,
+            this, &MainWindow::statistics);
     /* Preferences menu */
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
@@ -203,6 +207,19 @@ bool MainWindow::save() {
 
 void MainWindow::saveAll() {
     ui->tabbedInterface->saveAllFile();
+}
+
+void MainWindow::restart() {
+    static const int restartExitCode = 2020;
+
+    qApp->exit(restartExitCode);
+
+    QProcess process;
+    process.startDetached(qApp->arguments()[0], qApp->arguments());
+}
+
+void MainWindow::statistics() {
+    auto *dialog = new StatisticsDialog(this);
 }
 
 void MainWindow::pref_settings() {
@@ -322,15 +339,6 @@ void MainWindow::readSettings() {
     settings.endGroup();
 
     readPrefSettings(settings);
-}
-
-void MainWindow::restart() {
-    static const int restartExitCode = 2020;
-
-    qApp->exit(restartExitCode);
-
-    QProcess process;
-    process.startDetached(qApp->arguments()[0], qApp->arguments());
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
@@ -469,6 +477,8 @@ void MainWindow::loadFolder(const QString &dirPath,
     m_packInfo = packInfo;
     m_statusBar->onCurDirChanged();
     adjustForCurFolder(dirPath);
+
+    ui->menuTools->setEnabled(true);
 
 #ifndef QT_NO_CURSOR
     QGuiApplication::restoreOverrideCursor();
@@ -693,7 +703,6 @@ void MainWindow::commitData(QSessionManager &) {
 }
 
 PackMetaInfo MainWindow::getPackInfo() const {
-    qDebug() << m_packInfo.packFormat;
     return m_packInfo;
 }
 

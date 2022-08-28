@@ -17,6 +17,8 @@ namespace Glhp {
     CodeFile::FileType pathToFileType(const QString &dirpath,
                                       const QString &filepath);
     QIcon fileTypeToIcon(const CodeFile::FileType type);
+    QString fileTypeToName(const CodeFile::FileType type);
+
 
     QString toNamespacedID(const QString &dirpath, QString filepath,
                            bool noTagForm = false);

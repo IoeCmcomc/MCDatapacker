@@ -112,11 +112,17 @@ QString Command::Parser::text() const {
     return m_text;
 }
 
+void rtrim(QString &str) {
+    while (str.size() > 0 && str.at(str.size() - 1).isSpace())
+        str.chop(1);
+}
+
 /*!
  * \brief Sets the text which is parsed and resets the current position.
  */
 void Command::Parser::setText(const QString &text) {
     m_text = text;
+    rtrim(m_text);
     setPos(0);
 }
 
@@ -157,7 +163,7 @@ void Command::Parser::error(const QString &msg, const QVariantList &args) {
 
 void Command::Parser::error(const QString &msg, const QVariantList &args,
                             int pos, int length) {
-    qWarning() << "Command::Parser::error" << msg << pos << length;
+    /*qWarning() << "Command::Parser::error" << msg << pos << length; */
 /*
       QString errorIndicatorText = QString("\"%1«%2»%3\" (%4 chars)").arg(
           m_text.mid(pos - 10, 10),
@@ -646,12 +652,12 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
     if (processCurSchemaNode(depth, curSchemaNode))
         return true;
 
-    bool isRoot = curSchemaNode[QLatin1String("type")] ==
-                  QStringLiteral("root");
+    const bool isRoot = curSchemaNode[QLatin1String("type")] ==
+                        QStringLiteral("root");
 
-    int       startPos = m_pos;
-    bool      success  = false;
-    QString &&literal  = peekLiteral();
+    int             startPos = m_pos;
+    bool            success  = false;
+    const QString &&literal  = peekLiteral();
     /*qDebug() << "literal:" << literal; */
     bool         found    = false;
     const auto &&children = curSchemaNode[QLatin1String("children")].toObject();
@@ -659,8 +665,11 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
         curSchemaNode = it.value().toObject();
         if (curSchemaNode[QLatin1String("type")] == QStringLiteral("literal")) {
             if (literal == it.key()) {
-                found   = true;
-                ret     = brigadier_literal();
+                found = true;
+                const auto &&command = brigadier_literal();
+                if (isRoot)
+                    command->setIsCommand(true);
+                ret     = command;
                 success = parseResursively(curSchemaNode, depth + 1);
                 m_parsingResult->prepend(ret);
                 break;
@@ -750,7 +759,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                                                                parserId);
                     }
                 } catch (const Command::Parser::Error &err) {
-                    qWarning() << "Argument error:" << err.toLocalizedMessage();
+                    /*qWarning() << "Argument error:" << err.toLocalizedMessage(); */
                     errors << err;
                     int argLength = m_pos - startPos + 1;
                     setPos(startPos);

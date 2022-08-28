@@ -23,3 +23,11 @@ void Command::LiteralNode::accept(Command::NodeVisitor *visitor,
                                   Command::NodeVisitor::Order) {
     visitor->visit(this);
 }
+
+bool Command::LiteralNode::isCommand() const {
+    return m_isCommand;
+}
+
+void Command::LiteralNode::setIsCommand(bool isCommand) {
+    m_isCommand = isCommand;
+}

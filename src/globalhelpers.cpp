@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "vieweventfilter.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
@@ -256,3 +257,31 @@ const QMap<QString, QString> Glhp::colorHexes = {
     { "yellow",       "#ffff55" },
     { "white",        "#ffffff" }
 };
+
+
+QString Glhp::fileTypeToName(const CodeFile::FileType type) {
+    static QHash<CodeFile::FileType, const char*> const valueMap = {
+        { CodeFile::Binary,        QT_TR_NOOP("Binary")          },
+        { CodeFile::Structure,     QT_TR_NOOP("Structure")       },
+        { CodeFile::Image,         QT_TR_NOOP("Image")           },
+        { CodeFile::Text,          QT_TR_NOOP("Other")           },
+        { CodeFile::Function,      QT_TR_NOOP("Function")        },
+        { CodeFile::JsonText,      QT_TR_NOOP("JSON")            },
+        { CodeFile::Advancement,   QT_TR_NOOP("Advancement")     },
+        { CodeFile::LootTable,     QT_TR_NOOP("Loot table")      },
+        { CodeFile::Meta,          QT_TR_NOOP("Information")     },
+        { CodeFile::Predicate,     QT_TR_NOOP("Predicate")       },
+        { CodeFile::ItemModifier,  QT_TR_NOOP("Item modifier")   },
+        { CodeFile::Recipe,        QT_TR_NOOP("Recipe")          },
+        { CodeFile::BlockTag,      QT_TR_NOOP("Block tag")       },
+        { CodeFile::EntityTypeTag, QT_TR_NOOP("Entity type tag") },
+        { CodeFile::FluidTag,      QT_TR_NOOP("Fluid tag")       },
+        { CodeFile::FunctionTag,   QT_TR_NOOP("Function tag")    },
+        { CodeFile::ItemTag,       QT_TR_NOOP("Item tag")        },
+    };
+
+    if (type < 0)
+        return QString();
+
+    return QApplication::translate("Glhp", valueMap[type]);
+}

@@ -90,13 +90,15 @@ SOURCES += \
     parsers/command/nodes/uuidnode.cpp \
     parsers/command/parsenodecache.cpp \
     parsers/command/parser.cpp \
+    parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
-    parsers/command/visitors/nodevisitor.cpp \
+    parsers/command/visitors/overloadnodevisitor.cpp \
     predicatedock.cpp \
     problemarea.cpp \
     rawjsontextedit.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
+    statisticsdialog.cpp \
     statusbar.cpp \
     stripedscrollbar.cpp \
     tabbeddocumentinterface.cpp \
@@ -174,13 +176,15 @@ HEADERS += \
     parsers/command/parsenodecache.h \
     parsers/command/parser.h \
     parsers/command/minecraftparser.h \
+    parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
-    parsers/command/visitors/nodevisitor.h \
+    parsers/command/visitors/overloadnodevisitor.h \
     predicatedock.h \
     problemarea.h \
     rawjsontextedit.h \
     settingsdialog.h \
     stackedwidget.h \
+    statisticsdialog.h \
     statusbar.h \
     stripedscrollbar.h \
     tabbeddocumentinterface.h \
@@ -209,6 +213,7 @@ FORMS += \
     predicatedock.ui \
     rawjsontextedit.ui \
     settingsdialog.ui \
+    statisticsdialog.ui \
     tabbeddocumentinterface.ui \
     tagselectordialog.ui \
     visualrecipeeditordock.ui

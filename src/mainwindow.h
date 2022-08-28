@@ -68,6 +68,8 @@ private slots:
     void saveAll();
     void restart();
     /* Edit menu */
+    /* Tools menu */
+    void statistics();
     /* Preferences menu */
     void pref_settings();
     /* Help menu */

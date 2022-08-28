@@ -57,8 +57,8 @@ void StatusBar::onCurFileChanged() {
         m_tabsLabel->setText(tr("Tab %1 / %2")
                              .arg(m_tabbedInterface->getCurIndex() + 1)
                              .arg(m_tabbedInterface->count()));
-        m_fileLabel->setText(fileTypeToString(m_tabbedInterface->getCurFile()->
-                                              fileType));
+        m_fileLabel->setText(Glhp::fileTypeToName(
+                                 m_tabbedInterface->getCurFile()->fileType));
         for (auto *label: m_editorLabels)
             label->clear();
         updateCodeEditorStatus(m_tabbedInterface->getCodeEditor());
@@ -79,7 +79,7 @@ void StatusBar::updateCodeEditorStatus(CodeEditor *editor) {
         const int row  = editor->textCursor().positionInBlock();
 
         m_editorLabels[0]->setText(tr("Line %1, row %2").arg(line).arg(row));
-        m_editorLabels[1]->setText(tr("%n problem(s)", nullptr,
+        m_editorLabels[1]->setText(tr("%Ln problem(s)", nullptr,
                                       editor->problemCount()));
         m_editorLabels[2]->setText((editor->overwriteMode()) ? "OVR" : "INS");
     }
@@ -107,23 +107,4 @@ void StatusBar::changeEvent(QEvent *e) {
         onCurDirChanged();
         onCurFileChanged();
     }
-}
-
-QString StatusBar::fileTypeToString(CodeFile::FileType type) {
-    static const char* const valueMap[] = {
-        QT_TR_NOOP("Binary"),          QT_TR_NOOP("Structure"),
-        QT_TR_NOOP("Image"),           QT_TR_NOOP("Text"),
-        QT_TR_NOOP("Function"),        QT_TR_NOOP("JSON"),
-        QT_TR_NOOP("Advancement"),     QT_TR_NOOP("Loot table"),
-        QT_TR_NOOP("Information"),     QT_TR_NOOP("Predicate"),
-        QT_TR_NOOP("Item modifier"),
-        QT_TR_NOOP("Recipe"),          QT_TR_NOOP("Block tag"),
-        QT_TR_NOOP("Entity type tag"), QT_TR_NOOP("Fluid tag"),
-        QT_TR_NOOP("Function tag"),    QT_TR_NOOP("Item tag"),
-    };
-
-    if (type < 0)
-        return QString();
-
-    return tr(valueMap[type]);
 }

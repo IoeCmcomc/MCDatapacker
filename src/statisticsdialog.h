@@ -1,0 +1,48 @@
+#ifndef STATISTICSDIALOG_H
+#define STATISTICSDIALOG_H
+
+#include <QDialog>
+
+#include "parsers/command/visitors/nodecounter.h"
+
+
+namespace Ui {
+    class StatisticsDialog;
+}
+
+namespace Command {
+    class MinecraftParser;
+};
+
+class MainWindow;
+
+class StatisticsDialog : public QDialog
+{
+    Q_OBJECT
+
+    struct SyntaxErrorInfo {
+        QString path;
+        QString msg;
+        int     line = -1;
+    };
+
+public:
+    explicit StatisticsDialog(MainWindow *parent = nullptr);
+    ~StatisticsDialog();
+
+private:
+    QVector<SyntaxErrorInfo> m_syntaxErrorsInfo;
+    QString m_dirPath;
+    Ui::StatisticsDialog *ui;
+    MainWindow *m_mainWin              = nullptr;
+    Command::MinecraftParser *m_parser = nullptr;
+    Command::NodeCounter m_nodeCounter;
+    uint m_commandLines = 0;
+    uint m_commentLines = 0;
+    uint m_syntaxErrors = 0;
+
+    void collectAndSetupData();
+    void collectFunctionData(const QString &path);
+};
+
+#endif /* STATISTICSDIALOG_H */
