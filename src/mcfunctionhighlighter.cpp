@@ -49,6 +49,7 @@ void McfunctionHighlighter::setupRules() {
         QStringLiteral("\\bgamerule\\b"),
         QStringLiteral("\\bgive\\b"),
         QStringLiteral("\\bhelp\\b"),
+        QStringLiteral("\\bitem\\b"),
         QStringLiteral("\\bkick\\b"),
         QStringLiteral("\\bkill\\b"),
         QStringLiteral("\\blist\\b"),
@@ -59,7 +60,8 @@ void McfunctionHighlighter::setupRules() {
         QStringLiteral("\\bop\\b"),
         QStringLiteral("\\bpardon\\b"),
         QStringLiteral("\\bparticle\\b"),
-        QStringLiteral("\\blpaysound\\b"),
+        QStringLiteral("\\bperf\\b"),
+        QStringLiteral("\\bplaysound\\b"),
         QStringLiteral("\\bpublish\\b"),
         QStringLiteral("\\brecipe\\b"),
         QStringLiteral("\\breload\\b"),
@@ -127,7 +129,7 @@ void McfunctionHighlighter::setupRules() {
     quoteHighlightRules.insert('\'', quoteFmt);
 
     commentFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegularExpression(QStringLiteral("^#.*"));
+    rule.pattern = QRegularExpression(QStringLiteral(R"(^\s*#.*)"));
     rule.format  = commentFormat;
     highlightingRules.append(rule);
 }

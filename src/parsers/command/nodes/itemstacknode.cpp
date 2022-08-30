@@ -55,7 +55,7 @@ Command::ItemPredicateNode::ItemPredicateNode(Command::ItemStackNode *other)
 }
 
 QString Command::ItemPredicateNode::toString() const {
-    return ItemStackNode::toString().replace(0, 12, "ItemPredicateNode");
+    return ItemStackNode::toString().replace(0, 13, "ItemPredicateNode");
 }
 
 void Command::ItemPredicateNode::accept(Command::NodeVisitor *visitor,

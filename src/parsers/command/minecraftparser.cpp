@@ -408,11 +408,13 @@ parseEntityArguments() {
         '[', ']', '=', [this](
             const QString &key) -> QSharedPointer<ParseNode> {
         static const QStringList doubleValKeys { "x", "y", "z", "dx", "dy", "dz" };
-        static const QStringList rangeValKeys { "distance", "x_rotation", "y_rotation", "level" };
+        static const QStringList rangeValKeys { "distance", "x_rotation", "y_rotation" };
         if (doubleValKeys.contains(key)) {
             return brigadier_double();
         } else if (rangeValKeys.contains(key)) {
             return minecraft_floatRange();
+        } else if (key == QLatin1String("level")) {
+            return minecraft_intRange();
         } else if (key == QLatin1String("limit")) {
             return brigadier_integer();
         } else if (key == QLatin1String("predicate")) {
@@ -584,7 +586,7 @@ parseNbtPathStep() {
     default: {
         ret->setName(QSharedPointer<Command::StringNode>::create(ret->pos(),
                                                                  getWithCharset(
-                                                                     "a-zA-Z0-9_")));
+                                                                     "a-zA-Z0-9-_")));
         /*qDebug() << "After key" << ret->name()->value(); */
         if (ret->name()->value().isEmpty())
             error(QT_TRANSLATE_NOOP("Command::Parser::Error",
@@ -733,10 +735,7 @@ QSharedPointer<Command::EntityNode> Command::MinecraftParser::minecraft_entity(
         } else {
             setPos(curPos);
             QString literal;
-            literal = getWithCharset((props.contains(
-                                          QStringLiteral("charset"))) ? props[
-                                         QStringLiteral(
-                                             "charset")].toString() : "0-9a-zA-Z_");
+            literal = getWithCharset("0-9a-zA-Z-_#$%.§");
             if (literal.isEmpty()) {
                 this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                               "Invaild empty player name"));
@@ -1063,9 +1062,7 @@ minecraft_scoreHolder(const QVariantMap &props) {
         ret->setAll(true);
         advance();
     } else {
-        QVariantMap newProps(props);
-        newProps.insert(QStringLiteral("charset"), "0-9a-zA-Z-_#$.");
-        auto entity = minecraft_entity(newProps);
+        auto entity = minecraft_entity(props);
         ret = QSharedPointer<Command::ScoreHolderNode>::create(entity.get());
     }
     return ret;
@@ -1080,6 +1077,10 @@ minecraft_scoreboardSlot() {
     if (slot == QLatin1String("sidebar.team")) {
         this->eat('.');
         auto color = minecraft_color();
+        if (color->value() == "reset") {
+            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
+                                    "Invaild scoreboard slot"));
+        }
         slot += '.' + color->value();
     }
     return QSharedPointer<Command::ScoreboardSlotNode>::create(curPos, slot);

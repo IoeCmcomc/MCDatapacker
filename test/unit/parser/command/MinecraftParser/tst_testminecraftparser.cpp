@@ -122,15 +122,15 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) << "clear Alice" <<
         "RootNode[2](LiteralNode(clear), EntityNode[single](StringNode(\"Alice\")))";
     QTest::newRow(GEN_TAG) << "clear Alice minecraft:wool" <<
-        "RootNode[3](LiteralNode(clear), EntityNode[single](StringNode(\"Alice\")), ItemPredicateNodee(minecraft:wool))";
+        "RootNode[3](LiteralNode(clear), EntityNode[single](StringNode(\"Alice\")), ItemPredicateNode(minecraft:wool))";
     QTest::newRow(GEN_TAG) << "clear @a minecraft:orange_wool" <<
-        "RootNode[3](LiteralNode(clear), EntityNode[player](TargetSelectorNode(@a)), ItemPredicateNodee(minecraft:orange_wool))";
+        "RootNode[3](LiteralNode(clear), EntityNode[player](TargetSelectorNode(@a)), ItemPredicateNode(minecraft:orange_wool))";
     QTest::newRow(GEN_TAG) << "clear @r minecraft:stone 0" <<
-        "RootNode[4](LiteralNode(clear), EntityNode[single, player](TargetSelectorNode(@r)), ItemPredicateNodee(minecraft:stone), IntegerNode(0))";
+        "RootNode[4](LiteralNode(clear), EntityNode[single, player](TargetSelectorNode(@r)), ItemPredicateNode(minecraft:stone), IntegerNode(0))";
     QTest::newRow(GEN_TAG) <<
         R"(clear @p minecraft:golden_sword{Enchantments:[{id:"minecraft:sharpness",lvl:1s}]})"
                            <<
-        "RootNode[3](LiteralNode(clear), EntityNode[single, player](TargetSelectorNode(@p)), ItemPredicateNodee(minecraft:golden_sword))";
+        "RootNode[3](LiteralNode(clear), EntityNode[single, player](TargetSelectorNode(@p)), ItemPredicateNode(minecraft:golden_sword))";
 
     SET_TAG(data)
     QTest::newRow(GEN_TAG) <<
@@ -141,7 +141,7 @@ void TestMinecraftParser::commands_data() {
         "RootNode[5](LiteralNode(data), LiteralNode(get), LiteralNode(entity), EntityNode[single, player](TargetSelectorNode(@p)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"A\")), NbtPathStepNode<Index>([IntegerNode(-1)].), NbtPathStepNode<Key>(StringNode(\"B\"))))";
     QTest::newRow(GEN_TAG) <<
         "data modify storage test {} set value {Air: 299s, ok: true}" <<
-        "RootNode[8](LiteralNode(data), LiteralNode(modify), LiteralNode(storage), ResourceLocationNode(test), NbtPathNode(NbtPathStepNode<Root>({MapNode()})), LiteralNode(set), LiteralNode(value), MapNode(Air: NbtShortNode(299s), ok: NbtByteNode(1b)))";
+        "RootNode[8](LiteralNode(data), LiteralNode(modify), LiteralNode(storage), ResourceLocationNode(test), NbtPathNode(NbtPathStepNode<Root>({NbtCompoundNode()})), LiteralNode(set), LiteralNode(value), NbtCompoundNode(Air: NbtShortNode(299s), ok: NbtByteNode(1b)))";
     QTest::newRow(GEN_TAG) << "data get entity @s foodSaturationLevel" <<
         "RootNode[5](LiteralNode(data), LiteralNode(get), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"foodSaturationLevel\"))))";
     QTest::newRow(GEN_TAG) <<
@@ -152,11 +152,11 @@ void TestMinecraftParser::commands_data() {
         "data get entity @e[type=item,limit=1,sort=random] Pos[1]" <<
         "RootNode[5](LiteralNode(data), LiteralNode(get), LiteralNode(entity), EntityNode[](TargetSelectorNode(@e){MultiMapNode(limit: (IntegerNode(1)); sort: (StringNode(\"random\")); type: (ResourceLocationNode(item)))}), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Pos\")), NbtPathStepNode<Index>([IntegerNode(1)])))";
     QTest::newRow(GEN_TAG) << "data get entity @p Inventory[{Slot:0b}].id" <<
-        "RootNode[5](LiteralNode(data), LiteralNode(get), LiteralNode(entity), EntityNode[single, player](TargetSelectorNode(@p)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Inventory\")), NbtPathStepNode<Index>([{MapNode(Slot: NbtByteNode(0b))}].), NbtPathStepNode<Key>(StringNode(\"id\"))))";
+        "RootNode[5](LiteralNode(data), LiteralNode(get), LiteralNode(entity), EntityNode[single, player](TargetSelectorNode(@p)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Inventory\")), NbtPathStepNode<Index>([{NbtCompoundNode(Slot: NbtByteNode(0b))}].), NbtPathStepNode<Key>(StringNode(\"id\"))))";
     QTest::newRow(GEN_TAG) <<
         R"(data modify entity @e[x=0,y=64,z=0,type=dolphin,limit=1] Attributes[{Name:"generic.armor"}].Base set value 20)"
                            <<
-        "RootNode[8](LiteralNode(data), LiteralNode(modify), LiteralNode(entity), EntityNode[](TargetSelectorNode(@e){MultiMapNode(limit: (IntegerNode(1)); type: (ResourceLocationNode(dolphin)); x: (DoubleNode(0)); y: (DoubleNode(64)); z: (DoubleNode(0)))}), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Attributes\")), NbtPathStepNode<Index>([{MapNode(Name: NbtStringNode(generic.armor))}].), NbtPathStepNode<Key>(StringNode(\"Base\"))), LiteralNode(set), LiteralNode(value), NbtIntNode(20))";
+        "RootNode[8](LiteralNode(data), LiteralNode(modify), LiteralNode(entity), EntityNode[](TargetSelectorNode(@e){MultiMapNode(limit: (IntegerNode(1)); type: (ResourceLocationNode(dolphin)); x: (DoubleNode(0)); y: (DoubleNode(64)); z: (DoubleNode(0)))}), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Attributes\")), NbtPathStepNode<Index>([{NbtCompoundNode(Name: NbtStringNode(generic.armor))}].), NbtPathStepNode<Key>(StringNode(\"Base\"))), LiteralNode(set), LiteralNode(value), NbtIntNode(20))";
     QTest::newRow(GEN_TAG) <<
         R"(data modify block 1 64 1 Items[0].id set value "minecraft:diamond_block")"
                            <<
@@ -164,7 +164,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "data merge entity @e[type=zombie,limit=1,sort=nearest] {HandDropChances: [0f, 0.8f]}"
                            <<
-        "RootNode[5](LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[](TargetSelectorNode(@e){MultiMapNode(limit: (IntegerNode(1)); sort: (StringNode(\"nearest\")); type: (ResourceLocationNode(zombie)))}), MapNode(HandDropChances: NbtListNode(NbtFloatNode(0f), NbtFloatNode(0.8f))))";
+        "RootNode[5](LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[](TargetSelectorNode(@e){MultiMapNode(limit: (IntegerNode(1)); sort: (StringNode(\"nearest\")); type: (ResourceLocationNode(zombie)))}), NbtCompoundNode(HandDropChances: NbtListNode(NbtFloatNode(0f), NbtFloatNode(0.8f))))";
 
     SET_TAG(difficulty)
     QTest::newRow(GEN_TAG) << "difficulty hard" <<
@@ -191,7 +191,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "execute as @a[x_rotation=-90..-1,scores={uncraftfly=1..},gamemode=!creative] at @s if block ~ ~-1 ~ air run effect give @s minecraft:levitation 1 1 true"
                            <<
-        "RootNode[17](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a){MultiMapNode(gamemode: (!StringNode(\"creative\")); scores: (MapNode(uncraftfly: IntRangeNode(1..0))); x_rotation: (FloatRangeNode(-90..-1)))}), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~-1), z: AxisNode(~0)), BlockPredicateNodee(minecraft:air), LiteralNode(run), LiteralNode(effect), LiteralNode(give), EntityNode[single](TargetSelectorNode(@s)), MobEffectNode(minecraft:levitation), IntegerNode(1), IntegerNode(1), BoolNode(true))";
+        "RootNode[17](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a){MultiMapNode(gamemode: (!StringNode(\"creative\")); scores: (MapNode(uncraftfly: IntRangeNode(1..0))); x_rotation: (FloatRangeNode(-90..-1)))}), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~-1), z: AxisNode(~0)), BlockPredicateNode(minecraft:air), LiteralNode(run), LiteralNode(effect), LiteralNode(give), EntityNode[single](TargetSelectorNode(@s)), MobEffectNode(minecraft:levitation), IntegerNode(1), IntegerNode(1), BoolNode(true))";
     QTest::newRow(GEN_TAG) <<
         "execute as @s run tp @s 12 45 78" <<
         "RootNode[7](LiteralNode(execute), LiteralNode(as), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(run), LiteralNode(tp), EntityNode[single](TargetSelectorNode(@s)), Vec3Node(x: AxisNode(12), y: AxisNode(45), z: AxisNode(78)))";
@@ -201,7 +201,7 @@ void TestMinecraftParser::commands_data() {
         "RootNode[15](LiteralNode(execute), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MultiMapNode(tag: (!StringNode(\"stonks\"), StringNode(\"second\"), StringNode(\"test\")); type: (!ResourceLocationNode(villager), !ResourceLocationNode(player)))}), LiteralNode(rotated), RotationNode(x: AxisNode(0), z: AxisNode(~90)), LiteralNode(store), LiteralNode(success), LiteralNode(storage), ResourceLocationNode(mcdatapacker:test), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"executeSuccess\"))), LiteralNode(byte), DoubleNode(1), LiteralNode(run), LiteralNode(say), MessageNode(\"hi\"))";
     QTest::newRow(GEN_TAG) <<
         "execute if block ~ ~1 ~ #minecraft:chest[a=b]{Lock:\"\"} run say hi" <<
-        "RootNode[8](LiteralNode(execute), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~1), z: AxisNode(~0)), BlockPredicateNodee(minecraft:chest)[MapNode(a: StringNode(\"b\"))]{MapNode(Lock: NbtStringNode())}, LiteralNode(run), LiteralNode(say), MessageNode(\"hi\"))";
+        "RootNode[8](LiteralNode(execute), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~1), z: AxisNode(~0)), BlockPredicateNode(minecraft:chest)[MapNode(a: StringNode(\"b\"))]{NbtCompoundNode(Lock: NbtStringNode())}, LiteralNode(run), LiteralNode(say), MessageNode(\"hi\"))";
     QTest::newRow(GEN_TAG) << "execute as @e at @s run tp ^ ^ ^1" <<
         "RootNode[8](LiteralNode(execute), LiteralNode(as), EntityNode[](TargetSelectorNode(@e)), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(run), LiteralNode(tp), Vec3Node(x: AxisNode(^0), y: AxisNode(^0), z: AxisNode(^1)))";
     QTest::newRow(GEN_TAG) << "execute align yxz run spawnpoint @p ~ ~ ~" <<
@@ -211,7 +211,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "execute as @e[type=villager] run data merge entity @s {Invulnerable:1}"
                            <<
-        "RootNode[9](LiteralNode(execute), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MultiMapNode(type: (ResourceLocationNode(villager)))}), LiteralNode(run), LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), MapNode(Invulnerable: NbtIntNode(1)))";
+        "RootNode[9](LiteralNode(execute), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MultiMapNode(type: (ResourceLocationNode(villager)))}), LiteralNode(run), LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), NbtCompoundNode(Invulnerable: NbtIntNode(1)))";
     QTest::newRow(GEN_TAG) << "execute at @e[type=sheep] run kill @s" <<
         "RootNode[6](LiteralNode(execute), LiteralNode(at), EntityNode[](TargetSelectorNode(@e){MultiMapNode(type: (ResourceLocationNode(sheep)))}), LiteralNode(run), LiteralNode(kill), EntityNode[single](TargetSelectorNode(@s)))";
     QTest::newRow(GEN_TAG) <<
@@ -232,18 +232,18 @@ void TestMinecraftParser::commands_data() {
         "RootNode[13](LiteralNode(execute), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MultiMapNode(type: (ResourceLocationNode(sheep)))}), LiteralNode(positioned), LiteralNode(as), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(rotated), LiteralNode(as), EntityNode[single, player](TargetSelectorNode(@p)), LiteralNode(run), LiteralNode(tp), EntityNode[single](TargetSelectorNode(@s)), Vec3Node(x: AxisNode(^0), y: AxisNode(^0), z: AxisNode(^1)))";
     QTest::newRow(GEN_TAG) <<
         "execute as @a at @s if block ~ ~-1 ~ #wool run kill @s" <<
-        "RootNode[12](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~-1), z: AxisNode(~0)), BlockPredicateNodee(minecraft:wool), LiteralNode(run), LiteralNode(kill), EntityNode[single](TargetSelectorNode(@s)))";
+        "RootNode[12](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~-1), z: AxisNode(~0)), BlockPredicateNode(minecraft:wool), LiteralNode(run), LiteralNode(kill), EntityNode[single](TargetSelectorNode(@s)))";
     QTest::newRow(GEN_TAG) <<
         R"(execute as @a if data entity @s Inventory[{Slot:0b}].tag.Enchantments[{id:"minecraft:efficiency"}] run tp @s 0 64 0)"
                            <<
-        "RootNode[12](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(if), LiteralNode(data), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Inventory\")), NbtPathStepNode<Index>([{MapNode(Slot: NbtByteNode(0b))}].), NbtPathStepNode<Key>(StringNode(\"tag\").), NbtPathStepNode<Key>(StringNode(\"Enchantments\")), NbtPathStepNode<Index>([{MapNode(id: NbtStringNode(minecraft:efficiency))}])), LiteralNode(run), LiteralNode(tp), EntityNode[single](TargetSelectorNode(@s)), Vec3Node(x: AxisNode(0), y: AxisNode(64), z: AxisNode(0)))";
+        "RootNode[12](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(if), LiteralNode(data), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), NbtPathNode(NbtPathStepNode<Key>(StringNode(\"Inventory\")), NbtPathStepNode<Index>([{NbtCompoundNode(Slot: NbtByteNode(0b))}].), NbtPathStepNode<Key>(StringNode(\"tag\").), NbtPathStepNode<Key>(StringNode(\"Enchantments\")), NbtPathStepNode<Index>([{NbtCompoundNode(id: NbtStringNode(minecraft:efficiency))}])), LiteralNode(run), LiteralNode(tp), EntityNode[single](TargetSelectorNode(@s)), Vec3Node(x: AxisNode(0), y: AxisNode(64), z: AxisNode(0)))";
     QTest::newRow(GEN_TAG) <<
         "execute as @a at @s anchored eyes run particle smoke ^ ^ ^3" <<
         "RootNode[11](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(anchored), EntityAnchorNode(\"eyes\"), LiteralNode(run), LiteralNode(particle), ParticleNode(minecraft:smoke), Vec3Node(x: AxisNode(^0), y: AxisNode(^0), z: AxisNode(^3)))";
     QTest::newRow(GEN_TAG) <<
         R"(execute as @a at @s if block ~ ~ ~ water run say "My feet are soaked!")"
                            <<
-        "RootNode[12](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), BlockPredicateNodee(minecraft:water), LiteralNode(run), LiteralNode(say), MessageNode(\"\"My feet are soaked!\"\"))";
+        "RootNode[12](LiteralNode(execute), LiteralNode(as), EntityNode[player](TargetSelectorNode(@a)), LiteralNode(at), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), BlockPredicateNode(minecraft:water), LiteralNode(run), LiteralNode(say), MessageNode(\"\"My feet are soaked!\"\"))";
     QTest::newRow(GEN_TAG) <<
         R"(execute as @a unless score @s test = @s test run say "Score is reset")"
                            <<
@@ -251,7 +251,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "execute at @p as @e[type=pig,distance=..3] run data merge entity @s {Motion:[0.0,2.0,0.0]}"
                            <<
-        "RootNode[11](LiteralNode(execute), LiteralNode(at), EntityNode[single, player](TargetSelectorNode(@p)), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MultiMapNode(distance: (FloatRangeNode(..3)); type: (ResourceLocationNode(pig)))}), LiteralNode(run), LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), MapNode(Motion: NbtListNode(NbtDoubleNode(0), NbtDoubleNode(2), NbtDoubleNode(0))))";
+        "RootNode[11](LiteralNode(execute), LiteralNode(at), EntityNode[single, player](TargetSelectorNode(@p)), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MultiMapNode(distance: (FloatRangeNode(..3)); type: (ResourceLocationNode(pig)))}), LiteralNode(run), LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), NbtCompoundNode(Motion: NbtListNode(NbtDoubleNode(0), NbtDoubleNode(2), NbtDoubleNode(0))))";
     QTest::newRow(GEN_TAG) << "execute align yxz run spawnpoint @p ~ ~ ~" <<
         "RootNode[7](LiteralNode(execute), LiteralNode(align), SwizzleNode(xyz), LiteralNode(run), LiteralNode(spawnpoint), EntityNode[single, player](TargetSelectorNode(@p)), BlockPosNode(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)))";
 
@@ -265,7 +265,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "fill 52 63 -1516 33 73 -1536 minecraft:gold_block replace minecraft:orange_glazed_terracotta"
                            <<
-        "RootNode[6](LiteralNode(fill), BlockPosNode(x: AxisNode(52), y: AxisNode(63), z: AxisNode(-1516)), BlockPosNode(x: AxisNode(33), y: AxisNode(73), z: AxisNode(-1536)), BlockStateNode(minecraft:gold_block), LiteralNode(replace), BlockPredicateNodee(minecraft:orange_glazed_terracotta))";
+        "RootNode[6](LiteralNode(fill), BlockPosNode(x: AxisNode(52), y: AxisNode(63), z: AxisNode(-1516)), BlockPosNode(x: AxisNode(33), y: AxisNode(73), z: AxisNode(-1536)), BlockStateNode(minecraft:gold_block), LiteralNode(replace), BlockPredicateNode(minecraft:orange_glazed_terracotta))";
     QTest::newRow(GEN_TAG) << "fill ~-3 ~-3 ~-3 ~3 ~-1 ~3 water" <<
         "RootNode[4](LiteralNode(fill), BlockPosNode(x: AxisNode(~-3), y: AxisNode(~-3), z: AxisNode(~-3)), BlockPosNode(x: AxisNode(~3), y: AxisNode(~-1), z: AxisNode(~3)), BlockStateNode(minecraft:water))";
     QTest::newRow(GEN_TAG) <<
@@ -310,9 +310,9 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         R"(give @p diamond_sword{ Enchantments:[{id:"minecraft:sharpness",lvl:10}]} 1)"
                            <<
-        "RootNode[4](LiteralNode(give), EntityNode[single, player](TargetSelectorNode(@p)), ItemStackNode(minecraft:diamond_sword){MapNode(Enchantments: NbtListNode(MapNode(id: NbtStringNode(minecraft:sharpness), lvl: NbtIntNode(10))))}, IntegerNode(1))";
+        "RootNode[4](LiteralNode(give), EntityNode[single, player](TargetSelectorNode(@p)), ItemStackNode(minecraft:diamond_sword){NbtCompoundNode(Enchantments: NbtListNode(NbtCompoundNode(id: NbtStringNode(minecraft:sharpness), lvl: NbtIntNode(10))))}, IntegerNode(1))";
     QTest::newRow(GEN_TAG) << "give @a[distance=..5, nbt={Air:300s}] stone" <<
-        "RootNode[3](LiteralNode(give), EntityNode[player](TargetSelectorNode(@a){MultiMapNode(distance: (FloatRangeNode(..5)); nbt: (MapNode(Air: NbtShortNode(300s))))}), ItemStackNode(minecraft:stone))";
+        "RootNode[3](LiteralNode(give), EntityNode[player](TargetSelectorNode(@a){MultiMapNode(distance: (FloatRangeNode(..5)); nbt: (NbtCompoundNode(Air: NbtShortNode(300s))))}), ItemStackNode(minecraft:stone))";
 
     SET_TAG(locate)
     QTest::newRow(GEN_TAG) << "locate mansion" <<
@@ -352,7 +352,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "setblock ^ ^ ^3 minecraft:hopper[facing=east]{id: 'minecraft:hopper', TransferCooldown: 23}"
                            <<
-        "RootNode[3](LiteralNode(setblock), BlockPosNode(x: AxisNode(^0), y: AxisNode(^0), z: AxisNode(^3)), BlockStateNode(minecraft:hopper)[MapNode(facing: StringNode(\"east\"))]{MapNode(TransferCooldown: NbtIntNode(23), id: NbtStringNode(minecraft:hopper))})";
+        "RootNode[3](LiteralNode(setblock), BlockPosNode(x: AxisNode(^0), y: AxisNode(^0), z: AxisNode(^3)), BlockStateNode(minecraft:hopper)[MapNode(facing: StringNode(\"east\"))]{NbtCompoundNode(TransferCooldown: NbtIntNode(23), id: NbtStringNode(minecraft:hopper))})";
 
     SET_TAG(spreadplayers)
     QTest::newRow(GEN_TAG) << "spreadplayers 0 0 200 500 true @a" <<
@@ -364,15 +364,15 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         R"(summon creeper ~ ~ ~ {powered:1b,CustomName:'{"Powered Creeper"}'})"
                            <<
-        "RootNode[4](LiteralNode(summon), EntitySummonNode(creeper), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), MapNode(CustomName: NbtStringNode({\"Powered Creeper\"}), powered: NbtByteNode(1b)))";
+        "RootNode[4](LiteralNode(summon), EntitySummonNode(creeper), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), NbtCompoundNode(CustomName: NbtStringNode({\"Powered Creeper\"}), powered: NbtByteNode(1b)))";
     QTest::newRow(GEN_TAG) <<
         R"(summon spider ~ ~ ~ {Passengers:[{id:"minecraft:skeleton",HandItems:[{id:"minecraft:bow",Count:1b}]}]})"
                            <<
-        "RootNode[4](LiteralNode(summon), EntitySummonNode(spider), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), MapNode(Passengers: NbtListNode(MapNode(HandItems: NbtListNode(MapNode(Count: NbtByteNode(1b), id: NbtStringNode(minecraft:bow))), id: NbtStringNode(minecraft:skeleton)))))";
+        "RootNode[4](LiteralNode(summon), EntitySummonNode(spider), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), NbtCompoundNode(Passengers: NbtListNode(NbtCompoundNode(HandItems: NbtListNode(NbtCompoundNode(Count: NbtByteNode(1b), id: NbtStringNode(minecraft:bow))), id: NbtStringNode(minecraft:skeleton)))))";
     QTest::newRow(GEN_TAG) <<
         R"(summon villager ~ ~ ~ {Offers:{Recipes:[{buy:{id:dirt,Count:1},sell:{id:diamond,Count:1},rewardExp:false}]}})"
                            <<
-        "RootNode[4](LiteralNode(summon), EntitySummonNode(villager), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), MapNode(Offers: MapNode(Recipes: NbtListNode(MapNode(buy: MapNode(Count: NbtIntNode(1), id: NbtStringNode(dirt)), rewardExp: NbtByteNode(0b), sell: MapNode(Count: NbtIntNode(1), id: NbtStringNode(diamond)))))))";
+        "RootNode[4](LiteralNode(summon), EntitySummonNode(villager), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), NbtCompoundNode(Offers: NbtCompoundNode(Recipes: NbtListNode(NbtCompoundNode(buy: NbtCompoundNode(Count: NbtIntNode(1), id: NbtStringNode(dirt)), rewardExp: NbtByteNode(0b), sell: NbtCompoundNode(Count: NbtIntNode(1), id: NbtStringNode(diamond)))))))";
 
     SET_TAG(tellraw)
     QTest::newRow(GEN_TAG) << R"(tellraw @a "text to display")" <<
@@ -417,7 +417,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) << "trigger php add 1" <<
         "RootNode[4](LiteralNode(trigger), ObjectiveNode(\"php\"), LiteralNode(add), IntegerNode(1))";
 
-    SET_TAG(wweather)
+    SET_TAG(weather)
     QTest::newRow(GEN_TAG) << "weather clear" <<
         "RootNode[2](LiteralNode(weather), LiteralNode(clear))";
     QTest::newRow(GEN_TAG) << "weather rain 81920" <<
@@ -451,6 +451,7 @@ void TestMinecraftParser::commands() {
     }
     Q_ASSERT(result);
     QVERIFY(result->isVaild());
+/*    qDebug() << result->toString(); */
     QCOMPARE(result->toString(), parseTreeRepr);
 }
 

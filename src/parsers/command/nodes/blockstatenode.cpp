@@ -70,7 +70,7 @@ Command::BlockPredicateNode::BlockPredicateNode(Command::BlockStateNode *other)
 }
 
 QString Command::BlockPredicateNode::toString() const {
-    return BlockStateNode::toString().replace(0, 13, "BlockPredicateNode");
+    return BlockStateNode::toString().replace(0, 14, "BlockPredicateNode");
 }
 
 void Command::BlockPredicateNode::accept(Command::NodeVisitor *visitor,

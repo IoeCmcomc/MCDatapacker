@@ -112,17 +112,11 @@ QString Command::Parser::text() const {
     return m_text;
 }
 
-void rtrim(QString &str) {
-    while (str.size() > 0 && str.at(str.size() - 1).isSpace())
-        str.chop(1);
-}
-
 /*!
  * \brief Sets the text which is parsed and resets the current position.
  */
 void Command::Parser::setText(const QString &text) {
     m_text = text;
-    rtrim(m_text);
     setPos(0);
 }
 
@@ -532,12 +526,10 @@ QSharedPointer<Command::StringNode> Command::Parser::brigadier_string(
  */
 QSharedPointer<Command::ParseNode> Command::Parser::parse() {
     m_parsingResult = QSharedPointer<RootNode>::create(pos());
-    QElapsedTimer timer;
-    timer.start();
 
     if (m_schema.isEmpty()) {
         qWarning() << "The parser schema hasn't been initialized yet.";
-    } else if (text().trimmed().isEmpty() || text().at(0) == '#') {
+    } else if (text().trimmed().isEmpty() || text().trimmed().at(0) == '#') {
         m_parsingResult->setPos(0);
         return m_parsingResult;
     }
@@ -547,13 +539,10 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
 
     if (m_cache.contains(key)) {
         m_parsingResult = qSharedPointerCast<RootNode>(m_cache[key]);
-/*
-          qDebug() << "Got cached" << m_parsingResult << "in ms:" <<
-              timer.elapsed();
- */
         setPos(m_text.length());
     } else {
         try {
+            skipWs();
             if (parseResursively(m_schema)) {
                 m_parsingResult->setPos(0);
                 m_parsingResult->setLength(pos() - 1);
@@ -604,26 +593,27 @@ bool Command::Parser::processCurSchemaNode(int depth,
           qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
  */
         if (!curSchemaNode.contains(QLatin1String("children"))) {
-            if (!curSchemaNode.contains(QLatin1String("executable"))
-                || (curSchemaNode.contains(QLatin1String("executable"))
-                    && curSchemaNode.contains(QLatin1String("redirect")))) {
-                if (!m_curChar.isNull()) {
-                    QJsonArray redirect;
-                    if (curSchemaNode.contains(QLatin1String("redirect")))
-                        redirect =
-                            curSchemaNode[QLatin1String("redirect")].toArray();
+            if (curSchemaNode.contains(QLatin1String("redirect"))) {
+                if (curSchemaNode.contains(QLatin1String("executable")) &&
+                    (m_curChar.isNull() or (m_curChar == ' '))) {
+                    return true;
+                } else {
+                    QJsonArray redirect =
+                        curSchemaNode[QLatin1String("redirect")].toArray();
                     curSchemaNode = m_schema;
                     for (const auto &nodeNameRef: qAsConst(redirect)) {
                         curSchemaNode =
                             curSchemaNode[QLatin1String("children")]
                             .toObject()[nodeNameRef.toString()].toObject();
                     }
-                } else {
-                    error(QT_TR_NOOP("Incompleted command"));
                 }
             } else {
-                expect(QChar());
-                return true;
+                if (curSchemaNode.contains(QLatin1String("executable")) &&
+                    (m_curChar.isNull() or (m_curChar == ' '))) {
+                    return true;
+                } else {
+                    curSchemaNode = m_schema;
+                }
             }
         } else {
             if (curSchemaNode.contains(QLatin1String("executable"))) {
@@ -698,21 +688,11 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     if (m_cache.contains(key)) {
                         found = true;
                         ret   = m_cache[key];
-/*
-                          qDebug() << "Cached: " << ret << found << ret->pos() <<
-                              ret->length() << "elapsed time:" << timer.elapsed();
- */
                     } else if (key.pos = -1; m_cache.contains(key)) { /* Not taking position into account */
                         /* Make a copy of the cached object */
                         ret = QSharedPointer<ParseNode>::create(*m_cache[key]);
                         /* Change its pos to the start pos */
                         ret->setPos(startPos);
-
-/*
-                          qDebug() << "Detached from cache: " << ret << found <<
-                              ret->pos() <<
-                              ret->length() << "elapsed time:" << timer.elapsed();
- */
                     }
                     if (found) {
                         Q_ASSERT(ret != nullptr);

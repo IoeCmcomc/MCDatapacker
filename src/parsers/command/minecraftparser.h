@@ -45,7 +45,7 @@ private:
                                            const QChar &sepChar,
                                            std::function<QSharedPointer<Type>(const QString &)> func,
                                            bool acceptQuotation      = false,
-                                           const QString &keyCharset = R"(0-9a-zA-Z-_)")
+                                           const QString &keyCharset = R"(0-9a-zA-Z-_.+)")
         {
             auto obj = QSharedPointer<Container>::create(pos());
 

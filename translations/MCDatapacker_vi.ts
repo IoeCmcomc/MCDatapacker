@@ -110,55 +110,54 @@
         <translation>Lỗi cú pháp tại vị trí %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="215"/>
+        <location filename="../src/parsers/command/parser.cpp" line="209"/>
         <source>Unexpected %1, expecting %2</source>
         <translation>Không mong đợi %1, đang mong đợi %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="342"/>
+        <location filename="../src/parsers/command/parser.cpp" line="336"/>
         <source>Incomplete quoted string</source>
         <oldsource>Incomplete quoted string: %1</oldsource>
         <translation>Xâu trích dẫn chưa được hoàn thành</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="432"/>
+        <location filename="../src/parsers/command/parser.cpp" line="426"/>
         <source>%1 is not a vaild double number</source>
         <translation>%1 không phải là một số phẩy động đôi hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="453"/>
+        <location filename="../src/parsers/command/parser.cpp" line="447"/>
         <source>%1 is not a vaild float number</source>
         <translation>%1 không phải là một số phẩy động đơn hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="474"/>
+        <location filename="../src/parsers/command/parser.cpp" line="468"/>
         <source>%1 is not a vaild integer number</source>
         <translation>%1 không phải là một số nguyên hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="622"/>
-        <location filename="../src/parsers/command/parser.cpp" line="635"/>
+        <location filename="../src/parsers/command/parser.cpp" line="625"/>
         <source>Incompleted command</source>
         <translation>Lệnh chưa được hoàn thiện</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="770"/>
+        <location filename="../src/parsers/command/parser.cpp" line="760"/>
         <source>Unknown argument parser: &apos;%1&apos;</source>
         <oldsource>Unknown parser &apos;%1&apos;</oldsource>
         <translation>Bộ phân tích đối số không rõ: &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="787"/>
+        <location filename="../src/parsers/command/parser.cpp" line="777"/>
         <source>Incorrect argument</source>
         <translation>Đối số không chính xác</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="795"/>
+        <location filename="../src/parsers/command/parser.cpp" line="785"/>
         <source>Unknown subcommand &apos;%1&apos;</source>
         <translation>Lệnh phụ không rõ: &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/parser.cpp" line="797"/>
+        <location filename="../src/parsers/command/parser.cpp" line="787"/>
         <source>Unknown command &apos;%1&apos;</source>
         <translation>Lệnh không rõ: %1</translation>
     </message>
@@ -221,49 +220,54 @@
         <translation>Giá trị đối số phải là kiểu boolean</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="493"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="495"/>
         <source>Unknown entity argument name: %1</source>
         <translation>Tên đối số thực thể không hợp lệ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="534"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="536"/>
         <source>Invaild target selector variable: %1</source>
         <translation>Biến bộ chọn mục tiêu không hợp lệ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="590"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="592"/>
         <source>Invaild empty NBT path key</source>
         <translation>Khoá đường dẫn NBT rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="741"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="740"/>
         <source>Invaild empty player name</source>
         <translation>Tên người chơi rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="750"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="749"/>
         <source>Cannot parse entity</source>
         <translation>Không thể phân tích cú pháp thực thể</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="937"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="936"/>
         <source>Missing character &apos;.&apos; before a named tag</source>
         <translation>Thiếu kí tự &apos;.&apos; trước một nhãn có tên</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="962"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="961"/>
         <source>Objective &apos;%1&apos; must be less than 16 characters</source>
         <translation>Mục tiêu &apos;%1&apos; phải ngắn hơn 16 kí tự</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1034"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1033"/>
         <source>The character &apos;/&apos; is not allowed in the namespace</source>
         <translation>Kí tự &apos;/&apos; không được cho phép trong không gian tên</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1040"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1039"/>
         <source>Invaild empty namespaced ID</source>
         <translation>ID kèm không gian tên rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1081"/>
+        <source>Invaild scoreboard slot</source>
+        <translation>Ô bảng điểm không hợp lệ</translation>
     </message>
     <message>
         <source>The value must be greater than or equal to %1</source>
@@ -2751,7 +2755,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="369"/>
         <source>&amp;Statistics</source>
-        <translation>&amp;Thông kê</translation>
+        <translation>&amp;Thống kê</translation>
     </message>
     <message>
         <source>Save</source>
@@ -2885,23 +2889,24 @@ Bạn có muốn lưu các thay đổi không?</translation>
     <message>
         <location filename="../src/mainwindow.cpp" line="354"/>
         <source>Changing game version</source>
-        <translation></translation>
+        <translation>Thay đổi phiên bản trò chơi</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="355"/>
         <source>The game version has been changed from %1 to %2
 The program need to restart to apply the changes.</source>
-        <translation></translation>
+        <translation>Phiên bản trò chơi đã được thay đổi từ %1 sang %2
+Chương trình cần phải khởi động lại để áp dụng các thay đổi.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="360"/>
         <source>Restart</source>
-        <translation></translation>
+        <translation>Khởi động lại</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Keep</source>
-        <translation></translation>
+        <translation>Giữ lại</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="423"/>
