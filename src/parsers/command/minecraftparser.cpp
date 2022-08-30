@@ -388,7 +388,7 @@ parseEntityAdvancements() {
                     this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                                   "Argument value must be boolean"));
                 return nullptr;
-            }, false, R"(a-zA-z0-9-_:/)");
+            }, false, R"(a-zA-z0-9-_:.+/)");
         } else {
             auto ret = brigadier_bool();
             if (ret->isVaild())
@@ -399,7 +399,7 @@ parseEntityAdvancements() {
             return nullptr;
         }
         return nullptr;
-    }, false, R"(a-zA-z0-9-_:/)");
+    }, false, R"(a-zA-z0-9-_:.+/)");
 }
 
 QSharedPointer<Command::MultiMapNode> Command::MinecraftParser::
@@ -450,7 +450,7 @@ parseEntityArguments() {
                 literal = getQuotedString();
                 isQuote = true;
             } else {
-                literal = this->getWithCharset("0-9a-zA-Z-_");
+                literal = this->getWithCharset("0-9a-zA-Z-_.+");
             }
             return QSharedPointer<EntityArgumentValueNode>::create(
                 QSharedPointer<Command::StringNode>::create(
@@ -488,7 +488,7 @@ parseEntityArguments() {
                 '{', '}', '=', [this](const QString &) ->
                 QSharedPointer<IntRangeNode> {
                 return minecraft_intRange();
-            }, false, R"(0-9a-zA-Z-_.)");
+            }, false, R"(0-9a-zA-Z-_.+)");
         } else if (key == QLatin1String("advancements")) {
             return parseEntityAdvancements();
         } else{
@@ -586,7 +586,7 @@ parseNbtPathStep() {
     default: {
         ret->setName(QSharedPointer<Command::StringNode>::create(ret->pos(),
                                                                  getWithCharset(
-                                                                     "a-zA-Z0-9-_")));
+                                                                     "a-zA-Z0-9-_+")));
         /*qDebug() << "After key" << ret->name()->value(); */
         if (ret->name()->value().isEmpty())
             error(QT_TRANSLATE_NOOP("Command::Parser::Error",
@@ -1070,19 +1070,31 @@ minecraft_scoreHolder(const QVariantMap &props) {
 
 QSharedPointer<Command::ScoreboardSlotNode> Command::MinecraftParser::
 minecraft_scoreboardSlot() {
-    int       curPos = pos();
-    QString &&slot   = this->oneOf({ "list", "sidebar.team",
-                                     "sidebar", "belowName" });
+    const static QStringList scoreboardSlots = {
+        "list",                      "sidebar",
+        "belowName",
+        "sidebar.team.aqua",
+        "sidebar.team.black",
+        "sidebar.team.blue",
+        "sidebar.team.dark_aqua",
+        "sidebar.team.dark_blue",
+        "sidebar.team.dark_green",
+        "sidebar.team.dark_grey",
+        "sidebar.team.dark_purple",
+        "sidebar.team.dark_red",
+        "sidebar.team.gold",
+        "sidebar.team.green",
+        "sidebar.team.grey",
+        "sidebar.team.light_purple",
+        "sidebar.team.red",
+        "sidebar.team.reset",
+        "sidebar.team.white",
+        "sidebar.team.yellow",
+    };
 
-    if (slot == QLatin1String("sidebar.team")) {
-        this->eat('.');
-        auto color = minecraft_color();
-        if (color->value() == "reset") {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "Invaild scoreboard slot"));
-        }
-        slot += '.' + color->value();
-    }
+    int       curPos = pos();
+    QString &&slot   = this->oneOf(scoreboardSlots);
+
     return QSharedPointer<Command::ScoreboardSlotNode>::create(curPos, slot);
 }
 
@@ -1118,7 +1130,7 @@ QSharedPointer<Command::SwizzleNode> Command::MinecraftParser::minecraft_swizzle
 
 QSharedPointer<Command::TeamNode> Command::MinecraftParser::minecraft_team() {
     int       curPos  = pos();
-    QString &&literal = this->getWithCharset(QStringLiteral("-\\w.:"));
+    QString &&literal = this->getWithCharset(QStringLiteral("-+\\w.:"));
 
     return QSharedPointer<Command::TeamNode>::create(curPos, literal);
 }

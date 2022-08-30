@@ -23,7 +23,7 @@ void McfunctionHighlighter::setupRules() {
 
     keywordFormat.setForeground(Qt::blue);
     keywordFormat.setFontWeight(QFont::Bold);
-    keywordFormat.setToolTip("minecraft command");
+/*    keywordFormat.setToolTip("minecraft command"); */
     const QString keywordPatterns[] = {
         QStringLiteral("\\badvancement\\b"),
         QStringLiteral("\\bban\\b"),

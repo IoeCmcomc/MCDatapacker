@@ -592,10 +592,11 @@ bool Command::Parser::processCurSchemaNode(int depth,
           qDebug() << "has executable:" << curSchemaNode.contains("executable");
           qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
  */
+        bool canEndParsing = curChar().isNull() or (peek(2) == " ");
         if (!curSchemaNode.contains(QLatin1String("children"))) {
             if (curSchemaNode.contains(QLatin1String("redirect"))) {
                 if (curSchemaNode.contains(QLatin1String("executable")) &&
-                    (m_curChar.isNull() or (m_curChar == ' '))) {
+                    canEndParsing) {
                     return true;
                 } else {
                     QJsonArray redirect =
@@ -609,16 +610,16 @@ bool Command::Parser::processCurSchemaNode(int depth,
                 }
             } else {
                 if (curSchemaNode.contains(QLatin1String("executable")) &&
-                    (m_curChar.isNull() or (m_curChar == ' '))) {
+                    canEndParsing) {
                     return true;
                 } else {
                     curSchemaNode = m_schema;
                 }
             }
         } else {
-            if (curSchemaNode.contains(QLatin1String("executable"))) {
-                if (m_curChar.isNull())
-                    return true;
+            if (curSchemaNode.contains(QLatin1String("executable")) &&
+                canEndParsing) {
+                return true;
             }
         }
         if (curChar().isNull())
@@ -678,10 +679,8 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             }
             if (methodIndex != -1) {
                 /*qDebug() << "Argument parser ID:" << parserId; */
-                auto        &&method     = metaObject()->method(methodIndex);
-                int           returnType = method.returnType();
-                QElapsedTimer timer;
-                timer.start();
+                auto   &&method     = metaObject()->method(methodIndex);
+                int      returnType = method.returnType();
                 CacheKey key{ returnType, literal, startPos };
 
                 try {
@@ -721,10 +720,6 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                     if (invoked) {
                         found = true;
                         ret   = QVariantToParseNodeSharedPointer(returnVari);
-/*
-                          qDebug() << ret << found << "elapsed time:" <<
-                              timer.elapsed();
- */
                         Q_ASSERT(ret != nullptr);
                         if ((literal.length() == ret->length()) &&
                             ret->isVaild())
