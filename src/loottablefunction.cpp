@@ -109,8 +109,9 @@ QJsonObject LootTableFunction::toJson() const {
     if (ui->functionTypeCombo->currentIndex() == -1)
         return root;
 
-    root.insert("function", "minecraft:" +
-                functTypes[ui->functionTypeCombo->currentIndex()]);
+    const QString &&function = QStringLiteral("minecraft:") +
+                               functTypes[ui->functionTypeCombo->currentIndex()];
+    root.insert("function", function);
 
     switch (ui->functionTypeCombo->currentIndex()) {
     case 0: { /*Apply bonus */

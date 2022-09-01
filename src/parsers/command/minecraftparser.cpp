@@ -535,7 +535,7 @@ parseTargetSelector() {
     default: {
         error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                 "Invaild target selector variable: %1"),
-              { '@' + curChar() });
+              { QStringLiteral("@%1").arg(curChar()) });
     }
     }
     advance();

@@ -64,8 +64,9 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
 
     case 1: {      /* Item */
         if (root.contains(QLatin1String("name")))
-            ui->itemSlot->appendItem(InventoryItem(root.value(QLatin1String("name"))
-                                                .toString()));
+            ui->itemSlot->appendItem(InventoryItem(root.value(QLatin1String(
+                                                                  "name"))
+                                                   .toString()));
         break;
     }
 
@@ -132,7 +133,9 @@ QJsonObject LootTableEntry::toJson() const {
     QJsonObject root;
     const int   index = ui->typeCmobo->currentIndex();
 
-    root.insert("type", "minecraft:" + entryTypes[index]);
+    const QString &&type = QStringLiteral("minecraft:") + entryTypes[index];
+
+    root.insert("type", type);
     root.insert("weight", ui->weightSpin->value());
     if (const int quality = ui->qualitySpin->value(); quality != 0)
         root.insert("quality", quality);

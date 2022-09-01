@@ -228,8 +228,9 @@ QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
         QStringLiteral("smoking"),  QStringLiteral("campfire_cooking")
     };
 
-    root.insert(QStringLiteral("type"),
-                QStringLiteral("minecraft:") + smeltingTypes[index]);
+    const QString &&type = QStringLiteral("minecraft:") + smeltingTypes[index];
+
+    root.insert(QLatin1String("type"), type);
 
     const auto &items = ui->smeltingSlot_0->getItems();
     root.insert("ingredient", ingredientsToJson(items));

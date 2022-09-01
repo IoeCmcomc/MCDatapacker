@@ -24,7 +24,7 @@ QString Glhp::randStr(int length) {
 }
 
 QString Glhp::relPath(const QString &dirpath, QString path) {
-    const QString &&dataDir = dirpath + "/";
+    const QString &&dataDir = dirpath + QLatin1Char('/');
 
     if (!removePrefix(path, dataDir))
         return QString();
@@ -51,6 +51,35 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     { QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
       QStringLiteral("bmp") };
 
+    static const QVector<QPair<QString,
+                               CodeFile::FileType> > catPathToFileType {
+        { QStringLiteral("advancements"), CodeFile::Advancement },
+        { QStringLiteral("loot_tables"), CodeFile::LootTable },
+        { QStringLiteral("predicates"), CodeFile::Predicate },
+        { QStringLiteral("item_modifiers"), CodeFile::ItemModifier },
+        { QStringLiteral("recipes"), CodeFile::Recipe },
+        { QStringLiteral("tags/blocks"), CodeFile::BlockTag },
+        { QStringLiteral("tags/entity_types"), CodeFile::EntityTypeTag },
+        { QStringLiteral("tags/fluids"), CodeFile::FluidTag },
+        { QStringLiteral("tags/functions"), CodeFile::FunctionTag },
+        { QStringLiteral("tags/items"), CodeFile::ItemTag },
+        { QStringLiteral("tags/game_events"), CodeFile::GameEventTag },
+        { QStringLiteral("tags"), CodeFile::Tag },
+        { QStringLiteral("worldgen/biome"), CodeFile::Biome },
+        { QStringLiteral("worldgen/configured_carver"),
+          CodeFile::ConfiguredCarver },
+        { QStringLiteral("worldgen/configured_feature"),
+          CodeFile::ConfiguredFeature },
+        { QStringLiteral("worldgen/configured_structure_feature"),
+          CodeFile::StructureFeature },
+        { QStringLiteral("worldgen/configured_surface_builder"),
+          CodeFile::SurfaceBuilder },
+        { QStringLiteral("worldgen/noise_settings"), CodeFile::NoiseSettings },
+        { QStringLiteral("worldgen/processor_list"), CodeFile::ProcessorList },
+        { QStringLiteral("worldgen/template_pool"), CodeFile::TemplatePool },
+        { QStringLiteral("worldgen"), CodeFile::WorldGen },
+    };
+
     QFileInfo       info(filepath);
     const QString &&fullSuffix = info.suffix();
 
@@ -63,39 +92,12 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     } else if (imageExts.contains(fullSuffix)) {
         return CodeFile::Image;
     } else if (fullSuffix == QLatin1String("json")) {
-        if (isPathRelativeTo(dirpath, filepath,
-                             QStringLiteral("advancements"))) {
-            return CodeFile::Advancement;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("loot_tables"))) {
-            return CodeFile::LootTable;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("predicates"))) {
-            return CodeFile::Predicate;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("item_modifiers"))) {
-            return CodeFile::ItemModifier;
-        } else if (isPathRelativeTo(dirpath, filepath, QStringLiteral(
-                                        "recipes"))) {
-            return CodeFile::Recipe;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("tags/blocks"))) {
-            return CodeFile::BlockTag;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("tags/entity_types"))) {
-            return CodeFile::EntityTypeTag;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("tags/fluids"))) {
-            return CodeFile::FluidTag;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("tags/functions"))) {
-            return CodeFile::FunctionTag;
-        } else if (isPathRelativeTo(dirpath, filepath,
-                                    QStringLiteral("tags/items"))) {
-            return CodeFile::ItemTag;
-        } else {
-            return CodeFile::JsonText;
+        for (const auto &pair: catPathToFileType) {
+            if (isPathRelativeTo(dirpath, filepath, pair.first)) {
+                return pair.second;
+            }
         }
+        return CodeFile::JsonText;
     } else {
         return CodeFile::Text;
     }
@@ -125,7 +127,7 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
 bool Glhp::isPathRelativeTo(const QString &dirpath,
                             const QString &path,
                             const QString &catDir) {
-    const auto &&tmpDir = dirpath + QStringLiteral("/data/");
+    const QString &&tmpDir = dirpath + QStringLiteral("/data/");
 
     if (!path.startsWith(tmpDir)) return false;
 
@@ -145,13 +147,13 @@ QString Glhp::toNamespacedID(const QString &dirpath,
         if (!noTagForm && isPathRelativeTo(dirpath, finfo.filePath(),
                                            QStringLiteral("tags"))) {
             if (filepath.split('/').count() >= 4) {
-                r = "#" + filepath.section('/', 0, 0)
-                    + ':' + filepath.section('/', 3);
+                r = QLatin1Char('#') + filepath.section('/', 0, 0)
+                    + QLatin1Char(':') + filepath.section('/', 3);
             }
         } else {
             if (filepath.split('/').count() >= 3) {
                 r = filepath.section('/', 0, 0)
-                    + ':' + filepath.section('/', 2);
+                    + QLatin1Char(':') + filepath.section('/', 2);
             }
         }
     }
@@ -215,6 +217,8 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
                 appendPerCategory(nspace, "predicates");
                 appendPerCategory(nspace, "item_modifiers");
                 appendPerCategory(nspace, "recipes");
+                appendPerCategory(nspace, "tag");
+                appendPerCategory(nspace, "worldgen");
             }
         };
 
@@ -246,7 +250,7 @@ const QMap<QString, QString> Glhp::colorHexes = {
     { "dark_aqua",    "#00aaaa" },
     { "dark_red",     "#aa0000" },
     { "dark_purple",  "#aa00aa" },
-    { "glod",         "#ffAA00" },
+    { "gold",         "#ffAA00" },
     { "gray",         "#aaaaaa" },
     { "dark_gray",    "#555555" },
     { "blue",         "#5555ff" },
@@ -261,23 +265,34 @@ const QMap<QString, QString> Glhp::colorHexes = {
 
 QString Glhp::fileTypeToName(const CodeFile::FileType type) {
     static QHash<CodeFile::FileType, const char*> const valueMap = {
-        { CodeFile::Binary,        QT_TR_NOOP("Binary")          },
-        { CodeFile::Structure,     QT_TR_NOOP("Structure")       },
-        { CodeFile::Image,         QT_TR_NOOP("Image")           },
-        { CodeFile::Text,          QT_TR_NOOP("Other")           },
-        { CodeFile::Function,      QT_TR_NOOP("Function")        },
-        { CodeFile::JsonText,      QT_TR_NOOP("JSON")            },
-        { CodeFile::Advancement,   QT_TR_NOOP("Advancement")     },
-        { CodeFile::LootTable,     QT_TR_NOOP("Loot table")      },
-        { CodeFile::Meta,          QT_TR_NOOP("Information")     },
-        { CodeFile::Predicate,     QT_TR_NOOP("Predicate")       },
-        { CodeFile::ItemModifier,  QT_TR_NOOP("Item modifier")   },
-        { CodeFile::Recipe,        QT_TR_NOOP("Recipe")          },
-        { CodeFile::BlockTag,      QT_TR_NOOP("Block tag")       },
-        { CodeFile::EntityTypeTag, QT_TR_NOOP("Entity type tag") },
-        { CodeFile::FluidTag,      QT_TR_NOOP("Fluid tag")       },
-        { CodeFile::FunctionTag,   QT_TR_NOOP("Function tag")    },
-        { CodeFile::ItemTag,       QT_TR_NOOP("Item tag")        },
+        { CodeFile::Binary,            QT_TR_NOOP("Binary")            },
+        { CodeFile::Structure,         QT_TR_NOOP("Structure")         },
+        { CodeFile::Image,             QT_TR_NOOP("Image")             },
+        { CodeFile::Text,              QT_TR_NOOP("Other")             },
+        { CodeFile::Function,          QT_TR_NOOP("Function")          },
+        { CodeFile::JsonText,          QT_TR_NOOP("JSON")              },
+        { CodeFile::Advancement,       QT_TR_NOOP("Advancement")       },
+        { CodeFile::LootTable,         QT_TR_NOOP("Loot table")        },
+        { CodeFile::Meta,              QT_TR_NOOP("Information")       },
+        { CodeFile::Predicate,         QT_TR_NOOP("Predicate")         },
+        { CodeFile::ItemModifier,      QT_TR_NOOP("Item modifier")     },
+        { CodeFile::Recipe,            QT_TR_NOOP("Recipe")            },
+        { CodeFile::BlockTag,          QT_TR_NOOP("Block tag")         },
+        { CodeFile::EntityTypeTag,     QT_TR_NOOP("Entity type tag")   },
+        { CodeFile::FluidTag,          QT_TR_NOOP("Fluid tag")         },
+        { CodeFile::FunctionTag,       QT_TR_NOOP("Function tag")      },
+        { CodeFile::ItemTag,           QT_TR_NOOP("Item tag")          },
+        { CodeFile::GameEventTag,      QT_TR_NOOP("Game event tag")    },
+        { CodeFile::Tag,               QT_TR_NOOP("Tag")               },
+        { CodeFile::WorldGen,          QT_TR_NOOP("World generation")  },
+        { CodeFile::Biome,             QT_TR_NOOP("Biome")             },
+        { CodeFile::ConfiguredCarver,  QT_TR_NOOP("Carver")            },
+        { CodeFile::ConfiguredFeature, QT_TR_NOOP("Feature")           },
+        { CodeFile::StructureFeature,  QT_TR_NOOP("Structure feature") },
+        { CodeFile::SurfaceBuilder,    QT_TR_NOOP("Surface builder")   },
+        { CodeFile::NoiseSettings,     QT_TR_NOOP("Noise settings")    },
+        { CodeFile::ProcessorList,     QT_TR_NOOP("Processor list")    },
+        { CodeFile::TemplatePool,      QT_TR_NOOP("Jigsaw pool")       },
     };
 
     if (type < 0)

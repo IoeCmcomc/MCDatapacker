@@ -202,10 +202,12 @@ bool Command::Parser::expect(const QChar &chr, bool acceptNull) {
         return true;
     } else {
         const QString &&curCharTxt =
-            (m_curChar.isNull()) ? QLatin1String("EOL") : '\'' + m_curChar +
-            '\'';
+            (m_curChar.isNull()) ? QStringLiteral("EOL") : QLatin1Char('\'') +
+            m_curChar +
+            QLatin1Char('\'');
         const QString &&charTxt =
-            (chr.isNull()) ? QLatin1String("EOL") : '\'' + chr + '\'';
+            (chr.isNull()) ? QStringLiteral("EOL") : QLatin1Char('\'') + chr +
+            QLatin1Char('\'');
         error(QT_TR_NOOP("Unexpected %1, expecting %2"),
               { curCharTxt, charTxt }, m_pos, 1);
         return false;
@@ -546,11 +548,6 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
             if (parseResursively(m_schema)) {
                 m_parsingResult->setPos(0);
                 m_parsingResult->setLength(pos() - 1);
-/*
-                  qDebug() << "Parsed line" << m_parsingResult << "in ms:" <<
-                      timer.elapsed();
- */
-
                 m_cache.emplace(typeId, m_text, m_parsingResult);
             }
         } catch (const Command::Parser::Error &err) {
@@ -667,15 +664,15 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
             }
         } else if (curSchemaNode[QLatin1String("type")] ==
                    QStringLiteral("argument")) {
-            QString &&parserId = curSchemaNode["parser"].toString();
-            int       methodIndex;
+            QString    &&parserId = curSchemaNode["parser"].toString();
+            int          methodIndex;
+            const auto &&methodName = parserIdToMethodName(parserId);
             if (curSchemaNode.contains(QLatin1String("properties"))) {
                 methodIndex = metaObject()->indexOfMethod(
-                    parserIdToMethodName(parserId).toLatin1() +
-                    "(QVariantMap)");
+                    QStringLiteral("%1(QVariantMap)").arg(methodName).toLatin1());
             } else {
                 methodIndex = metaObject()->indexOfMethod(
-                    parserIdToMethodName(parserId).toLatin1() + "()");
+                    QStringLiteral("%1()").arg(methodName).toLatin1());
             }
             if (methodIndex != -1) {
                 /*qDebug() << "Argument parser ID:" << parserId; */

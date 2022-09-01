@@ -445,7 +445,7 @@ void TestMinecraftParser::commands() {
 
     MinecraftParser           parser(this, command);
     QSharedPointer<ParseNode> result = nullptr;
-    /*QBENCHMARK*/
+    QBENCHMARK
     {
         result = parser.parse();
     }

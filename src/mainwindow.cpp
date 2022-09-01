@@ -31,7 +31,7 @@
 
 
 QMap<QString, QVariantMap> MainWindow::MCRInfoMaps;
-QVersionNumber             MainWindow::curGameVersion = QVersionNumber(1, 15);
+QVersionNumber             MainWindow::curGameVersion = QVersionNumber();
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -346,7 +346,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
                  true);
     const QString gameVer = settings.value(QStringLiteral("gameVersion"),
-                                           QStringLiteral("1.15")).toString();
+                                           QStringLiteral("1.17")).toString();
 
     if (gameVer != getCurGameVersion().toString()) {
         if (fromDialog) {

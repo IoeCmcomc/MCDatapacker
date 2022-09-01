@@ -62,8 +62,10 @@ LootTableCondition::~LootTableCondition() {
 QJsonObject LootTableCondition::toJson() const {
     QJsonObject root;
 
-    root.insert("condition", "minecraft:" +
-                condTypes[ui->conditionTypeCombo->currentIndex()]);
+    const QString &&condType = QStringLiteral("minecraft:") +
+                               condTypes[ui->conditionTypeCombo->currentIndex()];
+
+    root.insert("condition", condType);
 
     switch (ui->conditionTypeCombo->currentIndex()) {
     case 0: { /*Block states */

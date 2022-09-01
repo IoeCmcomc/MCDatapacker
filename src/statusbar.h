@@ -37,8 +37,6 @@ private:
     QLabel *m_tabsLabel                        = nullptr;
     QLabel *m_fileLabel                        = nullptr;
     QVector<QLabel*> m_editorLabels;
-
-    static QString fileTypeToString(CodeFile::FileType type);
 };
 
 #endif /* STATUSBAR_H */

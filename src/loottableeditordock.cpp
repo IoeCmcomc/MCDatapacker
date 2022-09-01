@@ -53,8 +53,10 @@ LootTableEditorDock::~LootTableEditorDock() {
 void LootTableEditorDock::writeJson() {
     QJsonObject root;
 
-    root.insert("type", "minecraft:" +
-                types[ui->lootTableTypeCombo->currentIndex()]);
+    const QString &&type = QStringLiteral("minecraft:") +
+                           types[ui->lootTableTypeCombo->currentIndex()];
+
+    root.insert("type", type);
 
     QJsonArray pools = ui->poolsInterface->json();
     if (!pools.isEmpty())
