@@ -17,6 +17,7 @@
 #include <QTextBlock>
 #include <QShortcut>
 #include <QColorDialog>
+#include <QJsonDocument>
 
 
 RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
@@ -26,9 +27,12 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
 
     ui->textEdit->installEventFilter(this);
     QFont font;
-    font.setFamily("monospace [Consolas]");
-    font.setFixedPitch(true);
-    font.setStyleHint(QFont::Monospace);
+    /*
+       QTextMarkdownWriter doesn't output other formattings with monospaced fonts.
+       Therefore, normal font will be used instead.
+     */
+    /* font.setFixedPitch(true); */
+    /* font.setStyleHint(QFont::Monospace); */
     font.setPointSize(10);
     ui->textEdit->setFont(std::move(font));
 
@@ -70,6 +74,11 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
             this, &RawJsonTextEdit::colorBtnToggled);
     connect(ui->textEdit, &QTextEdit::cursorPositionChanged,
             this, &RawJsonTextEdit::updateFormatButtons);
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+            this, &RawJsonTextEdit::updateEditors);
+    connect(ui->sourceFormatCombo,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &RawJsonTextEdit::writeSourceEditor);
 }
 
 RawJsonTextEdit::~RawJsonTextEdit() {
@@ -111,6 +120,10 @@ void RawJsonTextEdit::setOneLine(bool value) {
 }
 
 QJsonValue RawJsonTextEdit::toJson() const {
+    if (!ui->textEdit->document()->isModified()) {
+        return m_json;
+    }
+
     QJsonArray arr = { "" };
 
     QTextDocument *doc = ui->textEdit->document();
@@ -131,21 +144,21 @@ QJsonValue RawJsonTextEdit::toJson() const {
 
                 component.insert("text", txt);
                 if (fmt.fontWeight() >= 75)
-                    component.insert("bold", true);
+                    component.insert(QLatin1String("bold"), true);
                 if (fmt.fontItalic())
-                    component.insert("italic", true);
+                    component.insert(QLatin1String("italic"), true);
                 if (fmt.fontUnderline())
-                    component.insert("underlined", true);
+                    component.insert(QLatin1String("underlined"), true);
                 if (fmt.fontStrikeOut())
-                    component.insert("strikethrough", true);
+                    component.insert(QLatin1String("strikethrough"), true);
                 if (fmt.foreground().style() == Qt::SolidPattern) {
                     const QString &&key = Glhp::colorHexes.key(
                         fmt.foreground().color().name());
                     if (!key.isEmpty()) {
-                        component.insert("color", key);
+                        component.insert(QLatin1String("color"), key);
                     } else if (MainWindow::getCurGameVersion() >=
                                QVersionNumber(1, 16)) {
-                        component.insert("color",
+                        component.insert(QLatin1String("color"),
                                          fmt.foreground().color().name());
                     }
                 }
@@ -159,6 +172,7 @@ QJsonValue RawJsonTextEdit::toJson() const {
 }
 
 void RawJsonTextEdit::fromJson(const QJsonValue &root) {
+    m_json = root;
     ui->textEdit->clear();
     appendJsonObject(JsonToComponent(root));
 }
@@ -172,17 +186,20 @@ QJsonObject RawJsonTextEdit::JsonToComponent(const QJsonValue &root) {
     }
 
     case QJsonValue::Bool: {
-        component.insert("text", (root.toBool()) ? "true" : "false");
+        component.insert(QLatin1String("text"),
+                         (root.toBool()) ? QStringLiteral(
+                             "true") : QStringLiteral("false"));
         break;
     }
 
     case QJsonValue::Double: {
-        component.insert("text", QString::number(root.toDouble()));
+        component.insert(QLatin1String("text"),
+                         QString::number(root.toDouble()));
         break;
     }
 
     case QJsonValue::String: {
-        component.insert("text", root.toString());
+        component.insert(QLatin1String("text"), root.toString());
         break;
     }
 
@@ -192,7 +209,7 @@ QJsonObject RawJsonTextEdit::JsonToComponent(const QJsonValue &root) {
             component = JsonToComponent(arr[0]);
             if (arr.count() > 1) {
                 arr.removeAt(0);
-                component.insert("extra", arr);
+                component.insert(QLatin1String("extra"), arr);
             }
         }
         break;
@@ -210,24 +227,26 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
     auto cursor = ui->textEdit->textCursor();
     auto fmt    = optFmt;
 
-    if (root.contains("bold"))
+    if (root.contains(QLatin1String("bold")))
         fmt.setFontWeight((root.value(
-                               "bold").toBool()) ? QFont::Bold : QFont::Normal);
-    if (root.contains("italic"))
-        fmt.setFontItalic(root.value("italic").toBool());
-    if (root.contains("underlined"))
-        fmt.setFontUnderline(root.value("underlined").toBool());
-    if (root.contains("strikethrough"))
-        fmt.setFontStrikeOut(root.value("strikethrough").toBool());
-    if (root.contains("color")) {
+                               QLatin1String(
+                                   "bold")).toBool()) ? QFont::Bold : QFont::Normal);
+    if (root.contains(QLatin1String("italic")))
+        fmt.setFontItalic(root.value(QLatin1String("italic")).toBool());
+    if (root.contains(QLatin1String("underlined")))
+        fmt.setFontUnderline(root.value(QLatin1String("underlined")).toBool());
+    if (root.contains(QLatin1String("strikethrough")))
+        fmt.setFontStrikeOut(root.value(QLatin1String("strikethrough")).toBool());
+    if (root.contains(QLatin1String("color"))) {
         const QString &&color = Glhp::colorHexes.value(root.value(
-                                                           "color").toString());
+                                                           QLatin1String(
+                                                               "color")).toString());
         if (!color.isEmpty()) {
             fmt.setForeground(QBrush(QColor(color)));
         } else if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
             QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
             const auto       &&match
-                = regex.match(root.value("color").toString(), 0,
+                = regex.match(root.value(QLatin1String("color")).toString(), 0,
                               QRegularExpression::NormalMatch,
                               QRegularExpression::AnchoredMatchOption);
             if (match.hasMatch()) {
@@ -323,6 +342,14 @@ bool RawJsonTextEdit::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
+void RawJsonTextEdit::checkColorBtn() {
+    if (ui->colorBtn->isChecked()) {
+        colorBtnToggled(true);
+    } else {
+        ui->colorBtn->setChecked(true);
+    }
+}
+
 void RawJsonTextEdit::updateFormatButtons() {
     auto   cursor = ui->textEdit->textCursor();
     auto &&fmt    = cursor.charFormat();
@@ -335,6 +362,14 @@ void RawJsonTextEdit::updateFormatButtons() {
         ui->underlineBtn->setChecked(fmt.fontUnderline());
         const QSignalBlocker blocker4(ui->strikeBtn);
         ui->strikeBtn->setChecked(fmt.fontStrikeOut());
+        const QSignalBlocker blocker5(ui->colorBtn);
+        if (fmt.foreground().style() == Qt::SolidPattern) {
+            currTextColor = fmt.foreground().color();
+            checkColorBtn();
+        } else {
+            colorBtnToggled(false);
+            ui->colorBtn->setChecked(false);
+        }
     }
 }
 
@@ -343,11 +378,79 @@ void RawJsonTextEdit::selectCustomColor() {
 
     if (color.isValid()) {
         currTextColor = color;
-        if (ui->colorBtn->isChecked()) {
-            colorBtnToggled(true);
+        checkColorBtn();
+    }
+}
+
+void RawJsonTextEdit::updateEditors(int tabIndex) {
+    if (tabIndex == 0) { /* "Edit" tab */
+        readSourceEditor(ui->sourceFormatCombo->currentIndex());
+    } else {             /* "Source" tab */
+        writeSourceEditor(ui->sourceFormatCombo->currentIndex());
+    }
+}
+
+void RawJsonTextEdit::readSourceEditor(int format) {
+    switch (format) {
+    case JSON: {
+        const auto &doc = QJsonDocument::fromJson(
+            ui->sourceEdit->toPlainText().toUtf8());
+        if (doc.isObject()) {
+            fromJson(doc.object());
+        } else if (doc.isArray()) {
+            fromJson(doc.array());
         } else {
-            ui->colorBtn->setChecked(true);
+            fromJson(QJsonValue());
         }
+
+        break;
+    }
+
+    case HTML: {
+        ui->textEdit->setHtml(ui->sourceEdit->toPlainText());
+        break;
+    }
+
+    case Markdown: {
+        ui->textEdit->setMarkdown(ui->sourceEdit->toPlainText());
+        break;
+    }
+    }
+}
+
+void RawJsonTextEdit::writeSourceEditor(int format) {
+    switch (format) {
+    case JSON: {
+        const auto  &&json = toJson();
+        QJsonDocument jsonDoc;
+        switch (json.type()) {
+        case QJsonValue::Object: {
+            jsonDoc = QJsonDocument(json.toObject());
+            break;
+        }
+
+        case QJsonValue::Array: {
+            jsonDoc = QJsonDocument(json.toArray());
+            break;
+        }
+
+        default:
+            break;
+        }
+        ui->sourceEdit->setPlainText(jsonDoc.toJson());
+        break;
+    }
+
+    case HTML: {
+        ui->sourceEdit->setPlainText(ui->textEdit->toHtml());
+        break;
+    }
+
+    case Markdown: {
+        ui->sourceEdit->setPlainText(ui->textEdit->toMarkdown(QTextDocument::
+                                                              MarkdownDialectCommonMark));
+        break;
+    }
     }
 }
 
@@ -357,11 +460,7 @@ void RawJsonTextEdit::initColorMenu() {
         pixmap.fill(colorCode);
         colorMenu.addAction(pixmap, QString(), this, [ = ]() {
             currTextColor = QColor(colorCode);
-            if (ui->colorBtn->isChecked()) {
-                colorBtnToggled(true);
-            } else {
-                ui->colorBtn->setChecked(true);
-            }
+            checkColorBtn();
         });
     }
     if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {

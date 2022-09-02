@@ -5,6 +5,7 @@
 #include <QTextEdit>
 #include <QMenu>
 #include <QColor>
+#include  <QJsonValue>
 
 namespace Ui {
     class RawJsonTextEdit;
@@ -25,7 +26,7 @@ public:
     QJsonValue toJson() const;
     void fromJson(const QJsonValue &root);
 
-public slots:
+public /*slots*/ :
     void setBold(bool bold);
     void setItalic(bool italic);
     void setUnderline(bool underline);
@@ -38,11 +39,21 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private /*slots*/ :
+    enum SourceFormat {
+        JSON,
+        HTML,
+        Markdown,
+    };
+
     void updateFormatButtons();
     void selectCustomColor();
+    void updateEditors(int tabIndex);
+    void readSourceEditor(int format);
+    void writeSourceEditor(int format);
 
 private:
     Ui::RawJsonTextEdit *ui;
+    QJsonValue m_json;
     QMenu colorMenu;
     bool isDarkMode      = false;
     bool isOneLine       = false;
@@ -52,6 +63,7 @@ private:
     QJsonObject JsonToComponent(const QJsonValue &root);
     void appendJsonObject(const QJsonObject &root,
                           const QTextCharFormat &optFmt = QTextCharFormat());
+    void checkColorBtn();
 };
 
 #endif /* RAWJSONTEXTEDIT_H */

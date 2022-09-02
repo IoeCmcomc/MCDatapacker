@@ -38,9 +38,6 @@
     </property>
     <item row="2" column="0" colspan="3">
      <widget class="QStackedWidget" name="stackedWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
       <widget class="QWidget" name="apply_bonus">
        <layout class="QFormLayout" name="formLayout_2">
         <item row="0" column="0">
@@ -739,7 +736,11 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumberProvider" name="setCount_countInput"/>
+         <widget class="NumberProvider" name="setCount_countInput">
+          <property name="minLimit">
+           <number>-2147483647</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

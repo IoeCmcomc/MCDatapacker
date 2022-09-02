@@ -15,6 +15,7 @@
 #include "predicatedock.h"
 #include "itemmodifierdock.h"
 #include "statisticsdialog.h"
+#include "rawjsontextedit.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -143,6 +144,8 @@ void MainWindow::initMenu() {
     /* Tools menu */
     connect(ui->actionStatistics, &QAction::triggered,
             this, &MainWindow::statistics);
+    connect(ui->actionRawJsonTextEditor, &QAction::triggered,
+            this, &MainWindow::rawJsonTextEditor);
     /* Preferences menu */
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
@@ -219,7 +222,16 @@ void MainWindow::restart() {
 }
 
 void MainWindow::statistics() {
-    auto *dialog = new StatisticsDialog(this);
+    new StatisticsDialog(this);
+}
+
+void MainWindow::rawJsonTextEditor() {
+    auto *editor = new RawJsonTextEdit(this);
+
+    editor->setWindowFlags(Qt::Tool);
+    editor->setAttribute(Qt::WA_DeleteOnClose);
+    editor->show();
+    editor->activateWindow();
 }
 
 void MainWindow::pref_settings() {

@@ -21,7 +21,7 @@ void setupComboFrom(QComboBox *combo, const QVariant &vari,
 void appendRowToTableWidget(QTableWidget *table,
                             std::initializer_list<QTableWidgetItem *> items);
 
-const QString deletiveToolTip = QT_TRANSLATE_NOOP("toolTip",
-                                                  "Right click this row to delete.");
+const QString deletiveToolTip = QStringLiteral(QT_TRANSLATE_NOOP("toolTip",
+                                                                 "Right click this row to delete."));
 
 #endif /* MODELFUNCTIONS_H */

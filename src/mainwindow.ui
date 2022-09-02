@@ -190,6 +190,7 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="actionStatistics"/>
+    <addaction name="actionRawJsonTextEditor"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -367,6 +368,11 @@
   <action name="actionStatistics">
    <property name="text">
     <string>&amp;Statistics</string>
+   </property>
+  </action>
+  <action name="actionRawJsonTextEditor">
+   <property name="text">
+    <string>&amp;Raw JSON text editor</string>
    </property>
   </action>
  </widget>

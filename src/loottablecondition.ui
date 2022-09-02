@@ -144,9 +144,6 @@
    </item>
    <item row="2" column="0" colspan="3">
     <widget class="QStackedWidget" name="stackedWidget">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
      <widget class="QWidget" name="block_state_property">
       <layout class="QFormLayout" name="formLayout_3">
        <item row="0" column="0">

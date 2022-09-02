@@ -532,8 +532,10 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
             auto opId  = modifier.value("operation").toString();
             int  opIdx = operationTypes.indexOf(opId);
-            if (opIdx == -1)
+            if (opIdx == -1) {
+                delete nameItem;
                 continue;
+            }
 
             QTableWidgetItem *opItem = new QTableWidgetItem(
                 ui->setAttr_opCombo->itemText(opIdx));
@@ -558,10 +560,12 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             } else if (slotsVal.isArray()) {
                 for (auto slotRef: slotsVal.toArray()) {
                     QString slot = slotRef.toString();
-                    if (slotTypes.contains(slot))
+                    if (slotTypes.contains(slot)) {
                         slotsList << slot;
-                    else
+                    } else {
+                        delete nameItem;
                         continue;
+                    }
                 }
             }
 

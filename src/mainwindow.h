@@ -70,6 +70,7 @@ private slots:
     /* Edit menu */
     /* Tools menu */
     void statistics();
+    void rawJsonTextEditor();
     /* Preferences menu */
     void pref_settings();
     /* Help menu */

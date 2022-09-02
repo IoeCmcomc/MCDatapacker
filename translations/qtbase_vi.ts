@@ -387,7 +387,7 @@
     <message>
         <location line="+1"/>
         <source>&amp;Red:</source>
-        <translation>%Đỏ:</translation>
+        <translation type="unfinished">&amp;Đỏ:</translation>
     </message>
     <message>
         <location line="+1"/>
