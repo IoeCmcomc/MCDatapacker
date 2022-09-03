@@ -1,6 +1,9 @@
 [submodule "lib/QFindDialogs"]
 	path = lib/QFindDialogs/QFindDialogs
 	url = https://github.com/teamYetZio/QFindDialogs
+[submodule "lib/QSimpleDialog"]
+	path = lib/QSimpleDialog
+	url = https://github.com/ultravires/QSimpleUpdater.git
 [submodule "lib/nbt-cpp"]
 	path = lib/nbt/nbt-cpp
 	url = git@github.com:handtruth/nbt-cpp.git
@@ -19,3 +22,6 @@
 [submodule "resource/minecraft/info/1.17/mcdata"]
 	path = resource/minecraft/info/1.17/mcdata
 	url = https://github.com/Arcensoth/mcdata
+[submodule "lib/QSimpleUpdater"]
+	path = lib/QSimpleUpdater
+	url = https://github.com/ultravires/QSimpleUpdater.git

@@ -17,6 +17,8 @@
 #include "statisticsdialog.h"
 #include "rawjsontextedit.h"
 
+#include "QSimpleUpdater.h"
+
 #include <QDebug>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -33,6 +35,9 @@
 
 QMap<QString, QVariantMap> MainWindow::MCRInfoMaps;
 QVersionNumber             MainWindow::curGameVersion = QVersionNumber();
+
+static const QString updateDefUrl = QStringLiteral(
+    "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -85,6 +90,13 @@ MainWindow::MainWindow(QWidget *parent)
     /*qDebug() << QIcon::fallbackSearchPaths(); */
 
     initDocks();
+
+    auto *updater = QSimpleUpdater::getInstance();
+    updater->setUseCustomInstallProcedures(updateDefUrl, true);
+    updater->setDownloaderEnabled(updateDefUrl, true);
+    updater->setDownloadDir(updateDefUrl, qApp->applicationDirPath());
+    connect(updater, &QSimpleUpdater::downloadFinished,
+            this, &MainWindow::installUpdate);
 }
 
 void MainWindow::initDocks() {
@@ -151,11 +163,13 @@ void MainWindow::initMenu() {
             this, &MainWindow::pref_settings);
     /* Help menu */
     connect(ui->actionAboutApp, &QAction::triggered, this, &MainWindow::about);
+    connect(ui->actionCheckForUpdates, &QAction::triggered,
+            this, &MainWindow::checkForUpdates);
+    connect(ui->actionDisclaimer, &QAction::triggered, this,
+            &MainWindow::disclaimer);
     connect(ui->actionAboutQt, &QAction::triggered, [this]() {
         QMessageBox::aboutQt(this);
     });
-    connect(ui->actionDisclaimer, &QAction::triggered, this,
-            &MainWindow::disclaimer);
 
     /* Menu items status update connections */
     connect(ui->tabbedInterface->getStackedWidget(),
@@ -244,6 +258,15 @@ void MainWindow::about() {
     auto *dialog = new AboutDialog(this);
 
     dialog->open();
+}
+
+void MainWindow::checkForUpdates() {
+    auto *updater = QSimpleUpdater::getInstance();
+
+    updater->setNotifyOnUpdate(updateDefUrl, false);
+    updater->setNotifyOnFinish(updateDefUrl, true);
+
+    updater->checkForUpdates(updateDefUrl);
 }
 
 void MainWindow::disclaimer() {
@@ -738,6 +761,10 @@ void MainWindow::updateWindowTitle(bool changed) {
     titleParts << QCoreApplication::applicationName();
     setWindowTitle(titleParts.join(QStringLiteral(" - ")));
     this->setWindowModified(changed);
+}
+
+void MainWindow::installUpdate(const QString &url, const QString &filepath) {
+    qDebug() << filepath;
 }
 
 QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,

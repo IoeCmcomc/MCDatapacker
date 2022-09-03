@@ -167,8 +167,10 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="actionAboutApp"/>
-    <addaction name="actionAboutQt"/>
+    <addaction name="actionCheckForUpdates"/>
     <addaction name="actionDisclaimer"/>
+    <addaction name="separator"/>
+    <addaction name="actionAboutQt"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -373,6 +375,11 @@
   <action name="actionRawJsonTextEditor">
    <property name="text">
     <string>&amp;Raw JSON text editor</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates">
+   <property name="text">
+    <string>&amp;Check for updates</string>
    </property>
   </action>
  </widget>

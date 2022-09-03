@@ -58,7 +58,7 @@ signals:
     void curDirChanged(const QDir &dir);
     void gameVersionChanged(const QString &ver);
 
-private slots:
+private /*slots*/ :
     /* File menu */
     void open();
     void newDatapack();
@@ -75,12 +75,14 @@ private slots:
     void pref_settings();
     /* Help menu */
     void about();
+    void checkForUpdates();
     void disclaimer();
     /* Internal slots */
     void onSystemWatcherFileChanged(const QString &filepath);
     void onCurFileChanged(const QString &path);
     void onDatapackChanged();
     void updateWindowTitle(bool changed);
+    void installUpdate(const QString &url, const QString &filepath);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
