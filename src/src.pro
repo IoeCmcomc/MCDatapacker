@@ -317,4 +317,17 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/libQFindDialogs.a
 
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/miniz/release/ -lminiz
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/miniz/debug/ -lminiz
+else:unix: LIBS += -L$$OUT_PWD/../lib/miniz/ -lminiz
+
+INCLUDEPATH += $$PWD/../lib/miniz
+DEPENDPATH += $$PWD/../lib/miniz
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/release/libminiz.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/libminiz.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/release/miniz.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/miniz.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/libminiz.a
+
 #message($$INCLUDEPATH)

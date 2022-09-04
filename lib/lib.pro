@@ -4,4 +4,5 @@ SUBDIRS = \
     QFindDialogs \
     json \
     lru-cache \
-    nbt
+    nbt \
+    miniz

@@ -18,6 +18,7 @@
 #include "rawjsontextedit.h"
 
 #include "QSimpleUpdater.h"
+#include "miniz-cpp/zip.hpp"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -31,6 +32,7 @@
 #include <QProcess>
 #include <QShortcut>
 #include <QClipboard>
+#include <QProgressDialog>
 
 
 QMap<QString, QVariantMap> MainWindow::MCRInfoMaps;
@@ -97,6 +99,11 @@ MainWindow::MainWindow(QWidget *parent)
     updater->setDownloadDir(updateDefUrl, qApp->applicationDirPath());
     connect(updater, &QSimpleUpdater::downloadFinished,
             this, &MainWindow::installUpdate);
+
+    const auto &&oldProgramFile = qApp->applicationDirPath() +
+                                  QLatin1String("/MCDatapacker_old");
+    if (QFile::exists(oldProgramFile))
+        QFile::remove(oldProgramFile);
 }
 
 void MainWindow::initDocks() {
@@ -227,7 +234,7 @@ void MainWindow::saveAll() {
 }
 
 void MainWindow::restart() {
-    static const int restartExitCode = 2020;
+    static const int restartExitCode = 2022;
 
     qApp->exit(restartExitCode);
 
@@ -764,7 +771,52 @@ void MainWindow::updateWindowTitle(bool changed) {
 }
 
 void MainWindow::installUpdate(const QString &url, const QString &filepath) {
+    using namespace miniz_cpp;
     qDebug() << filepath;
+
+
+    const auto appDirPath = qApp->applicationDirPath();
+    qDebug() << filepath << appDirPath << qApp->arguments()[0];
+    QFile::rename(qApp->arguments()[0],
+                  appDirPath + QLatin1String("/MCDatapacker_old"));
+    zip_file zipFile{ filepath.toStdString() };
+
+/*  zipFile.printdir(); */
+
+    QDir        dir(appDirPath);
+    auto const &infoList = zipFile.infolist();
+
+    QProgressDialog progress(QString(), QString(), 0,
+                             infoList.size(), this);
+    progress.setWindowTitle(tr("Extracting files"));
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
+
+    int i = 0;
+    for (auto const &info: infoList) {
+        const QString &filename = QString::fromStdString(info.filename);
+        progress.setValue(i);
+        progress.setLabelText(tr("Extracting: %1").arg(filename));
+        if (filename.rightRef(1) == '/') {
+            dir.mkpath(filename);
+        } else {
+            QFile file(appDirPath + QLatin1Char('/') + filename);
+            if (!file.open(QIODevice::WriteOnly))
+                return;
+
+            const auto &&fileData = zipFile.read(info);
+            file.write(fileData.c_str(), fileData.size());
+            file.close();
+        }
+        i++;
+    }
+
+    progress.setValue(progress.maximum());
+
+    QFile::rename(appDirPath + QLatin1String("/MCDatapacker.exe"),
+                  qApp->arguments()[0].replace('\\', '/'));
+
+    restart();
 }
 
 QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,

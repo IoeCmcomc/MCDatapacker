@@ -25,3 +25,6 @@
 [submodule "lib/QSimpleUpdater"]
 	path = lib/QSimpleUpdater
 	url = https://github.com/ultravires/QSimpleUpdater.git
+[submodule "lib/miniz-cpp"]
+	path = lib/miniz/miniz-cpp
+	url = https://github.com/vishal-ahirwar/miniz-cpp.git
