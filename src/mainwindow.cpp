@@ -33,6 +33,7 @@
 #include <QShortcut>
 #include <QClipboard>
 #include <QProgressDialog>
+#include <QSaveFile>
 
 
 QMap<QString, QVariantMap> MainWindow::MCRInfoMaps;
@@ -100,8 +101,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(updater, &QSimpleUpdater::downloadFinished,
             this, &MainWindow::installUpdate);
 
-    const auto &&oldProgramFile = qApp->applicationDirPath() +
-                                  QLatin1String("/MCDatapacker_old");
+    const auto &oldProgramFile = qApp->applicationDirPath() +
+                                 QLatin1String("/MCDatapacker_old");
     if (QFile::exists(oldProgramFile))
         QFile::remove(oldProgramFile);
 }
@@ -778,7 +779,7 @@ void MainWindow::installUpdate(const QString &url, const QString &filepath) {
     const auto appDirPath = qApp->applicationDirPath();
     qDebug() << filepath << appDirPath << qApp->arguments()[0];
     QFile::rename(qApp->arguments()[0],
-                  appDirPath + QLatin1String("/MCDatapacker_old"));
+                  appDirPath + "/MCDatapacker_old");
     zip_file zipFile{ filepath.toStdString() };
 
 /*  zipFile.printdir(); */
@@ -800,16 +801,19 @@ void MainWindow::installUpdate(const QString &url, const QString &filepath) {
         if (filename.rightRef(1) == '/') {
             dir.mkpath(filename);
         } else {
-            QFile file(appDirPath + QLatin1Char('/') + filename);
+            QSaveFile file(appDirPath + QLatin1Char('/') + filename);
             if (!file.open(QIODevice::WriteOnly))
                 return;
 
             const auto &&fileData = zipFile.read(info);
             file.write(fileData.c_str(), fileData.size());
-            file.close();
+            file.commit();
         }
         i++;
     }
+
+    /* QLatin1String("/QSU_Update.bin") crashes the program in release build */
+    QFile::remove(appDirPath + QStringLiteral("/QSU_Update.bin"));
 
     progress.setValue(progress.maximum());
 

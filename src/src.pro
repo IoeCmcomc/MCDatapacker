@@ -250,12 +250,12 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-VERSION = 0.4.0
+VERSION = 0.5.0
 QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
 QMAKE_TARGET_DESCRIPTION = MCDatapacker - Minecraft datapack editor
-QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2021 IoeCmcomc
+QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2022 IoeCmcomc
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/json/release/ -ljson
