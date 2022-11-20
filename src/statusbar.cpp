@@ -59,14 +59,14 @@ void StatusBar::onCurFileChanged() {
                              .arg(m_tabbedInterface->count()));
         m_fileLabel->setText(Glhp::fileTypeToName(
                                  m_tabbedInterface->getCurFile()->fileType));
-        for (auto *label: m_editorLabels)
+        for (auto *label: qAsConst(m_editorLabels))
             label->clear();
         updateCodeEditorStatus(m_tabbedInterface->getCodeEditor());
         updateImgViewerStatus(m_tabbedInterface->getImgViewer());
     } else {
         m_tabsLabel->clear();
         m_fileLabel->clear();
-        for (auto *label: m_editorLabels)
+        for (auto *label: qAsConst(m_editorLabels))
             label->clear();
     }
 }

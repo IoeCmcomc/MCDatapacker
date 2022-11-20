@@ -8,7 +8,9 @@
 #include <QDirIterator>
 #include <QProgressDialog>
 #include <QTableWidgetItem>
+#ifdef QT_OS_WIN
 #include <QtWin>
+#endif
 #include <QOperatingSystemVersion>
 #include <QElapsedTimer>
 
@@ -18,6 +20,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     m_mainWin = parent;
     ui->setupUi(this);
 
+#ifdef QT_OS_WIN
     if (QOperatingSystemVersion::current() <
         QOperatingSystemVersion::Windows8) {
         if (QtWin::isCompositionEnabled()) {
@@ -31,6 +34,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
             setAttribute(Qt::WA_TranslucentBackground, false);
         }
     }
+#endif
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
                                    QDir::current().dirName(),

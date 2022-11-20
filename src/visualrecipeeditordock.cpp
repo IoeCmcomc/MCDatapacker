@@ -366,7 +366,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
         if (pattern.count() > 3) return;
 
         int rowlen = pattern[0].toString().length();
-        for (auto row : qAsConst(pattern))
+        for (const auto &row : qAsConst(pattern))
             if (row.toString().length() != rowlen) return;
 
         if (pattern.count() == 3 && rowlen == 3)
@@ -375,7 +375,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
             ui->craftTypeInput->setCurrentIndex(1);
 
         QString patternStr;
-        for (auto row : qAsConst(pattern))
+        for (const auto &row : qAsConst(pattern))
             patternStr += row.toString().leftJustified(3, ' ');
         patternStr = patternStr.leftJustified(9, ' ');
 

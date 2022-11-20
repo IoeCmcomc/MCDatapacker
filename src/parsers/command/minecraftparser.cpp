@@ -85,9 +85,8 @@ QVariantToParseNodeSharedPointer(const QVariant &vari) {
 }
 
 QString Command::MinecraftParser::oneOf(const QStringList &strArr) {
-    QString          str;
     const int        start   = pos();
-    const QStringRef curText = this->text().midRef(this->pos());
+    const QString &curText = this->text().mid(this->pos());
 
     for (const QString &str: qAsConst(strArr)) {
         if (curText.startsWith(str)) {
@@ -255,7 +254,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
 QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
     const auto number = brigadier_double();
 
-    const QStringRef literal = text().midRef(number->pos(),
+    const QString &literal = text().mid(number->pos(),
                                              number->length());
     bool ok = false;
 
@@ -270,7 +269,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
         } else {
             error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                     "%1 is not a vaild SNBT byte tag"),
-                  { literal.toString() }, number->pos(), number->length());
+                  { literal }, number->pos(), number->length());
             break;
         }
     }
@@ -291,7 +290,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
         } else {
             error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                     "%1 is not a vaild SNBT float tag"),
-                  { literal.toString() }, number->pos(), number->length());
+                  { literal }, number->pos(), number->length());
             break;
         }
     }
@@ -306,7 +305,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
         } else {
             error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                     "%1 is not a vaild SNBT long tag"),
-                  { literal.toString() }, number->pos(), number->length());
+                  { literal }, number->pos(), number->length());
             break;
         }
     }
@@ -321,7 +320,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
         } else {
             error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                     "%1 is not a vaild SNBT short tag"),
-                  { literal.toString() }, number->pos(), number->length());
+                  { literal }, number->pos(), number->length());
             break;
         }
     }
@@ -341,7 +340,7 @@ QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
             } else {
                 error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                         "%1 is not a vaild SNBT integer tag"),
-                      { literal.toString() }, number->pos(), number->length());
+                      { literal }, number->pos(), number->length());
             }
         }
     }

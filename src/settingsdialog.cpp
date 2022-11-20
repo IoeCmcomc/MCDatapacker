@@ -3,7 +3,9 @@
 
 #include "mainwindow.h"
 
+#ifdef QT_OS_WIN
 #include <QtWin>
+#endif
 #include <QOperatingSystemVersion>
 #include <QFontDatabase>
 #include <QSettings>
@@ -13,6 +15,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
 
+#ifdef QT_OS_WIN
     if (QOperatingSystemVersion::current() <
         QOperatingSystemVersion::Windows8) {
         if (QtWin::isCompositionEnabled()) {
@@ -26,6 +29,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
             setAttribute(Qt::WA_TranslucentBackground, false);
         }
     }
+#endif
 
     setupLanguageSetting();
 

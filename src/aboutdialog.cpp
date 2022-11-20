@@ -1,7 +1,9 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
+#ifdef QT_OS_WIN
 #include <QtWin>
+#endif
 #include <QOperatingSystemVersion>
 #include <QGraphicsOpacityEffect>
 #include <QTimer>
@@ -14,6 +16,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui->mainInfoLabel->setText(ui->mainInfoLabel->text().arg(qApp->
                                                              applicationVersion()));
 
+#ifdef QT_OS_WIN
     if (QOperatingSystemVersion::current() <
         QOperatingSystemVersion::Windows8) {
         if (QtWin::isCompositionEnabled()) {
@@ -28,6 +31,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
             setAttribute(Qt::WA_TranslucentBackground, false);
         }
     }
+#endif
 
     auto *effect = new QGraphicsOpacityEffect(ui->logoLabel);
     ui->logoLabel->setGraphicsEffect(effect);

@@ -139,7 +139,7 @@ void ExtendedTableWidget::fromJson(const QJsonArray &root) {
 
     if (m_jsonMode == JsonMode::List) {
         int row = 0;
-        for (const auto jsonRef : root) {
+        for (const auto &jsonRef : root) {
             const QJsonObject &&obj = jsonRef.toObject();
             for (auto objIt = obj.constBegin();
                  objIt != obj.constEnd(); ++objIt) {

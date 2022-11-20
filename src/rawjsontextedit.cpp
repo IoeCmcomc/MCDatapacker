@@ -244,7 +244,7 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
         if (!color.isEmpty()) {
             fmt.setForeground(QBrush(QColor(color)));
         } else if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
-            QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
+            static QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
             const auto       &&match
                 = regex.match(root.value(QLatin1String("color")).toString(), 0,
                               QRegularExpression::NormalMatch,

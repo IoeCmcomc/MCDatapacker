@@ -1,7 +1,6 @@
 #include "modelfunctions.h"
 
 #include "mainwindow.h"
-#include "globalhelpers.h"
 #include "extendedtablewidget.h"
 
 #include <QApplication>
