@@ -4,13 +4,11 @@
 #include "mainwindow.h"
 #include "globalhelpers.h"
 #include "parsers/command/minecraftparser.h"
+#include "platforms/windows.h"
 
 #include <QDirIterator>
 #include <QProgressDialog>
 #include <QTableWidgetItem>
-#ifdef QT_OS_WIN
-#include <QtWin>
-#endif
 #include <QOperatingSystemVersion>
 #include <QElapsedTimer>
 
@@ -20,21 +18,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     m_mainWin = parent;
     ui->setupUi(this);
 
-#ifdef QT_OS_WIN
-    if (QOperatingSystemVersion::current() <
-        QOperatingSystemVersion::Windows8) {
-        if (QtWin::isCompositionEnabled()) {
-            QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
-            setAttribute(Qt::WA_TranslucentBackground, true);
-            setAttribute(Qt::WA_NoSystemBackground, false);
-            setStyleSheet(QStringLiteral(
-                              "StatisticsDialog { background: transparent; }"));
-        } else {
-            QtWin::resetExtendedFrame(this);
-            setAttribute(Qt::WA_TranslucentBackground, false);
-        }
-    }
-#endif
+    extendFrameOnWindows(this, "StatisticsDialog");
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
                                    QDir::current().dirName(),

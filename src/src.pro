@@ -96,6 +96,7 @@ SOURCES += \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/overloadnodevisitor.cpp \
+    platforms/windows.cpp \
     predicatedock.cpp \
     problemarea.cpp \
     rawjsontextedit.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \
+    platforms/windows.h \
     predicatedock.h \
     problemarea.h \
     rawjsontextedit.h \

@@ -2,10 +2,8 @@
 #include "ui_settingsdialog.h"
 
 #include "mainwindow.h"
+#include "platforms/windows.h"
 
-#ifdef QT_OS_WIN
-#include <QtWin>
-#endif
 #include <QOperatingSystemVersion>
 #include <QFontDatabase>
 #include <QSettings>
@@ -15,21 +13,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
 
-#ifdef QT_OS_WIN
-    if (QOperatingSystemVersion::current() <
-        QOperatingSystemVersion::Windows8) {
-        if (QtWin::isCompositionEnabled()) {
-            QtWin::extendFrameIntoClientArea(this, -1, -1, -1, -1);
-            setAttribute(Qt::WA_TranslucentBackground, true);
-            setAttribute(Qt::WA_NoSystemBackground, false);
-            setStyleSheet(QStringLiteral(
-                              "SettingsDialog, QTabWidget { background: transparent; }"));
-        } else {
-            QtWin::resetExtendedFrame(this);
-            setAttribute(Qt::WA_TranslucentBackground, false);
-        }
-    }
-#endif
+    extendFrameOnWindows(this, "SettingsDialog");
 
     setupLanguageSetting();
 
