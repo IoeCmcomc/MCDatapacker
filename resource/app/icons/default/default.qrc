@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/icons/default">
+        <file>index.theme</file>
+        <file>32/actions/list-add.png</file>
+        <file>32/actions/list-remove.png</file>
+        <file>32/actions/format-text-bold.png</file>
+        <file>32/actions/format-text-italic.png</file>
+        <file>32/actions/format-text-strikethrough.png</file>
+        <file>32/actions/format-text-underline.png</file>
+    </qresource>
+</RCC>

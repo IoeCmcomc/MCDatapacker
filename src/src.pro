@@ -237,7 +237,8 @@ RESOURCES += \
     ../resource/minecraft/info/1.15/1.15.qrc \
     ../resource/minecraft/info/1.16/1.16.qrc \
     ../resource/minecraft/info/1.17/1.17.qrc \
-    ../resource/minecraft/minecraft.qrc
+    ../resource/minecraft/minecraft.qrc \
+    ../resource/app/icons/default/default.qrc
 
 DISTFILES += \
     ../lib/QFindDialogs/LICENSE

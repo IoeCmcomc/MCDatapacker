@@ -385,7 +385,6 @@ void MainWindow::readSettings() {
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     const QString &style = settings.value(QStringLiteral("theme"),
                                        qApp->style()->objectName()).toString();
-    qDebug() << qApp->style()->objectName() << style;
     if (style.toLower() != qApp->style()->objectName()) {
         qApp->setStyle(style);
     }

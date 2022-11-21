@@ -7,15 +7,9 @@
         <file>icon/favicon.ico</file>
         <file>icon/reset.png</file>
         <file>icon/delete.png</file>
-        <file>icon/format-text-bold.png</file>
-        <file>icon/format-text-italic.png</file>
-        <file>icon/format-text-strikethrough.png</file>
-        <file>icon/format-text-underline.png</file>
         <file>icon/favicon_big.png</file>
         <file>icon/gutter/error.svg</file>
         <file>icon/gutter/warning.svg</file>
         <file>icon/gutter/error-and-warning.svg</file>
-        <file>icon/list-add.png</file>
-        <file>icon/list-remove.png</file>
     </qresource>
 </RCC>

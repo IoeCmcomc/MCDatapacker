@@ -131,16 +131,14 @@
       <item>
        <widget class="QToolButton" name="addBtn">
         <property name="icon">
-         <iconset resource="../resource/app/app.qrc">
-          <normaloff>:/icon/list-add.png</normaloff>:/icon/list-add.png</iconset>
+         <iconset theme="list-add"/>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="removeBtn">
         <property name="icon">
-         <iconset resource="../resource/app/app.qrc">
-          <normaloff>:/icon/list-remove.png</normaloff>:/icon/list-remove.png</iconset>
+         <iconset theme="list-remove"/>
         </property>
        </widget>
       </item>
@@ -149,8 +147,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resource/app/app.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

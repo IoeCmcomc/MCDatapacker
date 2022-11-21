@@ -18,6 +18,11 @@ int main(int argc, char *argv[]) {
 
     /*Q_INIT_RESOURCE(application); */
 
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(":/icon"));
+    QIcon::setFallbackThemeName(QStringLiteral("default"));
+    if (QIcon::themeName().isEmpty())
+        QIcon::setThemeName(QStringLiteral("default"));
+
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
 
@@ -27,10 +32,6 @@ int main(int argc, char *argv[]) {
     parser.addVersionOption();
     /*parser.addPositionalArgument("file", "The file to open."); */
     parser.process(a);
-
-    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/icon");
-    qDebug() << QIcon::fallbackSearchPaths();
-    qDebug() << QIcon::themeSearchPaths();
 
     MainWindow w;
     w.show();

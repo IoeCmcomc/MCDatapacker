@@ -1,0 +1,10 @@
+[Icon Theme]
+Name=Default
+Comment=Default theme for MCDatapacker
+
+Directories=32/actions
+
+[32/actions]
+Size=32
+Context=Actions
+Type=Fixed
