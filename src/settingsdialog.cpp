@@ -7,11 +7,14 @@
 #include <QOperatingSystemVersion>
 #include <QFontDatabase>
 #include <QSettings>
+#include <QStyleFactory>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
+
+    qDebug() << qApp->style()->objectName();
 
     extendFrameOnWindows(this, "SettingsDialog");
 
@@ -62,6 +65,7 @@ void SettingsDialog::onAccepted() {
     QSettings settings(QCoreApplication::organizationName(),
                        QCoreApplication::applicationName());
 
+    settings.setValue("theme", ui->themeCombo->currentText());
     settings.beginGroup("general");
     settings.setValue("locale", ui->languageCombo->currentData().toString());
     settings.setValue("reloadExternChanges",
@@ -88,6 +92,13 @@ void SettingsDialog::onAccepted() {
 void SettingsDialog::initSettings() {
     QSettings settings;
 
+    const auto &&styles = QStyleFactory::keys();
+    for (const auto &style: styles) {
+        ui->themeCombo->addItem(style);
+    }
+    ui->themeCombo->setCurrentText(settings.value(QStringLiteral("theme"),
+                                                  qApp->style()->objectName()).toString());
+
     settings.beginGroup(QStringLiteral("general"));
     ui->reloadExternChangesCombo->setCurrentIndex
         (settings.value(QStringLiteral("reloadExternChanges"), 0).toInt());
@@ -97,7 +108,7 @@ void SettingsDialog::initSettings() {
         ui->gameVersionCombo->addItem(finfo.fileName());
     ui->gameVersionCombo->setCurrentText(settings.value(QStringLiteral(
                                                             "gameVersion"),
-                                                        0).toString());
+                                                        "1.17").toString());
     settings.endGroup();
 
     settings.beginGroup(QStringLiteral("editor"));

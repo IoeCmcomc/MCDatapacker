@@ -21,19 +21,16 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
 
-    /*qDebug() << QStyleFactory::keys();
-     *
-       a.setStyle("windowsvista");
-       a.setStyle("Windows");
-       a.setStyle("fusion");
-     */
-
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
     parser.addVersionOption();
     /*parser.addPositionalArgument("file", "The file to open."); */
     parser.process(a);
+
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/icon");
+    qDebug() << QIcon::fallbackSearchPaths();
+    qDebug() << QIcon::themeSearchPaths();
 
     MainWindow w;
     w.show();

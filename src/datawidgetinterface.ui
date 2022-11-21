@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>125</width>
-    <height>194</height>
+    <height>206</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -61,7 +61,7 @@
         <x>0</x>
         <y>0</y>
         <width>85</width>
-        <height>192</height>
+        <height>204</height>
        </rect>
       </property>
      </widget>
@@ -132,7 +132,7 @@
        <widget class="QToolButton" name="addBtn">
         <property name="icon">
          <iconset resource="../resource/app/app.qrc">
-          <normaloff>:/icon/list_add.png</normaloff>:/icon/list_add.png</iconset>
+          <normaloff>:/icon/list-add.png</normaloff>:/icon/list-add.png</iconset>
         </property>
        </widget>
       </item>
@@ -140,7 +140,7 @@
        <widget class="QToolButton" name="removeBtn">
         <property name="icon">
          <iconset resource="../resource/app/app.qrc">
-          <normaloff>:/icon/list_remove.png</normaloff>:/icon/list_remove.png</iconset>
+          <normaloff>:/icon/list-remove.png</normaloff>:/icon/list-remove.png</iconset>
         </property>
        </widget>
       </item>

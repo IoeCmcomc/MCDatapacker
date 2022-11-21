@@ -45,6 +45,7 @@ static const QString updateDefUrl = QStringLiteral(
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
     readSettings();
 
     MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
@@ -88,9 +89,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(qApp, &QGuiApplication::commitDataRequest,
             this, &MainWindow::commitData);
     #endif
-
-    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << ":/icon");
-    /*qDebug() << QIcon::fallbackSearchPaths(); */
 
     initDocks();
 
@@ -385,6 +383,13 @@ void MainWindow::readSettings() {
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
+    const QString &style = settings.value(QStringLiteral("theme"),
+                                       qApp->style()->objectName()).toString();
+    qDebug() << qApp->style()->objectName() << style;
+    if (style.toLower() != qApp->style()->objectName()) {
+        qApp->setStyle(style);
+    }
+
     settings.beginGroup(QStringLiteral("general"));
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
                  true);
