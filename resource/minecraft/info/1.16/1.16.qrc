@@ -12,10 +12,9 @@
         <file>tag/entity_type.json</file>
         <file>tag/fluid.json</file>
         <file>tag/item.json</file>
-        <file>mcdata/generated/reports/blocks.json</file>
-        <file>mcdata/generated/reports/commands.json</file>
-        <file>mcdata/generated/reports/registries.json</file>
         <file>block.json</file>
         <file>item.json</file>
+        <file>summary/registries/data.min.json</file>
+        <file>summary/registries/data.msgpack</file>
     </qresource>
 </RCC>

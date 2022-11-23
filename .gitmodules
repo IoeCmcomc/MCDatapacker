@@ -13,18 +13,27 @@
 [submodule "lib/lru-cache"]
 	path = lib/lru-cache/lru-cache
 	url = git@github.com:goldsborough/lru-cache.git
-[submodule "resource/minecraft/info/1.15/mcdata"]
-	path = resource/minecraft/info/1.15/mcdata
-	url = git@github.com:Arcensoth/mcdata.git
-[submodule "resource/minecraft/info/1.16/mcdata"]
-	path = resource/minecraft/info/1.16/mcdata
-	url = git@github.com:Arcensoth/mcdata.git
-[submodule "resource/minecraft/info/1.17/mcdata"]
-	path = resource/minecraft/info/1.17/mcdata
-	url = https://github.com/Arcensoth/mcdata
 [submodule "lib/QSimpleUpdater"]
 	path = lib/QSimpleUpdater
 	url = https://github.com/ultravires/QSimpleUpdater.git
 [submodule "lib/miniz-cpp"]
 	path = lib/miniz/miniz-cpp
 	url = https://github.com/vishal-ahirwar/miniz-cpp.git
+[submodule "resource/minecraft/info/1.15/summary"]
+	path = resource/minecraft/info/1.15/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.15/registries"]
+	path = resource/minecraft/info/1.15/registries
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.16/summary"]
+	path = resource/minecraft/info/1.16/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.16/registries"]
+	path = resource/minecraft/info/1.16/registries
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.17/summary"]
+	path = resource/minecraft/info/1.17/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.17/registries"]
+	path = resource/minecraft/info/1.17/registries
+	url = https://github.com/misode/mcmeta.git

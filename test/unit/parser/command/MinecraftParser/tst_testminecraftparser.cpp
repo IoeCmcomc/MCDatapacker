@@ -49,7 +49,7 @@ TestMinecraftParser::~TestMinecraftParser() {
 
 void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setSchema(
-        ":/minecraft/1.17/mcdata/processed/reports/commands/data.min.json");
+        ":/minecraft/1.17/summary/commands/data.min.json");
     Command::MinecraftParser::setTestMode(true);
     /*
        for (int i = 1024; i < 2000; ++i) {

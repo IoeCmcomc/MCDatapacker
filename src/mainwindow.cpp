@@ -426,18 +426,9 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                                                QStringLiteral("item"),
                                                gameVer));
             MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
-            if (curGameVersion >= QVersionNumber(1, 17)) {
-                Command::MinecraftParser::setSchema(
-                    QStringLiteral(
-                        ":/minecraft/") + gameVer +
-                    QStringLiteral(
-                        "/mcdata/processed/reports/commands/data.min.json"));
-            } else {
-                Command::MinecraftParser::setSchema(
-                    QStringLiteral(
-                        ":/minecraft/") + gameVer +
-                    QStringLiteral("/mcdata/generated/reports/commands.json"));
-            }
+            Command::MinecraftParser::setSchema(
+                QStringLiteral(":/minecraft/") + gameVer +
+                QStringLiteral("/summary/commands/data.min.json"));
 
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);

@@ -28,7 +28,7 @@ TextNodeFormatter::~TextNodeFormatter() {
 
 void TextNodeFormatter::initTestCase() {
     MinecraftParser::setSchema(
-        ":/minecraft/1.15/mcdata/generated/reports/commands.json");
+        ":/minecraft/1.15/summary/commands/data.min.json");
 }
 
 void TextNodeFormatter::cleanupTestCase() {

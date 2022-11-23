@@ -1,7 +1,7 @@
 QT += testlib
 QT -= gui
 
-CONFIG += qt console warn_on depend_includepath testcase c++17 conan_basic_setup
+CONFIG += qt console warn_on depend_includepath testcase c++17
 CONFIG -= app_bundle
 
 TEMPLATE = app
@@ -87,7 +87,7 @@ RESOURCES += \
     ../../../../../resource/minecraft/info/1.17/1.17.qrc
 
 DISTFILES += \
-    ../../../../../resource/minecraft/info/1.17/mcdata/processed/reports/commands/data.min.json
+    ../../../../../resource/minecraft/info/1.17/summary/commands/data.min.json
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/lru-cache/release/ -llru-cache
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/lru-cache/debug/ -llru-cache

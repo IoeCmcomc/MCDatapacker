@@ -1,11 +1,278 @@
 #include "parser.h"
 
+#include "nlohmann/json.hpp"
+
 #include <QCoreApplication>
 #include <QFileInfo>
-#include <QJsonArray>
+//#include <QJsonArray>
 #include <QJsonDocument>
 #include <QMetaMethod>
 #include <QElapsedTimer>
+
+/* These classes are for benchmarking deserialization methods.
+ * For now, deserializing from JSON using QJsonDocumant (faster than from MessagePack).
+
+#include <QStack>
+
+#include <stack>
+
+using json = nlohmann::json;
+
+template <typename A, typename O>
+struct StackElement
+{
+    enum class Type {
+        Array,
+        Object,
+    };
+
+    A array;
+    O object;
+    Type type = StackElement::Type::Array;
+    QString lastKey;
+
+    StackElement() {}
+
+    StackElement(const A &arr) {
+        type = StackElement::Type::Array;
+        array = arr;
+    }
+
+    StackElement(const O &obj) {
+        type = StackElement::Type::Object;
+        object = obj;
+    }
+
+    StackElement(const StackElement &other) {
+        type = other.type;
+        if (type == StackElement::Type::Object) {
+            object = other.object;
+            lastKey = other.lastKey;
+        } else {
+            array = other.array;
+        }
+    };
+
+    StackElement(StackElement &&other) {
+        type = other.type;
+        if (type == StackElement::Type::Object) {
+            object = std::move(other.object);
+            lastKey = std::move(other.lastKey);
+        } else {
+            array = std::move(other.array);
+        }
+    };
+};
+
+template <typename E, typename A, typename O>
+class SaxConsumer : public json::json_sax_t
+{
+public:
+    O root;
+
+    using Element = StackElement<A, O>;
+    std::stack<Element> stack;
+
+    bool null() override
+    {
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, E());
+        } else {
+            top.array << E();
+        }
+        return true;
+    }
+
+    bool boolean(bool val) override
+    {
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, val);
+        } else {
+            top.array << val;
+        }
+        return true;
+    }
+
+    bool number_integer(number_integer_t val) override
+    {
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, val);
+        } else {
+            top.array << val;
+        }
+        return true;
+    }
+
+    bool number_unsigned(number_unsigned_t val) override
+    {
+        if (stack.size() == 0) {
+            qDebug() << root;
+        }
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, QVariant::fromValue(val).toJsonValue());
+        } else {
+            top.array << QVariant::fromValue(val).toJsonValue();
+        }
+        return true;
+    }
+
+    bool number_float(number_float_t val, const string_t& s) override
+    {
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, val);
+        } else {
+            top.array << val;
+        }
+        return true;
+    }
+
+    bool string(string_t& val) override
+    {
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, val.c_str());
+        } else {
+            top.array << QString::fromStdString(val);
+        }
+        return true;
+    }
+
+    bool start_object(std::size_t elements) override
+    {
+        stack.push(O());
+        return true;
+    }
+
+    bool end_object() override
+    {
+        const auto element = std::move(stack.top());
+        stack.pop();
+        if (stack.size() == 0) {
+            root = std::move(element.object);
+        } else {
+            auto &top = stack.top();
+            if (top.type == Element::Type::Object) {
+                top.object.insert(top.lastKey, element.object);
+            } else {
+                top.array << element.object;
+            }
+        }
+        return true;
+    }
+
+    bool start_array(std::size_t elements) override
+    {
+        stack.push(A());
+        return true;
+    }
+
+    bool end_array() override
+    {
+        const auto element = std::move(stack.top());
+        stack.pop();
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, element.array);
+        } else {
+            top.array << element.array;
+        }
+        return true;
+    }
+
+    bool key(string_t& val) override
+    {
+        auto &top = stack.top();
+        top.lastKey = val.c_str();
+        return true;
+    }
+
+    bool binary(json::binary_t& val) override
+    {
+        return false;
+    }
+
+    bool parse_error(std::size_t position, const std::string& last_token, const json::exception& ex) override
+    {
+        qWarning() << "parse_error(position=" << position << ", last_token=" << last_token.c_str() << ",\n            ex=" << ex.what() << ")";
+        return false;
+    }
+};
+
+Q_DECLARE_METATYPE(QVector<QVariant>)
+
+QVariant from_json(const json &v) {
+    using Type = json::value_t;
+    switch (v.type()) {
+    case Type::object: {
+        auto &&map = v.get<std::map<std::string, json>>();
+        QVariantMap qmap;
+        for (const auto &[k, v]: map) {
+            qmap.insert(k.c_str(), from_json(v));
+        }
+        return qmap;
+        break;
+    }
+    case Type::array: {
+        auto &&vec = v.get<std::vector<json>>();
+        QVector<QVariant> list;
+        for (const auto &v: vec) {
+            list << from_json(v);
+        }
+        QVariant vari;
+        vari.setValue(list);
+        return vari;
+        break;
+    }
+    case Type::boolean: {
+        return v.get<bool>();
+        break;
+    }
+    case Type::string : {
+        return v.get<std::string>().c_str();
+        break;
+    }
+    case Type::number_integer: {
+        return v.get<int>();
+        break;
+    }
+    case Type::number_float: {
+        return v.get<double>();
+        break;
+    }
+    case Type::number_unsigned: {
+        return v.get<unsigned int>();
+        break;
+    }
+    case Type::null: {
+        return QVariant();
+        break;
+    }
+    default:
+        return QVariant();
+        break;
+    }
+}
+
+class QtSaxConsumer: public SaxConsumer<QVariant, QVariantList, QVariantMap> {
+public:
+    bool number_unsigned(number_unsigned_t val) override
+    {
+        auto &top = stack.top();
+        if (top.type == Element::Type::Object) {
+            top.object.insert(top.lastKey, val);
+        } else {
+            top.array << val;
+        }
+        return true;
+    }
+};
+
+*/
 
 Command::Parser::Error::Error(const QString &whatArg, int pos, int length,
                               const QVariantList &args)
@@ -79,12 +346,25 @@ void Command::Parser::setSchema(const QString &filepath) {
         qWarning() << "File not exists:" << finfo.filePath();
         return;
     }
+
     QFile inFile(finfo.filePath());
     inFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray &&data = inFile.readAll();
     inFile.close();
 
+/*
+
+    using QtJsonSaxConsumer = SaxConsumer<QJsonValue, QJsonArray, QJsonObject>;
+    QtJsonSaxConsumer sax;
+    QElapsedTimer timer;
+    timer.start();
+    bool result = json::sax_parse(data, &sax);
+    qDebug() << "Nlohmann JSON SAX QJsonObject" << timer.nsecsElapsed();
+    setSchema(sax.root);
+*/
+
     QJsonParseError errorPtr{};
+    //timer.restart();
     QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
     if (doc.isNull()) {
         qWarning() << "Parsing failed" << errorPtr.error;
@@ -95,7 +375,62 @@ void Command::Parser::setSchema(const QString &filepath) {
         qWarning() << "Root is empty.";
         return;
     }
+    //qDebug() << "Qt QJsonDocument" << timer.nsecsElapsed();
     setSchema(root);
+
+/*
+    timer.restart();
+    const auto &&json = json::parse(data);
+    qDebug() << "Nlohmann JSON" << timer.nsecsElapsed();
+
+    timer.restart();
+    QJsonDocument &&doc2 = QJsonDocument::fromJson(data, &errorPtr);
+    if (doc.isNull()) {
+        qWarning() << "Parsing failed" << errorPtr.error;
+        return;
+    }
+    QJsonObject &&root2 = doc2.object();
+    if (root.isEmpty()) {
+        qWarning() << "Root is empty.";
+        return;
+    }
+    auto &&map = root2.toVariantMap();
+    qDebug() << "QJsonDocument QVariantMap"<< timer.nsecsElapsed();
+
+    QtSaxConsumer sax2;
+    timer.restart();
+    bool result2 = json::sax_parse(data, &sax);
+    qDebug() << "Nlohmann JSON SAX QVariantMap" << timer.nsecsElapsed();
+
+    timer.restart();
+    const auto &&json2 = json::parse(data);
+    const auto &variant = from_json(json2);
+    qDebug() << "Nlohmann JSON QVariant" << timer.nsecsElapsed();
+
+    QFile msgpackFile(finfo.filePath().replace(".min.json", ".msgpack"));
+    msgpackFile.open(QIODevice::ReadOnly);
+    QByteArray &&msgpackData = msgpackFile.readAll();
+    msgpackFile.close();
+
+    timer.restart();
+    const auto &&json3 = json::from_msgpack(msgpackData);
+    qDebug() << "Nlohmann MsgPack" << timer.nsecsElapsed();
+
+    timer.restart();
+    const auto &&json4 = json::from_msgpack(msgpackData);
+    const auto &variant2 = from_json(json4);
+    qDebug() << "Nlohmann MsgPack QVariant" << timer.nsecsElapsed();
+
+    QtJsonSaxConsumer sax3;
+    timer.restart();
+    bool result3 = json::sax_parse(msgpackData, &sax3, json::input_format_t::msgpack);
+    qDebug() << "Nlohmann MsgPack SAX QJsonObject" << timer.nsecsElapsed();
+
+    QtSaxConsumer sax4;
+    timer.restart();
+    bool result4 = json::sax_parse(msgpackData, &sax4, json::input_format_t::msgpack);
+    qDebug() << "Nlohmann MsgPack SAX QVariantMap" << timer.nsecsElapsed();
+*/
 }
 
 /*!

@@ -16,8 +16,7 @@
         <file>tag/entity_type.json</file>
         <file>tag/fluid.json</file>
         <file>tag/item.json</file>
-        <file>mcdata/generated/reports/blocks.json</file>
-        <file>mcdata/generated/reports/commands.json</file>
-        <file>mcdata/generated/reports/registries.json</file>
+        <file>summary/commands/data.min.json</file>
+        <file>summary/commands/data.msgpack</file>
     </qresource>
 </RCC>

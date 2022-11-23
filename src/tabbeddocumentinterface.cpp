@@ -388,7 +388,7 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
 void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
     Command::MinecraftParser::setSchema(
         QStringLiteral(":/minecraft/") + ver +
-        QStringLiteral("/mcdata/generated/reports/commands.json"));
+        QStringLiteral("/summary/commands/data.min.json"));
 
     for (const auto &file: qAsConst(files)) {
         if (file.fileType == CodeFile::Function) {
