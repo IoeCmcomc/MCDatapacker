@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 from pathlib import Path
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Tag') 
+req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Tag?oldid=2067543') 
 soup = BeautifulSoup(req.read(), "html.parser")
 
 h2 = soup.find("span", id="List_of_tags").parent
@@ -16,10 +16,7 @@ def find_tr_tags(tag):
 def get_html(tag):
     html = str()
     for child in tag.children:
-        #print(type(child))
-        #print(child)
         html += str(child)
-        #break
     return html
 
 h3 = h2

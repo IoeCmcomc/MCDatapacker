@@ -103,12 +103,12 @@ void SettingsDialog::initSettings() {
     ui->reloadExternChangesCombo->setCurrentIndex
         (settings.value(QStringLiteral("reloadExternChanges"), 0).toInt());
 
-    for (const auto &finfo:
-         QDir(QStringLiteral(":/minecraft")).entryInfoList({ "1.*" }))
+    const auto &versionFinfos = QDir(QStringLiteral(":/minecraft")).entryInfoList({ "1.*" });
+    for (const auto &finfo: versionFinfos)
         ui->gameVersionCombo->addItem(finfo.fileName());
     ui->gameVersionCombo->setCurrentText(settings.value(QStringLiteral(
                                                             "gameVersion"),
-                                                        "1.17").toString());
+                                                        "1.18").toString());
     settings.endGroup();
 
     settings.beginGroup(QStringLiteral("editor"));

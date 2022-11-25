@@ -5,7 +5,7 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Java_Edition_data_values/Biomes') 
+req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Biome/ID') 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 h1 = ids_soup.find("h1")
@@ -34,11 +34,11 @@ regex = re.compile(r"-(\d+)px -(\d+)px")
 for tr_tag in tr_tags:
     td_tags = tr_tag.find_all("td")
     id = td_tags[1].get_text(strip=True)
-    pos_match = regex.search(td_tags[0].span['style'])
+    pos_match = regex.search(td_tags[0].find("span", class_="sprite")['style'])
     pos = (int(i) for i in pos_match.groups())
     info.append((id, pos,))
 
-sheet_url = "https://gamepedia.cursecdn.com/minecraft_gamepedia/5/59/BiomeCSS.png"
+sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/5/59/BiomeCSS.png"
 with urllib.request.urlopen(sheet_url) as url:
     f = BytesIO(url.read())
 sheet_img = Image.open(f)

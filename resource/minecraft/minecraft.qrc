@@ -1338,5 +1338,27 @@
         <file>texture/item/raw_gold.png</file>
         <file>texture/item/raw_iron.png</file>
         <file>texture/item/spyglass.png</file>
+        <file>texture/biome/deep_dark.png</file>
+        <file>texture/biome/dripstone_caves.png</file>
+        <file>texture/biome/frozen_peaks.png</file>
+        <file>texture/biome/grove.png</file>
+        <file>texture/biome/jagged_peaks.png</file>
+        <file>texture/biome/lush_caves.png</file>
+        <file>texture/biome/mangrove_swamp.png</file>
+        <file>texture/biome/meadow.png</file>
+        <file>texture/biome/old_growth_birch_forest.png</file>
+        <file>texture/biome/old_growth_pine_taiga.png</file>
+        <file>texture/biome/old_growth_spruce_taiga.png</file>
+        <file>texture/biome/snowy_plains.png</file>
+        <file>texture/biome/snowy_slopes.png</file>
+        <file>texture/biome/sparse_jungle.png</file>
+        <file>texture/biome/stony_peaks.png</file>
+        <file>texture/biome/stony_shore.png</file>
+        <file>texture/biome/windswept_forest.png</file>
+        <file>texture/biome/windswept_gravelly_hills.png</file>
+        <file>texture/biome/windswept_hills.png</file>
+        <file>texture/biome/windswept_savanna.png</file>
+        <file>texture/biome/wooded_badlands.png</file>
+        <file>texture/item/music_disc_otherside.png</file>
     </qresource>
 </RCC>

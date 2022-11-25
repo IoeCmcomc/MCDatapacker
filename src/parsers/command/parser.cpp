@@ -1,10 +1,10 @@
 #include "parser.h"
 
-#include "nlohmann/json.hpp"
+//#include "nlohmann/json.hpp"
 
 #include <QCoreApplication>
 #include <QFileInfo>
-//#include <QJsonArray>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QMetaMethod>
 #include <QElapsedTimer>

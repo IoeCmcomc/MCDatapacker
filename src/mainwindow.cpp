@@ -6,7 +6,6 @@
 #include "settingsdialog.h"
 #include "aboutdialog.h"
 #include "disclaimerdialog.h"
-#include "globalhelpers.h"
 #include "tabbeddocumentinterface.h"
 #include "parsers/command/minecraftparser.h"
 #include "imgviewer.h"
@@ -392,8 +391,8 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     settings.beginGroup(QStringLiteral("general"));
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
                  true);
-    const QString gameVer = settings.value(QStringLiteral("gameVersion"),
-                                           QStringLiteral("1.17")).toString();
+    QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
+                                           QStringLiteral("1.18")).toString();
 
     if (gameVer != getCurGameVersion().toString()) {
         if (fromDialog) {
