@@ -1,4 +1,5 @@
 #include "entityconditiondialog.h"
+#include "modelfunctions.h"
 #include "ui_entityconditiondialog.h"
 
 #include "numberproviderdelegate.h"
@@ -8,6 +9,16 @@
 
 #include <QDebug>
 #include <QScrollArea>
+
+static const QVector<QString> gamemodes = {
+    "", "survival", "creative", "adventure", "spectator",
+};
+
+static const QVector<QString> catVariants = {
+    "", "all_black", "black", "british_shorthair",
+    "calico", "jellie", "persian", "ragdoll", "red",
+    "siamese", "tabby", "tuxedo", "white",
+};
 
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
@@ -20,6 +31,9 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     initComboModelView(QStringLiteral("stat_type"), statTypeModel,
                        ui->statTypeCombo, false);
 
+    ui->tabWidget->setTabVisible(2, MainWindow::getCurGameVersion() >= QVersionNumber(1, 16));
+    ui->tabWidget->setTabVisible(3, MainWindow::getCurGameVersion() >= QVersionNumber(1, 17));
+
     ui->headPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->chestPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->legsPropBtn->assignDialogClass<ItemConditionDialog>();
@@ -27,6 +41,24 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     ui->mainhandPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->offhandPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->locatPropBtn->assignDialogClass<LocationConditionDialog>();
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+        ui->vehicleBtn->assignDialogClass<EntityConditionDialog>();
+        ui->targetEntityBtn->assignDialogClass<EntityConditionDialog>();
+    } else {
+        ui->vehicleBtn->hide();
+        ui->targetEntityBtn->hide();
+    }
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        ui->passengerBtn->assignDialogClass<EntityConditionDialog>();
+        ui->steppingOnBtn->assignDialogClass<LocationConditionDialog>();
+        ui->lookingAtBtn->assignDialogClass<EntityConditionDialog>();
+        ui->entityStruckBtn->assignDialogClass<EntityConditionDialog>();
+    } else {
+        ui->passengerBtn->hide();
+        ui->steppingOnBtn->hide();
+        ui->lookingAtBtn->hide();
+        ui->lookingAtSep->hide();
+    }
 
     initEffectsPage();
     initPlayerAdv();
@@ -43,6 +75,7 @@ EntityConditionDialog::~EntityConditionDialog() {
 }
 
 QJsonObject EntityConditionDialog::toJson() const {
+
     QJsonObject root;
 
     if (ui->entityTypeCombo->currentIndex() != 0)
@@ -50,8 +83,8 @@ QJsonObject EntityConditionDialog::toJson() const {
                         Qt::UserRole + 1).toJsonValue());
     if (!ui->teamEdit->text().isEmpty())
         root.insert(QStringLiteral("team"), ui->teamEdit->text());
-    if (!ui->NBTEdit->text().isEmpty())
-        root.insert(QStringLiteral("nbt"), ui->NBTEdit->text());
+    if (!ui->NBTEdit->toPlainText().isEmpty())
+        root.insert(QStringLiteral("nbt"), ui->NBTEdit->toPlainText());
     QJsonObject distance;
     if (!ui->absDistanceInput->isCurrentlyUnset())
         distance.insert(QStringLiteral("absolute"),
@@ -92,11 +125,21 @@ QJsonObject EntityConditionDialog::toJson() const {
     if (!ui->legsPropBtn->getData().isEmpty())
         equipment.insert(QStringLiteral("legs"), ui->legsPropBtn->getData());
     if (!ui->feetPropBtn->getData().isEmpty())
-        equipment.insert(QStringLiteral("feet"), ui->feetPropBtn->getData()); ;
+        equipment.insert(QStringLiteral("feet"), ui->feetPropBtn->getData());
     if (!equipment.isEmpty())
         root.insert(QStringLiteral("equipment"), equipment);
     if (!ui->locatPropBtn->getData().isEmpty())
         root.insert(QStringLiteral("location"), ui->locatPropBtn->getData());
+    if (!ui->vehicleBtn->getData().isEmpty()
+            && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
+        root.insert(QStringLiteral("vehicle"), ui->vehicleBtn->getData());
+    }
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (!ui->passengerBtn->getData().isEmpty())
+            root.insert(QStringLiteral("passenger"), ui->passengerBtn->getData());
+        if (!ui->steppingOnBtn->getData().isEmpty())
+            root.insert(QStringLiteral("stepping_on"), ui->steppingOnBtn->getData());
+    }
 
     QJsonObject effects;
     for (int i = 0; i < entityEffectModel.rowCount(); ++i) {
@@ -129,17 +172,21 @@ QJsonObject EntityConditionDialog::toJson() const {
         QJsonObject player;
         if (ui->gameModeCombo->currentIndex() != 0)
             player.insert(QStringLiteral("gamemode"),
-                          ui->gameModeCombo->currentText().toLower());
+                          gamemodes[ui->gameModeCombo->currentIndex()]);
         if (!ui->playerLevelInput->isCurrentlyUnset())
             player.insert(QStringLiteral("level"),
                           ui->playerLevelInput->toJson());
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            if (!ui->lookingAtBtn->getData().isEmpty())
+                player.insert(QStringLiteral("looking_at"), ui->lookingAtBtn->getData());
+        }
 
         QJsonObject advancements;
-        for (int i = 0; i < playerAdvanmModel.rowCount(); ++i) {
+        for (int i = 0; i < playerAdvanModel.rowCount(); ++i) {
             auto advanm =
-                playerAdvanmModel.item(i, 0)->data(Qt::DisplayRole).toString();
+                playerAdvanModel.item(i, 0)->data(Qt::DisplayRole).toString();
             auto granted =
-                playerAdvanmModel.item(i, 1)->data(Qt::DisplayRole).toBool();
+                playerAdvanModel.item(i, 1)->data(Qt::DisplayRole).toBool();
             advancements.insert(advanm, granted);
         }
         if (!advancements.isEmpty())
@@ -175,13 +222,32 @@ QJsonObject EntityConditionDialog::toJson() const {
             root.insert(QStringLiteral("player"), player);
     }
 
+    if ((isNotSelected || (entityId == QStringLiteral("minecraft:cat")))
+            && (ui->catVariantCombo->currentIndex() > 0)) {
+        const auto &variant = catVariants[ui->catVariantCombo->currentIndex()];
+        root.insert(QStringLiteral("catType"), QStringLiteral("textures/entity/cat/%1.png").arg(variant));
+    }
+
     if ((isNotSelected ||
          (entityId == QStringLiteral("minecraft:fishing_bobber")))
         && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
         QJsonObject fishingHook;
-        ui->inOpenWaterCheck->insertToJsonObject(fishingHook, "in_open_water");
+        ui->inOpenWaterCheck->insertToJsonObject(fishingHook, QStringLiteral("in_open_water"));
         if (!fishingHook.isEmpty())
             root["fishing_hook"] = fishingHook;
+    }
+
+    if ((isNotSelected ||
+         (entityId == QStringLiteral("minecraft:lightning_bolt")))
+        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        QJsonObject lightningBolt;
+        if (!ui->blocksOnFireInput->isCurrentlyUnset()) {
+            lightningBolt.insert("lightning_bolt", ui->blocksOnFireInput->toJson());
+        }
+        if (!ui->entityStruckBtn->getData().isEmpty())
+            lightningBolt.insert(QStringLiteral("entity_struck"), ui->entityStruckBtn->getData());
+        if (!lightningBolt.isEmpty())
+            root["lightning_bolt"] = lightningBolt;
     }
 
     return root;
@@ -193,7 +259,7 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("team")))
         ui->teamEdit->setText(value[QStringLiteral("team")].toString());
     if (value.contains(QStringLiteral("nbt")))
-        ui->NBTEdit->setText(value[QStringLiteral("nbt")].toString());
+        ui->NBTEdit->setPlainText(value[QStringLiteral("nbt")].toString());
     if (value.contains(QStringLiteral("distance"))) {
         auto distance = value[QStringLiteral("distance")].toObject();
         if (distance.contains(QStringLiteral("absolute")))
@@ -243,6 +309,19 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     }
     if (value.contains(QStringLiteral("location")))
         ui->locatPropBtn->setData(value[QStringLiteral("location")].toObject());
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+        if (value.contains(QStringLiteral("vehicle")))
+            ui->locatPropBtn->setData(value[QStringLiteral("vehicle")].toObject());
+        if (value.contains(QStringLiteral("targeted_entity")))
+            ui->targetEntityBtn->setData(value[QStringLiteral("targeted_entity")].toObject());
+    }
+    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (value.contains(QStringLiteral("passenger")))
+            ui->passengerBtn->setData(value[QStringLiteral("passenger")].toObject());
+        if (value.contains(QStringLiteral("stepping_on")))
+            ui->steppingOnBtn->setData(value[QStringLiteral("stepping_on")].toObject());
+    }
+
     if (value.contains(QStringLiteral("effects"))) {
         auto effects = value[QStringLiteral("effects")].toObject();
         for (auto effectID : effects.keys()) {
@@ -278,16 +357,21 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("player"))) {
         auto player = value[QStringLiteral("player")].toObject();
         if (player.contains("gamemode")) {
-            auto gamemode = player[QStringLiteral("gamemode")].toString();
-            gamemode[0].toUpper();
-            setupComboFrom(ui->gameModeCombo, gamemode);
+            const int index = gamemodes.indexOf(player[QStringLiteral("gamemode")].toString());
+            if (index != -1) {
+                ui->gameModeCombo->setCurrentIndex(index);
+            }
+        }
+        if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))
+                && value.contains(QStringLiteral("looking_on"))) {
+            ui->lookingAtBtn->setData(value[QStringLiteral("looking_on")].toObject());
         }
         if (player.contains(QStringLiteral("level")))
             ui->playerLevelInput->fromJson(player[QStringLiteral("level")]);
         if (player.contains(QStringLiteral("advancements")))
             setupGrantedTableFromJson(player[QStringLiteral(
                                                  "advancements")].toObject(),
-                                      playerAdvanmModel);
+                                      playerAdvanModel);
         if (player.contains(QStringLiteral("recipes")))
             setupGrantedTableFromJson(player[QStringLiteral(
                                                  "recipes")].toObject(),
@@ -318,16 +402,35 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
             }
         }
     }
+    if (value.contains(QStringLiteral("catType"))) {
+        const auto &variantStr = value[QStringLiteral("catType")].toString();
+        for (int i = 1; i < catVariants.size(); ++i) {
+            if (variantStr == QStringLiteral("textures/entity/cat/%1.png").arg(catVariants[i])) {
+                ui->catVariantCombo->setCurrentIndex(i);
+                break;
+            }
+        }
+    }
     if (value.contains(QStringLiteral("fishing_hook"))
         && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
-        auto fishingHook = value[QStringLiteral("fishing_hook")].toObject();
+        const auto &fishingHook = value[QStringLiteral("fishing_hook")].toObject();
         ui->inOpenWaterCheck->setupFromJsonObject(fishingHook, "in_open_water");
+    }
+    if (value.contains(QStringLiteral("lightning_bolt"))
+        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        const auto &lightningBolt = value[QStringLiteral("lightning_bolt")].toObject();
+        if (lightningBolt.contains("blocks_set_on_fire")) {
+            ui->blocksOnFireInput->fromJson(lightningBolt["blocks_set_on_fire"]);
+        }
+        if (lightningBolt.contains("entity_struck")) {
+            ui->entityStruckBtn->setData(lightningBolt["entity_struck"].toObject());
+        }
     }
 }
 
 void EntityConditionDialog::onAddedEntityEffect() {
     if ((ui->effectAmpInput->isCurrentlyUnset())
-        | (ui->effectDuraInput->isCurrentlyUnset()))
+        || (ui->effectDuraInput->isCurrentlyUnset()))
         return;
 
     QString effectText = ui->effectCombo->currentText();
@@ -353,16 +456,16 @@ void EntityConditionDialog::onAddedEntityEffect() {
 }
 
 void EntityConditionDialog::onAddedPlayerAdv() {
-    QString advText = ui->advanmEdit->text();
+    QString advText = ui->advanEdit->text();
 
-    if (!playerAdvanmModel.findItems(advText).isEmpty())
+    if (!playerAdvanModel.findItems(advText).isEmpty())
         return;
 
     auto *advItem  = new QStandardItem(advText);
     auto *boolItem = new QStandardItem();
-    boolItem->setData(ui->advanmCheck->isChecked(), Qt::DisplayRole);
+    boolItem->setData(ui->advanCheck->isChecked(), Qt::DisplayRole);
 
-    playerAdvanmModel.appendRow({ advItem, boolItem });
+    playerAdvanModel.appendRow({ advItem, boolItem });
 }
 
 void EntityConditionDialog::onAddedPlayerRecipe() {
@@ -380,7 +483,7 @@ void EntityConditionDialog::onAddedPlayerRecipe() {
 
 void EntityConditionDialog::onAddedPlayerStat() {
     if (ui->statEdit->text().isEmpty()
-        | (ui->statValueInput->isCurrentlyUnset()))
+        || (ui->statValueInput->isCurrentlyUnset()))
         return;
 
     QStandardItem *typeItem =
@@ -402,34 +505,14 @@ void EntityConditionDialog::onEntityTypeChanged() {
         Qt::UserRole + 1).toString();
     const bool isNotSelected = ui->entityTypeCombo->currentIndex() == 0;
 
-    if (isNotSelected || entityId == QStringLiteral("minecraft:player")) {
-        if (ui->toolBox->indexOf(ui->player) == -1) {
-            ui->toolBox->addItem(ui->player, tr("Player"));
-        }
-    } else if (ui->player->parent() != nullptr) {
-        auto *sv = qobject_cast<QScrollArea *>(
-            ui->player->parent()->parent());
-        if (sv != nullptr) {
-            ui->toolBox->removeItem(ui->toolBox->indexOf(ui->player));
-            ui->player->setParent(nullptr);
-            delete sv;
-        }
-    }
+    ui->tabWidget->setTabEnabled(0, isNotSelected || entityId == QStringLiteral("minecraft:player"));
+    ui->tabWidget->setTabEnabled(1, isNotSelected || entityId == QStringLiteral("minecraft:cat"));
 
-    if ((isNotSelected ||
-         entityId == QStringLiteral("minecraft:fishing_bobber"))
-        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
-        if (ui->toolBox->indexOf(ui->fishingHook) == -1) {
-            ui->toolBox->addItem(ui->fishingHook, tr("Fishing hook"));
-        }
-    } else if (ui->fishingHook->parent() != nullptr) {
-        auto *sv = qobject_cast<QScrollArea *>(
-            ui->fishingHook->parent()->parent());
-        if (sv != nullptr) {
-            ui->toolBox->removeItem(ui->toolBox->indexOf(ui->fishingHook));
-            ui->fishingHook->setParent(nullptr);
-            delete sv;
-        }
+    if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
+        ui->tabWidget->setTabEnabled(2, isNotSelected || entityId == QStringLiteral("minecraft:fishing_bobber"));
+    }
+    if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        ui->tabWidget->setTabEnabled(3, isNotSelected || entityId == QStringLiteral("minecraft:lightning_bolt"));
     }
 }
 
@@ -460,10 +543,10 @@ void EntityConditionDialog::initPlayerAdv() {
     QStandardItem *advItem     = new QStandardItem(tr("Advancement"));
     QStandardItem *grantedItem = new QStandardItem(tr("Granted"));
 
-    initModelView(playerAdvanmModel, ui->advanmTableView,
+    initModelView(playerAdvanModel, ui->advanTable,
                   { advItem, grantedItem }, viewFilter);
 
-    connect(ui->advanmAddBtn, &QPushButton::clicked,
+    connect(ui->advanAddBtn, &QPushButton::clicked,
             this, &EntityConditionDialog::onAddedPlayerAdv);
 }
 
@@ -471,7 +554,7 @@ void EntityConditionDialog::initPlayerRecipe() {
     QStandardItem *recipeItem  = new QStandardItem(tr("Recipe"));
     QStandardItem *grantedItem = new QStandardItem(tr("Granted"));
 
-    initModelView(playerRecipeModel, ui->recipeTableView,
+    initModelView(playerRecipeModel, ui->recipeTable,
                   { recipeItem, grantedItem }, viewFilter);
 
     connect(ui->recipeAddBtn, &QPushButton::clicked,
@@ -488,7 +571,7 @@ void EntityConditionDialog::initPlayerStat() {
     delegate->setInputModes(NumberProvider::Exact
                             | NumberProvider::Range);
 
-    initModelView(playerStatModel, ui->statsTableView,
+    initModelView(playerStatModel, ui->statsTable,
                   { typeItem, statItem, valueItem }, viewFilter, delegate);
 
     connect(ui->statAddBtn, &QPushButton::clicked,

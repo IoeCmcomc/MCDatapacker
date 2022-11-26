@@ -30,6 +30,7 @@ private:
     QStandardItemModel itemsModel;
     QStandardItemModel potionsModel;
     QStandardItemModel enchantmentsModel;
+    bool from_1_17;
 
     void initTable(QTableWidget *table);
     void tableFromJson(const QJsonArray &jsonArr, QTableWidget *table);

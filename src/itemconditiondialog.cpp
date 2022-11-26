@@ -10,8 +10,10 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
 
+    from_1_17 = MainWindow::getCurGameVersion() >= QVersionNumber(1, 17);
+
     ui->itemSlot->setAcceptTag(false);
-    ui->itemSlot->setAcceptMultiple(false);
+    ui->itemSlot->setAcceptMultiple(from_1_17);
 
     initComboModelView("effect", potionsModel, ui->potionCombo);
     initComboModelView("enchantment", enchantmentsModel, ui->enchant_combo,
@@ -41,9 +43,19 @@ QJsonObject ItemConditionDialog::toJson() const {
     QJsonObject root;
 
     if (ui->itemRadio->isChecked()) {
-        if (!ui->itemSlot->isEmpty())
-            root.insert(QStringLiteral("item"),
-                        ui->itemSlot->getItem().getNamespacedID());
+        if (!ui->itemSlot->isEmpty()) {
+            if (from_1_17) {
+                QJsonArray ids;
+                for (const auto &item: ui->itemSlot->getItems()) {
+                    ids << item.getNamespacedID();
+                }
+                root.insert(QStringLiteral("items"), ids);
+            } else {
+                root.insert(QStringLiteral("item"),
+                            ui->itemSlot->getItem().getNamespacedID());
+            }
+        }
+
     } else {
         if (!ui->itemTagEdit->text().isEmpty())
             root.insert(QStringLiteral("tag"), ui->itemTagEdit->text());
@@ -93,13 +105,18 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     if (value.isEmpty())
         return;
 
-    if (value.contains(QStringLiteral("item"))) {
+    if (from_1_17 && value.contains(QStringLiteral("items"))) {
+        for (const auto &item: value[QStringLiteral("items")].toArray()) {
+            ui->itemSlot->appendItem(item.toString());
+        }
+    } else if (value.contains(QStringLiteral("item"))) {
         ui->itemSlot->setItem(InventoryItem(value[QStringLiteral(
                                                       "item")].toString()));
     } else if (value.contains(QStringLiteral("tag"))) {
         ui->itemTagEdit->setText(value[QStringLiteral("tag")].toString());
         ui->tagRadio->setChecked(true);
     }
+
     if (value.contains(QStringLiteral("count")))
         ui->countInput->fromJson(value[QStringLiteral("count")]);
     if (value.contains(QStringLiteral("durability")))

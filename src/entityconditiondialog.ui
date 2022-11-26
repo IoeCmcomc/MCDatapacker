@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>680</height>
+    <width>587</width>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,32 +49,22 @@
    <item row="1" column="0" colspan="4">
     <widget class="QToolBox" name="toolBox">
      <property name="tabSpacing">
-      <number>4</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="general">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>658</width>
-        <height>482</height>
+        <width>565</width>
+        <height>450</height>
        </rect>
       </property>
       <attribute name="label">
        <string>General</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="1" column="1" colspan="2">
-        <widget class="QLineEdit" name="NBTEdit"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Team:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="3">
+       <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Distance</string>
@@ -91,10 +81,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="modes">
-             <set>NumberProvider::ExactAndRange</set>
-            </property>
-            <property name="minLimit">
+            <property name="minLimit" stdset="0">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -107,10 +94,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="modes">
-             <set>NumberProvider::ExactAndRange</set>
-            </property>
-            <property name="minLimit">
+            <property name="minLimit" stdset="0">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -123,10 +107,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="modes">
-             <set>NumberProvider::ExactAndRange</set>
-            </property>
-            <property name="minLimit">
+            <property name="minLimit" stdset="0">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -139,10 +120,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="modes">
-             <set>NumberProvider::ExactAndRange</set>
-            </property>
-            <property name="minLimit">
+            <property name="minLimit" stdset="0">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -155,10 +133,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="modes">
-             <set>NumberProvider::ExactAndRange</set>
-            </property>
-            <property name="minLimit">
+            <property name="minLimit" stdset="0">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -168,12 +143,18 @@
             <property name="text">
              <string>Absolute:</string>
             </property>
+            <property name="buddy">
+             <cstring>absDistanceInput</cstring>
+            </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Horizontal</string>
+            </property>
+            <property name="buddy">
+             <cstring>horizDistanceInput</cstring>
             </property>
            </widget>
           </item>
@@ -182,12 +163,18 @@
             <property name="text">
              <string>X:</string>
             </property>
+            <property name="buddy">
+             <cstring>xDistanceInput</cstring>
+            </property>
            </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>Y:</string>
+            </property>
+            <property name="buddy">
+             <cstring>yDistanceInput</cstring>
             </property>
            </widget>
           </item>
@@ -196,121 +183,89 @@
             <property name="text">
              <string>Z:</string>
             </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_18">
-         <property name="text">
-          <string>NBT:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="QLineEdit" name="teamEdit"/>
-       </item>
-       <item row="3" column="2" rowspan="2">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>2</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Equipment</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="1">
-           <widget class="DialogDataButton" name="headPropBtn">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Head...</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="DialogDataButton" name="offhandPropBtn">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Offhand...</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="DialogDataButton" name="chestPropBtn">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Chest...</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="DialogDataButton" name="mainhandPropBtn">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Mainhand...</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="DialogDataButton" name="legsPropBtn">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Legs…</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="DialogDataButton" name="feetPropBtn">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Feet...</string>
+            <property name="buddy">
+             <cstring>zDistanceInput</cstring>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2">
+       <item row="0" column="2">
+        <layout class="QFormLayout" name="formLayout_3">
+         <property name="formAlignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Team:</string>
+           </property>
+           <property name="buddy">
+            <cstring>teamEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="teamEdit"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>NBT:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPlainTextEdit" name="NBTEdit"/>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0" colspan="3">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="DialogDataButton" name="vehicleBtn" native="true">
+           <property name="text" stdset="0">
+            <string>Vehicle...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="DialogDataButton" name="targetEntityBtn" native="true">
+           <property name="text" stdset="0">
+            <string>Targeted entity...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="DialogDataButton" name="passengerBtn" native="true">
+           <property name="text" stdset="0">
+            <string>Passenger...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="DialogDataButton" name="steppingOnBtn" native="true">
+           <property name="text" stdset="0">
+            <string>Stepping on...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="0">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>1</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>16777215</height>
+          </size>
          </property>
          <property name="title">
           <string comment="Boolean indicator">Flags</string>
@@ -354,8 +309,101 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="DialogDataButton" name="locatPropBtn">
+       <item row="2" column="1" rowspan="2" colspan="2">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Equipment</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="1">
+           <widget class="DialogDataButton" name="headPropBtn" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text" stdset="0">
+             <string>Head...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="DialogDataButton" name="offhandPropBtn" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text" stdset="0">
+             <string>Offhand...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="DialogDataButton" name="chestPropBtn" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text" stdset="0">
+             <string>Chest...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="DialogDataButton" name="mainhandPropBtn" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text" stdset="0">
+             <string>Mainhand...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="DialogDataButton" name="legsPropBtn" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text" stdset="0">
+             <string>Legs…</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="DialogDataButton" name="feetPropBtn" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text" stdset="0">
+             <string>Feet...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="DialogDataButton" name="locatPropBtn" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -368,7 +416,7 @@
            <height>30</height>
           </size>
          </property>
-         <property name="text">
+         <property name="text" stdset="0">
           <string>Location...</string>
          </property>
         </widget>
@@ -380,8 +428,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>658</width>
-        <height>482</height>
+        <width>565</width>
+        <height>450</height>
        </rect>
       </property>
       <attribute name="label">
@@ -403,9 +451,6 @@
            <height>22</height>
           </size>
          </property>
-         <property name="modes">
-          <set>NumberProvider::ExactAndRange</set>
-         </property>
         </widget>
        </item>
        <item row="0" column="1" colspan="2">
@@ -425,9 +470,6 @@
            <width>130</width>
            <height>22</height>
           </size>
-         </property>
-         <property name="modes">
-          <set>NumberProvider::ExactAndRange</set>
          </property>
         </widget>
        </item>
@@ -483,361 +525,518 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="player">
+     <widget class="QWidget" name="typeSpecific">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>637</width>
-        <height>499</height>
+        <width>544</width>
+        <height>565</height>
        </rect>
       </property>
       <attribute name="label">
-       <string>Player</string>
+       <string>Type specific</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_8">
-       <item row="0" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>Game mode:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="gameModeCombo">
-           <item>
-            <property name="text">
-             <string>(not set)</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Survival</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Creative</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Adventure</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Spectator</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_23">
-           <property name="text">
-            <string>Levels</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="NumberProvider" name="playerLevelInput">
-           <property name="minimumSize">
-            <size>
-             <width>130</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="modes">
-            <set>NumberProvider::ExactAndRange</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="groupBox_4">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>4</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Advancements</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <property name="leftMargin">
-           <number>6</number>
-          </property>
-          <property name="topMargin">
-           <number>6</number>
-          </property>
-          <property name="rightMargin">
-           <number>6</number>
-          </property>
-          <property name="bottomMargin">
-           <number>6</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_24">
-            <property name="text">
-             <string>ID:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QLineEdit" name="advanmEdit"/>
-          </item>
-          <item row="1" column="0" rowspan="2" colspan="3">
-           <widget class="QCheckBox" name="advanmCheck">
-            <property name="text">
-             <string>Granted</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QPushButton" name="advanmAddBtn">
-            <property name="text">
-             <string>Add</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3">
-           <widget class="QTableView" name="advanmTableView">
-            <property name="cursor" stdset="0">
-             <cursorShape>WhatsThisCursor</cursorShape>
-            </property>
-            <property name="toolTip">
-             <string>Right click a row to delete it.</string>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustToContents</enum>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
-            </property>
-            <attribute name="horizontalHeaderStretchLastSection">
-             <bool>true</bool>
-            </attribute>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QGroupBox" name="groupBox_5">
-         <property name="title">
-          <string>Recipes</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <property name="leftMargin">
-           <number>6</number>
-          </property>
-          <property name="topMargin">
-           <number>6</number>
-          </property>
-          <property name="rightMargin">
-           <number>6</number>
-          </property>
-          <property name="bottomMargin">
-           <number>6</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_25">
-            <property name="text">
-             <string>ID:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QLineEdit" name="recipeEdit"/>
-          </item>
-          <item row="1" column="0" rowspan="2" colspan="3">
-           <widget class="QCheckBox" name="recipeCheck">
-            <property name="text">
-             <string>Granted</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QPushButton" name="recipeAddBtn">
-            <property name="text">
-             <string>Add</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3">
-           <widget class="QTableView" name="recipeTableView">
-            <property name="toolTip">
-             <string>Right click a row to delete it.</string>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustToContents</enum>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
-            </property>
-            <attribute name="horizontalHeaderStretchLastSection">
-             <bool>true</bool>
-            </attribute>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox_6">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>5</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Stats</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <layout class="QFormLayout" name="formLayout_2">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_26">
-              <property name="text">
-               <string>Type:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="statTypeCombo"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_27">
-              <property name="text">
-               <string>Stat:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="statEdit">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_28">
-              <property name="text">
-               <string>Value:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="NumberProvider" name="statValueInput">
-              <property name="minimumSize">
-               <size>
-                <width>130</width>
-                <height>22</height>
-               </size>
-              </property>
-              <property name="modes">
-               <set>NumberProvider::ExactAndRange</set>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="2">
-             <widget class="QPushButton" name="statAddBtn">
-              <property name="text">
-               <string>Add</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QTableView" name="statsTableView">
-            <property name="toolTip">
-             <string>Right click a row to delete it.</string>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
-            </property>
-            <attribute name="horizontalHeaderCascadingSectionResizes">
-             <bool>true</bool>
-            </attribute>
-            <attribute name="horizontalHeaderStretchLastSection">
-             <bool>true</bool>
-            </attribute>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="fishingHook">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>658</width>
-        <height>482</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Fishing hook</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="leftMargin">
+        <number>3</number>
+       </property>
+       <property name="topMargin">
+        <number>3</number>
+       </property>
+       <property name="rightMargin">
+        <number>3</number>
+       </property>
+       <property name="bottomMargin">
+        <number>3</number>
+       </property>
        <item>
-        <widget class="TrueFalseBox" name="inOpenWaterCheck">
-         <property name="text">
-          <string>In open water</string>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-         <property name="tristate">
-          <bool>true</bool>
-         </property>
+         <widget class="QWidget" name="player">
+          <attribute name="title">
+           <string>Player</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="label_49">
+               <property name="text">
+                <string>Game mode:</string>
+               </property>
+               <property name="buddy">
+                <cstring>gameModeCombo</cstring>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="gameModeCombo">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <item>
+                <property name="text">
+                 <string>(not set)</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Survival</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Creative</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Adventure</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Spectator</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_50">
+               <property name="text">
+                <string>Levels</string>
+               </property>
+               <property name="buddy">
+                <cstring>playerLevelInput</cstring>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="NumberProvider" name="playerLevelInput">
+               <property name="minimumSize">
+                <size>
+                 <width>130</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="lookingAtSep">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="DialogDataButton" name="lookingAtBtn" native="true">
+               <property name="text" stdset="0">
+                <string>Looking at...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="groupBox_15">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>4</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Advancements</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_17">
+              <property name="leftMargin">
+               <number>6</number>
+              </property>
+              <property name="topMargin">
+               <number>6</number>
+              </property>
+              <property name="rightMargin">
+               <number>6</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
+              </property>
+              <item row="2" column="2">
+               <widget class="QPushButton" name="advanAddBtn">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="3">
+               <widget class="QTableView" name="advanTable">
+                <property name="cursor" stdset="0">
+                 <cursorShape>WhatsThisCursor</cursorShape>
+                </property>
+                <property name="toolTip">
+                 <string>Right click a row to delete it.</string>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QAbstractScrollArea::AdjustToContents</enum>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_51">
+                <property name="text">
+                 <string>ID:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>advanEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" colspan="2">
+               <widget class="QLineEdit" name="advanEdit"/>
+              </item>
+              <item row="1" column="0" rowspan="2" colspan="2">
+               <widget class="QCheckBox" name="advanCheck">
+                <property name="text">
+                 <string>Granted</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QGroupBox" name="groupBox_13">
+             <property name="title">
+              <string>Recipes</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_16">
+              <property name="leftMargin">
+               <number>6</number>
+              </property>
+              <property name="topMargin">
+               <number>6</number>
+              </property>
+              <property name="rightMargin">
+               <number>6</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string>ID:</string>
+                </property>
+                <property name="buddy">
+                 <cstring>recipeEdit</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" colspan="2">
+               <widget class="QLineEdit" name="recipeEdit"/>
+              </item>
+              <item row="1" column="0" rowspan="2" colspan="3">
+               <widget class="QCheckBox" name="recipeCheck">
+                <property name="text">
+                 <string>Granted</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QPushButton" name="recipeAddBtn">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="3">
+               <widget class="QTableView" name="recipeTable">
+                <property name="toolTip">
+                 <string>Right click a row to delete it.</string>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QAbstractScrollArea::AdjustToContents</enum>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QGroupBox" name="groupBox_14">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>5</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Stats</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_10">
+              <item>
+               <layout class="QFormLayout" name="formLayout_8">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_46">
+                  <property name="text">
+                   <string>Type:</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>statTypeCombo</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="statTypeCombo"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_47">
+                  <property name="text">
+                   <string>Stat:</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>statEdit</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="statEdit">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_48">
+                  <property name="text">
+                   <string>Value:</string>
+                  </property>
+                  <property name="buddy">
+                   <cstring>statValueInput</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="NumberProvider" name="statValueInput">
+                  <property name="minimumSize">
+                   <size>
+                    <width>130</width>
+                    <height>22</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" colspan="2">
+                 <widget class="QPushButton" name="statAddBtn">
+                  <property name="text">
+                   <string>Add</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTableView" name="statsTable">
+                <property name="toolTip">
+                 <string>Right click a row to delete it.</string>
+                </property>
+                <property name="alternatingRowColors">
+                 <bool>true</bool>
+                </property>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SingleSelection</enum>
+                </property>
+                <attribute name="horizontalHeaderCascadingSectionResizes">
+                 <bool>true</bool>
+                </attribute>
+                <attribute name="horizontalHeaderStretchLastSection">
+                 <bool>true</bool>
+                </attribute>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="cat">
+          <attribute name="title">
+           <string>Cat</string>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Variant:</string>
+             </property>
+             <property name="buddy">
+              <cstring>catVariantCombo</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="catVariantCombo">
+             <item>
+              <property name="text">
+               <string>(not set)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>All black</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Black</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>British</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Calico</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Jellie</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Persian</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Ragdoll</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Red</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Siamese</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tabby</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tuxedo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>White</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="fishingHook">
+          <attribute name="title">
+           <string>Fishing hook</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="TrueFalseBox" name="inOpenWaterCheck">
+             <property name="text">
+              <string>In open water</string>
+             </property>
+             <property name="tristate">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>454</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="lightning">
+          <attribute name="title">
+           <string>Lightining bolt</string>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Blocks set on fire:</string>
+             </property>
+             <property name="buddy">
+              <cstring>blocksOnFireInput</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="NumberProvider" name="blocksOnFireInput"/>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="DialogDataButton" name="entityStruckBtn" native="true">
+             <property name="text" stdset="0">
+              <string>Entity struck...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -872,8 +1071,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>565</x>
+     <y>712</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -888,8 +1087,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>608</x>
+     <y>712</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

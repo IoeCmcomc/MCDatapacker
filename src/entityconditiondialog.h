@@ -33,7 +33,7 @@ private:
     QStandardItemModel effectModel;
     QStandardItemModel entityEffectModel;
     QStandardItemModel playerRecipeModel;
-    QStandardItemModel playerAdvanmModel;
+    QStandardItemModel playerAdvanModel;
     QStandardItemModel statTypeModel;
     QStandardItemModel playerStatModel;
 

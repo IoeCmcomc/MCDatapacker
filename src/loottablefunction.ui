@@ -38,6 +38,9 @@
     </property>
     <item row="2" column="0" colspan="3">
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="apply_bonus">
        <layout class="QFormLayout" name="formLayout_2">
         <item row="0" column="0">
@@ -742,6 +745,13 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="TrueFalseBox" name="setCount_addCheck">
+          <property name="text">
+           <string>Relative to current value</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="set_damage">
@@ -755,6 +765,13 @@
         </item>
         <item row="0" column="1">
          <widget class="NumberProvider" name="setDamage_damageInput"/>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="TrueFalseBox" name="setDamage_addCheck">
+          <property name="text">
+           <string>Relative to current value</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

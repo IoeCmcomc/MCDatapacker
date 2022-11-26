@@ -1,7 +1,6 @@
 #ifndef BASECONDITION_H
 #define BASECONDITION_H
 
-#include "numberprovider.h"
 #include "vieweventfilter.h"
 #include "modelfunctions.h"
 

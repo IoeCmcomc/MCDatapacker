@@ -1,7 +1,5 @@
 #include "basecondition.h"
 
-#include "mainwindow.h"
-
 #include <QJsonObject>
 
 QJsonObject BaseCondition::toJson() const {

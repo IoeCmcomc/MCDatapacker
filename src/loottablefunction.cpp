@@ -28,6 +28,9 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
         model->item(14, 0)->setEnabled(false);
         view->setRowHidden(10, true); /* Set banner pattern */
         model->item(10, 0)->setEnabled(false);
+
+        ui->setCount_addCheck->hide();
+        ui->setDamage_addCheck->hide();
     }
 
     connect(ui->functionTypeCombo,
@@ -97,6 +100,8 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
                        ui->stewEffect_effectCombo);
     connect(ui->stewEffect_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::effectStew_onAdded);
+
+    //TODO: [1.17, "Copy NBT" function] source parameter can now be set to {"storage": <namespaced id>}, to access command storage.
 }
 
 LootTableFunction::~LootTableFunction() {
@@ -258,11 +263,17 @@ QJsonObject LootTableFunction::toJson() const {
 
     case 12: {   /* Set count */
         root.insert("count", ui->setCount_countInput->toJson());
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            ui->setCount_addCheck->insertToJsonObject(root, "add");
+        }
         break;
     }
 
     case 13: {   /* Set damage */
         root.insert("damage", ui->setDamage_damageInput->toJson());
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            ui->setDamage_addCheck->insertToJsonObject(root, "add");
+        }
         break;
     }
 
@@ -562,9 +573,6 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     QString slot = slotRef.toString();
                     if (slotTypes.contains(slot)) {
                         slotsList << slot;
-                    } else {
-                        delete nameItem;
-                        continue;
                     }
                 }
             }
@@ -603,6 +611,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             return;
 
         ui->setCount_countInput->fromJson(root.value("count"));
+        if (root.contains("add")) {
+            ui->setCount_addCheck->setupFromJsonObject(root, "add");
+        }
         break;
     }
 
@@ -611,12 +622,15 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             return;
 
         ui->setDamage_damageInput->fromJson(root.value(QLatin1String("damage")));
+        if (root.contains("add") && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+            ui->setDamage_addCheck->setupFromJsonObject(root, "add");
+        }
         break;
     }
 
     case 14: {   /* Set enchantments */
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
-            ui->setEnchant_table->fromJson(root["enchantments"].toObject());
+        ui->setEnchant_table->fromJson(root["enchantments"].toObject());
+        if (root.contains("add") && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
             ui->setEnchant_addCheck->setupFromJsonObject(root, "add");
         }
         break;

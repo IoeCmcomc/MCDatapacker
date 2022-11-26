@@ -1,7 +1,6 @@
 #ifndef LOCATIONCONDITIONDIALOG_H
 #define LOCATIONCONDITIONDIALOG_H
 
-#include "numberprovider.h"
 #include "basecondition.h"
 #include "loottablecondition.h"
 
@@ -33,6 +32,7 @@ private:
     QStandardItemModel featuresModel;
     QStandardItemModel blocksModel;
     QStandardItemModel fluidsModel;
+    bool from_1_17 = false;
 
     void initBlockGroup();
     void initFluidGroup();
