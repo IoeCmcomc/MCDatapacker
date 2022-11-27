@@ -6,6 +6,8 @@
 
 using json = nlohmann::json;
 
+bool Command::MinecraftParser::limitScoreboardObjectiveLength = true;
+
 Command::MinecraftParser::MinecraftParser(QObject *parent,
                                           const QString &input)
     : Command::Parser(parent, input) {
@@ -956,7 +958,7 @@ minecraft_objective() {
     int       curPos  = pos();
     QString &&objname = this->getWithCharset("0-9a-zA-Z-+_.#");
 
-    if (objname.length() > 16)
+    if (limitScoreboardObjectiveLength && (objname.length() > 16))
         this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                       "Objective '%1' must be less than 16 characters"),
                     { objname },

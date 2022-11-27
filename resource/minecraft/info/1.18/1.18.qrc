@@ -16,5 +16,6 @@
         <file>tag/game_event.json</file>
         <file>tag/item.json</file>
         <file>summary/commands/data.min.json</file>
+        <file>registries/block_entity_type/data.min.json</file>
     </qresource>
 </RCC>

@@ -428,6 +428,8 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
             Command::MinecraftParser::setSchema(
                 QStringLiteral(":/minecraft/") + gameVer +
                 QStringLiteral("/summary/commands/data.min.json"));
+            Command::MinecraftParser::limitScoreboardObjectiveLength
+                    = curGameVersion < QVersionNumber(1, 18);
 
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);

@@ -36,6 +36,33 @@ private /*slots*/ :
     void updateConditionsTab(int size);
 
 private:
+    enum Type {
+        ApplyBonus,
+        CopyNbt,
+        CopyState,
+        EnchantRandomly,
+        EnchantWithLevels,
+        ExplorationMap,
+        FillPlayerHead,
+        LimitCount,
+        LootingEnchant,
+        SetAttributes,
+        SetBannerPattern,
+        SetContents,
+        SetCount,
+        SetDamage,
+        SetEnchantments,
+        SetLootTable,
+        SetLore,
+        SetName,
+        SetNbt,
+        SetPotion,
+        SetStewEffect,
+        CopyName,
+        ExplosionDecay,
+        FurnaceSmelt = ExplosionDecay,
+    };
+
     QHBoxLayout conditionsLayout;
     QHBoxLayout entriesLayout;
     QStandardItemModel blocksModel;
@@ -44,6 +71,7 @@ private:
     QStandardItemModel featuresModel;
     QStandardItemModel mapIconsModel;
     QStandardItemModel attributesModel;
+    QStandardItemModel blockEntityTypesModel;
     ViewEventFilter viewFilter;
     const QStringList functTypes =
     { "apply_bonus",      "copy_nbt",            "copy_state",
@@ -51,8 +79,8 @@ private:
       "fill_player_head", "limit_count",         "looting_enchant",
       "set_attributes",   "set_banner_pattern",  "set_contents",
       "set_count",        "set_damage",          "set_enchantments",
-      "set_loot_table",   "set_lore",
-      "set_name",         "set_nbt",             "set_stew_effect",
+      "set_loot_table",   "set_lore",            "set_name",
+      "set_nbt",          "set_potion",          "set_stew_effect",
       "copy_name",        "explosion_decay",     "furnace_smelt" };
     const QStringList formulaTypes = { "binomial_with_bonus_count",
                                        "uniform_bonus_count", "ore_drops" };

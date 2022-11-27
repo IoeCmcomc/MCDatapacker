@@ -1,5 +1,4 @@
 #include "loottablefunction.h"
-#include "loottableentry.h"
 
 #include "loottablecondition.h"
 #include "ui_loottablefunction.h"
@@ -10,8 +9,37 @@
 #include "modelfunctions.h"
 
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QStringListModel>
+
+using QStringVector = QVector<QString>;
+
+QStringVector getRegistry(const QString &type, const QString &gameVer) {
+    QFileInfo finfo(":minecraft/" + gameVer + "/registries/" + type + "/data.min.json");
+
+    if (!(finfo.exists() && finfo.isFile())) {
+        qWarning() << "File not exists:" << finfo.path() << "Return empty.";
+        return QStringVector();
+    }
+    QFile inFile(finfo.filePath());
+    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray &&data = inFile.readAll();
+    inFile.close();
+
+    QJsonParseError errorPtr;
+    QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
+    if (doc.isNull()) {
+        qWarning() << "Parse failed" << errorPtr.error;
+        return QStringVector();
+    }
+
+    QStringVector values;
+    for (const auto &value : doc.array()) {
+        values << value.toString();
+    }
+    return values;
+}
 
 LootTableFunction::LootTableFunction(QWidget *parent) :
     QTabWidget(parent),
@@ -19,18 +47,35 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     ui->setupUi(this);
     updateConditionsTab(0);
 
+    auto *view  = qobject_cast<QListView*>(ui->functionTypeCombo->view());
+    auto *model =
+        static_cast<QStandardItemModel*>(ui->functionTypeCombo->model());
     if (MainWindow::getCurGameVersion() < QVersionNumber(1, 17)) {
-        auto *view  = qobject_cast<QListView*>(ui->functionTypeCombo->view());
-        auto  model =
-            static_cast<QStandardItemModel*>(ui->functionTypeCombo->model());
-
-        view->setRowHidden(14, true); /* Set enchantments */
-        model->item(14, 0)->setEnabled(false);
-        view->setRowHidden(10, true); /* Set banner pattern */
-        model->item(10, 0)->setEnabled(false);
+        view->setRowHidden(SetEnchantments, true);
+        model->item(SetEnchantments, 0)->setEnabled(false);
+        view->setRowHidden(SetBannerPattern, true);
+        model->item(SetBannerPattern, 0)->setEnabled(false);
 
         ui->setCount_addCheck->hide();
         ui->setDamage_addCheck->hide();
+    }
+    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 18)) {
+        view->setRowHidden(SetPotion, true);
+        model->item(SetPotion, 0)->setEnabled(false);
+
+        ui->setContent_typeLabel->hide();
+        ui->setContents_typeCombo->hide();
+        ui->lootTable_typeLabel->hide();
+        ui->lootTable_typeCombo->hide();
+    } else {
+        for (const auto &value: getRegistry("block_entity_type", MainWindow::getCurGameVersion().toString())) {
+            auto *item = new QStandardItem(value);
+            const QString &prefixedValue = "minecraft:" + value;
+            item->setData(prefixedValue);
+            blockEntityTypesModel.appendRow(item);
+        }
+        ui->setContents_typeCombo->setModel(&blockEntityTypesModel);
+        ui->lootTable_typeCombo->setModel(&blockEntityTypesModel);
     }
 
     connect(ui->functionTypeCombo,
@@ -67,6 +112,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
                        mapIconsModel,
                        ui->map_decoCombo);
 
+
     ui->limitCount_limitInput->setModes(NumberProvider::ExactAndRange);
 
     ui->lootEnchant_countInput->setModes(NumberProvider::ExactAndRange);
@@ -100,6 +146,8 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
                        ui->stewEffect_effectCombo);
     connect(ui->stewEffect_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::effectStew_onAdded);
+    ui->setPotion_potionCombo->setModel(&effectsModel);
+    ui->setPotion_potionCombo->addItem("empty", "empty");
 
     //TODO: [1.17, "Copy NBT" function] source parameter can now be set to {"storage": <namespaced id>}, to access command storage.
 }
@@ -119,7 +167,7 @@ QJsonObject LootTableFunction::toJson() const {
     root.insert("function", function);
 
     switch (ui->functionTypeCombo->currentIndex()) {
-    case 0: { /*Apply bonus */
+    case ApplyBonus: { /*Apply bonus */
         root.insert("enchantment", ui->bonus_enchantCombo->currentData(
                         Qt::UserRole + 1).toString());
         int formulaIndex = ui->bonus_formulaCombo->currentIndex();
@@ -133,7 +181,7 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 1: { /*Copy NBT */
+    case CopyNbt: { /*Copy NBT */
         root.insert("source",
                     entityTargets[ui->copyNBT_entityCombo->currentIndex()]);
         QJsonArray ops;
@@ -152,7 +200,7 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 2: { /* Copy states */
+    case CopyState: { /* Copy states */
         root.insert("block",
                     qvariant_cast<InventoryItem>(
                         ui->copyState_blockCombo->currentData(
@@ -166,7 +214,7 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 3: { /* Enchant randomly */
+    case EnchantRandomly: { /* Enchant randomly */
         QJsonArray enchantments;
         for (int i = 0; i < ui->enchantRand_list->count(); i++) {
             enchantments.append(ui->enchantRand_list->item(i)->data(Qt::UserRole
@@ -177,13 +225,13 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 4: { /* Enchant with level */
+    case EnchantWithLevels: { /* Enchant with level */
         ui->levelEnchant_treasureCheck->insertToJsonObject(root, "treasure");
         root.insert("levels", ui->levelEnchant_levelInput->toJson());
         break;
     }
 
-    case 5: { /* Exploration map */
+    case ExplorationMap: { /* Exploration map */
         root.insert("destination", ui->map_destCombo->currentData(Qt::UserRole +
                                                                   1).toString());
         root.insert("decoration", ui->map_decoCombo->currentData(Qt::UserRole +
@@ -195,24 +243,24 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 6: {   /* Fills player head */
+    case FillPlayerHead: {   /* Fills player head */
         root.insert("entity",
                     entityTargets[ui->fillHead_entityType->currentIndex()]);
         break;
     }
 
-    case 7: {   /* Limit count */
+    case LimitCount: {   /* Limit count */
         root.insert("limit", ui->limitCount_limitInput->toJson());
         break;
     }
 
-    case 8: {   /* Looting enchant */
+    case LootingEnchant: {   /* Looting enchant */
         root.insert("count", ui->lootEnchant_countInput->toJson());
         root.insert("limit", ui->lootEnchant_limitSpin->value());
         break;
     }
 
-    case 9: {   /* Set attributes */
+    case SetAttributes: {   /* Set attributes */
         QJsonArray modifiers;
         for (int i = 0; i < ui->setAttr_table->rowCount(); i++) {
             auto &&name = ui->setAttr_table->item(i, 0)->text();
@@ -247,21 +295,24 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 10: {   /* Set banner pattern */
+    case SetBannerPattern: {   /* Set banner pattern */
         root["patterns"] = ui->setPattern_table->toJsonArray();
         ui->setPattern_appendCheck->insertToJsonObject(root, "append");
         break;
     }
 
-    case 11: {   /* Set contents */
+    case SetContents: {   /* Set contents */
         const auto entries = ui->entryInterface->json();
         if (!entries.isEmpty()) {
             root.insert("entries", entries);
         }
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+            root.insert("type", ui->setContents_typeCombo->currentText());
+        }
         break;
     }
 
-    case 12: {   /* Set count */
+    case SetCount: {   /* Set count */
         root.insert("count", ui->setCount_countInput->toJson());
         if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
             ui->setCount_addCheck->insertToJsonObject(root, "add");
@@ -269,7 +320,7 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 13: {   /* Set damage */
+    case SetDamage: {   /* Set damage */
         root.insert("damage", ui->setDamage_damageInput->toJson());
         if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
             ui->setDamage_addCheck->insertToJsonObject(root, "add");
@@ -277,22 +328,25 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 14: {   /* Set enchantments */
+    case SetEnchantments: {   /* Set enchantments */
         root["enchantments"] = ui->setEnchant_table->toJsonObject();
         ui->setEnchant_addCheck->insertToJsonObject(root, "add");
         break;
     }
 
-    case 15: {   /* Set loot table */
+    case SetLootTable: {   /* Set loot table */
         if (ui->lootTable_idEdit->text().isEmpty())
             break;
         root.insert("name", ui->lootTable_idEdit->text());
         if (ui->lootTable_seedSpin->value() != 0)
             root.insert("seed", ui->lootTable_seedSpin->value());
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+            root.insert("type", ui->lootTable_typeCombo->currentText());
+        }
         break;
     }
 
-    case 16: {   /* Set lore */
+    case SetLore: {   /* Set lore */
         root.insert("entity",
                     entityTargets[ui->setLore_entityCombo->currentIndex()]);
         ui->setLore_replaceCheck->insertToJsonObject(root, "replace");
@@ -300,7 +354,7 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 17: {   /* Set name */
+    case SetName: {   /* Set name */
         root.insert("entity",
                     entityTargets[ui->setName_entityCombo->currentIndex()]);
         /*root.insert("name", ui->setName_textEdit->getTextEdit()->toPlainText()); */
@@ -308,12 +362,19 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 18: {   /* Set NBT string */
+    case SetNbt: {   /* Set NBT string */
         root.insert("tag", ui->setNBT_NBTEdit->text());
         break;
     }
 
-    case 19: {   /* Set stew effects */
+    case SetPotion: {
+        if (ui->setPotion_potionCombo->currentIndex() != 0) {
+            root.insert("potion", ui->setPotion_potionCombo->currentData(Qt::UserRole + 1).toString());
+        }
+        break;
+    }
+
+    case SetStewEffect: {   /* Set stew effects */
         QJsonArray effects;
         for (int i = 0; i < ui->stewEffect_table->rowCount(); ++i) {
             auto type = ui->stewEffect_table->item(i, 0)
@@ -330,8 +391,12 @@ QJsonObject LootTableFunction::toJson() const {
         break;
     }
 
-    case 20: {   /* Copy name */
+    case CopyName: {   /* Copy name */
         root.insert("source", "block_entity");
+        break;
+    }
+    default: {
+        break;
     }
     }
 
@@ -360,7 +425,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     ui->functionTypeCombo->setCurrentIndex(index);
 
     switch (index) {
-    case 0: { /*Apply bonus */
+    case ApplyBonus: { /*Apply bonus */
         if (!(root.contains("enchantment") && root.contains("formula")))
             return;
 
@@ -382,7 +447,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 1: { /*Copy NBT */
+    case CopyNbt: { /*Copy NBT */
         if (!root.contains("source"))
             return;
 
@@ -418,7 +483,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 2: { /* Copy states */
+    case CopyState: { /* Copy states */
         if (!root.contains("block"))
             return;
 
@@ -436,7 +501,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 3: { /* Enchant randomly */
+    case EnchantRandomly: { /* Enchant randomly */
         if (root.contains("enchantments")) {
             QJsonArray enchantments = root.value("enchantments").toArray();
             for (auto enchantmentRef : enchantments) {
@@ -457,7 +522,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 4: { /* Enchant with level */
+    case EnchantWithLevels: { /* Enchant with level */
         if (!root.contains("levels"))
             return;
 
@@ -466,7 +531,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 5: { /* Exploration map */
+    case ExplorationMap: { /* Exploration map */
         setupComboFrom(ui->map_destCombo, root.value("destination").toString());
         setupComboFrom(ui->map_decoCombo, root.value("decoration").toString());
 
@@ -480,7 +545,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 6: {   /* Fills player head */
+    case FillPlayerHead: {   /* Fills player head */
         if (!root.contains("entity"))
             return;
 
@@ -489,7 +554,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 7: {   /* Limit count */
+    case LimitCount: {   /* Limit count */
         if (!root.contains("limit"))
             return;
 
@@ -497,7 +562,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 8: {   /* Looting enchant */
+    case LootingEnchant: {   /* Looting enchant */
         if (!root.contains("count"))
             return;
 
@@ -508,7 +573,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 9: {   /* Set attributes */
+    case SetAttributes: {   /* Set attributes */
         if (!root.contains("modifiers"))
             return;
 
@@ -589,7 +654,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 10: {   /* Set banner pattern */
+    case SetBannerPattern: {   /* Set banner pattern */
         if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
             ui->setPattern_table->fromJson(root["patterns"].toArray());
             ui->setPattern_appendCheck->setupFromJsonObject(root, "append");
@@ -597,7 +662,14 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 11: {   /* Set contents */
+    case SetContents: {   /* Set contents */
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+            if (!root.contains("type")) {
+                return;
+            }
+            setupComboFrom(ui->setContents_typeCombo, root["type"].toString());
+        }
+
         if (root.contains("entries")) {
             if (!ui->entryInterface->mainWidget())
                 initEntryInterface();
@@ -606,7 +678,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 12: {   /* Set count */
+    case SetCount: {   /* Set count */
         if (!root.contains("count"))
             return;
 
@@ -617,7 +689,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 13: {   /* Set damage */
+    case SetDamage: {   /* Set damage */
         if (!root.contains("damage"))
             return;
 
@@ -628,7 +700,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 14: {   /* Set enchantments */
+    case SetEnchantments: {   /* Set enchantments */
         ui->setEnchant_table->fromJson(root["enchantments"].toObject());
         if (root.contains("add") && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
             ui->setEnchant_addCheck->setupFromJsonObject(root, "add");
@@ -636,9 +708,16 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 15: {   /* Set loot table */
+    case SetLootTable: {   /* Set loot table */
         if (!root.contains("name"))
             return;
+
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+            if (!root.contains("type")) {
+                return;
+            }
+            setupComboFrom(ui->lootTable_typeCombo, root["type"].toString());
+        }
 
         ui->lootTable_idEdit->setText(root.value("name").toString());
 
@@ -647,7 +726,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 16: {   /* Set lore */
+    case SetLore: {   /* Set lore */
         if (root.contains("entity"))
             ui->setLore_entityCombo->setCurrentIndex(
                 entityTargets.indexOf(root.value("entity").toString()));
@@ -660,7 +739,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 17: {   /* Set name */
+    case SetName: {   /* Set name */
         if (root.contains("entity"))
             ui->setName_entityCombo->setCurrentIndex(
                 entityTargets.indexOf(root.value("entity").toString()));
@@ -674,7 +753,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 18: {   /* Set NBT string */
+    case SetNbt: {   /* Set NBT string */
         if (!root.contains("tag"))
             return;
 
@@ -682,7 +761,16 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 19: {   /* Set stew effects */
+    case SetPotion: {
+        if (!root.contains("potion"))
+            return;
+
+        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            setupComboFrom(ui->setPotion_potionCombo, root["potion"].toString());
+        }
+    }
+
+    case SetStewEffect: {   /* Set stew effects */
         if (!root.contains("effects"))
             return;
 
@@ -719,7 +807,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         break;
     }
 
-    case 20: {   /* Copy name */
+    case CopyName: {   /* Copy name */
         if (!root.contains("source"))
             return;
 
@@ -753,7 +841,7 @@ void LootTableFunction::onTypeChanged(int index) {
         ui->stackedWidget->setCurrentIndex(maxIndex);
     else
         ui->stackedWidget->setCurrentIndex(index);
-    if ((index == 10) && !ui->entryInterface->mainWidget())
+    if ((index == SetContents) && !ui->entryInterface->mainWidget())
         initEntryInterface();
 }
 

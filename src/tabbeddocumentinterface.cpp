@@ -389,6 +389,8 @@ void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
     Command::MinecraftParser::setSchema(
         QStringLiteral(":/minecraft/") + ver +
         QStringLiteral("/summary/commands/data.min.json"));
+    Command::MinecraftParser::limitScoreboardObjectiveLength
+            = MainWindow::getCurGameVersion() < QVersionNumber(1, 18);
 
     for (const auto &file: qAsConst(files)) {
         if (file.fileType == CodeFile::Function) {

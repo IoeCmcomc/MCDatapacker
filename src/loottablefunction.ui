@@ -48,6 +48,9 @@
           <property name="text">
            <string>Enchantment:</string>
           </property>
+          <property name="buddy">
+           <cstring>bonus_enchantCombo</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -57,6 +60,9 @@
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Formula:</string>
+          </property>
+          <property name="buddy">
+           <cstring>bonus_formulaCombo</cstring>
           </property>
          </widget>
         </item>
@@ -84,6 +90,9 @@
           <property name="text">
            <string>Multiplier:</string>
           </property>
+          <property name="buddy">
+           <cstring>bonus_multiplierSpin</cstring>
+          </property>
          </widget>
         </item>
         <item row="2" column="1">
@@ -94,6 +103,9 @@
           <property name="text">
            <string>Extra:</string>
           </property>
+          <property name="buddy">
+           <cstring>bonus_extraSpin</cstring>
+          </property>
          </widget>
         </item>
         <item row="3" column="1">
@@ -103,6 +115,9 @@
          <widget class="QLabel" name="label_6">
           <property name="text">
            <string>Propability:</string>
+          </property>
+          <property name="buddy">
+           <cstring>bonus_probSpin</cstring>
           </property>
          </widget>
         </item>
@@ -120,6 +135,9 @@
          <widget class="QLabel" name="label_7">
           <property name="text">
            <string>Source:</string>
+          </property>
+          <property name="buddy">
+           <cstring>copyNBT_entityCombo</cstring>
           </property>
          </widget>
         </item>
@@ -227,6 +245,9 @@
           <property name="text">
            <string>Block:</string>
           </property>
+          <property name="buddy">
+           <cstring>copyState_blockCombo</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1" colspan="4">
@@ -254,6 +275,9 @@
           <property name="text">
            <string>Property:</string>
           </property>
+          <property name="buddy">
+           <cstring>copyState_lineEdit</cstring>
+          </property>
          </widget>
         </item>
         <item row="3" column="3">
@@ -271,6 +295,9 @@
          <widget class="QLabel" name="label_10">
           <property name="text">
            <string>Enchantment:</string>
+          </property>
+          <property name="buddy">
+           <cstring>enchantRand_enchantCombo</cstring>
           </property>
          </widget>
         </item>
@@ -310,6 +337,9 @@
           <property name="text">
            <string>Levels:</string>
           </property>
+          <property name="buddy">
+           <cstring>levelEnchant_levelInput</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -338,6 +368,9 @@
           <property name="text">
            <string>Destination:</string>
           </property>
+          <property name="buddy">
+           <cstring>map_destCombo</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -351,6 +384,9 @@
           <property name="text">
            <string>Decoration:</string>
           </property>
+          <property name="buddy">
+           <cstring>map_decoCombo</cstring>
+          </property>
          </widget>
         </item>
         <item row="2" column="0">
@@ -358,12 +394,18 @@
           <property name="text">
            <string>Zoom:</string>
           </property>
+          <property name="buddy">
+           <cstring>map_zoomSpin</cstring>
+          </property>
          </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>Search radius:</string>
+          </property>
+          <property name="buddy">
+           <cstring>map_radiusSpin</cstring>
           </property>
          </widget>
         </item>
@@ -403,6 +445,9 @@
           <property name="text">
            <string>Entity:</string>
           </property>
+          <property name="buddy">
+           <cstring>fillHead_entityType</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -433,6 +478,9 @@
           <property name="text">
            <string>Limit:</string>
           </property>
+          <property name="buddy">
+           <cstring>limitCount_limitInput</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -447,6 +495,9 @@
           <property name="text">
            <string>Count:</string>
           </property>
+          <property name="buddy">
+           <cstring>lootEnchant_countInput</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -456,6 +507,9 @@
          <widget class="QLabel" name="label_20">
           <property name="text">
            <string>Limit:</string>
+          </property>
+          <property name="buddy">
+           <cstring>lootEnchant_limitSpin</cstring>
           </property>
          </widget>
         </item>
@@ -480,6 +534,9 @@
          <widget class="QLabel" name="label_22">
           <property name="text">
            <string>Attribute:</string>
+          </property>
+          <property name="buddy">
+           <cstring>setAttr_attrCombo</cstring>
           </property>
          </widget>
         </item>
@@ -537,12 +594,18 @@
           <property name="text">
            <string>Amount:</string>
           </property>
+          <property name="buddy">
+           <cstring>setAttr_amountInput</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_21">
           <property name="text">
            <string>Name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>setAttr_nameEdit</cstring>
           </property>
          </widget>
         </item>
@@ -564,6 +627,9 @@
           <property name="text">
            <string>ID:</string>
           </property>
+          <property name="buddy">
+           <cstring>setAttr_IDEdit</cstring>
+          </property>
          </widget>
         </item>
         <item row="5" column="1" colspan="3">
@@ -580,6 +646,9 @@
          <widget class="QLabel" name="label_34">
           <property name="text">
            <string>Operation:</string>
+          </property>
+          <property name="buddy">
+           <cstring>setAttr_opCombo</cstring>
           </property>
          </widget>
         </item>
@@ -675,6 +744,9 @@
               <property name="text">
                <string>Pattern:</string>
               </property>
+              <property name="buddy">
+               <cstring>setPattern_patternCombo</cstring>
+              </property>
              </widget>
             </item>
             <item row="0" column="1">
@@ -684,6 +756,9 @@
              <widget class="QLabel" name="label_40">
               <property name="text">
                <string>Color:</string>
+              </property>
+              <property name="buddy">
+               <cstring>setPattern_colorCombo</cstring>
               </property>
              </widget>
             </item>
@@ -704,7 +779,13 @@
        </layout>
       </widget>
       <widget class="QWidget" name="set_contents">
-       <layout class="QGridLayout" name="gridLayout_10">
+       <layout class="QFormLayout" name="formLayout_14">
+        <property name="horizontalSpacing">
+         <number>4</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>4</number>
+        </property>
         <property name="leftMargin">
          <number>4</number>
         </property>
@@ -718,7 +799,26 @@
          <number>4</number>
         </property>
         <item row="0" column="0">
+         <widget class="QLabel" name="setContent_typeLabel">
+          <property name="text">
+           <string>Type:</string>
+          </property>
+          <property name="buddy">
+           <cstring>setContents_typeCombo</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="setContents_typeCombo"/>
+        </item>
+        <item row="1" column="0" colspan="2">
          <widget class="DataWidgetInterface" name="entryInterface">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -736,6 +836,9 @@
           <property name="text">
            <string>Count:</string>
           </property>
+          <property name="buddy">
+           <cstring>setCount_countInput</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -748,7 +851,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="TrueFalseBox" name="setCount_addCheck">
           <property name="text">
-           <string>Relative to current value</string>
+           <string>Add (change is relative to the current value)</string>
           </property>
          </widget>
         </item>
@@ -761,6 +864,9 @@
           <property name="text">
            <string>Damage:</string>
           </property>
+          <property name="buddy">
+           <cstring>setDamage_damageInput</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -769,7 +875,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="TrueFalseBox" name="setDamage_addCheck">
           <property name="text">
-           <string>Relative to current value</string>
+           <string>Add (change is relative to the current value)</string>
           </property>
          </widget>
         </item>
@@ -833,6 +939,9 @@
           <property name="text">
            <string>Name:</string>
           </property>
+          <property name="buddy">
+           <cstring>lootTable_idEdit</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -847,6 +956,9 @@
           <property name="text">
            <string>Seed:</string>
           </property>
+          <property name="buddy">
+           <cstring>lootTable_seedSpin</cstring>
+          </property>
          </widget>
         </item>
         <item row="1" column="1">
@@ -858,6 +970,19 @@
            <number>999999999</number>
           </property>
          </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="lootTable_typeLabel">
+          <property name="text">
+           <string>Type:</string>
+          </property>
+          <property name="buddy">
+           <cstring>lootTable_typeCombo</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="lootTable_typeCombo"/>
         </item>
        </layout>
       </widget>
@@ -979,6 +1104,23 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="set_potion">
+       <layout class="QFormLayout" name="formLayout_15">
+        <item row="0" column="1">
+         <widget class="QComboBox" name="setPotion_potionCombo"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_41">
+          <property name="text">
+           <string>Potion:</string>
+          </property>
+          <property name="buddy">
+           <cstring>setPotion_potionCombo</cstring>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="set_stew_effect">
        <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="3">
@@ -996,12 +1138,18 @@
           <property name="text">
            <string>Duration:</string>
           </property>
+          <property name="buddy">
+           <cstring>stewEffect_durationSpin</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label_30">
           <property name="text">
            <string>Effect:</string>
+          </property>
+          <property name="buddy">
+           <cstring>stewEffect_effectCombo</cstring>
           </property>
          </widget>
         </item>
@@ -1047,6 +1195,9 @@
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Function:</string>
+      </property>
+      <property name="buddy">
+       <cstring>functionTypeCombo</cstring>
       </property>
      </widget>
     </item>
@@ -1158,6 +1309,11 @@
       <item>
        <property name="text">
         <string>Set NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set potion</string>
        </property>
       </item>
       <item>

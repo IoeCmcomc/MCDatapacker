@@ -29,6 +29,7 @@ public:
             CanBeLocal  = 4,
         };
         Q_DECLARE_FLAGS(AxisParseOptions, AxisParseOption);
+        static bool limitScoreboardObjectiveLength;
 
         explicit MinecraftParser(QObject *parent      = nullptr,
                                  const QString &input = "");

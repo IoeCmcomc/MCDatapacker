@@ -16,7 +16,13 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
 
     const auto &&gameVer = MainWindow::getCurGameVersion();
 
-    if (gameVer >= QVersionNumber(1, 17))
+    if (gameVer >= QVersionNumber(1, 19))
+        ui->formatInput->setValue(10);
+    else if (gameVer >= QVersionNumber(1, 18, 2))
+        ui->formatInput->setValue(9);
+    else if (gameVer >= QVersionNumber(1, 18))
+        ui->formatInput->setValue(8);
+    else if (gameVer >= QVersionNumber(1, 17))
         ui->formatInput->setValue(7);
     else if (gameVer >= QVersionNumber(1, 16, 2))
         ui->formatInput->setValue(6);
