@@ -40,13 +40,8 @@ public:
     QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
-    static QVariantMap &getMCRInfo(const QString &type);
     void readPrefSettings(QSettings &settings, bool fromDialog = false);
-    static QVariantMap readMCRInfo(const QString &type         = "block",
-                                   const QString &ver          = curGameVersion.toString(),
-                                   const int depth             = 0);
 
-    static QVersionNumber getCurGameVersion();
     PackMetaInfo getPackInfo() const;
 
 protected:
@@ -104,7 +99,7 @@ private:
     ItemModifierDock *itemModifierDock             = nullptr;
     QLocale curLocale;
     QVector<QAction*> recentFoldersActions;
-    static QVersionNumber curGameVersion;
+    QString tempGameVerStr;
     const int maxRecentFoldersActions = 10;
 
     void initDocks();

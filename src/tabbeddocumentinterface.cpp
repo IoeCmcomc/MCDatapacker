@@ -6,6 +6,7 @@
 #include "fileswitcher.h"
 #include "mcfunctionhighlighter.h"
 #include "jsonhighlighter.h"
+#include "game.h"
 
 #include <QMessageBox>
 #include <QTextStream>
@@ -390,7 +391,7 @@ void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
         QStringLiteral(":/minecraft/") + ver +
         QStringLiteral("/summary/commands/data.min.json"));
     Command::MinecraftParser::limitScoreboardObjectiveLength
-            = MainWindow::getCurGameVersion() < QVersionNumber(1, 18);
+            = Game::version() < Game::v1_18;
 
     for (const auto &file: qAsConst(files)) {
         if (file.fileType == CodeFile::Function) {

@@ -5,6 +5,7 @@
 #include "loottablepool.h"
 #include "loottablefunction.h"
 #include "globalhelpers.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -18,7 +19,7 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
-    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 16)) {
+    if (Game::version() < Game::v1_16) {
         if (auto *view =
                 qobject_cast<QListView *>(ui->lootTableTypeCombo->view())) {
             const auto &&model =

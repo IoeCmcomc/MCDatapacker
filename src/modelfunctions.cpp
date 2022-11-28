@@ -1,6 +1,6 @@
 #include "modelfunctions.h"
 
-#include "mainwindow.h"
+#include "game.h"
 #include "extendedtablewidget.h"
 
 #include <QApplication>
@@ -28,7 +28,7 @@ void initComboModelView(const QString &infoType,
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
                                               "(not set)")));
-    const auto &&info = MainWindow::readMCRInfo(infoType);
+    const auto &&info = Game::getInfo(infoType);
     for (QString &key : info.keys()) {
         QStandardItem *item = new QStandardItem();
         if (info.value(key).toMap().contains(QStringLiteral("name")))

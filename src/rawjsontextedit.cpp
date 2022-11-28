@@ -1,8 +1,8 @@
 #include "rawjsontextedit.h"
 #include "ui_rawjsontextedit.h"
 
-#include "mainwindow.h"
 #include "globalhelpers.h"
+#include "game.h"
 
 #include <QToolButton>
 #include <QSignalBlocker>
@@ -43,22 +43,22 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_B), this, nullptr,
                           nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         ui->boldBtn->toggle();
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_I), this, nullptr,
                           nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         ui->italicBtn->toggle();
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_U), this, nullptr,
                           nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         ui->underlineBtn->toggle();
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_K), this, nullptr,
                           nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         ui->strikeBtn->toggle();
     });
 
@@ -156,8 +156,8 @@ QJsonValue RawJsonTextEdit::toJson() const {
                         fmt.foreground().color().name());
                     if (!key.isEmpty()) {
                         component.insert(QLatin1String("color"), key);
-                    } else if (MainWindow::getCurGameVersion() >=
-                               QVersionNumber(1, 16)) {
+                    } else if (Game::version() >=
+                               Game::v1_16) {
                         component.insert(QLatin1String("color"),
                                          fmt.foreground().color().name());
                     }
@@ -243,7 +243,7 @@ void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
                                                                "color")).toString());
         if (!color.isEmpty()) {
             fmt.setForeground(QBrush(QColor(color)));
-        } else if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+        } else if (Game::version() >= Game::v1_16) {
             static QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
             const auto       &&match
                 = regex.match(root.value(QLatin1String("color")).toString(), 0,
@@ -463,9 +463,8 @@ void RawJsonTextEdit::initColorMenu() {
             checkColorBtn();
         });
     }
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
-        colorMenu.addAction(tr("Select color..."),
-                            this,
+    if (Game::version() >= Game::v1_16) {
+        colorMenu.addAction(tr("Select color..."), this,
                             &RawJsonTextEdit::selectCustomColor);
     }
 

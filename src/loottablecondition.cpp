@@ -8,6 +8,7 @@
 #include "locationconditiondialog.h"
 #include "entityconditiondialog.h"
 #include "globalhelpers.h"
+#include "game.h"
 
 #include <QDialog>
 #include <QDoubleSpinBox>
@@ -17,7 +18,7 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     ui(new Ui::LootTableCondition) {
     ui->setupUi(this);
 
-    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 17)) {
+    if (Game::version() < Game::v1_17) {
         qobject_cast<QListView*>(ui->conditionTypeCombo->view())
         ->setRowHidden(15, true);
         static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model())->item(
@@ -517,7 +518,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     }
 
     case 15: { /* Value check */
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (Game::version() >= Game::v1_17) {
             if (value.contains(QLatin1String("value")))
                 ui->value_valueInput->fromJson(value[QLatin1String("value")]);
             if (value.contains(QLatin1String("range")))
@@ -749,7 +750,7 @@ void LootTableCondition::toolEnchant_onAdded() {
 }
 
 void LootTableCondition::initBlockStatesPage() {
-    auto blocksInfo = MainWindow::getMCRInfo("block");
+    const auto &&blocksInfo = Game::getInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
     for (const auto &key : blocksInfo.keys()) {

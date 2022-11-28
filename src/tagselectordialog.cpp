@@ -1,9 +1,8 @@
 #include "tagselectordialog.h"
 #include "ui_tagselectordialog.h"
 
-#include "inventoryitem.h"
 #include "globalhelpers.h"
-#include "mainwindow.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QDir>
@@ -90,7 +89,7 @@ void TagSelectorDialog::setupTagTreeView(
         model.appendRow(new QStandardItem(id));
     }
 
-    MCRTagInfo = MainWindow::readMCRInfo(tagStr);
+    MCRTagInfo = Game::getInfo(tagStr);
 
     auto tagIter = MCRTagInfo.constBegin();
     while ((tagIter != MCRTagInfo.constEnd())) {

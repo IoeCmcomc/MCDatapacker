@@ -8,6 +8,7 @@
 #include "QFindDialogs/src/findreplacedialog.h"
 #include "stripedscrollbar.h"
 #include "parsers/command/minecraftparser.h"
+#include "game.h"
 
 #include <QPainter>
 #include <QFileInfo>
@@ -39,18 +40,11 @@ QStringList getMinecraftInfoKeys(const QString &key) {
 
     timer.start();
 
-    QVariantMap infoMap;
+    const QVariantMap &&infoMap = Game::getInfo(key);
 
-    if (key == "block" || key == "item") {
-        infoMap = MainWindow::getMCRInfo(key);
-    } else {
-        infoMap = MainWindow::readMCRInfo(key);
-    }
-/*
-      qDebug() << key << infoMap.size();
-      qDebug() << "getMinecraftInfoKeys() exec time:" << timer.nsecsElapsed() /
-          1e6;
- */
+    //qDebug() << key << infoMap.size();
+    //qDebug() << "getMinecraftInfoKeys() exec time:" << timer.nsecsElapsed() / 1e6;
+
     return infoMap.keys();
 }
 
@@ -1002,7 +996,7 @@ QString textUnderCursorExtended(QTextCursor tc) {
     startOfWordExtended(tc);
     tc.setPosition(oldPos, QTextCursor::KeepAnchor);
 
-    qDebug() << "textUnderCursorExtended" << tc.selectedText();
+    //qDebug() << "textUnderCursorExtended" << tc.selectedText();
     return tc.selectedText();
 }
 

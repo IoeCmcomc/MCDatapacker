@@ -4,6 +4,7 @@
 #include "globalhelpers.h"
 #include "tabbeddocumentinterface.h"
 #include "imgviewer.h"
+#include "game.h"
 
 #include <QScrollBar>
 #include <QLabel>
@@ -21,7 +22,7 @@ StatusBar::StatusBar(MainWindow *parent,
     m_gameVerLabel = new QLabel(this);
     m_gameVerLabel->setText(tr("Minecraft %1",
                                "Example: \"Minecraft 1.16\"")
-                            .arg(MainWindow::getCurGameVersion().toString()));
+                            .arg(Game::versionString()));
     addWidget(m_gameVerLabel, 1);
 
     m_packFmtLabel = new QLabel(this);

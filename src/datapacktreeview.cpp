@@ -2,8 +2,8 @@
 
 #include "filenamedelegate.h"
 
-#include "mainwindow.h"
 #include "globalhelpers.h"
+#include "game.h"
 
 #include <QModelIndex>
 #include <QFile>
@@ -17,6 +17,7 @@
 #include <QToolTip>
 #include <QApplication>
 #include <QClipboard>
+#include <QMessageBox>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
@@ -132,7 +133,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
             addNewFileAction(newMenu, tr("Advancement"), jsonExt,
                              QLatin1String("advancements"));
-            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+            if (Game::version() >= Game::v1_16) {
                 addNewFileAction(newMenu, tr("Dimension"), jsonExt,
                                  QLatin1String("dimension"));
                 addNewFileAction(newMenu, tr("Dimension type"), jsonExt,
@@ -143,7 +144,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
                              QLatin1String("functions"));
             addNewFileAction(newMenu, tr("Loot table"), jsonExt,
                              QLatin1String("loot_tables"));
-            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            if (Game::version() >= Game::v1_17) {
                 addNewFileAction(newMenu, tr("Item modifier"), jsonExt,
                                  QLatin1String("item_modifiers"));
             }
@@ -166,7 +167,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
                              QLatin1String("tags/fluids"));
             addNewFileAction(tagMenu, tr("Functions"), jsonExt,
                              QLatin1String("tags/functions"));
-            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+            if (Game::version() >= Game::v1_17) {
                 addNewFileAction(tagMenu, tr("Game events"), jsonExt,
                                  QLatin1String("tags/game_events"));
             }
@@ -175,7 +176,7 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
             newMenu->addMenu(tagMenu);
 
-            if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+            if (Game::version() >= Game::v1_16) {
                 /*"World generation" menu */
                 QMenu *worldMenu = new QMenu(tr("World generation"), newMenu);
 
@@ -216,7 +217,7 @@ QAction *DatapackTreeView::addNewFileAction(QMenu *menu, const QString &name,
                                             QLatin1String catDir) {
     QAction *action = new QAction(name, menu);
 
-    connect(action, &QAction::triggered, [this, ext, catDir]() {
+    connect(action, &QAction::triggered, this, [this, ext, catDir]() {
         this->contextMenuOnNew(ext, catDir);
     });
     menu->addAction(action);

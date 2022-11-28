@@ -5,6 +5,7 @@
 
 #include "mainwindow.h"
 #include "globalhelpers.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QMap>
@@ -59,7 +60,7 @@ void VisualRecipeEditorDock::setupCustomTab() {
     ui->customTabBar->addTab(tr("Crafting"));
     ui->customTabBar->addTab(tr("Smelting"));
     ui->customTabBar->addTab(tr("Stonecutting"));
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))
+    if (Game::version() >= Game::v1_16)
         ui->customTabBar->addTab(tr("Smithing"));
 
     /*Make tab bar overlay top pixel of tab frame */
@@ -78,7 +79,7 @@ void VisualRecipeEditorDock::retranslate() {
     ui->customTabBar->setTabText(0, tr("Crafting"));
     ui->customTabBar->setTabText(1, tr("Smelting"));
     ui->customTabBar->setTabText(2, tr("Stonecutting"));
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))
+    if (Game::version() >= Game::v1_16)
         ui->customTabBar->setTabText(3, tr("Smithing"));
 }
 
@@ -91,7 +92,7 @@ void VisualRecipeEditorDock::changeEvent(QEvent *event) {
 void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
     Q_ASSERT(index >= 0 && index < 4);
     ui->stackedRecipeWidget->setCurrentIndex(index);
-    if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)))
+    if ((Game::version() >= Game::v1_16))
         ui->stackedOptions->setCurrentIndex(qMin(index, 3));
     else
         ui->stackedOptions->setCurrentIndex(qMin(index, 2));
@@ -118,7 +119,7 @@ void VisualRecipeEditorDock::writeRecipe() {
         break;
 
     case 3:
-        if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)))
+        if (Game::version() >= Game::v1_16)
             jsonDoc = QJsonDocument(genSmithingJson(root));
         break;
     }
@@ -349,7 +350,7 @@ void VisualRecipeEditorDock::readRecipe() {
     }
 
     if (type == QStringLiteral("smithing")
-        && ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)))) {
+        && (Game::version() >= Game::v1_16)) {
         ui->customTabBar->setCurrentIndex(3);
         readSmithingJson(root);
     }

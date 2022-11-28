@@ -3,9 +3,9 @@
 #include "ui_entityconditiondialog.h"
 
 #include "numberproviderdelegate.h"
-#include "mainwindow.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -31,8 +31,8 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     initComboModelView(QStringLiteral("stat_type"), statTypeModel,
                        ui->statTypeCombo, false);
 
-    ui->tabWidget->setTabVisible(2, MainWindow::getCurGameVersion() >= QVersionNumber(1, 16));
-    ui->tabWidget->setTabVisible(3, MainWindow::getCurGameVersion() >= QVersionNumber(1, 17));
+    ui->tabWidget->setTabVisible(2, Game::version() >= Game::v1_16);
+    ui->tabWidget->setTabVisible(3, Game::version() >= Game::v1_17);
 
     ui->headPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->chestPropBtn->assignDialogClass<ItemConditionDialog>();
@@ -41,14 +41,14 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     ui->mainhandPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->offhandPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->locatPropBtn->assignDialogClass<LocationConditionDialog>();
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+    if (Game::version() >= Game::v1_16) {
         ui->vehicleBtn->assignDialogClass<EntityConditionDialog>();
         ui->targetEntityBtn->assignDialogClass<EntityConditionDialog>();
     } else {
         ui->vehicleBtn->hide();
         ui->targetEntityBtn->hide();
     }
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+    if (Game::version() >= Game::v1_17) {
         ui->passengerBtn->assignDialogClass<EntityConditionDialog>();
         ui->steppingOnBtn->assignDialogClass<LocationConditionDialog>();
         ui->lookingAtBtn->assignDialogClass<EntityConditionDialog>();
@@ -131,10 +131,10 @@ QJsonObject EntityConditionDialog::toJson() const {
     if (!ui->locatPropBtn->getData().isEmpty())
         root.insert(QStringLiteral("location"), ui->locatPropBtn->getData());
     if (!ui->vehicleBtn->getData().isEmpty()
-            && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
+            && (Game::version() >= Game::v1_16)) {
         root.insert(QStringLiteral("vehicle"), ui->vehicleBtn->getData());
     }
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+    if (Game::version() >= Game::v1_17) {
         if (!ui->passengerBtn->getData().isEmpty())
             root.insert(QStringLiteral("passenger"), ui->passengerBtn->getData());
         if (!ui->steppingOnBtn->getData().isEmpty())
@@ -176,7 +176,7 @@ QJsonObject EntityConditionDialog::toJson() const {
         if (!ui->playerLevelInput->isCurrentlyUnset())
             player.insert(QStringLiteral("level"),
                           ui->playerLevelInput->toJson());
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (Game::version() >= Game::v1_17) {
             if (!ui->lookingAtBtn->getData().isEmpty())
                 player.insert(QStringLiteral("looking_at"), ui->lookingAtBtn->getData());
         }
@@ -230,7 +230,7 @@ QJsonObject EntityConditionDialog::toJson() const {
 
     if ((isNotSelected ||
          (entityId == QStringLiteral("minecraft:fishing_bobber")))
-        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
+        && (Game::version() >= Game::v1_16)) {
         QJsonObject fishingHook;
         ui->inOpenWaterCheck->insertToJsonObject(fishingHook, QStringLiteral("in_open_water"));
         if (!fishingHook.isEmpty())
@@ -239,7 +239,7 @@ QJsonObject EntityConditionDialog::toJson() const {
 
     if ((isNotSelected ||
          (entityId == QStringLiteral("minecraft:lightning_bolt")))
-        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        && (Game::version() >= Game::v1_17)) {
         QJsonObject lightningBolt;
         if (!ui->blocksOnFireInput->isCurrentlyUnset()) {
             lightningBolt.insert("lightning_bolt", ui->blocksOnFireInput->toJson());
@@ -309,13 +309,13 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     }
     if (value.contains(QStringLiteral("location")))
         ui->locatPropBtn->setData(value[QStringLiteral("location")].toObject());
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+    if (Game::version() >= Game::v1_16) {
         if (value.contains(QStringLiteral("vehicle")))
             ui->locatPropBtn->setData(value[QStringLiteral("vehicle")].toObject());
         if (value.contains(QStringLiteral("targeted_entity")))
             ui->targetEntityBtn->setData(value[QStringLiteral("targeted_entity")].toObject());
     }
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+    if (Game::version() >= Game::v1_17) {
         if (value.contains(QStringLiteral("passenger")))
             ui->passengerBtn->setData(value[QStringLiteral("passenger")].toObject());
         if (value.contains(QStringLiteral("stepping_on")))
@@ -362,7 +362,7 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                 ui->gameModeCombo->setCurrentIndex(index);
             }
         }
-        if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))
+        if ((Game::version() >= Game::v1_17)
                 && value.contains(QStringLiteral("looking_on"))) {
             ui->lookingAtBtn->setData(value[QStringLiteral("looking_on")].toObject());
         }
@@ -412,12 +412,12 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
         }
     }
     if (value.contains(QStringLiteral("fishing_hook"))
-        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
+        && (Game::version() >= Game::v1_16)) {
         const auto &fishingHook = value[QStringLiteral("fishing_hook")].toObject();
         ui->inOpenWaterCheck->setupFromJsonObject(fishingHook, "in_open_water");
     }
     if (value.contains(QStringLiteral("lightning_bolt"))
-        && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        && (Game::version() >= Game::v1_17)) {
         const auto &lightningBolt = value[QStringLiteral("lightning_bolt")].toObject();
         if (lightningBolt.contains("blocks_set_on_fire")) {
             ui->blocksOnFireInput->fromJson(lightningBolt["blocks_set_on_fire"]);
@@ -508,10 +508,10 @@ void EntityConditionDialog::onEntityTypeChanged() {
     ui->tabWidget->setTabEnabled(0, isNotSelected || entityId == QStringLiteral("minecraft:player"));
     ui->tabWidget->setTabEnabled(1, isNotSelected || entityId == QStringLiteral("minecraft:cat"));
 
-    if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 16))) {
+    if ((Game::version() >= Game::v1_16)) {
         ui->tabWidget->setTabEnabled(2, isNotSelected || entityId == QStringLiteral("minecraft:fishing_bobber"));
     }
-    if ((MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+    if ((Game::version() >= Game::v1_17)) {
         ui->tabWidget->setTabEnabled(3, isNotSelected || entityId == QStringLiteral("minecraft:lightning_bolt"));
     }
 }

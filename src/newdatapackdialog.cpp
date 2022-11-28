@@ -1,7 +1,7 @@
 #include "newdatapackdialog.h"
 #include "ui_newdatapackdialog.h"
 
-#include "mainwindow.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -14,19 +14,19 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->locationInput->setText(QDir::currentPath());
 
-    const auto &&gameVer = MainWindow::getCurGameVersion();
+    const auto &&gameVer = Game::version();
 
-    if (gameVer >= QVersionNumber(1, 19))
+    if (gameVer >= Game::v1_19)
         ui->formatInput->setValue(10);
-    else if (gameVer >= QVersionNumber(1, 18, 2))
+    else if (gameVer >= Game::v1_18_2)
         ui->formatInput->setValue(9);
-    else if (gameVer >= QVersionNumber(1, 18))
+    else if (gameVer >= Game::v1_18)
         ui->formatInput->setValue(8);
-    else if (gameVer >= QVersionNumber(1, 17))
+    else if (gameVer >= Game::v1_17)
         ui->formatInput->setValue(7);
     else if (gameVer >= QVersionNumber(1, 16, 2))
         ui->formatInput->setValue(6);
-    else if (gameVer >= QVersionNumber(1, 15))
+    else if (gameVer >= Game::v1_15)
         ui->formatInput->setValue(5);
     else if (gameVer >= QVersionNumber(1, 13))
         ui->formatInput->setValue(4);

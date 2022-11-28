@@ -3,43 +3,15 @@
 #include "loottablecondition.h"
 #include "ui_loottablefunction.h"
 #include "inventoryitem.h"
-#include "mainwindow.h"
 #include "numberproviderdelegate.h"
 #include "globalhelpers.h"
 #include "modelfunctions.h"
+#include "game.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStringListModel>
-
-using QStringVector = QVector<QString>;
-
-QStringVector getRegistry(const QString &type, const QString &gameVer) {
-    QFileInfo finfo(":minecraft/" + gameVer + "/registries/" + type + "/data.min.json");
-
-    if (!(finfo.exists() && finfo.isFile())) {
-        qWarning() << "File not exists:" << finfo.path() << "Return empty.";
-        return QStringVector();
-    }
-    QFile inFile(finfo.filePath());
-    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray &&data = inFile.readAll();
-    inFile.close();
-
-    QJsonParseError errorPtr;
-    QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
-    if (doc.isNull()) {
-        qWarning() << "Parse failed" << errorPtr.error;
-        return QStringVector();
-    }
-
-    QStringVector values;
-    for (const auto &value : doc.array()) {
-        values << value.toString();
-    }
-    return values;
-}
 
 LootTableFunction::LootTableFunction(QWidget *parent) :
     QTabWidget(parent),
@@ -50,7 +22,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     auto *view  = qobject_cast<QListView*>(ui->functionTypeCombo->view());
     auto *model =
         static_cast<QStandardItemModel*>(ui->functionTypeCombo->model());
-    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 17)) {
+    if (Game::version() < Game::v1_17) {
         view->setRowHidden(SetEnchantments, true);
         model->item(SetEnchantments, 0)->setEnabled(false);
         view->setRowHidden(SetBannerPattern, true);
@@ -59,7 +31,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
         ui->setCount_addCheck->hide();
         ui->setDamage_addCheck->hide();
     }
-    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 18)) {
+    if (Game::version() < Game::v1_18) {
         view->setRowHidden(SetPotion, true);
         model->item(SetPotion, 0)->setEnabled(false);
 
@@ -68,7 +40,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
         ui->lootTable_typeLabel->hide();
         ui->lootTable_typeCombo->hide();
     } else {
-        for (const auto &value: getRegistry("block_entity_type", MainWindow::getCurGameVersion().toString())) {
+        for (const auto &value: Game::getRegistry("block_entity_type")) {
             auto *item = new QStandardItem(value);
             const QString &prefixedValue = "minecraft:" + value;
             item->setData(prefixedValue);
@@ -306,7 +278,7 @@ QJsonObject LootTableFunction::toJson() const {
         if (!entries.isEmpty()) {
             root.insert("entries", entries);
         }
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+        if (Game::version() >= Game::v1_18) {
             root.insert("type", ui->setContents_typeCombo->currentText());
         }
         break;
@@ -314,7 +286,7 @@ QJsonObject LootTableFunction::toJson() const {
 
     case SetCount: {   /* Set count */
         root.insert("count", ui->setCount_countInput->toJson());
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (Game::version() >= Game::v1_18) {
             ui->setCount_addCheck->insertToJsonObject(root, "add");
         }
         break;
@@ -322,7 +294,7 @@ QJsonObject LootTableFunction::toJson() const {
 
     case SetDamage: {   /* Set damage */
         root.insert("damage", ui->setDamage_damageInput->toJson());
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (Game::version() >= Game::v1_18) {
             ui->setDamage_addCheck->insertToJsonObject(root, "add");
         }
         break;
@@ -340,7 +312,7 @@ QJsonObject LootTableFunction::toJson() const {
         root.insert("name", ui->lootTable_idEdit->text());
         if (ui->lootTable_seedSpin->value() != 0)
             root.insert("seed", ui->lootTable_seedSpin->value());
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+        if (Game::version() >= Game::v1_18) {
             root.insert("type", ui->lootTable_typeCombo->currentText());
         }
         break;
@@ -655,7 +627,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     }
 
     case SetBannerPattern: {   /* Set banner pattern */
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (Game::version() >= Game::v1_17) {
             ui->setPattern_table->fromJson(root["patterns"].toArray());
             ui->setPattern_appendCheck->setupFromJsonObject(root, "append");
         }
@@ -663,7 +635,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
     }
 
     case SetContents: {   /* Set contents */
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+        if (Game::version() >= Game::v1_18) {
             if (!root.contains("type")) {
                 return;
             }
@@ -694,7 +666,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             return;
 
         ui->setDamage_damageInput->fromJson(root.value(QLatin1String("damage")));
-        if (root.contains("add") && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        if (root.contains("add") && (Game::version() >= Game::v1_17)) {
             ui->setDamage_addCheck->setupFromJsonObject(root, "add");
         }
         break;
@@ -702,7 +674,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
     case SetEnchantments: {   /* Set enchantments */
         ui->setEnchant_table->fromJson(root["enchantments"].toObject());
-        if (root.contains("add") && (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17))) {
+        if (root.contains("add") && (Game::version() >= Game::v1_17)) {
             ui->setEnchant_addCheck->setupFromJsonObject(root, "add");
         }
         break;
@@ -712,7 +684,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         if (!root.contains("name"))
             return;
 
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 18)) {
+        if (Game::version() >= Game::v1_18) {
             if (!root.contains("type")) {
                 return;
             }
@@ -765,9 +737,10 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         if (!root.contains("potion"))
             return;
 
-        if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 17)) {
+        if (Game::version() >= Game::v1_18) {
             setupComboFrom(ui->setPotion_potionCombo, root["potion"].toString());
         }
+        break;
     }
 
     case SetStewEffect: {   /* Set stew effects */
@@ -959,7 +932,7 @@ void LootTableFunction::updateConditionsTab(int size) {
 }
 
 void LootTableFunction::initBlocksModel() {
-    auto blocksInfo = MainWindow::getMCRInfo("block");
+    auto blocksInfo = Game::getInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
     for (const auto &key : blocksInfo.keys()) {

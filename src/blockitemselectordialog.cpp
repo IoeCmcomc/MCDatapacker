@@ -1,7 +1,7 @@
 #include "blockitemselectordialog.h"
 #include "ui_blockitemselectordialog.h"
 
-#include "mainwindow.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QIcon>
@@ -33,22 +33,22 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent,
     setCategory(category);
     setupListView();
     connect(ui->searchLineEdit, &QLineEdit::textChanged,
-            [ = ](const QString &input) {
+            this, [ = ](const QString &input) {
         filterModel.setFilterRegularExpression(input);
     });
-    connect(ui->filterByBlockCheck, &QCheckBox::toggled, [ = ](bool checked) {
+    connect(ui->filterByBlockCheck, &QCheckBox::toggled, this, [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::BlockItems, checked);
     });
-    connect(ui->filterByItemCheck, &QCheckBox::toggled, [ = ](bool checked) {
+    connect(ui->filterByItemCheck, &QCheckBox::toggled, this, [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::NonblockItem, checked);
     });
     connect(ui->obtainableBlocksCheck, &QCheckBox::toggled,
-            [ = ](bool checked) {
+            this, [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::ObtainableBlocks,
                                          checked);
     });
     connect(ui->unobtainableBlocksCheck, &QCheckBox::toggled,
-            [ = ](bool checked) {
+            this, [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::UnobtainableBlocks,
                                          checked);
     });
@@ -75,8 +75,8 @@ void BlockItemSelectorDialog::setupListView() {
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
     ui->listView->setModel(&filterModel);
 
-    const auto &MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
-    const auto &MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+    const auto &&MCRItemInfo  = Game::getInfo(QStringLiteral("item"));
+    const auto &&MCRBlockInfo = Game::getInfo(QStringLiteral("block"));
 
     auto blockIter = MCRBlockInfo.constBegin();
     auto itemIter  = (m_category == SelectCategory::Blocks)

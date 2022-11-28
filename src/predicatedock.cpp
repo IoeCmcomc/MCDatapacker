@@ -5,6 +5,7 @@
 #include "loottablecondition.h"
 
 #include "globalhelpers.h"
+#include "game.h"
 
 #include <QDebug>
 #include <QJsonDocument>
@@ -56,7 +57,7 @@ void PredicateDock::onReadBtn() {
     if (json_doc.isNull() || json_doc.isEmpty())
         return;
 
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)
+    if (Game::version() >= Game::v1_16
         && json_doc.isArray()) {
         ui->dataInterface->setJson(json_doc.array());
     } else {
@@ -71,7 +72,7 @@ void PredicateDock::onReadBtn() {
 void PredicateDock::onWriteBtn() {
     QJsonDocument jsonDoc;
 
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)
+    if (Game::version() >= Game::v1_16
         && ui->dataInterface->entriesCount() != 1) {
         jsonDoc = QJsonDocument(ui->dataInterface->json());
     } else {

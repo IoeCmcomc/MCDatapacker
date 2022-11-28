@@ -1,7 +1,7 @@
 #include "inventoryitem.h"
 
 #include "inventoryslot.h"
-#include "mainwindow.h"
+#include "game.h"
 
 #include "globalhelpers.h"
 
@@ -49,8 +49,8 @@ void InventoryItem::setupItem(QString id) {
 
     Glhp::removePrefix(id, QStringLiteral("minecraft:"));
 
-    const auto &MCRItemInfo  = MainWindow::getMCRInfo(QStringLiteral("item"));
-    const auto &MCRBlockInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+    const auto &&MCRItemInfo  = Game::getInfo(QStringLiteral("item"));
+    const auto &&MCRBlockInfo = Game::getInfo(QStringLiteral("block"));
 
     if (id.endsWith(QLatin1String("banner_pattern"))) {
         iconpath = ":/minecraft/texture/item/banner_pattern.png";

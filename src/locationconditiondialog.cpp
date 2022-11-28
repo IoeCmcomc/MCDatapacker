@@ -1,9 +1,9 @@
 #include "locationconditiondialog.h"
 #include "ui_locationconditiondialog.h"
 
-#include "mainwindow.h"
 #include "globalhelpers.h"
 #include "inventoryitem.h"
+#include "game.h"
 
 #include <QVariant>
 #include <QJsonObject>
@@ -30,11 +30,11 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
     initComboModelView("feature", featuresModel, ui->featureCombo);
 
-    if (MainWindow::getCurGameVersion() < QVersionNumber(1, 16)) {
+    if (Game::version() < Game::v1_16) {
         ui->smokeyCheck->hide();
     }
 
-    from_1_17 = MainWindow::getCurGameVersion() >= QVersionNumber(1, 17);
+    from_1_17 = Game::version() >= Game::v1_17;
 
     connect(ui->addstateBtn, &QPushButton::clicked,
             this, &LocationConditionDialog::onAddedState);
@@ -75,7 +75,7 @@ QJsonObject LocationConditionDialog::toJson() const {
     if (!ui->lightInput->isCurrentlyUnset())
         root.insert(QStringLiteral("light"), { { "light",
                         ui->lightInput->toJson() } });
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+    if (Game::version() >= QVersionNumber(1, 16)) {
         ui->smokeyCheck->insertToJsonObject(root, "smokey");
     }
 
@@ -144,7 +144,7 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         if (light.contains(QStringLiteral("light")))
             ui->lightInput->fromJson(light[QStringLiteral("light")]);
     }
-    if (MainWindow::getCurGameVersion() >= QVersionNumber(1, 16)) {
+    if (Game::version() >= QVersionNumber(1, 16)) {
         ui->smokeyCheck->setupFromJsonObject(value, "smokey");
     }
 
@@ -244,8 +244,7 @@ void LocationConditionDialog::onAddedState() {
 void LocationConditionDialog::initBlockGroup() {
     ui->blockGroup->setChecked(false);
 
-    /*blocksModel.appendRow(new QStandardItem(tr("(not set)"))); */
-    auto blocksInfo = MainWindow::getMCRInfo(QStringLiteral("block"));
+    auto blocksInfo = Game::getInfo(QStringLiteral("block"));
     for (const auto &key : blocksInfo.keys()) {
         InventoryItem  invItem(key);
         QStandardItem *item = new QStandardItem();

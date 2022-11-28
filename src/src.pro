@@ -38,6 +38,7 @@ SOURCES += \
     entityconditiondialog.cpp \
     filenamedelegate.cpp \
     fileswitcher.cpp \
+    game.cpp \
     globalhelpers.cpp \
     highlighter.cpp \
     imgviewer.cpp \
@@ -125,6 +126,7 @@ HEADERS += \
     entityconditiondialog.h \
     filenamedelegate.h \
     fileswitcher.h \
+    game.h \
     globalhelpers.h \
     highlighter.h \
     imgviewer.h \

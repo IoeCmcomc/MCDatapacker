@@ -15,6 +15,7 @@
 #include "itemmodifierdock.h"
 #include "statisticsdialog.h"
 #include "rawjsontextedit.h"
+#include "game.h"
 
 #include "QSimpleUpdater.h"
 #include "miniz-cpp/zip.hpp"
@@ -35,9 +36,6 @@
 #include <QSaveFile>
 
 
-QMap<QString, QVariantMap> MainWindow::MCRInfoMaps;
-QVersionNumber             MainWindow::curGameVersion = QVersionNumber();
-
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
 
@@ -46,13 +44,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     readSettings();
-
-    MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
-                                   MainWindow::readMCRInfo(QStringLiteral(
-                                                               "block")));
-    MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
-                                   MainWindow::readMCRInfo(QStringLiteral(
-                                                               "item")));
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
@@ -117,7 +108,7 @@ void MainWindow::initDocks() {
     addDockWidget(Qt::RightDockWidgetArea, predicateDock);
     predicateDock->hide();
 
-    if (MainWindow::curGameVersion >= QVersionNumber(1, 17)) {
+    if (Game::version() >= Game::v1_17) {
         itemModifierDock = new ItemModifierDock(this);
         addDockWidget(Qt::RightDockWidgetArea, itemModifierDock);
         itemModifierDock->hide();
@@ -391,18 +382,17 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     settings.beginGroup(QStringLiteral("general"));
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
                  true);
-    QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
+    const QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
                                            QStringLiteral("1.18")).toString();
 
-    if (gameVer != getCurGameVersion().toString()) {
+    if (gameVer != tempGameVerStr) {
         if (fromDialog) {
             QMessageBox msgBox(QMessageBox::Warning,
                                tr("Changing game version"),
                                tr(
                                    "The game version has been changed from %1 to %2\n"
                                    "The program need to restart to apply the changes.")
-                               .arg(
-                                   getCurGameVersion().toString(), gameVer));
+                               .arg(tempGameVerStr, gameVer));
             QPushButton* restartBtn = msgBox.addButton(tr("Restart"),
                                                        QMessageBox::YesRole);
             msgBox.setDefaultButton(restartBtn);
@@ -412,24 +402,16 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
             if (msgBox.clickedButton() == restartBtn) {
                 restart();
             } else {
-                settings.setValue("gameVersion",
-                                  getCurGameVersion().toString());
+                settings.setValue("gameVersion", tempGameVerStr); // Set value explicitly
             }
         } else {
-            MainWindow::MCRInfoMaps.insert(QStringLiteral("block"),
-                                           MainWindow::readMCRInfo(
-                                               QStringLiteral("block"),
-                                               gameVer));
-            MainWindow::MCRInfoMaps.insert(QStringLiteral("item"),
-                                           MainWindow::readMCRInfo(
-                                               QStringLiteral("item"),
-                                               gameVer));
-            MainWindow::curGameVersion = QVersionNumber::fromString(gameVer);
+            settings.setValue(QStringLiteral("gameVersion"), gameVer); // Set value explicitly
+            tempGameVerStr = gameVer;
             Command::MinecraftParser::setSchema(
                 QStringLiteral(":/minecraft/") + gameVer +
                 QStringLiteral("/summary/commands/data.min.json"));
             Command::MinecraftParser::limitScoreboardObjectiveLength
-                    = curGameVersion < QVersionNumber(1, 18);
+                    = Game::version() < Game::v1_18;
 
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);
@@ -745,10 +727,6 @@ PackMetaInfo MainWindow::getPackInfo() const {
     return m_packInfo;
 }
 
-QVersionNumber MainWindow::getCurGameVersion() {
-    return curGameVersion;
-}
-
 void MainWindow::updateWindowTitle(bool changed) {
     QStringList titleParts;
 
@@ -770,7 +748,6 @@ void MainWindow::updateWindowTitle(bool changed) {
 void MainWindow::installUpdate(const QString &url, const QString &filepath) {
     using namespace miniz_cpp;
     qDebug() << filepath;
-
 
     const auto appDirPath = qApp->applicationDirPath();
     qDebug() << filepath << appDirPath << qApp->arguments()[0];
@@ -817,65 +794,6 @@ void MainWindow::installUpdate(const QString &url, const QString &filepath) {
                   qApp->arguments()[0].replace('\\', '/'));
 
     restart();
-}
-
-QVariantMap MainWindow::readMCRInfo(const QString &type, const QString &ver,
-                                    [[maybe_unused]] const int depth) {
-    QVariantMap retMap;
-
-    QFileInfo finfo(":minecraft/" + ver + "/" + type + ".json");
-
-    /*qDebug() << "readMCRInfo" << type << ver << finfo << finfo.exists(); */
-
-    if (!finfo.exists())
-        finfo.setFile(QStringLiteral(":minecraft/1.15/") + type + ".json");
-
-    if (!(finfo.exists() && finfo.isFile())) {
-        qWarning() << "File not exists:" << finfo.path() << "Return empty.";
-        return retMap;
-    }
-    /*qDebug() << finfo; */
-    QFile inFile(finfo.filePath());
-    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QByteArray &&data = inFile.readAll();
-    inFile.close();
-
-    QJsonParseError errorPtr;
-    QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
-    if (doc.isNull()) {
-        qWarning() << "Parse failed" << errorPtr.error;
-        return retMap;
-    }
-    QJsonObject root = doc.object();
-    if (root.isEmpty()) {
-        /*qDebug() << "Root is empty. Return empty"; */
-        return retMap;
-    }
-
-    if (root.contains("base")) {
-        const auto &tmpMap = MainWindow::readMCRInfo(type,
-                                                     root["base"].toString(),
-                                                     depth);
-        retMap.insert(std::move(tmpMap));
-        root.remove("base");
-    }
-    if (root.contains("removed")) {
-        for (const auto &keyRef: root["removed"].toArray()) {
-            const QString &key = keyRef.toString();
-            if (retMap.contains(key))
-                retMap.remove(key);
-        }
-        root.remove("removed");
-    }
-    if (root.contains("added"))
-        retMap.insert(root["added"].toVariant().toMap());
-    else
-        retMap.insert(root.toVariantMap());
-    return retMap;
-}
-
-QVariantMap &MainWindow::getMCRInfo(const QString &type) {
-    return MainWindow::MCRInfoMaps[type];
 }
 
 void MainWindow::newDatapack() {

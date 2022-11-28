@@ -1,16 +1,18 @@
 #include "itemconditiondialog.h"
 #include "ui_itemconditiondialog.h"
 
-#include "mainwindow.h"
+#include "game.h"
 #include "numberproviderdelegate.h"
 #include "inventoryslot.h"
+
+#include <QJsonObject>
 
 ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
 
-    from_1_17 = MainWindow::getCurGameVersion() >= QVersionNumber(1, 17);
+    from_1_17 = Game::version() >= Game::v1_17;
 
     ui->itemSlot->setAcceptTag(false);
     ui->itemSlot->setAcceptMultiple(from_1_17);
