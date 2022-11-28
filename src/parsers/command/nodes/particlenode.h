@@ -2,11 +2,10 @@
 #define PARTICLENODE_H
 
 #include "floatnode.h"
-#include "blockstatenode.h"
-#include "itemstacknode.h"
 #include "resourcelocationnode.h"
 
 namespace Command {
+
     class ParticleColorNode : public ParseNode {
 public:
         ParticleColorNode(int pos);
@@ -23,31 +22,27 @@ public:
         QSharedPointer<FloatNode> b() const;
         void setB(QSharedPointer<FloatNode> b);
 
-        QSharedPointer<FloatNode> size() const;
-        void setSize(QSharedPointer<FloatNode> size);
-
 private:
         QSharedPointer<FloatNode> m_r    = nullptr;
         QSharedPointer<FloatNode> m_g    = nullptr;
         QSharedPointer<FloatNode> m_b    = nullptr;
-        QSharedPointer<FloatNode> m_size = nullptr;
     };
 
     class ParticleNode : public ResourceLocationNode
     {
 public:
+        using ParamVector = QVector<QSharedPointer<ParseNode>>;
+
         ParticleNode(int pos, const QString &nspace,
                      const QString &id);
         ParticleNode(ResourceLocationNode *other);
         QString toString() const override;
         void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
 
-        QSharedPointer<ParseNode> params() const;
-        void setParams(QSharedPointer<BlockStateNode> params);
-        void setParams(QSharedPointer<ItemStackNode> params);
-        void setParams(QSharedPointer<ParticleColorNode> params);
+        ParamVector params() const;
+        void setParams(std::initializer_list<QSharedPointer<ParseNode>> params);
 private:
-        QSharedPointer<ParseNode> m_params = nullptr;
+        ParamVector m_params;
     };
 }
 

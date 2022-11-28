@@ -1,7 +1,5 @@
 #include "rootnode.h"
 
-#include "literalnode.h"
-
 static int _ = qRegisterMetaType<QSharedPointer<Command::RootNode> >();
 
 Command::RootNode::RootNode(int pos) : Command::ParseNode(pos) {

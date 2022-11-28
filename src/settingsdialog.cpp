@@ -62,8 +62,7 @@ void SettingsDialog::setupLanguageSetting() {
 }
 
 void SettingsDialog::onAccepted() {
-    QSettings settings(QCoreApplication::organizationName(),
-                       QCoreApplication::applicationName());
+    QSettings settings;
 
     settings.setValue("theme", ui->themeCombo->currentText());
     settings.beginGroup("general");
@@ -85,8 +84,6 @@ void SettingsDialog::onAccepted() {
     settings.setValue("showSpacesAndTabs",
                       ui->editorShowSpacesCheck->isChecked());
     settings.endGroup();
-
-    qobject_cast<MainWindow*>(parent())->readPrefSettings(settings, true);
 }
 
 void SettingsDialog::initSettings() {

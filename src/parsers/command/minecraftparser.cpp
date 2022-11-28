@@ -607,6 +607,18 @@ parseNbtPathStep() {
     return ret;
 }
 
+QSharedPointer<Command::ParticleColorNode> Command::MinecraftParser::parseParticleColor()
+{
+    auto color = QSharedPointer<ParticleColorNode>::create(pos());
+    color->setR(brigadier_float());
+    this->eat(' ');
+    color->setG(brigadier_float());
+    this->eat(' ');
+    color->setB(brigadier_float());
+    color->setLength(pos() - color->pos());
+    return color;
+}
+
 QSharedPointer<Command::AngleNode> Command::MinecraftParser::minecraft_angle() {
     bool       _    = false;
     const auto axis = parseAxis(AxisParseOption::NoOption, _);
@@ -994,24 +1006,26 @@ minecraft_particle() {
     QString &&fullid    = ret->fullId();
 
     if (fullid == QLatin1String("minecraft:block") ||
+        fullid == QLatin1String("minecraft:block_marker") ||
         fullid == QLatin1String("minecraft:falling_dust")) {
         eat(' ');
-        ret->setParams(minecraft_blockState());
+        ret->setParams({minecraft_blockState()});
     } else if (fullid == QLatin1String("minecraft:dust")) {
-        auto color = QSharedPointer<ParticleColorNode>::create(pos());
         this->eat(' ');
-        color->setR(brigadier_float());
-        this->eat(' ');
-        color->setG(brigadier_float());
-        this->eat(' ');
-        color->setB(brigadier_float());
-        this->eat(' ');
-        color->setSize(brigadier_float());
-        color->setLength(pos() - color->pos());
-        ret->setParams(color);
+        const auto &color = parseParticleColor();
+        eat(' ');
+        ret->setParams({color, brigadier_float()});
+    } else if (fullid == "minecraft:dust_color_transition") {
+        eat(' ');
+        const auto &startColor = parseParticleColor();
+        eat(' ');
+        const auto &size = brigadier_float();
+        eat(' ');
+        const auto &endColor = parseParticleColor();
+        ret->setParams({startColor, size, endColor});
     } else if (fullid == QLatin1String("minecraft:item")) {
         eat(' ');
-        ret->setParams(minecraft_itemStack());
+        ret->setParams({minecraft_itemStack()});
     }
     ret->setLength(pos() - ret->pos());
     return ret;

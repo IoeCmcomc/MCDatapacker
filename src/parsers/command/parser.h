@@ -163,7 +163,7 @@ private:
         const QRegularExpression m_literalStrRegex        = QRegularExpression(
             R"([a-zA-Z0-9-_.*<=>]+)");
         const QRegularExpression m_decimalNumRegex = QRegularExpression(
-            R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+)(?:[eE]\d+)?)");
+            R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))");
         static QJsonObject m_schema;
         QString m_text;
         uint m_pos = 0;

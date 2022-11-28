@@ -125,6 +125,7 @@ private:
         QSharedPointer<Command::MultiMapNode> parseEntityArguments();
         QSharedPointer<Command::TargetSelectorNode> parseTargetSelector();
         QSharedPointer<Command::NbtPathStepNode> parseNbtPathStep();
+        QSharedPointer<Command::ParticleColorNode> parseParticleColor();
 
         /* Direct parsing methods */
         Q_INVOKABLE QSharedPointer<Command::AngleNode> minecraft_angle();

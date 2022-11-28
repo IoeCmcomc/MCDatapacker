@@ -9,16 +9,15 @@ Command::ParticleColorNode::ParticleColorNode(int pos)
 
 QString Command::ParticleColorNode::toString() const {
     if (isVaild()) {
-        return QString("ParticleColorNode(%1, %2, %3, %4)").arg(
-            m_r->toString(), m_g->toString(),
-            m_b->toString(), m_size->toString());
+        return QString("ParticleColorNode(%1, %2, %3)").arg(
+            m_r->toString(), m_g->toString(), m_b->toString());
     } else {
         return QStringLiteral("ParticleColorNode(Invaild)");
     }
 }
 
 bool Command::ParticleColorNode::isVaild() const {
-    return ParseNode::isVaild() && m_r && m_g && m_b && m_size;
+    return ParseNode::isVaild() && m_r && m_g && m_b;
 }
 
 void Command::ParticleColorNode::accept(Command::NodeVisitor *visitor,
@@ -28,17 +27,8 @@ void Command::ParticleColorNode::accept(Command::NodeVisitor *visitor,
     m_r->accept(visitor);
     m_g->accept(visitor);
     m_b->accept(visitor);
-    m_size->accept(visitor);
     if (order == NodeVisitor::Order::Postorder)
         visitor->visit(this);
-}
-
-QSharedPointer<Command::FloatNode> Command::ParticleColorNode::size() const {
-    return m_size;
-}
-
-void Command::ParticleColorNode::setSize(QSharedPointer<FloatNode> size) {
-    m_size = size;
 }
 
 QSharedPointer<Command::FloatNode> Command::ParticleColorNode::b() const {
@@ -83,8 +73,15 @@ Command::ParticleNode::ParticleNode(Command::ResourceLocationNode *other)
 QString Command::ParticleNode::toString() const {
     QString ret = QString("ParticleNode(%1").arg(fullId());
 
-    if (m_params)
-        ret += QStringLiteral(", ") + m_params->toString();
+    if (!m_params.isEmpty()) {
+        ret += ", params: (";
+        for (const auto &param: m_params) {
+            ret += param->toString();
+            if (param != m_params.last())
+                ret += ", ";
+        }
+        ret += ")";
+    }
     return ret + ')';
 }
 
@@ -92,25 +89,21 @@ void Command::ParticleNode::accept(Command::NodeVisitor *visitor,
                                    Command::NodeVisitor::Order order) {
     if (order == NodeVisitor::Order::Preorder)
         visitor->visit(this);
-    if (m_params)
-        m_params->accept(visitor, order);
+    for (const auto &param: qAsConst(m_params)) {
+        param->accept(visitor, order);
+    }
     if (order == NodeVisitor::Order::Postorder)
         visitor->visit(this);
 }
 
-QSharedPointer<Command::ParseNode> Command::ParticleNode::params() const {
+Command::ParticleNode::ParamVector Command::ParticleNode::params() const {
     return m_params;
 }
 
-void Command::ParticleNode::setParams(QSharedPointer<BlockStateNode> params) {
-    m_params = params;
-}
-
-void Command::ParticleNode::setParams(QSharedPointer<ItemStackNode> params) {
-    m_params = params;
-}
-
-void Command::ParticleNode::setParams(QSharedPointer<ParticleColorNode> params)
+void Command::ParticleNode::setParams(std::initializer_list<QSharedPointer<ParseNode> > params)
 {
-    m_params = params;
+    for (const auto &param: params) {
+        m_params << param;
+    }
 }
+

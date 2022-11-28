@@ -246,8 +246,10 @@ void MainWindow::rawJsonTextEditor() {
 
 void MainWindow::pref_settings() {
     SettingsDialog dialog(this);
-
-    dialog.exec();
+    if (dialog.exec() == QDialog::Accepted) {
+        QSettings settings{};
+        readPrefSettings(settings, true);
+    }
 }
 
 void MainWindow::about() {

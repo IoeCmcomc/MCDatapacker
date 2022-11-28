@@ -84,10 +84,10 @@ HEADERS += \
     ../../../../../src/parsers/command/parser.h
 
 RESOURCES += \
-    ../../../../../resource/minecraft/info/1.17/1.17.qrc
+    ../../../../../resource/minecraft/info/1.18/1.18.qrc
 
 DISTFILES += \
-    ../../../../../resource/minecraft/info/1.17/summary/commands/data.min.json
+    ../../../../../resource/minecraft/info/1.18/summary/commands/data.min.json
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/lru-cache/release/ -llru-cache
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/lru-cache/debug/ -llru-cache
