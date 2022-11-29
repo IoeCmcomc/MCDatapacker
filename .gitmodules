@@ -43,3 +43,6 @@
 [submodule "resource/minecraft/info/1.18/registries"]
 	path = resource/minecraft/info/1.18/registries
 	url = https://github.com/misode/mcmeta.git
+[submodule "resource/app/fonts/Monocraft"]
+	path = resource/app/fonts/Monocraft
+	url = https://github.com/IdreesInc/Monocraft.git

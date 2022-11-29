@@ -244,7 +244,8 @@ RESOURCES += \
     ../resource/app/icons/default/default.qrc
 
 DISTFILES += \
-    ../lib/QFindDialogs/LICENSE
+    ../lib/QFindDialogs/LICENSE \
+    ../resource/app/fonts/Monocraft/LICENSE
 
 RC_ICONS = ../resource/app/icon/favicon.ico
 

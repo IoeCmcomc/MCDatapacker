@@ -3,10 +3,9 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QTranslator>
 #include <QDebug>
 #include <QDir>
-#include <QStyleFactory>
+#include <QFontDatabase>
 
 int main(int argc, char *argv[]) {
     qSetMessagePattern(
@@ -25,6 +24,9 @@ int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
+
+    const int fontId = QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/Monocraft/Monocraft.otf"));
+    qDebug() << fontId;
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
