@@ -39,7 +39,10 @@ struct CodeFile {
         WorldGen_end,
         Tag,
         BlockTag, EntityTypeTag, FluidTag,
-        FunctionTag, ItemTag, GameEventTag
+        FunctionTag, ItemTag, GameEventTag,
+        Tag_end,
+        JsonText_end,
+        Text_end,
     };
 
     QVariant  data;

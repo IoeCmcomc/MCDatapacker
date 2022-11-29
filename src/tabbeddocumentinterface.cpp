@@ -14,7 +14,27 @@
 #include <QSaveFile>
 #include <QShortcut>
 #include <QJsonDocument>
+#include <QDirIterator>
 
+void openAllFiles(TabbedDocumentInterface *widget, CodeFile::FileType minType, CodeFile::FileType maxType) {
+    QDir          &&dir     = QDir::current();
+    const QString &&dirPath = dir.path();
+
+    dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
+
+    QDirIterator  it(dir, QDirIterator::Subdirectories);
+
+    while (it.hasNext()) {
+        const QString &&path = it.next();
+        const auto &&finfo = it.fileInfo();
+        if (finfo.isFile()) {
+            const auto type = Glhp::pathToFileType(dirPath, path);
+            if ((type >= minType) && (type <= maxType)) {
+                widget->onOpenFile(path);
+            }
+        }
+    }
+}
 
 TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
     QFrame(parent),
@@ -55,6 +75,15 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
                               Qt::CTRL + Qt::SHIFT + Qt::Key_Tab), this),
             &QShortcut::activated, this,
             &TabbedDocumentInterface::onSwitchPrevFile);
+
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O, Qt::Key_F), this),
+            &QShortcut::activated, [this]() {
+        openAllFiles(this, CodeFile::Function, CodeFile::Function);
+    });
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O, Qt::Key_J), this),
+            &QShortcut::activated, [this]() {
+        openAllFiles(this, CodeFile::JsonText, CodeFile::JsonText_end);
+    });
 }
 
 TabbedDocumentInterface::~TabbedDocumentInterface() {
