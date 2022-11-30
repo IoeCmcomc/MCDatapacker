@@ -49,7 +49,7 @@ TestMinecraftParser::~TestMinecraftParser() {
 
 void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setSchema(
-        ":/minecraft/1.18/summary/commands/data.min.json");
+        ":/minecraft/1.18.2/summary/commands/data.min.json");
     Command::MinecraftParser::setTestMode(true);
     /*
        for (int i = 1024; i < 2000; ++i) {
@@ -225,7 +225,7 @@ void TestMinecraftParser::commands_data() {
         "execute in minecraft:the_nether positioned as @s run tp ~ ~ ~" <<
         "RootNode[9](LiteralNode(execute), LiteralNode(in), DimensionNode(minecraft:the_nether), LiteralNode(positioned), LiteralNode(as), EntityNode[single](TargetSelectorNode(@s)), LiteralNode(run), LiteralNode(tp), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)))";
     QTest::newRow(GEN_TAG) << "execute positioned 0 64 0 run locate village" <<
-        "RootNode[6](LiteralNode(execute), LiteralNode(positioned), Vec3Node(x: AxisNode(0), y: AxisNode(64), z: AxisNode(0)), LiteralNode(run), LiteralNode(locate), LiteralNode(village))";
+        "RootNode[6](LiteralNode(execute), LiteralNode(positioned), Vec3Node(x: AxisNode(0), y: AxisNode(64), z: AxisNode(0)), LiteralNode(run), LiteralNode(locate), ResourceLocationNode(village))";
     QTest::newRow(GEN_TAG) <<
         "execute as @e[type=sheep] positioned as @s rotated as @p run tp @s ^ ^ ^1"
                            <<
@@ -316,7 +316,7 @@ void TestMinecraftParser::commands_data() {
 
     SET_TAG(locate)
     QTest::newRow(GEN_TAG) << "locate mansion" <<
-        "RootNode[2](LiteralNode(locate), LiteralNode(mansion))";
+        "RootNode[2](LiteralNode(locate), ResourceLocationNode(mansion))";
 
     SET_TAG(locatebiome)
     QTest::newRow(GEN_TAG) << "locatebiome desert" <<

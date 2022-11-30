@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "platforms/windows.h"
+#include "game.h"
 
 #include <QOperatingSystemVersion>
 #include <QFontDatabase>
@@ -105,7 +106,7 @@ void SettingsDialog::initSettings() {
         ui->gameVersionCombo->addItem(finfo.fileName());
     ui->gameVersionCombo->setCurrentText(settings.value(QStringLiteral(
                                                             "gameVersion"),
-                                                        "1.18").toString());
+                                                        Game::defaultVersionString).toString());
     settings.endGroup();
 
     settings.beginGroup(QStringLiteral("editor"));

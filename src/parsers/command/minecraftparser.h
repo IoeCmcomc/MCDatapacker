@@ -167,6 +167,8 @@ private:
         minecraft_objectiveCriteria();
         Q_INVOKABLE QSharedPointer<Command::OperationNode> minecraft_operation();
         Q_INVOKABLE QSharedPointer<Command::ParticleNode> minecraft_particle();
+        Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode> minecraft_resource(const QVariantMap &props);
+        Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode> minecraft_resourceOrTag(const QVariantMap &props);
         Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode>
         minecraft_resourceLocation();
         Q_INVOKABLE QSharedPointer<Command::RotationNode> minecraft_rotation();

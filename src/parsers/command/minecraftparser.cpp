@@ -1031,6 +1031,23 @@ minecraft_particle() {
     return ret;
 }
 
+QSharedPointer<Command::ResourceLocationNode> Command::MinecraftParser::minecraft_resource(const QVariantMap &props) {
+    return minecraft_resourceLocation();
+}
+
+QSharedPointer<Command::ResourceLocationNode> Command::MinecraftParser::minecraft_resourceOrTag(const QVariantMap &props) {
+    const int curPos = pos();
+    bool isTag = false;
+    if (curChar() == '#') {
+        advance();
+        isTag = true;
+    }
+    const auto &node = minecraft_resourceLocation();
+    node->setPos(curPos);
+    node->setIsTag(isTag);
+    return node;
+}
+
 QSharedPointer<Command::ResourceLocationNode> Command::MinecraftParser::
 minecraft_resourceLocation() {
     const int              curPos = pos();

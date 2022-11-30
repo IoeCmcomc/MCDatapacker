@@ -240,6 +240,7 @@ RESOURCES += \
     ../resource/minecraft/info/1.16/1.16.qrc \
     ../resource/minecraft/info/1.17/1.17.qrc \
     ../resource/minecraft/info/1.18/1.18.qrc \
+    ../resource/minecraft/info/1.18.2/1.18.2.qrc \
     ../resource/minecraft/minecraft.qrc \
     ../resource/app/icons/default/default.qrc
 

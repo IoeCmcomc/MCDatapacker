@@ -385,7 +385,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
                  true);
     const QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
-                                           QStringLiteral("1.18")).toString();
+                                           Game::defaultVersionString).toString();
 
     if (gameVer != tempGameVerStr) {
         if (fromDialog) {

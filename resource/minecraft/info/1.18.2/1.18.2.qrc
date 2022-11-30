@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/minecraft/1.18.2">
+        <file>attribute.json</file>
+        <file>biome.json</file>
+        <file>block.json</file>
+        <file>dimension.json</file>
+        <file>effect.json</file>
+        <file>enchantment.json</file>
+        <file>entity.json</file>
+        <file>feature.json</file>
+        <file>fluid.json</file>
+        <file>item.json</file>
+        <file>tag/biome.json</file>
+        <file>tag/block.json</file>
+        <file>tag/configured_structure_feature.json</file>
+        <file>tag/entity_type.json</file>
+        <file>tag/fluid.json</file>
+        <file>tag/item.json</file>
+        <file>summary/commands/data.min.json</file>
+        <file>registries/block_entity_type/data.min.json</file>
+    </qresource>
+</RCC>

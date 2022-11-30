@@ -46,3 +46,9 @@
 [submodule "resource/app/fonts/Monocraft"]
 	path = resource/app/fonts/Monocraft
 	url = https://github.com/IdreesInc/Monocraft.git
+[submodule "resource/minecraft/info/1.18.2/summary"]
+	path = resource/minecraft/info/1.18.2/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.18.2/registries"]
+	path = resource/minecraft/info/1.18.2/registries
+	url = https://github.com/misode/mcmeta.git
