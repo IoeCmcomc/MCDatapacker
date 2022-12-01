@@ -18,6 +18,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QInputDialog>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
@@ -174,6 +175,21 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
             addNewFileAction(tagMenu, tr("Items"), jsonExt,
                              QLatin1String("tags/items"));
 
+            if (Game::version() >= Game::v1_18_2) {
+                QAction *action = new QAction(tr("Other..."), tagMenu);
+
+                connect(action, &QAction::triggered, this, [this]() {
+                    bool ok;
+                    const QString &tagType = QInputDialog::getText(this, tr("Tag folder path"),
+                                            tr("Please type the folder path of the tag (without the 'tags' prefix):"),
+                                            QLineEdit::Normal, QString(), &ok);
+                    if (ok && !tagType.isEmpty()) {
+                        this->contextMenuOnNew(QLatin1String(".json"), QStringLiteral("tags/") + tagType);
+                    }
+                });
+                tagMenu->addAction(action);
+            }
+
             newMenu->addMenu(tagMenu);
 
             if (Game::version() >= Game::v1_16) {
@@ -189,13 +205,26 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
                 addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
                                  QLatin1String(
                                      "worldgen/configured_structure_feature"));
-                addNewFileAction(worldMenu, tr("Surface builder"), jsonExt,
-                                 QLatin1String(
-                                     "worldgen/configured_surface_builder"));
+                if (Game::version() <= Game::v1_17) {
+                    addNewFileAction(worldMenu, tr("Surface builder"), jsonExt,
+                                     QLatin1String(
+                                         "worldgen/configured_surface_builder"));
+                } else {
+                    addNewFileAction(worldMenu, tr("Noise"), jsonExt,
+                                     QLatin1String("worldgen/noise"));
+                }
                 addNewFileAction(worldMenu, tr("Noise settings"), jsonExt,
                                  QLatin1String("worldgen/noise_settings"));
+                if (Game::version() >= Game::v1_18) {
+                    addNewFileAction(worldMenu, tr("Placed feature"), jsonExt,
+                                     QLatin1String("worldgen/placed_feature"));
+                }
                 addNewFileAction(worldMenu, tr("Processor list"), jsonExt,
                                  QLatin1String("worldgen/processor_list"));
+                if (Game::version() >= Game::v1_18_2) {
+                    addNewFileAction(worldMenu, tr("Structure set"), jsonExt,
+                                     QLatin1String("worldgen/structure_set"));
+                }
                 addNewFileAction(worldMenu, tr("Jigsaw pool"), jsonExt,
                                  QLatin1String("worldgen/template_pool"));
 
@@ -342,7 +371,7 @@ void DatapackTreeView::contextMenuOnNewFolder() {
 
 QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
                                           const QString &name,
-                                          QLatin1String catDir,
+                                          const QString &catDir,
                                           const QString &nspace) {
     if (index.isValid()) {
         QFileInfo finfo = dirModel.fileInfo(index);
@@ -381,7 +410,7 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
 }
 
 void DatapackTreeView::contextMenuOnNew(const QString &ext,
-                                        QLatin1String catDir) {
+                                        const QString &catDir) {
     QModelIndex selected = indexAt(cMenuPos);
     QModelIndex index    = makeNewFile(selected, Glhp::randStr() + ext, catDir);
 

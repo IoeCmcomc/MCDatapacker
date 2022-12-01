@@ -18,5 +18,6 @@
         <file>tag/item.json</file>
         <file>summary/commands/data.min.json</file>
         <file>registries/block_entity_type/data.min.json</file>
+        <file>registries/worldgen/configured_structure_feature/data.min.json</file>
     </qresource>
 </RCC>

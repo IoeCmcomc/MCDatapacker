@@ -373,6 +373,21 @@ void InventorySlot::paintEvent(QPaintEvent *event) {
                 auto pixmap = items[curItemIndex].getPixmap();
                 if (pixmap.isNull()) return;
 
+                if (!isEnabled()) {
+                    auto &&image = pixmap.toImage();
+
+                    QRgb *st = (QRgb*) image.bits(); // Detach the image
+                    const quint64 pixelCount = image.width() * image.height();
+
+                    for (quint64 p = 0; p < pixelCount; ++p) {
+                        const auto pixel = st[p];
+                        int gray = qGray(pixel);
+                        int alpha = qAlpha(pixel);
+                        st[p] = qRgba(gray, gray, gray, alpha);
+                    }
+
+                    pixmap = QPixmap::fromImage(image);
+                }
                 painter.drawPixmap((width() - pixmap.width()) / 2,
                                    (height() - pixmap.height()) / 2,
                                    pixmap);

@@ -35,7 +35,7 @@ private slots:
     void onCustomContextMenu(const QPoint &point);
     void contextMenuOnNewFolder();
     void contextMenuOnNew(const QString &name,
-                          QLatin1String catDir = QLatin1String());
+                          const QString &catDir = QString());
     void contextMenuOnOpen();
     void contextMenuOnRename();
     void contextMenuOnDelete();
@@ -53,7 +53,7 @@ private:
                               const QString &name, QLatin1String ext,
                               QLatin1String catDir = QLatin1String());
     QModelIndex makeNewFile(QModelIndex index, const QString &name,
-                            QLatin1String catDir  = QLatin1String(),
+                            const QString &catDir  = QString(),
                             const QString &nspace = QString());
     QModelIndex getSelected();
     bool isStringInTagFile(const QString &filepath, const QString &str);

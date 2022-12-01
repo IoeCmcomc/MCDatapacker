@@ -18,7 +18,7 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
     model.setParent(this);
     setupTagTreeView(type);
     connect(ui->tagFilterBox, &QLineEdit::textChanged,
-            [ = ](const QString &input) {
+            this, [this](const QString &input) {
         filterModel.setFilterRegularExpression(input);
     });
 

@@ -22,21 +22,24 @@ void initModelView(QStandardItemModel &model,
 }
 
 void initComboModelView(const QString &infoType,
-                        QStandardItemModel &model,
-                        QComboBox *combo, bool optional, bool append) {
+                        QStandardItemModel &model, QComboBox *combo,
+                        bool optional, bool append, bool asTag) {
     if (optional)
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
                                               "(not set)")));
     const auto &&info = Game::getInfo(infoType);
-    for (QString &key : info.keys()) {
+    for (auto it = info.cbegin(); it != info.cend(); ++it) {
+        QString key = it.key();
         QStandardItem *item = new QStandardItem();
-        if (info.value(key).toMap().contains(QStringLiteral("name")))
-            item->setText(info.value(key).toMap()[QStringLiteral(
+        if (it.value().toMap().contains(QStringLiteral("name")))
+            item->setText(it.value().toMap()[QStringLiteral(
                                                       "name")].toString());
-        else if (info.value(key).canConvert(QVariant::String)
-                 && !info.value(key).isNull())
-            item->setText(info.value(key).toString());
+        else if (it.value().canConvert(QVariant::String)
+                 && !it.value().isNull())
+            item->setText(it.value().toString());
+        else if (asTag)
+            item->setText("#" + key);
         else
             item->setText(key);
         QString &&iconPath =
@@ -44,10 +47,39 @@ void initComboModelView(const QString &infoType,
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
-        if (!key.contains(':') && append)
-            key.prepend(QLatin1String("minecraft:"));
+        if (!key.contains(':') && append) {
+            if (asTag) {
+                key.prepend(QLatin1String("#minecraft:"));
+            } else {
+                key.prepend(QLatin1String("minecraft:"));
+            }
+        }
+
         item->setData(key);
-        item->setData(key, ExtendedRole::ComboboxDataRole);
+        model.appendRow(item);
+    }
+    combo->setModel(&model);
+}
+
+void initComboModelViewFromRegistry(const QString &registry,
+                        QStandardItemModel &model,
+                        QComboBox *combo, bool optional, bool append) {
+    if (optional)
+        model.appendRow(new QStandardItem(QCoreApplication::translate(
+                                              "BaseCondition",
+                                              "(not set)")));
+    const auto &&values = Game::getRegistry(registry);
+    for (QString value : values) {
+        QStandardItem *item = new QStandardItem(value);
+        QString &&iconPath =
+            QString(":minecraft/texture/%1/%2.png").arg(registry, value);
+        QIcon icon(iconPath);
+        if (!icon.pixmap(1, 1).isNull())
+            item->setIcon(icon);
+        if (!value.contains(':') && append) {
+            value.prepend(QLatin1String("minecraft:"));
+        }
+        item->setData(value);
         model.appendRow(item);
     }
     combo->setModel(&model);
@@ -58,8 +90,16 @@ void setupComboFrom(QComboBox *combo, const QVariant &vari, int role) {
 
     if (vari.canConvert<QString>()) {
         QString &&str = vari.toString();
-        if (!str.startsWith(QStringLiteral("minecraft:")))
-            str.prepend(QStringLiteral("minecraft:"));
+        if (!str.contains(':')) {
+            if (str[0] == '#') {
+                if (!str.startsWith(QStringLiteral("#minecraft:")))
+                    str.prepend(QStringLiteral("#minecraft:"));
+            } else {
+                if (!str.startsWith(QStringLiteral("minecraft:")))
+                    str.prepend(QStringLiteral("minecraft:"));
+            }
+        }
+
         for (int i = 0; i < model->rowCount(); ++i) {
             QString &&val = model->item(i, 0)->data(role).toString();
             if (val == str) {

@@ -28,7 +28,12 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
 
     initComboModelView("biome", biomesModel, ui->biomeCombo);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
-    initComboModelView("feature", featuresModel, ui->featureCombo);
+    if (Game::version() >= Game::v1_18_2) {
+        initComboModelViewFromRegistry("worldgen/configured_structure_feature", featuresModel,
+                                       ui->featureCombo);
+    } else {
+        initComboModelView("feature", featuresModel, ui->featureCombo);
+    }
 
     if (Game::version() < Game::v1_16) {
         ui->smokeyCheck->hide();

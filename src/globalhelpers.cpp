@@ -74,8 +74,11 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
           CodeFile::StructureFeature },
         { QStringLiteral("worldgen/configured_surface_builder"),
           CodeFile::SurfaceBuilder },
+        { QStringLiteral("worldgen/noise"), CodeFile::Noise },
         { QStringLiteral("worldgen/noise_settings"), CodeFile::NoiseSettings },
+        { QStringLiteral("worldgen/placed_feature"), CodeFile::PlacedFeature },
         { QStringLiteral("worldgen/processor_list"), CodeFile::ProcessorList },
+        { QStringLiteral("worldgen/structure_set"), CodeFile::StructureSet },
         { QStringLiteral("worldgen/template_pool"), CodeFile::TemplatePool },
         { QStringLiteral("worldgen"), CodeFile::WorldGen },
     };
@@ -115,7 +118,7 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
         return QIcon(QStringLiteral(":/file-mcmeta"));
 
     default: {
-        if (type >= CodeFile::JsonText)
+        if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
             return QIcon(QStringLiteral(":/file-json"));
 
         break;
@@ -290,8 +293,11 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
         { CodeFile::ConfiguredFeature, QT_TR_NOOP("Feature")           },
         { CodeFile::StructureFeature,  QT_TR_NOOP("Structure feature") },
         { CodeFile::SurfaceBuilder,    QT_TR_NOOP("Surface builder")   },
+        { CodeFile::Noise,             QT_TR_NOOP("Noise")             },
         { CodeFile::NoiseSettings,     QT_TR_NOOP("Noise settings")    },
+        { CodeFile::PlacedFeature,     QT_TR_NOOP("Placed feature")    },
         { CodeFile::ProcessorList,     QT_TR_NOOP("Processor list")    },
+        { CodeFile::StructureSet,     QT_TR_NOOP("Structure set")      },
         { CodeFile::TemplatePool,      QT_TR_NOOP("Jigsaw pool")       },
     };
 

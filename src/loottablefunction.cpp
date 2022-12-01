@@ -40,13 +40,9 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
         ui->lootTable_typeLabel->hide();
         ui->lootTable_typeCombo->hide();
     } else {
-        for (const auto &value: Game::getRegistry("block_entity_type")) {
-            auto *item = new QStandardItem(value);
-            const QString &prefixedValue = "minecraft:" + value;
-            item->setData(prefixedValue);
-            blockEntityTypesModel.appendRow(item);
-        }
-        ui->setContents_typeCombo->setModel(&blockEntityTypesModel);
+        initComboModelViewFromRegistry(QStringLiteral("block_entity_type"),
+                                       blockEntityTypesModel,
+                                       ui->setContents_typeCombo, false);
         ui->lootTable_typeCombo->setModel(&blockEntityTypesModel);
     }
 
@@ -77,9 +73,18 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     connect(ui->enchantRand_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::enchantRand_onAdded);
 
-    initComboModelView(QStringLiteral("feature"),
-                       featuresModel,
-                       ui->map_destCombo);
+    if (Game::version() >= Game::v1_18_2) {
+        initComboModelView(QStringLiteral("tag/configured_structure_feature"),
+                           featuresModel, ui->map_destCombo,
+                           true, true, true);
+        initComboModelViewFromRegistry(QStringLiteral("worldgen/configured_structure_feature"),
+                           featuresModel,
+                           ui->map_destCombo, false);
+    } else {
+        initComboModelView(QStringLiteral("feature"),
+                           featuresModel,
+                           ui->map_destCombo);
+    }
     initComboModelView(QStringLiteral("map_icon"),
                        mapIconsModel,
                        ui->map_decoCombo);

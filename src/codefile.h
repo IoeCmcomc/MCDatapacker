@@ -29,11 +29,11 @@ struct CodeFile {
         ConfiguredFeature, /* 1.16.2+ */
         SurfaceBuilder,    /* 1.16.2 - 1.17 */
         StructureFeature,  /* 1.16.2 - 1.18.2, renamed to Structure (1.19+) */
-        /*Noise, // 1.18+ */
+        Noise, // 1.18+
         NoiseSettings,     /* 1.16.2+ */
-        /*PlacedFeature, // 1.18+ */
+        PlacedFeature, // 1.18+
         ProcessorList,     /* 1.16.2+ */
-        /*StructureSet, // 1.18.2+ */
+        StructureSet, // 1.18.2+
         TemplatePool,      /* 1.16.2+ */
         /*WorldPreset, // 1.19+ */
         WorldGen_end,
