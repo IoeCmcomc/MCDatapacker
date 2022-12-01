@@ -358,8 +358,9 @@ void VisualRecipeEditorDock::readRecipe() {
 
 void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
     QString type = root[QStringLiteral("type")].toString();
+    Glhp::removePrefix(type, QStringLiteral("minecraft:"));
 
-    if (type.endsWith(QStringLiteral("crafting_shaped"))) {
+    if (type == QStringLiteral("crafting_shaped")) {
         if (!root.contains(QStringLiteral("pattern"))) return;
 
         QJsonArray pattern = root[QStringLiteral("pattern")].toArray();
@@ -395,11 +396,13 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
                 craftingSlots[i]->setItems(JsonToIngredients(keyVal));
             }
         }
-    } else if (type.endsWith(QStringLiteral("crafting_shapeless"))) {
+    } else if (type == QStringLiteral("crafting_shapeless")) {
         if (!root.contains(QStringLiteral("ingredients"))) return;
 
         QJsonArray ingredients = root[QStringLiteral("ingredients")].toArray();
         if (ingredients.count() > 9 || ingredients.count() < 1) return;
+
+        ui->craftTypeInput->setCurrentIndex(2);
 
         for (int i = 0; i < 9; ++i) {
             if (i >= ingredients.count()) {
