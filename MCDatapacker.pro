@@ -7,3 +7,5 @@ SUBDIRS = \
 
 src.depends = lib
 test.depends = src
+
+OTHER_FILES += uncrustify.cfg

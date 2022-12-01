@@ -234,7 +234,7 @@ void ExtendedTableWidget::appendColumnMapping(const QString &jsonKey,
                                               QWidget *editor,
                                               VersionPair gameVerLim) {
 #define     CHECK_EDITOR_CLASS_AND_SET_ENUM(Class) \
-    if (qobject_cast<Class*>(editor)) editorClass = EditorClass::Class
+        if (qobject_cast<Class*>(editor)) editorClass = EditorClass::Class
 
     EditorClass editorClass = EditorClass::Unknown;
     CHECK_EDITOR_CLASS_AND_SET_ENUM(NumberProvider);
@@ -280,35 +280,35 @@ QJsonValue ExtendedTableWidget::itemDataToJson(int row, int col) const {
     auto *widget = m_columnMappings[col].editor;
 
     switch (m_columnMappings[col].editorClass) {
-    case EditorClass::NumberProvider: {
-        return item->data(NumberProviderRole).toJsonValue();
-    }
-
-    case EditorClass::QSpinBox: {
-        return item->data(Qt::EditRole).toInt();
-    }
-
-    case EditorClass::QLineEdit: {
-        return item->text();
-    }
-
-    case EditorClass::QComboBox: {
-        const auto  *editor = qobject_cast<QComboBox*>(widget);
-        const int    index  = item->data(ComboboxIndexRole).toInt();
-        const auto &&vari   = editor->itemData(index, ComboboxDataRole);
-        if (!vari.isNull()) {
-            return vari.toJsonValue();
-        } else {
-            return editor->itemData(index, Qt::DisplayRole).toJsonValue();
+        case EditorClass::NumberProvider: {
+            return item->data(NumberProviderRole).toJsonValue();
         }
-    }
 
-    case EditorClass::QCheckBox: {
-        return item->data(Qt::EditRole).toBool();
-    }
+        case EditorClass::QSpinBox: {
+            return item->data(Qt::EditRole).toInt();
+        }
 
-    default:
-        return QJsonValue::Null;
+        case EditorClass::QLineEdit: {
+            return item->text();
+        }
+
+        case EditorClass::QComboBox: {
+            const auto  *editor = qobject_cast<QComboBox*>(widget);
+            const int    index  = item->data(ComboboxIndexRole).toInt();
+            const auto &&vari   = editor->itemData(index, ComboboxDataRole);
+            if (!vari.isNull()) {
+                return vari.toJsonValue();
+            } else {
+                return editor->itemData(index, Qt::DisplayRole).toJsonValue();
+            }
+        }
+
+        case EditorClass::QCheckBox: {
+            return item->data(Qt::EditRole).toBool();
+        }
+
+        default:
+            return QJsonValue::Null;
     }
 }
 
@@ -334,45 +334,47 @@ void ExtendedTableWidget::loadItemFromJson(int row, int col,
     auto *widget = m_columnMappings[col].editor;
 
     switch (m_columnMappings[col].editorClass) {
-    case EditorClass::NumberProvider: {
-        item->setData(NumberProviderRole, value);
-        break;
-    }
+        case EditorClass::NumberProvider: {
+            item->setData(NumberProviderRole, value);
+            break;
+        }
 
-    case EditorClass::QSpinBox: {
-        item->setData(Qt::DisplayRole, value.toInt());
-        break;
-    }
+        case EditorClass::QSpinBox: {
+            item->setData(Qt::DisplayRole, value.toInt());
+            break;
+        }
 
-    case EditorClass::QLineEdit: {
-        item->setText(value.toString());
-        break;
-    }
+        case EditorClass::QLineEdit: {
+            item->setText(value.toString());
+            break;
+        }
 
-    case EditorClass::QComboBox: {
-        auto *editor = qobject_cast<QComboBox*>(widget);
-        int   index  = editor->findData(value.toVariant(),
-                                        ExtendedRole::ComboboxDataRole);
-        if (index == -1)
-            index = editor->findText(value.toString());
-        if (index == -1)
-            return;
+        case EditorClass::QComboBox: {
+            auto *editor = qobject_cast<QComboBox*>(widget);
+            int   index  = editor->findData(value.toVariant(),
+                                            ExtendedRole::ComboboxDataRole);
+            if (index == -1)
+                index = editor->findText(value.toString());
+            if (index == -1) {
+                delete item;
+                return;
+            }
 
-        item->setText(editor->itemData(index, Qt::DisplayRole).toString());
-        item->setData(Qt::DecorationRole,
-                      editor->itemData(index, Qt::DecorationRole));
-        item->setData(ComboboxIndexRole, index);
-        break;
-    }
+            item->setText(editor->itemData(index, Qt::DisplayRole).toString());
+            item->setData(Qt::DecorationRole,
+                          editor->itemData(index, Qt::DecorationRole));
+            item->setData(ComboboxIndexRole, index);
+            break;
+        }
 
-    case EditorClass::QCheckBox: {
-        item->setData(Qt::EditRole, value);
-        break;
-    }
+        case EditorClass::QCheckBox: {
+            item->setData(Qt::EditRole, value);
+            break;
+        }
 
-    default: {
-        break;
-    }
+        default: {
+            break;
+        }
     }
 
     ui->__qt__passive_table->setItem(row, col, item);
