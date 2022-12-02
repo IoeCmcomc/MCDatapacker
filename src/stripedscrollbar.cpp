@@ -54,7 +54,7 @@ void StripedScrollBar::redrawStripes() {
             if (const auto *data =
                     dynamic_cast<TextBlockData *>(it.userData())) {
                 for (int i = 0; i < data->problems().size(); ++i) {
-                    const auto &problem = data->problems()[i];
+                    const auto &problem = data->problems().at(i);
                     if (problem.type != ProblemInfo::Type::Invaild) {
                         p.setBrush((problem.type == ProblemInfo::Type::Error)
                             ? errorColor : warningColor);

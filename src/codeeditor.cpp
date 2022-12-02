@@ -36,23 +36,22 @@ TextFileData::TextFileData(QTextDocument *doc, CodeFile *parent) {
 }
 
 QStringList getMinecraftInfoKeys(const QString &key) {
-    QElapsedTimer timer;
-
-    timer.start();
+//    QElapsedTimer timer;
+//    timer.start();
 
     const QVariantMap &&infoMap = Game::getInfo(key);
 
-    //qDebug() << key << infoMap.size();
-    //qDebug() << "getMinecraftInfoKeys() exec time:" << timer.nsecsElapsed() / 1e6;
+//    qDebug() << key << infoMap.size();
+//    qDebug() << "getMinecraftInfoKeys() exec time:" <<
+//        timer.nsecsElapsed() / 1e6;
 
     return infoMap.keys();
 }
 
 QStringList loadMinecraftCommandLiterals(const QJsonObject &obj = QJsonObject(),
                                          ushort depth           = 0) {
-    QElapsedTimer timer;
-
-    timer.start();
+//    QElapsedTimer timer;
+//    timer.start();
 
     QJsonObject root;
 
@@ -76,11 +75,11 @@ QStringList loadMinecraftCommandLiterals(const QJsonObject &obj = QJsonObject(),
             ret += loadMinecraftCommandLiterals(node, depth + 1);
         }
     }
-/*
-      qDebug() << "function literals" << ret.size();
-      qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
-          timer.nsecsElapsed() / 1e6;
- */
+
+//    qDebug() << "function literals" << ret.size();
+//    qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
+//        timer.nsecsElapsed() / 1e6;
+
     return ret;
 }
 
@@ -97,8 +96,15 @@ QStringList loadMinecraftCompletionInfo() {
     ret += getMinecraftInfoKeys(QStringLiteral("item"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/block"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/entity_type"));
+    if (Game::version() >= Game::v1_17)
+        ret += getMinecraftInfoKeys(QStringLiteral("tag/game_event"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/fluid"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/item"));
+    ret << Game::getRegistry(QStringLiteral("advancement"));
+    ret << Game::getRegistry(QStringLiteral("recipe"));
+    ret << Game::getRegistry(QStringLiteral("loot_table"));
+    ret << Game::getRegistry(QStringLiteral("particle_type"));
+    ret << Game::getRegistry(QStringLiteral("sound_event"));
 
     ret.sort(Qt::CaseInsensitive);
     return std::move(ret);
@@ -349,16 +355,16 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (m_completer && m_completer->popup()->isVisible()) {
         /* The following keys are forwarded by the completer to the widget */
         switch (e->key()) {
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-        case Qt::Key_Escape:
-        case Qt::Key_Tab:
-        case Qt::Key_Backtab:
-            e->ignore();
-            return; /* let the completer do default behavior */
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+            case Qt::Key_Escape:
+            case Qt::Key_Tab:
+            case Qt::Key_Backtab:
+                e->ignore();
+                return; /* let the completer do default behavior */
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 
@@ -759,7 +765,7 @@ void CodeEditor::setCompleter(QCompleter *c) {
 }
 
 QCompleter *CodeEditor::completer() const {
-    return m_completer;;
+    return m_completer;
 }
 
 bool CodeEditor::getCanUndo() const {
