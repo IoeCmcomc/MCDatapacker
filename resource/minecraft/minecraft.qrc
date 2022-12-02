@@ -1360,5 +1360,32 @@
         <file>texture/biome/windswept_savanna.png</file>
         <file>texture/biome/wooded_badlands.png</file>
         <file>texture/item/music_disc_otherside.png</file>
+        <file>texture/map_icon/player.png</file>
+        <file>texture/map_icon/banner_black.png</file>
+        <file>texture/map_icon/banner_blue.png</file>
+        <file>texture/map_icon/banner_brown.png</file>
+        <file>texture/map_icon/banner_cyan.png</file>
+        <file>texture/map_icon/banner_gray.png</file>
+        <file>texture/map_icon/banner_green.png</file>
+        <file>texture/map_icon/banner_light_blue.png</file>
+        <file>texture/map_icon/banner_light_gray.png</file>
+        <file>texture/map_icon/banner_lime.png</file>
+        <file>texture/map_icon/banner_magenta.png</file>
+        <file>texture/map_icon/banner_orange.png</file>
+        <file>texture/map_icon/banner_pink.png</file>
+        <file>texture/map_icon/banner_purple.png</file>
+        <file>texture/map_icon/banner_red.png</file>
+        <file>texture/map_icon/banner_white.png</file>
+        <file>texture/map_icon/banner_yellow.png</file>
+        <file>texture/map_icon/blue_marker.png</file>
+        <file>texture/map_icon/frame.png</file>
+        <file>texture/map_icon/mansion.png</file>
+        <file>texture/map_icon/monument.png</file>
+        <file>texture/map_icon/player_off_limits.png</file>
+        <file>texture/map_icon/player_off_map.png</file>
+        <file>texture/map_icon/red_marker.png</file>
+        <file>texture/map_icon/red_x.png</file>
+        <file>texture/map_icon/target_point.png</file>
+        <file>texture/map_icon/target_x.png</file>
     </qresource>
 </RCC>

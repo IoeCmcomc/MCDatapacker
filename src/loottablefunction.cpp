@@ -68,6 +68,22 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     connect(ui->copyState_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::copyState_onAdded);
 
+    if (Game::version() < Game::v1_17) {
+        qobject_cast<QListView*>(ui->copyNBT_entityCombo->view())->setRowHidden(
+            4, true);
+        qobject_cast<QStandardItemModel*>(ui->copyNBT_entityCombo->model())->
+        item(4, 0)->setEnabled(false);
+        ui->copyNBT_storageLabel->hide();
+        ui->copyNBT_storageEdit->hide();
+    }
+    connect(ui->copyNBT_entityCombo,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this, [this](int index){
+        ui->copyNBT_storageLabel->setEnabled(index == 4);
+        ui->copyNBT_storageEdit->setEnabled(index == 4);
+    });
+
+
     ui->enchantRand_enchantCombo->setModel(&enchantmentsModel);
     ui->enchantRand_list->installEventFilter(&viewFilter);
     connect(ui->enchantRand_addBtn, &QPushButton::clicked,
@@ -83,12 +99,10 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
                                        ui->map_destCombo,
                                        false);
     } else {
-        initComboModelView(QStringLiteral("feature"),
-                           featuresModel,
+        initComboModelView(QStringLiteral("feature"), featuresModel,
                            ui->map_destCombo);
     }
-    initComboModelView(QStringLiteral("map_icon"),
-                       mapIconsModel,
+    initComboModelView(QStringLiteral("map_icon"), mapIconsModel,
                        ui->map_decoCombo);
 
 
@@ -127,8 +141,6 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
             this, &LootTableFunction::effectStew_onAdded);
     ui->setPotion_potionCombo->setModel(&effectsModel);
     ui->setPotion_potionCombo->addItem("empty", "empty");
-
-    //TODO: [1.17, "Copy NBT" function] source parameter can now be set to {"storage": <namespaced id>}, to access command storage.
 }
 
 LootTableFunction::~LootTableFunction() {
@@ -162,8 +174,15 @@ QJsonObject LootTableFunction::toJson() const {
         }
 
         case CopyNbt: { /*Copy NBT */
-            root.insert("source",
-                        entityTargets[ui->copyNBT_entityCombo->currentIndex()]);
+            if (ui->copyNBT_entityCombo->currentIndex() == 4) {
+                QJsonObject source;
+                source.insert("type", "storage");
+                source.insert("source", ui->copyNBT_storageEdit->text());
+                root.insert("source", source);
+            } else {
+                root.insert("source",
+                            entityTargets[ui->copyNBT_entityCombo->currentIndex()]);
+            }
             QJsonArray ops;
             for (int i = 0; i < ui->copyNBT_table->rowCount(); ++i) {
                 auto source = ui->copyNBT_table->item(i, 0)->text();
@@ -439,10 +458,27 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             if (!root.contains("source"))
                 return;
 
-            ui->copyNBT_entityCombo->setCurrentIndex(
-                entityTargets.indexOf(root.value("source").toString()));
+            if (root.value("source").isObject() &&
+                (Game::version() >= Game::v1_17)) {
+                const auto &&source = root.value("source").toObject();
+                if (!(source.contains("type") && source.contains("source")))
+                    return;
+
+                QString &&type = source.value("type").toString();
+                Glhp::removePrefix(type, "minecraft:");
+
+                if (type == "storage") {
+                    ui->copyNBT_entityCombo->setCurrentIndex(4);
+                    ui->copyNBT_storageEdit->setText(source.value(
+                                                         "source").toString());
+                }
+            } else {
+                ui->copyNBT_entityCombo->setCurrentIndex(
+                    entityTargets.indexOf(root.value("source").toString()));
+            }
 
             if (root.contains("ops")) {
+                ui->copyNBT_table->clearContents();
                 QJsonArray ops = root.value("ops").toArray();
                 for (auto opRef: ops) {
                     if (!opRef.isObject())
