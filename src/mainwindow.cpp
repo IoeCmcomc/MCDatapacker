@@ -83,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent)
     initDocks();
 
     auto *updater = QSimpleUpdater::getInstance();
+    updater->setModuleVersion(updateDefUrl,
+                              QCoreApplication::applicationVersion());
     updater->setUseCustomInstallProcedures(updateDefUrl, true);
     updater->setDownloaderEnabled(updateDefUrl, true);
     updater->setDownloadDir(updateDefUrl, qApp->applicationDirPath());
@@ -93,6 +95,9 @@ MainWindow::MainWindow(QWidget *parent)
                                  QLatin1String("/MCDatapacker_old");
     if (QFile::exists(oldProgramFile))
         QFile::remove(oldProgramFile);
+
+    updater->setNotifyOnFinish(updateDefUrl, false);
+    updater->checkForUpdates(updateDefUrl);
 }
 
 void MainWindow::initDocks() {
@@ -246,6 +251,7 @@ void MainWindow::rawJsonTextEditor() {
 
 void MainWindow::pref_settings() {
     SettingsDialog dialog(this);
+
     if (dialog.exec() == QDialog::Accepted) {
         QSettings settings{};
         readPrefSettings(settings, true);
@@ -376,7 +382,8 @@ void MainWindow::readSettings() {
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     const QString &style = settings.value(QStringLiteral("theme"),
-                                       qApp->style()->objectName()).toString();
+                                          qApp->style()->objectName()).toString();
+
     if (style.toLower() != qApp->style()->objectName()) {
         qApp->setStyle(style);
     }
@@ -385,7 +392,8 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
                  true);
     const QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
-                                           Game::defaultVersionString).toString();
+                                             Game::defaultVersionString).
+                              toString();
 
     if (gameVer != tempGameVerStr) {
         if (fromDialog) {
@@ -395,7 +403,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                                    "The game version has been changed from %1 to %2\n"
                                    "The program need to restart to apply the changes.")
                                .arg(tempGameVerStr, gameVer));
-            QPushButton* restartBtn = msgBox.addButton(tr("Restart"),
+            QPushButton *restartBtn = msgBox.addButton(tr("Restart"),
                                                        QMessageBox::YesRole);
             msgBox.setDefaultButton(restartBtn);
             msgBox.addButton(tr("Keep"), QMessageBox::NoRole);
@@ -413,7 +421,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
                 QStringLiteral(":/minecraft/") + gameVer +
                 QStringLiteral("/summary/commands/data.min.json"));
             Command::MinecraftParser::limitScoreboardObjectiveLength
-                    = Game::version() < Game::v1_18;
+                = Game::version() < Game::v1_18;
 
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);
@@ -448,14 +456,14 @@ bool MainWindow::maybeSave() {
                                QMessageBox::Save | QMessageBox::Discard |
                                QMessageBox::Cancel);
     switch (ret) {
-    case QMessageBox::Save:
-        return ui->tabbedInterface->saveAllFile();
+        case QMessageBox::Save:
+            return ui->tabbedInterface->saveAllFile();
 
-    case QMessageBox::Cancel:
-        return false;
+        case QMessageBox::Cancel:
+            return false;
 
-    default:
-        break;
+        default:
+            break;
     }
     return true;
 }
@@ -697,26 +705,26 @@ void MainWindow::updateEditMenu() {
     }
 }
 
-void MainWindow::changeEvent(QEvent* event) {
+void MainWindow::changeEvent(QEvent *event) {
     if (event != nullptr) {
         switch (event->type()) {
-        /* this event is send if a translator is loaded */
-        case QEvent::LanguageChange: {
-            /*qDebug() << "QEvent::LanguageChange"; */
-            ui->retranslateUi(this);
-            break;
-        }
+            /* this event is send if a translator is loaded */
+            case QEvent::LanguageChange: {
+                /*qDebug() << "QEvent::LanguageChange"; */
+                ui->retranslateUi(this);
+                break;
+            }
 
-        /* this event is send, if the system language changes */
-        case QEvent::LocaleChange: {
-            /*qDebug() << "QEvent::LocaleChange"; */
-            QString locale = QLocale::system().name();
-            loadLanguage(locale);
-            break;
-        }
+            /* this event is send, if the system language changes */
+            case QEvent::LocaleChange: {
+                /*qDebug() << "QEvent::LocaleChange"; */
+                QString locale = QLocale::system().name();
+                loadLanguage(locale);
+                break;
+            }
 
-        default:
-            break;
+            default:
+                break;
         }
     }
     QMainWindow::changeEvent(event);
