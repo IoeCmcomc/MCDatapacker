@@ -18,30 +18,30 @@ QString Command::NbtPathStepNode::toString() const {
         return ret += "Invaild)";
 
     switch (m_type) {
-    case Type::Root: {
-        ret += '{';
-        if (m_filter)
-            ret += m_filter->toString();
-        ret += '}';
-        break;
-    }
+        case Type::Root: {
+            ret += '{';
+            if (m_filter)
+                ret += m_filter->toString();
+            ret += '}';
+            break;
+        }
 
-    case Type::Key: {
-        ret += m_name->toString();
-        if (m_filter)
-            ret += '{' + m_filter->toString() + '}';
-        break;
-    }
+        case Type::Key: {
+            ret += m_name->toString();
+            if (m_filter)
+                ret += '{' + m_filter->toString() + '}';
+            break;
+        }
 
-    case Type::Index: {
-        ret += '[';
-        if (m_filter)
-            ret += '{' + m_filter->toString() + '}';
-        else if (m_index)
-            ret += m_index->toString();
-        ret += ']';
-        break;
-    }
+        case Type::Index: {
+            ret += '[';
+            if (m_filter)
+                ret += '{' + m_filter->toString() + '}';
+            else if (m_index)
+                ret += m_index->toString();
+            ret += ']';
+            break;
+        }
     }
     if (m_hasTrailingDot)
         ret += '.';
@@ -55,17 +55,22 @@ bool Command::NbtPathStepNode::isVaild() const {
         return false;
 
     switch (m_type) {
-    case Type::Root: {
-        return ret && m_filter;
-    }
+        case Type::Root: {
+            return ret && m_filter;
+        }
 
-    case Type::Key: {
-        return ret && m_name;
-    }
+        case Type::Key: {
+            return ret && m_name;
+        }
 
-    case Type::Index: {
-        return ret;
-    }
+        case Type::Index: {
+            return ret;
+        }
+
+        default: {
+            qWarning() << "Unknown type: " << m_type << ". Return false.";
+            return false;
+        }
     }
 }
 
@@ -74,23 +79,23 @@ void Command::NbtPathStepNode::accept(Command::NodeVisitor *visitor,
     if (order == NodeVisitor::Order::Preorder)
         visitor->visit(this);
     switch (m_type) {
-    case Type::Root: {
-        m_filter->accept(visitor, order);
-        break;
-    }
-
-    case Type::Key: {
-        return m_name->accept(visitor);
-
-        break;
-    }
-
-    case Type::Index: {
-        if (m_filter)
+        case Type::Root: {
             m_filter->accept(visitor, order);
-        else if (m_index)
-            m_index->accept(visitor);
-    }
+            break;
+        }
+
+        case Type::Key: {
+            return m_name->accept(visitor);
+
+            break;
+        }
+
+        case Type::Index: {
+            if (m_filter)
+                m_filter->accept(visitor, order);
+            else if (m_index)
+                m_index->accept(visitor);
+        }
     }
     if (order == NodeVisitor::Order::Postorder)
         visitor->visit(this);

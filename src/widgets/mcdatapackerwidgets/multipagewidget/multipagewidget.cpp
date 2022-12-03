@@ -88,9 +88,9 @@ void MultiPageWidget::addPage(QWidget *page) {
 }
 
 void MultiPageWidget::removePage(int index) {
-    QWidget *widget = stackWidget->widget(index);
+    QWidget *w = stackWidget->widget(index);
 
-    stackWidget->removeWidget(widget);
+    stackWidget->removeWidget(w);
 
     comboBox->removeItem(index);
 }

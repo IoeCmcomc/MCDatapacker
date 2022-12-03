@@ -129,7 +129,7 @@ void Highlighter::highlightBlock(const QString &text) {
                 } else if (currentBlockState() == QuotedString) {
                     quoteLength++;
                 } else if (currentBlockState() <= Normal) {
-                    for (auto &bracketPair: bracketPairs) {
+                    for (const auto &bracketPair: qAsConst(bracketPairs)) {
                         if (curChar == bracketPair.left ||
                             curChar == bracketPair.right) {
                             auto *info = new BracketInfo;
@@ -220,9 +220,8 @@ QString Highlighter::locateNamespacedId(QString id) {
 
     QStringList dirList =
         dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    QString path;
     for (const auto &catDir: dirList) {
-        path = dir.path() + "/" + catDir + "/" + id.section(":", 1, 1);
+        QString path = dir.path() + "/" + catDir + "/" + id.section(":", 1, 1);
         if (catDir == QStringLiteral("functions")
             && QFile::exists(path + QStringLiteral(".mcfunction"))) {
             return path + QStringLiteral(".mcfunction");

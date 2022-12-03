@@ -12,15 +12,15 @@
 /* These classes are for benchmarking deserialization methods.
  * For now, deserializing from JSON using QJsonDocumant (faster than from MessagePack).
 
-#include <QStack>
+ #include <QStack>
 
-#include <stack>
+ #include <stack>
 
-using json = nlohmann::json;
+   using json = nlohmann::json;
 
-template <typename A, typename O>
-struct StackElement
-{
+   template <typename A, typename O>
+   struct StackElement
+   {
     enum class Type {
         Array,
         Object,
@@ -62,12 +62,12 @@ struct StackElement
             array = std::move(other.array);
         }
     };
-};
+   };
 
-template <typename E, typename A, typename O>
-class SaxConsumer : public json::json_sax_t
-{
-public:
+   template <typename E, typename A, typename O>
+   class SaxConsumer : public json::json_sax_t
+   {
+   public:
     O root;
 
     using Element = StackElement<A, O>;
@@ -201,11 +201,11 @@ public:
         qWarning() << "parse_error(position=" << position << ", last_token=" << last_token.c_str() << ",\n            ex=" << ex.what() << ")";
         return false;
     }
-};
+   };
 
-Q_DECLARE_METATYPE(QVector<QVariant>)
+   Q_DECLARE_METATYPE(QVector<QVariant>)
 
-QVariant from_json(const json &v) {
+   QVariant from_json(const json &v) {
     using Type = json::value_t;
     switch (v.type()) {
     case Type::object: {
@@ -256,10 +256,10 @@ QVariant from_json(const json &v) {
         return QVariant();
         break;
     }
-}
+   }
 
-class QtSaxConsumer: public SaxConsumer<QVariant, QVariantList, QVariantMap> {
-public:
+   class QtSaxConsumer: public SaxConsumer<QVariant, QVariantList, QVariantMap> {
+   public:
     bool number_unsigned(number_unsigned_t val) override
     {
         auto &top = stack.top();
@@ -270,9 +270,9 @@ public:
         }
         return true;
     }
-};
+   };
 
-*/
+ */
 
 Command::Parser::Error::Error(const QString &whatArg, int pos, int length,
                               const QVariantList &args)
@@ -361,7 +361,7 @@ void Command::Parser::setSchema(const QString &filepath) {
     bool result = json::sax_parse(data, &sax);
     qDebug() << "Nlohmann JSON SAX QJsonObject" << timer.nsecsElapsed();
     setSchema(sax.root);
-*/
+ */
 
     QJsonParseError errorPtr{};
     //timer.restart();
@@ -430,7 +430,7 @@ void Command::Parser::setSchema(const QString &filepath) {
     timer.restart();
     bool result4 = json::sax_parse(msgpackData, &sax4, json::input_format_t::msgpack);
     qDebug() << "Nlohmann MsgPack SAX QVariantMap" << timer.nsecsElapsed();
-*/
+ */
 }
 
 /*!
@@ -676,38 +676,38 @@ QString Command::Parser::getQuotedString() {
                 value += curQuoteChar;
             } else {
                 switch (m_curChar.toLatin1()) {
-                case '\\': {
-                    value += '\\';
-                    break;
-                }
+                    case '\\': {
+                        value += '\\';
+                        break;
+                    }
 
-                case 'b': {
-                    value += '\b';
-                    break;
-                }
+                    case 'b': {
+                        value += '\b';
+                        break;
+                    }
 
-                case 'f': {
-                    value += '\f';
-                    break;
-                }
+                    case 'f': {
+                        value += '\f';
+                        break;
+                    }
 
-                case 'n': {
-                    value += '\n';
-                    break;
-                }
+                    case 'n': {
+                        value += '\n';
+                        break;
+                    }
 
-                case 't': {
-                    value += '\t';
-                    break;
-                }
+                    case 't': {
+                        value += '\t';
+                        break;
+                    }
 
-                case 'r': {
-                    value += '\r';
-                    break;
-                }
+                    case 'r': {
+                        value += '\r';
+                        break;
+                    }
 
-                default:
-                    value += m_curChar;
+                    default:
+                        value += m_curChar;
                 }
             }
             backslash = false;
@@ -827,12 +827,12 @@ QSharedPointer<Command::LiteralNode> Command::Parser::brigadier_literal() {
         auto &&ret = QSharedPointer<LiteralNode>::create(*qSharedPointerCast<LiteralNode>(
                                                              m_cache[key]));
         ret->setPos(start);
-        return std::move(ret);
+        return ret;
     } else {
         auto &&ret =
             QSharedPointer<Command::LiteralNode>::create(start, literal);
         m_cache.emplace(typeId, literal, ret);
-        return std::move(ret);
+        return ret;
     }
 }
 

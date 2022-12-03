@@ -107,7 +107,7 @@ QStringList loadMinecraftCompletionInfo() {
     ret << Game::getRegistry(QStringLiteral("sound_event"));
 
     ret.sort(Qt::CaseInsensitive);
-    return std::move(ret);
+    return ret;
 }
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {

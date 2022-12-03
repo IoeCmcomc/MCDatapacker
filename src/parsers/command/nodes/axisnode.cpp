@@ -34,8 +34,8 @@ void Command::AxisNode::accept(Command::NodeVisitor *visitor,
 }
 
 QString Command::AxisNode::format() const {
-    QString type2char[] = { "", "~", "^" };
-    QString number      =
+    const QString type2char[] = { "", "~", "^" };
+    QString       number      =
         (m_useInteger) ? QString::number(toInt()) : QString::number(toFloat());
 
     return type2char[m_type] + number;

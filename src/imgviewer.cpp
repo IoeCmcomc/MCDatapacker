@@ -23,7 +23,7 @@ ImgViewer::ImgViewer(QWidget *parent) :
     redrawBg();
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         loadData(toData());
     });
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, [this]() {
@@ -35,7 +35,7 @@ ImgViewer::ImgViewer(QWidget *parent) :
 
     m_timer.setParent(this);
     m_timer.setInterval(100);
-    connect(&m_timer, &QTimer::timeout, [this]() {
+    connect(&m_timer, &QTimer::timeout, this, [this]() {
         updateScene({ m_scene->sceneRect() });
     });
     m_timer.start();

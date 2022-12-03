@@ -16,17 +16,19 @@
 #include <QJsonDocument>
 #include <QDirIterator>
 
-void openAllFiles(TabbedDocumentInterface *widget, CodeFile::FileType minType, CodeFile::FileType maxType) {
+void openAllFiles(TabbedDocumentInterface *widget,
+                  CodeFile::FileType minType,
+                  CodeFile::FileType maxType) {
     QDir          &&dir     = QDir::current();
     const QString &&dirPath = dir.path();
 
     dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
 
-    QDirIterator  it(dir, QDirIterator::Subdirectories);
+    QDirIterator it(dir, QDirIterator::Subdirectories);
 
     while (it.hasNext()) {
-        const QString &&path = it.next();
-        const auto &&finfo = it.fileInfo();
+        const QString &&path  = it.next();
+        const auto    &&finfo = it.fileInfo();
         if (finfo.isFile()) {
             const auto type = Glhp::pathToFileType(dirPath, path);
             if ((type >= minType) && (type <= maxType)) {
@@ -76,11 +78,13 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
             &QShortcut::activated, this,
             &TabbedDocumentInterface::onSwitchPrevFile);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O, Qt::Key_F), this),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O,
+                                       Qt::Key_F), this),
             &QShortcut::activated, [this]() {
         openAllFiles(this, CodeFile::Function, CodeFile::Function);
     });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O, Qt::Key_J), this),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O,
+                                       Qt::Key_J), this),
             &QShortcut::activated, [this]() {
         openAllFiles(this, CodeFile::JsonText, CodeFile::JsonText_end);
     });
@@ -196,14 +200,14 @@ bool TabbedDocumentInterface::maybeSave(int index) {
                                QMessageBox::Save | QMessageBox::Discard |
                                QMessageBox::Cancel);
     switch (ret) {
-    case QMessageBox::Save:
-        return saveFile(index, files[index].fileInfo.absoluteFilePath());
+        case QMessageBox::Save:
+            return saveFile(index, files[index].fileInfo.absoluteFilePath());
 
-    case QMessageBox::Cancel:
-        return false;
+        case QMessageBox::Cancel:
+            return false;
 
-    default:
-        break;
+        default:
+            break;
     }
     return true;
 }
@@ -347,11 +351,9 @@ void TabbedDocumentInterface::clear() {
 }
 
 bool TabbedDocumentInterface::hasUnsavedChanges() const {
-    for (const auto &file: files) {
-        if (file.isModified)
-            return true;
-    }
-    return false;
+    return std::any_of(files.cbegin(), files.cend(), [](const CodeFile &file){
+        return file.isModified;
+    });
 }
 
 void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
@@ -364,7 +366,7 @@ void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
     openFile(filepath);
 }
 
-bool TabbedDocumentInterface::saveCurFile(const QString path) {
+bool TabbedDocumentInterface::saveCurFile(const QString &path) {
     return saveFile(getCurIndex(), path);
 }
 
@@ -420,7 +422,7 @@ void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
         QStringLiteral(":/minecraft/") + ver +
         QStringLiteral("/summary/commands/data.min.json"));
     Command::MinecraftParser::limitScoreboardObjectiveLength
-            = Game::version() < Game::v1_18;
+        = Game::version() < Game::v1_18;
 
     for (const auto &file: qAsConst(files)) {
         if (file.fileType == CodeFile::Function) {
@@ -549,7 +551,7 @@ void TabbedDocumentInterface::onTabChanged(int index) {
 void TabbedDocumentInterface::onTabMoved(int from, int to) {
     /*qDebug() << "Move from tab" << from << "to tab" << to; */
     tabMovedOrRemoved = true;
-    qSwap(files[from], files[to]);
+    std::swap(files[from], files[to]);
 }
 
 void TabbedDocumentInterface::onCloseFile(int index) {

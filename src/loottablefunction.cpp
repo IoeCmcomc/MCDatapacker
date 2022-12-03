@@ -993,10 +993,11 @@ void LootTableFunction::updateConditionsTab(int size) {
 }
 
 void LootTableFunction::initBlocksModel() {
-    auto blocksInfo = Game::getInfo("block");
+    const auto &blocksInfo = Game::getInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
-    for (const auto &key : blocksInfo.keys()) {
+    const auto &blockKeys = blocksInfo.keys();
+    for (const auto &key : blockKeys) {
         InventoryItem invItem(key);
         auto         *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));

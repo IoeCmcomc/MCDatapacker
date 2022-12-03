@@ -242,7 +242,7 @@ void InventorySlot::onCustomContextMenu(const QPoint &point) {
 
     if (items.count() != 0) {
         QAction *removeAction = new QAction(tr("Remove"), cMenu);
-        connect(removeAction, &QAction::triggered, [this]() {
+        connect(removeAction, &QAction::triggered, this, [this]() {
             clearItems();
         });
         cMenu->addAction(removeAction);
@@ -251,7 +251,7 @@ void InventorySlot::onCustomContextMenu(const QPoint &point) {
     if (getAcceptTag()) {
         QAction *seclectTagAction = new QAction(tr("Select tag..."), cMenu);
         seclectTagAction->setEnabled(getAcceptTag());
-        connect(seclectTagAction, &QAction::triggered, [this]() {
+        connect(seclectTagAction, &QAction::triggered, this, [this]() {
             TagSelectorDialog dialog(this, CodeFile::ItemTag);
             if (dialog.exec()) {
                 setItem(InventoryItem(dialog.getSelectedID()));
@@ -334,27 +334,27 @@ void InventorySlot::mouseReleaseEvent(QMouseEvent *event) {
     if ((!isDragged) && this->rect().contains(event->pos())) {
         /* Clicked properly */
         switch (event->button()) {
-        case Qt::LeftButton: {
-            BlockItemSelectorDialog dialog(this, m_selectCategory);
-            dialog.setAllowMultiple(getAcceptMultiple());
-            if (dialog.exec()) {
-                setItems(dialog.getSelectedItems());
+            case Qt::LeftButton: {
+                BlockItemSelectorDialog dialog(this, m_selectCategory);
+                dialog.setAllowMultiple(getAcceptMultiple());
+                if (dialog.exec()) {
+                    setItems(dialog.getSelectedItems());
+                }
+                break;
             }
-            break;
-        }
 
-        case Qt::MiddleButton: {
-            if (getAcceptMultiple()) {
-                auto *editor = new InventorySlotEditor(this);
-                editor->show();
-                update();
+            case Qt::MiddleButton: {
+                if (getAcceptMultiple()) {
+                    auto *editor = new InventorySlotEditor(this);
+                    editor->show();
+                    update();
+                }
+                break;
             }
-            break;
-        }
 
-        default: {
-            break;
-        }
+            default: {
+                break;
+            }
         }
     }
     isDragged = false;
@@ -376,13 +376,13 @@ void InventorySlot::paintEvent(QPaintEvent *event) {
                 if (!isEnabled()) {
                     auto &&image = pixmap.toImage();
 
-                    QRgb *st = (QRgb*) image.bits(); // Detach the image
+                    QRgb         *st         = (QRgb*)image.bits(); // Detach the image
                     const quint64 pixelCount = image.width() * image.height();
 
                     for (quint64 p = 0; p < pixelCount; ++p) {
                         const auto pixel = st[p];
-                        int gray = qGray(pixel);
-                        int alpha = qAlpha(pixel);
+                        int        gray  = qGray(pixel);
+                        int        alpha = qAlpha(pixel);
                         st[p] = qRgba(gray, gray, gray, alpha);
                     }
 

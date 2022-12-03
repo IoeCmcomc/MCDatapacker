@@ -55,33 +55,35 @@ void TagSelectorDialog::setupTagTreeView(
 
     QString tagStr = QStringLiteral("tag/");
     switch (type) {
-    case CodeFile::BlockTag:
-        tagStr += QStringLiteral("block");
-        break;
+        case CodeFile::BlockTag:
+            tagStr += QStringLiteral("block");
+            break;
 
-    case CodeFile::EntityTypeTag:
-        tagStr += QStringLiteral("entity_type");
-        break;
+        case CodeFile::EntityTypeTag:
+            tagStr += QStringLiteral("entity_type");
+            break;
 
-    case CodeFile::FluidTag:
-        tagStr += QStringLiteral("fluid");
-        break;
+        case CodeFile::FluidTag:
+            tagStr += QStringLiteral("fluid");
+            break;
 
-    case CodeFile::FunctionTag:
-        tagStr += QStringLiteral("function");
-        break;
+        case CodeFile::FunctionTag:
+            tagStr += QStringLiteral("function");
+            break;
 
-    case CodeFile::ItemTag:
-        tagStr += QStringLiteral("item");
-        break;
+        case CodeFile::ItemTag:
+            tagStr += QStringLiteral("item");
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     auto tagStrSplited = tagStr.split('/');
-    for (auto &tagStrSub : tagStrSplited)
-        tagStrSub += 's';
+    std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
+                   tagStrSplited.begin(), [](const QString &str){
+        return str + "s";
+    });
     auto tagDir = tagStrSplited.join('/');
 
     auto fileIDList = Glhp::fileIdList(QDir::currentPath(), tagDir);

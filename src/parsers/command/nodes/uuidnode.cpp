@@ -3,13 +3,13 @@
 const static int _ = qRegisterMetaType<QSharedPointer<Command::UuidNode> >();
 
 Command::UuidNode::UuidNode(int pos, int length, const QString &uuidStr)
-    : Command::ArgumentNode(pos, length, "minecraft:uuid") {
-    m_uuid = QUuid::fromString(uuidStr);
+    : Command::ArgumentNode(pos, length, "minecraft:uuid"),
+    m_uuid(QUuid::fromString(uuidStr)) {
 }
 
 Command::UuidNode::UuidNode(int pos, const QString &uuidStr)
-    : Command::ArgumentNode(pos, uuidStr.length(), "minecraft:uuid") {
-    m_uuid = QUuid::fromString(uuidStr);
+    : Command::ArgumentNode(pos, uuidStr.length(), "minecraft:uuid"),
+    m_uuid(QUuid::fromString(uuidStr)) {
 }
 
 QString Command::UuidNode::toString() const {

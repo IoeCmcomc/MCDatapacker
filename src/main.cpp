@@ -17,7 +17,8 @@ int main(int argc, char *argv[]) {
 
     /*Q_INIT_RESOURCE(application); */
 
-    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(":/icon"));
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(
+                                      ":/icon"));
     QIcon::setFallbackThemeName(QStringLiteral("default"));
     if (QIcon::themeName().isEmpty())
         QIcon::setThemeName(QStringLiteral("default"));
@@ -25,8 +26,8 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
 
-    const int fontId = QFontDatabase::addApplicationFont(QStringLiteral(":/fonts/Monocraft/Monocraft.otf"));
-    qDebug() << fontId;
+    QFontDatabase::addApplicationFont(QStringLiteral(
+                                          ":/fonts/Monocraft/Monocraft.otf"));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());

@@ -121,8 +121,8 @@ void DataWidgetInterface::mouseMoveEvent(QMouseEvent *e) {
 
 void DataWidgetInterface::enterEvent(QEvent *e) {
     QWidget::enterEvent(e);
-    if (const auto *enterEvent = static_cast<QEnterEvent*>(e)) {
-        if (!m_sidebarRect.contains(enterEvent->pos()))
+    if (const auto *event = static_cast<QEnterEvent*>(e)) {
+        if (!m_sidebarRect.contains(event->pos()))
             hideSidebar();
     }
 

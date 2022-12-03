@@ -21,7 +21,7 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
             this, &LootTableEntry::onTypeChanged);
     connect(this, &QTabWidget::currentChanged,
             this, &LootTableEntry::onTabChanged);
-    connect(ui->entryGroupLabel, &QLabel::linkActivated, [this]() {
+    connect(ui->entryGroupLabel, &QLabel::linkActivated, this, [this]() {
         setCurrentIndex(ENTRIES_TAB);
     });
     connect(ui->entriesInterface, &DataWidgetInterface::entriesCountChanged,
@@ -59,60 +59,63 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
 
     ui->typeCmobo->setCurrentIndex(index);
     switch (index) {
-    case 0:     /* Empty */
-        break;
+        case 0: /* Empty */
+            break;
 
-    case 1: {      /* Item */
-        if (root.contains(QLatin1String("name")))
-            ui->itemSlot->appendItem(InventoryItem(root.value(QLatin1String(
-                                                                  "name"))
-                                                   .toString()));
-        break;
-    }
-
-    case 2: {     /* Loot table */
-        if (root.contains(QLatin1String("name")))
-            ui->nameEdit->setText(root.value(QLatin1String("name")).toString());
-        break;
-    }
-
-    case 3: {    /*Tag */
-        if (root.contains(QLatin1String("name")))
-            ui->nameEdit->setText(root.value(QLatin1String("name")).toString());
-        ui->tagExpandCheck->setupFromJsonObject(root, QStringLiteral("expand"));
-        break;
-    }
-
-
-    case 4: {    /*Dynamic */
-        if (root.contains(QLatin1String("name"))) {
-            auto name = root.value(QLatin1String("name")).toString();
-            if (name == QLatin1String("minecraft:contents")
-                || name == QLatin1String("minecraft:self")) {
-                ui->nameEdit->setText(name);
-            }
-        }
-        break;
-    }
-
-    default: {     /*Group */
-        if (type == QLatin1String("alternatives")) {
-            ui->selectAltRadio->setChecked(true);
-        } else if (type == QLatin1String("group")) {
-            ui->selectAllRadio->setChecked(true);
-        } else if (type == QLatin1String("sequence")) {
-            ui->selectAltRadio->setChecked(true);
-        } else {
+        case 1: {  /* Item */
+            if (root.contains(QLatin1String("name")))
+                ui->itemSlot->appendItem(InventoryItem(root.value(QLatin1String(
+                                                                      "name"))
+                                                       .toString()));
             break;
         }
 
-        if (root.contains(QLatin1String("children"))) {
-            if (!ui->entriesInterface->mainWidget())
-                initEntryInterface();
-            ui->entriesInterface->setJson(
-                root.value(QLatin1String("children")).toArray());
+        case 2: { /* Loot table */
+            if (root.contains(QLatin1String("name")))
+                ui->nameEdit->setText(root.value(QLatin1String(
+                                                     "name")).toString());
+            break;
         }
-    }
+
+        case 3: { /*Tag */
+            if (root.contains(QLatin1String("name")))
+                ui->nameEdit->setText(root.value(QLatin1String(
+                                                     "name")).toString());
+            ui->tagExpandCheck->setupFromJsonObject(root,
+                                                    QStringLiteral("expand"));
+            break;
+        }
+
+
+        case 4: { /*Dynamic */
+            if (root.contains(QLatin1String("name"))) {
+                auto name = root.value(QLatin1String("name")).toString();
+                if (name == QLatin1String("minecraft:contents")
+                    || name == QLatin1String("minecraft:self")) {
+                    ui->nameEdit->setText(name);
+                }
+            }
+            break;
+        }
+
+        default: { /*Group */
+            if (type == QLatin1String("alternatives")) {
+                ui->selectAltRadio->setChecked(true);
+            } else if (type == QLatin1String("group")) {
+                ui->selectAllRadio->setChecked(true);
+            } else if (type == QLatin1String("sequence")) {
+                ui->selectAltRadio->setChecked(true);
+            } else {
+                break;
+            }
+
+            if (root.contains(QLatin1String("children"))) {
+                if (!ui->entriesInterface->mainWidget())
+                    initEntryInterface();
+                ui->entriesInterface->setJson(
+                    root.value(QLatin1String("children")).toArray());
+            }
+        }
     }
 
     if (root.contains(QLatin1String("conditions"))) {
@@ -141,50 +144,52 @@ QJsonObject LootTableEntry::toJson() const {
         root.insert("quality", quality);
     if (ui->typeCmobo->currentIndex())
         switch (index) {
-        case 0: /*Empty */
-            break;
+            case 0: /*Empty */
+                break;
 
-        case 1: {  /*Item */
-            if (ui->itemSlot->itemCount() == 1)
-                root.insert("name", ui->itemSlot->itemNamespacedID(0));
-            break;
-        }
-
-        case 2: { /*Loot table */
-            if (!ui->nameEdit->text().isEmpty())
-                root.insert("name", ui->nameEdit->text());
-            break;
-        }
-
-        case 3: {/*Tag */
-            if (!ui->nameEdit->text().isEmpty())
-                root.insert("name", ui->nameEdit->text());
-            ui->tagExpandCheck->insertToJsonObject(root, "expand");
-            break;
-        }
-
-        case 4: {/*Group */
-            if (ui->selectAltRadio->isChecked())
-                root.insert("type", "minecraft:alternatives");
-            else if (ui->selectSeqRadio->isChecked())
-                root.insert("type", "minecraft:sequence");
-
-            auto &&children = ui->entriesInterface->json();
-            if (!children.isEmpty())
-                root.insert("children", children);
-            break;
-        }
-
-        case 5: {/*Dynamic */
-            if ((ui->nameEdit->text() == QLatin1String("minecraft:contents"))
-                || (ui->nameEdit->text() == QLatin1String("minecraft:self"))) {
-                root.insert("name", ui->nameEdit->text());
+            case 1: { /*Item */
+                if (ui->itemSlot->itemCount() == 1)
+                    root.insert("name", ui->itemSlot->itemNamespacedID(0));
+                break;
             }
-            break;
-        }
 
-        default:
-            break;
+            case 2: { /*Loot table */
+                if (!ui->nameEdit->text().isEmpty())
+                    root.insert("name", ui->nameEdit->text());
+                break;
+            }
+
+            case 3: {/*Tag */
+                if (!ui->nameEdit->text().isEmpty())
+                    root.insert("name", ui->nameEdit->text());
+                ui->tagExpandCheck->insertToJsonObject(root, "expand");
+                break;
+            }
+
+            case 4: {/*Group */
+                if (ui->selectAltRadio->isChecked())
+                    root.insert("type", "minecraft:alternatives");
+                else if (ui->selectSeqRadio->isChecked())
+                    root.insert("type", "minecraft:sequence");
+
+                auto &&children = ui->entriesInterface->json();
+                if (!children.isEmpty())
+                    root.insert("children", children);
+                break;
+            }
+
+            case 5: {/*Dynamic */
+                if ((ui->nameEdit->text() ==
+                     QLatin1String("minecraft:contents"))
+                    || (ui->nameEdit->text() ==
+                        QLatin1String("minecraft:self"))) {
+                    root.insert("name", ui->nameEdit->text());
+                }
+                break;
+            }
+
+            default:
+                break;
         }
 
     auto &&conditions = ui->conditionsInterface->json();
@@ -219,70 +224,72 @@ void LootTableEntry::onTypeChanged(int index) {
     ui->nameEdit->setPlaceholderText(QStringLiteral("namespace:id"));
     setTabEnabled(ENTRIES_TAB, index == 4);
     switch (index) {
-    case 0: { /*Empty */
-        ui->stackedWidget->setCurrentIndex(0);
-        break;
-    }
+        case 0: { /*Empty */
+            ui->stackedWidget->setCurrentIndex(0);
+            break;
+        }
 
-    case 1: {  /*Item */
-        ui->stackedWidget->setCurrentIndex(1);
-        break;
-    }
+        case 1: { /*Item */
+            ui->stackedWidget->setCurrentIndex(1);
+            break;
+        }
 
-    case 2: { /*Loot table */
-        ui->stackedWidget->setCurrentIndex(2);
-        ui->tagExpandCheck->setEnabled(false);
-        break;
-    }
+        case 2: { /*Loot table */
+            ui->stackedWidget->setCurrentIndex(2);
+            ui->tagExpandCheck->setEnabled(false);
+            break;
+        }
 
-    case 3: {/*Tag */
-        ui->stackedWidget->setCurrentIndex(2);
-        ui->tagExpandCheck->setEnabled(true);
-        break;
-    }
+        case 3: {/*Tag */
+            ui->stackedWidget->setCurrentIndex(2);
+            ui->tagExpandCheck->setEnabled(true);
+            break;
+        }
 
-    case 4: {/*Group */
-        ui->stackedWidget->setCurrentIndex(3);
-        break;
-    }
+        case 4: {/*Group */
+            ui->stackedWidget->setCurrentIndex(3);
+            break;
+        }
 
-    case 5: {/*Dynamic */
-        ui->stackedWidget->setCurrentIndex(2);
-        ui->nameEdit->setPlaceholderText(tr("%1 or %2",
-                                            "\"minecraft:contents or minecraft:self\"").
-                                         arg(QLatin1String("minecraft:contents"),
-                                             QLatin1String("minecraft:self")));
-        ui->tagExpandCheck->setEnabled(false);
-        break;
-    }
+        case 5: {/*Dynamic */
+            ui->stackedWidget->setCurrentIndex(2);
+            ui->nameEdit->setPlaceholderText(tr("%1 or %2",
+                                                "\"minecraft:contents or minecraft:self\"").
+                                             arg(QLatin1String(
+                                                     "minecraft:contents"),
+                                                 QLatin1String(
+                                                     "minecraft:self")));
+            ui->tagExpandCheck->setEnabled(false);
+            break;
+        }
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
 void LootTableEntry::onTabChanged(int index) {
     switch (index) {
-    case ENTRIES_TAB: {
-        if (!ui->entriesInterface->mainWidget())
-            initEntryInterface();
-        break;
-    }
+        case ENTRIES_TAB: {
+            if (!ui->entriesInterface->mainWidget())
+                initEntryInterface();
+            break;
+        }
 
-    case 2: { /* Functions */
-        if (!ui->functionsInterface->mainWidget())
-            initFuncInterface();
-        break;
-    }
+        case 2: { /* Functions */
+            if (!ui->functionsInterface->mainWidget())
+                initFuncInterface();
+            break;
+        }
 
-    case 3: { /* Conditions */
-        if (!ui->conditionsInterface->mainWidget())
-            initCondInterface();
-        break;
-    }
+        case 3: { /* Conditions */
+            if (!ui->conditionsInterface->mainWidget())
+                initCondInterface();
+            break;
+        }
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
@@ -300,37 +307,37 @@ void LootTableEntry::updateConditionsTab(int size) {
 
 void LootTableEntry::reset(int index) {
     switch (index) {
-    case 0:     /*Empty */
-        break;
+        case 0: /*Empty */
+            break;
 
-    case 1: {      /*Item */
-        ui->itemSlot->clearItems();
-        break;
-    }
+        case 1: {  /*Item */
+            ui->itemSlot->clearItems();
+            break;
+        }
 
-    case 2: {     /*Loot table */
-        ui->nameEdit->clear();
-        break;
-    }
+        case 2: { /*Loot table */
+            ui->nameEdit->clear();
+            break;
+        }
 
-    case 3: {    /*Tag */
-        ui->nameEdit->clear();
-        ui->tagExpandCheck->unset();
-        break;
-    }
+        case 3: { /*Tag */
+            ui->nameEdit->clear();
+            ui->tagExpandCheck->unset();
+            break;
+        }
 
-    case 4: {    /*Group */
-        ui->entriesInterface->setJson({});
-        break;
-    }
+        case 4: { /*Group */
+            ui->entriesInterface->setJson({});
+            break;
+        }
 
-    case 5: {    /*Dynamic */
-        ui->nameEdit->clear();
-        break;
-    }
+        case 5: { /*Dynamic */
+            ui->nameEdit->clear();
+            break;
+        }
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 

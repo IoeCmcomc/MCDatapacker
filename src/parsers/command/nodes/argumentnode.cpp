@@ -2,7 +2,8 @@
 
 static int _ = qRegisterMetaType<QSharedPointer<Command::ArgumentNode> >();
 
-Command::ArgumentNode::ArgumentNode(int pos, int length, QString parserId)
+Command::ArgumentNode::ArgumentNode(int pos, int length,
+                                    const QString &parserId)
     : Command::ParseNode(pos, length) {
     setParserId(parserId);
 }

@@ -16,11 +16,10 @@ QSize ProblemArea::sizeHint() const {
 }
 
 bool hasType(const QVector<ProblemInfo> &problems, ProblemInfo::Type type) {
-    for (const auto &problem: qAsConst(problems))
-        if (problem.type == type)
-            return true;
-
-    return false;
+    return std::any_of(problems.cbegin(), problems.cend(),
+                       [type](const ProblemInfo &problem){
+        return problem.type == type;
+    });
 }
 
 void ProblemArea::paintEvent(QPaintEvent *event) {

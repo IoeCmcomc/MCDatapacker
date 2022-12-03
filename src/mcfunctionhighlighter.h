@@ -14,7 +14,7 @@ public:
 protected slots:
     void highlightBlock(const QString &text) override;
     void rehighlightBlock(const QTextBlock &block,
-                          const QVector<QTextLayout::FormatRange> formats);
+                          const QVector<QTextLayout::FormatRange> &formats);
 
     void checkProblems(bool checkAll = false) override;
 

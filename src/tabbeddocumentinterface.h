@@ -42,7 +42,7 @@ public:
 public /*slots*/ :
     void onOpenFile(const QString &filepath);
     bool saveCurFile();
-    bool saveCurFile(const QString path);
+    bool saveCurFile(const QString &path);
     bool saveAllFile();
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);

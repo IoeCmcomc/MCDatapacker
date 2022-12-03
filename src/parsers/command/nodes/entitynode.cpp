@@ -23,25 +23,25 @@ Command::EntityNode::EntityNode(
 
     using Variable = Command::TargetSelectorNode::Variable;
     switch (other->variable()) {
-    case Variable::A: {
-        m_playerOnly = true;
-        break;
-    }
+        case Variable::A: {
+            m_playerOnly = true;
+            break;
+        }
 
-    case Variable::E:
-        break;
+        case Variable::E:
+            break;
 
-    case Variable::P:
-    case Variable::R: {
-        m_playerOnly = true;
-        m_singleOnly = true;
-        break;
-    }
+        case Variable::P:
+        case Variable::R: {
+            m_playerOnly = true;
+            m_singleOnly = true;
+            break;
+        }
 
-    case Variable::S: {
-        m_singleOnly = true;
-        break;
-    }
+        case Variable::S: {
+            m_singleOnly = true;
+            break;
+        }
     }
 }
 
@@ -198,8 +198,7 @@ static const int _EntityArgumentValueNode =
 
 Command::EntityArgumentValueNode::EntityArgumentValueNode(
     QSharedPointer<ParseNode> valNode, bool negative)
-    : Command::ParseNode(valNode->pos(), valNode->length()) {
-    m_value = valNode;
+    : Command::ParseNode(valNode->pos(), valNode->length()), m_value(valNode) {
     setNegative(negative);
 }
 

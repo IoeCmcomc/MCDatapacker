@@ -7,7 +7,7 @@ namespace Command {
     class ArgumentNode : public ParseNode
     {
 public:
-        explicit ArgumentNode(int pos, int length, QString parserId);
+        explicit ArgumentNode(int pos, int length, const QString &parserId);
 
         virtual QString toString() const override;
         QString parserId() const;

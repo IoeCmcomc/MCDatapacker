@@ -36,7 +36,7 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this,
             &VisualRecipeEditorDock::onRecipeTabChanged);
-    connect(ui->cookTimeCheck, &QCheckBox::toggled, [this](bool checked) {
+    connect(ui->cookTimeCheck, &QCheckBox::toggled, this, [this](bool checked) {
         ui->cookTimeInput->setEnabled(checked);
     });
     connect(ui->writeRecipeBtn, &QPushButton::clicked,
@@ -106,22 +106,22 @@ void VisualRecipeEditorDock::writeRecipe() {
         root.insert("group", ui->recipeGroupInput->text());
     QJsonDocument jsonDoc;
     switch (index) {
-    case 0:
-        jsonDoc = QJsonDocument(genCraftingJson(root));
-        break;
+        case 0:
+            jsonDoc = QJsonDocument(genCraftingJson(root));
+            break;
 
-    case 1:
-        jsonDoc = QJsonDocument(genSmeltingJson(root));
-        break;
+        case 1:
+            jsonDoc = QJsonDocument(genSmeltingJson(root));
+            break;
 
-    case 2:
-        jsonDoc = QJsonDocument(genStonecuttingJson(root));
-        break;
+        case 2:
+            jsonDoc = QJsonDocument(genStonecuttingJson(root));
+            break;
 
-    case 3:
-        if (Game::version() >= Game::v1_16)
-            jsonDoc = QJsonDocument(genSmithingJson(root));
-        break;
+        case 3:
+            if (Game::version() >= Game::v1_16)
+                jsonDoc = QJsonDocument(genSmithingJson(root));
+            break;
     }
 
     qobject_cast<MainWindow*>(parent())->setCodeEditorText(jsonDoc.toJson());
@@ -358,6 +358,7 @@ void VisualRecipeEditorDock::readRecipe() {
 
 void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
     QString type = root[QStringLiteral("type")].toString();
+
     Glhp::removePrefix(type, QStringLiteral("minecraft:"));
 
     if (type == QStringLiteral("crafting_shaped")) {

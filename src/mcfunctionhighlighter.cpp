@@ -176,7 +176,7 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
-                                             const QVector<QTextLayout::FormatRange> formats)
+                                             const QVector<QTextLayout::FormatRange> &formats)
 {
     m_formats = formats;
     Highlighter::rehighlightBlock(block);
@@ -207,8 +207,8 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
                 dynamic_cast<TextBlockData*>(block.userData())) {
             QString lineText = block.text();
             parser.setText(lineText);
-            QElapsedTimer timer;
-            timer.start();
+            //QElapsedTimer timer;
+            //timer.start();
             result = parser.parse();
             if (result->isVaild()) {
                 data->clearProblems();

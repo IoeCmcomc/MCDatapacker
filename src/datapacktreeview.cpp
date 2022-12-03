@@ -40,7 +40,7 @@ DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
             this, &DatapackTreeView::onFileRenamed);
 }
 
-QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
+QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
     /*Right click context menu */
     auto           *cMenu = new QMenu(this);
     const QString &&path  = Glhp::relPath(dirPath, dirModel.filePath(index));
@@ -180,11 +180,16 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
 
                 connect(action, &QAction::triggered, this, [this]() {
                     bool ok;
-                    const QString &tagType = QInputDialog::getText(this, tr("Tag folder path"),
-                                            tr("Please type the folder path of the tag (without the 'tags' prefix):"),
-                                            QLineEdit::Normal, QString(), &ok);
+                    const QString &tagType =
+                        QInputDialog::getText(
+                            this, tr("Tag folder path"),
+                            tr(
+                                "Please type the folder path of the tag (without the 'tags' prefix):"),
+                            QLineEdit::Normal, QString(), &ok);
                     if (ok && !tagType.isEmpty()) {
-                        this->contextMenuOnNew(QLatin1String(".json"), QStringLiteral("tags/") + tagType);
+                        this->contextMenuOnNew(QLatin1String(".json"),
+                                               QStringLiteral(
+                                                   "tags/") + tagType);
                     }
                 });
                 tagMenu->addAction(action);
@@ -241,9 +246,9 @@ QMenu *DatapackTreeView::mkContextMenu(QModelIndex index) {
     return cMenu;
 }
 
-QAction *DatapackTreeView::addNewFileAction(QMenu *menu, const QString &name,
-                                            QLatin1String ext,
-                                            QLatin1String catDir) {
+QAction * DatapackTreeView::addNewFileAction(QMenu *menu, const QString &name,
+                                             QLatin1String ext,
+                                             QLatin1String catDir) {
     QAction *action = new QAction(name, menu);
 
     connect(action, &QAction::triggered, this, [this, ext, catDir]() {
@@ -276,7 +281,7 @@ void DatapackTreeView::load(const QDir &dir) {
 
 bool DatapackTreeView::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
-        auto helpEvent = static_cast<QHelpEvent*>(event);
+        auto helpEvent = static_cast<QHelpEvent *>(event);
         auto pos       = viewport()->mapFrom(this, helpEvent->pos());
         auto index     = indexAt(pos);
 
@@ -455,11 +460,10 @@ bool DatapackTreeView::isStringInTagFile(const QString &filepath,
 void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
                                                 const QString &str,
                                                 bool added) {
-    QString errorMessage;
-
     if (!QFileInfo::exists(filepath)) {
         QDir().mkpath(QFileInfo(filepath).dir().path());
         QSaveFile newFile(filepath);
+        QString   errorMessage;
         if (newFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QJsonArray values;
             values.push_back(str);
@@ -474,12 +478,11 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
                                .arg(QDir::toNativeSeparators(filepath),
                                     newFile.errorString());
             }
-        } else{
+        } else {
             errorMessage = tr("Cannot open file %1 for writing:\n%2.")
                            .arg(QDir::toNativeSeparators(filepath),
                                 newFile.errorString());
         }
-
         if (!errorMessage.isEmpty()) {
             QMessageBox::information(this, tr("Error"), errorMessage);
         }
