@@ -755,22 +755,14 @@
       <widget class="QWidget" name="set_banner_pattern">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="ExtendedTableWidget" name="setPattern_table" native="true">
-          <property name="columnTitles" stdset="0">
+         <widget class="ExtendedTableWidget" name="setPattern_table">
+          <property name="columnTitles">
            <stringlist>
             <string>Pattern</string>
             <string>Color</string>
            </stringlist>
           </property>
           <widget class="QFrame" name="container_2">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>100</width>
-             <height>30</height>
-            </rect>
-           </property>
            <layout class="QFormLayout" name="formLayout_13">
             <item row="0" column="0">
              <widget class="QLabel" name="label_39">
@@ -876,7 +868,7 @@
         </item>
         <item row="0" column="1">
          <widget class="NumberProvider" name="setCount_countInput">
-          <property name="minLimit" stdset="0">
+          <property name="minLimit">
            <number>-2147483647</number>
           </property>
          </widget>
@@ -917,22 +909,14 @@
       <widget class="QWidget" name="set_enchantments">
        <layout class="QGridLayout" name="gridLayout_11">
         <item row="0" column="0">
-         <widget class="ExtendedTableWidget" name="setEnchant_table" native="true">
-          <property name="columnTitles" stdset="0">
+         <widget class="ExtendedTableWidget" name="setEnchant_table">
+          <property name="columnTitles">
            <stringlist>
             <string>Enchantment</string>
             <string>Level</string>
            </stringlist>
           </property>
           <widget class="QFrame" name="container">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>100</width>
-             <height>30</height>
-            </rect>
-           </property>
            <layout class="QFormLayout" name="formLayout_6">
             <item row="0" column="0">
              <widget class="QLabel" name="label_37">
@@ -1416,6 +1400,7 @@
    <class>ExtendedTableWidget</class>
    <extends>QWidget</extends>
    <header>extendedtablewidget.h</header>
+   <addpagemethod>setContainer</addpagemethod>
    <container>1</container>
   </customwidget>
   <customwidget>

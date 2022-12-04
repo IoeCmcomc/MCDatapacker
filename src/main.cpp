@@ -17,17 +17,21 @@ int main(int argc, char *argv[]) {
 
     /*Q_INIT_RESOURCE(application); */
 
-    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(
-                                      ":/icon"));
-    QIcon::setFallbackThemeName(QStringLiteral("default"));
-    if (QIcon::themeName().isEmpty())
-        QIcon::setThemeName(QStringLiteral("default"));
-
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
 
     QFontDatabase::addApplicationFont(QStringLiteral(
                                           ":/fonts/Monocraft/Monocraft.otf"));
+
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(
+                                      ":/icon"));
+    QIcon::setFallbackThemeName(QStringLiteral("default"));
+    if (QIcon::themeName().isEmpty() || !QIcon::hasThemeIcon("list-add"))
+        QIcon::setThemeName(QStringLiteral("default"));
+    if (!QIcon::hasThemeIcon("list-add")) {
+        QIcon::setThemeSearchPaths({":/icons"});
+        QIcon::setThemeName(QStringLiteral("default"));
+    }
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
