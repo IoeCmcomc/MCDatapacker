@@ -11,7 +11,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/statusbar.cpp" line="82"/>
+        <location filename="../src/statusbar.cpp" line="83"/>
         <source>%Ln problem(s)</source>
         <translation>
             <numerusform>%Ln problem</numerusform>
