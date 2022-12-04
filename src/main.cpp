@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
-    QCoreApplication::setApplicationVersion("0.5.0");
+    QCoreApplication::setApplicationVersion("0.6.0");
 
     /*Q_INIT_RESOURCE(application); */
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     if (QIcon::themeName().isEmpty() || !QIcon::hasThemeIcon("list-add"))
         QIcon::setThemeName(QStringLiteral("default"));
     if (!QIcon::hasThemeIcon("list-add")) {
-        QIcon::setThemeSearchPaths({":/icons"});
+        QIcon::setThemeSearchPaths({ ":/icons" });
         QIcon::setThemeName(QStringLiteral("default"));
     }
 

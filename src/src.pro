@@ -259,7 +259,7 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-VERSION = 0.5.0
+VERSION = 0.6.0
 QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
