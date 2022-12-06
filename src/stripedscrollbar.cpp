@@ -1,13 +1,14 @@
 #include "stripedscrollbar.h"
 
 #include "codeeditor.h"
+#include "highlighter.h"
 
 #include <QPainter>
 #include <QStyleOptionSlider>
 
 StripedScrollBar::StripedScrollBar(Qt::Orientation orientation, QWidget *parent)
     : QScrollBar(orientation, parent) {
-    if (auto *editor = qobject_cast<CodeEditor*>(parent)) {
+    if (auto *editor = qobject_cast<CodeEditor *>(parent)) {
         m_editor = editor;
     }
     Q_ASSERT(m_editor);

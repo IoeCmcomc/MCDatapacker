@@ -2,7 +2,6 @@
 #include "ui_tabbeddocumentinterface.h"
 
 #include "globalhelpers.h"
-#include "mainwindow.h"
 #include "fileswitcher.h"
 #include "mcfunctionhighlighter.h"
 #include "jsonhighlighter.h"
@@ -43,28 +42,14 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
     ui(new Ui::TabbedDocumentInterface) {
     ui->setupUi(this);
 
-    ui->tabBar->setTabsClosable(true);
-    ui->tabBar->setMovable(true);
-    ui->tabBar->setDocumentMode(true);
-    ui->tabBar->setDrawBase(false);
-    ui->tabBar->setExpanding(false);
-    ui->tabBar->adjustSize();
+    getTabBar()->setDrawBase(false);
 
-    connect(ui->tabBar, &QTabBar::currentChanged,
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
             this, &TabbedDocumentInterface::onTabChanged);
-    connect(ui->tabBar, &QTabBar::tabCloseRequested,
+    connect(ui->tabWidget, &QTabWidget::tabCloseRequested,
             this, &TabbedDocumentInterface::onCloseFile);
-    connect(ui->tabBar, &QTabBar::tabMoved,
+    connect(getTabBar(), &QTabBar::tabMoved,
             this, &TabbedDocumentInterface::onTabMoved);
-
-    connect(ui->codeEditor->document(), &QTextDocument::modificationChanged,
-            this, &TabbedDocumentInterface::onModificationChanged);
-    connect(this, &TabbedDocumentInterface::curFileChanged,
-            this, &TabbedDocumentInterface::onCurFileChanged);
-    connect(ui->codeEditor, &CodeEditor::openFileRequest,
-            this, &TabbedDocumentInterface::onOpenFile);
-    connect(ui->codeEditor, &CodeEditor::textChanged,
-            this, &TabbedDocumentInterface::onCurTextChanged);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
             &QShortcut::activated, [this]() {
@@ -94,35 +79,12 @@ TabbedDocumentInterface::~TabbedDocumentInterface() {
     delete ui;
 }
 
-void TabbedDocumentInterface::addCodeFile(const CodeFile &file) {
-    /*qDebug() << "addCodeFile"; */
-    files << file;
-    ui->tabBar->addTab(file.title);
-    const int lastIndex = count() - 1;
-    ui->tabBar->setTabToolTip(lastIndex, file.fileInfo.filePath());
-    ui->tabBar->setTabIcon(lastIndex, Glhp::fileTypeToIcon(
-                               Glhp::pathToFileType(QDir::currentPath(),
-                                                    file.fileInfo.
-                                                    filePath())));
-    setCurIndex(count() - 1);
-}
-
 void TabbedDocumentInterface::openFile(const QString &filepath, bool reload) {
     if (filepath.isEmpty()
         || ((getCurFilePath() == filepath) && (!reload)))
         return;
     else {
-        auto newFile = readFile(filepath);
-        if (newFile.isVaild()) {
-            if (newFile.fileType >= CodeFile::Text) {
-                auto &&fileData = qvariant_cast<TextFileData>(newFile.data);
-                fileData.doc->setModified(false);
-                connect(fileData.doc, &QTextDocument::modificationChanged,
-                        this,
-                        &TabbedDocumentInterface::onModificationChanged);
-            }
-            addCodeFile(newFile);
-        }
+        addFile(filepath);
     }
 }
 
@@ -135,8 +97,6 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
 
     QSaveFile file(filepath);
     if (curFile.fileType >= CodeFile::Text) {
-        auto data = qvariant_cast<TextFileData>(curFile.data);
-
 #ifndef QT_NO_CURSOR
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
@@ -144,7 +104,7 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
         if (file.open(QFile::WriteOnly | QFile::Text)) {
             QTextStream out(&file);
             out.setCodec("UTF-8");
-            out << data.doc->toPlainText().toUtf8();
+            out << getCurDoc()->toPlainText().toUtf8();
             if (!file.commit()) {
                 errorMessage = tr("Cannot write file %1:\n%2.")
                                .arg(QDir::toNativeSeparators(filepath),
@@ -163,13 +123,13 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
 #endif
 
         if (!errorMessage.isEmpty()) {
-            QMessageBox::information(this, tr("Error"), errorMessage);
+            QMessageBox::information(this, tr("Save file error"), errorMessage);
             ok = false;
         }
 
         if (ok) {
             curFile.changePath(filepath);
-            data.doc->setModified(false);
+            getCurDoc()->setModified(false);
             if (index != getCurIndex())
                 updateTabTitle(index, false);
             files[index].isModified = false;
@@ -181,11 +141,11 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
 }
 
 void TabbedDocumentInterface::updateTabTitle(int index, bool changed) {
-    auto newTitle = getCurFile()->title;
+    auto &&newTitle = getCurFile()->name();
 
     if (changed)
         newTitle += '*';
-    ui->tabBar->setTabText(index, newTitle);
+    ui->tabWidget->setTabText(index, newTitle);
 }
 
 bool TabbedDocumentInterface::maybeSave(int index) {
@@ -201,7 +161,7 @@ bool TabbedDocumentInterface::maybeSave(int index) {
                                QMessageBox::Cancel);
     switch (ret) {
         case QMessageBox::Save:
-            return saveFile(index, files[index].fileInfo.absoluteFilePath());
+            return saveFile(index, files[index].info.absoluteFilePath());
 
         case QMessageBox::Cancel:
             return false;
@@ -217,11 +177,11 @@ void TabbedDocumentInterface::retranslate() {
 }
 
 int TabbedDocumentInterface::getCurIndex() const {
-    return ui->tabBar->currentIndex();
+    return ui->tabWidget->currentIndex();
 }
 
 void TabbedDocumentInterface::setCurIndex(int i) {
-    ui->tabBar->setCurrentIndex(i);
+    ui->tabWidget->setCurrentIndex(i);
 }
 
 void TabbedDocumentInterface::onModificationChanged(bool changed) {
@@ -233,66 +193,82 @@ void TabbedDocumentInterface::onModificationChanged(bool changed) {
     emit curModificationChanged(changed);
 }
 
-CodeFile TabbedDocumentInterface::readFile(const QString &path) {
+void TabbedDocumentInterface::addFile(const QString &path) {
     CodeFile newFile(path);
+    QWidget *widget = nullptr;
 
     if (newFile.fileType >= CodeFile::Text) {
-        QFile file(path);
-        if (!file.open(QFile::ReadOnly | QFile::Text)) {
-            QMessageBox::information(this, tr("Error"),
-                                     tr("Cannot read file %1:\n%2.")
-                                     .arg(QDir::toNativeSeparators(path),
-                                          file.errorString()));
-        } else {
-            QTextStream in(&file);
-            in.setCodec("UTF-8");
+        bool        ok;
+        const auto &text = readTextFile(path, ok);
+        if (!ok)
+            return;
 
-#ifndef QT_NO_CURSOR
-            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
+        auto *codeEditor = new CodeEditor(this);
 
-            int     c = 0;
-            QString content;
-            while (!in.atEnd()) {
-                content += in.readLine();
-                if (!in.atEnd())
-                    content += '\n';
-                ++c;
-            }
-
-            TextFileData data(new QTextDocument(this), &newFile);
-            auto         doc = data.doc;
-            doc->setPlainText(content);
-            doc->setMetaInformation(QTextDocument::DocumentTitle,
-                                    newFile.title);
-            if (newFile.fileType == CodeFile::Function) {
-                data.highlighter = new McfunctionHighlighter(data.doc);
-            } else if (newFile.fileType >= CodeFile::JsonText) {
-                data.highlighter = new JsonHighlighter(data.doc);
-            }
-            newFile.data.setValue(data);
+        if (newFile.fileType == CodeFile::Function) {
+            codeEditor->setCurHighlighter(new McfunctionHighlighter(codeEditor->
+                                                                    document()));
+        } else if (newFile.fileType >= CodeFile::JsonText) {
+            codeEditor->setCurHighlighter(new JsonHighlighter(codeEditor->
+                                                              document()));
         }
-        file.close();
+
+        codeEditor->setPlainText(text);
+        codeEditor->setFilePath(newFile.path());
+
+        if (auto *highlighter = codeEditor->getCurHighlighter()) {
+            highlighter->checkProblems();
+            highlighter->onDocChanged();
+            codeEditor->updateErrorSelections();
+        }
+
+        connect(codeEditor->document(), &QTextDocument::modificationChanged,
+                this, &TabbedDocumentInterface::onModificationChanged);
+        connect(codeEditor, &CodeEditor::openFileRequest,
+                this, &TabbedDocumentInterface::onOpenFile);
+        connect(codeEditor, &CodeEditor::textChanged,
+                this, &TabbedDocumentInterface::onCurTextChanged);
+
+        connect(codeEditor, &QPlainTextEdit::copyAvailable,
+                this, &TabbedDocumentInterface::updateEditMenuRequest);
+        connect(codeEditor, &QPlainTextEdit::undoAvailable,
+                this, &TabbedDocumentInterface::updateEditMenuRequest);
+        connect(codeEditor, &QPlainTextEdit::redoAvailable,
+                this, &TabbedDocumentInterface::updateEditMenuRequest);
+
+        connect(codeEditor, &CodeEditor::updateStatusBarRequest,
+                this, &TabbedDocumentInterface::updateStatusBarRequest);
+        connect(codeEditor, &CodeEditor::showMessageRequest,
+                this, &TabbedDocumentInterface::showMessageRequest);
+
+        connect(this, &TabbedDocumentInterface::settingsChanged,
+                codeEditor, &CodeEditor::readPrefSettings);
+
+        widget = codeEditor;
     } else if (newFile.fileType == CodeFile::Image) {
-        QString errStr;
-        if (auto &&data = ImgViewer::fromFile(path, errStr);
-            !errStr.isEmpty()) {
-            QMessageBox::information(this, tr("Error"),
-                                     tr("Cannot read file %1:\n%2.")
-                                     .arg(QDir::toNativeSeparators(path),
-                                          errStr));
-        } else {
-            newFile.data.setValue(data);
-        }
-    }
-#ifndef QT_NO_CURSOR
-    QGuiApplication::restoreOverrideCursor();
-#endif
+        auto *viewer = new ImgViewer(this);
 
-    return newFile;
+        connect(viewer,
+                &ImgViewer::updateStatusBarRequest,
+                this, &TabbedDocumentInterface::updateStatusBarRequest);
+
+        if (!viewer->setImage(path)) {
+            viewer->deleteLater();
+            return;
+        }
+
+        widget = viewer;
+    }
+    if (widget) {
+        files << newFile;
+        const auto &&icon  = Glhp::fileTypeToIcon(newFile.fileType);
+        const int    index =
+            ui->tabWidget->addTab(widget, icon, newFile.name());
+        ui->tabWidget->setCurrentIndex(index);
+    }
 }
 
-CodeFile *TabbedDocumentInterface::getCurFile() {
+CodeFile * TabbedDocumentInterface::getCurFile() {
     /*qDebug() << "getCurFile" << count() << getCurIndex(); */
     if (hasNoFile() || (getCurIndex() == -1))
         return nullptr;
@@ -303,37 +279,37 @@ CodeFile *TabbedDocumentInterface::getCurFile() {
 QString TabbedDocumentInterface::getCurFilePath() {
     /*qDebug() << "getCurFilePath"; */
     if (auto *curFile = getCurFile())
-        return curFile->fileInfo.filePath();
+        return curFile->path();
     else
         return "";
 }
 
-QTextDocument *TabbedDocumentInterface::getCurDoc() {
-    return getDocAt(getCurIndex());
+QTextDocument * TabbedDocumentInterface::getCurDoc() {
+    if (getCodeEditor()) {
+        return getCodeEditor()->document();
+    } else {
+        return nullptr;
+    }
 }
 
-QVector<CodeFile> *TabbedDocumentInterface::getFiles() {
+QVector<CodeFile> * TabbedDocumentInterface::getFiles() {
     return &files;
 }
 
-CodeEditor *TabbedDocumentInterface::getCodeEditor() const {
-    return ui->codeEditor;
+CodeEditor * TabbedDocumentInterface::getCodeEditor() const {
+    return qobject_cast<CodeEditor *>(ui->tabWidget->currentWidget());
 }
 
-ImgViewer *TabbedDocumentInterface::getImgViewer() const {
-    return ui->imgViewer;
+ImgViewer * TabbedDocumentInterface::getImgViewer() const {
+    return qobject_cast<ImgViewer *>(ui->tabWidget->currentWidget());
 }
 
-QTabBar *TabbedDocumentInterface::getTabBar() const {
-    return ui->tabBar;
-}
-
-QStackedWidget *TabbedDocumentInterface::getStackedWidget() {
-    return ui->stackedWidget;
+QTabBar * TabbedDocumentInterface::getTabBar() const {
+    return ui->tabWidget->tabBar();
 }
 
 int TabbedDocumentInterface::count() const {
-    return files.count();
+    return ui->tabWidget->count();
 }
 
 bool TabbedDocumentInterface::hasNoFile() const {
@@ -358,7 +334,7 @@ bool TabbedDocumentInterface::hasUnsavedChanges() const {
 
 void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
     for (int i = 0; i < count(); i++) {
-        if (files[i].fileInfo.filePath() == filepath) {
+        if (files[i].path() == filepath) {
             setCurIndex(i);
             return;
         }
@@ -373,7 +349,7 @@ bool TabbedDocumentInterface::saveCurFile(const QString &path) {
 bool TabbedDocumentInterface::saveCurFile() {
     /*qDebug() << "saveCurFile" << getCurIndex(); */
     if (auto *curFile = getCurFile()) {
-        return saveFile(getCurIndex(), curFile->fileInfo.filePath());
+        return saveFile(getCurIndex(), curFile->path());
     }
     return false;
 }
@@ -384,7 +360,7 @@ bool TabbedDocumentInterface::saveAllFile() {
     if (!hasNoFile()) {
         for (int i = 0; i < count(); i++) {
             /* AND operation */
-            r &= saveFile(i, files[i].fileInfo.filePath());
+            r &= saveFile(i, files[i].path());
         }
     }
     return r;
@@ -402,13 +378,13 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
 
     for (int i = 0; i < count(); i++) {
         auto *file = &files[i];
-        if (file->fileInfo.absoluteFilePath() == oldpath) {
+        if (file->info.absoluteFilePath() == oldpath) {
             file->changePath(newpath);
             updateTabTitle(i, file->isModified);
-            ui->tabBar->setTabIcon(
+            ui->tabWidget->setTabIcon(
                 i, Glhp::fileTypeToIcon(Glhp::pathToFileType(
                                             QDir::currentPath(),
-                                            file->fileInfo.filePath())));
+                                            file->path())));
 
             onModificationChanged(false);
             setCurIndex(getCurIndex());
@@ -423,48 +399,41 @@ void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
         QStringLiteral("/summary/commands/data.min.json"));
     Command::MinecraftParser::limitScoreboardObjectiveLength
         = Game::version() < Game::v1_18;
-
-    for (const auto &file: qAsConst(files)) {
-        if (file.fileType == CodeFile::Function) {
-            auto &&data = qvariant_cast<TextFileData>(file.data);
-            data.highlighter->checkProblems(true);
-        }
-    }
 }
 
 void TabbedDocumentInterface::undo() {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->codeEditor->undo();
+    if (auto *editor = getCodeEditor()) {
+        editor->undo();
     }
 }
 
 void TabbedDocumentInterface::redo() {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->codeEditor->redo();
+    if (auto *editor = getCodeEditor()) {
+        editor->redo();
     }
 }
 
 void TabbedDocumentInterface::selectAll() {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->codeEditor->selectAll();
+    if (auto *editor = getCodeEditor()) {
+        editor->selectAll();
     }
 }
 
 void TabbedDocumentInterface::cut() {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->codeEditor->cut();
+    if (auto *editor = getCodeEditor()) {
+        editor->cut();
     }
 }
 
 void TabbedDocumentInterface::copy() {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->codeEditor->copy();
+    if (auto *editor = getCodeEditor()) {
+        editor->copy();
     }
 }
 
 void TabbedDocumentInterface::paste() {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->codeEditor->paste();
+    if (auto *editor = getCodeEditor()) {
+        editor->paste();
     }
 }
 
@@ -474,25 +443,10 @@ void TabbedDocumentInterface::changeEvent(QEvent *event) {
         retranslate();
 }
 
-void TabbedDocumentInterface::saveFileData(int index) {
-    auto &file = files[index];
-
-    if (file.data.canConvert<TextFileData>()) {
-        auto &&data = qvariant_cast<TextFileData>(file.data);
-        data.textCursor = ui->codeEditor->textCursor();
-        file.data.setValue(std::move(data));
-    } else if (prevIndex < count()) {
-        if (files[prevIndex].fileType == CodeFile::Image) {
-            file.data.setValue(ui->imgViewer->toData());
-        }
-    }
-}
-
-QTextDocument *TabbedDocumentInterface::getDocAt(int index) const {
-    if (const auto &file = files[index];
-        file.data.canConvert<TextFileData>()) {
-        const auto &&data = qvariant_cast<TextFileData>(file.data);
-        return data.doc;
+QTextDocument * TabbedDocumentInterface::getDocAt(int index) const {
+    if (auto *editor =
+            qobject_cast<CodeEditor *>(ui->stackedWidget->widget(index))) {
+        return editor->document();
     } else {
         return nullptr;
     }
@@ -502,37 +456,10 @@ void TabbedDocumentInterface::onTabChanged(int index) {
     /*qDebug() << "Change to tab" << index << '/' << count(); */
 
     if (index > -1) {
-        if (prevIndex > -1)
-            if ((prevIndex < count()) && (prevIndex != index) &&
-                !tabMovedOrRemoved) {
-                saveFileData(prevIndex);
-            }
-
         auto *curFile = getCurFile();
         Q_ASSERT(curFile != nullptr);
-        if (curFile->data.canConvert<TextFileData>()) {
-            auto &&data = qvariant_cast<TextFileData>(curFile->data);
-
-            Q_ASSERT(data.doc != nullptr);
-            Q_ASSERT(data.doc == getDocAt(index));
-            ui->codeEditor->setDocument(data.doc);
-            if (lastRemovedDoc) {
-                if (lastRemovedDoc != ui->codeEditor->document())
-                    lastRemovedDoc->deleteLater();
-                lastRemovedDoc = nullptr;
-            }
-            ui->codeEditor->setTextCursor(data.textCursor);
-
-            if (ui->stackedWidget->currentIndex() != 1)
-                ui->stackedWidget->setCurrentIndex(1);
-        } else if (curFile->data.canConvert<ImageFileData>()) {
-            ui->imgViewer->loadData(qvariant_cast<ImageFileData>(curFile->data));
-
-            if (ui->stackedWidget->currentIndex() != 2)
-                ui->stackedWidget->setCurrentIndex(2);
-        }
-
-        emit curFileChanged(curFile->fileInfo.filePath());
+        ui->stackedWidget->setCurrentIndex(1);
+        emit curFileChanged(curFile->path());
     } else {
         if (ui->stackedWidget->currentIndex() != 0)
             ui->stackedWidget->setCurrentIndex(0);
@@ -543,14 +470,10 @@ void TabbedDocumentInterface::onTabChanged(int index) {
         emit curModificationChanged(false);
     else if (getCurDoc())
         emit curModificationChanged(getCurDoc()->isModified());
-
-    prevIndex         = index;
-    tabMovedOrRemoved = false;
 }
 
 void TabbedDocumentInterface::onTabMoved(int from, int to) {
     /*qDebug() << "Move from tab" << from << "to tab" << to; */
-    tabMovedOrRemoved = true;
     std::swap(files[from], files[to]);
 }
 
@@ -560,18 +483,9 @@ void TabbedDocumentInterface::onCloseFile(int index) {
 
     Q_ASSERT(count() > 0);
     if (maybeSave(index)) {
-        if (auto *doc = getDocAt(index)) {
-            disconnect(doc, &QTextDocument::modificationChanged,
-                       this, &TabbedDocumentInterface::onModificationChanged);
-            lastRemovedDoc = doc;
-        }
-        if ((index < getCurIndex()) && (count() > 1)) {
-            saveFileData(getCurIndex());
-            tabMovedOrRemoved = true;
-        }
         files.remove(index);
         /*qDebug() << "Close tab" << index; */
-        ui->tabBar->removeTab(index);
+        ui->tabWidget->removeTab(index);
     }
 }
 
@@ -593,25 +507,45 @@ void TabbedDocumentInterface::onCurTextChanged() {
 
 void TabbedDocumentInterface::onCurTextChangingDone() {
     /*qDebug() << "TabbedDocumentInterface::onCurTextChangingDone"; */
-    if (const auto *curFile = getCurFile(); curFile &&
-        curFile->data.canConvert<TextFileData>()) {
-        auto data = qvariant_cast<TextFileData>(getCurFile()->data);
-        if (auto *highlighter = data.highlighter) {
+    if (getCodeEditor()) {
+        auto *highlighter = getCodeEditor()->getCurHighlighter();
+        if (highlighter) {
             highlighter->checkProblems();
             highlighter->onDocChanged();
-            ui->codeEditor->updateErrorSelections();
+            getCodeEditor()->updateErrorSelections();
         }
     }
 }
 
-void TabbedDocumentInterface::onCurFileChanged(const QString &path) {
-    ui->codeEditor->setFilePath(path);
-    if (path.isEmpty())
-        return;
+QString TabbedDocumentInterface::readTextFile(const QString &path, bool &ok) {
+    QFile   file(path);
+    QString content;
 
-    if (getCurFile()->data.canConvert<TextFileData>()) {
-        auto data = qvariant_cast<TextFileData>(getCurFile()->data);
-        ui->codeEditor->setCurHighlighter(
-            (!hasNoFile()) ? data.highlighter : nullptr);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::information(this, tr("Loading text file error"),
+                                 tr("Cannot read file %1:\n%2.")
+                                 .arg(QDir::toNativeSeparators(path),
+                                      file.errorString()));
+        ok = false;
+    } else {
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
+
+#ifndef QT_NO_CURSOR
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
+        while (!in.atEnd()) {
+            content += in.readLine();
+            if (!in.atEnd())
+                content += '\n';
+        }
+        ok = true;
+
+#ifndef QT_NO_CURSOR
+        QApplication::restoreOverrideCursor();
+#endif
     }
+    file.close();
+    return content;
 }

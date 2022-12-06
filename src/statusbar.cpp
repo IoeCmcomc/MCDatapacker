@@ -72,7 +72,18 @@ void StatusBar::onCurFileChanged() {
     }
 }
 
+void StatusBar::updateStatusFrom(QWidget *widget) {
+    if (auto *editor = qobject_cast<CodeEditor *>(widget)) {
+        updateCodeEditorStatus(editor);
+    } else if (auto *viewer = qobject_cast<ImgViewer *>(widget)) {
+        updateImgViewerStatus(viewer);
+    }
+}
+
 void StatusBar::updateCodeEditorStatus(CodeEditor *editor) {
+    if (!editor)
+        return;
+
     Q_ASSERT(m_editorLabels.size() == 3);
     if (m_tabbedInterface->getCurFile() &&
         m_tabbedInterface->getCurFile()->fileType >= CodeFile::Text) {
@@ -87,6 +98,9 @@ void StatusBar::updateCodeEditorStatus(CodeEditor *editor) {
 }
 
 void StatusBar::updateImgViewerStatus(ImgViewer *viewer) {
+    if (!viewer)
+        return;
+
     if (m_tabbedInterface->getCurFile() &&
         m_tabbedInterface->getCurFile()->fileType == CodeFile::Image) {
         const auto &&img = viewer->getImage();

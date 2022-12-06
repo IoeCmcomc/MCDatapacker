@@ -24,7 +24,7 @@ ImgViewer::ImgViewer(QWidget *parent) :
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_R), this),
             &QShortcut::activated, this, [this]() {
-        loadData(toData());
+        setImage(m_image);
     });
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, [this]() {
         emit updateStatusBarRequest(this);
@@ -39,17 +39,6 @@ ImgViewer::ImgViewer(QWidget *parent) :
         updateScene({ m_scene->sceneRect() });
     });
     m_timer.start();
-}
-
-ImageFileData ImgViewer::fromFile(const QString &strFilePath,
-                                  QString &strError) {
-    ImageFileData data;
-
-    data.image.load(strFilePath);
-    if (data.image.isNull()) {
-        strError = QObject::tr("Cannot load image: %1.").arg(strFilePath);
-    }
-    return data;
 }
 
 bool ImgViewer::setImage(const QImage &image) {
@@ -201,33 +190,18 @@ bool ImgViewer::saveViewToDisk(QString &strError) {
     return true;
 }
 
+bool ImgViewer::setImage(const QString &path) {
+    QImage image(path);
+
+    if (image.isNull()) {
+        return false;
+    } else {
+        return setImage(image);
+    }
+}
+
 QImage ImgViewer::getImage() const {
     return m_image;
-}
-
-void ImgViewer::loadData(const ImageFileData &data) {
-    setImage(data.image);
-
-    const auto &tform = data.transform;
-    if (!tform.isIdentity())
-        setTransform(tform);
-
-    QTimer::singleShot(0, this, [data, this]() {
-        if (data.offsetX >= 0)
-            horizontalScrollBar()->setValue(data.offsetX);
-        if (data.offsetY >= 0)
-            verticalScrollBar()->setValue(data.offsetY);
-    });
-}
-
-ImageFileData ImgViewer::toData() const {
-    ImageFileData ret{ transform(), m_image };
-
-    if (horizontalScrollBar()->maximum() > 0)
-        ret.offsetX = horizontalScrollBar()->value();
-    if (verticalScrollBar()->maximum() > 0)
-        ret.offsetY = verticalScrollBar()->value();
-    return ret;
 }
 
 /* preserve fitWindow state on window resize */

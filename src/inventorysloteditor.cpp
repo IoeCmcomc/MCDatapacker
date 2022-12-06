@@ -4,11 +4,11 @@
 #include "inventoryslot.h"
 #include "blockitemselectordialog.h"
 #include "tagselectordialog.h"
-#include "mainwindow.h"
 #include "globalhelpers.h"
 
 #include <QMenu>
 #include <QScreen>
+#include <QMouseEvent>
 
 InventorySlotEditor::InventorySlotEditor(InventorySlot *parent) :
     QFrame(parent),
@@ -24,15 +24,13 @@ InventorySlotEditor::InventorySlotEditor(InventorySlot *parent) :
         auto *newBtnMenu = new QMenu(ui->newButton);
         newBtnMenu->addAction(tr("Item..."), this,
                               &InventorySlotEditor::onNewItem);
-        newBtnMenu->addAction(tr("Item tag..."),
-                              this,
+        newBtnMenu->addAction(tr("Item tag..."), this,
                               &InventorySlotEditor::onNewItemTag);
         ui->newButton->setMenu(newBtnMenu);
     } else {
         ui->newButton->setText(tr("New item..."));
         auto connection = connect(ui->newButton,
-                                  &QPushButton::clicked,
-                                  this,
+                                  &QPushButton::clicked, this,
                                   &InventorySlotEditor::onNewItem);
     }
 

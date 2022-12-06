@@ -8,7 +8,6 @@
 #include "disclaimerdialog.h"
 #include "tabbeddocumentinterface.h"
 #include "parsers/command/minecraftparser.h"
-#include "imgviewer.h"
 #include "visualrecipeeditordock.h"
 #include "loottableeditordock.h"
 #include "predicatedock.h"
@@ -64,15 +63,12 @@ MainWindow::MainWindow(QWidget *parent)
             ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
     connect(this, &MainWindow::gameVersionChanged, ui->tabbedInterface,
             &TabbedDocumentInterface::onGameVersionChanged);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &CodeEditor::updateStatusBarRequest,
-            m_statusBar, &StatusBar::updateCodeEditorStatus);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &CodeEditor::showMessageRequest,
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::updateStatusBarRequest,
+            m_statusBar, &StatusBar::updateStatusFrom);
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::showMessageRequest,
             m_statusBar, &StatusBar::showMessage);
-    connect(ui->tabbedInterface->getImgViewer(),
-            &ImgViewer::updateStatusBarRequest,
-            m_statusBar, &StatusBar::updateImgViewerStatus);
 
     #ifndef QT_NO_SESSIONMANAGER
     QGuiApplication::setFallbackSessionManagementEnabled(false);
@@ -173,14 +169,9 @@ void MainWindow::initMenu() {
     });
 
     /* Menu items status update connections */
-    connect(ui->tabbedInterface->getStackedWidget(),
-            &QStackedWidget::currentChanged, this, &MainWindow::updateEditMenu);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &QPlainTextEdit::copyAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &QPlainTextEdit::undoAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &QPlainTextEdit::redoAvailable, this, &MainWindow::updateEditMenu);
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::updateEditMenuRequest, this,
+            &MainWindow::updateEditMenu);
     connect(qApp->clipboard(), &QClipboard::changed, this,
             &MainWindow::updateEditMenu);
     ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
@@ -211,7 +202,7 @@ bool MainWindow::save() {
         return false;
 
     if (auto *curFile = ui->tabbedInterface->getCurFile();
-        curFile->fileInfo.fileName().isEmpty()) {
+        curFile->name().isEmpty()) {
         QString filepath
             = QFileDialog::getSaveFileName(this, tr("Save File"), QString());
         if (!filepath.isEmpty())
@@ -335,6 +326,7 @@ void MainWindow::onCurFileChanged(const QString &path) {
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
     if (itemModifierDock)
         itemModifierDock->setVisible(curFileType == CodeFile::ItemModifier);
+    updateEditMenu();
     m_statusBar->onCurFileChanged();
 }
 
@@ -428,7 +420,8 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
         }
     }
     settings.endGroup();
-    ui->tabbedInterface->getCodeEditor()->readPrefSettings();
+    //emit settingsChanged();
+    emit ui->tabbedInterface->settingsChanged();
 }
 
 void MainWindow::writeSettings() {
@@ -683,18 +676,14 @@ void MainWindow::updateRecentFolders() {
 }
 
 void MainWindow::updateEditMenu() {
-    if (ui->tabbedInterface->getStackedWidget()->currentIndex() == 1) {
-        ui->actionUndo->setEnabled(
-            ui->tabbedInterface->getCodeEditor()->getCanUndo());
-        ui->actionRedo->setEnabled(
-            ui->tabbedInterface->getCodeEditor()->getCanRedo());
+    if (auto *editor = ui->tabbedInterface->getCodeEditor()) {
+        ui->actionUndo->setEnabled(editor->getCanUndo());
+        ui->actionRedo->setEnabled(editor->getCanRedo());
         ui->actionSelectAll->setEnabled(true);
-        const bool hasSelection =
-            ui->tabbedInterface->getCodeEditor()->textCursor().hasSelection();
+        const bool hasSelection = editor->textCursor().hasSelection();
         ui->actionCut->setEnabled(hasSelection);
         ui->actionCopy->setEnabled(hasSelection);
-        ui->actionPaste->setEnabled(
-            ui->tabbedInterface->getCodeEditor()->canPaste());
+        ui->actionPaste->setEnabled(editor->canPaste());
     } else {
         ui->actionUndo->setEnabled(false);
         ui->actionRedo->setEnabled(false);
@@ -890,6 +879,9 @@ void MainWindow::setCodeEditorText(const QString &text) {
     if (ui->tabbedInterface->hasNoFile())
         return;
 
+    if (!ui->tabbedInterface->getCodeEditor())
+        return;
+
     /*ui->codeEditor->setPlainText(text); */
     QTextCursor cursor = ui->tabbedInterface->getCodeEditor()->textCursor();
 
@@ -902,7 +894,7 @@ void MainWindow::setCodeEditorText(const QString &text) {
 
 QString MainWindow::getCodeEditorText() {
     if (auto *doc = ui->tabbedInterface->getCurDoc())
-        return ui->tabbedInterface->getCurDoc()->toPlainText();
+        return doc->toPlainText();
     else
         return QString();
 }

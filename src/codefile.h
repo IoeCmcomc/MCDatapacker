@@ -1,8 +1,6 @@
 #ifndef CODEFILE_H
 #define CODEFILE_H
 
-#include "highlighter.h"
-
 #include <QFileInfo>
 #include <QDebug>
 
@@ -29,11 +27,11 @@ struct CodeFile {
         ConfiguredFeature, /* 1.16.2+ */
         SurfaceBuilder,    /* 1.16.2 - 1.17 */
         StructureFeature,  /* 1.16.2 - 1.18.2, renamed to Structure (1.19+) */
-        Noise, // 1.18+
+        Noise,             // 1.18+
         NoiseSettings,     /* 1.16.2+ */
-        PlacedFeature, // 1.18+
+        PlacedFeature,     // 1.18+
         ProcessorList,     /* 1.16.2+ */
-        StructureSet, // 1.18.2+
+        StructureSet,      // 1.18.2+
         TemplatePool,      /* 1.16.2+ */
         /*WorldPreset, // 1.19+ */
         WorldGen_end,
@@ -46,16 +44,21 @@ struct CodeFile {
     };
 
     QVariant  data;
-    QFileInfo fileInfo;
-    QString   title;
+    QFileInfo info;
     FileType  fileType   = Unknown;
     bool      isModified = false;
 
     CodeFile(const QString &path);
 
     inline bool isVaild() const {
-        return (!fileInfo.filePath().isEmpty()) && data.isValid();
-    };
+        return (!info.filePath().isEmpty()) && data.isValid();
+    }
+    inline QString name() const {
+        return info.fileName();
+    }
+    inline QString path() const {
+        return info.filePath();
+    }
     void changePath(const QString &path);
 };
 

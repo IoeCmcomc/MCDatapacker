@@ -1,8 +1,7 @@
 #include "codeeditor.h"
 
 #include "codegutter.h"
-#include "datapacktreeview.h"
-#include "mainwindow.h"
+#include "highlighter.h"
 #include "globalhelpers.h"
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
@@ -11,14 +10,13 @@
 #include "game.h"
 
 #include <QPainter>
-#include <QFileInfo>
 #include <QMimeData>
 #include <QFont>
 #include <QJsonDocument>
 #include <QShortcut>
 #include <QToolTip>
 #include <QTextDocumentFragment>
-#include <QGuiApplication>
+#include <QApplication>
 #include <QTimer>
 #include <QPlainTextDocumentLayout>
 #include <QScroller>
@@ -26,14 +24,9 @@
 #include <QCompleter>
 #include <QStringListModel>
 #include <QElapsedTimer>
+#include <QAbstractItemView>
+#include <QMenu>
 
-
-TextFileData::TextFileData(QTextDocument *doc, CodeFile *parent) {
-    this->parent = parent;
-    this->doc    = doc;
-    doc->setDocumentLayout(new QPlainTextDocumentLayout(doc));
-    this->textCursor = QTextCursor(doc);
-}
 
 QStringList getMinecraftInfoKeys(const QString &key) {
 //    QElapsedTimer timer;
@@ -114,6 +107,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     m_gutter = new CodeGutter(this);
     setAttribute(Qt::WA_Hover);
     setVerticalScrollBar(new StripedScrollBar(Qt::Vertical, this));
+    readPrefSettings();
 
     connect(this, &CodeEditor::blockCountChanged,
             this, &CodeEditor::updateGutterWidth);
@@ -164,25 +158,18 @@ void CodeEditor::readPrefSettings() {
         completer->setCaseSensitivity(Qt::CaseInsensitive);
         completer->setWrapAround(false);
         setCompleter(completer);
-
-
-/*
-          qDebug() << minecraftCompletionInfo.size() <<
-              m_completer->model()->rowCount() <<
-              m_completer->completionModel()->rowCount();
- */
     }
 
-    settings.beginGroup("editor");
+    m_settings.beginGroup("editor");
 
-    if (settings.contains("textFont")) {
-        monoFont = qvariant_cast<QFont>(settings.value("textFont"));
+    if (m_settings.contains("textFont")) {
+        monoFont = qvariant_cast<QFont>(m_settings.value("textFont"));
     } else {
         monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     }
     monoFont.setStyleHint(QFont::Monospace);
     monoFont.setFixedPitch(true);
-    monoFont.setPointSize(settings.value("textSize", 13).toInt());
+    monoFont.setPointSize(m_settings.value("textSize", 13).toInt());
 
     setFont(monoFont);
 
@@ -192,19 +179,19 @@ void CodeEditor::readPrefSettings() {
     if (m_gutter)
         m_gutter->setFont(font());
 
-    setLineWrapMode(settings.value("wrap", false).toBool()
+    setLineWrapMode(m_settings.value("wrap", false).toBool()
                         ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
     setTabStopDistance(fontMetrics().horizontalAdvance(
-                           QString(' ').repeated(settings.value("tabSize",
-                                                                4).toInt())));
+                           QString(' ').repeated(m_settings.value("tabSize",
+                                                                  4).toInt())));
 
     QTextOption &&option = document()->defaultTextOption();
     using Flag = QTextOption::Flag;
-    option.setFlags(settings.value("showSpacesAndTabs", false).toBool()
+    option.setFlags(m_settings.value("showSpacesAndTabs", false).toBool()
                         ? (option.flags() | Flag::ShowTabsAndSpaces)
                         : option.flags() & ~Flag::ShowTabsAndSpaces);
     document()->setDefaultTextOption(option);
-    settings.endGroup();
+    m_settings.endGroup();
 }
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
@@ -238,7 +225,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e) {
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
     QPlainTextEdit::mousePressEvent(e);
 
-    if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier
         || e->modifiers() & Qt::ControlModifier) {
         followNamespacedId(e);
     }
@@ -309,12 +296,12 @@ void CodeEditor::indentOnNewLine(QKeyEvent *e) {
 }
 
 void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
-    if (settings.value(QStringLiteral("editor/insertTabAsSpaces"), true)
+    if (m_settings.value(QStringLiteral("editor/insertTabAsSpaces"), true)
         .toBool()) {
         /* Handle Tab and Backtab keys */
 
         const int tabSize =
-            settings.value(QStringLiteral("editor/tabSize"), 4).toInt();
+            m_settings.value(QStringLiteral("editor/tabSize"), 4).toInt();
         auto cursor = textCursor();
         if (e->key() == Qt::Key_Tab) {
             cursor.insertText(QString(' ').repeated(tabSize));
@@ -400,7 +387,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
             completionInfo.removeDuplicates();
             completionInfo.sort(Qt::CaseInsensitive);
             if (auto *model =
-                    qobject_cast<QStringListModel*>(m_completer->model())) {
+                    qobject_cast<QStringListModel *>(m_completer->model())) {
                 model->setStringList(completionInfo);
             }
             qDebug() << minecraftCompletionInfo.size() <<
@@ -494,7 +481,7 @@ bool CodeEditor::event(QEvent *event) {
         /*QToolTip::hideText(); */
         /*qDebug() << "QEvent::ToolTip"; */
 
-        auto *helpEvent = static_cast<QHelpEvent*>(event);
+        auto *helpEvent = static_cast<QHelpEvent *>(event);
         auto  globalPos = mapToGlobal(helpEvent->pos());
         auto  pos       = helpEvent->pos();
         bool  done      = false;
@@ -594,20 +581,20 @@ void CodeEditor::setFilePath(const QString &path) {
     auto *doc = document();
 
     doc->setDefaultFont(font());
-    settings.beginGroup("editor");
+    m_settings.beginGroup("editor");
     /* The tab stop distance must be reset each time the current document is changed */
-    if (settings.value("insertTabAsSpaces", true).toBool()) {
+    if (m_settings.value("insertTabAsSpaces", true).toBool()) {
         setTabStopDistance(fontMetrics().horizontalAdvance(
-                               QString(' ').repeated(settings.value("tabSize",
-                                                                    4).toInt())));
+                               QString(' ').repeated(m_settings.value("tabSize",
+                                                                      4).toInt())));
     }
     QTextOption &&option = doc->defaultTextOption();
     using Flag = QTextOption::Flag;
-    option.setFlags(settings.value("showSpacesAndTabs", false).toBool()
+    option.setFlags(m_settings.value("showSpacesAndTabs", false).toBool()
                             ? (option.flags() | Flag::ShowTabsAndSpaces)
                             : option.flags() & ~Flag::ShowTabsAndSpaces);
     doc->setDefaultTextOption(option);
-    settings.endGroup();
+    m_settings.endGroup();
 }
 
 void CodeEditor::updateGutterWidth(int /* newBlockCount */) {
@@ -739,6 +726,10 @@ void CodeEditor::insertCompletion(const QString &completion) {
     setTextCursor(tc);
 }
 
+Highlighter * CodeEditor::getCurHighlighter() const {
+    return curHighlighter;
+}
+
 bool CodeEditor::getCanRedo() const {
     return canRedo;
 }
@@ -764,7 +755,7 @@ void CodeEditor::setCompleter(QCompleter *c) {
                      this, &CodeEditor::insertCompletion);
 }
 
-QCompleter *CodeEditor::completer() const {
+QCompleter * CodeEditor::completer() const {
     return m_completer;
 }
 
@@ -785,7 +776,7 @@ void CodeEditor::displayErrors() {
 
         setExtraSelections(selections);
         if (auto *scrollbar =
-                qobject_cast<StripedScrollBar*>(verticalScrollBar())) {
+                qobject_cast<StripedScrollBar *>(verticalScrollBar())) {
             scrollbar->redrawStripes();
             scrollbar->update();
         }
@@ -842,7 +833,7 @@ void CodeEditor::matchParentheses() {
     if (!data || !curHighlighter)
         return;
 
-    QVector<BracketInfo*> && infos = data->brackets();
+    QVector<BracketInfo *> && infos = data->brackets();
 
     int pos = textCursor().block().position();
 

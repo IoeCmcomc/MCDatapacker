@@ -13,20 +13,7 @@ class QCompleter;
 QT_END_NAMESPACE
 
 class CodeGutter;
-
-struct TextFileData {
-    CodeFile               *parent      = nullptr;
-    QPointer<QTextDocument> doc         = new QTextDocument();
-    QTextCursor             textCursor  = QTextCursor(doc);
-    Highlighter            *highlighter = nullptr;
-
-    TextFileData(QTextDocument * doc, CodeFile * parent = nullptr);
-    TextFileData()                     = default;
-    TextFileData(const TextFileData &) = default;
-    ~TextFileData()                    = default;
-};
-
-Q_DECLARE_METATYPE(TextFileData)
+class Highlighter;
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -36,6 +23,8 @@ public:
     CodeEditor(QWidget *parent = nullptr);
 
     void setFilePath(const QString &path);
+
+    Highlighter * getCurHighlighter() const;
     void setCurHighlighter(Highlighter *value);
 
     void displayErrors();
@@ -49,7 +38,6 @@ public:
 
     void setCompleter(QCompleter *c);
     QCompleter * completer() const;
-
 
 signals:
     void openFileRequest(const QString &filepath);
@@ -85,12 +73,12 @@ private:
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
-    QSettings settings;
+    QSettings m_settings;
     QStringList minecraftCompletionInfo;
     CodeGutter *m_gutter;
     QCompleter *m_completer = nullptr;
     QString filepath;
-    Highlighter *curHighlighter;
+    Highlighter *curHighlighter = nullptr;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;
     CodeFile::FileType curFileType = CodeFile::Text;

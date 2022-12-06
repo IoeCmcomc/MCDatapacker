@@ -2,10 +2,10 @@
 
 #include "codegutter.h"
 #include "codeeditor.h"
+#include "highlighter.h"
 
 #include <QPainter>
 #include <QSvgRenderer>
-
 
 ProblemArea::ProblemArea(CodeGutter *parent)
     : QWidget(parent), m_gutter(parent) {

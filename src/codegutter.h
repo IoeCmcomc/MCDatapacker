@@ -4,6 +4,7 @@
 #include "codeeditor.h"
 
 #include <QWidget>
+#include <QTextBlock>
 
 class CodeEditor;
 class LineNumberArea;
@@ -15,7 +16,7 @@ class CodeGutter : public QWidget
 public:
     explicit CodeGutter(CodeEditor *parent = nullptr);
 
-    CodeEditor *editor() const;
+    CodeEditor * editor() const;
 
     void updateChildrenGeometries();
 

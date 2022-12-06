@@ -46,7 +46,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    void changeEvent(QEvent* event) override;
+    void changeEvent(QEvent *event) override;
 
 signals:
     void curFileChanged(const QString &filepath);
@@ -98,7 +98,7 @@ private:
     PredicateDock *predicateDock                   = nullptr;
     ItemModifierDock *itemModifierDock             = nullptr;
     QLocale curLocale;
-    QVector<QAction*> recentFoldersActions;
+    QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
     const int maxRecentFoldersActions = 10;
 

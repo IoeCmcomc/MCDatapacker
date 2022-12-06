@@ -113,7 +113,7 @@ void FileSwitcher::initFileList() {
     }
 
     for (const auto &file: *files) {
-        const QFileInfo  finfo(file.fileInfo);
+        const QFileInfo  finfo(file.info);
         QListWidgetItem *fileItem = new QListWidgetItem(this);
         fileItem->setText
             (QDir::current().relativeFilePath(finfo.filePath()));
