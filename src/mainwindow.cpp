@@ -61,8 +61,6 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
             ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
-    connect(this, &MainWindow::gameVersionChanged, ui->tabbedInterface,
-            &TabbedDocumentInterface::onGameVersionChanged);
     connect(ui->tabbedInterface,
             &TabbedDocumentInterface::updateStatusBarRequest,
             m_statusBar, &StatusBar::updateStatusFrom);
@@ -409,11 +407,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
         } else {
             settings.setValue(QStringLiteral("gameVersion"), gameVer); // Set value explicitly
             tempGameVerStr = gameVer;
-            Command::MinecraftParser::setSchema(
-                QStringLiteral(":/minecraft/") + gameVer +
-                QStringLiteral("/summary/commands/data.min.json"));
-            Command::MinecraftParser::limitScoreboardObjectiveLength
-                = Game::version() < Game::v1_18;
+            Command::MinecraftParser::setGameVer(Game::version());
 
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);

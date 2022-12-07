@@ -27,8 +27,7 @@ TextNodeFormatter::~TextNodeFormatter() {
 }
 
 void TextNodeFormatter::initTestCase() {
-    MinecraftParser::setSchema(
-        ":/minecraft/1.15/summary/commands/data.min.json");
+    MinecraftParser::setGameVer(QVersionNumber(1, 15));
 }
 
 void TextNodeFormatter::cleanupTestCase() {
@@ -47,17 +46,17 @@ void TextNodeFormatter::test_case1() {
 
     qDebug() << *result;
 
-    auto *root = static_cast<RootNode*>(result.get());
+    auto *root = static_cast<RootNode *>(result.get());
 
     Q_ASSERT(root);
     qDebug() << *root;
 
-    auto *execute = static_cast<LiteralNode*>((*root)[0].get());
+    auto *execute = static_cast<LiteralNode *>((*root)[0].get());
 
     Q_ASSERT(execute);
     qDebug() << *execute;
 
-    auto *player = dynamic_cast<ComponentNode*>((*root)[2].get());
+    auto *player = dynamic_cast<ComponentNode *>((*root)[2].get());
 
     if (player) {
         qDebug() << *player;

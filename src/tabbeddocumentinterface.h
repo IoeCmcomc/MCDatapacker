@@ -44,7 +44,6 @@ public /*slots*/ :
     bool saveAllFile();
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);
-    void onGameVersionChanged(const QString &ver);
     void undo();
     void redo();
     void selectAll();

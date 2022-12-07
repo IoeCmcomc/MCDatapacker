@@ -1045,7 +1045,7 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
 
                     QGenericReturnArgument
                         returnArgument(typeName,
-                                       const_cast<void*>(returnVari.constData()));
+                                       const_cast<void *>(returnVari.constData()));
                     bool invoked = method.invoke(this, returnArgument,
                                                  Q_ARG(QVariantMap, props));
                     /*qDebug() << invoked << returnVari; */

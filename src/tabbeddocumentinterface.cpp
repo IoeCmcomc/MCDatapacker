@@ -393,14 +393,6 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
     }
 }
 
-void TabbedDocumentInterface::onGameVersionChanged(const QString &ver) {
-    Command::MinecraftParser::setSchema(
-        QStringLiteral(":/minecraft/") + ver +
-        QStringLiteral("/summary/commands/data.min.json"));
-    Command::MinecraftParser::limitScoreboardObjectiveLength
-        = Game::version() < Game::v1_18;
-}
-
 void TabbedDocumentInterface::undo() {
     if (auto *editor = getCodeEditor()) {
         editor->undo();

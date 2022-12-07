@@ -3,10 +3,10 @@
 
 #include "../../../../../src/parsers/command/minecraftparser.h"
 
-#define QBENCHMARK    if (true)
+#define QBENCHMARK          if (true)
 
 #define DECLARE_TAG_VARS    int i = 0; int c = 0; QString cat;
-#define SET_TAG(x)    i           = 0; cat =#x;
+#define SET_TAG(x)    i = 0; cat =#x;
 #define GEN_TAG             genTag(cat, i, c)
 
 using namespace Command;
@@ -48,8 +48,7 @@ TestMinecraftParser::~TestMinecraftParser() {
 }
 
 void TestMinecraftParser::initTestCase() {
-    Command::MinecraftParser::setSchema(
-        ":/minecraft/1.18.2/summary/commands/data.min.json");
+    Command::MinecraftParser::setGameVer(QVersionNumber(1, 18, 2));
     Command::MinecraftParser::setTestMode(true);
     /*
        for (int i = 1024; i < 2000; ++i) {
@@ -330,7 +329,8 @@ void TestMinecraftParser::commands_data() {
         "RootNode[6](LiteralNode(particle), ParticleNode(minecraft:dust, params: (ParticleColorNode(FloatNode(0.5), FloatNode(0.2), FloatNode(0.8)), FloatNode(1))), Vec3Node(x: AxisNode(~0), y: AxisNode(~0), z: AxisNode(~0)), Vec3Node(x: AxisNode(0), y: AxisNode(0), z: AxisNode(0)), FloatNode(1), IntegerNode(1))";
     QTest::newRow(GEN_TAG) << "particle minecraft:explosion_emitter ~10 ~ ~" <<
         "RootNode[3](LiteralNode(particle), ParticleNode(minecraft:explosion_emitter), Vec3Node(x: AxisNode(~10), y: AxisNode(~0), z: AxisNode(~0)))";
-    QTest::newRow(GEN_TAG) << "particle dust_color_transition 1.0 0.0 0.0 1.0 0.0 0.0 1.0" <<
+    QTest::newRow(GEN_TAG) <<
+    "particle dust_color_transition 1.0 0.0 0.0 1.0 0.0 0.0 1.0" <<
         "RootNode[2](LiteralNode(particle), ParticleNode(minecraft:dust_color_transition, params: (ParticleColorNode(FloatNode(1), FloatNode(0), FloatNode(0)), FloatNode(1), ParticleColorNode(FloatNode(0), FloatNode(0), FloatNode(1)))))";
 
     SET_TAG(playsound)
