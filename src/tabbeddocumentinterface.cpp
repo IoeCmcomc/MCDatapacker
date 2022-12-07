@@ -214,7 +214,7 @@ void TabbedDocumentInterface::addFile(const QString &path) {
         }
 
         codeEditor->setPlainText(text);
-        codeEditor->setFilePath(newFile.path());
+        codeEditor->setFileType(newFile.fileType);
 
         if (auto *highlighter = codeEditor->getCurHighlighter()) {
             highlighter->checkProblems();

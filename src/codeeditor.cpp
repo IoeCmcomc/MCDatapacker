@@ -127,8 +127,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Slash), this),
             &QShortcut::activated, this, &CodeEditor::toggleComment);
 
-    /*readPrefSettings(); */
-
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
     bracketSeclectFmt.setBackground(QColor(102, 227, 102, 170));
@@ -148,30 +146,44 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     onCursorPositionChanged();
 }
 
-void CodeEditor::readPrefSettings() {
-    {
-        auto *completer = new QCompleter(this);
+void CodeEditor::setFileType(CodeFile::FileType type) {
+    m_fileType = type;
+
+    initCompleter();
+}
+
+void CodeEditor::initCompleter() {
+    auto *completer = new QCompleter(this);
+
+    if (m_fileType == CodeFile::Function) {
         minecraftCompletionInfo = loadMinecraftCompletionInfo();
-        completer->setModel(new QStringListModel(minecraftCompletionInfo,
-                                                 this));
-        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-        completer->setCaseSensitivity(Qt::CaseInsensitive);
-        completer->setWrapAround(false);
-        setCompleter(completer);
     }
+    completer->setModel(new QStringListModel(minecraftCompletionInfo,
+                                             this));
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    setCompleter(completer);
+}
 
-    m_settings.beginGroup("editor");
+void CodeEditor::readPrefSettings() {
+    QSettings settings;
 
-    if (m_settings.contains("textFont")) {
-        monoFont = qvariant_cast<QFont>(m_settings.value("textFont"));
+    settings.beginGroup("editor");
+
+    QFont monoFont;
+    if (settings.contains("textFont")) {
+        monoFont = qvariant_cast<QFont>(settings.value("textFont"));
     } else {
         monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     }
     monoFont.setStyleHint(QFont::Monospace);
     monoFont.setFixedPitch(true);
-    monoFont.setPointSize(m_settings.value("textSize", 13).toInt());
+    monoFont.setPointSize(settings.value("textSize", 13).toInt());
 
     setFont(monoFont);
+    document()->setDefaultFont(monoFont);
+    m_fontSize = monoFont.pointSize();
 
     if (m_completer)
         m_completer->popup()->setFont(monoFont);
@@ -179,19 +191,20 @@ void CodeEditor::readPrefSettings() {
     if (m_gutter)
         m_gutter->setFont(font());
 
-    setLineWrapMode(m_settings.value("wrap", false).toBool()
+    setLineWrapMode(settings.value("wrap", false).toBool()
                         ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
-    setTabStopDistance(fontMetrics().horizontalAdvance(
-                           QString(' ').repeated(m_settings.value("tabSize",
-                                                                  4).toInt())));
+    m_tabSize = settings.value("tabSize", 4).toInt();
+    setTabStopDistance(fontMetrics().horizontalAdvance(QString(' ').repeated(
+                                                           m_tabSize)));
 
     QTextOption &&option = document()->defaultTextOption();
-    using Flag = QTextOption::Flag;
-    option.setFlags(m_settings.value("showSpacesAndTabs", false).toBool()
+    using Flag          = QTextOption::Flag;
+    m_insertTabAsSpaces = settings.value("showSpacesAndTabs", false).toBool();
+    option.setFlags(m_insertTabAsSpaces
                         ? (option.flags() | Flag::ShowTabsAndSpaces)
                         : option.flags() & ~Flag::ShowTabsAndSpaces);
     document()->setDefaultTextOption(option);
-    m_settings.endGroup();
+    settings.endGroup();
 }
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
@@ -204,7 +217,7 @@ void CodeEditor::wheelEvent(QWheelEvent *e) {
         if (m_gutter)
             m_gutter->setFont(font());
         emit showMessageRequest(tr("Zoom: %1%").arg(fontInfo().pointSize() * 100
-                                                    / monoFont.pointSize()),
+                                                    / m_fontSize),
                                 1500);
     } else {
         QPlainTextEdit::wheelEvent(e);
@@ -296,20 +309,17 @@ void CodeEditor::indentOnNewLine(QKeyEvent *e) {
 }
 
 void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
-    if (m_settings.value(QStringLiteral("editor/insertTabAsSpaces"), true)
-        .toBool()) {
+    if (m_insertTabAsSpaces) {
         /* Handle Tab and Backtab keys */
 
-        const int tabSize =
-            m_settings.value(QStringLiteral("editor/tabSize"), 4).toInt();
         auto cursor = textCursor();
         if (e->key() == Qt::Key_Tab) {
-            cursor.insertText(QString(' ').repeated(tabSize));
+            cursor.insertText(QString(' ').repeated(m_tabSize));
             setTextCursor(cursor);
         } else if (e->key() == Qt::Key_Backtab) {
             cursor.beginEditBlock();
             const QString &&line = cursor.block().text();
-            for (int i = tabSize; i > 0; --i) {
+            for (int i = m_tabSize; i > 0; --i) {
                 if (cursor.atBlockStart())
                     break;
                 const QChar &&curChar = line[cursor.positionInBlock() - 1];
@@ -451,11 +461,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     menu->addAction(sep1Action);
 
     QAction *formatAction = new QAction(tr("Format"), menu);
-    auto     dirpath      = QDir::currentPath();
-    auto     fileType     = Glhp::pathToFileType(dirpath, filepath);
 
-    formatAction->setDisabled(!((CodeFile::JsonText <= fileType) &&
-                                (fileType <= CodeFile::ItemTag)));
+    formatAction->setDisabled(!((CodeFile::JsonText <= m_fileType) &&
+                                (m_fileType <= CodeFile::JsonText_end)));
     if (formatAction->isEnabled()) {
         connect(formatAction, &QAction::triggered, [ = ]() {
             QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
@@ -574,27 +582,6 @@ void CodeEditor::highlightCurrentLine() {
         selections.append(selection);
     }
     setExtraSelections(selections);
-}
-
-void CodeEditor::setFilePath(const QString &path) {
-    filepath = path;
-    auto *doc = document();
-
-    doc->setDefaultFont(font());
-    m_settings.beginGroup("editor");
-    /* The tab stop distance must be reset each time the current document is changed */
-    if (m_settings.value("insertTabAsSpaces", true).toBool()) {
-        setTabStopDistance(fontMetrics().horizontalAdvance(
-                               QString(' ').repeated(m_settings.value("tabSize",
-                                                                      4).toInt())));
-    }
-    QTextOption &&option = doc->defaultTextOption();
-    using Flag = QTextOption::Flag;
-    option.setFlags(m_settings.value("showSpacesAndTabs", false).toBool()
-                            ? (option.flags() | Flag::ShowTabsAndSpaces)
-                            : option.flags() & ~Flag::ShowTabsAndSpaces);
-    doc->setDefaultTextOption(option);
-    m_settings.endGroup();
 }
 
 void CodeEditor::updateGutterWidth(int /* newBlockCount */) {
@@ -747,6 +734,7 @@ void CodeEditor::setCompleter(QCompleter *c) {
     if (!m_completer)
         return;
 
+    m_completer->popup()->setFont(font());
     m_completer->setWidget(this);
     m_completer->setCompletionMode(QCompleter::PopupCompletion);
     m_completer->setCaseSensitivity(Qt::CaseInsensitive);

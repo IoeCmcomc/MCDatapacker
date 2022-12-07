@@ -20,9 +20,9 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    CodeEditor(QWidget *parent = nullptr);
+    explicit CodeEditor(QWidget *parent = nullptr);
 
-    void setFilePath(const QString &path);
+    void setFileType(CodeFile::FileType type);
 
     Highlighter * getCurHighlighter() const;
     void setCurHighlighter(Highlighter *value);
@@ -69,21 +69,21 @@ private /*slots*/ :
     void insertCompletion(const QString &completion);
 
 private:
-    QFont monoFont;
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
-    QSettings m_settings;
     QStringList minecraftCompletionInfo;
     CodeGutter *m_gutter;
-    QCompleter *m_completer = nullptr;
-    QString filepath;
+    QCompleter *m_completer     = nullptr;
     Highlighter *curHighlighter = nullptr;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;
-    CodeFile::FileType curFileType = CodeFile::Text;
-    bool canUndo                   = false;
-    bool canRedo                   = false;
+    int m_fontSize                = 13;
+    int m_tabSize                 = 4;
+    CodeFile::FileType m_fileType = CodeFile::Text;
+    bool canUndo                  = false;
+    bool canRedo                  = false;
+    bool m_insertTabAsSpaces      = true;
 
     void highlightCurrentLine();
     void matchParentheses();
@@ -99,6 +99,7 @@ private:
     QString textUnderCursor() const;
     void handleKeyPressEvent(QKeyEvent *e);
     void indentOnNewLine(QKeyEvent *e);
+    void initCompleter();
 };
 
 
