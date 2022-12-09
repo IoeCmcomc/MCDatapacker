@@ -1,7 +1,6 @@
 #include "nbtnodes.h"
 
-static const int _NbtNode =
-    qRegisterMetaType<QSharedPointer<Command::NbtNode> >();
+static bool _ = TypeRegister<Command::NbtNode>::init();
 
 Command::NbtNode::NbtNode(int pos, int length, const QString &parserId)
     : Command::ArgumentNode(pos, length, parserId) {
@@ -16,19 +15,19 @@ void Command::NbtNode::accept(Command::NodeVisitor *visitor,
     visitor->visit(this);
 }
 
-#define DEFINE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)              \
-    static const int _ ## Class =                                        \
-        qRegisterMetaType<QSharedPointer<Command::Class> >();            \
-    Command::Class::Class(int pos, int length, ValueType value)          \
-        : Command::NbtNode(pos, length), tags::Tag(value) {              \
-    }                                                                    \
-    QString Command::Class::toString() const {                           \
-        return #Class + QString("(%1)").arg(QString::fromStdString(      \
-                                                std::to_string(*this))); \
-    }                                                                    \
-    nbt::tag_id Command::Class::id() const noexcept {                    \
-        return tags::Tag::id();                                          \
-    }
+#define DEFINE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)                  \
+        static const int _ ## Class =                                        \
+            qRegisterMetaType<QSharedPointer<Command::Class> >();            \
+        Command::Class::Class(int pos, int length, ValueType value)          \
+            : Command::NbtNode(pos, length), tags::Tag(value) {              \
+        }                                                                    \
+        QString Command::Class::toString() const {                           \
+            return #Class + QString("(%1)").arg(QString::fromStdString(      \
+                                                    std::to_string(*this))); \
+        }                                                                    \
+        nbt::tag_id Command::Class::id() const noexcept {                    \
+            return tags::Tag::id();                                          \
+        }
 
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtByteNode, byte_tag, char)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtDoubleNode, double_tag, double)
@@ -37,21 +36,21 @@ DEFINE_PRIMITIVE_TAG_NBTNODE(NbtIntNode, int_tag, int32_t)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtLongNode, long_tag, int64_t)
 DEFINE_PRIMITIVE_TAG_NBTNODE(NbtShortNode, short_tag, int16_t)
 
-#define DEFINE_ARRAY_NBTNODE(Class, TagId)                     \
-    static const int _ ## Class =                              \
-        qRegisterMetaType<QSharedPointer<Command::Class> >();  \
-    Command::Class::Class(int pos, int length)                 \
-        : Command::NbtNode(pos, length, "minecraft:nbt_tag") { \
-    }                                                          \
-    QString Command::Class::toString() const {                 \
-        QStringList items;                                     \
-        for (const auto &node: m_vector)                       \
-        items << node->toString();                             \
-        return #Class + QString("(%1)").arg(items.join(", ")); \
-    }                                                          \
-    nbt::tag_id Command::Class::id() const noexcept {          \
-        return nbt::tag_id::TagId;                             \
-    }
+#define DEFINE_ARRAY_NBTNODE(Class, TagId)                         \
+        static const int _ ## Class =                              \
+            qRegisterMetaType<QSharedPointer<Command::Class> >();  \
+        Command::Class::Class(int pos, int length)                 \
+            : Command::NbtNode(pos, length, "minecraft:nbt_tag") { \
+        }                                                          \
+        QString Command::Class::toString() const {                 \
+            QStringList items;                                     \
+            for (const auto &node: m_vector)                       \
+            items << node->toString();                             \
+            return #Class + QString("(%1)").arg(items.join(", ")); \
+        }                                                          \
+        nbt::tag_id Command::Class::id() const noexcept {          \
+            return nbt::tag_id::TagId;                             \
+        }
 
 DEFINE_ARRAY_NBTNODE(NbtByteArrayNode, tag_bytearray)
 DEFINE_ARRAY_NBTNODE(NbtIntArrayNode, tag_intarray)
@@ -127,8 +126,7 @@ void Command::NbtListNode::setPrefix(const nbt::tag_id &prefix) {
 }
 
 
-const static int _ =
-    qRegisterMetaType<QSharedPointer<Command::NbtCompoundNode> >();
+static bool _2 = TypeRegister<Command::NbtCompoundNode>::init();
 Command::NbtCompoundNode::NbtCompoundNode(int pos, int length)
     : Command::NbtNode(pos, length, "minecraft:nbt_compound_tag") {
 }

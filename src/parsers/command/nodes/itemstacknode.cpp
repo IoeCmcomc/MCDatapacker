@@ -1,7 +1,6 @@
 #include "itemstacknode.h"
 
-static const int _ItemStackNode =
-    qRegisterMetaType<QSharedPointer<Command::ItemStackNode> >();
+static bool _ = TypeRegister<Command::ItemStackNode>::init();
 
 Command::ItemStackNode::ItemStackNode(int pos, const QString &nspace,
                                       const QString &id)
@@ -39,8 +38,7 @@ void Command::ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
     m_nbt = nbt;
 }
 
-static const int _ItemPredicateNode =
-    qRegisterMetaType<QSharedPointer<Command::ItemPredicateNode> >();
+static bool _2 = TypeRegister<Command::ItemPredicateNode>::init();
 
 Command::ItemPredicateNode::ItemPredicateNode(int pos, const QString &nspace,
                                               const QString &id)

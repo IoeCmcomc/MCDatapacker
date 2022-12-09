@@ -1,6 +1,6 @@
 #include "floatrangenode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::FloatRangeNode> >();
+const static bool _ = TypeRegister<Command::FloatRangeNode>::init();
 
 Command::FloatRangeNode::FloatRangeNode(int pos, int length)
     : RangeNode(pos, length, "minecraft:float_range") {

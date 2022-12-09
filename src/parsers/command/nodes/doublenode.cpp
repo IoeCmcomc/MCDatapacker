@@ -1,6 +1,6 @@
 #include "doublenode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::DoubleNode> >();
+const static bool _ = TypeRegister<Command::DoubleNode>::init();
 
 Command::DoubleNode::DoubleNode(int pos, int length,
                                 double value)

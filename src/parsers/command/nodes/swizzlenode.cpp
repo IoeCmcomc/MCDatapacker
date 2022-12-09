@@ -1,6 +1,6 @@
 #include "swizzlenode.h"
 
-const static int _ = qRegisterMetaType<QSharedPointer<Command::SwizzleNode> >();
+const static bool _ = TypeRegister<Command::SwizzleNode>::init();
 
 Command::SwizzleNode::SwizzleNode(int pos, bool hasX,
                                   bool hasY, bool hasZ)

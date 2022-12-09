@@ -1,7 +1,6 @@
 #include "componentnode.h"
 
-static const int _ =
-    qRegisterMetaType<QSharedPointer<Command::ComponentNode> >();
+static bool _ = TypeRegister<Command::ComponentNode>::init();
 
 
 Command::ComponentNode::ComponentNode(int pos, int length)

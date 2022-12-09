@@ -50,8 +50,9 @@ TestMinecraftParser::~TestMinecraftParser() {
 void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setGameVer(QVersionNumber(1, 18, 2));
     Command::MinecraftParser::setTestMode(true);
-    /*
-       for (int i = 1024; i < 2000; ++i) {
+
+/*
+    for (int i = 1024; i < 2000; ++i) {
         QMetaType metatype(i);
         if (metatype.isRegistered()) {
             qDebug() << i << metatype.name() << metatype.isValid() <<
@@ -59,8 +60,9 @@ void TestMinecraftParser::initTestCase() {
         } else {
             break;
         }
-       }
-     */
+    }
+ */
+
 
     timer.start();
     /*QThread::sleep(5); */
@@ -330,7 +332,7 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) << "particle minecraft:explosion_emitter ~10 ~ ~" <<
         "RootNode[3](LiteralNode(particle), ParticleNode(minecraft:explosion_emitter), Vec3Node(x: AxisNode(~10), y: AxisNode(~0), z: AxisNode(~0)))";
     QTest::newRow(GEN_TAG) <<
-    "particle dust_color_transition 1.0 0.0 0.0 1.0 0.0 0.0 1.0" <<
+        "particle dust_color_transition 1.0 0.0 0.0 1.0 0.0 0.0 1.0" <<
         "RootNode[2](LiteralNode(particle), ParticleNode(minecraft:dust_color_transition, params: (ParticleColorNode(FloatNode(1), FloatNode(0), FloatNode(0)), FloatNode(1), ParticleColorNode(FloatNode(0), FloatNode(0), FloatNode(1)))))";
 
     SET_TAG(playsound)

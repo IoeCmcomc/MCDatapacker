@@ -1,6 +1,6 @@
 #include "literalnode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::LiteralNode> >();
+const static bool _ = TypeRegister<Command::LiteralNode>::init();
 
 Command::LiteralNode::LiteralNode(int pos, const QString &txt)
     : Command::ParseNode(pos, txt.length()) {

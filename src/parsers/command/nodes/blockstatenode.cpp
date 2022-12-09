@@ -1,9 +1,7 @@
 #include "blockstatenode.h"
 
-static const int _BlockStateNode =
-    qRegisterMetaType<QSharedPointer<Command::BlockStateNode> >();
-static const int _BlockPredicateNode =
-    qRegisterMetaType<QSharedPointer<Command::BlockPredicateNode> >();
+static bool _  = TypeRegister<Command::BlockStateNode>::init();
+static bool _2 = TypeRegister<Command::BlockPredicateNode>::init();
 
 
 Command::BlockStateNode::BlockStateNode(int pos, const QString &nspace,

@@ -55,8 +55,7 @@ void Command::ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
     m_r = r;
 }
 
-static const int _ParticleNode =
-    qRegisterMetaType<QSharedPointer<Command::ParticleNode> >();
+const static bool _ = TypeRegister<Command::ParticleNode>::init();
 
 Command::ParticleNode::ParticleNode(int pos, const QString &nspace,
                                     const QString &id)
@@ -100,8 +99,8 @@ Command::ParticleNode::ParamVector Command::ParticleNode::params() const {
     return m_params;
 }
 
-void Command::ParticleNode::setParams(std::initializer_list<QSharedPointer<ParseNode> > params)
-{
+void Command::ParticleNode::setParams(
+    std::initializer_list<QSharedPointer<ParseNode> > params) {
     for (const auto &param: params) {
         m_params << param;
     }

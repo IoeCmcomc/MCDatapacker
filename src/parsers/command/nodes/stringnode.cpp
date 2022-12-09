@@ -1,6 +1,6 @@
 #include "stringnode.h"
 
-const static int _ = qRegisterMetaType<QSharedPointer<Command::StringNode> >();
+const static bool _ = TypeRegister<Command::StringNode>::init();
 
 Command::StringNode::StringNode(int pos, const QString &value, bool isQuote)
     : Command::ArgumentNode(pos, value.length(), "brigadier:string") {

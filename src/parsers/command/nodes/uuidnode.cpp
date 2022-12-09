@@ -1,6 +1,6 @@
 #include "uuidnode.h"
 
-const static int _ = qRegisterMetaType<QSharedPointer<Command::UuidNode> >();
+const static bool _ = TypeRegister<Command::UuidNode>::init();
 
 Command::UuidNode::UuidNode(int pos, int length, const QString &uuidStr)
     : Command::ArgumentNode(pos, length, "minecraft:uuid"),

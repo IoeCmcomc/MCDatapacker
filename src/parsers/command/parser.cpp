@@ -894,26 +894,6 @@ QSharedPointer<Command::ParseNode> Command::Parser::parse() {
     return m_parsingResult;
 }
 
-/*!
- * \brief Try to cast a void pointer in \c vari to a QSharedPointer of ParseNode's subclass.
- */
-QSharedPointer<Command::ParseNode> Command::Parser::
-QVariantToParseNodeSharedPointer(
-    const QVariant &vari) {
-    unsigned short int typeId = vari.userType();
-
-    QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(ParseNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(RootNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ArgumentNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(BoolNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(DoubleNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(FloatNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(IntegerNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(StringNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(LiteralNode)
-    return nullptr;
-}
-
 bool Command::Parser::processCurSchemaNode(int depth,
                                            QJsonObject &curSchemaNode) {
     if (depth > 0) {
@@ -1048,10 +1028,11 @@ bool Command::Parser::parseResursively(QJsonObject curSchemaNode,
                                        const_cast<void *>(returnVari.constData()));
                     bool invoked = method.invoke(this, returnArgument,
                                                  Q_ARG(QVariantMap, props));
-                    /*qDebug() << invoked << returnVari; */
+//                    qDebug() << invoked << returnVari <<
+//                        returnVari.canConvert<QSharedPointer<ParseNode> >();
                     if (invoked) {
                         found = true;
-                        ret   = QVariantToParseNodeSharedPointer(returnVari);
+                        ret   = returnVari.value<QSharedPointer<ParseNode> >();
                         Q_ASSERT(ret != nullptr);
                         if ((literal.length() == ret->length()) &&
                             ret->isVaild())

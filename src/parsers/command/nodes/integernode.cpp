@@ -1,6 +1,6 @@
 #include "integernode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::IntegerNode> >();
+const static bool _ = TypeRegister<Command::IntegerNode>::init();
 
 Command::IntegerNode::IntegerNode(int pos, int length, int value)
     : Command::ArgumentNode(pos, length, "brigadier:integer") {

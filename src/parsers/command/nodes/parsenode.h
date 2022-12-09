@@ -32,4 +32,14 @@ QDebug operator<<(QDebug debug, const Command::ParseNode &node);
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::ParseNode>);
 
+template <typename T>
+struct TypeRegister {
+    static bool init() {
+        qRegisterMetaType<QSharedPointer<T> >();
+        QMetaType::registerConverter<QSharedPointer<T>,
+                                     QSharedPointer<Command::ParseNode> >();
+        return true;
+    };
+};
+
 #endif /* PARSENODE_H */

@@ -145,8 +145,7 @@ void Command::NbtPathStepNode::setHasTrailingDot(bool hasTrailingDot) {
     m_hasTrailingDot = hasTrailingDot;
 }
 
-static const int _NbtPathnode =
-    qRegisterMetaType<QSharedPointer<Command::NbtPathNode> >();
+const static bool _ = TypeRegister<Command::NbtPathNode>::init();
 
 Command::NbtPathNode::NbtPathNode(int pos)
     : Command::ArgumentNode(pos, -1, "minecraft:nbt_path") {

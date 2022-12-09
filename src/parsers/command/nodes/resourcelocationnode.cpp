@@ -1,7 +1,6 @@
 #include "resourcelocationnode.h"
 
-static int _ =
-    qRegisterMetaType<QSharedPointer<Command::ResourceLocationNode> >();
+const static bool _ = TypeRegister<Command::ResourceLocationNode>::init();
 
 Command::ResourceLocationNode::ResourceLocationNode(int pos,
                                                     const QString &nspace,

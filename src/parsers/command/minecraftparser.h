@@ -37,10 +37,6 @@ public:
 
         static void setGameVer(const QVersionNumber &newGameVer);
 
-protected:
-        QSharedPointer<ParseNode> QVariantToParseNodeSharedPointer(
-            const QVariant &vari);
-
 private:
         static inline QVersionNumber gameVer = QVersionNumber();
 

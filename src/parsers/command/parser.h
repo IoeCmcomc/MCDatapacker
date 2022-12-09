@@ -95,9 +95,6 @@ protected:
         bool parseResursively(QJsonObject curSchemaNode,
                               int depth = 0);
 
-        virtual QSharedPointer<ParseNode> QVariantToParseNodeSharedPointer(
-            const QVariant &vari);
-
         template<typename T>
         void checkMin(T value, T min) {
             if (value < min)
@@ -170,13 +167,5 @@ private:
         QChar m_curChar;
     };
 }
-
-#define QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(Type)               \
-    if (typeId == qMetaTypeId<QSharedPointer<Command::Type> >()) { \
-        return qSharedPointerCast<Command::ParseNode>(             \
-            vari.value<QSharedPointer<Command::Type> >());         \
-    }
-#define QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(Type) \
-    else QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(Type)
 
 #endif /* COMMANDPARSER_H */

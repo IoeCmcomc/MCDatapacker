@@ -1,16 +1,15 @@
 #include "similarresourcelocationnodes.h"
 
-#define DEFINE_TYPE_FROM_RESOURCELOCATIONNODE(Type, Id)                \
-    static const int _ ## Type =                                       \
-        qRegisterMetaType<QSharedPointer<Command::Type> >();           \
-    Command::Type::Type(int pos, const QString &nspace,                \
-                        const QString &id)                             \
-        : Command::ResourceLocationNode(pos, nspace, id) {             \
-        setParserId(Id);                                               \
-    }                                                                  \
-    QString Command::Type::toString() const {                          \
-        return ResourceLocationNode::toString().replace(0, 20, #Type); \
-    }
+#define DEFINE_TYPE_FROM_RESOURCELOCATIONNODE(Type, Id)                    \
+        const static bool _ ## Type = TypeRegister<Command::Type>::init(); \
+        Command::Type::Type(int pos, const QString &nspace,                \
+                            const QString &id)                             \
+            : Command::ResourceLocationNode(pos, nspace, id) {             \
+            setParserId(Id);                                               \
+        }                                                                  \
+        QString Command::Type::toString() const {                          \
+            return ResourceLocationNode::toString().replace(0, 20, #Type); \
+        }
 
 DEFINE_TYPE_FROM_RESOURCELOCATIONNODE(DimensionNode, "minecraft:dimension")
 DEFINE_TYPE_FROM_RESOURCELOCATIONNODE(EntitySummonNode,

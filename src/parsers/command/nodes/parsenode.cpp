@@ -1,6 +1,6 @@
 #include "parsenode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::ParseNode> >();
+const static int _ = qRegisterMetaType<QSharedPointer<Command::ParseNode> >();
 
 Command::ParseNode::ParseNode(int pos, int length) {
     setPos(pos);

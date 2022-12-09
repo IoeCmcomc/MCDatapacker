@@ -1,7 +1,7 @@
 #include "axisnode.h"
 
-int _  = qRegisterMetaType<QSharedPointer<Command::AxisNode> >();
-int _1 = qRegisterMetaType<QSharedPointer<Command::AngleNode> >();
+static int  _  = qRegisterMetaType<QSharedPointer<Command::AxisNode> >();
+static bool _2 = TypeRegister<Command::AngleNode>::init();
 
 Command::AxisNode::AxisNode(int pos, int length,
                             Command::AxisNode::AxisType type,

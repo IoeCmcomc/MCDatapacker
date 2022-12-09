@@ -1,7 +1,6 @@
 #include "entitynode.h"
 
-static const int _EntityNode =
-    qRegisterMetaType<QSharedPointer<Command::EntityNode> >();
+static bool _ = TypeRegister<Command::EntityNode>::init();
 
 Command::EntityNode::EntityNode(int pos)
     : Command::ArgumentNode(pos, -1, "minecraft:entity") {
@@ -122,8 +121,7 @@ void Command::EntityNode::setSingleOnly(bool singleOnly) {
     m_singleOnly = singleOnly;
 }
 
-static const int _GameProfileNode =
-    qRegisterMetaType<QSharedPointer<Command::GameProfileNode> >();
+static bool _2 = TypeRegister<Command::GameProfileNode>::init();
 
 Command::GameProfileNode::GameProfileNode(int pos)
     : Command::EntityNode(pos) {
@@ -151,8 +149,7 @@ void Command::GameProfileNode::accept(Command::NodeVisitor *visitor,
         visitor->visit(this);
 }
 
-static const int _ScoreHolderNode =
-    qRegisterMetaType<QSharedPointer<Command::ScoreHolderNode> >();
+static bool _3 = TypeRegister<Command::ScoreHolderNode>::init();
 
 Command::ScoreHolderNode::ScoreHolderNode(int pos)
     : Command::EntityNode(pos) {

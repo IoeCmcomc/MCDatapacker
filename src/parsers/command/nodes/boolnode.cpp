@@ -1,6 +1,6 @@
 #include "boolnode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::BoolNode> >();
+const static bool _ = TypeRegister<Command::BoolNode>::init();
 
 Command::BoolNode::BoolNode(int pos, bool value)
     : Command::ArgumentNode(pos, -1, "brigadier:bool") {

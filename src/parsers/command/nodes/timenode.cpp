@@ -1,6 +1,6 @@
 #include "timenode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::TimeNode> >();
+static bool _ = TypeRegister<Command::TimeNode>::init();
 
 Command::TimeNode::TimeNode(int pos, int length, int v, Unit unit)
     : Command::ArgumentNode(pos, length, "minecraf:time") {

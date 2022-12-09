@@ -1,6 +1,6 @@
 #include "floatnode.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::FloatNode> >();
+const static bool _ = TypeRegister<Command::FloatNode>::init();
 
 Command::FloatNode::FloatNode(int pos, int length, float value)
     : Command::ArgumentNode(pos, length, "brigadier:float") {

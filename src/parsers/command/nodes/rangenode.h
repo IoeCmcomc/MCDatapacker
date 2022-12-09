@@ -15,6 +15,7 @@ namespace Command {
             MinValueRole,
             MaxValueRole,
         };
+
 public:
         RangeNode(int pos, int length = 0, const QString &parserId = "")
             : ArgumentNode(pos, length, parserId) {
@@ -91,14 +92,14 @@ public:
         };
         QSharedPointer<T> maxValue() const {
             switch (m_primaryValRole) {
-            case PrimaryValueRole::MinValueRole:
-                return m_secondary;
+                case PrimaryValueRole::MinValueRole:
+                    return m_secondary;
 
-            case PrimaryValueRole::MaxValueRole:
-                return m_primary;
+                case PrimaryValueRole::MaxValueRole:
+                    return m_primary;
 
-            case PrimaryValueRole::ExactValueRole:
-                return nullptr;
+                case PrimaryValueRole::ExactValueRole:
+                    return nullptr;
             }
             return nullptr;
         };
