@@ -2,7 +2,7 @@
 #define TARGETSELECTORNODE_H
 
 #include "parsenode.h"
-#include "multimapnode.h"
+#include "mapnode.h"
 
 namespace Command {
     class TargetSelectorNode : public ParseNode
@@ -16,20 +16,19 @@ public:
             S,
         };
 
-        TargetSelectorNode(int pos);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit TargetSelectorNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         Variable variable() const;
         void setVariable(const Variable &variable);
 
-        QSharedPointer<MultiMapNode> args() const;
-        void setArgs(QSharedPointer<MultiMapNode> args);
+        QSharedPointer<MapNode> args() const;
+        void setArgs(QSharedPointer<MapNode> args);
 
 private:
-        Variable m_variable                 = Variable::A;
-        QSharedPointer<MultiMapNode> m_args = nullptr;
-        static const QMap<Variable, char> variableMap;
+        Variable m_variable            = Variable::A;
+        QSharedPointer<MapNode> m_args = nullptr;
     };
 }
 

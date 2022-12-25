@@ -1,52 +1,51 @@
 #ifndef MAPNODE_H
 #define MAPNODE_H
 
-#include "literalnode.h"
+#include "stringnode.h"
 
 namespace Command {
-/*
-   I found the idea of making MapNode inherit both ParseNode and QMap
-   when searching for a way to implement SnbtCompound as a subclass
-   of SnbtNode and MapNode. They inherits QObject, which makes
-   it nearly impossible to inherit both of them.
-   If MapNode inherits ParseNode and QMap, MapNode will have
-   functionalities of both of them. Then, SnbtCompound can just inherit
-   MapNode.
-
-    A few days later, I searched about multiple inheritence
-   and it is said that "Prefer composition over inheritance".
-   Therefore, I changed my mind.
- */
-    struct MapKey {
-        int     pos = -1;
-        QString text;
-        bool    isQuote   = false;
-        bool    sortByPos = true;
-        bool operator<(const MapKey &other) const;
-    };
-    using ParseNodeMap = QMap<MapKey, QSharedPointer<ParseNode> >;
-
-    class MapNode : public ParseNode
-    {
+    class KeyNode : public StringNode {
 public:
-        MapNode(int pos, int length = 0);
+        using StringNode::StringNode;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
+    };
 
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+    using KeyPtr = QSharedPointer<KeyNode>;
+
+    template<typename T>
+    class PairNode : public ParseNode, public QPair<KeyPtr, T> {
+public:
+        PairNode(const KeyPtr &key, const T &node) : ParseNode(
+                ParseNode::Kind::Container,
+                0) {
+            this->first  = key;
+            this->second = node;
+        }
+    };
+
+    class MapNode : public ParseNode {
+public:
+        using Pair = QSharedPointer<PairNode<NodePtr> >;
+
+        using Pairs = QVector<Pair>;
+
+        explicit MapNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         int size() const;
+        bool isEmpty() const;
         bool contains(const QString &key) const;
-        bool contains(const MapKey &key) const;
-        ParseNodeMap::const_iterator find(const QString &key) const;
-        void insert(const MapKey &key, QSharedPointer<ParseNode> node);
-        int remove(const MapKey &key);
+        Pairs::const_iterator find(const QString &key) const;
+        void insert(KeyPtr key, NodePtr node);
         void clear();
-        QSharedPointer<ParseNode> &operator[](const MapKey &key);
-        const QSharedPointer<ParseNode> operator[](const MapKey &key) const;
-        ParseNodeMap toMap() const;
+        PairNode<NodePtr> inline * constLast() const {
+            return m_pairs.constLast().data();
+        }
+        Pairs pairs() const;
 
 private:
-        ParseNodeMap m_map;
+        Pairs m_pairs;
     };
 }
 

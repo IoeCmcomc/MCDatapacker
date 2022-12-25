@@ -1,26 +1,15 @@
 #include "argumentnode.h"
+#include "../visitors/nodevisitor.h"
 
 static int _ = qRegisterMetaType<QSharedPointer<Command::ArgumentNode> >();
 
-Command::ArgumentNode::ArgumentNode(int pos, int length,
-                                    const QString &parserId)
-    : Command::ParseNode(pos, length) {
-    setParserId(parserId);
-}
+namespace Command {
+    void ArgumentNode::accept(Command::NodeVisitor *visitor,
+                              Command::VisitOrder) {
+        visitor->visit(this);
+    }
 
-QString Command::ArgumentNode::toString() const {
-    return QString("ArgumentNode<%1>").arg(parserId());
-}
-
-QString Command::ArgumentNode::parserId() const {
-    return m_parserId;
-}
-
-void Command::ArgumentNode::accept(Command::NodeVisitor *visitor,
-                                   Command::NodeVisitor::Order) {
-    visitor->visit(this);
-}
-
-void Command::ArgumentNode::setParserId(const QString &parserId) {
-    m_parserId = parserId;
+    ArgumentNode::ParserType ArgumentNode::parserType() const {
+        return m_parserType;
+    }
 }

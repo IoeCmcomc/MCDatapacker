@@ -1,60 +1,54 @@
 #include "timenode.h"
+#include "../visitors/nodevisitor.h"
 
-static bool _ = TypeRegister<Command::TimeNode>::init();
+const static bool _ = TypeRegister<Command::TimeNode>::init();
 
-Command::TimeNode::TimeNode(int pos, int length, int v, Unit unit)
-    : Command::ArgumentNode(pos, length, "minecraf:time") {
-    setValue(v);
-    setUnit(unit);
-}
-
-QString Command::TimeNode::toString() const {
-    const QString type2char[] = { "", "t", "s", "d" };
-
-    return QString("TimeNode(%1)").arg(QString::number(m_value) +
-                                       type2char[m_unit]);
-}
-
-void Command::TimeNode::accept(Command::NodeVisitor *visitor,
-                               Command::NodeVisitor::Order) {
-    visitor->visit(this);
-}
-
-Command::TimeNode::Unit Command::TimeNode::unit() const {
-    return m_unit;
-}
-
-void Command::TimeNode::setUnit(const Unit &unit) {
-    if (unit > 3) {
-        qWarning() << "Invaild unit type";
-        return;
+namespace Command {
+    TimeNode::TimeNode(const QString &text, int v, Unit unit)
+        : ArgumentNode(ParserType::Time, text), m_value(v), m_unit(unit) {
+        m_isValid = true;
     }
-    m_unit = unit;
-}
 
-int Command::TimeNode::toTick() const {
-    switch (m_unit) {
-        case Unit::ImplicitTick:
-        case Unit::Tick:
-            return qRound(m_value);
+    void TimeNode::accept(NodeVisitor *visitor, VisitOrder) {
+        visitor->visit(this);
+    }
 
-        case Unit::Second:
-            return qRound(m_value * 20);
+    TimeNode::Unit TimeNode::unit() const {
+        return m_unit;
+    }
 
-        case Unit::Day:
-            return qRound(m_value * 24000);
+    void TimeNode::setUnit(const Unit &unit) {
+        if (unit > 3) {
+            qWarning() << "Invaild unit type";
+            return;
+        }
+        m_unit = unit;
+    }
 
-        default: {
-            qWarning() << "Unknown unit: " << m_unit << ". Return -1.";
-            return -1;
+    int TimeNode::toTick() const {
+        switch (m_unit) {
+            case Unit::ImplicitTick:
+            case Unit::Tick:
+                return qRound(m_value);
+
+            case Unit::Second:
+                return qRound(m_value * 20);
+
+            case Unit::Day:
+                return qRound(m_value * 24000);
+
+            default: {
+                qWarning() << "Unknown unit: " << m_unit << ". Return -1.";
+                return -1;
+            }
         }
     }
-}
 
-float Command::TimeNode::value() const {
-    return m_value;
-}
+    float TimeNode::value() const {
+        return m_value;
+    }
 
-void Command::TimeNode::setValue(float value) {
-    m_value = value;
+    void TimeNode::setValue(float value) {
+        m_value = value;
+    }
 }

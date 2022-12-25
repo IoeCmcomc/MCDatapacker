@@ -50,7 +50,7 @@ struct CodeFile {
 
     CodeFile(const QString &path);
 
-    inline bool isVaild() const {
+    inline bool isValid() const {
         return (!info.filePath().isEmpty()) && data.isValid();
     }
     inline QString name() const {

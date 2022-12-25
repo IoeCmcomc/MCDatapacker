@@ -16,8 +16,8 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void test_case1();
-    void fullId();
+    void general();
+    void length();
     void nspace();
     void id();
     void isTag();
@@ -35,38 +35,35 @@ void TestResourceLocationNode::initTestCase() {
 void TestResourceLocationNode::cleanupTestCase() {
 }
 
-void TestResourceLocationNode::test_case1() {
-    ResourceLocationNode node(5, "minecraft", "apple");
+void TestResourceLocationNode::general() {
+    ResourceLocationNode node(15, SpanPtr::create("minecraft"), SpanPtr::create("apple"));
 
-    QCOMPARE(node.toString(), "ResourceLocationNode(minecraft:apple)");
+    QVERIFY(node.isValid() == false);
+    QCOMPARE(node.kind(), ParseNode::Kind::Argument);
+    QCOMPARE(node.parserType(), ArgumentNode::ParserType::ResourceLocation);
+    QCOMPARE(node.hasText(), false);
 }
 
-void TestResourceLocationNode::fullId() {
-    ResourceLocationNode node(5, "test", "first/second");
+void TestResourceLocationNode::length() {
+    ResourceLocationNode node(17, SpanPtr::create("test"), SpanPtr::create("first/second"));
 
-    QCOMPARE(node.fullId(), "test:first/second");
+    QCOMPARE(node.length(), 17);
 }
 
 void TestResourceLocationNode::nspace() {
-    ResourceLocationNode node(5, "test", "first/second");
+    ResourceLocationNode node(17, SpanPtr::create("test"), SpanPtr::create("first/second"));
 
-    QCOMPARE(node.nspace(), "test");
-
-    node.setNspace("mod");
-    QCOMPARE(node.nspace(), "mod");
+    QCOMPARE(node.nspace()->text(), SpanPtr::create("test")->text());
 }
 
 void TestResourceLocationNode::id() {
-    ResourceLocationNode node(5, "minecraft", "diamond_pickaxe");
+    ResourceLocationNode node(25, SpanPtr::create("minecraft"), SpanPtr::create("diamond_pickaxe"));
 
-    QCOMPARE(node.id(), "diamond_pickaxe");
-
-    node.setId("netherite_pickaxe");
-    QCOMPARE(node.id(), "netherite_pickaxe");
+    QCOMPARE(node.id()->text(), SpanPtr::create("diamond_pickaxe")->text());
 }
 
 void TestResourceLocationNode::isTag() {
-    ResourceLocationNode node(5, "qwerty", "test");
+    ResourceLocationNode node(12, SpanPtr::create("qwerty"), SpanPtr::create("test"));
 
     QCOMPARE(node.isTag(), false);
 

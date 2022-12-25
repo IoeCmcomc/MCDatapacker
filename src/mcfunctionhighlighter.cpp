@@ -210,7 +210,7 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
             //QElapsedTimer timer;
             //timer.start();
             result = parser.parse();
-            if (result->isVaild()) {
+            if (result->isValid()) {
                 data->clearProblems();
 
                 Command::NodeFormatter formatter;

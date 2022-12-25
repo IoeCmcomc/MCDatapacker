@@ -1,67 +1,55 @@
 #include "itemstacknode.h"
+#include "../visitors/nodevisitor.h"
 
 static bool _ = TypeRegister<Command::ItemStackNode>::init();
 
-Command::ItemStackNode::ItemStackNode(int pos, const QString &nspace,
-                                      const QString &id)
-    : Command::ResourceLocationNode(pos, nspace, id) {
-}
+namespace Command {
+    ItemStackNode::ItemStackNode(int length)
+        : ResourceLocationNode(ParserType::ItemStack, length) {
+    }
 
-QString Command::ItemStackNode::toString() const {
-    auto ret =
-        QString("ItemStackNode(%1)").arg(ResourceLocationNode::fullId());
+    bool ItemStackNode::isValid() const {
+        return ResourceLocationNode::isValid() && m_nbt;
+    }
 
-    if (m_nbt)
-        ret += '{' + m_nbt->toString() + '}';
-    return ret;
-}
+    void ItemStackNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (m_nbt)
+            m_nbt->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 
-bool Command::ItemStackNode::isVaild() const {
-    return ResourceLocationNode::isVaild() && m_nbt;
-}
+    QSharedPointer<NbtCompoundNode> ItemStackNode::nbt() const {
+        return m_nbt;
+    }
 
-void Command::ItemStackNode::accept(Command::NodeVisitor *visitor,
-                                    Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (m_nbt)
-        m_nbt->accept(visitor, order);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
+    void ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
+        m_nbt = nbt;
+    }
 
-QSharedPointer<Command::NbtCompoundNode> Command::ItemStackNode::nbt() const {
-    return m_nbt;
-}
+    static bool _2 = TypeRegister<ItemPredicateNode>::init();
 
-void Command::ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
-    m_nbt = nbt;
-}
+    ItemPredicateNode::ItemPredicateNode(int length)
+        : ItemStackNode(length) {
+        m_parserType = ParserType::ItemPredicate;
+    }
 
-static bool _2 = TypeRegister<Command::ItemPredicateNode>::init();
-
-Command::ItemPredicateNode::ItemPredicateNode(int pos, const QString &nspace,
-                                              const QString &id)
-    : Command::ItemStackNode(pos, nspace, id) {
-    setParserId("minecraft:item_predicate");
-}
-
-Command::ItemPredicateNode::ItemPredicateNode(Command::ItemStackNode *other)
-    : Command::ItemStackNode(other->pos(), other->nspace(), other->id()) {
-    setParserId("minecraft:item_predicate");
-    setLength(other->length());
-}
-
-QString Command::ItemPredicateNode::toString() const {
-    return ItemStackNode::toString().replace(0, 13, "ItemPredicateNode");
-}
-
-void Command::ItemPredicateNode::accept(Command::NodeVisitor *visitor,
-                                        Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (nbt())
-        nbt()->accept(visitor, order);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
+    void ItemPredicateNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (nbt())
+            nbt()->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 }

@@ -62,41 +62,34 @@ SOURCES += \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
     parsers/command/minecraftparser.cpp \
+    parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
     parsers/command/nodes/axesnode.cpp \
-    parsers/command/nodes/axisnode.cpp \
     parsers/command/nodes/blockstatenode.cpp \
-    parsers/command/nodes/boolnode.cpp \
     parsers/command/nodes/componentnode.cpp \
-    parsers/command/nodes/doublenode.cpp \
     parsers/command/nodes/entitynode.cpp \
-    parsers/command/nodes/floatnode.cpp \
     parsers/command/nodes/floatrangenode.cpp \
-    parsers/command/nodes/integernode.cpp \
     parsers/command/nodes/intrangenode.cpp \
     parsers/command/nodes/itemstacknode.cpp \
     parsers/command/nodes/literalnode.cpp \
     parsers/command/nodes/mapnode.cpp \
-    parsers/command/nodes/multimapnode.cpp \
     parsers/command/nodes/nbtnodes.cpp \
     parsers/command/nodes/nbtpathnode.cpp \
     parsers/command/nodes/parsenode.cpp \
     parsers/command/nodes/particlenode.cpp \
     parsers/command/nodes/resourcelocationnode.cpp \
     parsers/command/nodes/rootnode.cpp \
-    parsers/command/nodes/similaraxesnodes.cpp \
-    parsers/command/nodes/similarresourcelocationnodes.cpp \
-    parsers/command/nodes/similarstringnodes.cpp \
+    parsers/command/nodes/singlevaluenode.cpp \
     parsers/command/nodes/stringnode.cpp \
     parsers/command/nodes/swizzlenode.cpp \
     parsers/command/nodes/targetselectornode.cpp \
     parsers/command/nodes/timenode.cpp \
-    parsers/command/nodes/uuidnode.cpp \
     parsers/command/parsenodecache.cpp \
     parsers/command/parser.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/overloadnodevisitor.cpp \
+    parsers/command/visitors/reprprinter.cpp \
     platforms/windows.cpp \
     predicatedock.cpp \
     problemarea.cpp \
@@ -148,22 +141,17 @@ HEADERS += \
     mcfunctionhighlighter.h \
     modelfunctions.h \
     newdatapackdialog.h \
+    parsers/command/nodes/anglenode.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
-    parsers/command/nodes/axisnode.h \
     parsers/command/nodes/blockstatenode.h \
-    parsers/command/nodes/boolnode.h \
     parsers/command/nodes/componentnode.h \
-    parsers/command/nodes/doublenode.h \
     parsers/command/nodes/entitynode.h \
-    parsers/command/nodes/floatnode.h \
     parsers/command/nodes/floatrangenode.h \
-    parsers/command/nodes/integernode.h \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/mapnode.h \
-    parsers/command/nodes/multimapnode.h \
     parsers/command/nodes/nbtnodes.h \
     parsers/command/nodes/nbtpathnode.h \
     parsers/command/nodes/parsenode.h \
@@ -171,20 +159,18 @@ HEADERS += \
     parsers/command/nodes/rangenode.h \
     parsers/command/nodes/resourcelocationnode.h \
     parsers/command/nodes/rootnode.h \
-    parsers/command/nodes/similaraxesnodes.h \
-    parsers/command/nodes/similarresourcelocationnodes.h \
-    parsers/command/nodes/similarstringnodes.h \
+    parsers/command/nodes/singlevaluenode.h \
     parsers/command/nodes/stringnode.h \
     parsers/command/nodes/swizzlenode.h \
     parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \
-    parsers/command/nodes/uuidnode.h \
     parsers/command/parsenodecache.h \
     parsers/command/parser.h \
     parsers/command/minecraftparser.h \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \
+    parsers/command/visitors/reprprinter.h \
     platforms/windows.h \
     predicatedock.h \
     problemarea.h \

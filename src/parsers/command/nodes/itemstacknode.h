@@ -8,10 +8,10 @@ namespace Command {
     class ItemStackNode : public ResourceLocationNode
     {
 public:
-        ItemStackNode(int pos, const QString &nspace, const QString &id);
-        virtual QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ItemStackNode(int length);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
@@ -22,11 +22,9 @@ private:
 
     class ItemPredicateNode final : public ItemStackNode {
 public:
-        ItemPredicateNode(int pos, const QString &nspace,
-                          const QString &id);
-        ItemPredicateNode(ItemStackNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ItemPredicateNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
 }
 

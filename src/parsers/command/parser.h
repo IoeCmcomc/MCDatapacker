@@ -1,10 +1,7 @@
 #ifndef COMMANDPARSER_H
 #define COMMANDPARSER_H
 
-#include "nodes/boolnode.h"
-#include "nodes/doublenode.h"
-#include "nodes/floatnode.h"
-#include "nodes/integernode.h"
+#include "nodes/singlevaluenode.h"
 #include "nodes/stringnode.h"
 #include "nodes/rootnode.h"
 #include "parsenodecache.h"
@@ -13,6 +10,8 @@
 #include <QObject>
 
 #include <stdexcept>
+
+using QStringSet = QSet<QString>;
 
 namespace Command {
     class Parser : public QObject
@@ -33,13 +32,19 @@ public:
 
             QString toLocalizedMessage() const;
         };
+
+        struct Result {
+            NodePtr    tree;
+            QStringSet spans;
+        };
+
         QChar curChar() const;
 
         static QJsonObject getSchema();
         static void setSchema(const QJsonObject &schema);
         static void setSchema(const QString &filepath);
 
-        QSharedPointer<Command::RootNode> parsingResult();
+        Result parsingResult();
 
         QString text() const;
         void setText(const QString &text);
@@ -56,7 +61,7 @@ public:
         Q_INVOKABLE QSharedPointer<Command::LiteralNode> brigadier_literal();
         Q_INVOKABLE QSharedPointer<Command::StringNode> brigadier_string(
             const QVariantMap &props = {});
-        QSharedPointer<Command::ParseNode> parse();
+        NodePtr parse();
 
         Error lastError() const;
 
@@ -76,17 +81,16 @@ protected:
         void error [[noreturn]] (const QString &msg, const QVariantList &args,
                                  int pos, int length = 0);
         void advance(int n = 1);
-        void recede(int n  = 1);
 
         bool expect(const QChar &chr, bool acceptNull = false);
-        void eat(const QChar &chr, bool acceptNull    = false);
-        QString getUntil(const QChar &chr);
-        QString getRest();
+        QString eat(const QChar &chr, bool acceptNull = false);
+        QStringRef getUntil(QChar chr);
+        QStringRef getRest();
         QString getWithCharset(const QString &charset);
         QString getWithRegex(const QString &pattern);
         QString getWithRegex(const QRegularExpression &regex);
-        QString peek(int n);
-        void skipWs(bool once = true);
+        QStringRef peek(int n);
+        QString skipWs(bool once = true);
 
         QString peekLiteral();
         QString getQuotedString();
@@ -98,7 +102,7 @@ protected:
         template<typename T>
         void checkMin(T value, T min) {
             if (value < min)
-                error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                         "The value must be greater than or equal to %1"),
                       { min });
         }
@@ -106,7 +110,7 @@ protected:
         template<typename T>
         void checkMax(T value, T max) {
             if (value > max)
-                error(QT_TRANSLATE_NOOP("Command:Parser::Error",
+                error(QT_TRANSLATE_NOOP("Command::Parser::Error",
                                         "The value must be lesser than or equal to %1"),
                       { max });
         }
@@ -122,48 +126,47 @@ protected:
         auto callWithCache(QSharedPointer<Type> (Class::*funcPtr)(Args1 ...),
                            Class *that, const QString &literal,
                            Args2 &&... args) {
-            const int startPos  = pos();
+            if (m_testMode) {
+                return (that->*funcPtr)(std::forward<decltype(args)>(args)...);
+            }
+
             const int retTypeId = qMetaTypeId<QSharedPointer<Type> >();
 
             Q_ASSERT(retTypeId != 0);
-            CacheKey key{ retTypeId, literal, startPos };
+            CacheKey key{ retTypeId, literal };
 
             if (m_cache.contains(key)) {
                 const auto value = qSharedPointerCast<Type>(m_cache[key]);
                 Q_ASSERT(value != nullptr);
                 advance(value->length());
                 return value;
-            } else if (key.pos = -1; m_cache.contains(key)) {     /* Not taking position into account */
-                /* Make a copy of the cached object */
-                auto value = QSharedPointer<Type>::create(*qSharedPointerCast<Type>(
-                                                              m_cache[key]));
-                /* Change its pos to the start pos */
-                value->setPos(startPos);
-                if ((literal.length() == value->length()) && value->isVaild())
-                    m_cache.emplace(retTypeId, literal, startPos, value);
-                advance(value->length());
-                return value;
             }
             auto value =
                 (that->*funcPtr)(std::forward<decltype(args)>(args)...);
             Q_ASSERT(value != nullptr);
-            m_cache.emplace(retTypeId, literal, startPos, value);
+            m_cache.emplace(retTypeId, literal, value);
 
             return value;
         }
 
         void printMethods();
+
+        QString spanText(const QStringRef& text);
+        QString spanText(const QString& text);
+        QString spanText(int start);
+
 private:
         ParseNodeCache m_cache;
         Error m_lastError;
-        QSharedPointer<Command::RootNode> m_parsingResult = nullptr;
-        const QRegularExpression m_literalStrRegex        = QRegularExpression(
+        QSharedPointer<Command::RootNode> m_tree   = nullptr;
+        const QRegularExpression m_literalStrRegex = QRegularExpression(
             R"([a-zA-Z0-9-_.*<=>]+)");
         const QRegularExpression m_decimalNumRegex = QRegularExpression(
             R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))");
         static QJsonObject m_schema;
+        QStringSet m_spans;
         QString m_text;
-        uint m_pos = 0;
+        int m_pos = 0;
         QChar m_curChar;
     };
 }

@@ -8,10 +8,7 @@ TEMPLATE = app
 
 SOURCES +=  tst_testparser.cpp \
     ../../../../../src/parsers/command/nodes/argumentnode.cpp \
-    ../../../../../src/parsers/command/nodes/boolnode.cpp \
-    ../../../../../src/parsers/command/nodes/doublenode.cpp \
-    ../../../../../src/parsers/command/nodes/floatnode.cpp \
-    ../../../../../src/parsers/command/nodes/integernode.cpp \
+    ../../../../../src/parsers/command/nodes/singlevaluenode.cpp \
     ../../../../../src/parsers/command/nodes/literalnode.cpp \
     ../../../../../src/parsers/command/nodes/parsenode.cpp \
     ../../../../../src/parsers/command/nodes/rootnode.cpp \
@@ -21,10 +18,7 @@ SOURCES +=  tst_testparser.cpp \
 
 HEADERS += \
     ../../../../../src/parsers/command/nodes/argumentnode.h \
-    ../../../../../src/parsers/command/nodes/boolnode.h \
-    ../../../../../src/parsers/command/nodes/doublenode.h \
-    ../../../../../src/parsers/command/nodes/floatnode.h \
-    ../../../../../src/parsers/command/nodes/integernode.h \
+    ../../../../../src/parsers/command/nodes/singlevaluenode.h \
     ../../../../../src/parsers/command/nodes/literalnode.h \
     ../../../../../src/parsers/command/nodes/parsenode.h \
     ../../../../../src/parsers/command/nodes/rootnode.h \
@@ -51,16 +45,16 @@ DEPENDPATH += $$PWD/../../../../../lib/lru-cache
 
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/json/release/ -ljson
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/json/debug/ -ljson
-else:unix: LIBS += -L$$OUT_PWD/../../../../../lib/json/ -ljson
+#win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/json/release/ -ljson
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../../../lib/json/debug/ -ljson
+#else:unix: LIBS += -L$$OUT_PWD/../../../../../lib/json/ -ljson
 
-INCLUDEPATH += $$PWD/../../../../../lib/json \
-    $$PWD/../../../../../lib/json/json/single_include
-DEPENDPATH += $$PWD/../../../../../lib/json
+#INCLUDEPATH += $$PWD/../../../../../lib/json \
+#    $$PWD/../../../../../lib/json/json/single_include
+#DEPENDPATH += $$PWD/../../../../../lib/json
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/release/libjson.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/debug/libjson.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/release/json.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/debug/json.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/libjson.a
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/release/libjson.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/debug/libjson.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/release/json.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/debug/json.lib
+#else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../../../lib/json/libjson.a

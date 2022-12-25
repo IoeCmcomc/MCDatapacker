@@ -1,17 +1,16 @@
 #ifndef PARTICLENODE_H
 #define PARTICLENODE_H
 
-#include "floatnode.h"
+#include "singlevaluenode.h"
 #include "resourcelocationnode.h"
 
 namespace Command {
-
     class ParticleColorNode : public ParseNode {
 public:
-        ParticleColorNode(int pos);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ParticleColorNode(int length);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         QSharedPointer<FloatNode> r() const;
         void setR(QSharedPointer<FloatNode> r);
@@ -23,24 +22,24 @@ public:
         void setB(QSharedPointer<FloatNode> b);
 
 private:
-        QSharedPointer<FloatNode> m_r    = nullptr;
-        QSharedPointer<FloatNode> m_g    = nullptr;
-        QSharedPointer<FloatNode> m_b    = nullptr;
+        QSharedPointer<FloatNode> m_r = nullptr;
+        QSharedPointer<FloatNode> m_g = nullptr;
+        QSharedPointer<FloatNode> m_b = nullptr;
     };
 
     class ParticleNode : public ResourceLocationNode
     {
 public:
-        using ParamVector = QVector<QSharedPointer<ParseNode>>;
+        using ParamVector = QVector<NodePtr>;
 
-        ParticleNode(int pos, const QString &nspace,
-                     const QString &id);
-        ParticleNode(ResourceLocationNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ParticleNode(int length);
+        explicit ParticleNode(ResourceLocationNode *other);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         ParamVector params() const;
-        void setParams(std::initializer_list<QSharedPointer<ParseNode>> params);
+        void setParams(
+            std::initializer_list<NodePtr> params);
 private:
         ParamVector m_params;
     };

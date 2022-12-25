@@ -1,60 +1,90 @@
 #include "axesnode.h"
+#include "../visitors/nodevisitor.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::AxesNode> >();
+const static int _ =
+    qRegisterMetaType<QSharedPointer<Command::TwoAxesNode> >();
+const static int _2 = qRegisterMetaType<QSharedPointer<Command::XyzNode> >();
 
-Command::AxesNode::AxesNode(int pos, int length)
-    : Command::ArgumentNode(pos, length, "mcdatapacker:axes") {
-}
+namespace Command {
+    TwoAxesNode::TwoAxesNode(ParserType parserType, int length)
+        : ArgumentNode(parserType, length) {
+    }
 
-QString Command::AxesNode::toString() const {
-    QStringList components;
+    void TwoAxesNode::_accept(NodeVisitor *visitor, VisitOrder order) {
+        if (m_first)
+            m_first->accept(visitor, order);
+        if (m_second)
+            m_second->accept(visitor, order);
+    }
 
-    if (m_x != nullptr)
-        components << QString("x: %1").arg(m_x->toString());
-    if (m_y != nullptr)
-        components << QString("y: %1").arg(m_y->toString());
-    if (m_z != nullptr)
-        components << QString("z: %1").arg(m_z->toString());
-    return QString("AxesNode(%1)").arg(components.join(", "));
-}
+    AnglePtr TwoAxesNode::firstAxis() const {
+        return m_first;
+    }
 
-bool Command::AxesNode::isVaild() const {
-    return ArgumentNode::isVaild() && (m_x) && (m_z);
-}
+    void TwoAxesNode::setFirstAxis(AnglePtr axis) {
+        m_first = axis;
+    }
 
-void Command::AxesNode::accept(Command::NodeVisitor *visitor,
-                               NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (m_x)
-        m_x->accept(visitor);
-    if (m_y)
-        m_y->accept(visitor);
-    if (m_z)
-        m_z->accept(visitor);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
+    AnglePtr TwoAxesNode::secondAxis() const {
+        return m_second;
+    }
 
-QSharedPointer<Command::AxisNode> Command::AxesNode::x() const {
-    return m_x;
-}
+    void TwoAxesNode::setSecondAxis(AnglePtr axis) {
+        m_second = axis;
+    }
 
-void Command::AxesNode::setX(QSharedPointer<AxisNode> x) {
-    m_x = x;
-}
+    XyzNode::XyzNode(ParserType parserType, int length)
+        : ArgumentNode(parserType, length) {
+    }
 
-QSharedPointer<Command::AxisNode> Command::AxesNode::y() {
-    return m_y;
-}
-void Command::AxesNode::setY(QSharedPointer<AxisNode> y) {
-    m_y = y;
-}
+    void XyzNode::_accept(NodeVisitor *visitor, VisitOrder order) {
+        if (m_x)
+            m_x->accept(visitor, order);
+        if (m_y)
+            m_y->accept(visitor, order);
+        if (m_z)
+            m_z->accept(visitor, order);
+    }
 
-QSharedPointer<Command::AxisNode> Command::AxesNode::z() const {
-    return m_z;
-}
+    AnglePtr XyzNode::x() const {
+        return m_x;
+    }
 
-void Command::AxesNode::setZ(QSharedPointer<AxisNode> z) {
-    m_z = z;
+    void XyzNode::setX(AnglePtr x) {
+        m_x = x;
+    }
+
+    AnglePtr XyzNode::y() {
+        return m_y;
+    }
+    void XyzNode::setY(AnglePtr y) {
+        m_y = y;
+    }
+
+    AnglePtr XyzNode::z() const {
+        return m_z;
+    }
+
+    void XyzNode::setZ(AnglePtr z) {
+        m_z = z;
+    }
+
+#define DECLARE_NODE_CLASS(Class)                                     \
+        void Class::accept(NodeVisitor * visitor, VisitOrder order) { \
+            if (order == VisitOrder::LetTheVisitorDecide) {           \
+                visitor->visit(this);                                 \
+                return;                                               \
+            }                                                         \
+            if (order == VisitOrder::Preorder)                        \
+            visitor->visit(this);                                     \
+            _accept(visitor, order);                                  \
+            if (order == VisitOrder::Postorder)                       \
+            visitor->visit(this);                                     \
+        }                                                             \
+
+    DECLARE_NODE_CLASS(BlockPosNode)
+    DECLARE_NODE_CLASS(ColumnPosNode)
+    DECLARE_NODE_CLASS(RotationNode)
+    DECLARE_NODE_CLASS(Vec2Node)
+    DECLARE_NODE_CLASS(Vec3Node)
 }

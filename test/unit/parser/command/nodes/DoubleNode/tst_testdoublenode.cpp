@@ -1,7 +1,7 @@
 #include <QtTest>
 #include <QCoreApplication>
 
-#include "../../../../../../src/parsers/command/nodes/doublenode.h"
+#include "../../../../../../src/parsers/command/nodes/singlevaluenode.h"
 
 using namespace Command;
 
@@ -16,7 +16,7 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void test_case1();
+    void general();
 };
 
 TestDoubleNode::TestDoubleNode() {
@@ -31,12 +31,17 @@ void TestDoubleNode::initTestCase() {
 void TestDoubleNode::cleanupTestCase() {
 }
 
-void TestDoubleNode::test_case1() {
-    DoubleNode node(0, 4, 22.4);
+void TestDoubleNode::general() {
+    DoubleNode node("22.4", 22.4);
 
-    QCOMPARE(node.toString(), "DoubleNode(22.4)");
+    QVERIFY(node.isValid());
+    QCOMPARE(node.kind(), ParseNode::Kind::Argument);
+    QCOMPARE(node.parserType(), ArgumentNode::ParserType::Double);
+    QCOMPARE(node.text(), "22.4");
+    QCOMPARE(node.length(), 4);
+    QCOMPARE(node.value(), 22.4);
 }
 
-QTEST_MAIN(TestDoubleNode)
+QTEST_GUILESS_MAIN(TestDoubleNode)
 
 #include "tst_testdoublenode.moc"

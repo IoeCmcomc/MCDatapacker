@@ -1,97 +1,60 @@
 #include "mapnode.h"
-#include <tuple>
-
-bool Command::MapKey::operator<(const Command::MapKey &other) const {
-    if (sortByPos)
-        return std::tie(pos, text) < std::tie(other.pos, other.text);
-    else
-        return text < other.text;
-}
+#include "../visitors/nodevisitor.h"
 
 const static int _ = qRegisterMetaType<QSharedPointer<Command::MapNode> >();
 
-Command::MapNode::MapNode(int pos, int length)
-    : Command::ParseNode(pos, length) {
-}
+namespace Command {
+    DEFINE_ACCEPT_METHOD(KeyNode)
 
-QString Command::MapNode::toString() const {
-    QStringList itemReprs;
-
-    for (auto i = m_map.cbegin(); i != m_map.cend(); ++i)
-        itemReprs << QString("%1: %2").arg(i.key().text,
-                                           i.value()->toString());
-    return "MapNode(" + itemReprs.join(", ") + ')';
-}
-
-void Command::MapNode::accept(Command::NodeVisitor *visitor,
-                              Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    for (auto i = m_map.cbegin(); i != m_map.cend(); ++i) {
-        visitor->visit(i.key());
-        i.value()->accept(visitor, order);
+    MapNode::MapNode(int length) : ParseNode(Kind::Container, length) {
     }
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
 
-int Command::MapNode::size() const {
-    return m_map.size();
-}
-
-bool Command::MapNode::contains(const QString &key) const {
-    auto it = m_map.cbegin();
-
-    while (it != m_map.cend()) {
-        if (it.key().text == key)
-            return true;
-
-        ++it;
+    void MapNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        for (auto i = m_pairs.cbegin(); i != m_pairs.cend(); ++i) {
+            i->get()->first->accept(visitor, order);
+            i->get()->second->accept(visitor, order);
+        }
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
     }
-    return false;
-}
 
-bool Command::MapNode::contains(const MapKey &key)
-const {
-    return m_map.contains(key);
-}
-
-Command::ParseNodeMap::const_iterator Command::MapNode::find(const QString &key)
-const {
-    auto it = m_map.cbegin();
-
-    while (it != m_map.cend()) {
-        if (it.key().text == key)
-            return it;
-
-        ++it;
+    int MapNode::size() const {
+        return m_pairs.size();
     }
-    return m_map.cend();
-}
 
-void Command::MapNode::insert(const MapKey &key,
-                              QSharedPointer<ParseNode> node) {
-    m_map.insert(key, node);
-}
+    bool MapNode::isEmpty() const {
+        return m_pairs.isEmpty();
+    }
 
-int Command::MapNode::remove(const MapKey &key) {
-    return m_map.remove(key);
-}
-void Command::MapNode::clear() {
-    m_map.clear();
-}
+    bool MapNode::contains(const QString &key) const {
+        return std::any_of(m_pairs.cbegin(), m_pairs.cend(),
+                           [&key](const Pair& pair) {
+            return pair->first->value() == key;
+        });
+    }
 
-QSharedPointer<Command::ParseNode> &Command::MapNode::operator[](
-    const Command::MapKey &key) {
-    return m_map[key];
-}
+    MapNode::Pairs::const_iterator MapNode::find(const QString &key) const {
+        return std::find_if(m_pairs.cbegin(), m_pairs.cend(),
+                            [&key](const Pair& pair) {
+            return pair->first->value() == key;
+        });
+    }
 
-const QSharedPointer<Command::ParseNode> Command::MapNode::operator[](
-    const Command::MapKey &key)
-const {
-    return m_map[key];
-}
+    void MapNode::insert(KeyPtr key, NodePtr node) {
+        m_pairs << Pair::create(key, node);
+    }
 
-Command::ParseNodeMap Command::MapNode::toMap() const {
-    return m_map;
+    void MapNode::clear() {
+        m_pairs.clear();
+    }
+
+    MapNode::Pairs MapNode::pairs() const {
+        return m_pairs;
+    }
 }

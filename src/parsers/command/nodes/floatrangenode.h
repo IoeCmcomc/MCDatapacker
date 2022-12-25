@@ -1,15 +1,16 @@
 #ifndef FLOATRANGENODE_H
 #define FLOATRANGENODE_H
 
-#include "floatnode.h"
+#include "singlevaluenode.h"
 #include "rangenode.h"
 
 namespace Command {
-    class FloatRangeNode : public RangeNode<Command::FloatNode>
+    class FloatRangeNode : public RangeNode<FloatNode>
     {
 public:
-        FloatRangeNode(int pos, int length);
-        QString toString() const override;
+        explicit FloatRangeNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
 }
 

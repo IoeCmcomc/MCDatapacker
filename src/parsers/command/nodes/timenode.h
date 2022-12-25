@@ -13,12 +13,9 @@ public:
             Second,
             Day,
         };
-        TimeNode(int pos, int length,
+        TimeNode(const QString &text,
                  int v, Unit unit = Unit::ImplicitTick);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         float value() const;
         void setValue(float value);
@@ -29,10 +26,8 @@ public:
         int toTick() const;
 
 private:
-        float m_value;
-        Unit m_unit = Unit::ImplicitTick;
-
-private:
+        float m_value = 0;
+        Unit m_unit   = Unit::ImplicitTick;
     };
 }
 

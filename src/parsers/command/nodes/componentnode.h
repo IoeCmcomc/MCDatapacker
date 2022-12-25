@@ -9,12 +9,10 @@ namespace Command {
     class ComponentNode final : public ArgumentNode
     {
 public:
-        ComponentNode(int pos, int length);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
+        explicit ComponentNode(const QString &text);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder)  override;
 
         nlohmann::json value() const;
         void setValue(const nlohmann::json &value);

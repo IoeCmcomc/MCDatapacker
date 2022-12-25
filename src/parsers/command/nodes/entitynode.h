@@ -3,19 +3,19 @@
 
 #include "stringnode.h"
 #include "targetselectornode.h"
-#include "uuidnode.h"
+#include "singlevaluenode.h"
 
 namespace Command {
     class EntityNode : public ArgumentNode
     {
 public:
-        EntityNode(int pos);
-        EntityNode(QSharedPointer<StringNode> other);
-        EntityNode(QSharedPointer<TargetSelectorNode> other);
-        EntityNode(QSharedPointer<UuidNode> other);
-        virtual QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit EntityNode(int length);
+        explicit EntityNode(const QSharedPointer<StringNode> &other);
+        explicit EntityNode(const QSharedPointer<TargetSelectorNode> &other);
+        explicit EntityNode(const QSharedPointer<UuidNode> &other);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool singleOnly() const;
         void setSingleOnly(bool singleOnly);
@@ -23,32 +23,35 @@ public:
         bool playerOnly() const;
         void setPlayerOnly(bool playerOnly);
 
-        QVariant ptrVari() const;
+        NodePtr getNode() const;
+        void setNode(const NodePtr &ptr);
 
 protected:
-        void setPtrVari(const QVariant &PtrVari);
-        QSharedPointer<ParseNode> castPtrVari() const;
+        NodePtr m_ptr = nullptr;
+
+        explicit EntityNode(ParserType parserType, int length,
+                            const NodePtr &ptr);
 
 private:
-        QVariant m_ptrVari;
-        bool m_singleOnly = false;
-        bool m_playerOnly = false;
+        bool m_singleOnly = false; // Parser property
+        bool m_playerOnly = false; // Parser property
     };
 
     class GameProfileNode final : public EntityNode {
 public:
-        GameProfileNode(int pos);
-        GameProfileNode(EntityNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit GameProfileNode(int length);
+        explicit GameProfileNode(EntityNode *other);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
 
     class ScoreHolderNode final : public EntityNode {
 public:
-        ScoreHolderNode(int pos);
-        ScoreHolderNode(EntityNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ScoreHolderNode(int length);
+        explicit ScoreHolderNode(EntityNode *other);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
+
         bool isAll() const;
         void setAll(bool all);
 
@@ -58,20 +61,21 @@ private:
 
     class EntityArgumentValueNode final : public ParseNode {
 public:
-        EntityArgumentValueNode(QSharedPointer<ParseNode> valNode,
-                                bool negative = false);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit EntityArgumentValueNode(QSharedPointer<ArgumentNode> valNode,
+                                         bool negative = false);
+        explicit EntityArgumentValueNode(bool negative = false);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool isNegative() const;
         void setNegative(bool negative);
 
-        QSharedPointer<ParseNode> value() const;
-        void setValue(QSharedPointer<ParseNode> value);
+        QSharedPointer<ArgumentNode> getNode() const;
+        void setNode(QSharedPointer<ArgumentNode> value);
 private:
-        bool m_negative                   = false;
-        QSharedPointer<ParseNode> m_value = nullptr;
+        QSharedPointer<ArgumentNode> m_ptr = nullptr;
+        bool m_negative                    = false;
     };
 }
 

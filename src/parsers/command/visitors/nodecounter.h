@@ -17,8 +17,6 @@ namespace Command {
         void operator()(LiteralNode *node);
         void operator()(TargetSelectorNode *node);
         void operator()(EntityArgumentValueNode *node);
-        void operator()([[maybe_unused]] const MapKey &key) {
-        }
 
         uint         nbtAccessCount = 0;
         UintHash     commandCounts;
@@ -26,10 +24,11 @@ namespace Command {
     };
 
 
-    class NodeCounter : public OverloadNodeVisitor<NodeCounterImpl>
-    {
+    class NodeCounter : public OverloadNodeVisitor<NodeCounterImpl> {
 public:
-        NodeCounter() = default;
+        NodeCounter() : OverloadNodeVisitor(Postorder) {
+        };
+
         void startVisiting(ParseNode *node) override;
         UintHash commandCounts() const;
         SelectorHash targetSelectorCounts() const;

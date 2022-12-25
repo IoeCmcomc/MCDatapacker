@@ -3,6 +3,7 @@
 
 namespace Command {
     class ParseNode;
+    class ErrorNode;
     class RootNode;
     class ArgumentNode;
     class BoolNode;
@@ -12,8 +13,6 @@ namespace Command {
     class StringNode;
     class LiteralNode;
     class AngleNode;
-    class AxisNode;
-    class AxesNode;
     class BlockStateNode;
     class ComponentNode;
     class EntityNode;
@@ -23,7 +22,6 @@ namespace Command {
     class IntRangeNode;
     class ItemStackNode;
     class MapNode;
-    class MultiMapNode;
     class EntityArgumentValueNode;
     class NbtNode;
     class NbtByteArrayNode;
@@ -40,6 +38,8 @@ namespace Command {
     class NbtStringNode;
     class NbtPathNode;
     class NbtPathStepNode;
+    //class ResourceNode;
+    //class ResourceOrTagNode;
     class ResourceLocationNode;
     class BlockPosNode;
     class BlockPredicateNode;
@@ -68,17 +68,18 @@ namespace Command {
     class ParticleNode;
     class ParticleColorNode;
     class ItemPredicateNode;
-    struct MapKey;
+    class KeyNode;
 
-    class NodeVisitor
-    {
+    enum VisitOrder: int { Preorder, Postorder, LetTheVisitorDecide };
+
+    class NodeVisitor {
 public:
-        enum class Order { Preorder, Postorder, };
-
-        NodeVisitor() = default;
+        NodeVisitor(VisitOrder order) : m_order(order) {
+        };
 
         virtual void startVisiting(ParseNode *node)       = 0;
         virtual void visit(ParseNode *node)               = 0;
+        virtual void visit(ErrorNode *node)               = 0;
         virtual void visit(RootNode *node)                = 0;
         virtual void visit(ArgumentNode *node)            = 0;
         virtual void visit(BoolNode *node)                = 0;
@@ -88,8 +89,6 @@ public:
         virtual void visit(StringNode *node)              = 0;
         virtual void visit(LiteralNode *node)             = 0;
         virtual void visit(AngleNode *node)               = 0;
-        virtual void visit(AxisNode *node)                = 0;
-        virtual void visit(AxesNode *node)                = 0;
         virtual void visit(BlockStateNode *node)          = 0;
         virtual void visit(ComponentNode *node)           = 0;
         virtual void visit(EntityNode *node)              = 0;
@@ -99,7 +98,6 @@ public:
         virtual void visit(IntRangeNode *node)            = 0;
         virtual void visit(ItemStackNode *node)           = 0;
         virtual void visit(MapNode *node)                 = 0;
-        virtual void visit(MultiMapNode *node)            = 0;
         virtual void visit(EntityArgumentValueNode *node) = 0;
         virtual void visit(NbtNode *node)                 = 0;
         virtual void visit(NbtByteArrayNode *node)        = 0;
@@ -144,9 +142,10 @@ public:
         virtual void visit(ParticleNode *node)            = 0;
         virtual void visit(ParticleColorNode *node)       = 0;
         virtual void visit(ItemPredicateNode *node)       = 0;
-        virtual void visit(const MapKey &key)             = 0;
+        virtual void visit(KeyNode *node)                 = 0;
+
 protected:
-        Order m_visitOrder = Order::Postorder;
+        VisitOrder m_order = VisitOrder::Postorder;
     };
 }
 

@@ -7,26 +7,27 @@ namespace Command {
     class RootNode : public ParseNode
     {
 public:
-        explicit RootNode(int pos);
+        using Nodes = std::list<NodePtr>;
 
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit RootNode(int nodeLength = 0);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool isEmpty();
         int size();
 
-        void append(QSharedPointer<ParseNode> node);
-        void prepend(QSharedPointer<ParseNode> node);
+        void append(NodePtr node);
+        void prepend(NodePtr node);
         void remove(int i);
         void clear();
 
-        QSharedPointer<Command::ParseNode> &operator[](int index);
-        const QSharedPointer<Command::ParseNode> operator[](int index) const;
+        NodePtr &operator[](int index);
+        const NodePtr operator[](int index) const;
 
-        QVector<QSharedPointer<ParseNode> > children() const;
+        Nodes children() const;
 
 private:
-        QVector<QSharedPointer<ParseNode> > m_children;
+        Nodes m_children;
     };
 }
 

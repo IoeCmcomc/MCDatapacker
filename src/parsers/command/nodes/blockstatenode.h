@@ -6,13 +6,12 @@
 #include "resourcelocationnode.h"
 
 namespace Command {
-    class BlockStateNode : public ResourceLocationNode
-    {
+    class BlockStateNode : public ResourceLocationNode  {
 public:
-        BlockStateNode(int pos, const QString &nspace, const QString &id);
-        virtual QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
-        bool isVaild() const override;
+        explicit BlockStateNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        bool isValid() const override;
 
         QSharedPointer<MapNode> states() const;
         void setStates(QSharedPointer<MapNode> states);
@@ -27,11 +26,9 @@ private:
 
     class BlockPredicateNode final : public BlockStateNode {
 public:
-        BlockPredicateNode(int pos, const QString &nspace,
-                           const QString &id);
-        BlockPredicateNode(BlockStateNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit BlockPredicateNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
 }
 

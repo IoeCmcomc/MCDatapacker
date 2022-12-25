@@ -1,44 +1,82 @@
 #include "parsenode.h"
+#include "../visitors/nodevisitor.h"
 
 const static int _ = qRegisterMetaType<QSharedPointer<Command::ParseNode> >();
 
-Command::ParseNode::ParseNode(int pos, int length) {
-    setPos(pos);
-    setLength(length);
-}
+namespace Command {
+    bool ParseNode::isValid() const {
+        return m_isValid;
+    }
 
-QString Command::ParseNode::toString() const {
-    return "ParseNode()";
-}
+    DEFINE_ACCEPT_METHOD(ParseNode)
 
-bool Command::ParseNode::isVaild() const {
-    return pos() > -1;
-}
+    ParseNode::Kind ParseNode::kind() const {
+        return m_kind;
+    }
 
-void Command::ParseNode::setLength(int length) {
-    m_length = length;
-}
+    bool ParseNode::hasText() const {
+        return std::holds_alternative<QString>(m_span);
+    }
 
-void Command::ParseNode::accept(Command::NodeVisitor *visitor,
-                                Command::NodeVisitor::Order) {
-    visitor->visit(this);
-}
+    QString ParseNode::text() const {
+        return (hasText()) ? std::get<QString>(m_span) : QString();
+    }
 
-int Command::ParseNode::length() const {
-    return m_length;
-}
+    int ParseNode::length() const {
+        return (hasText()) ? std::get<QString>(m_span).length() : std::get<int>(
+            m_span);
+    }
 
-int Command::ParseNode::pos() const {
-    return m_pos;
-}
+    void ParseNode::setText(const QString &text) {
+        m_span = text;
+    }
 
-void Command::ParseNode::setPos(int pos) {
-    m_pos = pos;
+    void ParseNode::setLength(int length) {
+        m_span = length;
+    }
+
+    void ParseNode::setIsValid(bool newIsValid) {
+        m_isValid = newIsValid;
+    }
+
+    QString ParseNode::leadingTrivia() const {
+        return m_leadingTrivia;
+    }
+
+    void ParseNode::setLeadingTrivia(const QString &newLeadingTrivia) {
+        m_leadingTrivia = newLeadingTrivia;
+    }
+
+    QString ParseNode::trailingTrivia() const {
+        return m_trailingTrivia;
+    }
+
+    void ParseNode::setTrailingTrivia(const QString &newTrailingTrivia) {
+        m_trailingTrivia = newTrailingTrivia;
+    }
+
+    QString ParseNode::leftText() const {
+        return m_left;
+    }
+
+    void ParseNode::setLeftText(const QString &newLeft) {
+        m_left = newLeft;
+    }
+
+    QString ParseNode::rightText() const {
+        return m_right;
+    }
+
+    void ParseNode::setRightText(const QString &newRight) {
+        m_right = newRight;
+    }
+
+    DEFINE_ACCEPT_METHOD(ErrorNode)
 }
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node) {
     QDebugStateSaver saver(debug);
 
-    debug.nospace() << node.toString();
+    debug.nospace() << "ParseNode(" << node.length() << ")";
     return debug;
 }

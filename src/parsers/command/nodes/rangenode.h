@@ -17,10 +17,6 @@ namespace Command {
         };
 
 public:
-        RangeNode(int pos, int length = 0, const QString &parserId = "")
-            : ArgumentNode(pos, length, parserId) {
-            setExactValue(QSharedPointer<T>::create(pos, length, 0));
-        };
         QString format() const {
             if (hasMinValue() || hasMaxValue()) {
                 QStringList parts;
@@ -33,15 +29,6 @@ public:
                 return QString::number(exactValue()->value());
             }
         };
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override {
-            if (order == NodeVisitor::Order::Preorder)
-                visitor->visit(this);
-            m_primary->accept(visitor, order);
-            if (m_secondary)
-                m_secondary->accept(visitor, order);
-            if (order == NodeVisitor::Order::Postorder)
-                visitor->visit(this);
-        }
 
         void setExactValue(QSharedPointer<T> value) {
             m_primary        = value;
@@ -69,11 +56,7 @@ public:
             m_primaryValRole = PrimaryValueRole::MinValueRole;
         };
         QSharedPointer<T> minValue() const {
-            if (m_primaryValRole == PrimaryValueRole::MinValueRole) {
-                return m_primary;
-            } else {
-                return nullptr;
-            }
+            return hasMinValue() ? m_primary : nullptr;
         };
         inline bool hasMinValue() const {
             return m_primaryValRole == PrimaryValueRole::MinValueRole;
@@ -109,12 +92,20 @@ public:
         };
 
 protected:
+        using ArgumentNode::ArgumentNode;
+
         QSharedPointer<T> primary() const {
             return m_primary;
         }
         QSharedPointer<T> secondary() const {
             return m_secondary;
         }
+
+        RangeNode(ParserType parserType, int length)
+            : ArgumentNode(parserType, length) {
+            setExactValue(QSharedPointer<T>::create(QString(), 0));
+            m_primary->setIsValid(false);
+        };
 private:
         QSharedPointer<T> m_secondary = nullptr;
         QSharedPointer<T> m_primary   = nullptr;

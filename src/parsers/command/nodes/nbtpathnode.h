@@ -1,26 +1,22 @@
 #ifndef NBTPATHNODE_H
 #define NBTPATHNODE_H
 
-#include "integernode.h"
 #include "nbtnodes.h"
 #include "stringnode.h"
 
 namespace Command {
     class NbtPathStepNode : public ParseNode {
-        Q_GADGET
 public:
-        enum class Type : unsigned char {
+        enum class Type {
             Root,
             Key,
             Index,
         };
-        Q_ENUM(Type)
 
-        NbtPathStepNode(int pos);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
+        explicit NbtPathStepNode(int length);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder order)
         override;
 
         QSharedPointer<StringNode> name() const;
@@ -35,27 +31,24 @@ public:
         Type type() const;
         void setType(const Type &type);
 
-        bool hasTrailingDot() const;
-        void setHasTrailingDot(bool hasTrailingDot);
-
 private:
         QSharedPointer<StringNode> m_name        = nullptr;
         QSharedPointer<IntegerNode> m_index      = nullptr;
         QSharedPointer<NbtCompoundNode> m_filter = nullptr;
         Type m_type                              = Type::Root;
-        bool m_hasTrailingDot                    = false;
     };
 
-    class NbtPathNode : public ArgumentNode
-    {
+    class NbtPathNode : public ArgumentNode {
 public:
-        NbtPathNode(int pos);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        using Steps = QVector<QSharedPointer<NbtPathStepNode> >;
+
+        explicit NbtPathNode(int length);
+
+        bool isValid() const override;
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool isEmpty();
-        int size();
+        int size() const;
 
         void append(QSharedPointer<NbtPathStepNode> node);
         void remove(int i);
@@ -65,10 +58,10 @@ public:
         QSharedPointer<NbtPathStepNode> &operator[](int index);
         const QSharedPointer<NbtPathStepNode> operator[](int index) const;
 
-        QVector<QSharedPointer<NbtPathStepNode> > steps() const;
+        Steps steps() const;
 
 private:
-        QVector<QSharedPointer<NbtPathStepNode> > m_steps;
+        Steps m_steps;
     };
 }
 

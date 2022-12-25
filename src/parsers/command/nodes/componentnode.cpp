@@ -1,31 +1,25 @@
 #include "componentnode.h"
+#include "../visitors/nodevisitor.h"
 
 static bool _ = TypeRegister<Command::ComponentNode>::init();
 
+namespace Command {
+    ComponentNode::ComponentNode(const QString &text)
+        : ArgumentNode(ParserType::Component, text) {
+    }
 
-Command::ComponentNode::ComponentNode(int pos, int length)
-    : Command::ArgumentNode(pos, length, "minecraft:component") {
-}
+    bool ComponentNode::isValid() const {
+        return ArgumentNode::isValid() &&
+               !(m_value.is_null() || m_value.is_discarded());
+    }
 
-QString Command::ComponentNode::toString() const {
-    return QString("ComponentNode(%1)").arg(QString::fromStdString(
-                                                m_value.dump()));
-}
+    DEFINE_ACCEPT_METHOD(ComponentNode)
 
-bool Command::ComponentNode::isVaild() const {
-    return ArgumentNode::isVaild() &&
-           !(m_value.is_null() || m_value.is_discarded());
-}
+    nlohmann::json ComponentNode::value() const {
+        return m_value;
+    }
 
-void Command::ComponentNode::accept(Command::NodeVisitor *visitor,
-                                    Command::NodeVisitor::Order) {
-    visitor->visit(this);
-}
-
-nlohmann::json Command::ComponentNode::value() const {
-    return m_value;
-}
-
-void Command::ComponentNode::setValue(const nlohmann::json &value) {
-    m_value = value;
+    void ComponentNode::setValue(const nlohmann::json &value) {
+        m_value = value;
+    }
 }

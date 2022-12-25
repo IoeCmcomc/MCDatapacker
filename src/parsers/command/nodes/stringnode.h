@@ -1,28 +1,19 @@
 #ifndef STRINGNODE_H
 #define STRINGNODE_H
 
-#include "argumentnode.h"
+#include "singlevaluenode.h"
 #include "literalnode.h"
 
 namespace Command {
-    class StringNode : public ArgumentNode
+    class StringNode : public SingleValueNode<ArgumentNode, QString,
+                                              ArgumentNode::ParserType::String>
     {
 public:
-        explicit StringNode(int pos              = -1,
-                            const QString &value = "",
-                            bool isQuote         = false);
-
-        virtual QString toString() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
-        QString value() const;
-        void setValue(const QString &value);
+        using SingleValueNode::SingleValueNode;
 
         static QSharedPointer<StringNode> fromLiteralNode(LiteralNode *node);
 
-private:
-        QString m_value;
+        void accept(NodeVisitor *visitor, VisitOrder) override;
     };
 }
 
