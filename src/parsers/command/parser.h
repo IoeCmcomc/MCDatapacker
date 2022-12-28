@@ -5,6 +5,7 @@
 #include "nodes/stringnode.h"
 #include "nodes/rootnode.h"
 #include "parsenodecache.h"
+#include "schema/schemarootnode.h"
 
 #include <QJsonObject>
 #include <QObject>
@@ -26,11 +27,16 @@ public:
             explicit Error(const QString &whatArg   = QString(), int pos = -1,
                            int length               = 0,
                            const QVariantList &args = {});
-            uint pos          = 0;
-            uint length       = 1;
+            int pos           = 0;
+            int length        = 1;
             QVariantList args = {};
 
             QString toLocalizedMessage() const;
+
+            bool operator==(const Error &o) const {
+                return std::make_tuple(what(), pos, length) == std::make_tuple(
+                    o.what(), o.pos, o.length);
+            }
         };
 
         struct Result {
@@ -43,6 +49,7 @@ public:
         static QJsonObject getSchema();
         static void setSchema(const QJsonObject &schema);
         static void setSchema(const QString &filepath);
+        static void loadSchema(const QString &filepath);
 
         Result parsingResult();
 
@@ -90,14 +97,14 @@ protected:
         QString getWithRegex(const QString &pattern);
         QString getWithRegex(const QRegularExpression &regex);
         QStringRef peek(int n);
+        QStringRef peekUntil(QChar chr);
         QString skipWs(bool once = true);
 
         QString peekLiteral();
         QString getQuotedString();
 
-        bool processCurSchemaNode(int depth, QJsonObject &curSchemaNode);
-        bool parseResursively(QJsonObject curSchemaNode,
-                              int depth = 0);
+        bool canContinue(Schema::Node **schemaNode, int depth);
+        bool parseBySchema(const Schema::Node *schemaNode, int depth = 0);
 
         template<typename T>
         void checkMin(T value, T min) {
@@ -158,12 +165,13 @@ protected:
 private:
         ParseNodeCache m_cache;
         Error m_lastError;
-        QSharedPointer<Command::RootNode> m_tree   = nullptr;
-        const QRegularExpression m_literalStrRegex = QRegularExpression(
-            R"([a-zA-Z0-9-_.*<=>]+)");
+        QVector<Error> m_errors;
+        QSharedPointer<Command::RootNode> m_tree = nullptr;
+        const QRegularExpression m_literalStrRegex{ R"([\w.+-<=>]+)" };
         const QRegularExpression m_decimalNumRegex = QRegularExpression(
             R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))");
         static QJsonObject m_schema;
+        static inline Schema::RootNode m_schemaGraph;
         QStringSet m_spans;
         QString m_text;
         int m_pos = 0;

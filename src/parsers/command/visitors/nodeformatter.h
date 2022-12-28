@@ -197,7 +197,11 @@ public:
         }
         virtual void visit(ScoreHolderNode *node) override {
             m_pos += node->leadingTrivia().length();
-            node->getNode()->accept(this, m_order);
+            if (!node->isAll()) {
+                node->getNode()->accept(this, m_order);
+            } else {
+                m_pos += node->length();
+            }
             m_pos += node->trailingTrivia().length();
         }
         virtual void visit([[maybe_unused]] FloatRangeNode *node) override {

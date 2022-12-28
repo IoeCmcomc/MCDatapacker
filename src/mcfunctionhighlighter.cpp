@@ -141,7 +141,7 @@ void McfunctionHighlighter::setupRules() {
 void McfunctionHighlighter::highlightBlock(const QString &text) {
     Highlighter::highlightBlock(text);
     if (this->document()) {
-        auto *data = static_cast<TextBlockData*>(currentBlockUserData());
+        auto *data = static_cast<TextBlockData *>(currentBlockUserData());
 
         if (!data)
             return;
@@ -204,7 +204,7 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
 
     while (block.isValid() && block.blockNumber() <= end.blockNumber()) {
         if (TextBlockData *data =
-                dynamic_cast<TextBlockData*>(block.userData())) {
+                dynamic_cast<TextBlockData *>(block.userData())) {
             QString lineText = block.text();
             parser.setText(lineText);
             //QElapsedTimer timer;

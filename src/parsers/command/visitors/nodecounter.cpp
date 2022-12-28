@@ -29,8 +29,8 @@ namespace Command {
 
     void NodeCounterImpl::operator()(
         EntityArgumentValueNode *node) {
-        if (node->getNode()->parserType() ==
-            ArgumentNode::ParserType::NbtCompoundTag) {
+        if (node->getNode() && (node->getNode()->parserType() ==
+                                ArgumentNode::ParserType::NbtCompoundTag)) {
             ++nbtAccessCount;
         }
     }

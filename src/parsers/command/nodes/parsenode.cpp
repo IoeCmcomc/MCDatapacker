@@ -71,6 +71,17 @@ namespace Command {
         m_right = newRight;
     }
 
+    ParseNode::ParseNode(Kind kind) : m_kind(kind), m_span{0} {
+    }
+
+    ParseNode::ParseNode(Kind kind, int length) : m_kind(kind),
+        m_span{length} {
+    }
+
+    ParseNode::ParseNode(Kind kind, const QString &text) : m_kind(kind),
+        m_span{text} {
+    }
+
     DEFINE_ACCEPT_METHOD(ErrorNode)
 }
 

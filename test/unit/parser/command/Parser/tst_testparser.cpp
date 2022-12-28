@@ -35,8 +35,7 @@ TestParser::~TestParser() {
 }
 
 void TestParser::initTestCase() {
-    Parser::setSchema(
-        ":/minecraft/1.15/summary/commands/data.min.json");
+    Parser::setSchema(":/minecraft/1.15/summary/commands/data.min.json");
     Command::Parser::setTestMode(true);
 }
 

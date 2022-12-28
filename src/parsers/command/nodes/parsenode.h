@@ -54,14 +54,9 @@ protected:
         Kind m_kind    = Kind::Span;
         bool m_isValid = false;
 
-        explicit ParseNode(Kind kind) : m_kind(kind), m_span{0} {
-        }
-        explicit ParseNode(Kind kind, int length) : m_kind(kind),
-            m_span{length} {
-        }
-        explicit ParseNode(Kind kind, const QString &text) : m_kind(kind),
-            m_span{text} {
-        }
+        explicit ParseNode(Kind kind);
+        explicit ParseNode(Kind kind, int length);
+        explicit ParseNode(Kind kind, const QString &text);
 
         void setText(const QString &text);
 

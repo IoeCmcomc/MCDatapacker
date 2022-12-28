@@ -86,6 +86,10 @@ SOURCES += \
     parsers/command/nodes/timenode.cpp \
     parsers/command/parsenodecache.cpp \
     parsers/command/parser.cpp \
+    parsers/command/schema/schemaargumentnode.cpp \
+    parsers/command/schema/schemaliteralnode.cpp \
+    parsers/command/schema/schemanode.cpp \
+    parsers/command/schema/schemarootnode.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/overloadnodevisitor.cpp \
@@ -167,6 +171,10 @@ HEADERS += \
     parsers/command/parsenodecache.h \
     parsers/command/parser.h \
     parsers/command/minecraftparser.h \
+    parsers/command/schema/schemaargumentnode.h \
+    parsers/command/schema/schemaliteralnode.h \
+    parsers/command/schema/schemanode.h \
+    parsers/command/schema/schemarootnode.h \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \

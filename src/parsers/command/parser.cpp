@@ -1,6 +1,7 @@
 #include "parser.h"
 
-//#include "nlohmann/json.hpp"
+#include "schema/schemaargumentnode.h"
+#include "schema/schemaliteralnode.h"
 
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -10,7 +11,7 @@
 #include <QElapsedTimer>
 
 /* These classes are for benchmarking deserialization methods.
- * For now, deserializing from JSON using QJsonDocumant (faster than from MessagePack).
+ * For now, deserializing from JSON using QJsonDocument (faster than from MessagePack).
 
  #include <QStack>
 
@@ -463,6 +464,71 @@ namespace Command {
     bool result4 = json::sax_parse(msgpackData, &sax4, json::input_format_t::msgpack);
     qDebug() << "Nlohmann MsgPack SAX QVariantMap" << timer.nsecsElapsed();
  */
+
+        QElapsedTimer timer;
+        timer.start();
+        loadSchema(filepath);
+        qDebug() << "Schema loaded in" << timer.elapsed() << "ms";
+    }
+
+    void resolveRedirects(const json &j, Schema::Node *node,
+                          Schema::RootNode *root = nullptr) {
+        if (node->kind() == Schema::Node::Kind::Root) {
+            root = static_cast<Schema::RootNode *>(node);
+        }
+
+        if (j.contains("redirect")) {
+            Q_ASSERT(root != nullptr);
+            // Example: "execute as >@e< at @s ..."
+            node->setRedirect(
+                root->literalChildren()[j["redirect"][0].get<QString>()]);
+        }
+
+        if (j.contains("children")) {
+            const auto &children        = j["children"];
+            const auto &literalChildren = node->literalChildren();
+            for (auto it = literalChildren.cbegin();
+                 it != literalChildren.cend(); ++it) {
+                resolveRedirects(children[it.key().toStdString()], it.value(),
+                                 root);
+            }
+            const auto &argChildren = node->argumentChildren();
+            for (const auto &child: argChildren) {
+                resolveRedirects(children[child->name().toStdString()], child,
+                                 root);
+            }
+        } else if (!(node->redirect() || node->isExecutable())) {
+            // Example: "execute >run< say ..."
+            node->setRedirect(root);
+        }
+    }
+
+    void Parser::loadSchema(const QString &filepath) {
+        QFileInfo finfo(filepath);
+
+        if (!(finfo.exists() && finfo.isFile())) {
+            qWarning() << "File not exists:" << finfo.filePath();
+            return;
+        }
+
+        QFile      f(finfo.filePath());
+        const auto openOptions = (finfo.suffix() == "json")
+                ? (QIODevice::ReadOnly | QIODevice::Text) : QIODevice::ReadOnly;
+        f.open(openOptions);
+        QByteArray &&data = f.readAll();
+        f.close();
+
+        json j;
+
+        if (finfo.suffix() == "json") {
+            j = json::parse(data);
+        } else if (finfo.suffix() == "msgpack") {
+            j = json::from_msgpack(data);
+        }
+
+        m_schemaGraph = j.get<Schema::RootNode>();
+        resolveRedirects(j, &m_schemaGraph);
+        // TODO: Merge duplicated sub-trees
     }
 
 /*!
@@ -587,12 +653,7 @@ namespace Command {
  * \brief Returns the substring from the current character until it meets the character \a chr (exclusive).
  */
     QStringRef Parser::getUntil(QChar chr) {
-/*    QString ret; */
-
-        const int start = m_pos;
-        const int index = m_text.indexOf(chr, start);
-
-        const auto &ref = m_text.midRef(start, qMax(-1, index - start));
+        const QStringRef &ref = peekUntil(chr);
 
         advance(ref.length());
         return ref;
@@ -652,6 +713,15 @@ namespace Command {
         return m_text.midRef(m_pos, n);
     }
 
+    QStringRef Parser::peekUntil(QChar chr) {
+        const int start = m_pos;
+        const int index = m_text.indexOf(chr, start);
+
+        const auto &ref = m_text.midRef(start, qMax(-1, index - start));
+
+        return ref;
+    }
+
     QString Parser::skipWs(bool once) {
         const int start = m_pos;
 
@@ -667,15 +737,7 @@ namespace Command {
  * \brief Returns the next literal string (word) without advancing the current pos.
  */
     QString Parser::peekLiteral() {
-        const static QRegularExpression regex(R"([\S]+)");
-
-        if (auto match =
-                regex.match(m_text, m_pos, QRegularExpression::NormalMatch,
-                            QRegularExpression::AnchoredMatchOption);
-            match.hasMatch()) {
-            return match.captured();
-        }
-        return QString();
+        return peekUntil(QChar::Space).toString();
     }
 
 /*!
@@ -866,8 +928,8 @@ namespace Command {
                 error(QT_TR_NOOP("A quoted string is required."));
             }
         } else if (type == QLatin1String("word")) {
-            const auto &literal = brigadier_literal();
-            return StringNode::fromLiteralNode(literal.get());
+            const QString &&literal = getWithRegex(m_literalStrRegex);
+            return QSharedPointer<StringNode>::create(spanText(literal));
         }
         return defaultRet;
     }
@@ -882,6 +944,7 @@ namespace Command {
             qWarning() << "The parser schema hasn't been initialized yet.";
         } else if (text().trimmed().isEmpty() ||
                    text().trimmed().at(0) == '#') {
+            m_tree->setIsValid(true);
             return m_tree;
         }
         setPos(0);
@@ -894,7 +957,7 @@ namespace Command {
         } else {
             try {
                 m_tree->setLeadingTrivia(skipWs());
-                if (parseResursively(m_schema)) {
+                if (parseBySchema(&m_schemaGraph)) {
                     m_tree->setLength(pos() - 1);
                     m_tree->setTrailingTrivia(skipWs());
                     m_tree->setIsValid(true);
@@ -910,99 +973,64 @@ namespace Command {
         return m_tree;
     }
 
-    bool Parser::processCurSchemaNode(int depth,
-                                      QJsonObject &curSchemaNode) {
+    bool Parser::canContinue(Schema::Node **schemaNode, int depth) {
         if (depth > 100)
             qWarning() << "The parsing stack depth is too large:" << depth;
-/*
-          qDebug() << "has children:" << curSchemaNode.contains("children");
-          qDebug() << "has executable:" << curSchemaNode.contains("executable");
-          qDebug() << "has redirect:" << curSchemaNode.contains("redirect");
- */
+
         bool canEndParsing = curChar().isNull() or (peek(2) == " ");
-        if (!curSchemaNode.contains(QLatin1String("children"))) {
-            if (curSchemaNode.contains(QLatin1String("redirect"))) {
-                if (curSchemaNode.contains(QLatin1String("executable")) &&
-                    canEndParsing) {
-                    return true;
-                } else {
-                    QJsonArray redirect =
-                        curSchemaNode[QLatin1String("redirect")].toArray();
-                    curSchemaNode = m_schema;
-                    for (const auto &nodeNameRef: qAsConst(redirect)) {
-                        curSchemaNode =
-                            curSchemaNode[QLatin1String("children")]
-                            .toObject()[nodeNameRef.toString()].toObject();
-                    }
-                }
-            } else {
-                if (curSchemaNode.contains(QLatin1String("executable")) &&
-                    canEndParsing) {
-                    return true;
-                } else {
-                    curSchemaNode = m_schema;
-                }
-            }
-        } else {
-            if (curSchemaNode.contains(QLatin1String("executable")) &&
-                canEndParsing) {
-                return true;
-            }
+        if ((*schemaNode)->isExecutable() && canEndParsing) {
+            return false;
+        } else if ((*schemaNode)->isEmpty() && (*schemaNode)->redirect()) {
+            *schemaNode = (*schemaNode)->redirect();
         }
-        if (curChar().isNull())
+        if (curChar().isNull()) {
             error(QT_TR_NOOP("Incompleted command"));
+        }
         eat(' ');
 
-        return false; /* Should continue parsing */
+        return true;
     }
 
-    bool Parser::parseResursively(QJsonObject curSchemaNode, int depth) {
-/*
-      qDebug() << "Command::Parser::parseResursively"
-   << curSchemaNode << depth;
- */
+    bool Parser::parseBySchema(const Schema::Node *schemaNode, int depth) {
+        NodePtr                ret = nullptr;
+        QVector<Parser::Error> errors;
+        QVector<int>           argLengths;
 
-        QSharedPointer<ParseNode> ret = nullptr;
-        QVector<Parser::Error>    errors;
-        QVector<int>              argLengths;
-
-        const bool isRoot = curSchemaNode[QLatin1String("type")] ==
-                            QStringLiteral("root");
+        const bool isRoot = schemaNode->kind() == Schema::Node::Kind::Root;
 
         int             startPos = m_pos;
         bool            success  = false;
         const QString &&literal  = peekLiteral();
-        /*qDebug() << "literal:" << literal; */
-        bool         found    = false;
-        const auto &&children =
-            curSchemaNode[QLatin1String("children")].toObject();
 
-        for (auto it = children.constBegin(); it != children.constEnd(); ++it) {
-            curSchemaNode = it.value().toObject();
-            if (curSchemaNode[QLatin1String("type")] ==
-                QStringLiteral("literal")) {
-                if (literal == it.key()) {
-                    found = true;
-                    const auto &&command = brigadier_literal();
-                    if (isRoot)
-                        command->setIsCommand(true);
-                    ret = command;
-                    if (!processCurSchemaNode(depth, curSchemaNode)) {
-                        ret->setTrailingTrivia(QStringLiteral(" "));
-                        success = parseResursively(curSchemaNode, depth + 1);
-                        m_tree->prepend(ret);
-                    } else {
-                        m_tree->append(ret);
-                        return true;
-                    }
-                    break;
-                }
-            } else if (curSchemaNode[QLatin1String("type")] ==
-                       QStringLiteral("argument")) {
-                QString    &&parserId = curSchemaNode["parser"].toString();
-                int          methodIndex;
+        if (schemaNode->literalChildren().contains(literal)) {
+            const auto &&command = brigadier_literal();
+            if (isRoot)
+                command->setIsCommand(true);
+            ret = command;
+            Schema::Node *litNode =
+                schemaNode->literalChildren().value(literal);
+            if (canContinue(&litNode, depth)) {
+                ret->setTrailingTrivia(QStringLiteral(" "));
+                success = parseBySchema(litNode, depth + 1);
+                m_tree->prepend(ret);
+            } else {
+                m_tree->append(ret);
+                return true;
+            }
+        } else if (schemaNode->argumentChildren().isEmpty()) {
+            if (isRoot) {
+                errors << Error(QT_TR_NOOP("Unknown command '%1'"),
+                                m_pos, literal.length(), { literal });
+            } else {
+                errors << Error(QT_TR_NOOP("Unknown subcommand '%1'"),
+                                m_pos, literal.length(), { literal });
+            }
+        } else {
+            for (const auto *argNode: schemaNode->argumentChildren()) {
+                QString    &&parserId   = argNode->parserId();
                 const auto &&methodName = parserIdToMethodName(parserId);
-                if (curSchemaNode.contains(QLatin1String("properties"))) {
+                int          methodIndex;
+                if (!argNode->properties().isEmpty()) {
                     methodIndex = metaObject()->indexOfMethod(
                         QStringLiteral("%1(QVariantMap)").arg(
                             methodName).toLatin1());
@@ -1011,106 +1039,87 @@ namespace Command {
                         QStringLiteral("%1()").arg(methodName).toLatin1());
                 }
                 if (methodIndex != -1) {
-                    /*qDebug() << "Argument parser ID:" << parserId; */
                     auto   &&method     = metaObject()->method(methodIndex);
                     int      returnType = method.returnType();
                     CacheKey key{ returnType, literal };
-
-                    try {
-                        if (m_cache.contains(key)) {
-                            found = true;
-                            ret   = m_cache[key];
-                        }
-                        if (found) {
-                            Q_ASSERT(ret != nullptr);
-                            advance(literal.length());
-                            if ((literal.length() == ret->length()) &&
-                                !m_testMode)
-                                m_cache.emplace(returnType, literal, ret);
-                            if (!processCurSchemaNode(depth, curSchemaNode)) {
-                                ret->setTrailingTrivia(QStringLiteral(" "));
-                                success = parseResursively(curSchemaNode,
-                                                           depth + 1);
-                                m_tree->prepend(ret);
-                            } else {
-                                m_tree->append(ret);
-                                return true;
-                            }
-                            break;
-                        }
-
-                        auto props =
-                            curSchemaNode[QLatin1String("properties")].toObject()
-                            .toVariantMap();
+                    if (m_cache.contains(key)) {
+                        ret = m_cache[key];
+                        advance(ret->length());
+                    } else {
+                        const auto &props = argNode->properties();
 
                         auto typeName = method.typeName();
                         QGenericReturnArgument
                             returnArgument(typeName,
                                            static_cast<void *>(&ret));
-                        const bool invoked = method.invoke(this, returnArgument,
-                                                           Q_ARG(QVariantMap,
-                                                                 props));
-                        if (invoked) {
-                            found = true;
-                            Q_ASSERT(ret != nullptr);
-                            if ((literal.length() == ret->length()) &&
-                                !m_testMode)
-                                m_cache.emplace(returnType, literal, ret);
-                            if (!processCurSchemaNode(depth, curSchemaNode)) {
-                                ret->setTrailingTrivia(QStringLiteral(" "));
-                                success = parseResursively(curSchemaNode,
-                                                           depth + 1);
-                                m_tree->prepend(ret);
+
+                        try {
+                            const bool invoked =
+                                method.invoke(this, returnArgument,
+                                              Q_ARG(QVariantMap, props));
+                            if (invoked) {
+                                Q_ASSERT(ret != nullptr);
                             } else {
-                                m_tree->append(ret);
-                                return true;
+                                qWarning() << QLatin1String(
+                                    "Method not invoked: %1 (%2)").arg(parserIdToMethodName(
+                                                                           parserId),
+                                                                       parserId);
                             }
-                            break;
-                        } else {
-                            qWarning() << QLatin1String(
-                                "Method not invoked: %1 (%2)").arg(parserIdToMethodName(
-                                                                       parserId),
-                                                                   parserId);
+                        } catch (const Parser::Error &err) {
+                            errors << err;
+                            int argLength = m_pos - startPos + 1;
+                            setPos(startPos);
+                            argLengths << argLength;
+                            continue;
                         }
-                    } catch (const Parser::Error &err) {
-                        /*qWarning() << "Argument error:" << err.toLocalizedMessage(); */
-                        errors << err;
-                        int argLength = m_pos - startPos + 1;
-                        setPos(startPos);
-                        found = false;
-                        argLengths << argLength;
                     }
-                } else {
-                    error(QT_TR_NOOP("Unknown argument parser: '%1'"),
-                          { parserId });
+
+                    if (ret) {
+                        if ((literal.length() == ret->length()) &&
+                            !m_testMode)
+                            m_cache.emplace(returnType, literal, ret);
+                        Schema::Node *node =
+                            const_cast<Schema::ArgumentNode *>(argNode);
+                        if (canContinue(&node, depth)) {
+                            ret->setTrailingTrivia(QStringLiteral(" "));
+                            try {
+                                success = parseBySchema(node, depth + 1);
+                                m_tree->prepend(ret);
+                            } catch (const Parser::Error &err) {
+                                errors << err;
+                                int argLength = m_pos - startPos + 1;
+                                setPos(startPos);
+                                argLengths << argLength;
+                                continue;
+                            }
+                        } else {
+                            m_tree->append(ret);
+                            return true;
+                        }
+                        break;
+                    }
                 }
             }
         }
-        /*qDebug() << "After loop" << ret->isValid() << success << errors.length() <<
-           curSchemaNode.size(); */
-        if (ret && ret->isValid() && success) { /* If succeed */
-        } else if (errors.size() == 1) {
-            throw errors[0];
-        } else if (errors.size() == curSchemaNode.size()) {
-            bool sameAll =
-                std::all_of(argLengths.cbegin(), argLengths.cend(),
-                            [argLengths](int v) {
-                return v == argLengths[0];
-            });
-            if (sameAll) {
-                throw Parser::Error(QT_TR_NOOP("Incorrect argument"));
-            } else {
+
+        if (ret && success) { /* If succeed */
+            return true;
+        } else if (!errors.isEmpty()) {
+            if (errors.size() == 1) {
+                throw errors[0];
+            } else if (errors.size() == schemaNode->argumentChildren().size()) {
                 throw errors[*std::max_element(argLengths.cbegin(),
                                                argLengths.cend())];
-            }
-        }
-        if (!found) {
-            if (!isRoot) {
-                error(QT_TR_NOOP("Unknown subcommand '%1'"), { literal });
             } else {
-                error(QT_TR_NOOP("Unknown command '%1'"), { literal });
+                for (const auto &err: errors) {
+                    if (!m_errors.contains(err)) {
+                        m_errors << err;
+                    }
+                }
             }
+            return false;
+        } else {
+            Q_UNREACHABLE();
         }
-        return true;
     }
 }

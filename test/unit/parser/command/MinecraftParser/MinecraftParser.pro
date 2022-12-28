@@ -38,6 +38,10 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/timenode.cpp \
     ../../../../../src/parsers/command/parsenodecache.cpp \
     ../../../../../src/parsers/command/parser.cpp \
+    ../../../../../src/parsers/command/schema/schemaargumentnode.cpp \
+    ../../../../../src/parsers/command/schema/schemaliteralnode.cpp \
+    ../../../../../src/parsers/command/schema/schemanode.cpp \
+    ../../../../../src/parsers/command/schema/schemarootnode.cpp \
     ../../../../../src/parsers/command/visitors/reprprinter.cpp
 
 HEADERS += \
@@ -67,6 +71,10 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/timenode.h \
     ../../../../../src/parsers/command/parsenodecache.h \
     ../../../../../src/parsers/command/parser.h \
+    ../../../../../src/parsers/command/schema/schemaargumentnode.h \
+    ../../../../../src/parsers/command/schema/schemaliteralnode.h \
+    ../../../../../src/parsers/command/schema/schemanode.h \
+    ../../../../../src/parsers/command/schema/schemarootnode.h \
     ../../../../../src/parsers/command/visitors/reprprinter.cpp
 
 RESOURCES += \

@@ -111,8 +111,10 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        Q_ASSERT(m_ptr != nullptr);
-        m_ptr->accept(visitor, order);
+        if (!m_all) {
+            Q_ASSERT(m_ptr != nullptr);
+            m_ptr->accept(visitor, order);
+        }
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
     }
@@ -150,8 +152,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        Q_ASSERT(m_ptr != nullptr);
-        m_ptr->accept(visitor, order);
+        if (m_ptr)
+            m_ptr->accept(visitor, order);
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
     }

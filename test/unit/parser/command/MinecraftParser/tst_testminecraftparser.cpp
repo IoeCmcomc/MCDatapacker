@@ -117,9 +117,8 @@ void TestMinecraftParser::commands_data() {
     localTimer.start();
 
     SET_TAG(test)
-    QTest::newRow(GEN_TAG) <<
-        "execute if block ~ ~1 ~ #minecraft:chest[a=b]{Lock:\"\"} run say hi" <<
-        "RootNode[8](LiteralNode(execute), LiteralNode(if), LiteralNode(block), BlockPosNode(x: AngleNode(~0), y: AngleNode(~1), z: AngleNode(~0)), BlockPredicateNode(minecraft:chest)[MapNode(a: StringNode(\"b\"))]{NbtCompoundNode(Lock: NbtStringNode())}, LiteralNode(run), LiteralNode(say), MessageNode(\"hi\"))";
+    QTest::newRow(GEN_TAG) << R"(scoreboard objectives add tc.temp dummy)" <<
+        "placeholder";
 
     SET_TAG(advancement)
     QTest::newRow(GEN_TAG) <<
@@ -427,6 +426,12 @@ void TestMinecraftParser::commands_data() {
     SET_TAG(tp)
     QTest::newRow(GEN_TAG) << "tp 100 ~2 300" <<
         "RootNode[2](LiteralNode(tp), Vec3Node(x: AngleNode(100), y: AngleNode(~2), z: AngleNode(300)))";
+    QTest::newRow(GEN_TAG) << "tp IoeCmcomc" <<
+        "RootNode[2](LiteralNode(tp), EntityNode[single](StringNode(\"IoeCmcomc\")))";
+    QTest::newRow(GEN_TAG) << "tp @s ^ ^ ^1" <<
+        "RootNode[3](LiteralNode(tp), EntityNode[](TargetSelectorNode(@s)), Vec3Node(x: AngleNode(^), y: AngleNode(^), z: AngleNode(^1)))";
+    QTest::newRow(GEN_TAG) << "tp @e @s" <<
+        "RootNode[3](LiteralNode(tp), EntityNode[](TargetSelectorNode(@e)), EntityNode[single](TargetSelectorNode(@s)))";
 
     SET_TAG(trigger)
     QTest::newRow(GEN_TAG) << "trigger php_help" <<
