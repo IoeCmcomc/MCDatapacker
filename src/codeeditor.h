@@ -14,9 +14,9 @@ QT_END_NAMESPACE
 
 class CodeGutter;
 class Highlighter;
+class Parser;
 
-class CodeEditor : public QPlainTextEdit
-{
+class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
 
 public:
@@ -74,8 +74,9 @@ private:
     QTextCharFormat warningHighlightRule;
     QStringList minecraftCompletionInfo;
     CodeGutter *m_gutter;
-    QCompleter *m_completer     = nullptr;
-    Highlighter *curHighlighter = nullptr;
+    QCompleter *m_completer          = nullptr;
+    Highlighter *curHighlighter      = nullptr;
+    QScopedPointer<Parser> *m_parser = nullptr;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     int problemSelectionStartIndex;
     int m_fontSize                = 13;

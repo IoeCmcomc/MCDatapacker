@@ -91,8 +91,9 @@ QString repr(ParseNode *node) {
 
 void TestMinecraftParser::genRepr() {
     QFETCH(QString, command);
-    MinecraftParser parser(this, command);
-    const auto      result = parser.parse();
+    MinecraftParser parser;
+    parser.setText(command);
+    const auto result = parser.parse();
 
     QVERIFY(result->isValid());
     qDebug() << repr(result.get());
@@ -467,7 +468,7 @@ void TestMinecraftParser::commands() {
     QFETCH(QString, command);
     QFETCH(QString, parseTreeRepr);
 
-    MinecraftParser           parser(this, command);
+    MinecraftParser           parser(command);
     QSharedPointer<ParseNode> result = nullptr;
     QBENCHMARK
     {
@@ -544,14 +545,15 @@ void TestMinecraftParser::benchmarkCommandBoxes() {
 
     QFETCH(QString, command);
 
-    MinecraftParser           parser(this, command);
+    MinecraftParser           parser(command);
     QSharedPointer<ParseNode> result = nullptr;
     QBENCHMARK {
         result = parser.parse();
     }
     Q_ASSERT(result);
-    if (strlen(parser.lastError().what()) > 0)
-        qDebug() << parser.lastError().toLocalizedMessage();
+    for (const auto &error: parser.errors()) {
+        qDebug() << error.toLocalizedMessage();
+    }
     QVERIFY(result->isValid());
 }
 

@@ -63,6 +63,8 @@ public:
 private:
         Steps m_steps;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, NbtPath)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathStepNode>)

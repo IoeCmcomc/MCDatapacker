@@ -77,6 +77,10 @@ private:
         QSharedPointer<ArgumentNode> m_ptr = nullptr;
         bool m_negative                    = false;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Entity)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, GameProfile)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ScoreHolder)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::EntityNode>)

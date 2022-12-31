@@ -33,20 +33,17 @@ struct ProblemInfo {
     };
 
     Type    type   = Type::Invaild;
-    uint    line   = 0;
-    uint    col    = 0;
-    uint    length = 1;
+    int     line   = 0;
+    int     col    = 0;
+    int     length = 1;
     QString message;
 };
 
 
-class TextBlockData : public QTextBlockUserData
-{
+class TextBlockData : public QTextBlockUserData {
 public:
     TextBlockData() = default;
-    ~TextBlockData() {
-        clear();
-    }
+    ~TextBlockData();
 
     void clear();
     void clearProblems();
@@ -62,16 +59,15 @@ public:
 
 private:
     QVector<ProblemInfo> m_problems;
-    QVector<BracketInfo*> m_brackets;
-    QVector<NamespacedIdInfo*> m_namespaceIds;
+    QVector<BracketInfo *> m_brackets;
+    QVector<NamespacedIdInfo *> m_namespaceIds;
 };
 
 
 class CodeEditor;
 
 
-class Highlighter : public QSyntaxHighlighter
-{
+class Highlighter : public QSyntaxHighlighter {
     Q_OBJECT
 
 public:
@@ -83,7 +79,7 @@ public:
     };
     Highlighter(QTextDocument *parent);
 
-    QTextDocument *getParentDoc() const;
+    QTextDocument * getParentDoc() const;
 
     virtual void checkProblems(bool checkAll = false) = 0;
 

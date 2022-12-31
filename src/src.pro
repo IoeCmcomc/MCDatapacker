@@ -85,15 +85,16 @@ SOURCES += \
     parsers/command/nodes/targetselectornode.cpp \
     parsers/command/nodes/timenode.cpp \
     parsers/command/parsenodecache.cpp \
-    parsers/command/parser.cpp \
     parsers/command/schema/schemaargumentnode.cpp \
     parsers/command/schema/schemaliteralnode.cpp \
     parsers/command/schema/schemanode.cpp \
     parsers/command/schema/schemarootnode.cpp \
+    parsers/command/schemaparser.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/overloadnodevisitor.cpp \
     parsers/command/visitors/reprprinter.cpp \
+    parsers/parser.cpp \
     platforms/windows.cpp \
     predicatedock.cpp \
     problemarea.cpp \
@@ -169,16 +170,17 @@ HEADERS += \
     parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \
     parsers/command/parsenodecache.h \
-    parsers/command/parser.h \
     parsers/command/minecraftparser.h \
     parsers/command/schema/schemaargumentnode.h \
     parsers/command/schema/schemaliteralnode.h \
     parsers/command/schema/schemanode.h \
     parsers/command/schema/schemarootnode.h \
+    parsers/command/schemaparser.h \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \
     parsers/command/visitors/reprprinter.h \
+    parsers/parser.h \
     platforms/windows.h \
     predicatedock.h \
     problemarea.h \

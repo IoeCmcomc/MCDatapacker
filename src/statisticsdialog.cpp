@@ -24,7 +24,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
                                    QDir::current().dirName(),
                                    m_mainWin->getPackInfo().description));
 
-    m_parser = new Command::MinecraftParser(this);
+    m_parser = new Command::MinecraftParser();
 
     QElapsedTimer timer;
     timer.start();
@@ -35,7 +35,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
 }
 
 StatisticsDialog::~StatisticsDialog() {
-    qDebug() << ui;
+    delete m_parser;
     delete ui;
 }
 
@@ -219,8 +219,8 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                 ui->syntaxErrorTable->setItem(
                     row, 1, new QTableWidgetItem(QString::number(i)));
                 ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
-                                                  m_parser->lastError().
-                                                  toLocalizedMessage()));
+                                                  m_parser->errors().last()
+                                                  .toLocalizedMessage()));
                 ++m_syntaxErrors;
             }
         }

@@ -2,24 +2,27 @@
 #define SCHEMA_ARGUMENTNODE_H
 
 #include "schemanode.h"
+#include "../nodes/argumentnode.h"
 
 #include <QVariant>
 
 namespace Command::Schema {
     class ArgumentNode : public Node {
 public:
+        using ParserType = Command::ArgumentNode::ParserType;
+
         ArgumentNode();
 
         void setName(const QString &newName);
 
         QString name() const;
         QVariantMap properties() const;
-        QString parserId() const;
+        ParserType parserType() const;
 
 private:
         QString m_name;
-        QString m_parserId;
         QVariantMap m_props;
+        ParserType m_parserType;
 
         friend void from_json(const json &j, ArgumentNode *&n);
     };

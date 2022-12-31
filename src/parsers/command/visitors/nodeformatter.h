@@ -4,6 +4,7 @@
 #include "nodevisitor.h"
 
 #include "../nodes/rootnode.h"
+#include "../nodes/literalnode.h"
 #include "../nodes/stringnode.h"
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"

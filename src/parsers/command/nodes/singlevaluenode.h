@@ -44,6 +44,7 @@ public:                                                                         
                 using SingleValueNode::SingleValueNode;                                 \
                 void accept(NodeVisitor * visitor, VisitOrder) override;                \
             };                                                                          \
+            DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)                           \
         }                                                                               \
         Q_DECLARE_METATYPE(QSharedPointer<Command::Name ## Node>)                       \
         const static bool _ ## Name =                                                   \

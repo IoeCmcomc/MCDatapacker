@@ -7,15 +7,12 @@
 using json = nlohmann::json;
 
 namespace Command {
-    MinecraftParser::MinecraftParser(QObject *parent,
-                                     const QString &input)
-        : Parser(parent, input) {
-        /*printMethods(); */
-/*
-      connect(this, &QObject::destroyed, [ = ](QObject *obj) {
-          qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
-      });
- */
+    MinecraftParser::MinecraftParser() {
+        /*
+           connect(this, &QObject::destroyed, [ = ](QObject *obj) {
+           qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
+           });
+         */
     }
 
     QString MinecraftParser::oneOf(const QStringList &strArr) {
@@ -447,8 +444,8 @@ namespace Command {
 
     QSharedPointer<TargetSelectorNode> MinecraftParser::
     parseTargetSelector() {
-        const auto ret   = QSharedPointer<TargetSelectorNode>::create(0);
-        const int  start = pos();
+        const auto &ret   = QSharedPointer<TargetSelectorNode>::create(0);
+        const int   start = pos();
 
         eat('@');
         using Variable = TargetSelectorNode::Variable;
@@ -561,7 +558,7 @@ namespace Command {
     QSharedPointer<ParticleColorNode> MinecraftParser::
     parseParticleColor() {
         const int start = pos();
-        auto      color = QSharedPointer<ParticleColorNode>::create(0);
+        auto    &&color = QSharedPointer<ParticleColorNode>::create(0);
 
         color->setR(brigadier_float());
         color->r()->setTrailingTrivia(eat(' '));
@@ -641,6 +638,77 @@ namespace Command {
         }
         if (this->curChar() == '{')
             node->setNbt(parseCompoundTag());
+    }
+
+    NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
+                                          const QVariantMap &props) {
+        using ParserType = ArgumentNode::ParserType;
+        if (const auto &ret = SchemaParser::invokeMethod(parserType, props)) {
+            return ret;
+        }
+        switch (parserType) {
+            case ParserType::Angle: { return minecraft_angle(); }
+            case ParserType::BlockState: { return minecraft_blockState(); }
+            case ParserType::BlockPos: { return minecraft_blockPos(); }
+            case ParserType::BlockPredicate: { return minecraft_blockPredicate();
+            }
+            case ParserType::Color: { return minecraft_color(); }
+            case ParserType::ColumnPos: { return minecraft_columnPos(); }
+            case ParserType::Component: { return minecraft_component(); }
+            case ParserType::Dimension: { return minecraft_dimension(); }
+            case ParserType::Entity: { return minecraft_entity(props); }
+            case ParserType::EntityAnchor: { return minecraft_entityAnchor(); }
+            case ParserType::EntitySummon: { return minecraft_entitySummon(); }
+            case ParserType::FloatRange: { return minecraft_floatRange(props); }
+            case ParserType::Function: { return minecraft_function(); }
+            case ParserType::GameProfile: { return minecraft_gameProfile(props);
+            }
+            case ParserType::IntRange: { return minecraft_intRange(props); }
+            case ParserType::ItemEnchantment: { return minecraft_itemEnchantment();
+            }
+            case ParserType::ItemPredicate: { return minecraft_itemPredicate();
+            }
+            case ParserType::ItemSlot: { return minecraft_itemSlot(); }
+            case ParserType::ItemStack: { return minecraft_itemStack(); }
+            case ParserType::Message: { return minecraft_message(); }
+            case ParserType::MobEffect: { return minecraft_mobEffect(); }
+            case ParserType::NbtCompoundTag: { return minecraft_nbtCompoundTag();
+            }
+            case ParserType::NbtPath: { return minecraft_nbtPath(); }
+            case ParserType::NbtTag: { return minecraft_nbtTag(); }
+            case ParserType::Objective: { return minecraft_objective(); }
+            case ParserType::ObjectiveCriteria:  {
+                return minecraft_objectiveCriteria();
+            }
+            case ParserType::Operation: { return minecraft_operation(); }
+            case ParserType::Particle: { return minecraft_particle(); }
+            case ParserType::Resource: { return minecraft_resource(props); }
+            case ParserType::ResourceOrTag: {
+                return minecraft_resourceOrTag(props);
+            }
+            case ParserType::ResourceLocation: {
+                return minecraft_resourceLocation();
+            }
+            case ParserType::Rotation: { return minecraft_rotation(); }
+            case ParserType::ScoreHolder: { return minecraft_scoreHolder(props);
+            }
+            case ParserType::ScoreboardSlot: {
+                return minecraft_scoreboardSlot();
+            }
+            case ParserType::Swizzle: { return minecraft_swizzle(); }
+            case ParserType::Team: { return minecraft_team(); }
+            case ParserType::Time: { return minecraft_time(); }
+            case ParserType::Uuid: { return minecraft_uuid(); }
+            case ParserType::Vec2: { return minecraft_vec2(); }
+            case ParserType::Vec3: { return minecraft_vec3(); }
+
+            default: {
+                Q_UNREACHABLE();
+                return nullptr;
+
+                break;
+            }
+        }
     }
 
     QSharedPointer<AngleNode> MinecraftParser::minecraft_angle() {
@@ -1128,7 +1196,6 @@ namespace Command {
             acceptedChars = acceptedChars.replace(this->curChar(), QString());
             this->advance();
         }
-        this->expect(' ', true);
         return QSharedPointer<SwizzleNode>::create(spanText(start), axes);
     }
 

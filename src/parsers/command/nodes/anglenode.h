@@ -49,6 +49,8 @@ private:
         AxisType m_type   = AxisType::Absolute;
         bool m_useInteger = false;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Angle)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::AngleNode>)

@@ -29,8 +29,10 @@ public:
 private:
         Nodes m_children;
     };
+
+    DECLARE_TYPE_ENUM(ParseNode::Kind, Root)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::RootNode>);
+Q_DECLARE_METATYPE(QSharedPointer<Command::RootNode>)
 
 #endif /* ROOTNODE_H */

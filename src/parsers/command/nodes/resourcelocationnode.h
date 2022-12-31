@@ -34,6 +34,8 @@ protected:
                                       const SpanPtr &nspace, const SpanPtr &id);
         explicit ResourceLocationNode(ParserType parserType, int length);
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ResourceLocation)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::ResourceLocationNode>)

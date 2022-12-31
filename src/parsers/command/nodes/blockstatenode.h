@@ -30,6 +30,9 @@ public:
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, BlockState)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, BlockPredicate)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::BlockStateNode>)

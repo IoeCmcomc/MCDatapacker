@@ -1,10 +1,13 @@
 #include "highlighter.h"
 
-#include "mainwindow.h"
 #include "globalhelpers.h"
 
 #include <QDebug>
 #include <QDir>
+
+TextBlockData::~TextBlockData() {
+    clear();
+}
 
 void TextBlockData::clear() {
     qDeleteAll(m_brackets);
@@ -90,7 +93,7 @@ void Highlighter::highlightBlock(const QString &text) {
         bool           dataAlereadyExisted = false;
         if (currentBlockUserData()) {
             data =
-                dynamic_cast<TextBlockData*>(currentBlockUserData());
+                dynamic_cast<TextBlockData *>(currentBlockUserData());
             data->clear();
             dataAlereadyExisted = true;
         } else {
@@ -184,7 +187,7 @@ void Highlighter::rehighlightBlock(const QTextBlock &block) {
     m_highlightMunually = false;
 }
 
-QTextDocument *Highlighter::getParentDoc() const {
+QTextDocument * Highlighter::getParentDoc() const {
     return m_parentDoc;
 }
 

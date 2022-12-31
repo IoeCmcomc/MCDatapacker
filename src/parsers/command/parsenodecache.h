@@ -32,7 +32,7 @@ namespace Command {
     class ParseNodeCache
     {
 public:
-        ParseNodeCache(int capacity = 500);
+        explicit ParseNodeCache(int capacity = 500);
 
         using Cache = LRU::Cache<CacheKey, NodePtr>;
 

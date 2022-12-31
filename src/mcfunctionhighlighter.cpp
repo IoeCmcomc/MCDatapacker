@@ -7,7 +7,7 @@
 #include <QElapsedTimer>
 
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
-    : Highlighter(parent), parser(this) {
+    : Highlighter(parent) {
     setupRules();
 }
 
@@ -231,12 +231,11 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
                            << "Time elapsed:" << timer.elapsed();
  */
             } else {
-                auto      &&parseErr = parser.lastError();
-                ProblemInfo error{ ProblemInfo::Type::Error,
-                                   (uint)block.blockNumber(),
-                                   (uint)parseErr.pos,
-                                   (uint)parseErr.length,
-                                   parseErr.toLocalizedMessage(),
+                const auto  parseErr = parser.errors().last();
+                ProblemInfo error{
+                    ProblemInfo::Type::Error, block.blockNumber(),
+                    parseErr.pos, parseErr.length,
+                    parseErr.toLocalizedMessage(),
                 };
                 data->setProblems({ error });
             }

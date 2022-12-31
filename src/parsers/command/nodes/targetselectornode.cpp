@@ -1,8 +1,6 @@
 #include "targetselectornode.h"
 #include "../visitors/nodevisitor.h"
 
-#include <QMetaEnum>
-
 static const int _ =
     qRegisterMetaType<QSharedPointer<Command::TargetSelectorNode> >();
 

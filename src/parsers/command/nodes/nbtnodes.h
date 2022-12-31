@@ -40,6 +40,8 @@ protected:
         explicit NbtNode(ParserType parserType, TagType tagType, int length);
     };
 
+    DECLARE_TYPE_ENUM_FULL(NbtNode, ArgumentNode::ParserType, NbtTag)
+
     class NbtStringNode : public SingleValueNode<NbtNode, QString,
                                                  ArgumentNode::ParserType::NbtTag>
     {
@@ -186,6 +188,9 @@ public:
 private:
         Pairs m_pairs;
     };
+
+    DECLARE_TYPE_ENUM_FULL(NbtCompoundNode, ArgumentNode::ParserType,
+                           NbtCompoundTag)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::NbtListNode>)

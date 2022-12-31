@@ -29,6 +29,8 @@ private:
         float m_value = 0;
         Unit m_unit   = Unit::ImplicitTick;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Time)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::TimeNode>)

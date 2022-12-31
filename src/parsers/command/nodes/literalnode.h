@@ -17,6 +17,8 @@ public:
 private:
         bool m_isCommand = false;
     };
+
+    DECLARE_TYPE_ENUM(ParseNode::Kind, Literal)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::LiteralNode>);

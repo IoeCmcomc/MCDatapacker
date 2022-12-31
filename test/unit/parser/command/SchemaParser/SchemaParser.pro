@@ -6,7 +6,7 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES +=  tst_testparser.cpp \
+SOURCES +=  tst_testschemaparser.cpp \
     ../../../../../src/parsers/command/nodes/argumentnode.cpp \
     ../../../../../src/parsers/command/nodes/singlevaluenode.cpp \
     ../../../../../src/parsers/command/nodes/literalnode.cpp \
@@ -14,11 +14,12 @@ SOURCES +=  tst_testparser.cpp \
     ../../../../../src/parsers/command/nodes/rootnode.cpp \
     ../../../../../src/parsers/command/nodes/stringnode.cpp \
     ../../../../../src/parsers/command/parsenodecache.cpp \
-    ../../../../../src/parsers/command/parser.cpp \
+    ../../../../../src/parsers/command/schemaparser.cpp \
     ../../../../../src/parsers/command/schema/schemaargumentnode.cpp \
     ../../../../../src/parsers/command/schema/schemaliteralnode.cpp \
     ../../../../../src/parsers/command/schema/schemanode.cpp \
-    ../../../../../src/parsers/command/schema/schemarootnode.cpp
+    ../../../../../src/parsers/command/schema/schemarootnode.cpp \
+    ../../../../../src/parsers/parser.cpp
 
 HEADERS += \
     ../../../../../src/parsers/command/nodes/argumentnode.h \
@@ -28,11 +29,12 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/rootnode.h \
     ../../../../../src/parsers/command/nodes/stringnode.h \
     ../../../../../src/parsers/command/parsenodecache.h \
-    ../../../../../src/parsers/command/parser.h \
+    ../../../../../src/parsers/command/schemaparser.h \
     ../../../../../src/parsers/command/schema/schemaargumentnode.h \
     ../../../../../src/parsers/command/schema/schemaliteralnode.h \
     ../../../../../src/parsers/command/schema/schemanode.h \
-    ../../../../../src/parsers/command/schema/schemarootnode.h
+    ../../../../../src/parsers/command/schema/schemarootnode.h \
+    ../../../../../src/parsers/parser.h
 
 RESOURCES += \
     ../../../../../resource/minecraft/info/1.15/1.15.qrc

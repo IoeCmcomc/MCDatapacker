@@ -10,13 +10,14 @@ namespace Command {
     class ParseNode {
 public:
         enum class Kind: signed char {
-            Error = -1,
+            Unknown = -1,
+            Error,
             Span, // Act as a token, not visitable
             File,
             Root,
             Literal,
-            Argument,
             Container, // Contains two or more nodes
+            Argument,
         };
 
         using Span = std::variant<int, QString>;
@@ -79,6 +80,23 @@ public:
         explicit SpanNode(const QString &text) : ParseNode(Kind::Span, text) {
         };
     };
+
+    template <class T, typename E>
+    constexpr E nodeTypeEnum;
+
+    template <class T>
+    constexpr ParseNode::Kind nodeTypeEnum<T, ParseNode::Kind> =
+        ParseNode::Kind::Unknown;
+
+    #define DECLARE_TYPE_ENUM_FULL(Class, Enum, EnumValue)              \
+            template <>                                                 \
+            constexpr Enum nodeTypeEnum<Class, Enum> = Enum::EnumValue; \
+
+#define DECLARE_TYPE_ENUM(Enum, EnumValue) \
+        DECLARE_TYPE_ENUM_FULL(EnumValue ## Node, Enum, EnumValue)
+
+    DECLARE_TYPE_ENUM(ParseNode::Kind, Error)
+    DECLARE_TYPE_ENUM(ParseNode::Kind, Span)
 }
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node);

@@ -20,6 +20,8 @@ public:
 private:
         nlohmann::json m_value;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Component)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::ComponentNode>)

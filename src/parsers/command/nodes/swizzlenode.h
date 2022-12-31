@@ -25,6 +25,8 @@ public:
 private:
         Axes m_axes;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Swizzle)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::SwizzleNode>)

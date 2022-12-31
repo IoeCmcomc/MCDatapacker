@@ -12,6 +12,8 @@ public:
 
         void accept(NodeVisitor *visitor, VisitOrder) override;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, String)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::StringNode>);

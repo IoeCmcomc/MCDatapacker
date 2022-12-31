@@ -26,6 +26,9 @@ public:
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ItemStack)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ItemPredicate)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::ItemStackNode>)

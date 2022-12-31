@@ -11,5 +11,5 @@ SUBDIRS += unit/parser/command/nodes/DoubleNode \
     unit/parser/command/nodes/SwizzleNode \
     unit/parser/command/nodes/TimeNode \
     unit/parser/command/nodes/UuidNode \
-    unit/parser/command/Parser \
+    unit/parser/command/SchemaParser \
     unit/parser/command/MinecraftParser

@@ -7,12 +7,13 @@ namespace Command {
     class ArgumentNode : public ParseNode {
 public:
         enum class ParserType {
-            Unknown = -1,
+            Unknown = static_cast<int>(ParseNode::Kind::Argument),
             Bool,
             Double,
             Float,
             Integer,
-            Long, // Not used inside Minecraft
+            Literal, // Obsolete
+            Long,    // Not used inside Minecraft
             String,
             Angle,
             BlockPos,
@@ -79,6 +80,11 @@ protected:
             : ParseNode(Kind::Argument, text), m_parserType(parserType) {
         };
     };
+
+    template <class T>
+    constexpr ArgumentNode::ParserType nodeTypeEnum<T,
+                                                    ArgumentNode::ParserType> =
+        ArgumentNode::ParserType::Unknown;
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::ArgumentNode>);

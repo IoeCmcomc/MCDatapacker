@@ -1,7 +1,6 @@
 #ifndef TARGETSELECTORNODE_H
 #define TARGETSELECTORNODE_H
 
-#include "parsenode.h"
 #include "mapnode.h"
 
 namespace Command {

@@ -12,6 +12,8 @@ public:
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, FloatRange)
 }
 
 Q_DECLARE_METATYPE(QSharedPointer<Command::FloatRangeNode>);
