@@ -1,9 +1,6 @@
 #include "particlenode.h"
 #include "../visitors/nodevisitor.h"
 
-static const int _ParticleColorNode =
-    qRegisterMetaType<QSharedPointer<Command::ParticleColorNode> >();
-
 namespace Command {
     ParticleColorNode::ParticleColorNode(int length)
         : ParseNode(Kind::Container, length) {
@@ -50,8 +47,6 @@ namespace Command {
     void ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
         m_r = r;
     }
-
-    const static bool _ = TypeRegister<ParticleNode>::init();
 
     ParticleNode::ParticleNode(int length)
         : ResourceLocationNode(ParserType::Particle, length) {

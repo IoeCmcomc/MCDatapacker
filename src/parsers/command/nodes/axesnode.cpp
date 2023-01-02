@@ -1,10 +1,6 @@
 #include "axesnode.h"
 #include "../visitors/nodevisitor.h"
 
-const static int _ =
-    qRegisterMetaType<QSharedPointer<Command::TwoAxesNode> >();
-const static int _2 = qRegisterMetaType<QSharedPointer<Command::XyzNode> >();
-
 namespace Command {
     TwoAxesNode::TwoAxesNode(ParserType parserType, int length)
         : ArgumentNode(parserType, length) {

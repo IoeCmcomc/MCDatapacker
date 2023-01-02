@@ -64,7 +64,7 @@ protected:
 
     QString getQuotedString();
 
-    QString spanText(const QStringRef& text);
+    QString spanText(const QStringRef& textRef);
     QString spanText(const QString& text);
     QString spanText(int start);
 

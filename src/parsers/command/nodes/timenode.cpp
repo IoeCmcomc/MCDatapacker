@@ -1,8 +1,6 @@
 #include "timenode.h"
 #include "../visitors/nodevisitor.h"
 
-const static bool _ = TypeRegister<Command::TimeNode>::init();
-
 namespace Command {
     TimeNode::TimeNode(const QString &text, int v, Unit unit)
         : ArgumentNode(ParserType::Time, text), m_value(v), m_unit(unit) {
@@ -18,10 +16,6 @@ namespace Command {
     }
 
     void TimeNode::setUnit(const Unit &unit) {
-        if (unit > 3) {
-            qWarning() << "Invaild unit type";
-            return;
-        }
         m_unit = unit;
     }
 
@@ -38,7 +32,7 @@ namespace Command {
                 return qRound(m_value * 24000);
 
             default: {
-                qWarning() << "Unknown unit: " << m_unit << ". Return -1.";
+                Q_UNREACHABLE();
                 return -1;
             }
         }

@@ -67,7 +67,4 @@ private:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, NbtPath)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathStepNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathNode>)
-
 #endif /* NBTPATHNODE_H */

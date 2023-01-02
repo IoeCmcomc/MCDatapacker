@@ -1,8 +1,6 @@
 #include "componentnode.h"
 #include "../visitors/nodevisitor.h"
 
-static bool _ = TypeRegister<Command::ComponentNode>::init();
-
 namespace Command {
     ComponentNode::ComponentNode(const QString &text)
         : ArgumentNode(ParserType::Component, text) {

@@ -101,19 +101,6 @@ public:
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node);
 
-Q_DECLARE_METATYPE(Command::NodePtr);
-Q_DECLARE_METATYPE(QSharedPointer<Command::ErrorNode>);
-Q_DECLARE_METATYPE(QSharedPointer<Command::SpanNode>);
-
-template <typename T>
-struct TypeRegister {
-    static bool init() {
-        qRegisterMetaType<QSharedPointer<T> >();
-        QMetaType::registerConverter<QSharedPointer<T>, Command::NodePtr >();
-        return true;
-    };
-};
-
 #define DEFINE_ACCEPT_METHOD(Type)                             \
         void Type::accept(NodeVisitor * visitor, VisitOrder) { \
             visitor->visit(this);                              \

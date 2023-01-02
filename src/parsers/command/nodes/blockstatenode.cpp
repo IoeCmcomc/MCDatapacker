@@ -1,9 +1,6 @@
 #include "blockstatenode.h"
 #include "../visitors/nodevisitor.h"
 
-static bool _  = TypeRegister<Command::BlockStateNode>::init();
-static bool _2 = TypeRegister<Command::BlockPredicateNode>::init();
-
 namespace Command {
     BlockStateNode::BlockStateNode(int length)
         : ResourceLocationNode(ParserType::BlockState, length) {

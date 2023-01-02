@@ -6,8 +6,7 @@
 #include "nlohmann/json.hpp"
 
 namespace Command {
-    class ComponentNode final : public ArgumentNode
-    {
+    class ComponentNode final : public ArgumentNode {
 public:
         explicit ComponentNode(const QString &text);
 
@@ -23,7 +22,4 @@ private:
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Component)
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::ComponentNode>)
-
 #endif /* COMPONENTNODE_H */

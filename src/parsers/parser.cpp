@@ -301,33 +301,15 @@ QString Parser::getQuotedString() {
     return value;
 }
 
-QString Parser::spanText(const QStringRef &text) {
-    //qDebug() << "spanText(const QStringRef &text)" << text << m_pos <<
-    //    m_curChar;
-    auto it = std::find(m_spans.begin(), m_spans.end(), text);
-
-    if (it != m_spans.end()) {
-        return *it;
-    } else {
-        const QString &&newText = text.toString();
-        m_spans.insert(newText);
-        return newText;
-    }
+QString Parser::spanText(const QStringRef &textRef) {
+    return spanText(textRef.toString());
 }
 
 QString Parser::spanText(const QString &text) {
-    //qDebug() << "spanText(const QString &text)" << text << m_pos <<
-    //    m_curChar;
-    auto it = std::find(m_spans.begin(), m_spans.end(), text);
-
-    if (it != m_spans.end()) {
-        return *it;
-    } else {
-        m_spans.insert(text);
-        return text;
-    }
+    m_spans << text;
+    return *m_spans.find(text);
 }
 
 QString Parser::spanText(int start) {
-    return spanText(m_text.midRef(start, m_pos - start));
+    return spanText(m_text.mid(start, m_pos - start));
 }

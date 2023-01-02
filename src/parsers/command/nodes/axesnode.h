@@ -49,9 +49,6 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::TwoAxesNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::XyzNode>)
-
 #define DECLARE_NODE_CLASS(Name, Base)                                   \
         namespace Command {                                              \
             class Name ## Node : public Base {                           \
@@ -62,9 +59,6 @@ public:                                                                  \
             };                                                           \
             DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)            \
         }                                                                \
-        Q_DECLARE_METATYPE(QSharedPointer<Command::Name ## Node>)        \
-        const static bool _ ## Name =                                    \
-            TypeRegister<Command::Name ## Node>::init();                 \
 
 DECLARE_NODE_CLASS(BlockPos, XyzNode)
 DECLARE_NODE_CLASS(ColumnPos, TwoAxesNode)

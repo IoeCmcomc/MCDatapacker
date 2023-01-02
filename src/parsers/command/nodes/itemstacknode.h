@@ -31,7 +31,4 @@ public:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ItemPredicate)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ItemStackNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::ItemPredicateNode>)
-
 #endif /* ITEMSTACKNODE_H */

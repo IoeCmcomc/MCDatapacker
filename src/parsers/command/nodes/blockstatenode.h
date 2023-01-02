@@ -35,7 +35,4 @@ public:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, BlockPredicate)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::BlockStateNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::BlockPredicateNode>)
-
 #endif /* BLOCKSTATENODE_H */

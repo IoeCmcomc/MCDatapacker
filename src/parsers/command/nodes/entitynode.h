@@ -83,9 +83,4 @@ private:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ScoreHolder)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::EntityNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::GameProfileNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::ScoreHolderNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::EntityArgumentValueNode>)
-
 #endif /* ENTITYNODE_H */

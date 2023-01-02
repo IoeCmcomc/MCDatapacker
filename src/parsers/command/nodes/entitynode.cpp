@@ -1,8 +1,6 @@
 #include "entitynode.h"
 #include "../visitors/nodevisitor.h"
 
-static bool _ = TypeRegister<Command::EntityNode>::init();
-
 namespace Command {
     EntityNode::EntityNode(int length)
         : ArgumentNode(ParserType::Entity, length) {
@@ -67,8 +65,6 @@ namespace Command {
         m_singleOnly = singleOnly;
     }
 
-    static bool _2 = TypeRegister<GameProfileNode>::init();
-
     GameProfileNode::GameProfileNode(int length)
         : EntityNode(ParserType::GameProfile, length, nullptr) {
     }
@@ -90,8 +86,6 @@ namespace Command {
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
     }
-
-    static bool _3 = TypeRegister<ScoreHolderNode>::init();
 
     ScoreHolderNode::ScoreHolderNode(int length)
         : EntityNode(ParserType::ScoreHolder, length, nullptr) {
@@ -126,9 +120,6 @@ namespace Command {
     void ScoreHolderNode::setAll(bool all) {
         m_all = all;
     }
-
-    static const int _EntityArgumentValueNode =
-        qRegisterMetaType<QSharedPointer<EntityArgumentValueNode> >();
 
     EntityArgumentValueNode::EntityArgumentValueNode(
         QSharedPointer<ArgumentNode> valNode, bool negative)

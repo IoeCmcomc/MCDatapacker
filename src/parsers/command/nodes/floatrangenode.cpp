@@ -1,8 +1,6 @@
 #include "floatrangenode.h"
 #include "../visitors/nodevisitor.h"
 
-const static bool _ = TypeRegister<Command::FloatRangeNode>::init();
-
 namespace Command {
     FloatRangeNode::FloatRangeNode(int length)
         : RangeNode(ParserType::FloatRange, length) {

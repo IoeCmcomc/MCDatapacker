@@ -13,8 +13,8 @@ public:
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
-        bool isEmpty();
-        int size();
+        bool isEmpty() const;
+        int size() const;
 
         void append(NodePtr node);
         void prepend(NodePtr node);
@@ -32,7 +32,5 @@ private:
 
     DECLARE_TYPE_ENUM(ParseNode::Kind, Root)
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::RootNode>)
 
 #endif /* ROOTNODE_H */

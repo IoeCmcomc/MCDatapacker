@@ -1,10 +1,6 @@
 #include "nbtnodes.h"
 #include "../visitors/nodevisitor.h"
 
-static bool       _  = TypeRegister<Command::NbtNode>::init();
-const static bool __ =
-    TypeRegister<Command::NbtStringNode>::init();
-
 namespace Command {
     NbtNode::NbtNode(TagType tagType, int length)
         : ArgumentNode(ParserType::NbtTag, length), m_tagType(tagType) {
@@ -36,32 +32,26 @@ namespace Command {
     DEFINE_ACCEPT_METHOD(NbtShortNode)
     DEFINE_ACCEPT_METHOD(NbtStringNode)
 
-#define DEFINE_ARRAY_NBTNODE(Class)                                            \
-        static const int _ ## Class =                                          \
-            qRegisterMetaType<QSharedPointer<Class> >();                       \
-        void Command::Class::accept(NodeVisitor * visitor, VisitOrder order) { \
-            if (order == VisitOrder::LetTheVisitorDecide) {                    \
-                visitor->visit(this);                                          \
-                return;                                                        \
-            }                                                                  \
-            if (order == VisitOrder::Preorder) {                               \
-                visitor->visit(this);                                          \
-            }                                                                  \
-            for (const auto &elem: qAsConst(m_vector)) {                       \
-                elem->accept(visitor, order);                                  \
-            }                                                                  \
-            if (order == VisitOrder::Postorder) {                              \
-                visitor->visit(this);                                          \
-            }                                                                  \
-        }                                                                      \
+#define DEFINE_ARRAY_NBTNODE(Class)                                   \
+        void Class::accept(NodeVisitor * visitor, VisitOrder order) { \
+            if (order == VisitOrder::LetTheVisitorDecide) {           \
+                visitor->visit(this);                                 \
+                return;                                               \
+            }                                                         \
+            if (order == VisitOrder::Preorder) {                      \
+                visitor->visit(this);                                 \
+            }                                                         \
+            for (const auto &elem: qAsConst(m_vector)) {              \
+                elem->accept(visitor, order);                         \
+            }                                                         \
+            if (order == VisitOrder::Postorder) {                     \
+                visitor->visit(this);                                 \
+            }                                                         \
+        }                                                             \
 
     DEFINE_ARRAY_NBTNODE(NbtByteArrayNode)
     DEFINE_ARRAY_NBTNODE(NbtIntArrayNode)
     DEFINE_ARRAY_NBTNODE(NbtLongArrayNode)
-
-
-    static const int _NbtListNode =
-        qRegisterMetaType<QSharedPointer<NbtListNode> >();
 
     NbtListNode::NbtListNode(int length) : NbtNode(TagType::List, length) {
     }
@@ -94,9 +84,6 @@ namespace Command {
     void NbtListNode::setPrefix(TagType prefix) {
         m_prefix = prefix;
     }
-
-
-    static bool _2 = TypeRegister<NbtCompoundNode>::init();
 
     NbtCompoundNode::NbtCompoundNode(int length)
         : NbtNode(ParserType::NbtCompoundTag, TagType::Compound, length) {

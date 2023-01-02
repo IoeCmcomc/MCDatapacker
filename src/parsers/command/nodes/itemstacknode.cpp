@@ -1,8 +1,6 @@
 #include "itemstacknode.h"
 #include "../visitors/nodevisitor.h"
 
-static bool _ = TypeRegister<Command::ItemStackNode>::init();
-
 namespace Command {
     ItemStackNode::ItemStackNode(int length)
         : ResourceLocationNode(ParserType::ItemStack, length) {
@@ -32,8 +30,6 @@ namespace Command {
     void ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
         m_nbt = nbt;
     }
-
-    static bool _2 = TypeRegister<ItemPredicateNode>::init();
 
     ItemPredicateNode::ItemPredicateNode(int length)
         : ItemStackNode(length) {

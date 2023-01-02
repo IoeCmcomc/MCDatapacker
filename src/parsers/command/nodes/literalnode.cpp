@@ -1,8 +1,6 @@
 #include "literalnode.h"
 #include "../visitors/nodevisitor.h"
 
-const static bool _ = TypeRegister<Command::LiteralNode>::init();
-
 namespace Command {
     LiteralNode::LiteralNode(const QString &txt)
         : ParseNode(Kind::Literal, txt) {

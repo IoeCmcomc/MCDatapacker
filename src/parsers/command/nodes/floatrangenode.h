@@ -16,5 +16,4 @@ public:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, FloatRange)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::FloatRangeNode>);
 #endif /* FLOATRANGENODE_H */

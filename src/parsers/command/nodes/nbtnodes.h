@@ -5,9 +5,6 @@
 #include "mapnode.h"
 #include "singlevaluenode.h"
 
-#include <iostream>
-#include <sstream>
-
 namespace Command {
     class NbtNode : public ArgumentNode {
 public:
@@ -42,11 +39,33 @@ protected:
 
     DECLARE_TYPE_ENUM_FULL(NbtNode, ArgumentNode::ParserType, NbtTag)
 
+#define DECLARE_PRIMITIVE_TAG_NBTNODE(Name, T)                                               \
+        class Nbt ## Name ## Node : public SingleValueNode<NbtNode, T,                       \
+                                                           ArgumentNode::ParserType::NbtTag> \
+        {                                                                                    \
+public:                                                                                      \
+            Nbt ## Name ## Node(const QString &text, const T &value)                         \
+                : SingleValueNode(text, value) {                                             \
+                m_tagType = TagType::Name;                                                   \
+            };                                                                               \
+            void accept(NodeVisitor * visitor, VisitOrder) override;                         \
+        };                                                                                   \
+
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Byte, int8_t)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Double, double)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Float, float)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Int, int)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Long, int64_t)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Short, short)
+    //DECLARE_PRIMITIVE_TAG_NBTNODE(String, QString)
+
+#undef DECLARE_PRIMITIVE_TAG_NBTNODE
+
     class NbtStringNode : public SingleValueNode<NbtNode, QString,
                                                  ArgumentNode::ParserType::NbtTag>
     {
 public:
-        explicit NbtStringNode(const QString &text, const QString &value)
+        NbtStringNode(const QString &text, const QString &value)
             : SingleValueNode(text, value) {
             m_tagType = TagType::String;
         };
@@ -54,43 +73,9 @@ public:
             : SingleValueNode(text, text) {
             m_tagType = TagType::String;
         };
-
         void accept(NodeVisitor *visitor, VisitOrder) override;
     };
-}
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtStringNode>)
-
-#define DECLARE_PRIMITIVE_TAG_NBTNODE(Name, T)                                                   \
-        namespace Command {                                                                      \
-            class Nbt ## Name ## Node : public SingleValueNode<NbtNode, T,                       \
-                                                               ArgumentNode::ParserType::NbtTag> \
-            {                                                                                    \
-public:                                                                                          \
-                explicit Nbt ## Name ## Node(const QString &text,                                \
-                                             const T &value)                                     \
-                    : SingleValueNode(text, value) {                                             \
-                    m_tagType = TagType::Name;                                                   \
-                };                                                                               \
-                void accept(NodeVisitor * visitor, VisitOrder) override;                         \
-            };                                                                                   \
-        }                                                                                        \
-        Q_DECLARE_METATYPE(QSharedPointer<Command::Nbt ## Name ## Node>)                         \
-        const static bool __ ## Name =                                                           \
-            TypeRegister<Command::Nbt ## Name ## Node>::init();                                  \
-
-DECLARE_PRIMITIVE_TAG_NBTNODE(Byte, int8_t)
-DECLARE_PRIMITIVE_TAG_NBTNODE(Double, double)
-DECLARE_PRIMITIVE_TAG_NBTNODE(Float, float)
-DECLARE_PRIMITIVE_TAG_NBTNODE(Int, int)
-DECLARE_PRIMITIVE_TAG_NBTNODE(Long, int64_t)
-DECLARE_PRIMITIVE_TAG_NBTNODE(Short, short)
-//DECLARE_PRIMITIVE_TAG_NBTNODE(String, QString)
-
-#undef DECLARE_PRIMITIVE_TAG_NBTNODE
-
-namespace Command {
     template<class T>
     class NbtListlikeNode {
 public:
@@ -126,27 +111,22 @@ public:
 protected:
         QVector<QSharedPointer<T> > m_vector;
     };
-}
 
-#define DECLARE_ARRAY_NBTNODE(Name, ValueType)                                 \
-        namespace Command {                                                    \
-            class Nbt ## Name ## Node : public NbtNode,                        \
-                public NbtListlikeNode<ValueType> {                            \
-public:                                                                        \
-                explicit Nbt ## Name ## Node(int length)                       \
-                    : NbtNode(ParserType::NbtTag, TagType::Name, length) {};   \
-                void accept(NodeVisitor * visitor, VisitOrder order) override; \
-            };                                                                 \
-        }                                                                      \
-        Q_DECLARE_METATYPE(QSharedPointer<Command::Nbt ## Name ## Node>)       \
+#define DECLARE_ARRAY_NBTNODE(Name, ValueType)                             \
+        class Nbt ## Name ## Node : public NbtNode,                        \
+            public NbtListlikeNode<ValueType> {                            \
+public:                                                                    \
+            explicit Nbt ## Name ## Node(int length)                       \
+                : NbtNode(ParserType::NbtTag, TagType::Name, length) {};   \
+            void accept(NodeVisitor * visitor, VisitOrder order) override; \
+        };                                                                 \
 
-DECLARE_ARRAY_NBTNODE(ByteArray, NbtByteNode)
-DECLARE_ARRAY_NBTNODE(IntArray, NbtIntNode)
-DECLARE_ARRAY_NBTNODE(LongArray, NbtLongNode)
+    DECLARE_ARRAY_NBTNODE(ByteArray, NbtByteNode)
+    DECLARE_ARRAY_NBTNODE(IntArray, NbtIntNode)
+    DECLARE_ARRAY_NBTNODE(LongArray, NbtLongNode)
 
 #undef DECLARE_ARRAY_NBTNODE
 
-namespace Command {
     using NbtPtr = QSharedPointer<NbtNode>;
 
     class NbtListNode : public NbtNode, public NbtListlikeNode<NbtNode> {
@@ -163,8 +143,7 @@ private:
         TagType m_prefix = TagType::Unknown;
     };
 
-    class NbtCompoundNode : public NbtNode
-    {
+    class NbtCompoundNode : public NbtNode {
 public:
 
         using Pair  = QSharedPointer<PairNode<NbtPtr> >;
@@ -192,8 +171,5 @@ private:
     DECLARE_TYPE_ENUM_FULL(NbtCompoundNode, ArgumentNode::ParserType,
                            NbtCompoundTag)
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtListNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtCompoundNode>)
 
 #endif /* NBTNODES_H */

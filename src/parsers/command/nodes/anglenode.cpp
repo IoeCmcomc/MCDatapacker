@@ -1,8 +1,6 @@
 #include "anglenode.h"
 #include "../visitors/nodevisitor.h"
 
-static bool _ = TypeRegister<Command::AngleNode>::init();
-
 namespace Command {
     AngleNode::AngleNode(AngleNode::AxisType type)
         : ArgumentNode(ParserType::Angle, QString()), m_type{type} {

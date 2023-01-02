@@ -87,6 +87,4 @@ protected:
         ArgumentNode::ParserType::Unknown;
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ArgumentNode>);
-
 #endif /* ARGUMENTNODE_H */

@@ -1,9 +1,6 @@
 #include "targetselectornode.h"
 #include "../visitors/nodevisitor.h"
 
-static const int _ =
-    qRegisterMetaType<QSharedPointer<Command::TargetSelectorNode> >();
-
 namespace Command {
     TargetSelectorNode::TargetSelectorNode(int length)
         : ParseNode(Kind::Container, length) {

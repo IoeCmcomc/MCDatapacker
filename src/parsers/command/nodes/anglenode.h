@@ -53,7 +53,4 @@ private:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Angle)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::AngleNode>)
-
-
 #endif /* ANGLENODE_H */

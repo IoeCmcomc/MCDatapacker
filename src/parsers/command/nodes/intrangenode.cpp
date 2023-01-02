@@ -1,8 +1,6 @@
 #include "intrangenode.h"
 #include "../visitors/nodevisitor.h"
 
-const static bool _ = TypeRegister<Command::IntRangeNode>::init();
-
 namespace Command {
     IntRangeNode::IntRangeNode(int length)
         : RangeNode(ParserType::IntRange, length) {

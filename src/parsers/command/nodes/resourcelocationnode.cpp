@@ -1,8 +1,6 @@
 #include "resourcelocationnode.h"
 #include "../visitors/nodevisitor.h"
 
-const static bool _ = TypeRegister<Command::ResourceLocationNode>::init();
-
 namespace Command {
     ResourceLocationNode::ResourceLocationNode(int length)
         : ArgumentNode(ParserType::ResourceLocation, length) {

@@ -570,18 +570,19 @@ namespace Command {
     }
 
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {
-        static const int typeId  = qMetaTypeId<QSharedPointer<LiteralNode> >();
-        const QString  &&literal = getUntil(QChar::Space).toString();
-        CacheKey         key{ typeId, literal };
+//        static constexpr int typeId  = getTypeEnumId<LiteralNode>();
+        const QString &&literal = getUntil(QChar::Space).toString();
+//        CacheKey             key{ typeId, literal };
 
-        if (m_cache.contains(key)) {
-            return m_cache[key].staticCast<LiteralNode>();
-        } else {
-            auto &&ret =
-                QSharedPointer<LiteralNode>::create(spanText(literal));
-            m_cache.emplace(typeId, literal, ret);
-            return ret;
-        }
+//        if (m_cache.contains(key)) {
+//            return qSharedPointerCast<LiteralNode>(m_cache[key]);
+//        } else {
+        auto &&ret =
+            QSharedPointer<LiteralNode>::create(spanText(literal));
+
+//        m_cache.emplace(typeId, literal, ret);
+        return ret;
+//        }
     }
 
     QSharedPointer<StringNode> SchemaParser::brigadier_string(
@@ -625,30 +626,30 @@ namespace Command {
             return m_tree;
         }
         setPos(0);
-        constexpr int typeId = getTypeEnumId<RootNode>();
-        CacheKey      key{ typeId, text() };
+//        constexpr int typeId = getTypeEnumId<RootNode>();
+//        CacheKey      key{ typeId, text() + '\1' };
 
-        if (m_cache.contains(key) && !m_testMode) {
-            m_tree = qSharedPointerCast<RootNode>(m_cache[key]);
-            setPos(txt.length());
-        } else {
-            try {
-                m_tree->setLeadingTrivia(skipWs());
-                if (parseBySchema(&m_schemaGraph)) {
-                    m_tree->setLength(pos() - 1);
-                    m_tree->setTrailingTrivia(skipWs());
-                    m_tree->setIsValid(true);
-                    m_cache.emplace(typeId, txt, m_tree);
-                }
-            } catch (const SchemaParser::Error &err) {
-                qDebug() << "Command::Parser::parse: errors detected";
-                m_errors << err;
-                for (const auto &error: m_errors) {
-                    qDebug() << error.toLocalizedMessage();
-                }
-                m_tree->setIsValid(false);
+//        if (m_cache.contains(key) && !m_testMode) {
+//            m_tree = qSharedPointerCast<RootNode>(m_cache[key]);
+//            setPos(txt.length());
+//        } else {
+        try {
+            m_tree->setLeadingTrivia(skipWs());
+            if (parseBySchema(&m_schemaGraph)) {
+                m_tree->setLength(pos() - 1);
+                m_tree->setTrailingTrivia(skipWs());
+                m_tree->setIsValid(true);
+//                    m_cache.emplace(typeId, txt, m_tree);
             }
+        } catch (const SchemaParser::Error &err) {
+            qDebug() << "Command::Parser::parse: errors detected";
+            m_errors << err;
+            for (const auto &error: m_errors) {
+                qDebug() << error.toLocalizedMessage();
+            }
+            m_tree->setIsValid(false);
         }
+//        }
         return m_tree;
     }
 
@@ -724,30 +725,31 @@ namespace Command {
                     argLengths << literal.length();
                     continue;
                 }
-                const int parserId = static_cast<int>(parserType);
+//                const int   parserId = static_cast<int>(parserType);
+                const auto &props = argNode->properties();
 
-                CacheKey key{ parserId, literal };
-                if (m_cache.contains(key)) {
-                    ret = m_cache[key];
-                    advance(ret->length());
-                } else {
-                    const auto &props = argNode->properties();
-                    try {
-                        ret = invokeMethod(parserType, props);
-                        Q_ASSERT(ret != nullptr);
-                    } catch (const SchemaParser::Error &err) {
-                        errors << err;
-                        int argLength = pos() - startPos + 1;
-                        setPos(startPos);
-                        argLengths << argLength;
-                        continue;
-                    }
+
+//                CacheKey key{ parserId, literal, props };
+//                if (m_cache.contains(key)) {
+//                    ret = m_cache[key];
+//                    advance(ret->length());
+//                } else {
+                try {
+                    ret = invokeMethod(parserType, props);
+                    Q_ASSERT(ret != nullptr);
+                } catch (const SchemaParser::Error &err) {
+                    errors << err;
+                    int argLength = pos() - startPos + 1;
+                    setPos(startPos);
+                    argLengths << argLength;
+                    continue;
                 }
+//                }
 
                 if (ret) {
-                    if ((literal.length() == ret->length()) &&
-                        !m_testMode)
-                        m_cache.emplace(parserId, literal, ret);
+//                    if ((literal.length() == ret->length()) &&
+//                        !m_testMode)
+//                        m_cache.emplace(parserId, literal, ret);
                     Schema::Node *node =
                         const_cast<Schema::ArgumentNode *>(argNode);
                     if (canContinue(&node, depth)) {

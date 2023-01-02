@@ -15,6 +15,4 @@ public:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, IntRange)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::IntRangeNode>);
-
 #endif /* INTRANGENODE_H */

@@ -1,10 +1,6 @@
 #include "nbtpathnode.h"
 #include "../visitors/nodevisitor.h"
 
-static const int _NbtPathStepnode =
-    qRegisterMetaType<QSharedPointer<Command::NbtPathStepNode> >();
-const static bool _ = TypeRegister<Command::NbtPathNode>::init();
-
 namespace Command {
     NbtPathStepNode::NbtPathStepNode(int length)
         : ParseNode(ParseNode::Kind::Container, length) {

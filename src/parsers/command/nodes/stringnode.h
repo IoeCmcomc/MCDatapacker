@@ -16,6 +16,4 @@ public:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, String)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::StringNode>);
-
 #endif /* STRINGNODE_H */

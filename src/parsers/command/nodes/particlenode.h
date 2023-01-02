@@ -47,7 +47,4 @@ private:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Particle)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ParticleColorNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::ParticleNode>)
-
 #endif /* PARTICLENODE_H */

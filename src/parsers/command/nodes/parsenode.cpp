@@ -1,8 +1,6 @@
 #include "parsenode.h"
 #include "../visitors/nodevisitor.h"
 
-const static int _ = qRegisterMetaType<QSharedPointer<Command::ParseNode> >();
-
 namespace Command {
     bool ParseNode::isValid() const {
         return m_isValid;

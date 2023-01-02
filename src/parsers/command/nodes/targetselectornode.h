@@ -31,6 +31,4 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::TargetSelectorNode>)
-
 #endif /* TARGETSELECTORNODE_H */

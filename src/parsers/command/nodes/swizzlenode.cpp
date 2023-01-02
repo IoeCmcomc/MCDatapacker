@@ -1,8 +1,6 @@
 #include "swizzlenode.h"
 #include "../visitors/nodevisitor.h"
 
-const static bool _ = TypeRegister<Command::SwizzleNode>::init();
-
 namespace Command {
     SwizzleNode::SwizzleNode(const QString &text, bool hasX, bool hasY,
                              bool hasZ)

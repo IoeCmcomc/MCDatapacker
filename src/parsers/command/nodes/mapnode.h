@@ -49,6 +49,4 @@ private:
     };
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::MapNode>)
-
 #endif /* MAPNODE_H */

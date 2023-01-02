@@ -2,7 +2,8 @@
 
 namespace Command {
     bool CacheKey::operator==(const CacheKey &rhs) const {
-        return (typeId == rhs.typeId) && (literalStr == rhs.literalStr);
+        return (typeId == rhs.typeId) && (literalStr == rhs.literalStr)
+               && (props == rhs.props);
     }
 
     ParseNodeCache::ParseNodeCache(int capacity)  : m_cache(capacity) {
@@ -25,15 +26,22 @@ namespace Command {
         return m_cache.contains(key);
     }
 
-    const QSharedPointer<ParseNode> &ParseNodeCache::lookup(
+    const NodePtr &ParseNodeCache::lookup(
         const CacheKey &key) const {
         return m_cache.lookup(key);
     }
 
     void ParseNodeCache::emplace(const int typeId, const QString &literalStr,
-                                 QSharedPointer<ParseNode> node) {
+                                 NodePtr node) {
         m_cache.emplace(std::piecewise_construct,
                         std::forward_as_tuple(typeId, literalStr),
+                        std::forward_as_tuple(node));
+    }
+
+    void ParseNodeCache::emplace(const int typeId, const QString &literalStr,
+                                 const QVariantMap &props, NodePtr node) {
+        m_cache.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(typeId, literalStr, props),
                         std::forward_as_tuple(node));
     }
 
@@ -41,7 +49,7 @@ namespace Command {
         return m_cache.lookup(key);
     }
 
-    const QSharedPointer<ParseNode> &ParseNodeCache::operator[](
+    const NodePtr &ParseNodeCache::operator[](
         const CacheKey &key) const {
         return m_cache.lookup(key);
     }

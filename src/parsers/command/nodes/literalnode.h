@@ -21,6 +21,4 @@ private:
     DECLARE_TYPE_ENUM(ParseNode::Kind, Literal)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::LiteralNode>);
-
 #endif /* LITERALNODE_H */

@@ -7,7 +7,7 @@ namespace Command {
     class TimeNode : public ArgumentNode
     {
 public:
-        enum Unit : unsigned char {
+        enum class Unit : unsigned char {
             ImplicitTick,
             Tick,
             Second,
@@ -32,7 +32,5 @@ private:
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Time)
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::TimeNode>)
 
 #endif /* TIMENODE_H */

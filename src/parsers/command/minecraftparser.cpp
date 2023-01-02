@@ -416,7 +416,7 @@ namespace Command {
                 return ret;
             } else if (key == QLatin1String("nbt")) {
                 const auto &&ret = parseNegEntityArg();
-                ret->setNegative(parseCompoundTag());
+                ret->setNode(parseCompoundTag());
                 return ret;
             } else if (key == QLatin1String("tag") || key == QLatin1String(
                            "team")) {
@@ -547,7 +547,7 @@ namespace Command {
         /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
         if (curChar() == '.') {
             advance();
-            ret->setTrailingTrivia(spanText("."));
+            ret->setTrailingTrivia(spanText(pos() - 1));
         }
         /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
         ret->setLength(pos() - start);
@@ -705,8 +705,6 @@ namespace Command {
             default: {
                 Q_UNREACHABLE();
                 return nullptr;
-
-                break;
             }
         }
     }

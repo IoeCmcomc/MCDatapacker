@@ -1,8 +1,6 @@
 #include "mapnode.h"
 #include "../visitors/nodevisitor.h"
 
-const static int _ = qRegisterMetaType<QSharedPointer<Command::MapNode> >();
-
 namespace Command {
     DEFINE_ACCEPT_METHOD(KeyNode)
 

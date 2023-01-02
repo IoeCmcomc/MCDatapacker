@@ -98,25 +98,27 @@ protected:
         auto callWithCache(QSharedPointer<Type> (Class::*funcPtr)(Args1 ...),
                            Class *that, const QString &literal,
                            Args2 &&... args) {
-            if (m_testMode) {
-                return (that->*funcPtr)(std::forward<decltype(args)>(args)...);
-            }
+            //if (m_testMode) {
+            return (that->*funcPtr)(std::forward<Args1>(args)...);
+            //}
 
-            constexpr int retTypeId = getTypeEnumId<Type>();
-            CacheKey      key{ retTypeId, literal };
+            /*
+               constexpr int retTypeId = getTypeEnumId<Type>();
+               CacheKey      key{ retTypeId, literal };
 
-            if (m_cache.contains(key)) {
+               if (m_cache.contains(key)) {
                 const auto value = qSharedPointerCast<Type>(m_cache[key]);
                 Q_ASSERT(value != nullptr);
                 advance(value->length());
                 return value;
-            }
-            auto value =
+               }
+               auto value =
                 (that->*funcPtr)(std::forward<decltype(args)>(args)...);
-            Q_ASSERT(value != nullptr);
-            m_cache.emplace(retTypeId, literal, value);
+               Q_ASSERT(value != nullptr);
+               m_cache.emplace(retTypeId, literal, value);
 
-            return value;
+               return value;
+             */
         }
 
         virtual NodePtr invokeMethod(ArgumentNode::ParserType parserType,
@@ -124,9 +126,8 @@ protected:
 
 private:
         ParseNodeCache m_cache;
-        Error m_lastError;
         QSharedPointer<Command::RootNode> m_tree = nullptr;
-        const QRegularExpression m_literalStrRegex{ R"([\w.+-<=>]+)" };
+        const QRegularExpression m_literalStrRegex{ R"([\w.+-]+)" };
         const QRegularExpression m_decimalNumRegex = QRegularExpression(
             R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))");
         static inline QJsonObject m_schema;

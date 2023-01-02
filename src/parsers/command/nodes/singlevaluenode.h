@@ -9,13 +9,13 @@ namespace Command {
     class SingleValueNode : public Base
     {
 public:
-        explicit SingleValueNode(const QString &text, const T &value)
+        SingleValueNode(const QString &text, const T &value)
             : Base(PT, text), m_value(value) {
             this->m_isValid = true;
         };
         template <typename _T = T,
-                  typename = typename std::enable_if<std::is_same<_T,
-                                                                  QString>::value>::type >
+                  typename = typename std::enable_if_t<std::is_same<_T,
+                                                                    QString>::value> >
         explicit SingleValueNode(const QString &text)
             : Base(PT, text), m_value(text) {
             this->m_isValid = true;
@@ -46,9 +46,6 @@ public:                                                                         
             };                                                                          \
             DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)                           \
         }                                                                               \
-        Q_DECLARE_METATYPE(QSharedPointer<Command::Name ## Node>)                       \
-        const static bool _ ## Name =                                                   \
-            TypeRegister<Command::Name ## Node>::init();                                \
 
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Bool, bool)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Double, double)

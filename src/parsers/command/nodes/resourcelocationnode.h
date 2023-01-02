@@ -38,7 +38,6 @@ protected:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ResourceLocation)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ResourceLocationNode>)
 
 #define DECLARE_RESOURCE_LOCATION_NODE_CLASS(Name)                       \
         namespace Command {                                              \
@@ -50,10 +49,6 @@ public:                                                                  \
                 void accept(NodeVisitor * visitor, VisitOrder) override; \
             };                                                           \
         }                                                                \
-        /*Q_DECLARE_METATYPE(Command::Name ## Node)*/                    \
-        Q_DECLARE_METATYPE(QSharedPointer<Command::Name ## Node>)        \
-        const static bool _ ## Name =                                    \
-            TypeRegister<Command::Name ## Node>::init();                 \
 
 DECLARE_RESOURCE_LOCATION_NODE_CLASS(Dimension)
 DECLARE_RESOURCE_LOCATION_NODE_CLASS(EntitySummon)

@@ -1,8 +1,6 @@
 #include "rootnode.h"
 #include "../visitors/nodevisitor.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::RootNode> >();
-
 namespace Command {
     RootNode::RootNode(int length) : ParseNode(Kind::Root, length) {
     }
@@ -21,11 +19,11 @@ namespace Command {
             visitor->visit(this);
     }
 
-    bool RootNode::isEmpty() {
+    bool RootNode::isEmpty() const {
         return m_children.empty();
     }
 
-    int RootNode::size() {
+    int RootNode::size() const {
         return m_children.size();
     }
 
@@ -41,8 +39,7 @@ namespace Command {
         m_children.clear();
     }
 
-    RootNode::Nodes RootNode::children()
-    const {
+    RootNode::Nodes RootNode::children() const {
         return m_children;
     }
 }

@@ -29,7 +29,6 @@ private:
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Swizzle)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::SwizzleNode>)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Command::SwizzleNode::Axes)
 
 #endif /* SWIZZLENODE_H */
