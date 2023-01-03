@@ -514,9 +514,9 @@ namespace Command {
 
     QSharedPointer<DoubleNode> SchemaParser::brigadier_double(
         const QVariantMap &props) {
-        QString &&raw   = getWithRegex(m_decimalNumRegex);
-        bool      ok    = false;
-        double    value = raw.toDouble(&ok);
+        const QString &&raw   = getWithRegex(m_decimalNumRegex);
+        bool            ok    = false;
+        double          value = raw.toDouble(&ok);
 
         if (!ok)
             error(QT_TR_NOOP("%1 is not a vaild double number"), { raw });
@@ -533,9 +533,9 @@ namespace Command {
 
     QSharedPointer<FloatNode> SchemaParser::brigadier_float(
         const QVariantMap &props) {
-        QString &&raw   = getWithRegex(m_decimalNumRegex);
-        bool      ok    = false;
-        float     value = raw.toFloat(&ok);
+        const QString &&raw   = getWithRegex(m_decimalNumRegex);
+        bool            ok    = false;
+        float           value = raw.toFloat(&ok);
 
         if (!ok)
             error(QT_TR_NOOP("%1 is not a vaild float number"), { raw });
@@ -552,9 +552,9 @@ namespace Command {
 
     QSharedPointer<IntegerNode> SchemaParser::brigadier_integer(
         const QVariantMap &props) {
-        QString &&raw   = getWithRegex(R"([+-]?\d+)");
-        bool      ok    = false;
-        int       value = raw.toFloat(&ok);
+        const QString &&raw   = getWithRegex(R"([+-]?\d+)");
+        bool            ok    = false;
+        int             value = raw.toFloat(&ok);
 
         if (!ok)
             error(QT_TR_NOOP("%1 is not a vaild integer number"), { raw });
@@ -577,7 +577,7 @@ namespace Command {
 //        if (m_cache.contains(key)) {
 //            return qSharedPointerCast<LiteralNode>(m_cache[key]);
 //        } else {
-        auto &&ret =
+        const auto &&ret =
             QSharedPointer<LiteralNode>::create(spanText(literal));
 
 //        m_cache.emplace(typeId, literal, ret);
@@ -587,13 +587,13 @@ namespace Command {
 
     QSharedPointer<StringNode> SchemaParser::brigadier_string(
         const QVariantMap &props) {
-        auto defaultRet = QSharedPointer<StringNode>::create(QString());
+        const auto &&defaultRet = QSharedPointer<StringNode>::create(QString());
 
         if (!props.contains(QLatin1String("type")))
             error(QT_TR_NOOP(
                       "The required paramenter 'type' of the 'brigadier_string' argument parser is missing."));
 
-        QString &&type = props[QLatin1String("type")].toString();
+        const QString &&type = props[QLatin1String("type")].toString();
         if (type == QLatin1String("greedy")) {
             return QSharedPointer<StringNode>::create(spanText(getRest()));
         } else if (type == QLatin1String("phrase")) {
@@ -665,8 +665,8 @@ namespace Command {
         if (depth > 256)
             qWarning() << "The parsing stack depth is too large:" << depth;
 
-        bool canEndParsing = curChar().isNull()
-                             || (peek(2) == QLatin1String(" "));
+        const bool canEndParsing = curChar().isNull()
+                                   || (peek(2) == QLatin1String(" "));
         if ((*schemaNode)->isExecutable() && canEndParsing) {
             return false;
         } else if ((*schemaNode)->isEmpty() && (*schemaNode)->redirect()) {
@@ -682,7 +682,7 @@ namespace Command {
 
     bool SchemaParser::parseBySchema(const Schema::Node *schemaNode,
                                      int depth) {
-        NodePtr                      ret = nullptr;
+        NodePtr                      ret;
         QVector<SchemaParser::Error> errors;
         QVector<int>                 argLengths;
 

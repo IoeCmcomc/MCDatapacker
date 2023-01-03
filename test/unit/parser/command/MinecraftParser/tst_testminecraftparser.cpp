@@ -470,7 +470,7 @@ void TestMinecraftParser::commands() {
     QFETCH(QString, parseTreeRepr);
 
     MinecraftParser           parser(command);
-    QSharedPointer<ParseNode> result = nullptr;
+    QSharedPointer<ParseNode> result;
     QBENCHMARK
     {
         result = parser.parse();
@@ -544,7 +544,7 @@ void TestMinecraftParser::benchmarkCommandBoxes() {
     QFETCH(QString, command);
 
     MinecraftParser           parser(command);
-    QSharedPointer<ParseNode> result = nullptr;
+    QSharedPointer<ParseNode> result;
     QBENCHMARK {
         result = parser.parse();
     }

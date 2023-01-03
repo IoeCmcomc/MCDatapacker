@@ -32,7 +32,7 @@ namespace Command {
     }
 
     void BlockStateNode::setStates(QSharedPointer<MapNode> states) {
-        m_states = states;
+        m_states = std::move(states);
     }
 
     QSharedPointer<NbtCompoundNode> BlockStateNode::nbt()
@@ -41,7 +41,7 @@ namespace Command {
     }
 
     void BlockStateNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
-        m_nbt = nbt;
+        m_nbt = std::move(nbt);
     }
 
     BlockPredicateNode::BlockPredicateNode(int length)

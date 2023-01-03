@@ -114,15 +114,10 @@ void Parser::advance(int n) {
 }
 
 /*!
- * \brief throws a \c error if the char \a chr isn't equal to the current character.
+ * \brief Throws a \c error if the char \a chr isn't equal to the current character.
  */
-bool Parser::expect(const QChar &chr, bool acceptNull) {
-/*    qDebug() << "Command::Parser::expect" << chr << acceptNull << m_curChar; */
-    bool cond = m_curChar == chr;
-
-    if (!cond && acceptNull)
-        cond = m_curChar.isNull();
-    if (cond) {
+bool Parser::expect(QChar chr) {
+    if (m_curChar == chr) {
         return true;
     } else {
         const QString &&curCharTxt =
@@ -141,13 +136,26 @@ bool Parser::expect(const QChar &chr, bool acceptNull) {
 }
 
 /*!
- * \brief Much like \c expect(), but also advances one character.
+ * \brief Consumes the character \a chr and optionaly skips whitespaces.
  * \sa eat()
  */
-QString Parser::eat(const QChar &chr, bool acceptNull) {
-    expect(chr, acceptNull);
+QString Parser::eat(QChar chr, EatOptions options) {
+    const int start = m_pos;
+
+    if (options.testFlag(SkipLeftWs)) {
+        while (m_curChar.isSpace())
+            advance();
+    }
+
+    expect(chr);
     advance();
-    return spanText(m_pos - 1);
+
+    if (options.testFlag(SkipRightWs)) {
+        while (m_curChar.isSpace())
+            advance();
+    }
+
+    return spanText(start);
 }
 
 /*!
@@ -174,16 +182,7 @@ QStringRef Parser::getRest() {
  * \brief Returns the substring from the current character with the given (regex) \a charset.
  */
 QString Parser::getWithCharset(const QString &charset) {
-    QString            ret;
-    QRegularExpression regex('[' + charset + ']');
-
-    while (regex.match(m_curChar).hasMatch()) {
-        if (m_curChar.isNull())
-            break;
-        ret += m_curChar;
-        advance();
-    }
-    return ret;
+    return getWithRegex("[" + charset + "]+");
 }
 
 /*!
@@ -218,9 +217,7 @@ QStringRef Parser::peekUntil(QChar chr) {
     const int start = m_pos;
     const int index = m_text.indexOf(chr, start);
 
-    const auto &ref = m_text.midRef(start, qMax(-1, index - start));
-
-    return ref;
+    return m_text.midRef(start, qMax(-1, index - start));
 }
 
 QString Parser::skipWs(bool once) {
@@ -238,7 +235,7 @@ QString Parser::skipWs(bool once) {
  * \brief Returns the next quoted string.
  */
 QString Parser::getQuotedString() {
-    QVector<QChar> delimiters{ '"', '\'' };
+    const static QVector<QChar> delimiters{ '"', '\'' };
 
     QChar curQuoteChar;
 
@@ -307,6 +304,11 @@ QString Parser::spanText(const QStringRef &textRef) {
 
 QString Parser::spanText(const QString &text) {
     m_spans << text;
+    return *m_spans.find(text);
+}
+
+QString Parser::spanText(QString &&text) {
+    m_spans << std::move(text);
     return *m_spans.find(text);
 }
 

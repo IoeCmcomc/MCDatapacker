@@ -25,7 +25,7 @@ namespace Command {
     }
 
     void TargetSelectorNode::setArgs(QSharedPointer<MapNode> args) {
-        m_args = args;
+        m_args = std::move(args);
     }
 
     TargetSelectorNode::Variable TargetSelectorNode::variable()

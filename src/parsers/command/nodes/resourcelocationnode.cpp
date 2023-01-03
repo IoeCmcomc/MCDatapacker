@@ -32,16 +32,16 @@ namespace Command {
         return m_namespace;
     }
 
-    void ResourceLocationNode::setNamespace(const SpanPtr &nspace) {
-        m_namespace = nspace;
+    void ResourceLocationNode::setNamespace(SpanPtr nspace) {
+        m_namespace = std::move(nspace);
     }
 
     SpanPtr ResourceLocationNode::id() const {
         return m_id;
     }
 
-    void ResourceLocationNode::setId(const SpanPtr &id) {
-        m_id = id;
+    void ResourceLocationNode::setId(SpanPtr id) {
+        m_id = std::move(id);
     }
 
     bool ResourceLocationNode::isTag() const {

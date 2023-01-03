@@ -28,7 +28,7 @@ namespace Command {
     }
 
     void ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
-        m_nbt = nbt;
+        m_nbt = std::move(nbt);
     }
 
     ItemPredicateNode::ItemPredicateNode(int length)

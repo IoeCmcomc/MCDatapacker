@@ -87,10 +87,10 @@ public:
             return m_vector.size();
         }
         virtual void append(QSharedPointer<T> node) {
-            m_vector.append(node);
+            m_vector.append(std::move(node));
         }
         void insert(int i, QSharedPointer<T> node) {
-            m_vector.insert(i, node);
+            m_vector.insert(i, std::move(node));
         }
         void remove(int i) {
             m_vector.remove(i);

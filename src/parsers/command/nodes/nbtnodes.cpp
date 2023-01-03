@@ -74,7 +74,7 @@ namespace Command {
         if (isEmpty())
             m_prefix = node->tagType();
         if (node->tagType() == m_prefix)
-            m_vector << node;
+            m_vector << std::move(node);
         else
             qWarning() << "Incompatible node type";
     }

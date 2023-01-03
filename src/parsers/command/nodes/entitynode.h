@@ -1,18 +1,17 @@
 #ifndef ENTITYNODE_H
 #define ENTITYNODE_H
 
-#include "stringnode.h"
-#include "targetselectornode.h"
-#include "singlevaluenode.h"
+//#include "stringnode.h"
+//#include "targetselectornode.h"
+//#include "singlevaluenode.h"
+
+#include "argumentnode.h"
 
 namespace Command {
     class EntityNode : public ArgumentNode
     {
 public:
         explicit EntityNode(int length);
-        explicit EntityNode(const QSharedPointer<StringNode> &other);
-        explicit EntityNode(const QSharedPointer<TargetSelectorNode> &other);
-        explicit EntityNode(const QSharedPointer<UuidNode> &other);
 
         bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order) override;
@@ -24,10 +23,15 @@ public:
         void setPlayerOnly(bool playerOnly);
 
         NodePtr getNode() const;
-        void setNode(const NodePtr &ptr);
+        template <typename T>
+        typename std::enable_if_t<std::is_assignable_v<NodePtr, T> >
+        setNode(T &&node) {
+            setLength(node->length());
+            m_ptr = std::forward<T>(node);
+        }
 
 protected:
-        NodePtr m_ptr = nullptr;
+        NodePtr m_ptr;
 
         explicit EntityNode(ParserType parserType, int length,
                             const NodePtr &ptr);
@@ -61,8 +65,8 @@ private:
 
     class EntityArgumentValueNode final : public ParseNode {
 public:
-        explicit EntityArgumentValueNode(QSharedPointer<ArgumentNode> valNode,
-                                         bool negative = false);
+        using ArgPtr = QSharedPointer<ArgumentNode>;
+
         explicit EntityArgumentValueNode(bool negative = false);
 
         bool isValid() const override;
@@ -71,11 +75,16 @@ public:
         bool isNegative() const;
         void setNegative(bool negative);
 
-        QSharedPointer<ArgumentNode> getNode() const;
-        void setNode(QSharedPointer<ArgumentNode> value);
+        ArgPtr getNode() const;
+        template <typename T>
+        typename std::enable_if_t<std::is_assignable_v<ArgPtr, T> >
+        setNode(T &&node) {
+            m_ptr = std::forward<T>(node);
+        }
+
 private:
-        QSharedPointer<ArgumentNode> m_ptr = nullptr;
-        bool m_negative                    = false;
+        ArgPtr m_ptr;
+        bool m_negative = false;
     };
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Entity)

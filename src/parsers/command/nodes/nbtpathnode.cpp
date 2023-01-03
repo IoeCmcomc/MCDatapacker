@@ -67,7 +67,7 @@ namespace Command {
     }
 
     void NbtPathStepNode::setName(QSharedPointer<StringNode> name) {
-        m_name = name;
+        m_name = std::move(name);
         setType(Type::Key);
     }
 
@@ -76,7 +76,7 @@ namespace Command {
     }
 
     void NbtPathStepNode::setIndex(QSharedPointer<IntegerNode> index) {
-        m_index = index;
+        m_index = std::move(index);
         setType(Type::Index);
     }
 
@@ -86,7 +86,7 @@ namespace Command {
     }
 
     void NbtPathStepNode::setFilter(QSharedPointer<NbtCompoundNode> filter) {
-        m_filter = filter;
+        m_filter = std::move(filter);
     }
 
     NbtPathStepNode::Type NbtPathStepNode::type() const {
@@ -123,7 +123,7 @@ namespace Command {
     }
 
     void NbtPathNode::append(QSharedPointer<NbtPathStepNode> node) {
-        m_steps.append(node);
+        m_steps.append(std::move(node));
     }
 
     void NbtPathNode::remove(int i) {

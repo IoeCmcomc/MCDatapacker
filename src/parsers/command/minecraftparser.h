@@ -13,6 +13,7 @@
 #include "nodes/particlenode.h"
 #include "nodes/swizzlenode.h"
 #include "nodes/timenode.h"
+#include "nodes/targetselectornode.h"
 
 #include <QVersionNumber>
 
@@ -36,6 +37,7 @@ private:
         static inline QVersionNumber gameVer = QVersionNumber();
 
         QString oneOf(const QStringList &strArr);
+        QString eatListSep(QChar sepChr, QChar endChr);
 
         template<class Container, class Type>
         QSharedPointer<Container> parseMap(QChar beginChar,
@@ -45,8 +47,8 @@ private:
                                            bool acceptQuotation      = false,
                                            const QString &keyCharset = R"(0-9a-zA-Z-_.+)")
         {
-            const auto &&obj   = QSharedPointer<Container>::create(0);
-            const int    start = pos();
+            auto    &&obj   = QSharedPointer<Container>::create(0);
+            const int start = pos();
 
             obj->setLeftText(this->eat(beginChar));
             while (this->curChar() != endChar) {
@@ -79,10 +81,7 @@ private:
                 obj->insert(key, value);
                 value->setTrailingTrivia(spanText(this->skipWs(false)));
                 if (this->curChar() != endChar) {
-                    triviaStart = pos();
-                    this->eat(',');
-                    this->skipWs(false);
-                    obj->constLast()->setTrailingTrivia(spanText(triviaStart));
+                    obj->constLast()->setTrailingTrivia(eat(',', SkipRightWs));
                 }
             }
             obj->setRightText(this->eat(endChar));
@@ -117,12 +116,7 @@ private:
                     }
                     elem->setLeadingTrivia(trivia);
                     ret->append(elem);
-                    const int triviaStart = pos();
-                    if (this->curChar() != ']') {
-                        this->eat(',');
-                        skipWs(false);
-                    }
-                    elem->setTrailingTrivia(spanText(triviaStart));
+                    elem->setTrailingTrivia(eatListSep(',', ']'));
                 }
                 ret->setRightText(eat(']'));
                 return ret;

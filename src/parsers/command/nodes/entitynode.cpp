@@ -6,19 +6,6 @@ namespace Command {
         : ArgumentNode(ParserType::Entity, length) {
     }
 
-    EntityNode::EntityNode(const QSharedPointer<StringNode> &other)
-        : ArgumentNode(ParserType::Entity, other->length()), m_ptr(other) {
-    }
-
-    EntityNode::EntityNode(const QSharedPointer<TargetSelectorNode> &other)
-        : ArgumentNode(ParserType::Entity, other->length()), m_ptr(other) {
-    }
-
-    EntityNode::EntityNode(const QSharedPointer<UuidNode> &other)
-        : ArgumentNode(ParserType::Entity, other->length()), m_ptr(other),
-        m_singleOnly(true) {
-    }
-
     bool EntityNode::isValid() const {
         return ParseNode::isValid() && m_ptr;
     }
@@ -48,9 +35,9 @@ namespace Command {
         return m_ptr;
     }
 
-    void EntityNode::setNode(const NodePtr &ptr) {
-        m_ptr = ptr;
-    }
+//    void EntityNode::setNode(const NodePtr &ptr) {
+//        m_ptr = ptr;
+//    }
 
     EntityNode::EntityNode(ParserType parserType, int length,
                            const NodePtr &ptr)
@@ -121,12 +108,6 @@ namespace Command {
         m_all = all;
     }
 
-    EntityArgumentValueNode::EntityArgumentValueNode(
-        QSharedPointer<ArgumentNode> valNode, bool negative)
-        : ParseNode(Kind::Container, valNode->length()),
-        m_ptr(valNode), m_negative(negative) {
-    }
-
     EntityArgumentValueNode::EntityArgumentValueNode(bool negative)
         : ParseNode(Kind::Container, 0), m_negative(negative) {
     }
@@ -157,11 +138,7 @@ namespace Command {
         m_negative = negative;
     }
 
-    QSharedPointer<ArgumentNode> EntityArgumentValueNode::getNode()  const {
+    EntityArgumentValueNode::ArgPtr EntityArgumentValueNode::getNode()  const {
         return m_ptr;
-    }
-
-    void EntityArgumentValueNode::setNode(QSharedPointer<ArgumentNode> value) {
-        m_ptr = value;
     }
 }

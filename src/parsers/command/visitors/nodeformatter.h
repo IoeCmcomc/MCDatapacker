@@ -17,6 +17,7 @@
 #include "../nodes/particlenode.h"
 #include "../nodes/swizzlenode.h"
 #include "../nodes/timenode.h"
+#include "../nodes/targetselectornode.h"
 
 #include <QRandomGenerator>
 #include <QTextCharFormat>

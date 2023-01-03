@@ -43,6 +43,14 @@ public:
     QStringSet spans() const;
 
 protected:
+    enum EatOption { // For use in eat() method
+        NoOption    = 0x0,
+        SkipLeftWs  = 0x1,
+        SkipRightWs = 0x2,
+        SkipBothWs  = 0x3,
+    };
+    Q_DECLARE_FLAGS(EatOptions, EatOption);
+
     Errors m_errors;
     QStringSet m_spans;
 
@@ -51,8 +59,8 @@ protected:
                              int pos, int length = 0);
     void advance(int n = 1);
 
-    bool expect(const QChar &chr, bool acceptNull = false);
-    QString eat(const QChar &chr, bool acceptNull = false);
+    bool expect(QChar chr);
+    QString eat(QChar chr, EatOptions options = NoOption);
     QStringRef getUntil(QChar chr);
     QStringRef getRest();
     QString getWithCharset(const QString &charset);
@@ -66,6 +74,7 @@ protected:
 
     QString spanText(const QStringRef& textRef);
     QString spanText(const QString& text);
+    QString spanText(QString&& text);
     QString spanText(int start);
 
 private:

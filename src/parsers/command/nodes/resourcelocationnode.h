@@ -17,10 +17,10 @@ public:
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         SpanPtr nspace() const;
-        void setNamespace(const SpanPtr &nspace);
+        void setNamespace(SpanPtr nspace);
 
         SpanPtr id() const;
-        void setId(const SpanPtr &id);
+        void setId(SpanPtr id);
 
         bool isTag() const;
         void setIsTag(bool isTag);

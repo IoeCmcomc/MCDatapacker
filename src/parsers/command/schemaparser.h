@@ -126,7 +126,7 @@ protected:
 
 private:
         ParseNodeCache m_cache;
-        QSharedPointer<Command::RootNode> m_tree = nullptr;
+        QSharedPointer<Command::RootNode> m_tree;
         const QRegularExpression m_literalStrRegex{ R"([\w.+-]+)" };
         const QRegularExpression m_decimalNumRegex = QRegularExpression(
             R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))");
@@ -134,8 +134,5 @@ private:
         static inline Schema::RootNode m_schemaGraph;
     };
 }
-
-#define PARSER_METHOD(Id, Ptr)                        \
-        { QStringLiteral(Id), new ParserMethod(Ptr) } \
 
 #endif /* COMMANDPARSER_H */

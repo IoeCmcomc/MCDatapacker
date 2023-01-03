@@ -29,7 +29,7 @@ namespace Command {
     }
 
     void ParticleColorNode::setB(QSharedPointer<FloatNode> b) {
-        m_b = b;
+        m_b = std::move(b);
     }
 
     QSharedPointer<FloatNode> ParticleColorNode::g() const {
@@ -37,7 +37,7 @@ namespace Command {
     }
 
     void ParticleColorNode::setG(QSharedPointer<FloatNode> g) {
-        m_g = g;
+        m_g = std::move(g);
     }
 
     QSharedPointer<FloatNode> ParticleColorNode::r() const {
@@ -45,7 +45,7 @@ namespace Command {
     }
 
     void ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
-        m_r = r;
+        m_r = std::move(r);
     }
 
     ParticleNode::ParticleNode(int length)
@@ -78,7 +78,7 @@ namespace Command {
     void ParticleNode::setParams(
         std::initializer_list<QSharedPointer<ParseNode> > params) {
         for (const auto &param: params) {
-            m_params << param;
+            m_params << std::move(param);
         }
     }
 }

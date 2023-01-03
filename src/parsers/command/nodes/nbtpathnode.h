@@ -32,10 +32,10 @@ public:
         void setType(const Type &type);
 
 private:
-        QSharedPointer<StringNode> m_name        = nullptr;
-        QSharedPointer<IntegerNode> m_index      = nullptr;
-        QSharedPointer<NbtCompoundNode> m_filter = nullptr;
-        Type m_type                              = Type::Root;
+        QSharedPointer<StringNode> m_name;
+        QSharedPointer<IntegerNode> m_index;
+        QSharedPointer<NbtCompoundNode> m_filter;
+        Type m_type = Type::Root;
     };
 
     class NbtPathNode : public ArgumentNode {
