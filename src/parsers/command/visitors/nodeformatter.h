@@ -265,6 +265,8 @@ public:
 
             m_formatRanges << std::move(range);
 
+            m_pos += node->leftText().length();
+
             const auto &pairs = node->pairs();
             for (auto i = pairs.cbegin(); i != pairs.cend(); ++i) {
                 i->get()->first->accept(this, m_order);
@@ -272,6 +274,7 @@ public:
                 m_pos += i->get()->trailingTrivia().length();
             }
 
+            m_pos += node->rightText().length();
             m_pos += node->trailingTrivia().length();
         }
 
@@ -328,6 +331,8 @@ public:
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
+
+            m_pos += node->leftText().length();
 
             const auto &pairs = node->pairs();
             for (auto i = pairs.cbegin(); i != pairs.cend(); ++i) {
@@ -408,6 +413,15 @@ public:
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
+
+            m_pos += node->leftText().length();
+
+            for (const auto &elem: node->children()) {
+                elem->accept(this, m_order);
+            }
+
+            m_pos += node->rightText().length() +
+                     node->trailingTrivia().length();
         }
         virtual void visit(NbtLongArrayNode *node) override {
             m_pos += node->leadingTrivia().length();
@@ -419,6 +433,15 @@ public:
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
+
+            m_pos += node->leftText().length();
+
+            for (const auto &elem: node->children()) {
+                elem->accept(this, m_order);
+            }
+
+            m_pos += node->rightText().length() +
+                     node->trailingTrivia().length();
         }
         virtual void visit(NbtLongNode *node) override {
             m_pos += node->leadingTrivia().length();
@@ -760,12 +783,12 @@ public:
 
             fmt.setForeground(QColor("#276321"));
             /* Only colorize the '@x' part */
-            QTextLayout::FormatRange range{ m_pos, 2,
+            QTextLayout::FormatRange range{ m_pos, node->leftText().length(),
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
 
-            m_pos += 2;
+            m_pos += node->leftText().length();
 
             if (node->args())
                 node->args()->accept(this, m_order);

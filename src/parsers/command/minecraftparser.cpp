@@ -199,15 +199,28 @@ namespace Command {
 
             case '"':
             case '\'': {
+                const QString &&quoted = getQuotedString();
                 return QSharedPointer<NbtStringNode>::create(spanText(start),
-                                                             getQuotedString());
+                                                             quoted);
+            }
+
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '-':
+            case '.': {
+                return parseNumericTag();
             }
 
             default: {
-                if (curChar().isNumber() || curChar() == '-' ||
-                    curChar() == '.') {
-                    return parseNumericTag();
-                } else if (const auto &&boolean = brigadier_bool()) {
+                if (const auto &&boolean = brigadier_bool()) {
                     return QSharedPointer<NbtByteNode>::create(boolean->text(),
                                                                boolean->value());
                 } else {
@@ -235,7 +248,7 @@ namespace Command {
                 advance();
                 float integer = literal.toFloat(&ok);
                 if (ok && integer <= 128 && integer >= -127) {
-                    return QSharedPointer<NbtByteNode>::create(literal,
+                    return QSharedPointer<NbtByteNode>::create(spanText(start),
                                                                (int8_t)integer);
                 } else {
                     error(QT_TRANSLATE_NOOP("Parser::Error",
@@ -247,7 +260,7 @@ namespace Command {
 
             case 'd': {
                 advance();
-                return QSharedPointer<NbtDoubleNode>::create(literal,
+                return QSharedPointer<NbtDoubleNode>::create(spanText(start),
                                                              number->value());
             }
 
@@ -255,7 +268,8 @@ namespace Command {
                 advance();
                 float value = literal.toFloat(&ok);
                 if (ok) {
-                    return QSharedPointer<NbtFloatNode>::create(literal, value);
+                    return QSharedPointer<NbtFloatNode>::create(spanText(start),
+                                                                value);
                 } else {
                     error(QT_TRANSLATE_NOOP("Parser::Error",
                                             "%1 is not a vaild SNBT float tag"),
@@ -268,7 +282,8 @@ namespace Command {
                 advance();
                 int64_t value = literal.toLongLong(&ok);
                 if (ok) {
-                    return QSharedPointer<NbtLongNode>::create(literal, value);
+                    return QSharedPointer<NbtLongNode>::create(spanText(start),
+                                                               value);
                 } else {
                     error(QT_TRANSLATE_NOOP("Parser::Error",
                                             "%1 is not a vaild SNBT long tag"),
@@ -281,7 +296,8 @@ namespace Command {
                 advance();
                 short value = literal.toFloat(&ok);
                 if (ok) {
-                    return QSharedPointer<NbtShortNode>::create(literal, value);
+                    return QSharedPointer<NbtShortNode>::create(spanText(start),
+                                                                value);
                 } else {
                     error(QT_TRANSLATE_NOOP("Parser::Error",
                                             "%1 is not a vaild SNBT short tag"),
@@ -632,7 +648,7 @@ namespace Command {
         }
         node->setId(std::move(id));
 
-        node->setLength(pos() - start + 1);
+        node->setLength(pos() - start);
     }
 
     void MinecraftParser::parseBlock(BlockStateNode *node, bool acceptTag) {

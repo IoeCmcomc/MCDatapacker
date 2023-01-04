@@ -38,7 +38,7 @@ namespace Command {
 
 
     void NodeCounter::startVisiting(ParseNode *node) {
-        node->accept(this, VisitOrder::Preorder);
+        node->accept(this, m_order);
     }
 
     UintHash NodeCounter::commandCounts() const {

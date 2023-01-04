@@ -18,6 +18,7 @@ namespace Command {
         void operator()(TargetSelectorNode *node);
         void operator()(EntityArgumentValueNode *node);
 
+        NodeVisitor *visitor        = nullptr;
         uint         nbtAccessCount = 0;
         UintHash     commandCounts;
         SelectorHash targetSelectorCounts;

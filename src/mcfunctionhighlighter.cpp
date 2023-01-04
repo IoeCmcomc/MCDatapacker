@@ -2,6 +2,7 @@
 #include "codeeditor.h"
 
 #include "parsers/command/visitors/nodeformatter.h"
+#include "parsers/command/visitors/sourceprinter.h"
 
 #include <QDebug>
 #include <QElapsedTimer>
@@ -202,6 +203,9 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
                        ->
                        findBlock(-1)) : doc->lastBlock();
 
+    auto *editor = dynamic_cast<CodeEditor *>(document()->parent()->parent());
+    Q_ASSERT(editor != nullptr);
+
     while (block.isValid() && block.blockNumber() <= end.blockNumber()) {
         if (TextBlockData *data =
                 dynamic_cast<TextBlockData *>(block.userData())) {
@@ -213,11 +217,23 @@ void McfunctionHighlighter::checkProblems(bool checkAll) {
             if (result->isValid()) {
                 data->clearProblems();
 
+                Command::SourcePrinter printer;
+                printer.startVisiting(result.get());
+                if (printer.source() != lineText)
+                    qDebug() << printer.source();
+
                 Command::NodeFormatter formatter;
                 formatter.startVisiting(result.get());
                 /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
                 document()->blockSignals(true);
                 rehighlightBlock(block, formatter.formatRanges());
+                /*
+                   QTextCursor tc = editor->textCursor();
+                   tc.setPosition(block.position());
+                   tc.select(QTextCursor::LineUnderCursor);
+                   tc.insertText(printer.source());
+                   editor->setTextCursor(tc);
+                 */
                 document()->blockSignals(false);
 
 /*

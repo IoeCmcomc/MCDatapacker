@@ -25,8 +25,8 @@ private:
         QRegularExpression pattern;
         QTextCharFormat    format;
     };
-    QVector<HighlightingRule> highlightingRules;
-    QVector<QTextLayout::FormatRange> m_formats;
+
+    Command::MinecraftParser parser;
 
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;
@@ -35,7 +35,8 @@ private:
     QTextCharFormat namespacedIDFormat;
     QTextCharFormat commentFormat;
 
-    Command::MinecraftParser parser;
+    QVector<HighlightingRule> highlightingRules;
+    QVector<QTextLayout::FormatRange> m_formats;
 };
 
 #endif /* MCFUNCTIONHIGHLIGHTER_H */

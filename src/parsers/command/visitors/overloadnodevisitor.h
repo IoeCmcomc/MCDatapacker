@@ -17,12 +17,14 @@
 #include "../nodes/particlenode.h"
 #include "../nodes/swizzlenode.h"
 #include "../nodes/timenode.h"
+#include "../nodes/targetselectornode.h"
 
 namespace Command {
     template <typename T>
     class OverloadNodeVisitor : public NodeVisitor {
 public:
         explicit OverloadNodeVisitor(VisitOrder order) : NodeVisitor(order) {
+            impl.visitor = this;
         };
 
         virtual void visit(ParseNode *node) override {
@@ -223,14 +225,6 @@ public:
 
 protected:
         T impl;
-    };
-
-    class TestImpl {
-        void operator()(ParseNode *) {
-        }
-    };
-
-    class Test : public OverloadNodeVisitor<TestImpl> {
     };
 }
 

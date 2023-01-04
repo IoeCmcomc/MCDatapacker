@@ -67,19 +67,19 @@ private:
                     name = this->getWithCharset(keyCharset);
                 if (name.isNull())
                     error("Invaild empty key", {}, keyPos);
-                const auto &&key = KeyPtr::create(spanText(name));
+                const auto &&key = KeyPtr::create(spanText(keyPos), name);
                 key->setLeadingTrivia(trivia);
                 int triviaStart = pos();
                 this->skipWs(false);
                 this->eat(sepChar);
                 key->setTrailingTrivia(spanText(triviaStart));
                 const auto &&valueTrivia = skipWs(false);
-                const int    valueStart  = pos();
-                const auto &&value       = func(name);
-                value->setLength(pos() - valueStart);
+                //const int    valueStart  = pos();
+                const auto &&value = func(name);
+                //value->setLength(pos() - valueStart);
                 value->setLeadingTrivia(spanText(valueTrivia));
+                value->setTrailingTrivia(this->skipWs(false));
                 obj->insert(key, value);
-                value->setTrailingTrivia(spanText(this->skipWs(false)));
                 if (this->curChar() != endChar) {
                     obj->constLast()->setTrailingTrivia(eat(',', SkipRightWs));
                 }
