@@ -8,8 +8,7 @@ namespace Command {
         return m_repr;
     }
 
-    void ReprPrinter::reprResourceLocation(ResourceLocationNode *node,
-                                           bool autoClose) {
+    void ReprPrinter::reprResourceLocation(ResourceLocationNode *node) {
         m_repr += '(';
 
         if (node->isTag())
@@ -26,8 +25,7 @@ namespace Command {
             }
         }
 
-        if (autoClose)
-            m_repr += ')';
+        m_repr += ')';
     }
 
     void ReprPrinter::reprEntityNode(EntityNode *node) {

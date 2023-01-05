@@ -22,25 +22,30 @@ public:
         void setB(QSharedPointer<FloatNode> b);
 
 private:
-        QSharedPointer<FloatNode> m_r = nullptr;
-        QSharedPointer<FloatNode> m_g = nullptr;
-        QSharedPointer<FloatNode> m_b = nullptr;
+        QSharedPointer<FloatNode> m_r;
+        QSharedPointer<FloatNode> m_g;
+        QSharedPointer<FloatNode> m_b;
     };
 
-    class ParticleNode : public ResourceLocationNode
-    {
+    class ParticleNode : public ArgumentNode {
 public:
         using ParamVector = QVector<NodePtr>;
 
         explicit ParticleNode(int length);
-        explicit ParticleNode(ResourceLocationNode *other);
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         ParamVector params() const;
-        void setParams(
-            std::initializer_list<NodePtr> params);
+        template <typename ...Args>
+        void setParams(Args&& ... params) {
+            (m_params << ... << std::forward<Args>(params));
+        };
+
+        QSharedPointer<ResourceLocationNode> resLoc() const;
+        void setResLoc(QSharedPointer<ResourceLocationNode> newResLoc);
+
 private:
+        QSharedPointer<ResourceLocationNode> m_resLoc;
         ParamVector m_params;
     };
 

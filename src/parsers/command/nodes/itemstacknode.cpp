@@ -17,6 +17,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
+        Q_ASSERT(m_resLoc != nullptr);
+        m_resLoc->accept(visitor, order);
         if (m_nbt)
             m_nbt->accept(visitor, order);
         if (order == VisitOrder::Postorder)
@@ -31,6 +33,15 @@ namespace Command {
         m_nbt = std::move(nbt);
     }
 
+    QSharedPointer<ResourceLocationNode> ItemStackNode::resLoc() const {
+        return m_resLoc;
+    }
+
+    void ItemStackNode::setResLoc(
+        QSharedPointer<ResourceLocationNode> newResLoc) {
+        m_resLoc = std::move(newResLoc);
+    }
+
     ItemPredicateNode::ItemPredicateNode(int length)
         : ItemStackNode(length) {
         m_parserType = ParserType::ItemPredicate;
@@ -43,6 +54,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
+        Q_ASSERT(resLoc() != nullptr);
+        resLoc()->accept(visitor, order);
         if (nbt())
             nbt()->accept(visitor, order);
         if (order == VisitOrder::Postorder)

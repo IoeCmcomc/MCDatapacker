@@ -24,7 +24,7 @@ namespace Command {
         void operator()(BlockStateNode *node) {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            printResourceLocation(node);
+            node->resLoc()->accept(visitor, LetTheVisitorDecide);
             if (node->states()) {
                 node->states()->accept(visitor, LetTheVisitorDecide);
             }
@@ -76,7 +76,7 @@ namespace Command {
         void operator()(ItemStackNode *node) {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            printResourceLocation(node);
+            node->resLoc()->accept(visitor, LetTheVisitorDecide);
             if (node->nbt()) {
                 node->nbt()->accept(visitor, LetTheVisitorDecide);
             }
@@ -178,7 +178,22 @@ namespace Command {
             m_text += node->trailingTrivia();
         };
         void operator()(ResourceLocationNode *node) {
-            printResourceLocation(node);
+            m_text += node->leadingTrivia();
+            m_text += node->leftText();
+
+            if (node->nspace()) {
+                m_text += node->nspace()->leadingTrivia();
+                m_text += node->nspace()->leftText();
+                m_text += node->nspace()->text();
+                m_text += node->nspace()->rightText();
+                m_text += node->nspace()->trailingTrivia();
+            }
+            m_text += node->id()->leadingTrivia();
+            m_text += node->id()->leftText();
+            m_text += node->id()->text();
+            m_text += node->id()->rightText();
+            m_text += node->id()->trailingTrivia();
+
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
@@ -225,28 +240,11 @@ namespace Command {
         void operator()(ParticleNode *node) {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            printResourceLocation(node);
+            node->resLoc()->accept(visitor, LetTheVisitorDecide);
             printList(node->params());
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-
-        void printResourceLocation(ResourceLocationNode *node) {
-            m_text += node->leadingTrivia();
-            m_text += node->leftText();
-            if (node->nspace()) {
-                m_text += node->nspace()->leadingTrivia();
-                m_text += node->nspace()->leftText();
-                m_text += node->nspace()->text();
-                m_text += node->nspace()->rightText();
-                m_text += node->nspace()->trailingTrivia();
-            }
-            m_text += node->id()->leadingTrivia();
-            m_text += node->id()->leftText();
-            m_text += node->id()->text();
-            m_text += node->id()->rightText();
-            m_text += node->id()->trailingTrivia();
-        }
 
         template <typename V>
         void printList(const V &vector) {

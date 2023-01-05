@@ -73,8 +73,9 @@ public:
             m_repr += QString("AngleNode(%1)").arg(node->text());
         };
         virtual void visit(BlockStateNode *node) override {
-            m_repr += "BlockStateNode";
-            reprResourceLocation(node);
+            m_repr += "BlockStateNode(";
+            node->resLoc()->accept(this, m_order);
+            m_repr += ')';
             if (node->states() && !node->states()->isEmpty()) {
                 m_repr += '[';
                 node->states()->accept(this, m_order);
@@ -109,8 +110,9 @@ public:
             m_repr += QString("IntRangeNode(%1)").arg(node->format());
         };
         virtual void visit(ItemStackNode *node) override {
-            m_repr += "ItemStackNode";
-            reprResourceLocation(node);
+            m_repr += "ItemStackNode(";
+            node->resLoc()->accept(this, m_order);
+            m_repr += ')';
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
                 node->nbt()->accept(this, m_order);
@@ -257,8 +259,9 @@ public:
             reprAxes(node);
         }
         virtual void visit(BlockPredicateNode *node) override {
-            m_repr += "BlockPredicateNode";
-            reprResourceLocation(node);
+            m_repr += "BlockPredicateNode(";
+            node->resLoc()->accept(this, m_order);
+            m_repr += ')';
             if (node->states() && !node->states()->isEmpty()) {
                 m_repr += '[';
                 node->states()->accept(this, m_order);
@@ -364,8 +367,8 @@ public:
                 QString("UuidNode(%1)").arg(node->value().toString());
         };
         virtual void visit(ParticleNode *node) override {
-            m_repr += "ParticleNode";
-            reprResourceLocation(node, false);
+            m_repr += "ParticleNode(id: ";
+            node->resLoc()->accept(this, m_order);
             if (!node->params().isEmpty()) {
                 m_repr += ", params: ";
                 reprList(node->params());
@@ -382,8 +385,9 @@ public:
             m_repr += ')';
         };
         virtual void visit(ItemPredicateNode *node) override {
-            m_repr += "ItemPredicateNode";
-            reprResourceLocation(node);
+            m_repr += "ItemPredicateNode(";
+            node->resLoc()->accept(this, m_order);
+            m_repr += ')';
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
                 node->nbt()->accept(this, m_order);
@@ -440,8 +444,7 @@ private:
             m_repr += ')';
         };
 
-        void reprResourceLocation(ResourceLocationNode *node,
-                                  bool autoClose = true);
+        void reprResourceLocation(ResourceLocationNode *node);
         void reprEntityNode(EntityNode *node);
     };
 }

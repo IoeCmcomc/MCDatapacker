@@ -49,12 +49,7 @@ namespace Command {
     }
 
     ParticleNode::ParticleNode(int length)
-        : ResourceLocationNode(ParserType::Particle, length) {
-    }
-
-    ParticleNode::ParticleNode(ResourceLocationNode *other)
-        : ResourceLocationNode(ParserType::Particle, other->length(),
-                               other->nspace(), other->id()) {
+        : ArgumentNode(ParserType::Particle, length) {
     }
 
     void ParticleNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -64,6 +59,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
+        Q_ASSERT(m_resLoc != nullptr);
+        m_resLoc->accept(visitor, order);
         for (const auto &param: qAsConst(m_params)) {
             param->accept(visitor, order);
         }
@@ -75,10 +72,12 @@ namespace Command {
         return m_params;
     }
 
-    void ParticleNode::setParams(
-        std::initializer_list<QSharedPointer<ParseNode> > params) {
-        for (const auto &param: params) {
-            m_params << std::move(param);
-        }
+    QSharedPointer<ResourceLocationNode> ParticleNode::resLoc() const {
+        return m_resLoc;
+    }
+
+    void ParticleNode::setResLoc(QSharedPointer<ResourceLocationNode> newResLoc)
+    {
+        m_resLoc = std::move(newResLoc);
     }
 }

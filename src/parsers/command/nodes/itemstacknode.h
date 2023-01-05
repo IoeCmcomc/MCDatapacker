@@ -16,8 +16,12 @@ public:
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
 
+        QSharedPointer<ResourceLocationNode> resLoc() const;
+        void setResLoc(QSharedPointer<ResourceLocationNode> newResLoc);
+
 private:
-        QSharedPointer<NbtCompoundNode> m_nbt = nullptr;
+        QSharedPointer<ResourceLocationNode> m_resLoc;
+        QSharedPointer<NbtCompoundNode> m_nbt;
     };
 
     class ItemPredicateNode final : public ItemStackNode {

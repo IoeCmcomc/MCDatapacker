@@ -155,16 +155,15 @@ public:
         virtual void visit(BlockStateNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            const int length = node->length();
-
             QTextCharFormat fmt;
             fmt.setForeground(QColor("#7d7b55"));
 
-            QTextLayout::FormatRange range{ m_pos, length,
+            QTextLayout::FormatRange range{ m_pos, node->resLoc()->length(),
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
 
+            m_pos += node->resLoc()->length();
             if (node->states())
                 node->states()->accept(this, m_order);
             if (node->nbt())
@@ -237,17 +236,16 @@ public:
         virtual void visit(ItemStackNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            const int length = node->length();
-
             /*auto fmt = defaultFormat(node); */
             QTextCharFormat fmt;
             fmt.setForeground(QColor("#7d7b55"));
 
-            QTextLayout::FormatRange range{ m_pos, length,
+            QTextLayout::FormatRange range{ m_pos, node->resLoc()->length(),
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
 
+            m_pos += node->resLoc()->length();
             if (node->nbt())
                 node->nbt()->accept(this, m_order);
 
@@ -274,8 +272,8 @@ public:
                 m_pos += i->get()->trailingTrivia().length();
             }
 
-            m_pos += node->rightText().length();
-            m_pos += node->trailingTrivia().length();
+            m_pos += node->rightText().length() +
+                     node->trailingTrivia().length();
         }
 
         virtual void visit(EntityArgumentValueNode *node) override {
@@ -341,7 +339,8 @@ public:
                 m_pos += i->get()->trailingTrivia().length();
             }
 
-            m_pos += node->trailingTrivia().length();
+            m_pos += node->rightText().length() +
+                     node->trailingTrivia().length();
         }
         virtual void visit(NbtDoubleNode *node) override {
             m_pos += node->leadingTrivia().length();
@@ -557,12 +556,12 @@ public:
             fmt.setForeground(QColor("#7d7b55"));
             fmt.setFontItalic(true);
 
-            QTextLayout::FormatRange range{ m_pos,
-                                            node->length(),
+            QTextLayout::FormatRange range{ m_pos, node->resLoc()->length(),
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
 
+            m_pos += node->resLoc()->length();
             if (node->states())
                 node->states()->accept(this, m_order);
 
@@ -827,11 +826,12 @@ public:
             QTextCharFormat fmt;
             fmt.setForeground(QColor("#49B13B"));
 
-            QTextLayout::FormatRange range{ m_pos, node->length(),
+            QTextLayout::FormatRange range{ m_pos, node->resLoc()->length(),
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
 
+            m_pos += node->resLoc()->length();
             if (!node->params().isEmpty()) {
                 for (const auto &child: node->params()) {
                     child->accept(this, m_order);
@@ -857,12 +857,12 @@ public:
             fmt.setForeground(QColor("#B89C3D"));
             fmt.setFontItalic(true);
 
-            QTextLayout::FormatRange range{ m_pos,
-                                            node->length(),
+            QTextLayout::FormatRange range{ m_pos, node->resLoc()->length(),
                                             std::move(fmt) };
 
             m_formatRanges << std::move(range);
 
+            m_pos += node->resLoc()->length();
             if (node->nbt())
                 node->nbt()->accept(this, m_order);
 

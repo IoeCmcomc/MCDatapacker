@@ -652,7 +652,10 @@ namespace Command {
     }
 
     void MinecraftParser::parseBlock(BlockStateNode *node, bool acceptTag) {
-        parseResourceLocation(node, acceptTag);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(resLoc.get(), acceptTag);
+        node->setResLoc(std::move(resLoc));
 
         if (this->curChar() == '[') {
             node->setStates(
@@ -968,10 +971,12 @@ namespace Command {
     }
 
     QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
-        const int    start = pos();
-        const auto &&ret   = QSharedPointer<ItemStackNode>::create(0);
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ItemStackNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
 
-        parseResourceLocation(ret.get());
+        parseResourceLocation(resLoc.get());
+        ret->setResLoc(std::move(resLoc));
 
         if (this->curChar() == '{') {
             ret->setNbt(parseCompoundTag());
@@ -982,10 +987,12 @@ namespace Command {
 
     QSharedPointer<ItemPredicateNode> MinecraftParser::
     minecraft_itemPredicate() {
-        const int    start = pos();
-        const auto &&ret   = QSharedPointer<ItemPredicateNode>::create(0);
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ItemPredicateNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
 
-        parseResourceLocation(ret.get(), true);
+        parseResourceLocation(resLoc.get(), true);
+        ret->setResLoc(std::move(resLoc));
 
         if (this->curChar() == '{') {
             ret->setNbt(parseCompoundTag());
@@ -1075,46 +1082,49 @@ namespace Command {
         return QSharedPointer<OperationNode>::create(spanText(literal));
     }
 
-    QSharedPointer<ParticleNode> MinecraftParser::
-    minecraft_particle() {
-        const int    start = pos();
-        const auto &&ret   = QSharedPointer<ParticleNode>::create(0);
+    QSharedPointer<ParticleNode> MinecraftParser::minecraft_particle() {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ParticleNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
 
-        parseResourceLocation(ret.get());
+        parseResourceLocation(resLoc.get());
 
         QString fullId;
-        if (!ret->nspace()) {
-            fullId = ret->id()->text();
+        if (!resLoc->nspace()) {
+            fullId = resLoc->id()->text();
         } else {
-            const QString &&nspace = ret->nspace()->text();
+            const QString &&nspace = resLoc->nspace()->text();
             if (nspace.isEmpty() || (nspace == "minecraft")) {
-                fullId = ret->id()->text();
+                fullId = resLoc->id()->text();
             } else {
-                fullId = nspace + ":" + ret->id()->text();
+                fullId = nspace + ":" + resLoc->id()->text();
             }
         }
+
+        ret->setResLoc(std::move(resLoc));
 
         if (fullId == QLatin1String("block") ||
             fullId == QLatin1String("block_marker") ||
             fullId == QLatin1String("falling_dust")) {
             ret->setLeadingTrivia(eat(' '));
-            ret->setParams({ minecraft_blockState() });
+            ret->setParams(minecraft_blockState());
         } else if (fullId == QLatin1String("dust")) {
             ret->setLeadingTrivia(eat(' '));
-            const auto &color = parseParticleColor();
+            const auto &&color = parseParticleColor();
             color->setTrailingTrivia(eat(' '));
-            ret->setParams({ color, brigadier_float() });
+            ret->setParams(std::move(color), brigadier_float());
         } else if (fullId == "dust_color_transition") {
             ret->setLeadingTrivia(eat(' '));
-            const auto &startColor = parseParticleColor();
+            const auto &&startColor = parseParticleColor();
             startColor->setTrailingTrivia(eat(' '));
-            const auto &size = brigadier_float();
+            const auto &&size = brigadier_float();
             size->setTrailingTrivia(eat(' '));
-            const auto &endColor = parseParticleColor();
-            ret->setParams({ startColor, size, endColor });
+            const auto &&endColor = parseParticleColor();
+            ret->setParams(std::move(startColor), std::move(size),
+                           std::move(endColor));
         } else if (fullId == QLatin1String("item")) {
             ret->setLeadingTrivia(eat(' '));
-            ret->setParams({ minecraft_itemStack() });
+            ret->setParams(minecraft_itemStack());
         }
         ret->setLength(pos() - start);
         return ret;

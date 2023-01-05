@@ -3,7 +3,7 @@
 
 namespace Command {
     BlockStateNode::BlockStateNode(int length)
-        : ResourceLocationNode(ParserType::BlockState, length) {
+        : ArgumentNode(ParserType::BlockState, length) {
     }
 
     void BlockStateNode::accept(NodeVisitor *visitor,
@@ -14,6 +14,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
+        Q_ASSERT(m_resLoc != nullptr);
+        m_resLoc->accept(visitor, order);
         if (m_states)
             m_states->accept(visitor, order);
         if (m_nbt)
@@ -23,7 +25,7 @@ namespace Command {
     }
 
     bool BlockStateNode::isValid() const {
-        return ResourceLocationNode::isValid() && m_states && m_nbt;
+        return ArgumentNode::isValid() && m_states && m_nbt;
     }
 
 
@@ -35,13 +37,21 @@ namespace Command {
         m_states = std::move(states);
     }
 
-    QSharedPointer<NbtCompoundNode> BlockStateNode::nbt()
-    const {
+    QSharedPointer<NbtCompoundNode> BlockStateNode::nbt()  const {
         return m_nbt;
     }
 
     void BlockStateNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
         m_nbt = std::move(nbt);
+    }
+
+    QSharedPointer<ResourceLocationNode> BlockStateNode::resLoc() const {
+        return m_resLoc;
+    }
+
+    void BlockStateNode::setResLoc(
+        QSharedPointer<ResourceLocationNode> newResLoc) {
+        m_resLoc = std::move(newResLoc);
     }
 
     BlockPredicateNode::BlockPredicateNode(int length)
@@ -57,6 +67,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
+        Q_ASSERT(resLoc() != nullptr);
+        resLoc()->accept(visitor, order);
         if (states())
             states()->accept(visitor, order);
         if (nbt())
