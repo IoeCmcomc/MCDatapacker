@@ -25,10 +25,6 @@ namespace Command {
 public:
         explicit ReprPrinter();
 
-        virtual void startVisiting(ParseNode *node) override {
-            node->accept(this, m_order);
-        };
-
         virtual void visit(ParseNode *node) override {
             m_repr += QString("ParseNode[%1]").arg(node->length());
             qWarning() << "ReprPrinter: Unknown ParseNode detected.";
@@ -398,6 +394,16 @@ public:
             m_repr += QString("KeyNode(\"%1\")").arg(node->value());
         };
 
+        virtual void visit(TwoAxesNode *node) override {
+            m_repr += "TwoAxesNode";
+            reprAxes(node, "first", "second");
+        }
+
+        virtual void visit(XyzNode *node) override {
+            m_repr += "XyzNode";
+            reprAxes(node);
+        }
+
         QString repr() const;
 
 private:
@@ -419,14 +425,13 @@ private:
         template<class T>
         typename std::enable_if<std::is_base_of<TwoAxesNode, T>::value,
                                 void>::type
-        reprAxes(T *node, const QString &firstLabel,
-                 const QString &secondLabel) {
+        reprAxes(T *node, const char *firstLabel, const char *secondLabel) {
             m_repr += '(';
-            m_repr += firstLabel;
+            m_repr += QLatin1String(firstLabel);
             m_repr += ": ";
             node->firstAxis()->accept(this, m_order);
             m_repr += ", ";
-            m_repr += secondLabel;
+            m_repr += QLatin1String(secondLabel);
             m_repr += ": ";
             node->secondAxis()->accept(this, m_order);
             m_repr += ')';

@@ -3,53 +3,44 @@
 //#include "../minecraftparser.h"
 
 namespace Command {
-    void NodeCounterImpl::operator()(ParseNode *node) {
-    }
-
-    void NodeCounterImpl::operator()(LiteralNode *node) {
+    void NodeCounter::visit(LiteralNode *node) {
         if (!node->isCommand())
             return;
 
         const QString &&command = node->text();
 
-        if (commandCounts.contains(command))
-            ++commandCounts[command];
+        if (m_commandCounts.contains(command))
+            ++m_commandCounts[command];
         else
-            commandCounts[command] = 1;
+            m_commandCounts[command] = 1;
     }
 
-    void NodeCounterImpl::operator()(TargetSelectorNode *node) {
+    void NodeCounter::visit(TargetSelectorNode *node) {
         const auto varType = node->variable();
 
-        if (targetSelectorCounts.contains(varType))
-            ++targetSelectorCounts[varType];
+        if (m_targetSelectorCounts.contains(varType))
+            ++m_targetSelectorCounts[varType];
         else
-            targetSelectorCounts[varType] = 1;
+            m_targetSelectorCounts[varType] = 1;
     }
 
-    void NodeCounterImpl::operator()(
+    void NodeCounter::visit(
         EntityArgumentValueNode *node) {
         if (node->getNode() && (node->getNode()->parserType() ==
                                 ArgumentNode::ParserType::NbtCompoundTag)) {
-            ++nbtAccessCount;
+            ++m_nbtAccessCount;
         }
     }
 
-
-
-    void NodeCounter::startVisiting(ParseNode *node) {
-        node->accept(this, m_order);
-    }
-
     UintHash NodeCounter::commandCounts() const {
-        return impl.commandCounts;
+        return m_commandCounts;
     }
 
     SelectorHash NodeCounter::targetSelectorCounts() const {
-        return impl.targetSelectorCounts;
+        return m_targetSelectorCounts;
     }
 
     int NodeCounter::nbtAccessCount() const {
-        return impl.nbtAccessCount;
+        return m_nbtAccessCount;
     }
 }

@@ -42,6 +42,8 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/schema/schemaliteralnode.cpp \
     ../../../../../src/parsers/command/schema/schemanode.cpp \
     ../../../../../src/parsers/command/schema/schemarootnode.cpp \
+    ../../../../../src/parsers/command/visitors/nodevisitor.cpp \
+    ../../../../../src/parsers/command/visitors/overloadnodevisitor.cpp \
     ../../../../../src/parsers/command/visitors/reprprinter.cpp \
     ../../../../../src/parsers/parser.cpp
 
@@ -76,7 +78,9 @@ HEADERS += \
     ../../../../../src/parsers/command/schema/schemaliteralnode.h \
     ../../../../../src/parsers/command/schema/schemanode.h \
     ../../../../../src/parsers/command/schema/schemarootnode.h \
-    ../../../../../src/parsers/command/visitors/reprprinter.cpp \
+    ../../../../../src/parsers/command/visitors/nodevisitor.h \
+    ../../../../../src/parsers/command/visitors/overloadnodevisitor.h \
+    ../../../../../src/parsers/command/visitors/reprprinter.h \
     ../../../../../src/parsers/parser.h
 
 RESOURCES += \

@@ -3,11 +3,11 @@
 
 namespace Command {
     ItemStackNode::ItemStackNode(int length)
-        : ResourceLocationNode(ParserType::ItemStack, length) {
+        : ArgumentNode(ParserType::ItemStack, length) {
     }
 
     bool ItemStackNode::isValid() const {
-        return ResourceLocationNode::isValid() && m_nbt;
+        return ArgumentNode::isValid() && m_nbt;
     }
 
     void ItemStackNode::accept(NodeVisitor *visitor, VisitOrder order) {

@@ -5,8 +5,7 @@
 #include "resourcelocationnode.h"
 
 namespace Command {
-    class ItemStackNode : public ResourceLocationNode
-    {
+    class ItemStackNode : public ArgumentNode {
 public:
         explicit ItemStackNode(int length);
 

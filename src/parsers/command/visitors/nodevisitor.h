@@ -69,6 +69,8 @@ namespace Command {
     class ParticleColorNode;
     class ItemPredicateNode;
     class KeyNode;
+    class TwoAxesNode;
+    class XyzNode;
 
     enum VisitOrder: int { Preorder, Postorder, LetTheVisitorDecide };
 
@@ -77,7 +79,8 @@ public:
         NodeVisitor(VisitOrder order) : m_order(order) {
         };
 
-        virtual void startVisiting(ParseNode *node)       = 0;
+        void startVisiting(ParseNode *node);
+
         virtual void visit(ParseNode *node)               = 0;
         virtual void visit(ErrorNode *node)               = 0;
         virtual void visit(RootNode *node)                = 0;
@@ -143,6 +146,8 @@ public:
         virtual void visit(ParticleColorNode *node)       = 0;
         virtual void visit(ItemPredicateNode *node)       = 0;
         virtual void visit(KeyNode *node)                 = 0;
+        virtual void visit(TwoAxesNode *node)             = 0;
+        virtual void visit(XyzNode *node)                 = 0;
 
 protected:
         VisitOrder m_order = VisitOrder::Postorder;

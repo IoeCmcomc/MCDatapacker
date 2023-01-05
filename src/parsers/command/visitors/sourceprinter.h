@@ -4,140 +4,144 @@
 #include "overloadnodevisitor.h"
 
 namespace Command {
-    struct SourcePrinterImpl {
-        void operator()(ParseNode *node) {
+    class SourcePrinter : public OverloadNodeVisitor {
+public:
+        SourcePrinter();
+
+        void visit(ParseNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             m_text += node->text();
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(RootNode *node) {
+
+        void visit(RootNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             for (const auto &child: node->children()) {
-                child->accept(visitor, LetTheVisitorDecide);
+                child->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(BlockStateNode *node) {
+        void visit(BlockStateNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->resLoc()->accept(visitor, LetTheVisitorDecide);
+            node->resLoc()->accept(this, m_order);
             if (node->states()) {
-                node->states()->accept(visitor, LetTheVisitorDecide);
+                node->states()->accept(this, m_order);
             }
             if (node->nbt()) {
-                node->nbt()->accept(visitor, LetTheVisitorDecide);
+                node->nbt()->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(EntityNode *node) {
+        void visit(EntityNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->getNode()->accept(visitor, LetTheVisitorDecide);
+            node->getNode()->accept(this, m_order);
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(FloatRangeNode *node) {
+        void visit(FloatRangeNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             if (node->hasMinValue() || node->hasMaxValue()) {
                 if (node->hasMinValue()) {
-                    node->minValue()->accept(visitor, LetTheVisitorDecide);
+                    node->minValue()->accept(this, m_order);
                 }
                 if (node->hasMaxValue()) {
-                    node->maxValue()->accept(visitor, LetTheVisitorDecide);
+                    node->maxValue()->accept(this, m_order);
                 }
             } else {
-                node->exactValue()->accept(visitor, LetTheVisitorDecide);
+                node->exactValue()->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(IntRangeNode *node) {
+        void visit(IntRangeNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             if (node->hasMinValue() || node->hasMaxValue()) {
                 if (node->hasMinValue()) {
-                    node->minValue()->accept(visitor, LetTheVisitorDecide);
+                    node->minValue()->accept(this, m_order);
                 }
                 if (node->hasMaxValue()) {
-                    node->maxValue()->accept(visitor, LetTheVisitorDecide);
+                    node->maxValue()->accept(this, m_order);
                 }
             } else {
-                node->exactValue()->accept(visitor, LetTheVisitorDecide);
+                node->exactValue()->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(ItemStackNode *node) {
+        void visit(ItemStackNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->resLoc()->accept(visitor, LetTheVisitorDecide);
+            node->resLoc()->accept(this, m_order);
             if (node->nbt()) {
-                node->nbt()->accept(visitor, LetTheVisitorDecide);
+                node->nbt()->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(MapNode *node) {
+        void visit(MapNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             const auto &&pairs = node->pairs();
             for (auto i = pairs.cbegin(); i != pairs.cend(); ++i) {
                 m_text += i->get()->leadingTrivia();
                 m_text += i->get()->leftText();
-                i->get()->first->accept(visitor, LetTheVisitorDecide);
-                i->get()->second->accept(visitor, LetTheVisitorDecide);
+                i->get()->first->accept(this, m_order);
+                i->get()->second->accept(this, m_order);
                 m_text += i->get()->rightText();
                 m_text += i->get()->trailingTrivia();
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(EntityArgumentValueNode *node) {
+        void visit(EntityArgumentValueNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             if (node->getNode()) {
-                node->getNode()->accept(visitor, LetTheVisitorDecide);
+                node->getNode()->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(NbtByteArrayNode *node) {
+        void visit(NbtByteArrayNode *node) override {
             printList(node, node->children());
         };
-        void operator()(NbtCompoundNode *node) {
+        void visit(NbtCompoundNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             const auto &&pairs = node->pairs();
             for (auto i = pairs.cbegin(); i != pairs.cend(); ++i) {
                 m_text += i->get()->leadingTrivia();
                 m_text += i->get()->leftText();
-                i->get()->first->accept(visitor, LetTheVisitorDecide);
-                i->get()->second->accept(visitor, LetTheVisitorDecide);
+                i->get()->first->accept(this, m_order);
+                i->get()->second->accept(this, m_order);
                 m_text += i->get()->rightText();
                 m_text += i->get()->trailingTrivia();
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(NbtIntArrayNode *node) {
+        void visit(NbtIntArrayNode *node) override {
             printList(node, node->children());
         };
-        void operator()(NbtListNode *node) {
+        void visit(NbtListNode *node) override {
             printList(node, node->children());
         };
-        void operator()(NbtLongArrayNode *node) {
+        void visit(NbtLongArrayNode *node) override {
             printList(node, node->children());
         };
-        void operator()(NbtPathNode *node) {
+        void visit(NbtPathNode *node) override {
             printList(node, node->steps());
         };
-        void operator()(NbtPathStepNode *node) {
+        void visit(NbtPathStepNode *node) override {
             using Type = NbtPathStepNode::Type;
             static const QMap<Type, QString> type2Name {
                 { Type::Index, "Index" },
@@ -151,24 +155,24 @@ namespace Command {
             switch (node->type()) {
                 case Type::Root: {
                     if (node->filter())
-                        node->filter()->accept(visitor, LetTheVisitorDecide);
+                        node->filter()->accept(this, m_order);
                     break;
                 }
 
                 case Type::Key: {
-                    node->name()->accept(visitor, LetTheVisitorDecide);
+                    node->name()->accept(this, m_order);
 
                     if (node->filter()) {
-                        node->filter()->accept(visitor, LetTheVisitorDecide);
+                        node->filter()->accept(this, m_order);
                     }
                     break;
                 }
 
                 case Type::Index: {
                     if (node->filter()) {
-                        node->filter()->accept(visitor, LetTheVisitorDecide);
+                        node->filter()->accept(this, m_order);
                     }else if (node->index()) {
-                        node->index()->accept(visitor, LetTheVisitorDecide);
+                        node->index()->accept(this, m_order);
                     }
                     break;
                 }
@@ -177,7 +181,7 @@ namespace Command {
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(ResourceLocationNode *node) {
+        void visit(ResourceLocationNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
 
@@ -198,49 +202,49 @@ namespace Command {
             m_text += node->trailingTrivia();
         };
 
-        void operator()(TwoAxesNode *node) {
+        void visit(TwoAxesNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->firstAxis()->accept(visitor, LetTheVisitorDecide);
-            node->secondAxis()->accept(visitor, LetTheVisitorDecide);
+            node->firstAxis()->accept(this, m_order);
+            node->secondAxis()->accept(this, m_order);
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
 
-        void operator()(XyzNode *node) {
+        void visit(XyzNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->x()->accept(visitor, LetTheVisitorDecide);
-            node->y()->accept(visitor, LetTheVisitorDecide);
-            node->z()->accept(visitor, LetTheVisitorDecide);
+            node->x()->accept(this, m_order);
+            node->y()->accept(this, m_order);
+            node->z()->accept(this, m_order);
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
 
-        void operator()(TargetSelectorNode *node) {
+        void visit(TargetSelectorNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             if (node->args()) {
-                node->args()->accept(visitor, LetTheVisitorDecide);
+                node->args()->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
 
 
-        void operator()(ParticleColorNode *node) {
+        void visit(ParticleColorNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->r()->accept(visitor, LetTheVisitorDecide);
-            node->g()->accept(visitor, LetTheVisitorDecide);
-            node->b()->accept(visitor, LetTheVisitorDecide);
+            node->r()->accept(this, m_order);
+            node->g()->accept(this, m_order);
+            node->b()->accept(this, m_order);
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void operator()(ParticleNode *node) {
+        void visit(ParticleNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
-            node->resLoc()->accept(visitor, LetTheVisitorDecide);
+            node->resLoc()->accept(this, m_order);
             printList(node->params());
             m_text += node->rightText();
             m_text += node->trailingTrivia();
@@ -249,7 +253,7 @@ namespace Command {
         template <typename V>
         void printList(const V &vector) {
             for (const auto &item: vector) {
-                item->accept(visitor, LetTheVisitorDecide);
+                item->accept(this, m_order);
             }
         }
 
@@ -258,28 +262,18 @@ namespace Command {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             for (const auto &item: vector) {
-                item->accept(visitor, LetTheVisitorDecide);
+                item->accept(this, m_order);
             }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         }
 
-        NodeVisitor *visitor = nullptr;
-        QString      m_text;
-    };
-
-
-    class SourcePrinter : public OverloadNodeVisitor<SourcePrinterImpl> {
-public:
-        SourcePrinter();
-
-        void startVisiting(ParseNode *node) override {
-            node->accept(this, m_order);
-        }
-
         QString source() const {
-            return impl.m_text;
+            return m_text;
         }
+
+private:
+        QString m_text;
     };
 }
 

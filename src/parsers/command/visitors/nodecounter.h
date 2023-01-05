@@ -11,29 +11,23 @@ using UintHash     = QHash<QString, uint>;
 using SelectorHash = QMap<Command::TargetSelectorNode::Variable, uint>;
 
 namespace Command {
-    struct NodeCounterImpl {
-        void operator()(ParseNode *node);
-
-        void operator()(LiteralNode *node);
-        void operator()(TargetSelectorNode *node);
-        void operator()(EntityArgumentValueNode *node);
-
-        NodeVisitor *visitor        = nullptr;
-        uint         nbtAccessCount = 0;
-        UintHash     commandCounts;
-        SelectorHash targetSelectorCounts;
-    };
-
-
-    class NodeCounter : public OverloadNodeVisitor<NodeCounterImpl> {
+    class NodeCounter : public OverloadNodeVisitor {
 public:
         NodeCounter() : OverloadNodeVisitor(Postorder) {
         };
 
-        void startVisiting(ParseNode *node) override;
+        void visit(LiteralNode *node) override;
+        void visit(TargetSelectorNode *node) override;
+        void visit(EntityArgumentValueNode *node) override;
+
         UintHash commandCounts() const;
         SelectorHash targetSelectorCounts() const;
         int nbtAccessCount() const;
+
+private:
+        uint m_nbtAccessCount = 0;
+        UintHash m_commandCounts;
+        SelectorHash m_targetSelectorCounts;
     };
 }
 

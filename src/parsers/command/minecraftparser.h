@@ -18,7 +18,7 @@
 #include <QVersionNumber>
 
 namespace Command {
-    class MinecraftParser : public SchemaParser  {
+    class MinecraftParser final : public SchemaParser  {
         Q_GADGET;
 public:
         enum class AxisParseOption : unsigned char {

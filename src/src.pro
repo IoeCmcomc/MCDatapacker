@@ -92,6 +92,7 @@ SOURCES += \
     parsers/command/schemaparser.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
+    parsers/command/visitors/nodevisitor.cpp \
     parsers/command/visitors/overloadnodevisitor.cpp \
     parsers/command/visitors/reprprinter.cpp \
     parsers/command/visitors/sourceprinter.cpp \
