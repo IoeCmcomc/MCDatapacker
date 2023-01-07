@@ -43,7 +43,7 @@ private slots:
 };
 
 TestMinecraftParser::TestMinecraftParser() {
-    QThread::sleep(10);
+    //QThread::sleep(10);
 }
 
 TestMinecraftParser::~TestMinecraftParser() {
@@ -75,7 +75,7 @@ void TestMinecraftParser::cleanupTestCase() {
 }
 
 void TestMinecraftParser::genRepr_data() {
-    //QSKIP("");
+    QSKIP("");
     //DECLARE_TAG_VARS;
 
     //QTest::addColumn<QString>("command");

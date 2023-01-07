@@ -22,6 +22,10 @@ private slots:
     void parseFloat();
     void parseInteger();
     void parseString();
+    void useRegexToParseStringLiteral();
+    void useLoopToParseStringLiteral();
+    void useLoopToParseStringLiteral2();
+    void useLoopToParseStringLiteral3();
 };
 
 TestSchemaParser::TestSchemaParser() {
@@ -131,6 +135,245 @@ void TestSchemaParser::parseString() {
     QCOMPARE(result->parserType(), ArgumentNode::ParserType::String);
     QCOMPARE(result->text(), "\"Speed Upgrade for Blocks\"");
     QCOMPARE(result->value(), "Speed Upgrade for Blocks");
+}
+
+static const QRegularExpression m_literalStrRegex{
+    QStringLiteral(R"([\w.+-]+)") };
+
+QStringList parseWithRegex(const QString &text) {
+    int   pos = 0;
+    QChar chr;
+
+    QStringList ret;
+
+    while (pos < text.length()) {
+        chr = text.at(pos);
+        const auto &match = m_literalStrRegex.match(text,
+                                                    pos,
+                                                    QRegularExpression::NormalMatch);
+
+        if (match.hasMatch()) {
+            const QString &&matchStr = match.captured();
+            pos = match.capturedStart() + matchStr.length();
+            ret << std::move(matchStr);
+        } else {
+            return ret;
+        }
+    }
+    return ret;
+}
+
+QStringList parseWithoutRegex(const QString &text) {
+    int   pos = 0;
+    QChar chr;
+
+    QStringList ret;
+    int         start = -1;
+
+    while (pos < text.length()) {
+        chr = text.at(pos);
+        if (chr.isLetterOrNumber() || chr == '_' || chr == '.' || chr == '-' ||
+            chr == '+') {
+            if (start == -1) {
+                start = pos;
+            }
+        } else if (start != -1) {
+            ret << text.mid(start, pos - start);
+            start = -1;
+        }
+        pos += 1;
+    }
+    if (start != -1) {
+        ret << text.mid(start, pos - start);
+    }
+    return ret;
+}
+
+QStringList parseWithoutRegex2(const QString &text) {
+    int   pos = 0;
+    QChar chr;
+
+    QStringList ret;
+    int         start = -1;
+
+    while (pos < text.length()) {
+        chr = text.at(pos);
+        switch (chr.toLatin1()) {
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '.':
+            case '+':
+            case '-':
+            case '_':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z': {
+                if (start == -1) {
+                    start = pos;
+                }
+                break;
+            }
+            default: {
+                if (start != -1) {
+                    ret << text.mid(start, pos - start);
+                    start = -1;
+                }
+                break;
+            }
+        }
+        pos += 1;
+    }
+    if (start != -1) {
+        ret << text.mid(start, pos - start);
+    }
+    return ret;
+}
+
+QStringList parseWithoutRegex3(const QString &text) {
+    int   pos = 0;
+    QChar chr;
+
+    QStringList ret;
+    int         start = -1;
+
+    while (pos < text.length()) {
+        chr = text.at(pos);
+        if ((chr >= 'a' && chr <= 'z') || (chr >= '0' && chr <= '9') ||
+            (chr >= 'A' && chr <= 'Z') || chr == '_' || chr == '.' ||
+            chr == '-' || chr == '+') {
+            if (start == -1) {
+                start = pos;
+            }
+        } else if (start != -1) {
+            ret << text.mid(start, pos - start);
+            start = -1;
+        }
+        pos += 1;
+    }
+    if (start != -1) {
+        ret << text.mid(start, pos - start);
+    }
+    return ret;
+}
+
+static const auto input = QStringLiteral(
+    "IP addresses are written and displayed in human-readable notations, such as 192.0.2.1 in IPv4, and 2001:db8:0:1234:0:567:8:1 in IPv6. The size of the routing prefix of the address is designated in CIDR notation by suffixing the address with the number of significant bits, e.g., 192.0.2.1/24, which is equivalent to the historically used subnet mask 255.255.255.0.");
+static const QStringList result = {
+    "IP",             "addresses",   "are",
+    "written",        "and",         "displayed", "in",
+    "human-readable", "notations",   "such",
+    "as",             "192.0.2.1",   "in",
+    "IPv4",           "and",         "2001",      "db8",
+    "0",              "1234",        "0",
+    "567",            "8",           "1",         "in",        "IPv6.",
+    "The",            "size",        "of",
+    "the",            "routing",     "prefix",    "of",        "the",
+    "address",        "is",          "designated","in",
+    "CIDR",           "notation",    "by",        "suffixing", "the",
+    "address",        "with",        "the",       "number",
+    "of",             "significant", "bits",      "e.g.",
+    "192.0.2.1",      "24",          "which",
+    "is",             "equivalent",  "to",        "the",       "historically",
+    "used",           "subnet",      "mask",
+    "255.255.255.0.",
+};
+
+//static const auto input = QStringLiteral(
+//    "a_long_string_with_numbers_such_as_12345");
+//static const auto result = QStringList(
+//    "a_long_string_with_numbers_such_as_12345");
+
+void TestSchemaParser::useRegexToParseStringLiteral() {
+    QStringList ret;
+
+    QBENCHMARK {
+        ret = parseWithRegex(input);
+    }
+    QCOMPARE(ret, result);
+}
+
+void TestSchemaParser::useLoopToParseStringLiteral() {
+    QStringList ret;
+
+    QBENCHMARK {
+        ret = parseWithoutRegex(input);
+    }
+    QCOMPARE(ret, result);
+}
+
+void TestSchemaParser::useLoopToParseStringLiteral2() {
+    QStringList ret;
+
+    QBENCHMARK {
+        ret = parseWithoutRegex2(input);
+    }
+    QCOMPARE(ret, result);
+}
+
+void TestSchemaParser::useLoopToParseStringLiteral3() {
+    QStringList ret;
+
+    QBENCHMARK {
+        ret = parseWithoutRegex3(input);
+    }
+    QCOMPARE(ret, result);
 }
 
 QTEST_GUILESS_MAIN(TestSchemaParser)

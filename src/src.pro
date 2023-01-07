@@ -338,4 +338,19 @@ else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PW
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/miniz.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/libminiz.a
 
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/uberswitch/release/ -luberswitch
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/uberswitch/debug/ -luberswitch
+else:unix: LIBS += -L$$OUT_PWD/../lib/uberswitch/ -luberswitch
+
+INCLUDEPATH += $$PWD/../lib/uberswitch \
+    $$PWD/../lib/uberswitch/uberswitch/include
+DEPENDPATH += $$PWD/../lib/uberswitch
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/release/libuberswitch.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/debug/libuberswitch.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/release/uberswitch.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/debug/uberswitch.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/libuberswitch.a
+
 #message($$INCLUDEPATH)

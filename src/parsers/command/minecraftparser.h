@@ -28,6 +28,8 @@ public:
         };
         Q_DECLARE_FLAGS(AxisParseOptions, AxisParseOption);
 
+        using QLatin1StringVector = QVector<QLatin1String>;
+
         MinecraftParser();
         using SchemaParser::SchemaParser;
 
@@ -36,7 +38,7 @@ public:
 private:
         static inline QVersionNumber gameVer = QVersionNumber();
 
-        QString oneOf(const QStringList &strArr);
+        QString oneOf(const QLatin1StringVector &strArr);
         QString eatListSep(QChar sepChr, QChar endChr);
 
         template<class Container, class Type>
@@ -44,8 +46,8 @@ private:
                                            QChar endChar,
                                            QChar sepChar,
                                            std::function<QSharedPointer<Type>(const QString &)> func,
-                                           bool acceptQuotation      = false,
-                                           const QString &keyCharset = R"(0-9a-zA-Z-_.+)")
+                                           bool acceptQuotation            = false,
+                                           const QLatin1String &keyCharset = R"(0-9a-zA-Z-_.+)"_QL1)
         {
             auto    &&obj   = QSharedPointer<Container>::create(0);
             const int start = pos();
@@ -98,7 +100,7 @@ private:
         QSharedPointer<NbtNode> parseNumericTag();
 
         template<class Container, class Type>
-        QSharedPointer<Container> parseArrayTag(const QString &errorMsg) {
+        QSharedPointer<Container> parseArrayTag(const char *errorMsg) {
             const int start = pos() - 2;
 
             advance();
@@ -112,7 +114,7 @@ private:
                     const auto &&elem   = qSharedPointerCast<Type>(
                         parseNumericTag());
                     if (!elem) {
-                        error(QString(errorMsg));
+                        error(errorMsg);
                     }
                     elem->setLeadingTrivia(trivia);
                     ret->append(elem);
@@ -121,8 +123,7 @@ private:
                 ret->setRightText(eat(']'));
                 return ret;
             } else {
-                error(QString(
-                          "Missing the character ';' after array type indicator"));
+                error("Missing the character ';' after array type indicator");
             }
             return nullptr;
         }

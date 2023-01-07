@@ -14,8 +14,6 @@
 
 #include <stdexcept>
 
-using QStringSet = QSet<QString>;
-
 namespace Command {
     class SchemaParser : public Parser {
         Q_GADGET
@@ -127,9 +125,11 @@ protected:
 private:
         ParseNodeCache m_cache;
         QSharedPointer<Command::RootNode> m_tree;
-        const QRegularExpression m_literalStrRegex{ R"([\w.+-]+)" };
-        const QRegularExpression m_decimalNumRegex = QRegularExpression(
-            R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))");
+        // Declaring this member as static will decreases the parser performance
+        const QRegularExpression m_literalStrRegex{
+            QStringLiteral(R"([\w.+-]+)") };
+        static inline const QRegularExpression m_decimalNumRegex{
+            QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
         static inline QJsonObject m_schema;
         static inline Schema::RootNode m_schemaGraph;
     };

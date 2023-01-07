@@ -5,4 +5,5 @@ SUBDIRS = \
     json \
     lru-cache \
     nbt \
-    miniz
+    miniz \
+    uberswitch

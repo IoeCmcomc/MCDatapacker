@@ -52,3 +52,6 @@
 [submodule "resource/minecraft/info/1.18.2/registries"]
 	path = resource/minecraft/info/1.18.2/registries
 	url = https://github.com/misode/mcmeta.git
+[submodule "lib/uberswitch/uberswitch"]
+	path = lib/uberswitch/uberswitch
+	url = https://github.com/falemagn/uberswitch.git

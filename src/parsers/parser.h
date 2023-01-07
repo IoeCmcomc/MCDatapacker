@@ -3,10 +3,19 @@
 
 #include <QVariantList>
 #include <QSet>
+#include <QDebug>
 
 #include <stdexcept>
 
 using QStringSet = QSet<QString>;
+
+QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
+    return QLatin1String(literal, size);
+}
+
+QLatin1Char constexpr operator ""_QL1(const char chr) {
+    return QLatin1Char(chr);
+}
 
 class Parser {
     Q_GADGET
@@ -17,9 +26,12 @@ public:
         int length        = 1;
         QVariantList args = {};
 
-        explicit Error(const QString &whatArg   = QString(), int pos = -1,
-                       int length               = 0,
-                       const QVariantList &args = {});
+        explicit Error(const QString &whatArg       = QString(), int pos = -1,
+                       int length                   = 0,
+                       const QVariantList &args     = {});
+        explicit Error(const char *whatArg, int pos = -1,
+                       int length                   = 0,
+                       const QVariantList &args     = {});
 
         QString toLocalizedMessage() const;
 
@@ -55,7 +67,10 @@ protected:
     QStringSet m_spans;
 
     void error(const QString &msg, const QVariantList &args = {});
+    void error(const char *msg, const QVariantList &args    = {});
     void error [[noreturn]] (const QString &msg, const QVariantList &args,
+                             int pos, int length = 0);
+    void error [[noreturn]] (const char *msg, const QVariantList &args,
                              int pos, int length = 0);
     void advance(int n = 1);
 
@@ -64,6 +79,7 @@ protected:
     QStringRef getUntil(QChar chr);
     QStringRef getRest();
     QString getWithCharset(const QString &charset);
+    QString getWithCharset(const QLatin1String &charset);
     QString getWithRegex(const QString &pattern);
     QString getWithRegex(const QRegularExpression &regex);
     QStringRef peek(int n);

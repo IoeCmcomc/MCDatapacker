@@ -3,6 +3,8 @@
 #include "schema/schemaargumentnode.h"
 #include "schema/schemaliteralnode.h"
 
+#include "uberswitch/include/uberswitch/uberswitch.hpp"
+
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -464,7 +466,8 @@ namespace Command {
         }
 
         QFile      f(finfo.filePath());
-        const auto openOptions = (finfo.suffix() == "json")
+        const bool isJson      = finfo.suffix() == "json"_QL1;
+        const auto openOptions = (isJson)
                 ? (QIODevice::ReadOnly | QIODevice::Text) : QIODevice::ReadOnly;
         f.open(openOptions);
         QByteArray &&data = f.readAll();
@@ -472,9 +475,9 @@ namespace Command {
 
         json j;
 
-        if (finfo.suffix() == "json") {
+        if (isJson) {
             j = json::parse(data);
-        } else if (finfo.suffix() == "msgpack") {
+        } else if (finfo.suffix() == "msgpack"_QL1) {
             j = json::from_msgpack(data);
         }
 
@@ -501,10 +504,10 @@ namespace Command {
     QSharedPointer<BoolNode> SchemaParser::brigadier_bool() {
         const int start = pos();
 
-        if (peek(4) == QLatin1String("true")) {
+        if (peek(4) == "true"_QL1) {
             advance(4);
             return QSharedPointer<BoolNode>::create(spanText(start), true);
-        } else if (peek(5) == QLatin1String("false")) {
+        } else if (peek(5) == "false"_QL1) {
             advance(5);
             return QSharedPointer<BoolNode>::create(spanText(start), false);
         } else {
@@ -552,7 +555,7 @@ namespace Command {
 
     QSharedPointer<IntegerNode> SchemaParser::brigadier_integer(
         const QVariantMap &props) {
-        const QString &&raw   = getWithRegex(R"([+-]?\d+)");
+        const QString &&raw   = getWithRegex(QStringLiteral(R"([+-]?\d+)"));
         bool            ok    = false;
         int             value = raw.toFloat(&ok);
 
@@ -589,26 +592,33 @@ namespace Command {
         const QVariantMap &props) {
         const auto &&defaultRet = QSharedPointer<StringNode>::create(QString());
 
-        if (!props.contains(QLatin1String("type")))
+        if (!props.contains(QStringLiteral("type")))
             error(QT_TR_NOOP(
                       "The required paramenter 'type' of the 'brigadier_string' argument parser is missing."));
 
-        const QString &&type = props[QLatin1String("type")].toString();
-        if (type == QLatin1String("greedy")) {
-            return QSharedPointer<StringNode>::create(spanText(getRest()));
-        } else if (type == QLatin1String("phrase")) {
-            if (curChar() == '"' || curChar() == '\'') {
-                const int    start = pos();
-                const auto &&str   = getQuotedString();
-                return QSharedPointer<StringNode>::create(spanText(start), str);
-            } else {
-                error(QT_TR_NOOP("A quoted string is required."));
+        const QString &&type = props[QStringLiteral("type")].toString();
+        uswitch (type) {
+            ucase ("greedy"_QL1): {
+                return QSharedPointer<StringNode>::create(spanText(getRest()));
             }
-        } else if (type == QLatin1String("word")) {
-            const QString &&literal = getWithRegex(m_literalStrRegex);
-            return QSharedPointer<StringNode>::create(spanText(literal));
+            ucase ("phrase"_QL1): {
+                if (curChar() == '"' || curChar() == '\'') {
+                    const int    start = pos();
+                    const auto &&str   = getQuotedString();
+                    return QSharedPointer<StringNode>::create(spanText(start),
+                                                              str);
+                } else {
+                    error(QT_TR_NOOP("A quoted string is required."));
+                }
+            }
+            ucase ("word"_QL1): {
+                const QString &&literal = getWithRegex(m_literalStrRegex);
+                return QSharedPointer<StringNode>::create(spanText(literal));
+            }
+            default: {
+                return defaultRet;
+            }
         }
-        return defaultRet;
     }
 
 /*!
@@ -666,7 +676,7 @@ namespace Command {
             qWarning() << "The parsing stack depth is too large:" << depth;
 
         const bool canEndParsing = curChar().isNull()
-                                   || (peek(2) == QLatin1String(" "));
+                                   || (peek(2) == " "_QL1);
         if ((*schemaNode)->isExecutable() && canEndParsing) {
             return false;
         } else if ((*schemaNode)->isEmpty() && (*schemaNode)->redirect()) {
@@ -675,7 +685,7 @@ namespace Command {
         if (curChar().isNull()) {
             error(QT_TR_NOOP("Incompleted command"));
         }
-        eat(' ');
+        eat(QChar::Space);
 
         return true;
     }

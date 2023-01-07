@@ -9,11 +9,16 @@ Parser::Error::Error(const QString &whatArg, int pos, int length,
         args) {
 }
 
+Parser::Error::Error(const char *whatArg, int pos, int length,
+                     const QVariantList &args)
+    : std::runtime_error(whatArg), pos(pos), length(length), args(args) {
+}
+
 QString Parser::Error::toLocalizedMessage() const {
     QString &&errMsg =
         QCoreApplication::translate("Parser::Error", what());
 
-    if (errMsg == what())
+    if (errMsg == QString::fromUtf8(what()))
         errMsg = QCoreApplication::translate("Parser", what());
 
     for (int i = 0; i < args.size(); ++i) {
@@ -89,6 +94,10 @@ void Parser::error(const QString &msg, const QVariantList &args) {
     error(msg, args, m_pos);
 }
 
+void Parser::error(const char *msg, const QVariantList &args) {
+    error(msg, args, m_pos);
+}
+
 void Parser::error(const QString &msg, const QVariantList &args,
                    int pos, int length) {
     /*qWarning() << "Command::Parser::error" << msg << pos << length; */
@@ -100,6 +109,11 @@ void Parser::error(const QString &msg, const QVariantList &args,
           QString::number(m_text.length()));
  */
 
+    throw Parser::Error(msg, pos, length, args);
+}
+
+void Parser::error(const char *msg, const QVariantList &args,
+                   int pos, int length) {
     throw Parser::Error(msg, pos, length, args);
 }
 
@@ -121,14 +135,11 @@ bool Parser::expect(QChar chr) {
         return true;
     } else {
         const QString &&curCharTxt =
-            (m_curChar.isNull()) ? QStringLiteral("EOL") : QLatin1Char('\'')
-            +
-            m_curChar +
-            QLatin1Char('\'');
+            (m_curChar.isNull()) ? QStringLiteral("EOL") : '\''_QL1
+            + m_curChar + '\''_QL1;
         const QString &&charTxt =
-            (chr.isNull()) ? QStringLiteral("EOL") : QLatin1Char('\'') +
-            chr +
-            QLatin1Char('\'');
+            (chr.isNull()) ? QStringLiteral("EOL") : '\''_QL1 +
+            chr + '\''_QL1;
         error(QT_TR_NOOP("Unexpected %1, expecting %2"),
               { curCharTxt, charTxt }, m_pos, 1);
         return false;
@@ -182,7 +193,11 @@ QStringRef Parser::getRest() {
  * \brief Returns the substring from the current character with the given (regex) \a charset.
  */
 QString Parser::getWithCharset(const QString &charset) {
-    return getWithRegex("[" + charset + "]+");
+    return getWithRegex("["_QL1 + charset + "]+"_QL1);
+}
+
+QString Parser::getWithCharset(const QLatin1String &charset) {
+    return getWithRegex("["_QL1 + charset + "]+"_QL1);
 }
 
 /*!
