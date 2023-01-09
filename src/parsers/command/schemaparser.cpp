@@ -626,15 +626,15 @@ namespace Command {
  */
     QSharedPointer<ParseNode> SchemaParser::parse() {
         m_tree = QSharedPointer<RootNode>::create();
+        m_errors.clear();
         const QString &txt = text();
 
         if (m_schema.isEmpty()) {
             qWarning() << "The parser schema hasn't been initialized yet.";
-        } else if (txt.trimmed().isEmpty() ||
-                   txt.trimmed().at(0) == '#') {
-            m_tree->setIsValid(true);
+            m_tree->setIsValid(false);
             return m_tree;
         }
+
         setPos(0);
 //        constexpr int typeId = getTypeEnumId<RootNode>();
 //        CacheKey      key{ typeId, text() + '\1' };
@@ -694,7 +694,6 @@ namespace Command {
                                      int depth) {
         NodePtr                      ret;
         QVector<SchemaParser::Error> errors;
-        QVector<int>                 argLengths;
 
         const bool isRoot = schemaNode->kind() == Schema::Node::Kind::Root;
 
@@ -732,7 +731,6 @@ namespace Command {
                     errors <<
                         Error(QT_TR_NOOP("Cannot parse unsupported argument"),
                               pos(), literal.length(), {});
-                    argLengths << literal.length();
                     continue;
                 }
 //                const int   parserId = static_cast<int>(parserType);
@@ -747,11 +745,10 @@ namespace Command {
                 try {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
-                } catch (const SchemaParser::Error &err) {
+                } catch (SchemaParser::Error &err) {
+                    err.length = pos() - startPos + 1;
                     errors << err;
-                    int argLength = pos() - startPos + 1;
                     setPos(startPos);
-                    argLengths << argLength;
                     continue;
                 }
 //                }
@@ -767,11 +764,10 @@ namespace Command {
                         try {
                             success = parseBySchema(node, depth + 1);
                             m_tree->prepend(ret);
-                        } catch (const SchemaParser::Error &err) {
+                        } catch (SchemaParser::Error &err) {
+                            err.length = pos() - startPos + 1;
                             errors << err;
-                            int argLength = pos() - startPos + 1;
                             setPos(startPos);
-                            argLengths << argLength;
                             continue;
                         }
                     } else {
@@ -789,8 +785,12 @@ namespace Command {
             if (errors.size() == 1) {
                 throw errors[0];
             } else if (errors.size() == schemaNode->argumentChildren().size()) {
-                throw errors[*std::max_element(argLengths.cbegin(),
-                                               argLengths.cend())];
+                const auto errorToThrow = *std::max_element(
+                    errors.cbegin(), errors.cend(),
+                    [](const auto& a, const auto& b) {
+                    return a.length < b.length;
+                });
+                throw errorToThrow;
             } else {
                 for (const auto &err: errors) {
                     if (!m_errors.contains(err)) {

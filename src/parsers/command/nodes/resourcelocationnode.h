@@ -4,8 +4,6 @@
 #include "argumentnode.h"
 
 namespace Command {
-    using SpanPtr = QSharedPointer<SpanNode>;
-
     class ResourceLocationNode : public ArgumentNode
     {
 public:

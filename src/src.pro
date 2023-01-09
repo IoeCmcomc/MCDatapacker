@@ -61,6 +61,7 @@ SOURCES += \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
     newdatapackdialog.cpp \
+    parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
@@ -68,6 +69,7 @@ SOURCES += \
     parsers/command/nodes/blockstatenode.cpp \
     parsers/command/nodes/componentnode.cpp \
     parsers/command/nodes/entitynode.cpp \
+    parsers/command/nodes/filenode.cpp \
     parsers/command/nodes/floatrangenode.cpp \
     parsers/command/nodes/intrangenode.cpp \
     parsers/command/nodes/itemstacknode.cpp \
@@ -148,12 +150,14 @@ HEADERS += \
     mcfunctionhighlighter.h \
     modelfunctions.h \
     newdatapackdialog.h \
+    parsers/command/mcfunctionparser.h \
     parsers/command/nodes/anglenode.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
     parsers/command/nodes/blockstatenode.h \
     parsers/command/nodes/componentnode.h \
     parsers/command/nodes/entitynode.h \
+    parsers/command/nodes/filenode.h \
     parsers/command/nodes/floatrangenode.h \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \

@@ -60,15 +60,15 @@ void JsonHighlighter::checkProblems(bool) {
     for (auto block = getParentDoc()->begin();
          block != getParentDoc()->end(); block = block.next()) {
         if (TextBlockData *data =
-                dynamic_cast<TextBlockData*>(block.userData())) {
+                dynamic_cast<TextBlockData *>(block.userData())) {
             if (!(jsonDoc.isNull() && block.contains(jsonErr.offset))) {
                 data->clearProblems();
             } else {
                 QTextCursor tc(getParentDoc());
                 tc.setPosition(jsonErr.offset);
                 ProblemInfo error{ ProblemInfo::Type::Error,
-                                   (uint)tc.blockNumber(),
-                                   (uint)tc.positionInBlock(), 1,
+                                   tc.blockNumber(),
+                                   tc.positionInBlock(), 1,
                                    jsonErr.errorString() };
                 data->setProblems({ error });
             }

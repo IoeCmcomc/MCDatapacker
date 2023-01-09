@@ -4,7 +4,8 @@
 #include <QRegularExpression>
 
 #include "highlighter.h"
-#include "parsers/command/minecraftparser.h"
+//#include "parsers/command/minecraftparser.h"
+#include "parsers/command/mcfunctionparser.h"
 
 class McfunctionHighlighter : public Highlighter
 {
@@ -26,7 +27,8 @@ private:
         QTextCharFormat    format;
     };
 
-    Command::MinecraftParser parser;
+    //Command::MinecraftParser parser;
+    Command::McfunctionParser parser;
 
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;

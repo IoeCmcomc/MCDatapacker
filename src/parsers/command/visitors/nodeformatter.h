@@ -434,16 +434,18 @@ public:
                 }
 
                 case Type::Key: {
-                    return node->name()->accept(this, m_order);
+                    node->name()->accept(this, m_order);
 
                     break;
                 }
 
                 case Type::Index: {
+                    m_pos += node->leftText().length();
                     if (node->filter())
                         node->filter()->accept(this, m_order);
                     else if (node->index())
                         node->index()->accept(this, m_order);
+                    m_pos += node->rightText().length();
                 }
             }
 

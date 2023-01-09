@@ -32,8 +32,7 @@ QString Parser::Error::toLocalizedMessage() const {
 }
 
 bool Parser::Error::operator==(const Error &o) const {
-    return std::make_tuple(what(), pos, length) == std::make_tuple(
-        o.what(), o.pos, o.length);
+    return std::make_tuple(pos, length) == std::make_tuple(o.pos, o.length);
 }
 
 Parser::Parser() {

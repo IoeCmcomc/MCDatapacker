@@ -81,6 +81,8 @@ public:
         };
     };
 
+    using SpanPtr = QSharedPointer<SpanNode>;
+
     template <class T, typename E>
     constexpr E nodeTypeEnum;
 
