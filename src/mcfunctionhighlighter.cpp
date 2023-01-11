@@ -18,114 +18,29 @@ void McfunctionHighlighter::setupRules() {
     fmt.setForeground(QColor(62, 195, 0));
     singleCommentHighlightRules.insert('#', fmt);
 
-    fmt = QTextCharFormat();
-
     HighlightingRule rule;
 
     keywordFormat.setForeground(Qt::blue);
     keywordFormat.setFontWeight(QFont::Bold);
 /*    keywordFormat.setToolTip("minecraft command"); */
-    static const QString keywordPatterns[] = {
-        QStringLiteral("\\badvancement\\b"),
-        QStringLiteral("\\abttribute\\b"),
-        QStringLiteral("\\bban\\b"),
-        QStringLiteral("\\bban-ip\\b"),
-        QStringLiteral("\\bbanlist\\b"),
-        QStringLiteral("\\bbossbar\\b"),
-        QStringLiteral("\\bclear\\b"),
-        QStringLiteral("\\bclone\\b"),
-        QStringLiteral("\\bdata\\b"),
-        QStringLiteral("\\bdatapack\\b"),
-        QStringLiteral("\\bdebug\\b"),
-        QStringLiteral("\\bdefaultgamemode\\b"),
-        QStringLiteral("\\bdeop\\b"),
-        QStringLiteral("\\bdifficulty\\b"),
-        QStringLiteral("\\beffect\\b"),
-        QStringLiteral("\\bechant\\b"),
-        QStringLiteral("\\bexecute\\b"),
-        QStringLiteral("\\bexperience\\b"),
-        QStringLiteral("\\bfill\\b"),
-        QStringLiteral("\\bforceload\\b"),
-        QStringLiteral("\\bfunction\\b"),
-        QStringLiteral("\\bgamemode\\b"),
-        QStringLiteral("\\bgamerule\\b"),
-        QStringLiteral("\\bgive\\b"),
-        QStringLiteral("\\bhelp\\b"),
-        QStringLiteral("\\bitem\\b"),
-        QStringLiteral("\\bjfr\\b"),
-        QStringLiteral("\\bkick\\b"),
-        QStringLiteral("\\bkill\\b"),
-        QStringLiteral("\\blist\\b"),
-        QStringLiteral("\\blocate\\b"),
-        QStringLiteral("\\blocatebiome\\b"),
-        QStringLiteral("\\bloot\\b"),
-        QStringLiteral("\\bme\\b"),
-        QStringLiteral("\\bmsg\\b"),
-        QStringLiteral("\\bop\\b"),
-        QStringLiteral("\\bpardon\\b"),
-        QStringLiteral("\\bpardon-ip\\b"),
-        QStringLiteral("\\bparticle\\b"),
-        QStringLiteral("\\bperf\\b"),
-        QStringLiteral("\\bplaysound\\b"),
-        QStringLiteral("\\bpublish\\b"),
-        QStringLiteral("\\brecipe\\b"),
-        QStringLiteral("\\breload\\b"),
-        QStringLiteral("\\breplaceitem\\b"),
-        QStringLiteral("\\bsave-all\\b"),
-        QStringLiteral("\\bsave-off\\b"),
-        QStringLiteral("\\bsave-on\\b"),
-        QStringLiteral("\\bsay\\b"),
-        QStringLiteral("\\bschedule\\b"),
-        QStringLiteral("\\bscoreboard\\b"),
-        QStringLiteral("\\bseed\\b"),
-        QStringLiteral("\\bsetblock\\b"),
-        QStringLiteral("\\bsetidletimeout\\b"),
-        QStringLiteral("\\bsetworldspawn\\b"),
-        QStringLiteral("\\bspawnpoint\\b"),
-        QStringLiteral("\\bspectate\\b"),
-        QStringLiteral("\\bspreadplayer\\b"),
-        QStringLiteral("\\bstop\\b"),
-        QStringLiteral("\\bstopsound\\b"),
-        QStringLiteral("\\bsummon\\b"),
-        QStringLiteral("\\btag\\b"),
-        QStringLiteral("\\bteam\\b"),
-        QStringLiteral("\\bteleport\\b"),
-        QStringLiteral("\\bteammsg\\b"),
-        QStringLiteral("\\btell\\b"),
-        QStringLiteral("\\btellraw\\b"),
-        QStringLiteral("\\btime\\b"),
-        QStringLiteral("\\btitle\\b"),
-        QStringLiteral("\\btm\\b"),
-        QStringLiteral("\\btp\\b"),
-        QStringLiteral("\\btrigger\\b"),
-        QStringLiteral("\\bw\\b"),
-        QStringLiteral("\\bweather\\b"),
-        QStringLiteral("\\bwhitelist\\b"),
-        QStringLiteral("\\bworldborder\\b"),
-        QStringLiteral("\\bxp\\b")
-    };
-    for (const QString &pattern : keywordPatterns) {
-        rule.pattern = QRegularExpression(pattern);
-        rule.format  = keywordFormat;
-        highlightingRules.append(rule);
-    }
 
-    numberFormat.setForeground(QColor(47, 151, 193));
-    rule.pattern =
-        QRegularExpression(QStringLiteral(
-                               R"((?<!\w)-?\d+(?:\.\d+)?[bBsSlLfFdD]?(?!\w))"));
-    rule.format = numberFormat;
+    const static QRegularExpression keywordRegex{ QStringLiteral(
+                                                      R"((?<=^| )(?>(?>a)(?>dvancement|ttribute)|b(?>an(?>-ip|list|)|ossbar)|cl(?>ear|one)|d(?>ata(?:pack)?|e(?>bug|faultgamemode|op)|ifficulty)|e(?>chant|ffect|x(?>ecute|perience))|f(?>ill|orceload|unction)|g(?>ame(?>mode|rule)|ive)|help|item|jfr|ki(?>ck|ll)|l(?>ist|o(?>cate(?:biome)?|ot))|m(?>e|sg)|op|p(?>ar(?>don(?:-ip)?|ticle)|erf|laysound|ublish)|re(?>cipe|load|placeitem)|s(?>a(?>ve-(?>all|o(?>ff|n))|y)|c(?>hedule|oreboard)|e(?>ed|t(?>block|idletimeout|worldspawn))|p(?>awnpoint|ectate|readplayer)|top(?:sound)?|ummon)|t(?>ag|e(?>am(?:msg)?|l(?>eport|l(?:raw)?))|i(?>me|tle)|m|p|rigger)|w(?>eather|hitelist|orldborder|)|xp)(?= |$))") };
+    rule.pattern = keywordRegex;
+    rule.format  = keywordFormat;
     highlightingRules.append(rule);
 
-    posFormat.setForeground(QColor(171, 129, 205));
-    rule.pattern = QRegularExpression(QStringLiteral("[~^]?-?\\d+(?:\\s|$)"));
-    rule.format  = posFormat;
+
+    numberFormat.setForeground(QColor(47, 151, 193));
+    const static QRegularExpression numberRegex{ QStringLiteral(
+                                                     R"((?<!\w)-?\d+(?:\.\d+)?[bBsSlLfFdD]?(?!\w))") };
+    rule.pattern = numberRegex;
+    rule.format  = numberFormat;
     highlightingRules.append(rule);
 
     namespacedIDFormat.setForeground(QColor(69, 80, 59));
-    rule.pattern =
-        QRegularExpression(QStringLiteral(R"(\b[a-z0-9-_]+:[a-z0-9-_/.]+\b)"));
-    rule.format = namespacedIDFormat;
+    rule.pattern = namespacedIdRegex;
+    rule.format  = namespacedIDFormat;
     highlightingRules.append(rule);
 
     auto quoteFmt = QTextCharFormat();
@@ -134,7 +49,8 @@ void McfunctionHighlighter::setupRules() {
     quoteHighlightRules.insert('\'', quoteFmt);
 
     commentFormat.setForeground(Qt::darkGreen);
-    rule.pattern = QRegularExpression(QStringLiteral(R"(^\s*#.*)"));
+    const static QRegularExpression commentRegex{ QStringLiteral(R"(^\s*#.*)") };
+    rule.pattern = commentRegex;
     rule.format  = commentFormat;
     highlightingRules.append(rule);
 }

@@ -32,7 +32,6 @@ private:
 
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;
-    QTextCharFormat posFormat;
     QTextCharFormat entitySelectorFormat;
     QTextCharFormat namespacedIDFormat;
     QTextCharFormat commentFormat;

@@ -112,21 +112,28 @@ void Highlighter::highlightBlock(const QString &text) {
             for (int i = 0; i < text.length(); i++) {
                 auto curChar = text[i];
                 if (quoteHighlightRules.contains(curChar)) {
-                    if (!backslash && (currentBlockState() == QuotedString)) {
-                        setCurrentBlockState(Normal);
-                        setFormat(quoteStart,
-                                  quoteLength + 1,
-                                  quoteHighlightRules[curQuoteChar]);
+                    if (!backslash) {
+                        if (curChar == curQuoteChar) {
+                            setCurrentBlockState(Normal);
+                            setFormat(quoteStart,
+                                      quoteLength + 1,
+                                      quoteHighlightRules[curQuoteChar]);
+                            curQuoteChar = '\0';
+                            quoteLength  = 0;
+                        } else if (currentBlockState() == Normal) {
+                            setCurrentBlockState(QuotedString);
+                            curQuoteChar = curChar;
+                            quoteStart   = i;
+                            quoteLength++;
+                        }
                     } else {
-                        setCurrentBlockState(QuotedString);
-                        curQuoteChar = curChar;
-                        quoteStart   = i;
                         quoteLength++;
+                        backslash = false;
                     }
                 } else if (backslash) {
                     quoteLength++;
                     backslash = false;
-                } else if (curChar == QLatin1Char('\\')) {
+                } else if (curChar == '\\') {
                     backslash = true;
                     quoteLength++;
                 } else if (currentBlockState() == QuotedString) {

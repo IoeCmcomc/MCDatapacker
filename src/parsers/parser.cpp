@@ -291,8 +291,28 @@ QString Parser::getQuotedString() {
                         break;
                     }
 
+                    case 'u': {
+                        advance();
+                        const auto &literal = peek(4);
+                        bool        ok;
+                        ushort      codepoint = literal.toUShort(&ok, 16);
+                        if (ok) {
+                            value += QChar(codepoint);
+                            advance(3);
+                        } else {
+                            error(QT_TR_NOOP("Invalid Unicode code point"), {},
+                                  pos() - 2, 6);
+                        }
+                        break;
+                    }
+
                     case 'r': {
                         value += '\r';
+                        break;
+                    }
+
+                    case '/': {
+                        value += '/';
                         break;
                     }
 

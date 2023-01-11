@@ -498,7 +498,7 @@ void TabbedDocumentInterface::onCurTextChanged() {
 }
 
 void TabbedDocumentInterface::onCurTextChangingDone() {
-    /*qDebug() << "TabbedDocumentInterface::onCurTextChangingDone"; */
+    //qDebug() << "TabbedDocumentInterface::onCurTextChangingDone";
     if (getCodeEditor()) {
         auto *highlighter = getCodeEditor()->getCurHighlighter();
         if (highlighter) {

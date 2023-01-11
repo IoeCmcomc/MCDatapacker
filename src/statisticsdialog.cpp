@@ -197,12 +197,14 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
         int i = 0;
         while (!in.atEnd()) {
             ++i;
-            const QString &line = in.readLine();
-            if (line.startsWith('#'))
-                ++m_commentLines;
-
-            if (line.trimmed() == QString())
+            const QString &&line    = in.readLine();
+            const auto     &trimmed = line.trimmed();
+            if (trimmed.isEmpty()) {
                 continue;
+            } else if (trimmed[0] == '#') {
+                ++m_commentLines;
+                continue;
+            }
 
             m_parser->setText(line);
 

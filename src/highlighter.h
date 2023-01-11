@@ -95,6 +95,8 @@ protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
     QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
     QVector<BracketPair> bracketPairs;
+    QRegularExpression namespacedIdRegex{ QStringLiteral(
+                                              R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };
 
     friend class CodeEditor;
 
@@ -103,11 +105,9 @@ protected:
 
 private:
     QVector<QTextBlock> m_changedBlocks;
-    bool m_highlightMunually             = false;
-    bool m_highlightingFirstBlock        = false;
-    QRegularExpression namespacedIdRegex =
-        QRegularExpression(QStringLiteral(
-                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+\b)"));
+    bool m_highlightMunually      = false;
+    bool m_highlightingFirstBlock = false;
+
 
     QTextDocument *m_parentDoc;
     QTextCharFormat m_invisSpaceFmt;
