@@ -50,6 +50,7 @@ protected:
 
     void resizeEvent(QResizeEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *e) override;;
     void keyPressEvent(QKeyEvent *e) override;
     void wheelEvent(QWheelEvent *e) override;
     void dropEvent(QDropEvent *e) override;
@@ -101,6 +102,8 @@ private:
     void handleKeyPressEvent(QKeyEvent *e);
     void indentOnNewLine(QKeyEvent *e);
     void initCompleter();
+    void startOfWordExtended(QTextCursor &tc) const;
+    QString textUnderCursorExtended(QTextCursor tc) const;
 };
 
 

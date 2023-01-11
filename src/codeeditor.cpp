@@ -244,25 +244,81 @@ void CodeEditor::mousePressEvent(QMouseEvent *e) {
     }
 }
 
-void startOfWordExtended(QTextCursor &tc) {
+void CodeEditor::mouseDoubleClickEvent(QMouseEvent *e) {
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier
+        || e->modifiers() & Qt::ShiftModifier) {
+        QTextCursor tc = textCursor();
+        //tc.select(QTextCursor::WordUnderCursor);
+        tc.movePosition(QTextCursor::EndOfWord);
+        const int oldPos = tc.position();
+        tc = textCursor(); // Reuse initial position
+        startOfWordExtended(tc);
+        tc.setPosition(oldPos, QTextCursor::KeepAnchor);
+        setTextCursor(tc);
+        e->accept();
+    } else {
+        QPlainTextEdit::mouseDoubleClickEvent(e);
+    }
+}
+
+void debugTextCursor(const QTextCursor &tc) {
+    //return;
+
+    const QString reprTemplate("'%1|%2' (pos: %3)");
+    const QString reprTemplate2("'%1%2%3%4%5' (anc: %6, pos: %7)");
+
+    const QString &&line   = tc.block().text();
+    const int       pos    = tc.positionInBlock();
+    const int       anchor = tc.anchor() - tc.block().position();
+
+    if (pos == anchor) {
+        qDebug() <<
+            reprTemplate.arg(line.leftRef(pos)).arg(line.midRef(pos)).arg(pos);
+    } else {
+        const int   left  = qMin(pos, anchor);
+        const int   right = qMax(pos, anchor);
+        const QChar lchar = (pos > anchor) ? '[' : '|';
+        const QChar rchar = (pos > anchor) ? '|' : ']';
+
+        qDebug() << reprTemplate2.arg(line.leftRef(left)).arg(lchar)
+            .arg(line.midRef(left, right - left)).arg(rchar)
+            .arg(line.midRef(right)).arg(anchor).arg(pos);
+    }
+}
+
+void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
     static const QString extendedAcceptedCharsset("#.:/");
+
+    //debugTextCursor(tc);
 
     while (true) {
         /* Move cursor to the left of the word */
-        tc.select(QTextCursor::WordUnderCursor);
-        tc.setPosition(tc.anchor());
+        tc.movePosition(QTextCursor::StartOfWord);
+        //debugTextCursor(tc);
 
         /* Get the character to the left of the cursor */
         tc.movePosition(QTextCursor::PreviousCharacter,
                         QTextCursor::KeepAnchor);
+        //debugTextCursor(tc);
         const QChar &curChar = *tc.selectedText().constBegin();
 
         if (extendedAcceptedCharsset.contains(curChar)) {
             tc.movePosition(QTextCursor::PreviousCharacter);
-            tc.movePosition(QTextCursor::PreviousWord);
-            tc.movePosition(QTextCursor::NextCharacter);
+            //debugTextCursor(tc);
+            if (!tc.atBlockStart()) {
+                tc.movePosition(QTextCursor::PreviousWord);
+                //debugTextCursor(tc);
+                tc.movePosition(QTextCursor::NextCharacter);
+                //debugTextCursor(tc);
+            } else {
+                // Prevent infinite loop when '#' is at start of a line
+                tc.movePosition(QTextCursor::NextCharacter);
+                //debugTextCursor(tc);
+                return;
+            }
         } else {
             tc.movePosition(QTextCursor::NextCharacter);
+            //debugTextCursor(tc);
             return;
         }
     }
@@ -316,6 +372,8 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
         if (e->key() == Qt::Key_Tab) {
             cursor.insertText(QString(' ').repeated(m_tabSize));
             setTextCursor(cursor);
+            e->accept();
+            return;
         } else if (e->key() == Qt::Key_Backtab) {
             cursor.beginEditBlock();
             const QString &&line = cursor.block().text();
@@ -329,22 +387,21 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
             }
             cursor.endEditBlock();
             setTextCursor(cursor);
-        } else {
-            goto base;
+            e->accept();
+            return;
         }
-    } else {
- base:
-        if (e->key() == Qt::Key_Return) {
-            indentOnNewLine(e);
-        } else {
-            if ((e->key() == Qt::Key_Insert) &&
-                (e->modifiers() == Qt::NoModifier)) {
-                setOverwriteMode(!overwriteMode());
-                emit updateStatusBarRequest(this);
-            }
+    }
 
-            QPlainTextEdit::keyPressEvent(e);
+    if (e->key() == Qt::Key_Return) {
+        indentOnNewLine(e);
+    } else {
+        if ((e->key() == Qt::Key_Insert) &&
+            (e->modifiers() == Qt::NoModifier)) {
+            setOverwriteMode(!overwriteMode());
+            emit updateStatusBarRequest(this);
         }
+
+        QPlainTextEdit::keyPressEvent(e);
     }
 }
 
@@ -368,16 +425,20 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     const bool isShortcut =
         (e->modifiers().testFlag(Qt::ControlModifier) &&
          e->key() == Qt::Key_Space);  /* CTRL+Space */
+
     /* Do not process the shortcut when we have a completer */
-    if (!m_completer || !isShortcut)
+    if (!m_completer || !isShortcut) {
         handleKeyPressEvent(e);
+    }
 
     const bool ctrlOrShift = e->modifiers().testFlag(Qt::ControlModifier) ||
                              e->modifiers().testFlag(Qt::ShiftModifier);
-    if (!m_completer || (ctrlOrShift && e->text().isEmpty()))
-        return;
 
-    const static QString eow("~@$%^&*()+{}|\"<>?,;'[]\\-="); /* end of word */
+    if (!m_completer || (ctrlOrShift && e->text().isEmpty())) {
+        return;
+    }
+
+    const static QString eow(QStringLiteral("~@$%^&*()+{}|\"<>?,;'[]\\-=")); /* end of word */
     const bool           hasModifier =
         (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     const QString &&completionPrefix = textUnderCursor();
@@ -552,7 +613,6 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
 }
 
 void CodeEditor::onCursorPositionChanged() {
-    /*qDebug() << "CodeEditor::onCursorPositionChanged"; */
     setExtraSelections({});
     /*highlightCurrentLine(); */
     matchParentheses();
@@ -975,7 +1035,7 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
     }
 }
 
-QString textUnderCursorExtended(QTextCursor tc) {
+QString CodeEditor::textUnderCursorExtended(QTextCursor tc) const {
     const int oldPos = tc.position();
 
     startOfWordExtended(tc);
