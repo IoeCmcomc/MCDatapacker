@@ -10,11 +10,10 @@
 class JsonHighlighter : public Highlighter
 {
 public:
-    JsonHighlighter(QTextDocument *parent = 0);
+    JsonHighlighter(QTextDocument *parent);
 
 protected:
     void highlightBlock(const QString &text) override;
-    void checkProblems(bool checkAll = false) override;
 
 private:
     struct HighlightingRule {

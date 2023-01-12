@@ -68,7 +68,7 @@ private:
                 if (name.isNull())
                     name = this->getWithCharset(keyCharset);
                 if (name.isNull())
-                    error("Invaild empty key", {}, keyPos);
+                    error("Invalid empty key", {}, keyPos);
                 const auto &&key = KeyPtr::create(spanText(keyPos), name);
                 key->setLeadingTrivia(trivia);
                 int triviaStart = pos();

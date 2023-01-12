@@ -7,6 +7,7 @@
 #include <QStringList>
 
 #include "codefile.h"
+#include "parsers/parser.h"
 
 QT_BEGIN_NAMESPACE
 class QCompleter;
@@ -16,16 +17,31 @@ class CodeGutter;
 class Highlighter;
 class Parser;
 
+struct ProblemInfo {
+    enum class Type {
+        Invalid,
+        Warning,
+        Error,
+    };
+
+    Type    type   = Type::Invalid;
+    int     pos    = 0;
+    int     length = 1;
+    QString message;
+};
+
 class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
 
 public:
+    using Problems = QVector<ProblemInfo>;
+
     explicit CodeEditor(QWidget *parent = nullptr);
 
     void setFileType(CodeFile::FileType type);
 
-    Highlighter * getCurHighlighter() const;
-    void setCurHighlighter(Highlighter *value);
+    Highlighter * highlighter() const;
+    void setHighlighter(Highlighter *value);
 
     void displayErrors();
     void updateErrorSelections();
@@ -39,6 +55,10 @@ public:
     void setCompleter(QCompleter *c);
     QCompleter * completer() const;
 
+    void setParser(std::unique_ptr<Parser> newParser);
+
+    Parser * parser() const;
+
 signals:
     void openFileRequest(const QString &filepath);
     void updateStatusBarRequest(CodeEditor *editor);
@@ -47,6 +67,7 @@ signals:
 protected:
     friend class LineNumberArea;
     friend class ProblemArea;
+    friend class StripedScrollBar;
 
     void resizeEvent(QResizeEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -68,6 +89,7 @@ private /*slots*/ :
     void onUndoAvailable(bool value);
     void onRedoAvailable(bool value);
     void insertCompletion(const QString &completion);
+    void onTextChanged();
 
 private:
     QTextCharFormat bracketSeclectFmt;
@@ -76,9 +98,10 @@ private:
     QStringList minecraftCompletionInfo;
     CodeGutter *m_gutter;
     QCompleter *m_completer          = nullptr;
-    Highlighter *curHighlighter      = nullptr;
-    QScopedPointer<Parser> *m_parser = nullptr;
+    Highlighter *m_highlighter       = nullptr;
+    std::unique_ptr<Parser> m_parser = nullptr;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
+    Problems m_problems;
     int problemSelectionStartIndex;
     int m_fontSize                = 13;
     int m_tabSize                 = 4;

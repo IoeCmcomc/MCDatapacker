@@ -5,20 +5,17 @@
 #include "nodes/filenode.h"
 
 namespace Command {
-    class McfunctionParser : public Parser
-    {
+    class McfunctionParser : public Parser {
 public:
         McfunctionParser();
 
-        void parse();
-
         QSharedPointer<FileNode> syntaxTree() const;
 
-        QHash<int, Errors> errorsByLine() const;
+protected:
+        bool parseImpl() override;
 
 private:
         MinecraftParser m_commandParser;
-        QHash<int, Errors> m_errorsByLine;
         QSharedPointer<FileNode> m_tree;
     };
 }

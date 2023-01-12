@@ -1,14 +1,16 @@
 #include "mcfunctionhighlighter.h"
 #include "codeeditor.h"
 
+#include "parsers/command/mcfunctionparser.h"
 #include "parsers/command/visitors/nodeformatter.h"
 #include "parsers/command/visitors/sourceprinter.h"
 
 #include <QDebug>
 #include <QElapsedTimer>
 
-McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent)
-    : Highlighter(parent) {
+McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
+                                             Command::McfunctionParser *parser)
+    : Highlighter(parent), m_parser(parser) {
     setupRules();
 }
 
@@ -88,8 +90,6 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
             }
         }
     }
-
-    setCurrentBlockState(0);
 }
 
 void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
@@ -183,51 +183,30 @@ void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
 //             << "Time elapsed:" << timer.elapsed();
 //}
 
-void McfunctionHighlighter::checkProblems(bool checkAll) {
-    parser.setText(document()->toPlainText());
-    parser.parse();
-    const auto &&result       = parser.syntaxTree();
-    const auto &&resultLines  = result->lines();
-    const auto  &errorsByLine = parser.errorsByLine();
+void McfunctionHighlighter::rehighlightDelayed() {
+    Q_ASSERT(m_parser != nullptr);
+
+    const auto &&result      = m_parser->syntaxTree();
+    const auto &&resultLines = result->lines();
 
     auto resultIter = resultLines.cbegin();
-    for (auto block = getParentDoc()->begin();
-         block != getParentDoc()->end(); block = block.next()) {
-        if (TextBlockData *data =
-                dynamic_cast<TextBlockData *>(block.userData())) {
-            const QString &&lineText = block.text();
-            if (result->isValid() ||
-                !errorsByLine.contains(block.blockNumber())) {
-                data->clearProblems();
+    for (auto block = document()->begin();
+         block != document()->end(); block = block.next()) {
+        const QString &&lineText   = block.text();
+        auto           *lineResult = resultIter->get();
+        if (lineResult->isValid()
+            && (lineResult->kind() == Command::ParseNode::Kind::Root)) {
+            Command::SourcePrinter printer;
+            printer.startVisiting(lineResult);
+            if (printer.source() != lineText)
+                qDebug() << printer.source();
 
-                auto *lineResult = resultIter->get();
-                if (lineResult->kind() ==
-                    Command::ParseNode::Kind::Root) {
-                    Command::SourcePrinter printer;
-                    printer.startVisiting(lineResult);
-                    if (printer.source() != lineText)
-                        qDebug() << printer.source();
-
-                    Command::NodeFormatter formatter;
-                    formatter.startVisiting(lineResult);
-                    /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
-                    document()->blockSignals(true);
-                    rehighlightBlock(block, formatter.formatRanges());
-                    document()->blockSignals(false);
-                }
-            } else {
-                QTextCursor          tc(getParentDoc());
-                QVector<ProblemInfo> problems;
-                for (const auto &err: errorsByLine[block.blockNumber()]) {
-                    tc.setPosition(err.pos);
-                    ProblemInfo error{ ProblemInfo::Type::Error,
-                                       tc.blockNumber(),
-                                       tc.positionInBlock(), err.length,
-                                       err.toLocalizedMessage() };
-                    problems.append(std::move(error));
-                }
-                data->setProblems(problems);
-            }
+            Command::NodeFormatter formatter;
+            formatter.startVisiting(lineResult);
+            /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
+            document()->blockSignals(true);
+            rehighlightBlock(block, formatter.formatRanges());
+            document()->blockSignals(false);
         }
 
         ++resultIter;

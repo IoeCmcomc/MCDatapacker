@@ -109,16 +109,18 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     setVerticalScrollBar(new StripedScrollBar(Qt::Vertical, this));
     readPrefSettings();
 
-    connect(this, &CodeEditor::blockCountChanged,
+    connect(this, &QPlainTextEdit::blockCountChanged,
             this, &CodeEditor::updateGutterWidth);
-    connect(this, &CodeEditor::updateRequest,
+    connect(this, &QPlainTextEdit::updateRequest,
             this, &CodeEditor::updateGutter);
-    connect(this, &CodeEditor::cursorPositionChanged,
+    connect(this, &QPlainTextEdit::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
-    connect(this, &CodeEditor::undoAvailable,
+    connect(this, &QPlainTextEdit::undoAvailable,
             this, &CodeEditor::onUndoAvailable);
-    connect(this, &CodeEditor::redoAvailable,
+    connect(this, &QPlainTextEdit::redoAvailable,
             this, &CodeEditor::onRedoAvailable);
+    connect(document(), &QTextDocument::contentsChanged,
+            this, &CodeEditor::onTextChanged);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
@@ -461,9 +463,9 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
                     qobject_cast<QStringListModel *>(m_completer->model())) {
                 model->setStringList(completionInfo);
             }
-            qDebug() << minecraftCompletionInfo.size() <<
-                m_completer->model()->rowCount() <<
-                m_completer->completionModel()->rowCount();
+//            qDebug() << minecraftCompletionInfo.size() <<
+//                m_completer->model()->rowCount() <<
+//                m_completer->completionModel()->rowCount();
         }
 
         m_completer->setCompletionPrefix(completionPrefix);
@@ -614,7 +616,7 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
 
 void CodeEditor::onCursorPositionChanged() {
     setExtraSelections({});
-    /*highlightCurrentLine(); */
+    highlightCurrentLine();
     matchParentheses();
     problemSelectionStartIndex = extraSelections().size() - 1;
     if (!problemExtraSelections.isEmpty()) {
@@ -675,8 +677,8 @@ void CodeEditor::openReplaceDialog() {
 }
 
 void CodeEditor::toggleComment() {
-    if (!curHighlighter ||
-        curHighlighter->singleCommentHighlightRules.isEmpty())
+    if (!m_highlighter ||
+        m_highlighter->singleCommentHighlightRules.isEmpty())
         return;
 
     auto       txtCursor    = textCursor();
@@ -711,7 +713,7 @@ void CodeEditor::toggleComment() {
     int         anchorCharAdded     = 0;
     int         posCharAdded        = 0;
     const QChar commentChar         =
-        curHighlighter->singleCommentHighlightRules.cbegin().key();
+        m_highlighter->singleCommentHighlightRules.cbegin().key();
 
     for (int i = 0; i < count; i++) {
         txtCursor.movePosition(QTextCursor::StartOfLine);
@@ -773,8 +775,36 @@ void CodeEditor::insertCompletion(const QString &completion) {
     setTextCursor(tc);
 }
 
-Highlighter * CodeEditor::getCurHighlighter() const {
-    return curHighlighter;
+void CodeEditor::onTextChanged() {
+    if (m_parser) {
+        bool ok = m_parser->parse(toPlainText());
+        m_problems.clear();
+        if (!ok) {
+            m_problems.reserve(m_parser->errors().size());
+            for (const auto &error: m_parser->errors()) {
+                ProblemInfo problem{ ProblemInfo::Type::Error,
+                                     error.pos, error.length,
+                                     error.toLocalizedMessage() };
+                m_problems << std::move(problem);
+            }
+        }
+        if (m_highlighter) {
+            m_highlighter->rehighlightDelayed();
+        }
+        updateErrorSelections();
+    }
+}
+
+Parser * CodeEditor::parser() const {
+    return m_parser.get();
+}
+
+void CodeEditor::setParser(std::unique_ptr<Parser> newParser) {
+    m_parser = std::move(newParser);
+}
+
+Highlighter * CodeEditor::highlighter() const {
+    return m_highlighter;
 }
 
 bool CodeEditor::getCanRedo() const {
@@ -811,8 +841,8 @@ bool CodeEditor::getCanUndo() const {
     return canUndo;
 }
 
-void CodeEditor::setCurHighlighter(Highlighter *value) {
-    curHighlighter = value;
+void CodeEditor::setHighlighter(Highlighter *value) {
+    m_highlighter = value;
 }
 
 void CodeEditor::displayErrors() {
@@ -836,37 +866,35 @@ void CodeEditor::displayErrors() {
 void CodeEditor::updateErrorSelections() {
     /*qDebug() << "CodeEditor::updateErrorSelections"; */
     if (!isReadOnly()) {
-        if (!document() || !curHighlighter)
+        if (!document() || !m_parser)
             return;
 
         problemExtraSelections.clear();
 
-        for (auto it = document()->firstBlock(); it != document()->end();
-             it = it.next()) {
-            if (TextBlockData *data =
-                    dynamic_cast<TextBlockData *>(it.userData())) {
-                for (const auto &problem: data->problems()) {
-                    QTextEdit::ExtraSelection selection;
-                    /* Point the cursor to the beginning of the current line */
-                    QTextCursor selCursor(it);
-                    selCursor.setPosition(selCursor.position() + problem.col);
-                    if (problem.length > 0) {
-                        if (selCursor.atBlockEnd()) {
-                            selCursor.select(QTextCursor::LineUnderCursor);
-                        } else {
-                            selCursor.setPosition(
-                                selCursor.position() + problem.length,
-                                QTextCursor::KeepAnchor);
-                        }
-                    } else {
-                        selCursor.select(QTextCursor::WordUnderCursor);
-                    }
-                    selection.cursor = selCursor;
-                    selection.format = errorHighlightRule;
-                    selection.format.setToolTip(problem.message);
-                    problemExtraSelections << selection;
+        QTextCursor tc = textCursor();
+        tc.movePosition(QTextCursor::End);
+        const int endPos = tc.position();
+
+        for (const auto &problem: m_problems) {
+            QTextEdit::ExtraSelection selection;
+            QTextCursor               selCursor = textCursor();
+            selCursor.setPosition(qBound(0, problem.pos, endPos));
+
+            if (problem.length > 0) {
+                if (selCursor.atBlockEnd()) {
+                    selCursor.select(QTextCursor::LineUnderCursor);
+                } else {
+                    selCursor.setPosition(
+                        selCursor.position() + problem.length,
+                        QTextCursor::KeepAnchor);
                 }
+            } else {
+                selCursor.select(QTextCursor::WordUnderCursor);
             }
+            selection.cursor = selCursor;
+            selection.format = errorHighlightRule;
+            selection.format.setToolTip(problem.message);
+            problemExtraSelections << selection;
         }
     }
     displayErrors();
@@ -878,7 +906,7 @@ void CodeEditor::matchParentheses() {
     TextBlockData *data =
         dynamic_cast<TextBlockData *>(textCursor().block().userData());
 
-    if (!data || !curHighlighter)
+    if (!data || !m_highlighter)
         return;
 
     QVector<BracketInfo *> && infos = data->brackets();
@@ -896,7 +924,7 @@ void CodeEditor::matchParentheses() {
         bool isOnTheLeftOfChar = info->pos == curPos;
 
         if (isOnTheLeftOfChar || (info->pos == curPos - 1)) {
-            for (const auto &pair: qAsConst(curHighlighter->bracketPairs)) {
+            for (const auto &pair: qAsConst(m_highlighter->bracketPairs)) {
                 if (info->character == pair.left) {
                     if (matchLeftBracket(textCursor().block(), i + 1,
                                          pair.left, pair.right,
@@ -1016,7 +1044,7 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
     TextBlockData *data =
         dynamic_cast<TextBlockData *>(textCursor().block().userData());
 
-    if (!data || !curHighlighter)
+    if (!data || !m_highlighter)
         return;
 
     QVector<NamespacedIdInfo *> infos = data->namespacedIds();

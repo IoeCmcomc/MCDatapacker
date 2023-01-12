@@ -25,28 +25,12 @@ struct NamespacedIdInfo {
 };
 
 
-struct ProblemInfo {
-    enum class Type {
-        Invaild,
-        Warning,
-        Error,
-    };
-
-    Type    type   = Type::Invaild;
-    int     line   = 0;
-    int     col    = 0;
-    int     length = 1;
-    QString message;
-};
-
-
 class TextBlockData : public QTextBlockUserData {
 public:
     TextBlockData() = default;
     ~TextBlockData();
 
     void clear();
-    void clearProblems();
 
     QVector<BracketInfo *> brackets();
     QVector<NamespacedIdInfo *> namespacedIds();
@@ -54,42 +38,33 @@ public:
     void insert(BracketInfo *info);
     void insert(NamespacedIdInfo *info);
 
-    QVector<ProblemInfo> problems() const;
-    void setProblems(const QVector<ProblemInfo> &problems);
-
 private:
-    QVector<ProblemInfo> m_problems;
     QVector<BracketInfo *> m_brackets;
     QVector<NamespacedIdInfo *> m_namespaceIds;
 };
 
 
 class CodeEditor;
-
+class Parser;
 
 class Highlighter : public QSyntaxHighlighter {
     Q_OBJECT
 
 public:
     enum BlockState {
-        Normal,
+        Normal = -1,
         QuotedString,
         Comment,
         MultilineComment,
     };
+
     Highlighter(QTextDocument *parent);
 
-    QTextDocument * getParentDoc() const;
-
-    virtual void checkProblems(bool checkAll = false) = 0;
-
-public:
     using QSyntaxHighlighter::rehighlightBlock;
     void rehighlightBlock(const QTextBlock &block);
 
     QVector<QTextBlock> changedBlocks() const;
     void onDocChanged();
-
 
 protected:
     QMap<QChar, QTextCharFormat> quoteHighlightRules;
@@ -102,15 +77,14 @@ protected:
 
     void highlightBlock(const QString &text);
     void mergeFormat(int start, int count, const QTextCharFormat &fmt);
+    virtual void rehighlightDelayed() {
+    };
 
 private:
     QVector<QTextBlock> m_changedBlocks;
-    bool m_highlightMunually      = false;
-    bool m_highlightingFirstBlock = false;
-
-
-    QTextDocument *m_parentDoc;
     QTextCharFormat m_invisSpaceFmt;
+    bool m_highlightManually      = false;
+    bool m_highlightingFirstBlock = false;
 
     void collectNamespacedIds(const QString &text, TextBlockData *data);
     QString locateNamespacedId(QString id);

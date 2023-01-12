@@ -23,6 +23,7 @@ private slots:
     void parseInteger();
     void parseString();
     void useRegexToParseStringLiteral();
+    void useRegexToParseStringLiteral2();
     void useLoopToParseStringLiteral();
     void useLoopToParseStringLiteral2();
     void useLoopToParseStringLiteral3();
@@ -151,6 +152,31 @@ QStringList parseWithRegex(const QString &text) {
         const auto &match = m_literalStrRegex.match(text,
                                                     pos,
                                                     QRegularExpression::NormalMatch);
+
+        if (match.hasMatch()) {
+            const QString &&matchStr = match.captured();
+            pos = match.capturedStart() + matchStr.length();
+            ret << std::move(matchStr);
+        } else {
+            return ret;
+        }
+    }
+    return ret;
+}
+
+QStringList parseWithRegex2(const QString &text) {
+    static const QRegularExpression literalStrRegex{
+        QStringLiteral(R"([\w.+-]+)") };
+    int   pos = 0;
+    QChar chr;
+
+    QStringList ret;
+
+    while (pos < text.length()) {
+        chr = text.at(pos);
+        const auto &match = literalStrRegex.match(text,
+                                                  pos,
+                                                  QRegularExpression::NormalMatch);
 
         if (match.hasMatch()) {
             const QString &&matchStr = match.captured();
@@ -313,38 +339,50 @@ QStringList parseWithoutRegex3(const QString &text) {
     return ret;
 }
 
-static const auto input = QStringLiteral(
-    "IP addresses are written and displayed in human-readable notations, such as 192.0.2.1 in IPv4, and 2001:db8:0:1234:0:567:8:1 in IPv6. The size of the routing prefix of the address is designated in CIDR notation by suffixing the address with the number of significant bits, e.g., 192.0.2.1/24, which is equivalent to the historically used subnet mask 255.255.255.0.");
-static const QStringList result = {
-    "IP",             "addresses",   "are",
-    "written",        "and",         "displayed", "in",
-    "human-readable", "notations",   "such",
-    "as",             "192.0.2.1",   "in",
-    "IPv4",           "and",         "2001",      "db8",
-    "0",              "1234",        "0",
-    "567",            "8",           "1",         "in",        "IPv6.",
-    "The",            "size",        "of",
-    "the",            "routing",     "prefix",    "of",        "the",
-    "address",        "is",          "designated","in",
-    "CIDR",           "notation",    "by",        "suffixing", "the",
-    "address",        "with",        "the",       "number",
-    "of",             "significant", "bits",      "e.g.",
-    "192.0.2.1",      "24",          "which",
-    "is",             "equivalent",  "to",        "the",       "historically",
-    "used",           "subnet",      "mask",
-    "255.255.255.0.",
-};
-
 //static const auto input = QStringLiteral(
-//    "a_long_string_with_numbers_such_as_12345");
-//static const auto result = QStringList(
-//    "a_long_string_with_numbers_such_as_12345");
+//    "IP addresses are written and displayed in human-readable notations, such as 192.0.2.1 in IPv4, and 2001:db8:0:1234:0:567:8:1 in IPv6. The size of the routing prefix of the address is designated in CIDR notation by suffixing the address with the number of significant bits, e.g., 192.0.2.1/24, which is equivalent to the historically used subnet mask 255.255.255.0.");
+//static const QStringList result = {
+//    "IP",             "addresses",   "are",
+//    "written",        "and",         "displayed", "in",
+//    "human-readable", "notations",   "such",
+//    "as",             "192.0.2.1",   "in",
+//    "IPv4",           "and",         "2001",      "db8",
+//    "0",              "1234",        "0",
+//    "567",            "8",           "1",         "in",        "IPv6.",
+//    "The",            "size",        "of",
+//    "the",            "routing",     "prefix",    "of",        "the",
+//    "address",        "is",          "designated","in",
+//    "CIDR",           "notation",    "by",        "suffixing", "the",
+//    "address",        "with",        "the",       "number",
+//    "of",             "significant", "bits",      "e.g.",
+//    "192.0.2.1",      "24",          "which",
+//    "is",             "equivalent",  "to",        "the",       "historically",
+//    "used",           "subnet",      "mask",
+//    "255.255.255.0.",
+//};
+
+static const auto input = QStringLiteral(
+    "a_long_string_with_numbers_such_as_12345");
+static const auto result = QStringList(
+    "a_long_string_with_numbers_such_as_12345");
+
+//static const auto input  = QStringLiteral("prefix.some_text.123");
+//static const auto result = QStringList("prefix.some_text.123");
 
 void TestSchemaParser::useRegexToParseStringLiteral() {
     QStringList ret;
 
     QBENCHMARK {
         ret = parseWithRegex(input);
+    }
+    QCOMPARE(ret, result);
+}
+
+void TestSchemaParser::useRegexToParseStringLiteral2() {
+    QStringList ret;
+
+    QBENCHMARK {
+        ret = parseWithRegex2(input);
     }
     QCOMPARE(ret, result);
 }

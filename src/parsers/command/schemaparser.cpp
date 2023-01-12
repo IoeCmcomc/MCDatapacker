@@ -615,14 +615,12 @@ namespace Command {
                 const QString &&literal = getWithRegex(m_literalStrRegex);
                 return QSharedPointer<StringNode>::create(spanText(literal));
             }
-            default: {
-                return defaultRet;
-            }
         }
+        return defaultRet;
     }
 
 /*!
- * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invaild \c ParseNode if an error occured.
+ * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invalid \c ParseNode if an error occured.
  */
     QSharedPointer<ParseNode> SchemaParser::parse() {
         m_tree = QSharedPointer<RootNode>::create();
@@ -652,11 +650,11 @@ namespace Command {
 //                    m_cache.emplace(typeId, txt, m_tree);
             }
         } catch (const SchemaParser::Error &err) {
-            qDebug() << "Command::Parser::parse: errors detected";
+            //qDebug() << "Command::Parser::parse: errors detected";
             m_errors << err;
-            for (const auto &error: m_errors) {
-                qDebug() << error.toLocalizedMessage();
-            }
+//            for (const auto &error: m_errors) {
+//                qDebug() << error.toLocalizedMessage();
+//            }
             m_tree->setIsValid(false);
         }
 //        }

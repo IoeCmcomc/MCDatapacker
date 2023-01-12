@@ -239,7 +239,7 @@ namespace Command {
                     const QString &&value =
                         getWithCharset("a-zA-Z0-9-_."_QL1);
                     if (value.isEmpty())
-                        error(QT_TR_NOOP("Invaild empty tag value"));
+                        error(QT_TR_NOOP("Invalid empty tag value"));
                     return QSharedPointer<NbtStringNode>::create(spanText(value));
                 }
             }
@@ -525,7 +525,7 @@ namespace Command {
             }
 
             default: {
-                error(QT_TR_NOOP("Invaild target selector variable: %1"),
+                error(QT_TR_NOOP("Invalid target selector variable: %1"),
                       { QStringLiteral("@%1").arg(curChar()) });
             }
         }
@@ -586,7 +586,7 @@ namespace Command {
                                  spanText(getWithCharset("a-zA-Z0-9-_+"_QL1))));
                 /*qDebug() << "After key" << ret->name()->value(); */
                 if (ret->name()->value().isEmpty())
-                    error(QT_TR_NOOP("Invaild empty NBT path key"));
+                    error(QT_TR_NOOP("Invalid empty NBT path key"));
                 if (curChar() == '{')
                     ret->setFilter(minecraft_nbtCompoundTag());
             };
@@ -663,7 +663,7 @@ namespace Command {
                         nspace->length());
         Q_ASSERT(id != nullptr);
         if (id->leftText().isNull() && id->text().isEmpty()) {
-            this->error(QT_TR_NOOP("Invaild empty namespaced ID"));
+            this->error(QT_TR_NOOP("Invalid empty namespaced ID"));
         }
 
         if (nspace) {
@@ -862,7 +862,7 @@ namespace Command {
                 const QString &&literal =
                     getWithCharset("0-9a-zA-Z-_#$%.§"_QL1);
                 if (literal.isEmpty()) {
-                    this->error(QT_TR_NOOP("Invaild empty player name"));
+                    this->error(QT_TR_NOOP("Invalid empty player name"));
                 }
                 const auto &&playerName = QSharedPointer<StringNode>::create(spanText(
                                                                                  literal));

@@ -5,8 +5,7 @@
 
 class CodeEditor;
 
-class StripedScrollBar : public QScrollBar
-{
+class StripedScrollBar : public QScrollBar {
     Q_OBJECT
 public:
     StripedScrollBar(Qt::Orientation orientation, QWidget *parent = nullptr);
@@ -14,8 +13,8 @@ public:
     void redrawStripes();
 
 protected:
-    void paintEvent(QPaintEvent* event) override;
-    void resizeEvent(QResizeEvent * event) override;
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     CodeEditor *m_editor = nullptr;

@@ -69,8 +69,6 @@ private /*slots*/ :
     void onCloseFile(int index);
     void onSwitchNextFile();
     void onSwitchPrevFile();
-    void onCurTextChanged();
-    void onCurTextChangingDone();
 
 private:
     Ui::TabbedDocumentInterface *ui;

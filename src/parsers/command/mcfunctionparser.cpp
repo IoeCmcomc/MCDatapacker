@@ -4,15 +4,15 @@ namespace Command {
     McfunctionParser::McfunctionParser() {
     }
 
-    void McfunctionParser::parse() {
+    QSharedPointer<FileNode> McfunctionParser::syntaxTree() const {
+        return m_tree;
+    }
+
+    bool McfunctionParser::parseImpl() {
         m_tree = QSharedPointer<FileNode>::create();
-        m_spans.clear();
-        m_errors.clear();
-        m_errorsByLine.clear();
 
         const auto &&lines = text().splitRef(QChar::LineFeed);
 
-        int lineNumber = 0;
         for (const auto &line: lines) {
             const int         linePos = pos();
             const QStringRef &trimmed = line.trimmed();
@@ -36,7 +36,6 @@ namespace Command {
                             m_errors << error;
                         }
                     }
-                    m_errorsByLine[lineNumber] = errors;
                 }
                 m_tree->append(std::move(command));
             }
@@ -44,15 +43,7 @@ namespace Command {
             if (curChar() == QChar::LineFeed) {
                 advance();
             }
-            ++lineNumber;
         }
-    }
-
-    QSharedPointer<FileNode> McfunctionParser::syntaxTree() const {
-        return m_tree;
-    }
-
-    QHash<int, Parser::Errors> McfunctionParser::errorsByLine() const {
-        return m_errorsByLine;
+        return m_tree->isValid();
     }
 }

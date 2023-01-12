@@ -6,6 +6,9 @@
 #include "mcfunctionhighlighter.h"
 #include "jsonhighlighter.h"
 #include "game.h"
+#include "parsers/command/mcfunctionparser.h"
+#include "parsers/jsonparser.h"
+
 
 #include <QMessageBox>
 #include <QTextStream>
@@ -206,28 +209,24 @@ void TabbedDocumentInterface::addFile(const QString &path) {
         auto *codeEditor = new CodeEditor(this);
 
         if (newFile.fileType == CodeFile::Function) {
-            codeEditor->setCurHighlighter(new McfunctionHighlighter(codeEditor->
-                                                                    document()));
+            auto &&parser = std::make_unique<Command::McfunctionParser>();
+            codeEditor->setHighlighter(
+                new McfunctionHighlighter(codeEditor->document(),
+                                          parser.get()));
+            codeEditor->setParser(std::move(parser));
         } else if (newFile.fileType >= CodeFile::JsonText) {
-            codeEditor->setCurHighlighter(new JsonHighlighter(codeEditor->
-                                                              document()));
+            codeEditor->setHighlighter(new JsonHighlighter(codeEditor->
+                                                           document()));
+            codeEditor->setParser(std::make_unique<JsonParser>());
         }
 
         codeEditor->setPlainText(text);
         codeEditor->setFileType(newFile.fileType);
 
-        if (auto *highlighter = codeEditor->getCurHighlighter()) {
-            highlighter->checkProblems();
-            highlighter->onDocChanged();
-            codeEditor->updateErrorSelections();
-        }
-
         connect(codeEditor->document(), &QTextDocument::modificationChanged,
                 this, &TabbedDocumentInterface::onModificationChanged);
         connect(codeEditor, &CodeEditor::openFileRequest,
                 this, &TabbedDocumentInterface::onOpenFile);
-        connect(codeEditor, &CodeEditor::textChanged,
-                this, &TabbedDocumentInterface::onCurTextChanged);
 
         connect(codeEditor, &QPlainTextEdit::copyAvailable,
                 this, &TabbedDocumentInterface::updateEditMenuRequest);
@@ -489,24 +488,6 @@ void TabbedDocumentInterface::onSwitchNextFile() {
 void TabbedDocumentInterface::onSwitchPrevFile() {
     if (!hasNoFile())
         new FileSwitcher(this, true);
-}
-
-void TabbedDocumentInterface::onCurTextChanged() {
-    /*qDebug() << "TabbedDocumentInterface::onCurTextChanged"; */
-    /* TODO: Delay the following method after 150ms without QTimer */
-    onCurTextChangingDone();
-}
-
-void TabbedDocumentInterface::onCurTextChangingDone() {
-    //qDebug() << "TabbedDocumentInterface::onCurTextChangingDone";
-    if (getCodeEditor()) {
-        auto *highlighter = getCodeEditor()->getCurHighlighter();
-        if (highlighter) {
-            highlighter->checkProblems();
-            highlighter->onDocChanged();
-            getCodeEditor()->updateErrorSelections();
-        }
-    }
 }
 
 QString TabbedDocumentInterface::readTextFile(const QString &path, bool &ok) {

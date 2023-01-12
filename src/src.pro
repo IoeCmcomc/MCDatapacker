@@ -98,6 +98,7 @@ SOURCES += \
     parsers/command/visitors/overloadnodevisitor.cpp \
     parsers/command/visitors/reprprinter.cpp \
     parsers/command/visitors/sourceprinter.cpp \
+    parsers/jsonparser.cpp \
     parsers/parser.cpp \
     platforms/windows.cpp \
     predicatedock.cpp \
@@ -187,6 +188,7 @@ HEADERS += \
     parsers/command/visitors/overloadnodevisitor.h \
     parsers/command/visitors/reprprinter.h \
     parsers/command/visitors/sourceprinter.h \
+    parsers/jsonparser.h \
     parsers/parser.h \
     platforms/windows.h \
     predicatedock.h \

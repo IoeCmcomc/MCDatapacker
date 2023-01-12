@@ -467,7 +467,7 @@ void MainWindow::openFolder(const QString &dirpath) {
             loadFolder(dirpath, metaInfo);
         } else {
             QMessageBox::critical(this,
-                                  tr("Invaild datapack"),
+                                  tr("Invalid datapack"),
                                   tr(
                                       "The pack format in the pack.memeta file must be greater than zero."));
         }

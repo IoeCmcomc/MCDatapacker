@@ -49,10 +49,17 @@ public:
 
     QString text() const;
     void setText(const QString &newText);
+    void setText(QString &&newText);
+
+    bool parse();
+    bool parse(const QString &text);
+    bool parse(QString &&text);
 
     Errors errors() const;
 
     QStringSet spans() const;
+
+
 
 protected:
     enum EatOption { // For use in eat() method
@@ -92,6 +99,11 @@ protected:
     QString spanText(const QString& text);
     QString spanText(QString&& text);
     QString spanText(int start);
+
+protected:
+    virtual bool parseImpl() {
+        return false;
+    };
 
 private:
     QString m_text;

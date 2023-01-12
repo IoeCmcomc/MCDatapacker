@@ -4,20 +4,22 @@
 #include <QRegularExpression>
 
 #include "highlighter.h"
-//#include "parsers/command/minecraftparser.h"
-#include "parsers/command/mcfunctionparser.h"
 
-class McfunctionHighlighter : public Highlighter
-{
+namespace Command {
+    class McfunctionParser;
+}
+
+class McfunctionHighlighter : public Highlighter {
 public:
-    McfunctionHighlighter(QTextDocument *parent = nullptr);
+    McfunctionHighlighter(QTextDocument *parent,
+                          Command::McfunctionParser *parser = nullptr);
 
 protected slots:
     void highlightBlock(const QString &text) override;
     void rehighlightBlock(const QTextBlock &block,
                           const QVector<QTextLayout::FormatRange> &formats);
 
-    void checkProblems(bool checkAll = false) override;
+    void rehighlightDelayed() override;
 
 private:
     void setupRules();
@@ -27,9 +29,6 @@ private:
         QTextCharFormat    format;
     };
 
-    //Command::MinecraftParser parser;
-    Command::McfunctionParser parser;
-
     QTextCharFormat keywordFormat;
     QTextCharFormat numberFormat;
     QTextCharFormat entitySelectorFormat;
@@ -38,6 +37,8 @@ private:
 
     QVector<HighlightingRule> highlightingRules;
     QVector<QTextLayout::FormatRange> m_formats;
+
+    Command::McfunctionParser *m_parser = nullptr;
 };
 
 #endif /* MCFUNCTIONHIGHLIGHTER_H */

@@ -78,6 +78,11 @@ void Parser::setText(const QString &text) {
     setPos(0);
 }
 
+void Parser::setText(QString &&newText) {
+    m_text = std::move(newText);
+    setPos(0);
+}
+
 Parser::Errors Parser::errors() const {
     return m_errors;
 }
@@ -348,4 +353,20 @@ QString Parser::spanText(QString &&text) {
 
 QString Parser::spanText(int start) {
     return spanText(m_text.mid(start, m_pos - start));
+}
+
+bool Parser::parse() {
+    m_errors.clear();
+    setPos(0);
+    return parseImpl();
+}
+
+bool Parser::parse(const QString &text) {
+    setText(text);
+    return parse();
+}
+
+bool Parser::parse(QString &&text) {
+    setText(std::move(text));
+    return parse();
 }
