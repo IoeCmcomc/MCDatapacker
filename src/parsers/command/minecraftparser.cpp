@@ -236,8 +236,7 @@ namespace Command {
                     return QSharedPointer<NbtByteNode>::create(boolean->text(),
                                                                boolean->value());
                 } else {
-                    const QString &&value =
-                        getWithCharset("a-zA-Z0-9-_."_QL1);
+                    const QString &&value = getLiteralString();
                     if (value.isEmpty())
                         error(QT_TR_NOOP("Invalid empty tag value"));
                     return QSharedPointer<NbtStringNode>::create(spanText(value));
@@ -444,7 +443,7 @@ namespace Command {
                     if (curChar() == '"' || curChar() == '\'') {
                         literal = getQuotedString();
                     } else {
-                        literal = this->getWithCharset("0-9a-zA-Z-_.+"_QL1);
+                        literal = getLiteralString();
                     }
                     ret->setNode(QSharedPointer<StringNode>::create(spanText(
                                                                         start),
@@ -468,7 +467,7 @@ namespace Command {
                 ucase ("tag"_QL1):
                 ucase ("team"_QL1): {
                     const auto &&ret  = parseNegEntityArg();
-                    QString &&literal = getWithCharset("0-9a-zA-Z-_.+"_QL1);
+                    QString &&literal = getLiteralString();
                     ret->setNode(QSharedPointer<StringNode>::create(spanText(
                                                                         literal)));
                     return ret;
@@ -477,7 +476,7 @@ namespace Command {
                     return parseMap<MapNode, IntRangeNode>(
                         '{', '}', '=', [this](const QString &) {
                         return minecraft_intRange();
-                    }, false, R"(0-9a-zA-Z-_.+)"_QL1);
+                    });
                 }
                 ucase ("advancements"): {
                     return parseEntityAdvancements();
@@ -583,7 +582,7 @@ namespace Command {
 
             default: {
                 ret->setName(QSharedPointer<StringNode>::create(
-                                 spanText(getWithCharset("a-zA-Z0-9-_+"_QL1))));
+                                 spanText(getWithCharset("0-9a-zA-Z-_+"_QL1))));
                 /*qDebug() << "After key" << ret->name()->value(); */
                 if (ret->name()->value().isEmpty())
                     error(QT_TR_NOOP("Invalid empty NBT path key"));

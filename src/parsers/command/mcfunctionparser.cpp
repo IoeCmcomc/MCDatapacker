@@ -11,11 +11,12 @@ namespace Command {
     bool McfunctionParser::parseImpl() {
         m_tree = QSharedPointer<FileNode>::create();
 
-        const auto &&lines = text().splitRef(QChar::LineFeed);
+        const auto &&txt   = text(); // This prevent crash in release build
+        const auto &&lines = txt.splitRef(QChar::LineFeed);
 
         for (const auto &line: lines) {
-            const int         linePos = pos();
-            const QStringRef &trimmed = line.trimmed();
+            const int   linePos = pos();
+            const auto &trimmed = line.trimmed();
             if (trimmed.isEmpty() || trimmed[0] == '#') {
                 const auto &&span = SpanPtr::create(spanText(line));
                 m_tree->append(std::move(span));

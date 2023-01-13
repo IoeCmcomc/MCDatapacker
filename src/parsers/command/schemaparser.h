@@ -54,7 +54,8 @@ public:
 protected:
         static inline bool m_testMode = false;
 
-        QString peekLiteral();
+        QString peekLiteral() const;
+        QString getLiteralString();
 
         bool canContinue(Schema::Node **schemaNode, int depth);
         bool parseBySchema(const Schema::Node *schemaNode, int depth = 0);
@@ -125,9 +126,6 @@ protected:
 private:
         ParseNodeCache m_cache;
         QSharedPointer<Command::RootNode> m_tree;
-        // Declaring this member as static will decreases the parser performance
-        const QRegularExpression m_literalStrRegex{
-            QStringLiteral(R"([\w.+-]+)") };
         static inline const QRegularExpression m_decimalNumRegex{
             QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
         static inline QJsonObject m_schema;

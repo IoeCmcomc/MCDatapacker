@@ -1,10 +1,10 @@
 #include "mcfunctionhighlighter.h"
-#include "codeeditor.h"
 
 #include "parsers/command/mcfunctionparser.h"
 #include "parsers/command/visitors/nodeformatter.h"
 #include "parsers/command/visitors/sourceprinter.h"
 
+#include <QTextDocument>
 #include <QDebug>
 #include <QElapsedTimer>
 

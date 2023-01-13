@@ -301,7 +301,7 @@ namespace Command {
                 return brigadier_literal();
             }
             case ParserType::Long: {
-                error("The 'brigadier:long' parser has'nt been implemented yet.");
+                error("The 'brigadier:long' parser hasn't been implemented yet.");
             }
             case ParserType::String: {
                 return brigadier_string(props);
@@ -497,8 +497,89 @@ namespace Command {
 /*!
  * \brief Returns the next literal string (word) without advancing the current pos.
  */
-    QString SchemaParser::peekLiteral() {
+    QString SchemaParser::peekLiteral() const {
         return peekUntil(QChar::Space).toString();
+    }
+
+    QString SchemaParser::getLiteralString() {
+        const int start = pos();
+
+        while (true) {
+            switch (curChar().toLatin1()) {
+                case 'e':
+                case '_':
+                case 'a':
+                case 't':
+                case 'r':
+                case 'n':
+                case 'c':
+                case 'l':
+                case 'm':
+                case 'i':
+                case 'h':
+                case 's':
+                case 'o':
+                case 'd':
+                case 'p':
+                case 'b':
+                case 'u':
+                case 'g':
+                case 'j':
+                case 'k':
+                case 'y':
+                case '1':
+                case 'f':
+                case 'v':
+                case 'w':
+                case '2':
+                case 'z':
+                case 'C':
+                case '3':
+                case 'q':
+                case 'x':
+                case '4':
+                case 'T':
+                case '5':
+                case 'L':
+                case '0':
+                case 'N':
+                case '.':
+                case 'H':
+                case 'E':
+                case '7':
+                case '6':
+                case '9':
+                case '8':
+                case 'S':
+                case 'I':
+                case 'G':
+                case 'O':
+                case 'A':
+                case 'D':
+                case 'W':
+                case 'P':
+                case 'M':
+                case 'F':
+                case 'B':
+                case 'R':
+                case 'K':
+                case '-':
+                case 'Z':
+                case 'V':
+                case 'Q':
+                case '+':
+                case 'J':
+                case 'U':
+                case 'X':
+                case 'Y': {
+                    advance();
+                    break;
+                }
+                default: {
+                    return text().mid(start, pos() - start);
+                }
+            }
+        }
     }
 
     QSharedPointer<BoolNode> SchemaParser::brigadier_bool() {
@@ -612,7 +693,7 @@ namespace Command {
                 }
             }
             ucase ("word"_QL1): {
-                const QString &&literal = getWithRegex(m_literalStrRegex);
+                const QString &&literal = getLiteralString();
                 return QSharedPointer<StringNode>::create(spanText(literal));
             }
         }

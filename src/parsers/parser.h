@@ -45,7 +45,9 @@ public:
     int pos() const;
     void setPos(int newPos);
 
-    QChar curChar() const;
+    QChar inline curChar() const {
+        return m_curChar;
+    }
 
     QString text() const;
     void setText(const QString &newText);
@@ -89,8 +91,8 @@ protected:
     QString getWithCharset(const QLatin1String &charset);
     QString getWithRegex(const QString &pattern);
     QString getWithRegex(const QRegularExpression &regex);
-    QStringRef peek(int n);
-    QStringRef peekUntil(QChar chr);
+    QStringRef peek(int n) const;
+    QStringRef peekUntil(QChar chr) const;
     QString skipWs(bool once = true);
 
     QString getQuotedString();

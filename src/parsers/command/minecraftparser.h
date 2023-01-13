@@ -47,7 +47,7 @@ private:
                                            QChar sepChar,
                                            std::function<QSharedPointer<Type>(const QString &)> func,
                                            bool acceptQuotation            = false,
-                                           const QLatin1String &keyCharset = R"(0-9a-zA-Z-_.+)"_QL1)
+                                           const QLatin1String &keyCharset = QLatin1String())
         {
             auto    &&obj   = QSharedPointer<Container>::create(0);
             const int start = pos();
@@ -65,16 +65,19 @@ private:
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
-                if (name.isNull())
-                    name = this->getWithCharset(keyCharset);
+                if (name.isNull()) {
+                    setPos(keyPos);
+                    if (keyCharset.isNull()) {
+                        name = getLiteralString();
+                    } else {
+                        name = this->getWithCharset(keyCharset);
+                    }
+                }
                 if (name.isNull())
                     error("Invalid empty key", {}, keyPos);
                 const auto &&key = KeyPtr::create(spanText(keyPos), name);
                 key->setLeadingTrivia(trivia);
-                int triviaStart = pos();
-                this->skipWs(false);
-                this->eat(sepChar);
-                key->setTrailingTrivia(spanText(triviaStart));
+                key->setTrailingTrivia(spanText(eat(sepChar, SkipLeftWs)));
                 const auto &&valueTrivia = skipWs(false);
                 //const int    valueStart  = pos();
                 const auto &&value = func(name);

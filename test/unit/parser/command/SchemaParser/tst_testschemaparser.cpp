@@ -225,72 +225,72 @@ QStringList parseWithoutRegex2(const QString &text) {
     while (pos < text.length()) {
         chr = text.at(pos);
         switch (chr.toLatin1()) {
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
             case 'e':
-            case 'f':
-            case 'g':
-            case 'h':
-            case 'i':
-            case 'j':
-            case 'k':
+            case '_':
+            case 'a':
+            case 't':
+            case 'r':
+            case 'n':
+            case 'c':
             case 'l':
             case 'm':
-            case 'n':
-            case 'o':
-            case 'p':
-            case 'q':
-            case 'r':
+            case 'i':
+            case 'h':
             case 's':
-            case 't':
+            case 'o':
+            case 'd':
+            case 'p':
+            case 'b':
             case 'u':
+            case 'g':
+            case 'j':
+            case 'k':
+            case 'y':
+            case '1':
+            case 'f':
             case 'v':
             case 'w':
-            case 'x':
-            case 'y':
-            case 'z':
-            case '0':
-            case '1':
             case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-            case '.':
-            case '+':
-            case '-':
-            case '_':
-            case 'A':
-            case 'B':
+            case 'z':
             case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-            case 'G':
-            case 'H':
-            case 'I':
-            case 'J':
-            case 'K':
-            case 'L':
-            case 'M':
-            case 'N':
-            case 'O':
-            case 'P':
-            case 'Q':
-            case 'R':
-            case 'S':
+            case '3':
+            case 'q':
+            case 'x':
+            case '4':
             case 'T':
-            case 'U':
-            case 'V':
+            case '5':
+            case 'L':
+            case '0':
+            case 'N':
+            case '.':
+            case 'H':
+            case 'E':
+            case '7':
+            case '6':
+            case '9':
+            case '8':
+            case 'S':
+            case 'I':
+            case 'G':
+            case 'O':
+            case 'A':
+            case 'D':
             case 'W':
+            case 'P':
+            case 'M':
+            case 'F':
+            case 'B':
+            case 'R':
+            case 'K':
+            case '-':
+            case 'Z':
+            case 'V':
+            case 'Q':
+            case '+':
+            case 'J':
+            case 'U':
             case 'X':
-            case 'Y':
-            case 'Z': {
+            case 'Y': {
                 if (start == -1) {
                     start = pos;
                 }

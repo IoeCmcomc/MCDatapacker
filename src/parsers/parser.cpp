@@ -39,6 +39,7 @@ Parser::Parser() {
 }
 
 Parser::Parser(const QString &input) : m_text(input) {
+    setPos(0);
 }
 
 int Parser::pos() const {
@@ -57,10 +58,6 @@ void Parser::setPos(int pos) {
         m_curChar = QChar();
     else
         m_curChar = m_text.at(pos);
-}
-
-QChar Parser::curChar() const {
-    return m_curChar;
 }
 
 /*!
@@ -102,6 +99,10 @@ void Parser::error(const char *msg, const QVariantList &args) {
     error(msg, args, m_pos);
 }
 
+/*!
+ * \brief Throws a \c Command::Parser::ParsingError with a formatted message,
+ * a absoulte position and a length.
+ */
 void Parser::error(const QString &msg, const QVariantList &args,
                    int pos, int length) {
     /*qWarning() << "Command::Parser::error" << msg << pos << length; */
@@ -228,17 +229,29 @@ QString Parser::getWithRegex(const QRegularExpression &regex) {
     return ret;
 }
 
-QStringRef Parser::peek(int n) {
+/*!
+ * \brief Returns \a n next characters (including the current character) without
+ * advancing the current position.
+ */
+QStringRef Parser::peek(int n) const {
     return m_text.midRef(m_pos, n);
 }
 
-QStringRef Parser::peekUntil(QChar chr) {
+/*!
+ * \brief Returns the substring from the current character until it meets the
+ * character \a chr (exclusive). It will not advances the current position.
+ */
+QStringRef Parser::peekUntil(QChar chr) const {
     const int start = m_pos;
     const int index = m_text.indexOf(chr, start);
 
     return m_text.midRef(start, qMax(-1, index - start));
 }
 
+/*!
+ * \brief Skips and returns subsequent whitespaces.
+ * If \a once is true, only one whitespace is skipped.
+ */
 QString Parser::skipWs(bool once) {
     const int start = m_pos;
 
