@@ -4,6 +4,7 @@
 #include "nlohmann/json.hpp"
 
 #include <QMap>
+#include <QHash>
 
 using json = nlohmann::json;
 
@@ -29,23 +30,24 @@ public:
             Argument,
             Unknown
         };
+        using LiteralChildrenType = QMap<QString, LiteralNode *>;
 
         Node();
 
         Kind kind() const;
 
-        QMap<QString, LiteralNode *> literalChildren() const;
+        LiteralChildrenType literalChildren() const;
         QVector<ArgumentNode *> argumentChildren() const;
 
         bool inline isEmpty() const {
-            return m_literalChildren.isEmpty() && m_argumentChildren.isEmpty();
+            return m_literalChildren.empty() && m_argumentChildren.isEmpty();
         }
         bool isExecutable() const;
         Node * redirect() const;
         void setRedirect(Node *newRedirect);
 
 protected:
-        QMap<QString, LiteralNode *> m_literalChildren;
+        LiteralChildrenType m_literalChildren;
         QVector<ArgumentNode *> m_argumentChildren;
         Node *m_redirect  = nullptr;
         Kind m_kind       = Kind::Unknown;

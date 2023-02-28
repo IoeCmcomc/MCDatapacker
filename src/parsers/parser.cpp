@@ -355,13 +355,15 @@ QString Parser::spanText(const QStringRef &textRef) {
 }
 
 QString Parser::spanText(const QString &text) {
-    m_spans << text;
-    return *m_spans.find(text);
+    return *m_spans.insert(text);
+//    m_spans.insert(text);
+//    return *m_spans.find(text);
 }
 
 QString Parser::spanText(QString &&text) {
-    m_spans << std::move(text);
-    return *m_spans.find(text);
+    return *m_spans.insert(std::move(text));
+//    m_spans.insert(std::move(text));
+//    return *m_spans.find(text);
 }
 
 QString Parser::spanText(int start) {

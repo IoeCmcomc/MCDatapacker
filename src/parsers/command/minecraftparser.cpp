@@ -1124,25 +1124,23 @@ namespace Command {
             }
         }
 
-        ret->setResLoc(std::move(resLoc));
-
         uswitch (fullId) {
             ucase ("block"_QL1):
             ucase ("block_marker"_QL1):
             ucase ("falling_dust"_QL1): {
-                ret->setLeadingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' '));
                 ret->setParams(minecraft_blockState());
                 break;
             }
             ucase ("dust"_QL1): {
-                ret->setLeadingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' '));
                 const auto &&color = parseParticleColor();
                 color->setTrailingTrivia(eat(' '));
                 ret->setParams(std::move(color), brigadier_float());
                 break;
             }
             ucase ("dust_color_transition"_QL1): {
-                ret->setLeadingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' '));
                 const auto &&startColor = parseParticleColor();
                 startColor->setTrailingTrivia(eat(' '));
                 const auto &&size = brigadier_float();
@@ -1153,11 +1151,12 @@ namespace Command {
                 break;
             }
             ucase ("item"_QL1): {
-                ret->setLeadingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' '));
                 ret->setParams(minecraft_itemStack());
                 break;
             }
         }
+        ret->setResLoc(std::move(resLoc));
         ret->setLength(pos() - start);
         return ret;
     }

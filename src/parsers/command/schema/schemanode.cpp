@@ -11,7 +11,7 @@ namespace Command::Schema {
         return m_kind;
     }
 
-    QMap<QString, LiteralNode *> Node::literalChildren() const {
+    Node::LiteralChildrenType Node::literalChildren() const {
         return m_literalChildren;
     }
 

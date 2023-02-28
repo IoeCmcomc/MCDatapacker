@@ -436,6 +436,8 @@ public:
                 case Type::Key: {
                     node->name()->accept(this, m_order);
 
+                    if (node->filter())
+                        node->filter()->accept(this, m_order);
                     break;
                 }
 
@@ -467,11 +469,11 @@ public:
         virtual void visit(BlockPosNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ m_pos, node->length(),
-                                            std::move(fmt) };
+//            auto                     fmt = defaultFormat(node);
+//            QTextLayout::FormatRange range{ m_pos, node->length(),
+//                                            std::move(fmt) };
 
-            m_formatRanges << std::move(range);
+//            m_formatRanges << std::move(range);
 
             m_pos += node->length() + node->trailingTrivia().length();
         }
@@ -500,51 +502,54 @@ public:
         virtual void visit(ColumnPosNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ m_pos, node->length(),
-                                            std::move(fmt) };
+//            auto                     fmt = defaultFormat(node);
+//            QTextLayout::FormatRange range{ m_pos, node->length(),
+//                                            std::move(fmt) };
 
-            m_formatRanges << std::move(range);
+//            m_formatRanges << std::move(range);
 
             m_pos += node->length() + node->trailingTrivia().length();
         }
         virtual void visit(RotationNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ m_pos, node->length(),
-                                            std::move(fmt) };
+//            auto                     fmt = defaultFormat(node);
+//            QTextLayout::FormatRange range{ m_pos, node->length(),
+//                                            std::move(fmt) };
 
-            m_formatRanges << std::move(range);
+//            m_formatRanges << std::move(range);
 
             m_pos += node->length() + node->trailingTrivia().length();
         }
         virtual void visit(Vec2Node *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ m_pos, node->length(),
-                                            std::move(fmt) };
+//            auto                     fmt = defaultFormat(node);
+//            QTextLayout::FormatRange range{ m_pos, node->length(),
+//                                            std::move(fmt) };
 
-            m_formatRanges << std::move(range);
+//            m_formatRanges << std::move(range);
 
             m_pos += node->length() + node->trailingTrivia().length();
         }
         virtual void visit(Vec3Node *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
-            QTextLayout::FormatRange range{ m_pos, node->length(),
-                                            std::move(fmt) };
+//            auto                     fmt = defaultFormat(node);
+//            QTextLayout::FormatRange range{ m_pos, node->length(),
+//                                            std::move(fmt) };
 
-            m_formatRanges << std::move(range);
+//            m_formatRanges << std::move(range);
 
             m_pos += node->length() + node->trailingTrivia().length();
         }
         virtual void visit(DimensionNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#40677d"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -555,7 +560,10 @@ public:
         virtual void visit(EntitySummonNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#238500"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -566,7 +574,10 @@ public:
         virtual void visit(FunctionNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#13acba"));
+            fmt.setFontItalic(true);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -577,7 +588,10 @@ public:
         virtual void visit(ItemEnchantmentNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#7a077a"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -588,7 +602,10 @@ public:
         virtual void visit(MobEffectNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#7a6f82"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -599,7 +616,10 @@ public:
         virtual void visit(ColorNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#565756"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -610,7 +630,10 @@ public:
         virtual void visit(EntityAnchorNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#8ca177"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -621,7 +644,10 @@ public:
         virtual void visit(ItemSlotNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#779fa1"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -636,7 +662,10 @@ public:
         virtual void visit(ObjectiveNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#d41e7f"));
+            fmt.setFontItalic(true);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -647,7 +676,10 @@ public:
         virtual void visit(ObjectiveCriteriaNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#7a4c65"));
+            fmt.setFontItalic(true);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -658,7 +690,10 @@ public:
         virtual void visit(OperationNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#13e853"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -669,7 +704,10 @@ public:
         virtual void visit(ScoreboardSlotNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#7d364b"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -680,7 +718,10 @@ public:
         virtual void visit(TeamNode *node) override {
             m_pos += node->leadingTrivia().length();
 
-            auto                     fmt = defaultFormat(node);
+            QTextCharFormat fmt;
+
+            fmt.setForeground(QColor("#826c4f"));
+            fmt.setFontWeight(QFont::Medium);
             QTextLayout::FormatRange range{ m_pos, node->length(),
                                             std::move(fmt) };
 
@@ -759,6 +800,7 @@ public:
             m_formatRanges << std::move(range);
 
             m_pos += node->resLoc()->length();
+            m_pos += node->resLoc()->trailingTrivia().length();
             if (!node->params().isEmpty()) {
                 for (const auto &child: node->params()) {
                     child->accept(this, m_order);

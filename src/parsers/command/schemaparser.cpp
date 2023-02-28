@@ -780,13 +780,15 @@ namespace Command {
         bool            success  = false;
         const QString &&literal  = peekLiteral();
 
-        if (schemaNode->literalChildren().contains(literal)) {
+        const auto &literalChildren = schemaNode->literalChildren();
+
+        if (const auto &literalNode = literalChildren.constFind(literal);
+            literalNode != literalChildren.end()) {
             const auto &&command = brigadier_literal();
             if (isRoot)
                 command->setIsCommand(true);
             ret = command;
-            Schema::Node *litNode =
-                schemaNode->literalChildren().value(literal);
+            Schema::Node *litNode = literalNode.value();
             if (canContinue(&litNode, depth)) {
                 ret->setTrailingTrivia(QStringLiteral(" "));
                 success = parseBySchema(litNode, depth + 1);
