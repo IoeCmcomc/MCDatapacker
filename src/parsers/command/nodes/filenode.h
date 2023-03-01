@@ -6,7 +6,7 @@
 namespace Command {
     class FileNode : public ParseNode {
 public:
-        using Lines = std::list<NodePtr>;
+        using Lines = QVector<NodePtr>;
 
         FileNode();
 
@@ -21,9 +21,13 @@ public:
             m_lines.push_back(std::forward<T>(node));
         }
 
+        NodePtr const operator[](const int i) const {
+            return m_lines[i];
+        }
+
         Lines lines() const;
 
-    private:
+private:
         Lines m_lines;
     };
 }

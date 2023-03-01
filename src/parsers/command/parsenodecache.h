@@ -57,27 +57,28 @@ namespace std {
 }
 
 namespace Command {
+    using WeakNodePtr = QWeakPointer<ParseNode>;
+
     class ParseNodeCache
     {
 public:
         explicit ParseNodeCache(int capacity = 500);
 
-        using Cache = LRU::Cache<CacheKey, NodePtr>;
+        using Cache = LRU::Cache<CacheKey, WeakNodePtr>;
 
         bool isEmpty() const;
         int size() const;
-        int capacity() const {
-            return m_cache.capacity();
-        }
+        int capacity() const;
+        void setCapacity(const size_t capacity);;
         void clear();
         bool contains(const CacheKey &key) const;
-        const NodePtr &lookup(const CacheKey &key) const;
+        const WeakNodePtr &lookup(const CacheKey &key) const;
         void emplace(const int typeId, const QString &literalStr,
-                     NodePtr node);
+                     WeakNodePtr node);
         void emplace(const int typeId, const QString &literalStr,
-                     const QVariantMap &props, NodePtr node);
-        NodePtr &operator[](const CacheKey &key);
-        const NodePtr &operator[](const CacheKey &key) const;
+                     const QVariantMap &props, WeakNodePtr node);
+        WeakNodePtr &operator[](const CacheKey &key);
+        const WeakNodePtr &operator[](const CacheKey &key) const;
 
         const LRU::Statistics<CacheKey> &stats() const {
             return m_cache.stats();

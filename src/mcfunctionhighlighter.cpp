@@ -6,7 +6,6 @@
 
 #include <QTextDocument>
 #include <QDebug>
-#include <QElapsedTimer>
 
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
                                              Command::McfunctionParser *parser)
@@ -100,116 +99,33 @@ void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
     m_formats.clear();
 }
 
-//void McfunctionHighlighter::checkProblems(bool checkAll) {
-//    QSharedPointer<Command::ParseNode> result = nullptr;
-
-//    QElapsedTimer timer;
-
-//    timer.start();
-//    const auto &&changedBlks = changedBlocks();
-//    const auto  *doc         = document();
-//    Q_ASSERT(doc != nullptr);
-
-//    auto block =
-//        (!checkAll) ? ((!changedBlks.isEmpty()) ? changedBlks.constFirst() : doc
-//                       ->
-//                       findBlock(-1)) : doc->firstBlock();
-//    const auto &end =
-//        (!checkAll) ? ((!changedBlks.isEmpty()) ? changedBlks.constLast() : doc
-//                       ->
-//                       findBlock(-1)) : doc->lastBlock();
-
-//    auto *editor = dynamic_cast<CodeEditor *>(document()->parent()->parent());
-//    Q_ASSERT(editor != nullptr);
-
-//    while (block.isValid() && block.blockNumber() <= end.blockNumber()) {
-//        if (TextBlockData *data =
-//                dynamic_cast<TextBlockData *>(block.userData())) {
-//            QString lineText = block.text();
-//            parser.setText(lineText);
-//            //QElapsedTimer timer;
-//            //timer.start();
-//            result = parser.parse();
-//            if (result->isValid()) {
-//                data->clearProblems();
-
-//                Command::SourcePrinter printer;
-//                printer.startVisiting(result.get());
-//                if (printer.source() != lineText)
-//                    qDebug() << printer.source();
-
-//                Command::NodeFormatter formatter;
-//                formatter.startVisiting(result.get());
-//                /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
-//                document()->blockSignals(true);
-//                rehighlightBlock(block, formatter.formatRanges());
-//                /*
-//                   QTextCursor tc = editor->textCursor();
-//                   tc.setPosition(block.position());
-//                   tc.select(QTextCursor::LineUnderCursor);
-//                   tc.insertText(printer.source());
-//                   editor->setTextCursor(tc);
-//                 */
-//                document()->blockSignals(false);
-
-///*
-//                  qDebug() << "Size:" << parser.cache().size() << '/' <<
-//                      parser.cache().capacity()
-//                           << "Total access:" <<
-//                      parser.cache().stats().total_accesses()
-//                           << "Total hit:" << parser.cache().stats().total_hits()
-//                           << "Total miss:" << parser.cache().stats().total_hits()
-//                           << "Hit rate:" << parser.cache().stats().hit_rate()
-//                           << "Time elapsed:" << timer.elapsed();
-// */
-//            } else {
-//                const auto  parseErr = parser.errors().last();
-//                ProblemInfo error{
-//                    ProblemInfo::Type::Error, block.blockNumber(),
-//                    parseErr.pos, parseErr.length,
-//                    parseErr.toLocalizedMessage(),
-//                };
-//                data->setProblems({ error });
-//            }
-//        }
-//        block = block.next();
-//    }
-//    qDebug() << "Size:" << parser.cache().size() << '/' <<
-//        parser.cache().capacity()
-//             << "Total access:" << parser.cache().stats().total_accesses()
-//             << "Total hit:" << parser.cache().stats().total_hits()
-//             << "Total miss:" << parser.cache().stats().total_misses()
-//             << "Hit rate:" << parser.cache().stats().hit_rate()
-//             << "Time elapsed:" << timer.elapsed();
-//}
-
 void McfunctionHighlighter::rehighlightDelayed() {
     Q_ASSERT(m_parser != nullptr);
 
     const auto &&result      = m_parser->syntaxTree();
     const auto &&resultLines = result->lines();
+    const auto &&blocks      = changedBlocks();
 
-    auto resultIter = resultLines.cbegin();
-    for (auto block = document()->begin();
-         block != document()->end(); block = block.next()) {
-        const QString &&lineText   = block.text();
-        auto           *lineResult = resultIter->get();
+    for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
+        const QString &&lineText   = iter->text();
+        auto           *lineResult = resultLines[iter->blockNumber()].get();
         if (lineResult->isValid()
             && (lineResult->kind() == Command::ParseNode::Kind::Root)) {
             Command::SourcePrinter printer;
             printer.startVisiting(lineResult);
-            if (printer.source() != lineText)
+            if (printer.source() != lineText) {
+                // qDebug() << lineText;
                 qDebug() << printer.source();
+            }
 
             Command::NodeFormatter formatter;
             formatter.startVisiting(lineResult);
             /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
             document()->blockSignals(true);
-            rehighlightBlock(block, formatter.formatRanges());
+            rehighlightBlock(*iter, formatter.formatRanges());
             document()->blockSignals(false);
         }
 
-        ++resultIter;
         /*emit document()->documentLayout()->updateBlock(block); */
     }
 }

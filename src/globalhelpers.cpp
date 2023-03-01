@@ -108,21 +108,21 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
 
 QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
     switch (type) {
-    case CodeFile::Function:
-        return QIcon(QStringLiteral(":/file-mcfunction"));
+        case CodeFile::Function:
+            return QIcon(QStringLiteral(":/file-mcfunction"));
 
-    case CodeFile::Structure:
-        return QIcon(QStringLiteral(":/file-nbt"));
+        case CodeFile::Structure:
+            return QIcon(QStringLiteral(":/file-nbt"));
 
-    case CodeFile::Meta:
-        return QIcon(QStringLiteral(":/file-mcmeta"));
+        case CodeFile::Meta:
+            return QIcon(QStringLiteral(":/file-mcmeta"));
 
-    default: {
-        if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
-            return QIcon(QStringLiteral(":/file-json"));
+        default: {
+            if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
+                return QIcon(QStringLiteral(":/file-json"));
 
-        break;
-    }
+            break;
+        }
     }
     return QIcon();
 }
@@ -267,7 +267,7 @@ const QMap<QString, QString> Glhp::colorHexes = {
 
 
 QString Glhp::fileTypeToName(const CodeFile::FileType type) {
-    static QHash<CodeFile::FileType, const char*> const valueMap = {
+    static QHash<CodeFile::FileType, const char *> const valueMap = {
         { CodeFile::Binary,            QT_TR_NOOP("Binary")            },
         { CodeFile::Structure,         QT_TR_NOOP("Structure")         },
         { CodeFile::Image,             QT_TR_NOOP("Image")             },
@@ -297,7 +297,7 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
         { CodeFile::NoiseSettings,     QT_TR_NOOP("Noise settings")    },
         { CodeFile::PlacedFeature,     QT_TR_NOOP("Placed feature")    },
         { CodeFile::ProcessorList,     QT_TR_NOOP("Processor list")    },
-        { CodeFile::StructureSet,     QT_TR_NOOP("Structure set")      },
+        { CodeFile::StructureSet,      QT_TR_NOOP("Structure set")     },
         { CodeFile::TemplatePool,      QT_TR_NOOP("Jigsaw pool")       },
     };
 

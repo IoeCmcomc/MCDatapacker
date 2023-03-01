@@ -18,6 +18,14 @@ namespace Command {
         return m_cache.size();
     }
 
+    int ParseNodeCache::capacity() const {
+        return m_cache.capacity();
+    }
+
+    void ParseNodeCache::setCapacity(const size_t capacity) {
+        m_cache.capacity(capacity);
+    }
+
     void ParseNodeCache::clear() {
         m_cache.clear();
     }
@@ -26,30 +34,30 @@ namespace Command {
         return m_cache.contains(key);
     }
 
-    const NodePtr &ParseNodeCache::lookup(
+    const WeakNodePtr &ParseNodeCache::lookup(
         const CacheKey &key) const {
         return m_cache.lookup(key);
     }
 
     void ParseNodeCache::emplace(const int typeId, const QString &literalStr,
-                                 NodePtr node) {
+                                 WeakNodePtr node) {
         m_cache.emplace(std::piecewise_construct,
                         std::forward_as_tuple(typeId, literalStr),
                         std::forward_as_tuple(node));
     }
 
     void ParseNodeCache::emplace(const int typeId, const QString &literalStr,
-                                 const QVariantMap &props, NodePtr node) {
+                                 const QVariantMap &props, WeakNodePtr node) {
         m_cache.emplace(std::piecewise_construct,
                         std::forward_as_tuple(typeId, literalStr, props),
                         std::forward_as_tuple(node));
     }
 
-    NodePtr &ParseNodeCache::operator [](const CacheKey &key) {
+    WeakNodePtr &ParseNodeCache::operator [](const CacheKey &key) {
         return m_cache.lookup(key);
     }
 
-    const NodePtr &ParseNodeCache::operator[](
+    const WeakNodePtr &ParseNodeCache::operator[](
         const CacheKey &key) const {
         return m_cache.lookup(key);
     }

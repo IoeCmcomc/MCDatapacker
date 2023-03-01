@@ -16,6 +16,7 @@ protected:
 
 private:
         MinecraftParser m_commandParser;
+        ParseNodeCache m_cache;
         QSharedPointer<FileNode> m_tree;
     };
 }

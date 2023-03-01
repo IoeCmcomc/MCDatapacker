@@ -36,6 +36,8 @@ public:
         static void setGameVer(const QVersionNumber &newGameVer);
 
 private:
+        friend class McfunctionParser;
+
         static inline QVersionNumber gameVer = QVersionNumber();
 
         QString oneOf(const QLatin1StringVector &strArr);
@@ -104,7 +106,7 @@ private:
 
         template<class Container, class Type>
         QSharedPointer<Container> parseArrayTag(const char *errorMsg) {
-            const int start = pos() - 2;
+            const int start = pos() - 1;
 
             advance();
             if (curChar() == ';') {
