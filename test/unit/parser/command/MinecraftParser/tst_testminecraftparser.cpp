@@ -53,19 +53,6 @@ void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setGameVer(QVersionNumber(1, 18, 2));
     Command::MinecraftParser::setTestMode(false);
 
-/*
-    for (int i = 1024; i < 2000; ++i) {
-        QMetaType metatype(i);
-        if (metatype.isRegistered()) {
-            qDebug() << i << metatype.name() << metatype.isValid() <<
-                metatype.isRegistered();
-        } else {
-            break;
-        }
-    }
- */
-
-
     timer.start();
     /*QThread::sleep(5); */
 }
@@ -113,14 +100,19 @@ void TestMinecraftParser::commands_data() {
      * and caused the MinecraftParser to produce errors.
      *
      * These characters are removed in this file.
+     *
+     * Other commands are either made up or copied from datapacks hosted on Github
+     * and having compatible licenses.
      */
 
     QElapsedTimer localTimer;
     localTimer.start();
 
     SET_TAG(test)
-    QTest::newRow(GEN_TAG) << R"(scoreboard objectives add tc.temp dummy)" <<
-        "RootNode[5](LiteralNode(scoreboard), LiteralNode(objectives), LiteralNode(add), StringNode(\"tc.temp\"), ObjectiveCriteriaNode(\"dummy\"))";
+    QTest::newRow(GEN_TAG) <<
+        R"(scoreboard players operation * OhMyDatID += $ OhMyDat)"
+                           <<
+        "RootNode[8](LiteralNode(scoreboard), LiteralNode(players), LiteralNode(operation), ScoreHolderNode(*), ObjectiveNode(\"OhMyDatID\"), OperationNode(\"+=\"), ScoreHolderNode[](StringNode(\"$\")), ObjectiveNode(\"OhMyDat\"))";
 
     SET_TAG(advancement)
     QTest::newRow(GEN_TAG) <<
@@ -133,6 +125,10 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) <<
         "attribute @s minecraft:generic.armor base set 5" <<
         "RootNode[6](LiteralNode(attribute), EntityNode[single](TargetSelectorNode(@s)), ResourceLocationNode(minecraft:generic.armor), LiteralNode(base), LiteralNode(set), DoubleNode(5))";
+    QTest::newRow(GEN_TAG) <<
+        "attribute @s generic.max_health modifier remove 8b138417-eccd-429b-a080-4beb98b7aa30"
+                           <<
+        "RootNode[6](LiteralNode(attribute), EntityNode[single](TargetSelectorNode(@s)), ResourceLocationNode(generic.max_health), LiteralNode(modifier), LiteralNode(remove), UuidNode({8b138417-eccd-429b-a080-4beb98b7aa30}))";
 
     SET_TAG(clear)
     QTest::newRow(GEN_TAG) << "clear" << "RootNode[1](LiteralNode(clear))";
@@ -271,6 +267,10 @@ void TestMinecraftParser::commands_data() {
         "RootNode[11](LiteralNode(execute), LiteralNode(at), EntityNode[](TargetSelectorNode(@p)), LiteralNode(as), EntityNode[](TargetSelectorNode(@e){MapNode(KeyNode(\"type\"): EntityArgumentValueNode(ResourceLocationNode(pig)), KeyNode(\"distance\"): FloatRangeNode(..3))}), LiteralNode(run), LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@s)), NbtCompoundNode(KeyNode(\"Motion\"): NbtListNode[3](NbtDoubleNode(0), NbtDoubleNode(2), NbtDoubleNode(0))))";
     QTest::newRow(GEN_TAG) << "execute align yxz run spawnpoint @p ~ ~ ~" <<
         "RootNode[7](LiteralNode(execute), LiteralNode(align), SwizzleNode(yxz), LiteralNode(run), LiteralNode(spawnpoint), EntityNode[player](TargetSelectorNode(@p)), BlockPosNode(x: AngleNode(~), y: AngleNode(~), z: AngleNode(~)))";
+    QTest::newRow(GEN_TAG) <<
+        R"(execute if entity @s[advancements={mob_manager:entity_finder/check_attacked_entity={0.1=true}}] run say 0.1)"
+                           <<
+        "RootNode[7](LiteralNode(execute), LiteralNode(if), LiteralNode(entity), EntityNode[](TargetSelectorNode(@s){MapNode(KeyNode(\"advancements\"): MapNode(KeyNode(\"mob_manager:entity_finder/check_attacked_entity\"): MapNode(KeyNode(\"0.1\"): BoolNode(true))))}), LiteralNode(run), LiteralNode(say), MessageNode(\"0.1\"))";
 
     SET_TAG(experience)
     QTest::newRow(GEN_TAG) << "experience query Steve levels" <<
@@ -339,6 +339,12 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) << "locatebiome desert" <<
         "RootNode[2](LiteralNode(locatebiome), ResourceLocationNode(desert))";
 
+    SET_TAG(loot)
+    QTest::newRow(GEN_TAG) <<
+        R"(loot replace entity @p[scores={string.simplifyp=0}] enderchest.0 mine -30000000 10 74063)"
+                           <<
+        "RootNode[7](LiteralNode(loot), LiteralNode(replace), LiteralNode(entity), EntityNode[](TargetSelectorNode(@p){MapNode(KeyNode(\"scores\"): MapNode(KeyNode(\"string.simplifyp\"): IntRangeNode(0)))}), ItemSlotNode(\"enderchest.0\"), LiteralNode(mine), BlockPosNode(x: AngleNode(-30000000), y: AngleNode(10), z: AngleNode(74063)))";
+
     SET_TAG(particle)
     QTest::newRow(GEN_TAG) <<
         "particle block minecraft:furnace[lit=true] ~ ~ ~ 0 0 0 1 1" <<
@@ -365,12 +371,25 @@ void TestMinecraftParser::commands_data() {
         "RootNode[5](LiteralNode(scoreboard), LiteralNode(players), LiteralNode(enable), ScoreHolderNode[](TargetSelectorNode(@a)), ObjectiveNode(\"phase\"))";
     QTest::newRow(GEN_TAG) << "scoreboard players set a b 0" <<
         "RootNode[6](LiteralNode(scoreboard), LiteralNode(players), LiteralNode(set), ScoreHolderNode[](StringNode(\"a\")), ObjectiveNode(\"b\"), IntegerNode(0))";
+    QTest::newRow(GEN_TAG) << "scoreboard players reset * load.status" <<
+        "RootNode[5](LiteralNode(scoreboard), LiteralNode(players), LiteralNode(reset), ScoreHolderNode(*), ObjectiveNode(\"load.status\"))";
+    QTest::newRow(GEN_TAG) <<
+        "scoreboard objectives setdisplay sidebar.team.gold FlagDisp" <<
+        "RootNode[5](LiteralNode(scoreboard), LiteralNode(objectives), LiteralNode(setdisplay), ScoreboardSlotNode(\"sidebar.team.gold\"), ObjectiveNode(\"FlagDisp\"))";
+    QTest::newRow(GEN_TAG) <<
+        R"(scoreboard players operation * OhMyDatID += $ OhMyDat)"
+                           <<
+        "RootNode[8](LiteralNode(scoreboard), LiteralNode(players), LiteralNode(operation), ScoreHolderNode(*), ObjectiveNode(\"OhMyDatID\"), OperationNode(\"+=\"), ScoreHolderNode[](StringNode(\"$\")), ObjectiveNode(\"OhMyDat\"))";
 
     SET_TAG(setblock)
     QTest::newRow(GEN_TAG) <<
         "setblock ^ ^ ^3 minecraft:hopper[facing=east]{id: 'minecraft:hopper', TransferCooldown: 23}"
                            <<
         "RootNode[3](LiteralNode(setblock), BlockPosNode(x: AngleNode(^), y: AngleNode(^), z: AngleNode(^3)), BlockStateNode(ResourceLocationNode(minecraft:hopper))[MapNode(KeyNode(\"facing\"): StringNode(\"east\"))]{NbtCompoundNode(KeyNode(\"id\"): NbtStringNode(\"minecraft:hopper\"), KeyNode(\"TransferCooldown\"): NbtIntNode(23))})";
+
+    SET_TAG(spawnpoint)
+    QTest::newRow(GEN_TAG) << R"(spawnpoint @s 12 64 66 -180)" <<
+        "RootNode[4](LiteralNode(spawnpoint), EntityNode[player](TargetSelectorNode(@s)), BlockPosNode(x: AngleNode(12), y: AngleNode(64), z: AngleNode(66)), AngleNode(-180))";
 
     SET_TAG(spreadplayers)
     QTest::newRow(GEN_TAG) << "spreadplayers 0 0 200 500 true @a" <<
@@ -391,6 +410,11 @@ void TestMinecraftParser::commands_data() {
         R"(summon villager ~ ~ ~ {Offers:{Recipes:[{buy:{id:dirt,Count:1},sell:{id:diamond,Count:1},rewardExp:false}]}})"
                            <<
         "RootNode[4](LiteralNode(summon), EntitySummonNode(villager), Vec3Node(x: AngleNode(~), y: AngleNode(~), z: AngleNode(~)), NbtCompoundNode(KeyNode(\"Offers\"): NbtCompoundNode(KeyNode(\"Recipes\"): NbtListNode[1](NbtCompoundNode(KeyNode(\"buy\"): NbtCompoundNode(KeyNode(\"id\"): NbtStringNode(\"dirt\"), KeyNode(\"Count\"): NbtIntNode(1)), KeyNode(\"sell\"): NbtCompoundNode(KeyNode(\"id\"): NbtStringNode(\"diamond\"), KeyNode(\"Count\"): NbtIntNode(1)), KeyNode(\"rewardExp\"): NbtByteNode(0))))))";
+
+    SET_TAG(team)
+    QTest::newRow(GEN_TAG) << R"(team modify m.Purple color dark_purple)" <<
+        "RootNode[5](LiteralNode(team), LiteralNode(modify), TeamNode(\"m.Purple\"), LiteralNode(color), ColorNode(\"dark_purple\"))";
+
 
     SET_TAG(tellraw)
     QTest::newRow(GEN_TAG) << R"(tellraw @a "text to display")" <<

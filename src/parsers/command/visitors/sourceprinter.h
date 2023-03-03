@@ -45,6 +45,17 @@ public:
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
+        void visit(ScoreHolderNode *node) override {
+            m_text += node->leadingTrivia();
+            m_text += node->leftText();
+            if (node->isAll()) {
+                m_text += '*';
+            } else {
+                node->getNode()->accept(this, m_order);
+            }
+            m_text += node->rightText();
+            m_text += node->trailingTrivia();
+        };
         void visit(FloatRangeNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();

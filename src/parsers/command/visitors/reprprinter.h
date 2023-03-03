@@ -97,7 +97,11 @@ public:
         };
         virtual void visit(ScoreHolderNode *node) override {
             m_repr += "ScoreHolderNode";
-            reprEntityNode(node);
+            if (node->isAll()) {
+                m_repr += "(*)";
+            } else {
+                reprEntityNode(node);
+            }
         };
         virtual void visit(FloatRangeNode *node) override {
             m_repr += QString("FloatRangeNode(%1)").arg(node->format());

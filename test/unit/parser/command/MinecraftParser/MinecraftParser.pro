@@ -6,11 +6,9 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-win32 {
-QMAKE_CXXFLAGS += -fprofile-arcs -ftest-coverage -O0
-QMAKE_LFLAGS += -g -fprofile-arcs -ftest-coverage -lgcov
-QMAKE_LFLAGS_WINDOWS += -g -fprofile-arcs -ftest-coverage -lgcov
-}
+QMAKE_CXXFLAGS_DEBUG += --coverage -O0 -fPIC -fprofile-abs-path
+QMAKE_LFLAGS_DEBUG += --coverage -fPIC -fprofile-abs-path
+QMAKE_LFLAGS_WINDOWS += --coverage -fPIC -O0 -fprofile-abs-path
 
 #DEFINES += QT_ASCII_CAST_WARNINGS
 

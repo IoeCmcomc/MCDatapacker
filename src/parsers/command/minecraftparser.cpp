@@ -1210,7 +1210,6 @@ namespace Command {
     QSharedPointer<ScoreboardSlotNode> MinecraftParser::
     minecraft_scoreboardSlot() {
         const static QLatin1StringVector scoreboardSlots = {
-            "sidebar"_QL1,
             "belowName"_QL1,
             "sidebar.team.aqua"_QL1,
             "sidebar.team.black"_QL1,
@@ -1229,6 +1228,7 @@ namespace Command {
             "sidebar.team.reset"_QL1,
             "sidebar.team.white"_QL1,
             "sidebar.team.yellow"_QL1,
+            "sidebar"_QL1,
         };
 
         const QString &&slot = this->oneOf(scoreboardSlots);
