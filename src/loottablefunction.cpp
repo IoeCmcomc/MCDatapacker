@@ -19,9 +19,9 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     ui->setupUi(this);
     updateConditionsTab(0);
 
-    auto *view  = qobject_cast<QListView*>(ui->functionTypeCombo->view());
+    auto *view  = qobject_cast<QListView *>(ui->functionTypeCombo->view());
     auto *model =
-        static_cast<QStandardItemModel*>(ui->functionTypeCombo->model());
+        static_cast<QStandardItemModel *>(ui->functionTypeCombo->model());
     if (Game::version() < Game::v1_17) {
         view->setRowHidden(SetEnchantments, true);
         model->item(SetEnchantments, 0)->setEnabled(false);
@@ -69,9 +69,9 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
             this, &LootTableFunction::copyState_onAdded);
 
     if (Game::version() < Game::v1_17) {
-        qobject_cast<QListView*>(ui->copyNBT_entityCombo->view())->setRowHidden(
+        qobject_cast<QListView *>(ui->copyNBT_entityCombo->view())->setRowHidden(
             4, true);
-        qobject_cast<QStandardItemModel*>(ui->copyNBT_entityCombo->model())->
+        qobject_cast<QStandardItemModel *>(ui->copyNBT_entityCombo->model())->
         item(4, 0)->setEnabled(false);
         ui->copyNBT_storageLabel->hide();
         ui->copyNBT_storageEdit->hide();
@@ -418,12 +418,12 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         return;
 
     QString function = root.value(QLatin1String("function")).toString();
-    Glhp::removePrefix(function, QLatin1String("minecraft:"));
+    Glhp::removePrefix(function, "minecraft:"_QL1);
 
     const int index = functTypes.indexOf(function);
 
     const auto &&model =
-        static_cast<QStandardItemModel*>(ui->functionTypeCombo->model());
+        static_cast<QStandardItemModel *>(ui->functionTypeCombo->model());
     const auto &&item = model->item(index, 0);
     if (!item->isEnabled())
         return;
@@ -465,7 +465,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     return;
 
                 QString &&type = source.value("type").toString();
-                Glhp::removePrefix(type, "minecraft:");
+                Glhp::removePrefix(type, "minecraft:"_QL1);
 
                 if (type == "storage") {
                     ui->copyNBT_entityCombo->setCurrentIndex(4);

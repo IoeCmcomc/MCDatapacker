@@ -47,7 +47,7 @@ void InventoryItem::setupItem(QString id) {
     QString iconpath;
     QPixmap iconpix;
 
-    Glhp::removePrefix(id, QStringLiteral("minecraft:"));
+    Glhp::removePrefix(id, "minecraft:"_QL1);
 
     const auto &&MCRItemInfo  = Game::getInfo(QStringLiteral("item"));
     const auto &&MCRBlockInfo = Game::getInfo(QStringLiteral("block"));

@@ -21,9 +21,6 @@ public:
         void remove(int i);
         void clear();
 
-        NodePtr &operator[](int index);
-        const NodePtr operator[](int index) const;
-
         Nodes children() const;
 
 private:

@@ -23,7 +23,7 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
         if (auto *view =
                 qobject_cast<QListView *>(ui->lootTableTypeCombo->view())) {
             const auto &&model =
-                static_cast<QStandardItemModel*>(ui->lootTableTypeCombo->model());
+                static_cast<QStandardItemModel *>(ui->lootTableTypeCombo->model());
             for (int i = 8; i < view->model()->rowCount(); ++i) {
                 view->setRowHidden(i, true);
                 model->item(i, 0)->setEnabled(false);
@@ -67,13 +67,13 @@ void LootTableEditorDock::writeJson() {
     if (!functions.isEmpty())
         root.insert("functions", functions);
 
-    qobject_cast<MainWindow*>(parent())->
+    qobject_cast<MainWindow *>(parent())->
     setCodeEditorText(QJsonDocument(root).toJson());
 }
 
 void LootTableEditorDock::readJson() {
     QString input =
-        qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+        qobject_cast<MainWindow *>(parent())->getCodeEditorText();
     QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
 
     if (json_doc.isNull() || (!json_doc.isObject()))
@@ -85,12 +85,12 @@ void LootTableEditorDock::readJson() {
     }
 
     QString type = root.value("type").toString();
-    Glhp::removePrefix(type, "minecraft:");
+    Glhp::removePrefix(type, "minecraft:"_QL1);
 
     const int index = types.indexOf(type);
     if (index > -1) {
         const auto &&model =
-            static_cast<QStandardItemModel*>(ui->lootTableTypeCombo->model());
+            static_cast<QStandardItemModel *>(ui->lootTableTypeCombo->model());
         const auto &&item = model->item(index, 0);
         if (!item->isEnabled())
             return;

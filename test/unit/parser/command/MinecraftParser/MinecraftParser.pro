@@ -6,9 +6,11 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-QMAKE_CXXFLAGS_DEBUG += --coverage -O0 -fPIC -fprofile-abs-path
-QMAKE_LFLAGS_DEBUG += --coverage -fPIC -fprofile-abs-path
-QMAKE_LFLAGS_WINDOWS += --coverage -fPIC -O0 -fprofile-abs-path
+CONFIG(debug, debug|release) {
+    QMAKE_CXXFLAGS_DEBUG += --coverage -O0 -fPIC -fprofile-abs-path
+    QMAKE_LFLAGS_DEBUG += --coverage -fPIC -fprofile-abs-path
+    QMAKE_LFLAGS_WINDOWS += --coverage -fPIC -O0 -fprofile-abs-path
+}
 
 #DEFINES += QT_ASCII_CAST_WARNINGS
 

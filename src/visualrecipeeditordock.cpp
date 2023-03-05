@@ -27,11 +27,11 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     ui->outputSlot->setAcceptMultiple(false);
 
     this->craftingSlots =
-        QVector<InventorySlot*>({ ui->craftingSlot_1, ui->craftingSlot_2,
-                                  ui->craftingSlot_3, ui->craftingSlot_4,
-                                  ui->craftingSlot_5, ui->craftingSlot_6,
-                                  ui->craftingSlot_7, ui->craftingSlot_8,
-                                  ui->craftingSlot_9 });
+        QVector<InventorySlot *>({ ui->craftingSlot_1, ui->craftingSlot_2,
+                                   ui->craftingSlot_3, ui->craftingSlot_4,
+                                   ui->craftingSlot_5, ui->craftingSlot_6,
+                                   ui->craftingSlot_7, ui->craftingSlot_8,
+                                   ui->craftingSlot_9 });
 
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this,
@@ -124,7 +124,7 @@ void VisualRecipeEditorDock::writeRecipe() {
             break;
     }
 
-    qobject_cast<MainWindow*>(parent())->setCodeEditorText(jsonDoc.toJson());
+    qobject_cast<MainWindow *>(parent())->setCodeEditorText(jsonDoc.toJson());
 }
 
 QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
@@ -301,7 +301,7 @@ QJsonValue ingredientsToJson(const QVector<InventoryItem> &items) {
 }
 
 void VisualRecipeEditorDock::readRecipe() {
-    QString input = qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+    QString input = qobject_cast<MainWindow *>(parent())->getCodeEditorText();
 
     QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
 
@@ -327,7 +327,7 @@ void VisualRecipeEditorDock::readRecipe() {
     if (!root.contains(QStringLiteral("type"))) return;
 
     QString type = root[QStringLiteral("type")].toString();
-    Glhp::removePrefix(type, QStringLiteral("minecraft:"));
+    Glhp::removePrefix(type, "minecraft:"_QL1);
 
     for (const QString &craftingType : craftingTypes) {
         if (type == craftingType) {
@@ -359,7 +359,7 @@ void VisualRecipeEditorDock::readRecipe() {
 void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
     QString type = root[QStringLiteral("type")].toString();
 
-    Glhp::removePrefix(type, QStringLiteral("minecraft:"));
+    Glhp::removePrefix(type, "minecraft:"_QL1);
 
     if (type == QStringLiteral("crafting_shaped")) {
         if (!root.contains(QStringLiteral("pattern"))) return;

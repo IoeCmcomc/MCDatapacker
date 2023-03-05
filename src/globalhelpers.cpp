@@ -1,14 +1,12 @@
 #include "globalhelpers.h"
 
-#include "mainwindow.h"
-#include "vieweventfilter.h"
-
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QRandomGenerator>
+#include <QStringMatcher>
 
 using namespace Glhp;
 
@@ -35,7 +33,7 @@ QString Glhp::relPath(const QString &dirpath, QString path) {
 QString Glhp::relNamespace(const QString &dirpath, QString path) {
     QString &&rp = relPath(dirpath, std::move(path));
 
-    if (removePrefix(rp, QStringLiteral("data/")))
+    if (removePrefix(rp, "data/"_QL1))
         rp = rp.section('/', 0, 0);
     else
         rp.clear();
@@ -127,62 +125,87 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
     return QIcon();
 }
 
-bool Glhp::isPathRelativeTo(const QString &dirpath,
-                            const QString &path,
-                            const QString &catDir) {
-    const QString &&tmpDir = dirpath + QStringLiteral("/data/");
+bool Glhp::isPathRelativeTo(const QString &dirpath, QStringView path,
+                            QStringView category) {
+    static QString && dataDir{};
+    dataDir = dirpath + "/data/"_QL1;
 
-    if (!path.startsWith(tmpDir)) return false;
+    if (!path.startsWith(dataDir))
+        return false;
 
-    return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
+    const int sepIndex = path.indexOf('/', dataDir.length() + 1);
+    if (sepIndex == -1)
+        return false;
+
+    return path.mid(sepIndex + 1).startsWith(category);
 }
 
-QString Glhp::toNamespacedID(const QString &dirpath,
-                             QString filepath,
+QString Glhp::toNamespacedID(const QString &dirpath, QStringView filepath,
                              bool noTagForm) {
-    const QString &&datapath = dirpath + QStringLiteral("/data/");
-    QString         r;
+    const QString &&dataDir = dirpath + QStringLiteral("/data/");
 
-    if (filepath.startsWith(datapath)) {
-        const auto &&finfo = QFileInfo(filepath);
-        filepath = finfo.dir().path() + '/' + finfo.completeBaseName();
-        filepath.remove(0, datapath.length());
-        if (!noTagForm && isPathRelativeTo(dirpath, finfo.filePath(),
-                                           QStringLiteral("tags"))) {
-            if (filepath.split('/').count() >= 4) {
-                r = QLatin1Char('#') + filepath.section('/', 0, 0)
-                    + QLatin1Char(':') + filepath.section('/', 3);
-            }
-        } else {
-            if (filepath.split('/').count() >= 3) {
-                r = filepath.section('/', 0, 0)
-                    + QLatin1Char(':') + filepath.section('/', 2);
-            }
-        }
+    if (!filepath.startsWith(dataDir))
+        return QString();
+
+    static QStringMatcher sepMatcher(u"/");
+
+    // Extract namespace part
+    int sepIndex = sepMatcher.indexIn(filepath, dataDir.length() + 1);
+    if (sepIndex == -1)
+        return QString();
+
+    const QString &&nameSpace = filepath.mid(dataDir.length(),
+                                             sepIndex -
+                                             dataDir.length()).toString();
+
+    // Extract ID part
+    bool isTag = false;
+    if (filepath.mid(sepIndex).startsWith("/tags/"_QL1)) {
+        isTag    = true;
+        sepIndex = sepMatcher.indexIn(filepath, sepIndex + 1);
+        if (sepIndex == -1)
+            return QString();
     }
-    return r;
+
+    if (filepath.mid(sepIndex).startsWith("/worldgen/"_QL1)) {
+        sepIndex = sepMatcher.indexIn(filepath, sepIndex + 1);
+        if (sepIndex == -1)
+            return QString();
+    }
+
+    sepIndex = sepMatcher.indexIn(filepath, sepIndex + 1);
+    if (sepIndex == -1)
+        return QString();
+
+    const int       lastDot = filepath.lastIndexOf('.');
+    const QString &&id      =
+        filepath.mid(sepIndex + 1, lastDot - sepIndex - 1).toString();
+
+    if (isTag && !noTagForm) {
+        return "#"_QL1 + nameSpace + ":"_QL1 + id;
+    } else {
+        return nameSpace + ":"_QL1 + id;
+    }
 }
 
-QVariant Glhp::strToVariant(const QString &str) {
+QVariant Glhp::strToVariant(QStringView str) {
     bool isInt;
     auto intValue = str.toInt(&isInt);
 
     if (isInt) {
         return intValue;
+    } else if (str == QLatin1String("true")) {
+        return true;
+    } else if (str == QLatin1String("false")) {
+        return false;
     } else {
-        if (str == QLatin1String("true") || str == QLatin1String("false")) {
-            return str == QLatin1String("true");
-        } else {
-            return str;
-        }
+        return str.toString();
     }
 }
 
 QString Glhp::variantToStr(const QVariant &vari) {
     if (vari.type() == QVariant::Bool)
         return vari.toBool() ? QStringLiteral("true") : QStringLiteral("false");
-    else if (vari.type() == QVariant::Int)
-        return vari.toString();
     else
         return vari.toString();
 }
@@ -227,8 +250,9 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
 
 
     if (nspace.isEmpty()) {
-        QDir   dir(dataPath);
-        auto &&nspaceDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        QDir         dir(dataPath);
+        const auto &&nspaceDirs = dir.entryList(
+            QDir::Dirs | QDir::NoDotAndDotDot);
         for (const auto &nspaceDir : nspaceDirs) {
             appendIDToList(nspaceDir.section('.', 0, 0), catDir);
         }
@@ -238,7 +262,15 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
     return idList;
 }
 
-bool Glhp::removePrefix(QString &str, const QString &prefix) {
+bool Glhp::removePrefix(QString &str, QLatin1String prefix) {
+    bool &&r = str.startsWith(prefix);
+
+    if (r)
+        str.remove(0, prefix.size());
+    return r;
+}
+
+bool Glhp::removePrefix(QString &str, QStringView prefix) {
     bool &&r = str.startsWith(prefix);
 
     if (r)
@@ -304,5 +336,5 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
     if (type < 0)
         return QString();
 
-    return QApplication::translate("Glhp", valueMap[type]);
+    return QCoreApplication::translate("Glhp", valueMap[type]);
 }

@@ -208,7 +208,7 @@ void Highlighter::collectNamespacedIds(const QString &text,
 QString Highlighter::locateNamespacedId(QString id) {
     bool isTag = false;
 
-    if (Glhp::removePrefix(id, QStringLiteral("#")))
+    if (Glhp::removePrefix(id, "#"_QL1))
         isTag = true;
     auto dir = QDir::current();
     dir.cd(QStringLiteral("data/") + id.section(":", 0, 0));

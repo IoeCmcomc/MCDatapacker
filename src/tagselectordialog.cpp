@@ -128,7 +128,7 @@ void TagSelectorDialog::showDetails() {
     auto id = getInternalSelectedID();
 
     if (!id.isEmpty()) {
-        Glhp::removePrefix(id, QStringLiteral("minecraft:"));
+        Glhp::removePrefix(id, "minecraft:"_QL1);
         if (MCRTagInfo.contains(id)) {
             const auto details = MCRTagInfo[id].toString();
             ui->tagDetailsLabel->setText(details);

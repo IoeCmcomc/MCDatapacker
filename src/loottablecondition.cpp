@@ -19,9 +19,9 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     ui->setupUi(this);
 
     if (Game::version() < Game::v1_17) {
-        qobject_cast<QListView*>(ui->conditionTypeCombo->view())
+        qobject_cast<QListView *>(ui->conditionTypeCombo->view())
         ->setRowHidden(15, true);
-        static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model())->item(
+        static_cast<QStandardItemModel *>(ui->conditionTypeCombo->model())->item(
             15, 0)->setEnabled(false);
     }
 
@@ -31,7 +31,7 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     MainWindow *mainWin = nullptr;
     for (auto *wid : qApp->topLevelWidgets()) {
         if (wid->objectName() == QStringLiteral("MainWindow")) {
-            mainWin = qobject_cast<MainWindow*>(wid);
+            mainWin = qobject_cast<MainWindow *>(wid);
             break;
         }
     }
@@ -273,7 +273,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     auto value = QJsonObject::fromVariantMap(valueMap);
 
     QString condType = value["condition"].toString();
-    Glhp::removePrefix(condType, "minecraft:");
+    Glhp::removePrefix(condType, "minecraft:"_QL1);
 
     bool isRandChanceWithLoot = false;
     bool singleInverted       = false;
@@ -287,7 +287,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
 
     int          condIndex = condTypes.indexOf(condType);
     const auto &&model     =
-        static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model());
+        static_cast<QStandardItemModel *>(ui->conditionTypeCombo->model());
     const auto &&item = model->item(condIndex, 0);
     if (!item->isEnabled())
         return;
@@ -668,7 +668,7 @@ void LootTableCondition::reset(int index) {
 }
 
 void LootTableCondition::clearModelExceptHeaders(QStandardItemModel &model) {
-    QVector<QStandardItem*> headers;
+    QVector<QStandardItem *> headers;
 
     for (int i = 0; i < model.columnCount(); ++i) {
         headers << model.takeHorizontalHeaderItem(i);
@@ -724,8 +724,8 @@ void LootTableCondition::setupRefCombo() {
     /*qDebug() << "setupRefCombo"; */
     if (condRefsModel.rowCount() > 0)
         condRefsModel.clear();
-    auto predRefIDs = Glhp::fileIdList(QDir::currentPath(),
-                                       "predicates");
+    auto predRefIDs =
+        Glhp::fileIdList(QDir::currentPath(), QStringLiteral("predicates"));
 
     for (const auto &predRef : qAsConst(predRefIDs))
         condRefsModel.appendRow(new QStandardItem(predRef));
