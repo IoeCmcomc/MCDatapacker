@@ -27,10 +27,9 @@ public:
             QStringSet spans;
         };
 
-        static QJsonObject getSchema();
-        static void setSchema(const QJsonObject &schema);
         static void setSchema(const QString &filepath);
         static void loadSchema(const QString &filepath);
+        static Schema::RootNode * schema();
 
         Result parsingResult();
 
@@ -128,7 +127,6 @@ private:
         QSharedPointer<Command::RootNode> m_tree;
         static inline const QRegularExpression m_decimalNumRegex{
             QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
-        static inline QJsonObject m_schema;
         static inline Schema::RootNode m_schemaGraph;
     };
 }

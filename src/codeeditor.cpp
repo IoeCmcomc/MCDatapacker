@@ -7,6 +7,8 @@
 #include "QFindDialogs/src/findreplacedialog.h"
 #include "stripedscrollbar.h"
 #include "parsers/command/minecraftparser.h"
+#include "parsers/command/schema/schemaliteralnode.h"
+#include "parsers/command/schema/schemaargumentnode.h"
 #include "game.h"
 
 #include <QPainter>
@@ -41,43 +43,40 @@ QStringList getMinecraftInfoKeys(const QString &key) {
     return infoMap.keys();
 }
 
-QStringList loadMinecraftCommandLiterals(const QJsonObject &obj = QJsonObject(),
-                                         ushort depth           = 0) {
-//    QElapsedTimer timer;
-//    timer.start();
+QStringList loadMinecraftCommandLiterals(
+    const Command::Schema::Node * const node, ushort depth = 0) {
+    QElapsedTimer timer;
 
-    QJsonObject root;
+    if (depth == 0)
+        timer.start();
 
-    if (obj.isEmpty()) {
-        root = Command::MinecraftParser::getSchema();
-    } else {
-        root = obj;
+    QStringList ret;
+
+    for (auto it = node->literalChildren().cbegin();
+         it != node->literalChildren().cend(); ++it) {
+        ret << it.key();
+        ret += loadMinecraftCommandLiterals(it.value(), depth + 1);
     }
 
-    const auto &&children = root[QStringLiteral("children")].toObject();
-    QStringList  ret;
-    for (auto it = children.constBegin(); it != children.constEnd(); ++it) {
-        const auto   &&node     = it.value().toObject();
-        const QString &nodeType = node[QStringLiteral("type")].toString();
-        if (nodeType == QStringLiteral("literal")) {
-            ret << it.key();
-            /*qDebug() << "literal:" << it.key() << "depth:" << depth; */
-            ret += loadMinecraftCommandLiterals(node, depth + 1);
-        } else if (nodeType == QStringLiteral("argument")) {
-            /*qDebug() << "argument:" << it.key() << "depth:" << depth; */
-            ret += loadMinecraftCommandLiterals(node, depth + 1);
-        }
+    // cppcheck-suppress iterators3
+    for (auto it = node->argumentChildren().cbegin();
+         it != node->argumentChildren().cend(); ++it) {
+        // cppcheck-suppress danglingTemporaryLifetime
+        ret += loadMinecraftCommandLiterals(*it, depth + 1);
     }
 
-//    qDebug() << "function literals" << ret.size();
-//    qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
-//        timer.nsecsElapsed() / 1e6;
+//    if (depth == 0) {
+//        qDebug() << "function literals" << ret.size();
+//        qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
+//            timer.nsecsElapsed() / 1e6;
+//    }
 
     return ret;
 }
 
 QStringList loadMinecraftCompletionInfo() {
-    QStringList &&ret = loadMinecraftCommandLiterals();
+    QStringList &&ret = loadMinecraftCommandLiterals(
+        Command::MinecraftParser::schema());
 
     ret += getMinecraftInfoKeys(QStringLiteral("attribute"));
     ret += getMinecraftInfoKeys(QStringLiteral("block"));
@@ -93,11 +92,11 @@ QStringList loadMinecraftCompletionInfo() {
         ret += getMinecraftInfoKeys(QStringLiteral("tag/game_event"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/fluid"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/item"));
-    ret << Game::getRegistry(QStringLiteral("advancement"));
-    ret << Game::getRegistry(QStringLiteral("recipe"));
-    ret << Game::getRegistry(QStringLiteral("loot_table"));
-    ret << Game::getRegistry(QStringLiteral("particle_type"));
-    ret << Game::getRegistry(QStringLiteral("sound_event"));
+    ret += Game::getRegistry(QStringLiteral("advancement"));
+    ret += Game::getRegistry(QStringLiteral("recipe"));
+    ret += Game::getRegistry(QStringLiteral("loot_table"));
+    ret += Game::getRegistry(QStringLiteral("particle_type"));
+    ret += Game::getRegistry(QStringLiteral("sound_event"));
 
     ret.sort(Qt::CaseInsensitive);
     return ret;

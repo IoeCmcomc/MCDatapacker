@@ -124,7 +124,11 @@ public:
 
             QTextCharFormat fmt;
 
-            fmt.setForeground(Qt::blue);
+            if (node->isCommand()) {
+                fmt.setForeground(Qt::blue);
+            } else {
+                fmt.setForeground(QColor("#0e2be8"));
+            }
             fmt.setFontWeight(QFont::Bold);
 
             QTextLayout::FormatRange range{ m_pos, node->length(),

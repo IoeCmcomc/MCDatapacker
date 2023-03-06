@@ -15,7 +15,7 @@ SOURCES +=  tst_testnbtnodes.cpp \
     ../../../../../../src/parsers/command/nodes/parsenode.cpp
 
 HEADERS += ../../../../../../src/parsers/command/nodes/argumentnode.h \
-HEADERS += ../../../../../../src/parsers/command/nodes/singlevaluenode.h \
+    ../../../../../../src/parsers/command/nodes/singlevaluenode.h \
     ../../../../../../src/parsers/command/nodes/mapnode.h \
     ../../../../../../src/parsers/command/nodes/nbtnodes.h \
     ../../../../../../src/parsers/command/nodes/stringnode.h \

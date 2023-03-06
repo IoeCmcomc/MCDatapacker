@@ -51,7 +51,7 @@ TestMinecraftParser::~TestMinecraftParser() {
 
 void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setGameVer(QVersionNumber(1, 18, 2));
-    Command::MinecraftParser::setTestMode(false);
+    Command::MinecraftParser::setTestMode(true);
 
     timer.start();
 //    QThread::sleep(5);

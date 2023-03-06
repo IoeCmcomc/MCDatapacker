@@ -315,111 +315,12 @@ namespace Command {
         }
     }
 
-    QJsonObject SchemaParser::getSchema() {
-        return m_schema;
-    }
-
-    void SchemaParser::setSchema(const QJsonObject &schema) {
-        m_schema = schema;
-    }
-
 /*!
  * \brief Opens a JSON file and loads it into the static schema.
  */
     void SchemaParser::setSchema(const QString &filepath) {
-        QFileInfo finfo(filepath);
-
-        if (!(finfo.exists() && finfo.isFile())) {
-            qWarning() << "File not exists:" << finfo.filePath();
-            return;
-        }
-
-        QFile inFile(finfo.filePath());
-        inFile.open(QIODevice::ReadOnly | QIODevice::Text);
-        QByteArray &&data = inFile.readAll();
-        inFile.close();
-
-/*
-
-    using QtJsonSaxConsumer = SaxConsumer<QJsonValue, QJsonArray, QJsonObject>;
-    QtJsonSaxConsumer sax;
-    QElapsedTimer timer;
-    timer.start();
-    bool result = json::sax_parse(data, &sax);
-    qDebug() << "Nlohmann JSON SAX QJsonObject" << timer.nsecsElapsed();
-    setSchema(sax.root);
- */
-
-        QJsonParseError errorPtr{};
-        //timer.restart();
-        QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
-        if (doc.isNull()) {
-            qWarning() << "Parsing failed" << errorPtr.error;
-            return;
-        }
-        QJsonObject &&root = doc.object();
-        if (root.isEmpty()) {
-            qWarning() << "Root is empty.";
-            return;
-        }
-        //qDebug() << "Qt QJsonDocument" << timer.nsecsElapsed();
-        setSchema(root);
-
-/*
-    timer.restart();
-    const auto &&json = json::parse(data);
-    qDebug() << "Nlohmann JSON" << timer.nsecsElapsed();
-
-    timer.restart();
-    QJsonDocument &&doc2 = QJsonDocument::fromJson(data, &errorPtr);
-    if (doc.isNull()) {
-        qWarning() << "Parsing failed" << errorPtr.error;
-        return;
-    }
-    QJsonObject &&root2 = doc2.object();
-    if (root.isEmpty()) {
-        qWarning() << "Root is empty.";
-        return;
-    }
-    auto &&map = root2.toVariantMap();
-    qDebug() << "QJsonDocument QVariantMap"<< timer.nsecsElapsed();
-
-    QtSaxConsumer sax2;
-    timer.restart();
-    bool result2 = json::sax_parse(data, &sax);
-    qDebug() << "Nlohmann JSON SAX QVariantMap" << timer.nsecsElapsed();
-
-    timer.restart();
-    const auto &&json2 = json::parse(data);
-    const auto &variant = from_json(json2);
-    qDebug() << "Nlohmann JSON QVariant" << timer.nsecsElapsed();
-
-    QFile msgpackFile(finfo.filePath().replace(".min.json", ".msgpack"));
-    msgpackFile.open(QIODevice::ReadOnly);
-    QByteArray &&msgpackData = msgpackFile.readAll();
-    msgpackFile.close();
-
-    timer.restart();
-    const auto &&json3 = json::from_msgpack(msgpackData);
-    qDebug() << "Nlohmann MsgPack" << timer.nsecsElapsed();
-
-    timer.restart();
-    const auto &&json4 = json::from_msgpack(msgpackData);
-    const auto &variant2 = from_json(json4);
-    qDebug() << "Nlohmann MsgPack QVariant" << timer.nsecsElapsed();
-
-    QtJsonSaxConsumer sax3;
-    timer.restart();
-    bool result3 = json::sax_parse(msgpackData, &sax3, json::input_format_t::msgpack);
-    qDebug() << "Nlohmann MsgPack SAX QJsonObject" << timer.nsecsElapsed();
-
-    QtSaxConsumer sax4;
-    timer.restart();
-    bool result4 = json::sax_parse(msgpackData, &sax4, json::input_format_t::msgpack);
-    qDebug() << "Nlohmann MsgPack SAX QVariantMap" << timer.nsecsElapsed();
- */
-
         QElapsedTimer timer;
+
         timer.start();
         loadSchema(filepath);
         qDebug() << "Schema loaded in" << timer.elapsed() << "ms";
@@ -484,6 +385,10 @@ namespace Command {
         m_schemaGraph = j.get<Schema::RootNode>();
         resolveRedirects(j, &m_schemaGraph);
         // TODO: Merge duplicated sub-trees
+    }
+
+    Schema::RootNode * SchemaParser::schema() {
+        return &m_schemaGraph;
     }
 
 /*!
@@ -654,19 +559,12 @@ namespace Command {
     }
 
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {
-//        static constexpr int typeId  = getTypeEnumId<LiteralNode>();
-        const QString &&literal = getUntil(QChar::Space).toString();
-//        CacheKey             key{ typeId, literal };
+        const auto &&literal = getUntil(QChar::Space).toString();
 
-//        if (m_cache.contains(key)) {
-//            return qSharedPointerCast<LiteralNode>(m_cache[key]);
-//        } else {
         const auto &&ret =
             QSharedPointer<LiteralNode>::create(spanText(literal));
 
-//        m_cache.emplace(typeId, literal, ret);
         return ret;
-//        }
     }
 
     QSharedPointer<StringNode> SchemaParser::brigadier_string(
@@ -708,37 +606,35 @@ namespace Command {
         m_errors.clear();
         const QString &txt = text();
 
-        if (m_schema.isEmpty()) {
+        if (m_schemaGraph.isEmpty()) {
             qWarning() << "The parser schema hasn't been initialized yet.";
             m_tree->setIsValid(false);
             return m_tree;
         }
 
         setPos(0);
-//        constexpr int typeId = getTypeEnumId<RootNode>();
-//        CacheKey      key{ typeId, text() + '\1' };
-
-//        if (m_cache.contains(key) && !m_testMode) {
-//            m_tree = qSharedPointerCast<RootNode>(m_cache[key]);
-//            setPos(txt.length());
-//        } else {
         try {
             m_tree->setLeadingTrivia(skipWs());
             if (parseBySchema(&m_schemaGraph)) {
                 m_tree->setLength(pos() - 1);
                 m_tree->setTrailingTrivia(skipWs());
                 m_tree->setIsValid(true);
-//                    m_cache.emplace(typeId, txt, m_tree);
             }
         } catch (const SchemaParser::Error &err) {
-            //qDebug() << "Command::Parser::parse: errors detected";
+            qDebug() << "Command::Parser::parse: errors detected";
             m_errors << err;
-//            for (const auto &error: m_errors) {
-//                qDebug() << error.toLocalizedMessage();
-//            }
+            for (const auto &error: m_errors) {
+                qDebug() << error.toLocalizedMessage();
+            }
             m_tree->setIsValid(false);
         }
-//        }
+
+//        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
+//                 << "Total access:" << m_cache.stats().total_accesses()
+//                 << ". Total hit:" << m_cache.stats().total_hits()
+//                 << ". Total miss:" << m_cache.stats().total_misses()
+//                 << ". Hit rate:" << m_cache.stats().hit_rate();
+
         return m_tree;
     }
 
@@ -788,6 +684,7 @@ namespace Command {
             if (isRoot)
                 command->setIsCommand(true);
             ret = command;
+
             Schema::Node *litNode = literalNode.value();
             if (canContinue(&litNode, depth)) {
                 ret->setTrailingTrivia(QStringLiteral(" "));
@@ -814,15 +711,8 @@ namespace Command {
                               pos(), literal.length(), {});
                     continue;
                 }
-//                const int   parserId = static_cast<int>(parserType);
                 const auto &props = argNode->properties();
 
-
-//                CacheKey key{ parserId, literal, props };
-//                if (m_cache.contains(key)) {
-//                    ret = m_cache[key];
-//                    advance(ret->length());
-//                } else {
                 try {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
@@ -832,12 +722,8 @@ namespace Command {
                     setPos(startPos);
                     continue;
                 }
-//                }
 
                 if (ret) {
-//                    if ((literal.length() == ret->length()) &&
-//                        !m_testMode)
-//                        m_cache.emplace(parserId, literal, ret);
                     Schema::Node *node =
                         const_cast<Schema::ArgumentNode *>(argNode);
                     if (canContinue(&node, depth)) {

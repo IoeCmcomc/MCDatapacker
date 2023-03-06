@@ -32,17 +32,17 @@ namespace Command {
                 const auto &&lineText = line.toString();
                 CacheKey     key{ typeId, lineText };
                 NodePtr      command;
-                if (!m_cache.contains(key)
-                    || !(command = m_cache[key].lock())) {
-                    m_commandParser.setText(lineText);
-                    m_commandParser.m_spans = m_spans;
-                    command                 = m_commandParser.parse();
-                    m_spans                 =
-                        m_commandParser.parsingResult().spans;
-                    if (command->isValid()) {
-                        m_cache.emplace(typeId, lineText, WeakNodePtr(command));
-                    }
+//                if (!m_cache.contains(key)
+//                    || !(command = m_cache[key].lock())) {
+                m_commandParser.setText(lineText);
+                m_commandParser.m_spans = m_spans;
+                command                 = m_commandParser.parse();
+                m_spans                 =
+                    m_commandParser.parsingResult().spans;
+                if (command->isValid()) {
+                    m_cache.emplace(typeId, lineText, WeakNodePtr(command));
                 }
+//                }
 
                 if (tree->isValid()) {
                     tree->setIsValid(command->isValid());
@@ -66,12 +66,20 @@ namespace Command {
             }
         }
 
-        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
-                 << "Total access:" << m_cache.stats().total_accesses()
-                 << ". Total hit:" << m_cache.stats().total_hits()
-                 << ". Total miss:" << m_cache.stats().total_misses()
-                 << ". Hit rate:" << m_cache.stats().hit_rate()
-                 << ". Time elapsed:" << timer.nsecsElapsed() << "ns.";
+//        const auto &cache = m_commandParser.cache();
+//        qInfo() << "Size:" << cache.size() << '/' << cache.capacity()
+//                << "Total access:" << cache.stats().total_accesses()
+//                << ". Total hit:" << cache.stats().total_hits()
+//                << ". Total miss:" << cache.stats().total_misses()
+//                << ". Hit rate:" << cache.stats().hit_rate();
+
+//        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
+//                 << "Total access:" << m_cache.stats().total_accesses()
+//                 << ". Total hit:" << m_cache.stats().total_hits()
+//                 << ". Total miss:" << m_cache.stats().total_misses()
+//                 << ". Hit rate:" << m_cache.stats().hit_rate()
+//                 << ". Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
+        qInfo() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
 
         m_tree = tree;
         m_cache.setCapacity(lines.length() + 1);
