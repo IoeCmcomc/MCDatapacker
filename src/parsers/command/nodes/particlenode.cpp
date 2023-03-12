@@ -6,10 +6,6 @@ namespace Command {
         : ParseNode(Kind::Container, length) {
     }
 
-    bool ParticleColorNode::isValid() const {
-        return ParseNode::isValid() && m_r && m_g && m_b;
-    }
-
     void ParticleColorNode::accept(NodeVisitor *visitor, VisitOrder order) {
         if (order == VisitOrder::LetTheVisitorDecide) {
             visitor->visit(this);
@@ -17,9 +13,12 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        m_r->accept(visitor, order);
-        m_g->accept(visitor, order);
-        m_b->accept(visitor, order);
+        if (m_r)
+            m_r->accept(visitor, order);
+        if (m_g)
+            m_g->accept(visitor, order);
+        if (m_b)
+            m_b->accept(visitor, order);
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
     }
@@ -29,7 +28,8 @@ namespace Command {
     }
 
     void ParticleColorNode::setB(QSharedPointer<FloatNode> b) {
-        m_b = std::move(b);
+        m_isValid &= b->isValid();
+        m_b        = std::move(b);
     }
 
     QSharedPointer<FloatNode> ParticleColorNode::g() const {
@@ -37,7 +37,8 @@ namespace Command {
     }
 
     void ParticleColorNode::setG(QSharedPointer<FloatNode> g) {
-        m_g = std::move(g);
+        m_isValid &= g->isValid();
+        m_g        = std::move(g);
     }
 
     QSharedPointer<FloatNode> ParticleColorNode::r() const {
@@ -45,7 +46,8 @@ namespace Command {
     }
 
     void ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
-        m_r = std::move(r);
+        m_isValid &= r->isValid();
+        m_r        = std::move(r);
     }
 
     ParticleNode::ParticleNode(int length)
@@ -78,6 +80,7 @@ namespace Command {
 
     void ParticleNode::setResLoc(QSharedPointer<ResourceLocationNode> newResLoc)
     {
-        m_resLoc = std::move(newResLoc);
+        m_isValid = newResLoc->isValid();
+        m_resLoc  = std::move(newResLoc);
     }
 }

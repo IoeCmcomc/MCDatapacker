@@ -22,13 +22,12 @@ public:
 
         using Span = std::variant<int, QString>;
 
-        virtual bool isValid() const;
+        bool isValid() const;
         virtual void accept(NodeVisitor *visitor, VisitOrder order);
 
         Kind kind() const;
 
         bool hasText() const;
-
         QString text() const;
         int length() const;
 

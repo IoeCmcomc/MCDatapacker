@@ -18,7 +18,8 @@ namespace Command {
     }
 
     void TwoAxesNode::setFirstAxis(AnglePtr axis) {
-        m_first = std::move(axis);
+        m_isValid = axis->isValid();
+        m_first   = std::move(axis);
     }
 
     AnglePtr TwoAxesNode::secondAxis() const {
@@ -26,7 +27,8 @@ namespace Command {
     }
 
     void TwoAxesNode::setSecondAxis(AnglePtr axis) {
-        m_second = std::move(axis);
+        m_isValid &= axis->isValid();
+        m_second   = std::move(axis);
     }
 
     XyzNode::XyzNode(ParserType parserType, int length)
@@ -47,14 +49,16 @@ namespace Command {
     }
 
     void XyzNode::setX(AnglePtr x) {
-        m_x = std::move(x);
+        m_isValid = x->isValid();
+        m_x       = std::move(x);
     }
 
     AnglePtr XyzNode::y() {
         return m_y;
     }
     void XyzNode::setY(AnglePtr y) {
-        m_y = std::move(y);
+        m_isValid &= y->isValid();
+        m_y        = std::move(y);
     }
 
     AnglePtr XyzNode::z() const {
@@ -62,7 +66,8 @@ namespace Command {
     }
 
     void XyzNode::setZ(AnglePtr z) {
-        m_z = std::move(z);
+        m_isValid &= z->isValid();
+        m_z        = std::move(z);
     }
 
 #define DECLARE_NODE_CLASS(Class)                                     \

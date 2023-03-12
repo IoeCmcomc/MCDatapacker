@@ -72,7 +72,7 @@ void TestSchemaParser::parseBool() {
 
     parser.setText("simp");
     result = QSharedPointer<BoolNode>(parser.brigadier_bool());
-    QVERIFY(result == nullptr);
+    QVERIFY(result->isValid() == false);
 }
 
 void TestSchemaParser::parseDouble() {

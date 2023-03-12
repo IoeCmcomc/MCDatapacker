@@ -109,8 +109,7 @@ void McfunctionHighlighter::rehighlightDelayed() {
     for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
         const QString &&lineText   = iter->text();
         auto           *lineResult = resultLines[iter->blockNumber()].get();
-        if (lineResult->isValid()
-            && (lineResult->kind() == Command::ParseNode::Kind::Root)) {
+        if (lineResult->kind() == Command::ParseNode::Kind::Root) {
             Command::SourcePrinter printer;
             printer.startVisiting(lineResult);
             if (printer.source() != lineText) {

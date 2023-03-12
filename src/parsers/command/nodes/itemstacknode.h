@@ -9,7 +9,6 @@ namespace Command {
 public:
         explicit ItemStackNode(int length);
 
-        bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         QSharedPointer<NbtCompoundNode> nbt() const;

@@ -54,6 +54,7 @@ namespace Command {
     DEFINE_ARRAY_NBTNODE(NbtLongArrayNode)
 
     NbtListNode::NbtListNode(int length) : NbtNode(TagType::List, length) {
+        m_isValid = true;
     }
 
     void NbtListNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -71,6 +72,7 @@ namespace Command {
     }
 
     void NbtListNode::append(QSharedPointer<NbtNode> node) {
+        m_isValid &= node->isValid();
         if (isEmpty())
             m_prefix = node->tagType();
         if (node->tagType() == m_prefix)
@@ -87,6 +89,7 @@ namespace Command {
 
     NbtCompoundNode::NbtCompoundNode(int length)
         : NbtNode(ParserType::NbtCompoundTag, TagType::Compound, length) {
+        m_isValid = true;
     }
 
     void NbtCompoundNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -127,6 +130,11 @@ namespace Command {
     }
 
     void NbtCompoundNode::insert(KeyPtr key, NbtPtr node) {
+        if (m_pairs.empty()) {
+            m_isValid = key->isValid() && node->isValid();
+        } else {
+            m_isValid &= key->isValid() && node->isValid();
+        }
         m_pairs << Pair::create(key, node);
     }
 

@@ -6,10 +6,6 @@ namespace Command {
         : ArgumentNode(ParserType::ItemStack, length) {
     }
 
-    bool ItemStackNode::isValid() const {
-        return ArgumentNode::isValid() && m_nbt;
-    }
-
     void ItemStackNode::accept(NodeVisitor *visitor, VisitOrder order) {
         if (order == VisitOrder::LetTheVisitorDecide) {
             visitor->visit(this);
@@ -17,8 +13,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        Q_ASSERT(m_resLoc != nullptr);
-        m_resLoc->accept(visitor, order);
+        if (m_resLoc)
+            m_resLoc->accept(visitor, order);
         if (m_nbt)
             m_nbt->accept(visitor, order);
         if (order == VisitOrder::Postorder)
@@ -30,7 +26,8 @@ namespace Command {
     }
 
     void ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
-        m_nbt = std::move(nbt);
+        m_isValid &= nbt->isValid();
+        m_nbt      = std::move(nbt);
     }
 
     QSharedPointer<ResourceLocationNode> ItemStackNode::resLoc() const {
@@ -39,7 +36,8 @@ namespace Command {
 
     void ItemStackNode::setResLoc(
         QSharedPointer<ResourceLocationNode> newResLoc) {
-        m_resLoc = std::move(newResLoc);
+        m_resLoc  = std::move(newResLoc);
+        m_isValid = m_resLoc->isValid();
     }
 
     ItemPredicateNode::ItemPredicateNode(int length)
@@ -54,8 +52,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        Q_ASSERT(resLoc() != nullptr);
-        resLoc()->accept(visitor, order);
+        if (resLoc())
+            resLoc()->accept(visitor, order);
         if (nbt())
             nbt()->accept(visitor, order);
         if (order == VisitOrder::Postorder)

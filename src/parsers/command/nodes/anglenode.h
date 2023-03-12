@@ -7,7 +7,7 @@ namespace Command {
     class AngleNode : public ArgumentNode
     {
 public:
-        enum class AxisType : unsigned char {
+        enum class AxisType : uint16_t {
             Absolute,
             Relative,
             Local

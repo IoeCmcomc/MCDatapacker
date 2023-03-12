@@ -9,7 +9,6 @@ namespace Command {
 public:
         explicit ParticleColorNode(int length);
 
-        bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         QSharedPointer<FloatNode> r() const;
@@ -36,8 +35,10 @@ public:
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         ParamVector params() const;
+
         template <typename ...Args>
         void setParams(Args&& ... params) {
+            m_isValid = (params->isValid() && ...);
             (m_params << ... << std::forward<Args>(params));
         };
 

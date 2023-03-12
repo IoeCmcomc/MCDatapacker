@@ -32,7 +32,7 @@ void TestDoubleNode::cleanupTestCase() {
 }
 
 void TestDoubleNode::general() {
-    DoubleNode node("22.4", 22.4);
+    DoubleNode node("22.4", 22.4, true);
 
     QVERIFY(node.isValid());
     QCOMPARE(node.kind(), ParseNode::Kind::Argument);

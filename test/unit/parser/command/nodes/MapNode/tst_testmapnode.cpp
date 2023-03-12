@@ -34,7 +34,7 @@ void TestMapNode::cleanupTestCase() {
 void TestMapNode::test_case1() {
     MapNode node(0);
 
-    QVERIFY(node.isValid() == false);
+    QVERIFY(node.isValid() == true);
 
     QCOMPARE(node.kind(), ParseNode::Kind::Container);
     QCOMPARE(node.size(), 0);

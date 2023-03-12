@@ -28,11 +28,15 @@ namespace Command {
     }
 
     void RootNode::append(QSharedPointer<ParseNode> node) {
-        m_children.push_back(node);
+        m_isValid = m_children.empty() ? node->isValid() : (m_isValid &&
+                                                            node->isValid());
+        m_children.emplace_back(node);
     }
 
     void RootNode::prepend(QSharedPointer<ParseNode> node) {
-        m_children.push_front(node);
+        m_isValid = m_children.empty() ? node->isValid() : (m_isValid &&
+                                                            node->isValid());
+        m_children.emplace_front(node);
     }
 
     void RootNode::clear() {

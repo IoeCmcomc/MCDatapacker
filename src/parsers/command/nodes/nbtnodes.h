@@ -44,8 +44,9 @@ protected:
                                                            ArgumentNode::ParserType::NbtTag> \
         {                                                                                    \
 public:                                                                                      \
-            Nbt ## Name ## Node(const QString &text, const T &value)                         \
-                : SingleValueNode(text, value) {                                             \
+            Nbt ## Name ## Node(const QString &text, const T &value,                         \
+                                const bool isValid)                                          \
+                : SingleValueNode(text, value, isValid) {                                    \
                 m_tagType = TagType::Name;                                                   \
             };                                                                               \
             void accept(NodeVisitor * visitor, VisitOrder) override;                         \
@@ -65,12 +66,13 @@ public:                                                                         
                                                  ArgumentNode::ParserType::NbtTag>
     {
 public:
-        NbtStringNode(const QString &text, const QString &value)
-            : SingleValueNode(text, value) {
+        NbtStringNode(const QString &text, const QString &value,
+                      const bool isValid)
+            : SingleValueNode(text, value, isValid) {
             m_tagType = TagType::String;
         };
-        explicit NbtStringNode(const QString &text)
-            : SingleValueNode(text, text) {
+        explicit NbtStringNode(const QString &text, const bool isValid)
+            : SingleValueNode(text, text, isValid) {
             m_tagType = TagType::String;
         };
         void accept(NodeVisitor *visitor, VisitOrder) override;
@@ -117,7 +119,9 @@ protected:
             public NbtListlikeNode<ValueType> {                            \
 public:                                                                    \
             explicit Nbt ## Name ## Node(int length)                       \
-                : NbtNode(ParserType::NbtTag, TagType::Name, length) {};   \
+                : NbtNode(ParserType::NbtTag, TagType::Name, length) {     \
+                m_isValid = true;                                          \
+            };                                                             \
             void accept(NodeVisitor * visitor, VisitOrder order) override; \
         };                                                                 \
 

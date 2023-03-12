@@ -33,9 +33,10 @@ void TestUuidNode::cleanupTestCase() {
 }
 
 void TestUuidNode::invalid() {
-    UuidNode node("xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx", QUuid("xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"));
+    UuidNode node("xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx",
+                  QUuid("xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"));
 
-    QCOMPARE(node.isValid(), true);
+    QCOMPARE(node.isValid(), false);
     QCOMPARE(node.value().isNull(), true);
 
     node.setIsValid(false);
@@ -43,7 +44,8 @@ void TestUuidNode::invalid() {
 }
 
 void TestUuidNode::general() {
-    UuidNode node("dd12be42-52a9-4a91-a8a1-11c01849e498", QUuid("dd12be42-52a9-4a91-a8a1-11c01849e498"));
+    UuidNode node("dd12be42-52a9-4a91-a8a1-11c01849e498",
+                  QUuid("dd12be42-52a9-4a91-a8a1-11c01849e498"), true);
 
     QVERIFY(node.isValid());
     QCOMPARE(node.kind(), ParseNode::Kind::Argument);

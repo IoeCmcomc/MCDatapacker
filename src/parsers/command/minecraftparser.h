@@ -76,8 +76,8 @@ private:
                     }
                 }
                 if (name.isNull())
-                    error("Invalid empty key", {}, keyPos);
-                const auto &&key = KeyPtr::create(spanText(keyPos), name);
+                    throwError("Invalid empty key", {}, keyPos);
+                const auto &&key = KeyPtr::create(spanText(keyPos), name, true);
                 key->setLeadingTrivia(trivia);
                 key->setTrailingTrivia(spanText(eat(sepChar, SkipLeftWs)));
                 const auto &&valueTrivia = skipWs(false);
@@ -109,28 +109,23 @@ private:
             const int start = pos() - 1;
 
             advance();
-            if (curChar() == ';') {
-                const auto &&ret = QSharedPointer<Container>::create(0);
-                advance();
-                ret->setLeftText(spanText(start));
+            const auto &&ret = QSharedPointer<Container>::create(0);
+            advance();
+            ret->setLeftText(spanText(start));
 
-                while (curChar() != ']') {
-                    const auto &&trivia = skipWs(false);
-                    const auto &&elem   = qSharedPointerCast<Type>(
-                        parseNumericTag());
-                    if (!elem) {
-                        error(errorMsg);
-                    }
-                    elem->setLeadingTrivia(trivia);
-                    ret->append(elem);
-                    elem->setTrailingTrivia(eatListSep(',', ']'));
+            while (curChar() != ']') {
+                const auto &&trivia = skipWs(false);
+                const auto &&numTag = parseNumericTag();
+                const auto &&elem   = qSharedPointerCast<Type>(numTag);
+                if (!elem) {
+                    throwError(errorMsg);
                 }
-                ret->setRightText(eat(']'));
-                return ret;
-            } else {
-                error("Missing the character ';' after array type indicator");
+                elem->setLeadingTrivia(trivia);
+                ret->append(elem);
+                elem->setTrailingTrivia(eatListSep(',', ']'));
             }
-            return nullptr;
+            ret->setRightText(eat(']'));
+            return ret;
         }
         QSharedPointer<NbtListNode> parseListTag();
         QSharedPointer<MapNode> parseEntityAdvancements();

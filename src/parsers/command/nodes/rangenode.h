@@ -10,7 +10,7 @@
 namespace Command {
     template<typename T>
     class RangeNode : public ArgumentNode {
-        enum class PrimaryValueRole : unsigned char {
+        enum class PrimaryValueRole : uint8_t {
             ExactValueRole,
             MinValueRole,
             MaxValueRole,
@@ -21,9 +21,11 @@ public:
             if (hasMinValue() || hasMaxValue()) {
                 QStringList parts;
                 parts <<
-                    ((hasMinValue()) ? QString::number(minValue()->value()) : "");
+                    ((hasMinValue()) ? QString::number(minValue()->value()) :
+                     QString());
                 parts <<
-                    ((hasMaxValue()) ? QString::number(maxValue()->value()) : "");
+                    ((hasMaxValue()) ? QString::number(maxValue()->value()) :
+                     QString());
                 return parts.join(QStringLiteral(".."));
             } else {
                 return QString::number(exactValue()->value());
@@ -37,6 +39,7 @@ public:
         template <typename _T = T>
         typename std::enable_if_t<is_same_pointer_type<_T> >
         setExactValue(_T &&value) {
+            m_isValid        = value->isValid();
             m_primary        = std::forward<_T>(value);
             m_primaryValRole = PrimaryValueRole::ExactValueRole;
             if (m_secondary)
@@ -53,12 +56,19 @@ public:
         template <typename _T = T>
         typename std::enable_if_t<is_same_pointer_type<_T> >
         setMinValue(_T &&value, bool keepMax) {
-            if (keepMax) {
-                if (!m_secondary)
-                    m_secondary = std::move(m_primary);
+            if (m_secondary) {
+                m_isValid &= value->isValid();
             } else {
-                if (m_secondary)
+                m_isValid = value->isValid();
+            }
+            if (keepMax) {
+                if (!m_secondary) {
+                    m_secondary = std::move(m_primary);
+                }
+            } else {
+                if (m_secondary) {
                     m_secondary = nullptr;
+                }
             }
             m_primary        = std::forward<_T>(value);
             m_primaryValRole = PrimaryValueRole::MinValueRole;
@@ -73,12 +83,18 @@ public:
         template <typename _T = T>
         typename std::enable_if_t<is_same_pointer_type<_T> >
         setMaxValue(_T &&value, bool keepMin) {
+            if (m_secondary) {
+                m_isValid &= value->isValid();
+            } else {
+                m_isValid = value->isValid();
+            }
             if (keepMin) {
                 m_secondary      = std::forward<_T>(value);
                 m_primaryValRole = PrimaryValueRole::MinValueRole;
             } else {
-                if (m_secondary)
+                if (m_secondary) {
                     m_secondary = nullptr;
+                }
                 m_primary        = std::forward<_T>(value);
                 m_primaryValRole = PrimaryValueRole::MaxValueRole;
             }

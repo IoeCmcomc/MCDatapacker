@@ -11,6 +11,7 @@ namespace Command {
                                                const SpanPtr &id)
         : ArgumentNode(ParserType::ResourceLocation, length),
         m_namespace(nspace), m_id(id) {
+        m_isValid = nspace->isValid() && id->isValid();
     }
 
     ResourceLocationNode::ResourceLocationNode(ParserType parserType,
@@ -41,6 +42,8 @@ namespace Command {
     }
 
     void ResourceLocationNode::setId(SpanPtr id) {
+        m_isValid = m_namespace ? id->isValid() && m_namespace->isValid()
+                                : id->isValid();
         m_id = std::move(id);
     }
 

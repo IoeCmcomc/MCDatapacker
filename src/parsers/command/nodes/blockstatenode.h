@@ -11,7 +11,6 @@ public:
         explicit BlockStateNode(int length);
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
-        bool isValid() const override;
 
         QSharedPointer<MapNode> states() const;
         void setStates(QSharedPointer<MapNode> states);

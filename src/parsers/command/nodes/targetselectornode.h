@@ -8,6 +8,7 @@ namespace Command {
     {
 public:
         enum class Variable {
+            Unknown = -1,
             A,
             E,
             P,
@@ -26,7 +27,7 @@ public:
         void setArgs(QSharedPointer<MapNode> args);
 
 private:
-        Variable m_variable            = Variable::A;
+        Variable m_variable            = Variable::Unknown;
         QSharedPointer<MapNode> m_args = nullptr;
     };
 }

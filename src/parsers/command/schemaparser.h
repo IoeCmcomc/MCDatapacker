@@ -62,17 +62,17 @@ protected:
         template<typename T>
         void checkMin(T value, T min) {
             if (value < min)
-                error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                        "The value must be greater than or equal to %1"),
-                      { min });
+                reportError(QT_TRANSLATE_NOOP("Command::Parser::Error",
+                                              "The value must be greater than or equal to %1"),
+                            { min });
         }
 
         template<typename T>
         void checkMax(T value, T max) {
             if (value > max)
-                error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                        "The value must be lesser than or equal to %1"),
-                      { max });
+                reportError(QT_TRANSLATE_NOOP("Command::Parser::Error",
+                                              "The value must be lesser than or equal to %1"),
+                            { max });
         }
 
         template<typename T>

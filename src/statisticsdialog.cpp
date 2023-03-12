@@ -220,9 +220,15 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                     new QTableWidgetItem(Glhp::relPath(m_dirPath, path)));
                 ui->syntaxErrorTable->setItem(
                     row, 1, new QTableWidgetItem(QString::number(i)));
-                ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
-                                                  m_parser->errors().last()
-                                                  .toLocalizedMessage()));
+                if (m_parser->errors().isEmpty()) {
+                    ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
+                                                      "Invalid command"));
+                } else {
+                    ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
+                                                      m_parser->errors().last()
+                                                      .toLocalizedMessage()));
+                }
+
                 ++m_syntaxErrors;
             }
         }

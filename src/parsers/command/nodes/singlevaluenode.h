@@ -9,16 +9,18 @@ namespace Command {
     class SingleValueNode : public Base
     {
 public:
-        SingleValueNode(const QString &text, const T &value)
+        SingleValueNode(const QString &text, const T &value,
+                        const bool isValid = false)
             : Base(PT, text), m_value(value) {
-            this->m_isValid = true;
+            this->m_isValid = isValid;
         };
         template <typename _T = T,
                   typename = typename std::enable_if_t<std::is_same<_T,
                                                                     QString>::value> >
-        explicit SingleValueNode(const QString &text)
+        explicit SingleValueNode(const QString &text,
+                                 const bool isValid = false)
             : Base(PT, text), m_value(text) {
-            this->m_isValid = true;
+            this->m_isValid = isValid;
         };
 
         inline T value() const {

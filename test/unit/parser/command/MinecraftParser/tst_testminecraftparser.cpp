@@ -4,7 +4,7 @@
 #include "../../../../../src/parsers/command/minecraftparser.h"
 #include "../../../../../src/parsers/command/visitors/reprprinter.h"
 
-//#define QBENCHMARK          if (true)
+#define QBENCHMARK          if (true)
 
 #define DECLARE_TAG_VARS    int i = 0; int c = 0; QString cat;
 #define SET_TAG(x)    i = 0; cat =#x;
@@ -110,9 +110,9 @@ void TestMinecraftParser::commands_data() {
 
     SET_TAG(test)
     QTest::newRow(GEN_TAG) <<
-        R"(scoreboard players operation * OhMyDatID += $ OhMyDat)"
+        R"(tp @s 12 45 78)"
                            <<
-        "RootNode[8](LiteralNode(scoreboard), LiteralNode(players), LiteralNode(operation), ScoreHolderNode(*), ObjectiveNode(\"OhMyDatID\"), OperationNode(\"+=\"), ScoreHolderNode[](StringNode(\"$\")), ObjectiveNode(\"OhMyDat\"))";
+        "LiteralNode(tp), EntityNode[](TargetSelectorNode(@s)), Vec3Node(x: AngleNode(12), y: AngleNode(45), z: AngleNode(78)))";
 
     SET_TAG(advancement)
     QTest::newRow(GEN_TAG) <<

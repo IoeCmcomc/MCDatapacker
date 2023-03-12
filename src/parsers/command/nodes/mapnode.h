@@ -15,11 +15,11 @@ public:
     template<typename T>
     class PairNode : public ParseNode, public QPair<KeyPtr, T> {
 public:
-        PairNode(const KeyPtr &key, const T &node) : ParseNode(
-                ParseNode::Kind::Container,
-                0) {
-            this->first  = key;
-            this->second = node;
+        PairNode(KeyPtr key, T node) : ParseNode(
+                ParseNode::Kind::Container, 0) {
+            m_isValid    = key->isValid() && node->isValid();
+            this->first  = std::move(key);
+            this->second = std::move(node);
         }
     };
 

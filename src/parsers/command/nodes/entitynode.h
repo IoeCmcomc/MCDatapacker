@@ -13,7 +13,6 @@ namespace Command {
 public:
         explicit EntityNode(int length);
 
-        bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool singleOnly() const;
@@ -27,7 +26,8 @@ public:
         typename std::enable_if_t<std::is_assignable_v<NodePtr, T> >
         setNode(T &&node) {
             setLength(node->length());
-            m_ptr = std::forward<T>(node);
+            m_isValid = node->isValid();
+            m_ptr     = std::forward<T>(node);
         }
 
 protected:
@@ -36,7 +36,6 @@ protected:
         explicit EntityNode(ParserType parserType, int length,
                             const NodePtr &ptr);
 
-private:
         bool m_singleOnly = false; // Parser property
         bool m_playerOnly = false; // Parser property
     };
@@ -69,7 +68,6 @@ public:
 
         explicit EntityArgumentValueNode(bool negative = false);
 
-        bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool isNegative() const;
@@ -79,7 +77,8 @@ public:
         template <typename T>
         typename std::enable_if_t<std::is_assignable_v<ArgPtr, T> >
         setNode(T &&node) {
-            m_ptr = std::forward<T>(node);
+            m_isValid = node->isValid();
+            m_ptr     = std::forward<T>(node);
         }
 
 private:

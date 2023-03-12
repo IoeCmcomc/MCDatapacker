@@ -27,6 +27,7 @@ namespace Command {
             const auto &trimmed = line.trimmed();
             if (trimmed.isEmpty() || trimmed[0] == '#') {
                 const auto &&span = SpanPtr::create(spanText(line));
+                span->setIsValid(true);
                 tree->append(std::move(span));
             } else {
                 const auto &&lineText = line.toString();
@@ -43,10 +44,6 @@ namespace Command {
                     m_cache.emplace(typeId, lineText, WeakNodePtr(command));
                 }
 //                }
-
-                if (tree->isValid()) {
-                    tree->setIsValid(command->isValid());
-                }
 
                 if (!command->isValid()) {
                     auto errors = m_commandParser.errors();

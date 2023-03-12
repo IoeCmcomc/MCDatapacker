@@ -6,10 +6,6 @@ namespace Command {
         : ArgumentNode(ParserType::Entity, length) {
     }
 
-    bool EntityNode::isValid() const {
-        return ParseNode::isValid() && m_ptr;
-    }
-
     void EntityNode::accept(NodeVisitor *visitor, VisitOrder order) {
         if (order == VisitOrder::LetTheVisitorDecide) {
             visitor->visit(this);
@@ -17,8 +13,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        Q_ASSERT(m_ptr != nullptr);
-        m_ptr->accept(visitor, order);
+        if (m_ptr)
+            m_ptr->accept(visitor, order);
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
     }
@@ -59,6 +55,9 @@ namespace Command {
     GameProfileNode::GameProfileNode(EntityNode *other)
         : EntityNode(ParserType::GameProfile, other->length(),
                      other->getNode()) {
+        m_singleOnly = other->singleOnly();
+        m_playerOnly = other->playerOnly();
+        m_isValid    = other->isValid();
     }
 
     void GameProfileNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -68,8 +67,8 @@ namespace Command {
         }
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
-        Q_ASSERT(m_ptr != nullptr);
-        m_ptr->accept(visitor, order);
+        if (m_ptr)
+            m_ptr->accept(visitor, order);
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
     }
@@ -81,8 +80,9 @@ namespace Command {
     ScoreHolderNode::ScoreHolderNode(EntityNode *other)
         : EntityNode(ParserType::GameProfile, other->length(),
                      other->getNode()) {
-        setSingleOnly(other->singleOnly());
-        setPlayerOnly(other->playerOnly());
+        m_singleOnly = other->singleOnly();
+        m_playerOnly = other->playerOnly();
+        m_isValid    = other->isValid();
     }
 
     void ScoreHolderNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -93,8 +93,8 @@ namespace Command {
         if (order == VisitOrder::Preorder)
             visitor->visit(this);
         if (!m_all) {
-            Q_ASSERT(m_ptr != nullptr);
-            m_ptr->accept(visitor, order);
+            if (m_ptr)
+                m_ptr->accept(visitor, order);
         }
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
@@ -105,15 +105,12 @@ namespace Command {
     }
 
     void ScoreHolderNode::setAll(bool all) {
-        m_all = all;
+        m_isValid = true;
+        m_all     = all;
     }
 
     EntityArgumentValueNode::EntityArgumentValueNode(bool negative)
         : ParseNode(Kind::Container, 0), m_negative(negative) {
-    }
-
-    bool EntityArgumentValueNode::isValid() const {
-        return ParseNode::isValid() && m_ptr;
     }
 
     void EntityArgumentValueNode::accept(NodeVisitor *visitor,

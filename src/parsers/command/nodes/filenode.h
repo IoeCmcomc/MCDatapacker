@@ -18,6 +18,8 @@ public:
         }
         template<class T>
         void append(T&& node) {
+            m_isValid = m_lines.empty() ? node->isValid()
+                                        : m_isValid && node->isValid();
             m_lines.push_back(std::forward<T>(node));
         }
 

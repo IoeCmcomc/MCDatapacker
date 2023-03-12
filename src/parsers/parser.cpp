@@ -91,20 +91,20 @@ QStringSet Parser::spans() const {
 /*!
  * \brief Throws a \c Command::Parser::ParsingError with a formatted message.
  */
-void Parser::error(const QString &msg, const QVariantList &args) {
-    error(msg, args, m_pos);
+void Parser::throwError(const QString &msg, const QVariantList &args) {
+    throwError(msg, args, m_pos);
 }
 
-void Parser::error(const char *msg, const QVariantList &args) {
-    error(msg, args, m_pos);
+void Parser::throwError(const char *msg, const QVariantList &args) {
+    throwError(msg, args, m_pos);
 }
 
 /*!
  * \brief Throws a \c Command::Parser::ParsingError with a formatted message,
  * a absoulte position and a length.
  */
-void Parser::error(const QString &msg, const QVariantList &args,
-                   int pos, int length) {
+void Parser::throwError(const QString &msg, const QVariantList &args,
+                        int pos, int length) {
     /*qWarning() << "Command::Parser::error" << msg << pos << length; */
 /*
       QString errorIndicatorText = QString("\"%1«%2»%3\" (%4 chars)").arg(
@@ -117,9 +117,26 @@ void Parser::error(const QString &msg, const QVariantList &args,
     throw Parser::Error(msg, pos, length, args);
 }
 
-void Parser::error(const char *msg, const QVariantList &args,
-                   int pos, int length) {
+void Parser::throwError(const char *msg, const QVariantList &args,
+                        int pos, int length) {
     throw Parser::Error(msg, pos, length, args);
+}
+
+/*!
+ * \brief Adds a \c Command::Parser::ParsingError with a formatted message
+ * to the error list and continue.
+ */
+void Parser::reportError(const char *msg, const QVariantList &args) {
+    reportError(msg, args, m_pos);
+}
+
+/*!
+ * \brief Adds a \c Command::Parser::ParsingError with a formatted message,
+ * a absoulte position and a length to the error list and continue.
+ */
+void Parser::reportError(const char *msg, const QVariantList &args, int pos,
+                         int length) {
+    m_errors << Parser::Error(msg, pos, length, args);
 }
 
 /*!
@@ -145,8 +162,8 @@ bool Parser::expect(QChar chr) {
         const QString &&charTxt =
             (chr.isNull()) ? QStringLiteral("EOL") : '\''_QL1 +
             chr + '\''_QL1;
-        error(QT_TR_NOOP("Unexpected %1, expecting %2"),
-              { curCharTxt, charTxt }, m_pos, 1);
+        throwError(QT_TR_NOOP("Unexpected %1, expecting %2"),
+                   { curCharTxt, charTxt }, m_pos, 1);
         return false;
     }
 }
@@ -278,7 +295,7 @@ QString Parser::getQuotedString() {
     bool    backslash = false;
     while ((m_curChar != curQuoteChar) || backslash) {
         if (m_pos >= m_text.length())
-            error(QT_TR_NOOP("Incomplete quoted string"));
+            throwError(QT_TR_NOOP("Incomplete quoted string"));
         if (backslash) {
             if (m_curChar == curQuoteChar) {
                 value += curQuoteChar;
@@ -318,8 +335,10 @@ QString Parser::getQuotedString() {
                             value += QChar(codepoint);
                             advance(3);
                         } else {
-                            error(QT_TR_NOOP("Invalid Unicode code point"), {},
-                                  pos() - 2, 6);
+                            throwError(QT_TR_NOOP("Invalid Unicode code point"),
+                                       {},
+                                       pos() - 2,
+                                       6);
                         }
                         break;
                     }
@@ -385,3 +404,4 @@ bool Parser::parse(QString &&text) {
     setText(std::move(text));
     return parse();
 }
+

@@ -15,7 +15,6 @@ public:
 
         explicit NbtPathStepNode(int length);
 
-        bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order)
         override;
 
@@ -44,7 +43,6 @@ public:
 
         explicit NbtPathNode(int length);
 
-        bool isValid() const override;
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool isEmpty();

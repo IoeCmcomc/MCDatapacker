@@ -33,7 +33,8 @@ void TestStringNode::cleanupTestCase() {
 
 void TestStringNode::test_case1() {
     StringNode node(
-        "Although a \"long\" argument type is present in brigadier, it is not used by Minecraft.");
+        "Although a \"long\" argument type is present in brigadier, it is not used by Minecraft.",
+        true);
 
     QVERIFY(node.isValid());
     QCOMPARE(node.kind(), ParseNode::Kind::Argument);

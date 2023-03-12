@@ -6,32 +6,6 @@ namespace Command {
         : ParseNode(ParseNode::Kind::Container, length) {
     }
 
-    bool NbtPathStepNode::isValid() const {
-        bool ret = ParseNode::isValid();
-
-        if (!ret)
-            return false;
-
-        switch (m_type) {
-            case Type::Root: {
-                return ret && m_filter;
-            }
-
-            case Type::Key: {
-                return ret && m_name;
-            }
-
-            case Type::Index: {
-                return ret;
-            }
-
-            default: {
-                Q_UNREACHABLE();
-                return false;
-            }
-        }
-    }
-
     void NbtPathStepNode::accept(NodeVisitor *visitor, VisitOrder order) {
         if (order == VisitOrder::LetTheVisitorDecide) {
             visitor->visit(this);
@@ -41,12 +15,16 @@ namespace Command {
             visitor->visit(this);
         switch (m_type) {
             case Type::Root: {
-                m_filter->accept(visitor, order);
+                if (m_filter)
+                    m_filter->accept(visitor, order);
                 break;
             }
 
             case Type::Key: {
-                return m_name->accept(visitor, order);
+                if (m_name)
+                    m_name->accept(visitor, order);
+                if (m_filter)
+                    m_filter->accept(visitor, order);
 
                 break;
             }
@@ -67,7 +45,8 @@ namespace Command {
     }
 
     void NbtPathStepNode::setName(QSharedPointer<StringNode> name) {
-        m_name = std::move(name);
+        m_isValid = name->isValid();
+        m_name    = std::move(name);
         setType(Type::Key);
     }
 
@@ -76,7 +55,8 @@ namespace Command {
     }
 
     void NbtPathStepNode::setIndex(QSharedPointer<IntegerNode> index) {
-        m_index = std::move(index);
+        m_isValid &= index->isValid();
+        m_index    = std::move(index);
         setType(Type::Index);
     }
 
@@ -86,7 +66,8 @@ namespace Command {
     }
 
     void NbtPathStepNode::setFilter(QSharedPointer<NbtCompoundNode> filter) {
-        m_filter = std::move(filter);
+        m_isValid &= filter->isValid();
+        m_filter   = std::move(filter);
     }
 
     NbtPathStepNode::Type NbtPathStepNode::type() const {
@@ -94,15 +75,12 @@ namespace Command {
     }
 
     void NbtPathStepNode::setType(const Type &type) {
-        m_type = type;
+        m_type    = type;
+        m_isValid = true;
     }
 
     NbtPathNode::NbtPathNode(int length)
         : ArgumentNode(ArgumentNode::ParserType::NbtPath, length) {
-    }
-
-    bool NbtPathNode::isValid() const {
-        return ArgumentNode::isValid() && !m_steps.isEmpty();
     }
 
     void NbtPathNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -123,6 +101,8 @@ namespace Command {
     }
 
     void NbtPathNode::append(QSharedPointer<NbtPathStepNode> node) {
+        m_isValid =
+            m_steps.empty() ? node->isValid() : (m_isValid && node->isValid());
         m_steps.append(std::move(node));
     }
 

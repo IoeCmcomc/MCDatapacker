@@ -78,12 +78,19 @@ protected:
     Errors m_errors;
     QStringSet m_spans;
 
-    void error(const QString &msg, const QVariantList &args = {});
-    void error(const char *msg, const QVariantList &args    = {});
-    void error [[noreturn]] (const QString &msg, const QVariantList &args,
-                             int pos, int length = 0);
-    void error [[noreturn]] (const char *msg, const QVariantList &args,
-                             int pos, int length = 0);
+    void throwError [[noreturn]](const QString &msg,
+                                 const QVariantList &args = {});
+    void throwError [[noreturn]](const char *msg,
+                                 const QVariantList &args = {});
+    void throwError [[noreturn]](const QString &msg, const QVariantList &args,
+                                 int pos, int length = 0);
+    void throwError [[noreturn]](const char *msg, const QVariantList &args,
+                                 int pos, int length = 0);
+
+    void reportError(const char *msg, const QVariantList &args = {});
+    void reportError(const char *msg, const QVariantList &args,
+                     int pos, int length = 0);
+
     void advance(int n = 1);
 
     bool expect(QChar chr);

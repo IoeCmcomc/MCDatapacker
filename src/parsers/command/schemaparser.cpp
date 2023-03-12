@@ -1,5 +1,6 @@
 #include "schemaparser.h"
 
+//#include "visitors/sourceprinter.h"
 #include "schema/schemaargumentnode.h"
 #include "schema/schemaliteralnode.h"
 
@@ -301,7 +302,8 @@ namespace Command {
                 return brigadier_literal();
             }
             case ParserType::Long: {
-                error("The 'brigadier:long' parser hasn't been implemented yet.");
+                throwError(
+                    "The 'brigadier:long' parser hasn't been implemented yet.");
             }
             case ParserType::String: {
                 return brigadier_string(props);
@@ -492,12 +494,15 @@ namespace Command {
 
         if (peek(4) == "true"_QL1) {
             advance(4);
-            return QSharedPointer<BoolNode>::create(spanText(start), true);
+            return QSharedPointer<BoolNode>::create(spanText(start), true,
+                                                    true);
         } else if (peek(5) == "false"_QL1) {
             advance(5);
-            return QSharedPointer<BoolNode>::create(spanText(start), false);
+            return QSharedPointer<BoolNode>::create(spanText(start), false,
+                                                    true);
         } else {
-            return nullptr;
+            reportError("Expecting a boolean value ('true' or 'false')");
+            return QSharedPointer<BoolNode>::create(QString(), false);
         }
     }
 
@@ -507,8 +512,10 @@ namespace Command {
         bool            ok    = false;
         double          value = raw.toDouble(&ok);
 
-        if (!ok)
-            error(QT_TR_NOOP("%1 is not a vaild double number"), { raw });
+        if (!ok) {
+            reportError(QT_TR_NOOP("%1 is not a vaild double number"), { raw });
+            return QSharedPointer<DoubleNode>::create(spanText(raw), false);
+        }
         if (const QVariant &vari = props.value(QStringLiteral(
                                                    "min")); vari.isValid()) {
             checkMin(value, vari.toDouble());
@@ -517,7 +524,7 @@ namespace Command {
                                                    "max")); vari.isValid()) {
             checkMax(value, vari.toDouble());
         }
-        return QSharedPointer<DoubleNode>::create(spanText(raw), value);
+        return QSharedPointer<DoubleNode>::create(spanText(raw), value, true);
     }
 
     QSharedPointer<FloatNode> SchemaParser::brigadier_float(
@@ -526,8 +533,10 @@ namespace Command {
         bool            ok    = false;
         float           value = raw.toFloat(&ok);
 
-        if (!ok)
-            error(QT_TR_NOOP("%1 is not a vaild float number"), { raw });
+        if (!ok) {
+            reportError(QT_TR_NOOP("%1 is not a vaild float number"), { raw });
+            return QSharedPointer<FloatNode>::create(spanText(raw), false);
+        }
         if (const QVariant &vari = props.value(QStringLiteral(
                                                    "min")); vari.isValid()) {
             checkMin(value, vari.toFloat());
@@ -536,7 +545,7 @@ namespace Command {
                                                    "max")); vari.isValid()) {
             checkMax(value, vari.toFloat());
         }
-        return QSharedPointer<FloatNode>::create(spanText(raw), value);
+        return QSharedPointer<FloatNode>::create(spanText(raw), value, true);
     }
 
     QSharedPointer<IntegerNode> SchemaParser::brigadier_integer(
@@ -545,8 +554,11 @@ namespace Command {
         bool            ok    = false;
         int             value = raw.toFloat(&ok);
 
-        if (!ok)
-            error(QT_TR_NOOP("%1 is not a vaild integer number"), { raw });
+        if (!ok) {
+            reportError(QT_TR_NOOP("%1 is not a vaild integer number"),
+                        { raw });
+            return QSharedPointer<IntegerNode>::create(spanText(raw), false);
+        }
         if (const QVariant &vari = props.value(QStringLiteral(
                                                    "min")); vari.isValid()) {
             checkMin(value, vari.toInt());
@@ -555,51 +567,48 @@ namespace Command {
                                                    "max")); vari.isValid()) {
             checkMax(value, vari.toInt());
         }
-        return QSharedPointer<IntegerNode>::create(spanText(raw), value);
+        return QSharedPointer<IntegerNode>::create(spanText(raw), value, true);
     }
 
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {
-        const auto &&literal = getUntil(QChar::Space).toString();
-
-        const auto &&ret =
-            QSharedPointer<LiteralNode>::create(spanText(literal));
-
-        return ret;
+        return QSharedPointer<LiteralNode>::create(
+            spanText(getUntil(QChar::Space)));
     }
 
     QSharedPointer<StringNode> SchemaParser::brigadier_string(
         const QVariantMap &props) {
-        const auto &&defaultRet = QSharedPointer<StringNode>::create(QString());
-
         if (!props.contains(QStringLiteral("type")))
-            error(QT_TR_NOOP(
-                      "The required paramenter 'type' of the 'brigadier_string' argument parser is missing."));
+            throwError(QT_TR_NOOP(
+                           "The required paramenter 'type' of the 'brigadier_string' argument parser is missing."));
 
         const QString &&type = props[QStringLiteral("type")].toString();
         uswitch (type) {
             ucase ("greedy"_QL1): {
-                return QSharedPointer<StringNode>::create(spanText(getRest()));
+                return QSharedPointer<StringNode>::create(spanText(getRest()),
+                                                          true);
             }
             ucase ("phrase"_QL1): {
                 if (curChar() == '"' || curChar() == '\'') {
                     const int    start = pos();
                     const auto &&str   = getQuotedString();
-                    return QSharedPointer<StringNode>::create(spanText(start),
-                                                              str);
+                    return QSharedPointer<StringNode>::create(
+                        spanText(start), str, !str.isEmpty());
                 } else {
-                    error(QT_TR_NOOP("A quoted string is required."));
+                    throwError(QT_TR_NOOP("A quoted string is required."));
                 }
             }
             ucase ("word"_QL1): {
                 const QString &&literal = getLiteralString();
-                return QSharedPointer<StringNode>::create(spanText(literal));
+                return QSharedPointer<StringNode>::create(spanText(literal),
+                                                          !literal.isEmpty());
             }
         }
-        return defaultRet;
+        return QSharedPointer<StringNode>::create(QString(), false);
     }
 
 /*!
- * \brief Parses the current text using the static schema. Returns the \c parsingResult or an invalid \c ParseNode if an error occured.
+ * \brief Parses the current text using the static schema.
+ * Returns the \c parsingResult or an invalid \c ParseNode if an error occured.
  */
     QSharedPointer<ParseNode> SchemaParser::parse() {
         m_tree = QSharedPointer<RootNode>::create();
@@ -608,7 +617,6 @@ namespace Command {
 
         if (m_schemaGraph.isEmpty()) {
             qWarning() << "The parser schema hasn't been initialized yet.";
-            m_tree->setIsValid(false);
             return m_tree;
         }
 
@@ -618,15 +626,24 @@ namespace Command {
             if (parseBySchema(&m_schemaGraph)) {
                 m_tree->setLength(pos() - 1);
                 m_tree->setTrailingTrivia(skipWs());
-                m_tree->setIsValid(true);
+//                const auto &treeChildren = m_tree->children();
+//                for (auto it = treeChildren.cbegin();
+//                     it != treeChildren.cend(); ++it) {
+//                    if (!(*it)->isValid()) {
+//                        SourcePrinter printer;
+//                        printer.startVisiting((*it).get());
+//                        qDebug() << printer.source();
+//                        break;
+//                    }
+//                }
             }
         } catch (const SchemaParser::Error &err) {
             qDebug() << "Command::Parser::parse: errors detected";
+            qDebug() << text();
             m_errors << err;
             for (const auto &error: m_errors) {
                 qDebug() << error.toLocalizedMessage();
             }
-            m_tree->setIsValid(false);
         }
 
 //        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
@@ -658,7 +675,7 @@ namespace Command {
             *schemaNode = (*schemaNode)->redirect();
         }
         if (curChar().isNull()) {
-            error(QT_TR_NOOP("Incompleted command"));
+            throwError(QT_TR_NOOP("Incompleted command"));
         }
         eat(QChar::Space);
 
@@ -681,6 +698,7 @@ namespace Command {
         if (const auto &literalNode = literalChildren.constFind(literal);
             literalNode != literalChildren.end()) {
             const auto &&command = brigadier_literal();
+            command->setIsValid(true);
             if (isRoot)
                 command->setIsCommand(true);
             ret = command;
@@ -696,19 +714,20 @@ namespace Command {
             }
         } else if (schemaNode->argumentChildren().isEmpty()) {
             if (isRoot) {
-                errors << Error(QT_TR_NOOP("Unknown command '%1'"),
-                                pos(), literal.length(), { literal });
+                reportError(QT_TR_NOOP("Unknown command '%1'"), { literal },
+                            pos(), literal.length());
             } else {
-                errors << Error(QT_TR_NOOP("Unknown subcommand '%1'"),
-                                pos(), literal.length(), { literal });
+                reportError(QT_TR_NOOP("Unknown subcommand '%1'"), { literal },
+                            pos(), literal.length());
             }
         } else {
             for (const auto *argNode: schemaNode->argumentChildren()) {
                 const auto parserType = argNode->parserType();
                 if (parserType == ArgumentNode::ParserType::Unknown) {
-                    errors <<
-                        Error(QT_TR_NOOP("Cannot parse unsupported argument"),
-                              pos(), literal.length(), {});
+                    reportError(QT_TR_NOOP(
+                                    "Cannot parse unsupported argument type"),
+                                {}, pos(),
+                                literal.length());
                     continue;
                 }
                 const auto &props = argNode->properties();
@@ -767,7 +786,7 @@ namespace Command {
             }
             return true;
         } else {
-            Q_UNREACHABLE();
+            return false;
         }
     }
 }

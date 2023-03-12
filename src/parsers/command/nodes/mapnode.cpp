@@ -5,6 +5,7 @@ namespace Command {
     DEFINE_ACCEPT_METHOD(KeyNode)
 
     MapNode::MapNode(int length) : ParseNode(Kind::Container, length) {
+        m_isValid = true;
     }
 
     void MapNode::accept(NodeVisitor *visitor, VisitOrder order) {
@@ -45,6 +46,11 @@ namespace Command {
     }
 
     void MapNode::insert(KeyPtr key, NodePtr node) {
+        if (m_pairs.empty()) {
+            m_isValid = key->isValid() && node->isValid();
+        } else {
+            m_isValid &= key->isValid() && node->isValid();
+        }
         m_pairs << Pair::create(key, node);
     }
 
