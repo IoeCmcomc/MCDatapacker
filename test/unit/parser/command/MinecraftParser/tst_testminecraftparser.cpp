@@ -62,7 +62,7 @@ void TestMinecraftParser::cleanupTestCase() {
 }
 
 void TestMinecraftParser::genRepr_data() {
-    QSKIP("");
+//    QSKIP("");
     //DECLARE_TAG_VARS;
 
     //QTest::addColumn<QString>("command");
@@ -109,10 +109,8 @@ void TestMinecraftParser::commands_data() {
     localTimer.start();
 
     SET_TAG(test)
-    QTest::newRow(GEN_TAG) <<
-        R"(tp @s 12 45 78)"
-                           <<
-        "LiteralNode(tp), EntityNode[](TargetSelectorNode(@s)), Vec3Node(x: AngleNode(12), y: AngleNode(45), z: AngleNode(78)))";
+    QTest::newRow(GEN_TAG) << R"(tp @s 12 45 78)" <<
+        "RootNode[3](LiteralNode(tp), EntityNode[](TargetSelectorNode(@s)), Vec3Node(x: AngleNode(12), y: AngleNode(45), z: AngleNode(78)))";
 
     SET_TAG(advancement)
     QTest::newRow(GEN_TAG) <<

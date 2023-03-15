@@ -53,6 +53,10 @@ public:
 protected:
         static inline bool m_testMode = false;
 
+        void reportError(const char *msg, const QVariantList &args = {});
+        void reportError(const char *msg, const QVariantList &args,
+                         int pos, int length = 0);
+
         QString peekLiteral() const;
         QString getLiteralString();
 
@@ -125,6 +129,7 @@ protected:
 private:
         ParseNodeCache m_cache;
         QSharedPointer<Command::RootNode> m_tree;
+        bool m_canBacktrack = false;
         static inline const QRegularExpression m_decimalNumRegex{
             QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
         static inline Schema::RootNode m_schemaGraph;

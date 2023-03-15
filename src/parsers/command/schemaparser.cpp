@@ -282,6 +282,26 @@ namespace Command {
     SchemaParser::SchemaParser() {
     }
 
+    /*!
+     * \brief Adds a \c Command::Parser::ParsingError with a formatted message
+     * to the error list and continue.
+     */
+    void SchemaParser::reportError(const char *msg, const QVariantList &args) {
+        reportError(msg, args, pos());
+    }
+
+    /*!
+     * \brief Add or throw an error based on current parser states.
+     */
+    void SchemaParser::reportError(const char *msg, const QVariantList &args,
+                                   int pos, int length) {
+        if (m_canBacktrack) {
+            throwError(msg, args, pos, length);
+        } else {
+            m_errors << Parser::Error(msg, pos, length, args);
+        }
+    }
+
     NodePtr SchemaParser::invokeMethod(ArgumentNode::ParserType parserType,
                                        const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;
@@ -721,6 +741,9 @@ namespace Command {
                             pos(), literal.length());
             }
         } else {
+            if (schemaNode->argumentChildren().size() > 1) {
+                m_canBacktrack = true;
+            }
             for (const auto *argNode: schemaNode->argumentChildren()) {
                 const auto parserType = argNode->parserType();
                 if (parserType == ArgumentNode::ParserType::Unknown) {
@@ -746,9 +769,14 @@ namespace Command {
                     Schema::Node *node =
                         const_cast<Schema::ArgumentNode *>(argNode);
                     if (canContinue(&node, depth)) {
+                        if (argNode->isEmpty() && !argNode->redirect()) {
+                            setPos(startPos);
+                            continue;
+                        }
                         ret->setTrailingTrivia(QStringLiteral(" "));
                         try {
-                            success = parseBySchema(node, depth + 1);
+                            m_canBacktrack = false;
+                            success        = parseBySchema(node, depth + 1);
                             m_tree->prepend(ret);
                         } catch (SchemaParser::Error &err) {
                             err.length = pos() - startPos + 1;

@@ -87,10 +87,6 @@ protected:
     void throwError [[noreturn]](const char *msg, const QVariantList &args,
                                  int pos, int length = 0);
 
-    void reportError(const char *msg, const QVariantList &args = {});
-    void reportError(const char *msg, const QVariantList &args,
-                     int pos, int length = 0);
-
     void advance(int n = 1);
 
     bool expect(QChar chr);
@@ -112,7 +108,6 @@ protected:
     QString spanText(QString&& text);
     QString spanText(int start);
 
-protected:
     virtual bool parseImpl() {
         return false;
     };
