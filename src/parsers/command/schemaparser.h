@@ -57,11 +57,18 @@ protected:
         void reportError(const char *msg, const QVariantList &args,
                          int pos, int length = 0);
 
+        bool errorIfNot(const bool condition, const char *msg) {
+            if (!condition) {
+                reportError(msg);
+            }
+            return condition;
+        };
+
         QString peekLiteral() const;
         QString getLiteralString();
 
         bool canContinue(Schema::Node **schemaNode, int depth);
-        bool parseBySchema(const Schema::Node *schemaNode, int depth = 0);
+        void parseBySchema(const Schema::Node *schemaNode, int depth = 0);
 
         template<typename T>
         void checkMin(T value, T min) {
@@ -129,7 +136,6 @@ protected:
 private:
         ParseNodeCache m_cache;
         QSharedPointer<Command::RootNode> m_tree;
-        bool m_canBacktrack = false;
         static inline const QRegularExpression m_decimalNumRegex{
             QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
         static inline Schema::RootNode m_schemaGraph;

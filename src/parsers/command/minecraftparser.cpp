@@ -373,8 +373,8 @@ namespace Command {
             if (first || (elem->tagType() == ret->prefix())) {
                 first = false;
             } else {
-                throwError(QT_TR_NOOP(
-                               "Type of elements in this list tag must be the same"));
+                reportError(QT_TR_NOOP(
+                                "Type of elements in this list tag must be the same"));
             }
             elem->setTrailingTrivia(eatListSep(',', ']'));
             ret->append(elem);
@@ -395,15 +395,8 @@ namespace Command {
                     return brigadier_bool();
                 }, false, R"(a-zA-z0-9-_:.+/)"_QL1);
             } else {
-                const auto &&ret = brigadier_bool();
-                if (ret->isValid())
-                    return ret;
-                else
-                    this->throwError(QT_TR_NOOP(
-                                         "Argument value must be a boolean"));
-                return nullptr;
+                return brigadier_bool();
             }
-            return nullptr;
         }, false, R"(a-zA-z0-9-_:.+/)"_QL1);
     }
 
@@ -464,7 +457,9 @@ namespace Command {
                     }
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(start), literal,
-                                     !literal.isEmpty()));
+                                     errorIfNot(
+                                         !literal.isEmpty(),
+                                         "Invalid empty name in target selector")));
                     return ret;
                 }
                 ucase ("type"_QL1): {
@@ -486,7 +481,7 @@ namespace Command {
                     const auto &&ret  = parseNegEntityArg();
                     QString &&literal = getLiteralString();
                     ret->setNode(QSharedPointer<StringNode>::create(
-                                     spanText(literal), !literal.isEmpty()));
+                                     spanText(literal), true));
                     return ret;
                 }
                 ucase ("scores"_QL1): {
@@ -600,12 +595,11 @@ namespace Command {
 
             default: {
                 const auto &&name = getWithCharset("0-9a-zA-Z-_+"_QL1);
-                if (name.isEmpty()) {
-                    throwError(QT_TR_NOOP("Invalid empty NBT path key"));
-                } else {
-                    ret->setName(QSharedPointer<StringNode>::create(
-                                     spanText(name), true));
-                }
+                ret->setName(QSharedPointer<StringNode>::create(
+                                 spanText(name),
+                                 errorIfNot(!name.isEmpty(),
+                                            QT_TR_NOOP(
+                                                "Invalid empty NBT path key"))));
                 if (curChar() == '{')
                     ret->setFilter(parseCompoundTag());
             };
@@ -653,19 +647,20 @@ namespace Command {
         const static QRegularExpression charsetRegex{ QStringLiteral(
                                                           "[0-9a-z-_\\/.]*") };
 
-        const int start = pos();
+        bool      hasError = false;
+        const int start    = pos();
         SpanPtr   nspace;
         SpanPtr   id;
 
         if (curChar() == '#') {
-            if (acceptTag) {
-                node->setIsTag(true);
-                advance();
-                node->setLeftText(spanText(start));
-            } else {
-                throwError(QT_TR_NOOP(
-                               "A resource location tag is not allowed here."));
+            node->setLeftText(spanText(start));
+            node->setIsTag(true);
+            if (!acceptTag) {
+                reportError(QT_TR_NOOP(
+                                "A resource location tag is not allowed here."));
+                hasError = true;
             }
+            advance();
         }
 
         id = SpanPtr::create(spanText(getWithRegex(charsetRegex)));
@@ -687,7 +682,7 @@ namespace Command {
         }
         Q_ASSERT(id != nullptr);
         if (id->leftText().isNull() && id->text().isEmpty()) {
-            this->throwError(QT_TR_NOOP("Invalid empty namespaced ID"));
+            this->reportError(QT_TR_NOOP("Invalid empty namespaced ID"));
         } else {
             id->setIsValid(true);
         }
@@ -698,6 +693,7 @@ namespace Command {
         node->setId(std::move(id));
 
         node->setLength(pos() - start);
+        node->setIsValid(!hasError);
     }
 
     void MinecraftParser::parseBlock(BlockStateNode *node, bool acceptTag) {
@@ -848,20 +844,20 @@ namespace Command {
 
     QSharedPointer<ComponentNode> MinecraftParser::
     minecraft_component() {
-        const int curPos = pos();
+        const int    curPos = pos();
+        const auto &&rest   = getRest();
 
         try {
-            const auto &&rest = getRest();
-            json       &&j    = json::parse(rest.toString().toStdString());
-            const auto &&ret  =
+            json       &&j   = json::parse(rest.toString().toStdString());
+            const auto &&ret =
                 QSharedPointer<ComponentNode>::create(spanText(rest));
             ret->setValue(std::move(j));
             return ret;
         }  catch (const json::parse_error &err) {
             /* TODO: Process JSON errors for localization */
-            throwError(err.what(), {}, curPos + err.byte - 1);
+            reportError(err.what(), {}, curPos + err.byte - 1);
+            return QSharedPointer<ComponentNode>::create(spanText(rest));
         }
-        return nullptr;
     }
 
     QSharedPointer<DimensionNode> MinecraftParser::
@@ -880,23 +876,21 @@ namespace Command {
         if (this->curChar() == '@') {
             ret->setNode(parseTargetSelector());
         } else {
-            const auto &&uuid = minecraft_uuid();
+            auto &&uuid = minecraft_uuid();
             if (uuid->isValid()) {
                 ret->setNode(std::move(uuid));
             } else {
                 setPos(curPos);
+                m_errors.pop_back();
                 const QString &&literal =
                     getWithCharset("0-9a-zA-Z-_#$%.§"_QL1);
-                if (literal.isEmpty()) {
-                    this->throwError(QT_TR_NOOP("Invalid empty player name"));
-                }
+
                 ret->setNode(QSharedPointer<StringNode>::create(
-                                 spanText(literal), true));
+                                 spanText(literal),
+                                 errorIfNot(!literal.isEmpty(),
+                                            QT_TR_NOOP(
+                                                "Invalid empty player name"))));
             }
-        }
-        if (!ret) {
-            throwError(QT_TR_NOOP("Cannot parse entity"));
-            return ret;
         }
         ret->setPlayerOnly(
             props[QStringLiteral("type")].toString() == "players"_QL1);
@@ -1015,10 +1009,11 @@ namespace Command {
 
     QSharedPointer<ItemSlotNode> MinecraftParser::
     minecraft_itemSlot() {
-        const QString &&objname = this->getWithCharset("a-z0-9._"_QL1);
+        const QString &&slot = this->getWithCharset("a-z0-9._"_QL1);
 
-        return QSharedPointer<ItemSlotNode>::create(spanText(objname),
-                                                    !objname.isEmpty());
+        return QSharedPointer<ItemSlotNode>::create(
+            spanText(slot), errorIfNot(!slot.isEmpty(),
+                                       "Invalid empty item slot"));
     }
 
     QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
@@ -1082,10 +1077,10 @@ namespace Command {
 
             if ((step->type() == NbtPathStepNode::Type::Key)
                 && (!(last->trailingTrivia() == '.'))) {
-                throwError(QT_TR_NOOP(
-                               "Missing character '.' before a named tag"),
-                           {},
-                           start + last->length() - 1);
+                reportError(QT_TR_NOOP(
+                                "Missing character '.' before a named tag"),
+                            {},
+                            start + last->length() - 1);
             }
             ret->append(step);
             last = ret->last();
@@ -1105,9 +1100,13 @@ namespace Command {
     minecraft_objective() {
         const int curPos  = pos();
         QString &&objname = this->getWithCharset("0-9a-zA-Z-+_.#"_QL1);
-        bool      valid   = !objname.isEmpty();
+        bool      valid   = true;
 
-        if ((objname.length() > 16) && (gameVer < QVersionNumber(1, 18, 2))) {
+        if (objname.isEmpty()) {
+            reportError("Invalid empty objective");
+            valid = false;
+        } else if ((objname.length() > 16) &&
+                   (gameVer < QVersionNumber(1, 18, 2))) {
             reportError(QT_TR_NOOP(
                             "Objective '%1' must be less than 16 characters"),
                         { objname }, curPos, objname.length());
@@ -1120,8 +1119,9 @@ namespace Command {
     minecraft_objectiveCriteria() {
         const QString &&criteria = this->getWithCharset("-\\w.:"_QL1);
 
-        return QSharedPointer<ObjectiveCriteriaNode>::create(spanText(criteria),
-                                                             !criteria.isEmpty());
+        return QSharedPointer<ObjectiveCriteriaNode>::create(
+            spanText(criteria), errorIfNot(!criteria.isEmpty(),
+                                           "Invalid empty objective criteria"));
     }
 
     QSharedPointer<OperationNode> MinecraftParser::
@@ -1226,16 +1226,15 @@ namespace Command {
 
     QSharedPointer<ScoreHolderNode> MinecraftParser::
     minecraft_scoreHolder(const QVariantMap &props) {
-        auto &&ret = QSharedPointer<ScoreHolderNode>::create(1);
-
         if (curChar() == '*') {
+            auto &&ret = QSharedPointer<ScoreHolderNode>::create(1);
             ret->setAll(true);
             advance();
+            return ret;
         } else {
             const auto &&entity = minecraft_entity(props);
-            ret = QSharedPointer<ScoreHolderNode>::create(entity.get());
+            return QSharedPointer<ScoreHolderNode>::create(entity.get());
         }
-        return ret;
     }
 
     QSharedPointer<ScoreboardSlotNode> MinecraftParser::
@@ -1301,7 +1300,9 @@ namespace Command {
         const QString &&literal =
             this->getWithCharset("-+\\w.:"_QL1);
 
-        return QSharedPointer<TeamNode>::create(spanText(literal), true);
+        return QSharedPointer<TeamNode>::create(spanText(literal),
+                                                errorIfNot(!literal.isEmpty(),
+                                                           "Invalid empty team"));
     }
 
     QSharedPointer<TimeNode> MinecraftParser::minecraft_time() {
@@ -1351,12 +1352,14 @@ namespace Command {
             hexList << match.captured(5).rightJustified(12, '0');
             const QUuid uuid(hexList.join('-'));
             if (uuid.isNull()) {
+                reportError("Invalid null UUID");
                 return QSharedPointer<UuidNode>::create(QString(),
                                                         std::move(uuid), false);
             }
             return QSharedPointer<UuidNode>::create(
                 spanText(match.capturedRef()), std::move(uuid), true);
         } else {
+            reportError("Invalid UUID");
             return QSharedPointer<UuidNode>::create(QString(), QUuid(), false);
         }
     }

@@ -67,7 +67,7 @@ private:
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
-                if (name.isNull()) {
+                if (name.isEmpty()) {
                     setPos(keyPos);
                     if (keyCharset.isNull()) {
                         name = getLiteralString();
@@ -75,9 +75,10 @@ private:
                         name = this->getWithCharset(keyCharset);
                     }
                 }
-                if (name.isNull())
-                    throwError("Invalid empty key", {}, keyPos);
-                const auto &&key = KeyPtr::create(spanText(keyPos), name, true);
+                if (name.isEmpty())
+                    reportError("Invalid empty key", {}, keyPos);
+                const auto &&key = KeyPtr::create(spanText(keyPos), name,
+                                                  !name.isEmpty());
                 key->setLeadingTrivia(trivia);
                 key->setTrailingTrivia(spanText(eat(sepChar, SkipLeftWs)));
                 const auto &&valueTrivia = skipWs(false);
@@ -118,7 +119,7 @@ private:
                 const auto &&numTag = parseNumericTag();
                 const auto &&elem   = qSharedPointerCast<Type>(numTag);
                 if (!elem) {
-                    throwError(errorMsg);
+                    reportError(errorMsg);
                 }
                 elem->setLeadingTrivia(trivia);
                 ret->append(elem);

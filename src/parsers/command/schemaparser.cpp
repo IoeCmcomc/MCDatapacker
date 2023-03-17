@@ -295,11 +295,7 @@ namespace Command {
      */
     void SchemaParser::reportError(const char *msg, const QVariantList &args,
                                    int pos, int length) {
-        if (m_canBacktrack) {
-            throwError(msg, args, pos, length);
-        } else {
-            m_errors << Parser::Error(msg, pos, length, args);
-        }
+        m_errors << Parser::Error(msg, pos, length, args);
     }
 
     NodePtr SchemaParser::invokeMethod(ArgumentNode::ParserType parserType,
@@ -521,7 +517,8 @@ namespace Command {
             return QSharedPointer<BoolNode>::create(spanText(start), false,
                                                     true);
         } else {
-            reportError("Expecting a boolean value ('true' or 'false')");
+            reportError(QT_TR_NOOP(
+                            "A boolean value can only be either 'true' or 'false'"));
             return QSharedPointer<BoolNode>::create(QString(), false);
         }
     }
@@ -612,15 +609,18 @@ namespace Command {
                     const int    start = pos();
                     const auto &&str   = getQuotedString();
                     return QSharedPointer<StringNode>::create(
-                        spanText(start), str, !str.isEmpty());
+                        spanText(start), str, true);
                 } else {
                     throwError(QT_TR_NOOP("A quoted string is required."));
                 }
             }
             ucase ("word"_QL1): {
                 const QString &&literal = getLiteralString();
-                return QSharedPointer<StringNode>::create(spanText(literal),
-                                                          !literal.isEmpty());
+                return QSharedPointer<StringNode>::create(
+                    spanText(literal),
+                    errorIfNot(
+                        !literal.isEmpty(),
+                        "Expected a single word without spaces."));
             }
         }
         return QSharedPointer<StringNode>::create(QString(), false);
@@ -643,9 +643,9 @@ namespace Command {
         setPos(0);
         try {
             m_tree->setLeadingTrivia(skipWs());
-            if (parseBySchema(&m_schemaGraph)) {
-                m_tree->setLength(pos() - 1);
-                m_tree->setTrailingTrivia(skipWs());
+            parseBySchema(&m_schemaGraph);
+            m_tree->setLength(pos() - 1);
+            m_tree->setTrailingTrivia(skipWs());
 //                const auto &treeChildren = m_tree->children();
 //                for (auto it = treeChildren.cbegin();
 //                     it != treeChildren.cend(); ++it) {
@@ -656,7 +656,6 @@ namespace Command {
 //                        break;
 //                    }
 //                }
-            }
         } catch (const SchemaParser::Error &err) {
             qDebug() << "Command::Parser::parse: errors detected";
             qDebug() << text();
@@ -702,10 +701,9 @@ namespace Command {
         return true;
     }
 
-    bool SchemaParser::parseBySchema(const Schema::Node *schemaNode,
+    void SchemaParser::parseBySchema(const Schema::Node *schemaNode,
                                      int depth) {
-        NodePtr                      ret;
-        QVector<SchemaParser::Error> errors;
+        NodePtr ret;
 
         const bool isRoot = schemaNode->kind() == Schema::Node::Kind::Root;
 
@@ -724,13 +722,15 @@ namespace Command {
             ret = command;
 
             Schema::Node *litNode = literalNode.value();
+
             if (canContinue(&litNode, depth)) {
                 ret->setTrailingTrivia(QStringLiteral(" "));
-                success = parseBySchema(litNode, depth + 1);
+                parseBySchema(litNode, depth + 1);
+                success = true;
                 m_tree->prepend(ret);
             } else {
                 m_tree->append(ret);
-                return true;
+                return;
             }
         } else if (schemaNode->argumentChildren().isEmpty()) {
             if (isRoot) {
@@ -741,9 +741,7 @@ namespace Command {
                             pos(), literal.length());
             }
         } else {
-            if (schemaNode->argumentChildren().size() > 1) {
-                m_canBacktrack = true;
-            }
+            const bool canBacktrack = schemaNode->argumentChildren().size() > 1;
             for (const auto *argNode: schemaNode->argumentChildren()) {
                 const auto parserType = argNode->parserType();
                 if (parserType == ArgumentNode::ParserType::Unknown) {
@@ -754,67 +752,49 @@ namespace Command {
                     continue;
                 }
                 const auto &props = argNode->properties();
+                ret.reset();
 
                 try {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
                 } catch (SchemaParser::Error &err) {
                     err.length = pos() - startPos + 1;
-                    errors << err;
+                    m_errors << err;
+                }
+                if (!ret || (!ret->isValid() && canBacktrack)) {
                     setPos(startPos);
                     continue;
                 }
 
-                if (ret) {
-                    Schema::Node *node =
-                        const_cast<Schema::ArgumentNode *>(argNode);
+                Schema::Node *node =
+                    const_cast<Schema::ArgumentNode *>(argNode);
+                try {
                     if (canContinue(&node, depth)) {
                         if (argNode->isEmpty() && !argNode->redirect()) {
                             setPos(startPos);
                             continue;
                         }
+
                         ret->setTrailingTrivia(QStringLiteral(" "));
-                        try {
-                            m_canBacktrack = false;
-                            success        = parseBySchema(node, depth + 1);
-                            m_tree->prepend(ret);
-                        } catch (SchemaParser::Error &err) {
-                            err.length = pos() - startPos + 1;
-                            errors << err;
-                            setPos(startPos);
-                            continue;
-                        }
+
+                        parseBySchema(node, depth + 1);
+                        m_tree->prepend(ret);
                     } else {
                         m_tree->append(ret);
-                        return true;
                     }
-                    break;
+                    success = true;
+                } catch (SchemaParser::Error &err) {
+                    err.length = pos() - startPos + 1;
+                    m_errors << err;
+                    setPos(startPos);
                 }
+                break;
             }
         }
 
-        if (ret && success) { /* If succeed */
-            return true;
-        } else if (!errors.isEmpty()) {
-            if (errors.size() == 1) {
-                throw errors[0];
-            } else if (errors.size() == schemaNode->argumentChildren().size()) {
-                const auto errorToThrow = *std::max_element(
-                    errors.cbegin(), errors.cend(),
-                    [](const auto& a, const auto& b) {
-                    return a.length < b.length;
-                });
-                throw errorToThrow;
-            } else {
-                for (const auto &err: errors) {
-                    if (!m_errors.contains(err)) {
-                        m_errors << err;
-                    }
-                }
-            }
-            return true;
-        } else {
-            return false;
+        if (!success) {
+            m_tree->append(QSharedPointer<ErrorNode>::create(
+                               getRest().toString()));
         }
     }
 }

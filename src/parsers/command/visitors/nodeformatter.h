@@ -40,6 +40,21 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
+
+        virtual void visit(ErrorNode *node) override {
+            m_pos += node->leadingTrivia().length();
+
+            QTextCharFormat fmt;
+            fmt.setFontStrikeOut(true);
+
+            QTextLayout::FormatRange range{ m_pos, node->length(),
+                                            std::move(fmt) };
+
+            m_formatRanges << std::move(range);
+
+            m_pos += node->trailingTrivia().length();
+        }
+
         virtual void visit(RootNode *node) override {
             m_pos += node->leadingTrivia().length();
 
