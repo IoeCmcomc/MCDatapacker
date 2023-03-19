@@ -714,6 +714,32 @@ namespace Command {
             node->setNbt(parseCompoundTag());
     }
 
+    void Command::MinecraftParser::parseEntity(Command::EntityNode *node,
+                                               bool allowFakePlayer) {
+        int curPos = pos();
+
+        if (this->curChar() == '@') {
+            node->setNode(parseTargetSelector());
+        } else {
+            auto &&uuid = minecraft_uuid();
+            if (uuid->isValid()) {
+                node->setNode(std::move(uuid));
+            } else {
+                setPos(curPos);
+                m_errors.pop_back();
+                const QString &&literal = allowFakePlayer
+                        ? getUntil(QChar::Space)
+                        : getWithCharset("0-9a-zA-Z_"_QL1);
+
+                node->setNode(QSharedPointer<StringNode>::create(
+                                  spanText(literal),
+                                  errorIfNot(!literal.isEmpty(),
+                                             QT_TR_NOOP(
+                                                 "Invalid empty player name"))));
+            }
+        }
+    }
+
     NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
                                           const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;
@@ -735,8 +761,7 @@ namespace Command {
             case ParserType::EntitySummon: { return minecraft_entitySummon(); }
             case ParserType::FloatRange: { return minecraft_floatRange(props); }
             case ParserType::Function: { return minecraft_function(); }
-            case ParserType::GameProfile: { return minecraft_gameProfile(props);
-            }
+            case ParserType::GameProfile: { return minecraft_gameProfile(); }
             case ParserType::IntRange: { return minecraft_intRange(props); }
             case ParserType::ItemEnchantment: { return minecraft_itemEnchantment();
             }
@@ -870,32 +895,14 @@ namespace Command {
 
     QSharedPointer<EntityNode> MinecraftParser::minecraft_entity(
         const QVariantMap &props) {
-        const auto &&ret    = QSharedPointer<EntityNode>::create(0);
-        int          curPos = pos();
+        const auto &&ret = QSharedPointer<EntityNode>::create(0);
 
-        if (this->curChar() == '@') {
-            ret->setNode(parseTargetSelector());
-        } else {
-            auto &&uuid = minecraft_uuid();
-            if (uuid->isValid()) {
-                ret->setNode(std::move(uuid));
-            } else {
-                setPos(curPos);
-                m_errors.pop_back();
-                const QString &&literal =
-                    getWithCharset("0-9a-zA-Z-_#$%.§<>"_QL1);
+        ret->setPlayerOnly(props[QStringLiteral(
+                                     "type")].toString() == "players"_QL1);
+        ret->setSingleOnly(props[QStringLiteral(
+                                     "amount")].toString() == "single"_QL1);
 
-                ret->setNode(QSharedPointer<StringNode>::create(
-                                 spanText(literal),
-                                 errorIfNot(!literal.isEmpty(),
-                                            QT_TR_NOOP(
-                                                "Invalid empty player name"))));
-            }
-        }
-        ret->setPlayerOnly(
-            props[QStringLiteral("type")].toString() == "players"_QL1);
-        ret->setSingleOnly(
-            props[QStringLiteral("amount")].toString() == "single"_QL1);
+        parseEntity(ret.get(), false);
         return ret;
     }
 
@@ -963,11 +970,13 @@ namespace Command {
         return ret;
     }
 
-    QSharedPointer<GameProfileNode> MinecraftParser::
-    minecraft_gameProfile(const QVariantMap &props) {
-        const auto &&entity = minecraft_entity(props);
+    QSharedPointer<GameProfileNode> MinecraftParser::minecraft_gameProfile() {
+        const auto &&ret = QSharedPointer<GameProfileNode>::create(0);
 
-        return QSharedPointer<GameProfileNode>::create(entity.get());
+        ret->setPlayerOnly(true);
+
+        parseEntity(ret.get(), false);
+        return ret;
     }
 
     QSharedPointer<IntRangeNode> MinecraftParser::
@@ -1229,12 +1238,17 @@ namespace Command {
     minecraft_scoreHolder(const QVariantMap &props) {
         if (curChar() == '*') {
             auto &&ret = QSharedPointer<ScoreHolderNode>::create(1);
+            ret->setSingleOnly(props[QStringLiteral(
+                                         "amount")].toString() == "single"_QL1);
             ret->setAll(true);
             advance();
             return ret;
         } else {
-            const auto &&entity = minecraft_entity(props);
-            return QSharedPointer<ScoreHolderNode>::create(entity.get());
+            const auto &&ret = QSharedPointer<ScoreHolderNode>::create(0);
+            ret->setSingleOnly(props[QStringLiteral(
+                                         "amount")].toString() == "single"_QL1);
+            parseEntity(ret.get(), true);
+            return ret;
         }
     }
 

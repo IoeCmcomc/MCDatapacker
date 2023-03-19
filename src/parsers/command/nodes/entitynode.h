@@ -43,7 +43,6 @@ protected:
     class GameProfileNode final : public EntityNode {
 public:
         explicit GameProfileNode(int length);
-        explicit GameProfileNode(EntityNode *other);
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
     };
@@ -51,7 +50,6 @@ public:
     class ScoreHolderNode final : public EntityNode {
 public:
         explicit ScoreHolderNode(int length);
-        explicit ScoreHolderNode(EntityNode *other);
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 

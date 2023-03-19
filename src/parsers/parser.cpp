@@ -177,11 +177,11 @@ QString Parser::eat(QChar chr, EatOptions options) {
 /*!
  * \brief Returns the substring from the current character until it meets the character \a chr (exclusive).
  */
-QStringRef Parser::getUntil(QChar chr) {
+QString Parser::getUntil(QChar chr) {
     const QStringRef &ref = peekUntil(chr);
 
     advance(ref.length());
-    return ref;
+    return ref.toString();
 }
 
 /*!

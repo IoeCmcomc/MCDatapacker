@@ -52,14 +52,6 @@ namespace Command {
         : EntityNode(ParserType::GameProfile, length, nullptr) {
     }
 
-    GameProfileNode::GameProfileNode(EntityNode *other)
-        : EntityNode(ParserType::GameProfile, other->length(),
-                     other->getNode()) {
-        m_singleOnly = other->singleOnly();
-        m_playerOnly = other->playerOnly();
-        m_isValid    = other->isValid();
-    }
-
     void GameProfileNode::accept(NodeVisitor *visitor, VisitOrder order) {
         if (order == VisitOrder::LetTheVisitorDecide) {
             visitor->visit(this);
@@ -75,14 +67,6 @@ namespace Command {
 
     ScoreHolderNode::ScoreHolderNode(int length)
         : EntityNode(ParserType::ScoreHolder, length, nullptr) {
-    }
-
-    ScoreHolderNode::ScoreHolderNode(EntityNode *other)
-        : EntityNode(ParserType::GameProfile, other->length(),
-                     other->getNode()) {
-        m_singleOnly = other->singleOnly();
-        m_playerOnly = other->playerOnly();
-        m_isValid    = other->isValid();
     }
 
     void ScoreHolderNode::accept(NodeVisitor *visitor, VisitOrder order) {

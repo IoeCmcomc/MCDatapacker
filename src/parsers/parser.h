@@ -91,7 +91,7 @@ protected:
 
     bool expect(QChar chr);
     QString eat(QChar chr, EatOptions options = NoOption);
-    QStringRef getUntil(QChar chr);
+    QString getUntil(QChar chr);
     QStringRef getRest();
     QString getWithCharset(const QString &charset);
     QString getWithCharset(const QLatin1String &charset);

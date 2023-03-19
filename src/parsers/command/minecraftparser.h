@@ -138,6 +138,7 @@ private:
         void parseResourceLocation(ResourceLocationNode *node,
                                    bool acceptTag = false);
         void parseBlock(BlockStateNode *node, bool acceptTag);
+        void parseEntity(EntityNode *node, bool allowFakePlayer);
 
         NodePtr invokeMethod(ArgumentNode::ParserType parserType,
                              const QVariantMap &props) override;
@@ -159,8 +160,7 @@ private:
         QSharedPointer<FloatRangeNode> minecraft_floatRange(
             const QVariantMap &props = {});
         QSharedPointer<FunctionNode> minecraft_function();
-        QSharedPointer<GameProfileNode> minecraft_gameProfile(
-            const QVariantMap &props = {});
+        QSharedPointer<GameProfileNode> minecraft_gameProfile();
         QSharedPointer<IntRangeNode> minecraft_intRange(
             const QVariantMap &props = {});
         QSharedPointer<ItemEnchantmentNode> minecraft_itemEnchantment();
