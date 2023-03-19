@@ -31,8 +31,8 @@ namespace Command {
                 tree->append(std::move(span));
             } else {
                 const auto &&lineText = line.toString();
-                CacheKey     key{ typeId, lineText };
                 NodePtr      command;
+//                CacheKey     key{ typeId, lineText };
 //                if (!m_cache.contains(key)
 //                    || !(command = m_cache[key].lock())) {
                 m_commandParser.setText(lineText);
@@ -40,9 +40,9 @@ namespace Command {
                 command                 = m_commandParser.parse();
                 m_spans                 =
                     m_commandParser.parsingResult().spans;
-                if (command->isValid()) {
-                    m_cache.emplace(typeId, lineText, WeakNodePtr(command));
-                }
+//                    if (command->isValid()) {
+//                        m_cache.emplace(typeId, lineText, WeakNodePtr(command));
+//                    }
 //                }
 
                 if (!command->isValid()) {

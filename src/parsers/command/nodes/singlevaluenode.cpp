@@ -2,6 +2,12 @@
 #include "../visitors/nodevisitor.h"
 
 namespace Command {
+    void FloatNode::chopTrailingDot() {
+        if (text().back() == '.') {
+            setText(text().chopped(1));
+        }
+    }
+
     DEFINE_ACCEPT_METHOD(BoolNode)
     DEFINE_ACCEPT_METHOD(DoubleNode)
     DEFINE_ACCEPT_METHOD(FloatNode)

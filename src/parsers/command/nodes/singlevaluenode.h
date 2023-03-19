@@ -49,9 +49,21 @@ public:                                                                         
             DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)                           \
         }                                                                               \
 
+namespace Command {
+    class FloatNode : public SingleValueNode<ArgumentNode, float,
+                                             ArgumentNode::ParserType::Float>
+    {
+public:
+        using SingleValueNode::SingleValueNode;
+        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void chopTrailingDot();
+    };
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Float)
+}
+
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Bool, bool)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Double, double)
-DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Float, float)
+//DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Float, float)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Integer, int)
 
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Color, QString)

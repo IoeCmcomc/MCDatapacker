@@ -278,6 +278,65 @@
 
  */
 
+const static QHash<QString, QString> misspellings = {
+    { "allign",      "align"      },
+    { "alwasy",      "always"     },
+    { "alwyas",      "always"     },
+    { "ammount",     "amount"     },
+    { "atribute",    "attribute"  },
+    { "availabe",    "available"  },
+    { "availaible",  "available"  },
+    { "availble",    "available"  },
+    { "availiable",  "available"  },
+    { "availible",   "available"  },
+    { "avalable",    "available"  },
+    { "avaliable",   "available"  },
+    { "avilable",    "available"  },
+    { "bedore",      "before"     },
+    { "befoer",      "before"     },
+    { "claer",       "clear"      },
+    { "dammage",     "damage"     },
+    { "destory",     "destroy"    },
+    { "difficulity", "difficulty" },
+    { "dificulty",   "difficulty" },
+    { "doulbe",      "double"     },
+    { "entitity",    "entity"     },
+    { "everthing",   "everything" },
+    { "everyting",   "everything" },
+    { "excecute",    "execute"    },
+    { "experiance",  "experience" },
+    { "expierence",  "experience" },
+    { "frome",       "from"       },
+    { "fucntion",    "function"   },
+    { "funtion",     "function"   },
+    { "halp",        "help"       },
+    { "iwth",        "with"       },
+    { "lastr",       "last"       },
+    { "lsat",        "last"       },
+    { "nmae",        "name"       },
+    { "onyl",        "only"       },
+    { "recrod",      "record"     },
+    { "rocord",      "record"     },
+    { "schedual",    "schedule"   },
+    { "stlye",       "style"      },
+    { "stpo",        "stop"       },
+    { "succsess",    "success"    },
+    { "sucess",      "success"    },
+    { "sytle",       "style"      },
+    { "thru",        "through"    },
+    { "timne",       "time"       },
+    { "tkae",        "take"       },
+    { "untill",      "until"      },
+    { "visable",     "visible"    },
+    { "whith",       "with"       },
+    { "wih",         "with"       },
+    { "wiht",        "with"       },
+    { "withh",       "with"       },
+    { "witht",       "with"       },
+    { "witn",        "with"       },
+    { "wtih",        "with"       },
+};
+
 namespace Command {
     SchemaParser::SchemaParser() {
     }
@@ -707,40 +766,23 @@ namespace Command {
 
         const bool isRoot = schemaNode->kind() == Schema::Node::Kind::Root;
 
-        int             startPos = pos();
-        bool            success  = false;
-        const QString &&literal  = peekLiteral();
+        const int       start                = pos();
+        const QString &&literal              = peekLiteral();
+        Schema::Node   *litNode              = nullptr;
+        bool            reportInvalidCommand = false;
+
 
         const auto &literalChildren = schemaNode->literalChildren();
 
         if (const auto &literalNode = literalChildren.constFind(literal);
             literalNode != literalChildren.end()) {
+            litNode = literalNode.value();
+
             const auto &&command = brigadier_literal();
-            command->setIsValid(true);
             if (isRoot)
                 command->setIsCommand(true);
             ret = command;
-
-            Schema::Node *litNode = literalNode.value();
-
-            if (canContinue(&litNode, depth)) {
-                ret->setTrailingTrivia(QStringLiteral(" "));
-                parseBySchema(litNode, depth + 1);
-                success = true;
-                m_tree->prepend(ret);
-            } else {
-                m_tree->append(ret);
-                return;
-            }
-        } else if (schemaNode->argumentChildren().isEmpty()) {
-            if (isRoot) {
-                reportError(QT_TR_NOOP("Unknown command '%1'"), { literal },
-                            pos(), literal.length());
-            } else {
-                reportError(QT_TR_NOOP("Unknown subcommand '%1'"), { literal },
-                            pos(), literal.length());
-            }
-        } else {
+        } else if (!schemaNode->argumentChildren().isEmpty()) {
             const bool canBacktrack = schemaNode->argumentChildren().size() > 1;
             for (const auto *argNode: schemaNode->argumentChildren()) {
                 const auto parserType = argNode->parserType();
@@ -758,11 +800,11 @@ namespace Command {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
                 } catch (SchemaParser::Error &err) {
-                    err.length = pos() - startPos + 1;
+                    err.length = pos() - start + 1;
                     m_errors << err;
                 }
                 if (!ret || (!ret->isValid() && canBacktrack)) {
-                    setPos(startPos);
+                    setPos(start);
                     continue;
                 }
 
@@ -771,30 +813,87 @@ namespace Command {
                 try {
                     if (canContinue(&node, depth)) {
                         if (argNode->isEmpty() && !argNode->redirect()) {
-                            setPos(startPos);
+                            setPos(start);
                             continue;
                         }
 
                         ret->setTrailingTrivia(QStringLiteral(" "));
-
                         parseBySchema(node, depth + 1);
                         m_tree->prepend(ret);
                     } else {
                         m_tree->append(ret);
                     }
-                    success = true;
                 } catch (SchemaParser::Error &err) {
-                    err.length = pos() - startPos + 1;
+                    err.length = pos() - start + 1;
                     m_errors << err;
-                    setPos(startPos);
+                    setPos(start);
                 }
                 break;
             }
+        } else {
+            reportInvalidCommand = true;
+            if (literal.length() > 2) {
+                const QStringList &&literals = literalChildren.keys();
+                const auto        &&filtered = literals.filter(literal,
+                                                               Qt::CaseInsensitive);
+                if (!filtered.isEmpty()) {
+                    litNode = literalChildren[filtered[0]];
+                } else if (misspellings.contains(literal)) {
+                    litNode = literalChildren[misspellings[literal]];
+                } else {
+                    for (const QString &lit: literals) {
+                        if (literal.contains(lit)) {
+                            litNode = literalChildren[lit];
+                            break;
+                        }
+                    }
+                }
+
+                if (litNode) {
+                    const auto &&command = brigadier_literal();
+                    command->setIsValid(false);
+                    if (isRoot)
+                        command->setIsCommand(true);
+                    ret = command;
+                }
+            }
         }
 
-        if (!success) {
+        if (litNode) {
+            if (canContinue(&litNode, depth)) {
+                ret->setTrailingTrivia(QStringLiteral(" "));
+                parseBySchema(litNode, depth + 1);
+                m_tree->prepend(ret);
+            } else {
+                m_tree->append(ret);
+            }
+        }
+
+        if (!ret) {
+            reportInvalidCommand = true;
             m_tree->append(QSharedPointer<ErrorNode>::create(
                                getRest().toString()));
+        }
+
+        if (reportInvalidCommand) {
+            if (literal.isEmpty()) {
+                if (isRoot) {
+                    reportError(QT_TR_NOOP("Invalid empty command"), {},
+                                start, literal.length());
+                } else {
+                    reportError(QT_TR_NOOP("Invalid empty sub-command"), {},
+                                start, literal.length());
+                }
+            } else {
+                if (isRoot) {
+                    reportError(QT_TR_NOOP("Unknown command '%1'"), { literal },
+                                start, literal.length());
+                } else {
+                    reportError(QT_TR_NOOP("Unknown sub-command '%1'"),
+                                { literal },
+                                start, literal.length());
+                }
+            }
         }
     }
 }

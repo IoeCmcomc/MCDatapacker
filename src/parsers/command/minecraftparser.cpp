@@ -883,7 +883,7 @@ namespace Command {
                 setPos(curPos);
                 m_errors.pop_back();
                 const QString &&literal =
-                    getWithCharset("0-9a-zA-Z-_#$%.§"_QL1);
+                    getWithCharset("0-9a-zA-Z-_#$%.§<>"_QL1);
 
                 ret->setNode(QSharedPointer<StringNode>::create(
                                  spanText(literal),
@@ -932,8 +932,9 @@ namespace Command {
             if (this->peek(2) == ".."_QL1) {
                 this->advance(2);
                 hasDoubleDot = true;
-            } else if (text().midRef(pos() - 1, 2) == ".."_QL1) {
+            } else if (num1->text().back() == '.'_QL1 && curChar() == '.'_QL1) {
                 this->advance();
+                num1->chopTrailingDot();
                 hasDoubleDot = true;
             }
             if (hasDoubleDot) {
