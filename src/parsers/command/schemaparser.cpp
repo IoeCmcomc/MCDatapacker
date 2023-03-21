@@ -771,7 +771,6 @@ namespace Command {
         Schema::Node   *litNode              = nullptr;
         bool            reportInvalidCommand = false;
 
-
         const auto &literalChildren = schemaNode->literalChildren();
 
         if (const auto &literalNode = literalChildren.constFind(literal);
@@ -783,8 +782,9 @@ namespace Command {
                 command->setIsCommand(true);
             ret = command;
         } else if (!schemaNode->argumentChildren().isEmpty()) {
-            const bool canBacktrack = schemaNode->argumentChildren().size() > 1;
-            for (const auto *argNode: schemaNode->argumentChildren()) {
+            const auto &argumentChildren = schemaNode->argumentChildren();
+            const auto *lastArgNode      = argumentChildren.constLast();
+            for (const auto *argNode: argumentChildren) {
                 const auto parserType = argNode->parserType();
                 if (parserType == ArgumentNode::ParserType::Unknown) {
                     reportError(QT_TR_NOOP(
@@ -793,7 +793,8 @@ namespace Command {
                                 literal.length());
                     continue;
                 }
-                const auto &props = argNode->properties();
+                const bool  canBacktrack = argNode != lastArgNode;
+                const auto &props        = argNode->properties();
                 ret.reset();
 
                 try {
@@ -812,12 +813,13 @@ namespace Command {
                     const_cast<Schema::ArgumentNode *>(argNode);
                 try {
                     if (canContinue(&node, depth)) {
-                        if (argNode->isEmpty() && !argNode->redirect()) {
+                        if (argNode->isEmpty() && !argNode->redirect() &&
+                            canBacktrack) {
                             setPos(start);
                             continue;
                         }
 
-                        ret->setTrailingTrivia(QStringLiteral(" "));
+//                        ret->setTrailingTrivia(QStringLiteral(" "));
                         parseBySchema(node, depth + 1);
                         m_tree->prepend(ret);
                     } else {
@@ -826,7 +828,13 @@ namespace Command {
                 } catch (SchemaParser::Error &err) {
                     err.length = pos() - start + 1;
                     m_errors << err;
-                    setPos(start);
+                    if (!canBacktrack) {
+                        m_tree->append(ret);
+                        m_tree->append(QSharedPointer<ErrorNode>::create(
+                                           spanText(getRest())));
+                    } else {
+                        setPos(start);
+                    }
                 }
                 break;
             }
@@ -860,19 +868,30 @@ namespace Command {
         }
 
         if (litNode) {
-            if (canContinue(&litNode, depth)) {
-                ret->setTrailingTrivia(QStringLiteral(" "));
-                parseBySchema(litNode, depth + 1);
-                m_tree->prepend(ret);
-            } else {
+            try {
+                if (canContinue(&litNode, depth)) {
+//                ret->setTrailingTrivia(QStringLiteral(" "));
+                    parseBySchema(litNode, depth + 1);
+                    m_tree->prepend(ret);
+                } else {
+                    m_tree->append(ret);
+                }
+            } catch (SchemaParser::Error &err) {
+                //err.length = pos() - start + 1;
+                m_errors << err;
+                ret->setIsValid(false);
                 m_tree->append(ret);
             }
         }
 
         if (!ret) {
             reportInvalidCommand = true;
-            m_tree->append(QSharedPointer<ErrorNode>::create(
-                               getRest().toString()));
+            auto &&node =
+                QSharedPointer<ErrorNode>::create(spanText(getRest()));
+            node->setLeadingTrivia(" ");
+            m_tree->append(std::move(node));
+        } else if (depth > 0) {
+            ret->setLeadingTrivia(QStringLiteral(" "));
         }
 
         if (reportInvalidCommand) {

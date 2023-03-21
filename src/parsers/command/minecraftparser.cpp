@@ -653,7 +653,6 @@ namespace Command {
         SpanPtr   id;
 
         if (curChar() == '#') {
-            node->setLeftText(spanText(start));
             node->setIsTag(true);
             if (!acceptTag) {
                 reportError(QT_TR_NOOP(
@@ -661,6 +660,7 @@ namespace Command {
                 hasError = true;
             }
             advance();
+            node->setLeftText(spanText(start));
         }
 
         id = SpanPtr::create(spanText(getWithRegex(charsetRegex)));
@@ -939,7 +939,8 @@ namespace Command {
             if (this->peek(2) == ".."_QL1) {
                 this->advance(2);
                 hasDoubleDot = true;
-            } else if (num1->text().back() == '.'_QL1 && curChar() == '.'_QL1) {
+            } else if (!num1->text().isEmpty() && num1->text().back() == '.'_QL1
+                       && curChar() == '.'_QL1) {
                 this->advance();
                 num1->chopTrailingDot();
                 hasDoubleDot = true;
@@ -1322,7 +1323,7 @@ namespace Command {
 
     QSharedPointer<TimeNode> MinecraftParser::minecraft_time() {
         const int    curPos = pos();
-        auto         unit   = TimeNode::Unit::Tick;
+        auto         unit   = TimeNode::Unit::ImplicitTick;
         const auto &&number = brigadier_float();
 
         switch (this->curChar().toLatin1()) {
@@ -1344,8 +1345,11 @@ namespace Command {
                 break;
             }
         }
-        return QSharedPointer<TimeNode>::create(spanText(curPos),
-                                                number->value(), unit);
+
+        auto &&ret = QSharedPointer<TimeNode>::create(spanText(curPos),
+                                                      number->value(), unit);
+        ret->setIsValid(number->isValid());
+        return ret;
     }
 
     QSharedPointer<UuidNode> MinecraftParser::minecraft_uuid() {

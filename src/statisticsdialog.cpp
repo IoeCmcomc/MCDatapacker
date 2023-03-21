@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "globalhelpers.h"
 #include "parsers/command/minecraftparser.h"
+#include "parsers/command/visitors/sourceprinter.h"
 #include "platforms/windows.h"
 
 #include <QDirIterator>
@@ -212,6 +213,15 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
             if (result->isValid()) {
                 m_nodeCounter.startVisiting(result.get());
                 ++m_commandLines;
+
+                if (result->kind() == Command::ParseNode::Kind::Root) {
+                    Command::SourcePrinter printer;
+                    printer.startVisiting(result.get());
+                    if (printer.source() != line) {
+                        qDebug() << path << i;
+                        qDebug() << printer.source();
+                    }
+                }
             } else {
                 const int row = ui->syntaxErrorTable->rowCount();
                 ui->syntaxErrorTable->insertRow(row);

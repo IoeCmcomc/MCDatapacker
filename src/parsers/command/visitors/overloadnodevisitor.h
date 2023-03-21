@@ -240,6 +240,8 @@ private:
                 visit(static_cast<BlockStateNode *>(node));
             } else if constexpr (is_base_of<EntityNode, U>) {
                 visit(static_cast<EntityNode *>(node));
+            } else if constexpr (is_base_of<ItemStackNode, U>) {
+                visit(static_cast<ItemStackNode *>(node));
             } else if constexpr (is_base_of<NbtNode, U>) {
                 visit(static_cast<NbtNode *>(node));
             } else if constexpr (is_base_of<ResourceLocationNode, U>) {
