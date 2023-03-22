@@ -18,8 +18,9 @@ namespace Command {
         const auto &&txt   = text(); // This prevent crash in release build
         const auto &&lines = txt.splitRef(QChar::LineFeed);
 
-        QElapsedTimer timer;
+        m_commandParser.m_spans = std::move(m_spans);
 
+        QElapsedTimer timer;
         timer.start();
 
         for (const auto &line: lines) {
@@ -36,10 +37,7 @@ namespace Command {
 //                if (!m_cache.contains(key)
 //                    || !(command = m_cache[key].lock())) {
                 m_commandParser.setText(lineText);
-                m_commandParser.m_spans = m_spans;
-                command                 = m_commandParser.parse();
-                m_spans                 =
-                    m_commandParser.parsingResult().spans;
+                command = m_commandParser.parse();
 //                    if (command->isValid()) {
 //                        m_cache.emplace(typeId, lineText, WeakNodePtr(command));
 //                    }
@@ -78,7 +76,8 @@ namespace Command {
 //                 << ". Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
         qInfo() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
 
-        m_tree = tree;
+        m_tree  = tree;
+        m_spans = m_commandParser.spans();
         m_cache.setCapacity(lines.length() + 1);
         return m_tree->isValid();
     }

@@ -22,16 +22,9 @@ public:
         SchemaParser();
         using Parser::Parser;
 
-        struct Result {
-            NodePtr    tree;
-            QStringSet spans;
-        };
-
         static void setSchema(const QString &filepath);
         static void loadSchema(const QString &filepath);
         static Schema::RootNode * schema();
-
-        Result parsingResult();
 
         QSharedPointer<Command::BoolNode> brigadier_bool();
         QSharedPointer<Command::DoubleNode> brigadier_double(

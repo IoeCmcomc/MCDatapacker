@@ -2,12 +2,14 @@
 #define PARSER_H
 
 #include <QVariantList>
-#include <QSet>
 #include <QDebug>
 
 #include <stdexcept>
 
-using QStringSet = QSet<QString>;
+//using StringHash = QHash<QStringView, QString>;
+using StringHash = std::unordered_map<QStringView, QString>;
+
+//using StringHash = QSet<QString>;
 
 #ifndef QLATIN1STRING_OPERATOR
 QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
@@ -62,7 +64,7 @@ public:
 
     Errors errors() const;
 
-    QStringSet spans() const;
+    StringHash spans() const;
 
 
 
@@ -76,7 +78,7 @@ protected:
     Q_DECLARE_FLAGS(EatOptions, EatOption);
 
     Errors m_errors;
-    QStringSet m_spans;
+    StringHash m_spans;
 
     void throwError [[noreturn]](const QString &msg,
                                  const QVariantList &args = {});
@@ -92,6 +94,7 @@ protected:
     bool expect(QChar chr);
     QString eat(QChar chr, EatOptions options = NoOption);
     QString getUntil(QChar chr);
+    QStringRef getUntilRef(QChar chr);
     QStringRef getRest();
     QString getWithCharset(const QString &charset);
     QString getWithCharset(const QLatin1String &charset);

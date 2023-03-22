@@ -84,7 +84,7 @@ Parser::Errors Parser::errors() const {
     return m_errors;
 }
 
-QStringSet Parser::spans() const {
+StringHash Parser::spans() const {
     return m_spans;
 }
 
@@ -182,6 +182,13 @@ QString Parser::getUntil(QChar chr) {
 
     advance(ref.length());
     return ref.toString();
+}
+
+QStringRef Parser::getUntilRef(QChar chr) {
+    const QStringRef &ref = peekUntil(chr);
+
+    advance(ref.length());
+    return ref;
 }
 
 /*!
@@ -353,27 +360,51 @@ QString Parser::getQuotedString() {
 }
 
 QString Parser::spanText(const QStringRef &textRef) {
-    return spanText(textRef.toString());
+//    return spanText(textRef.toString());
+
+//    const auto &&it = m_spans.constFind(QStringView(textRef));
+
+//    if (it != m_spans.cend()) {
+//        return *it;
+//    } else {
+//        const QString &&copy = textRef.toString();
+//        return *m_spans.insert(QStringView(copy), copy);
+//    }
+
+    const auto &&it = m_spans.find(textRef);
+
+    if (it != m_spans.cend()) {
+        return it->second;
+    } else {
+        const QString &&copy = textRef.toString();
+        return m_spans.try_emplace(copy, std::move(copy)).first->second;
+    }
 }
 
 QString Parser::spanText(const QString &text) {
 //    return text;
-    return *m_spans.insert(text);
+//    return *m_spans.insert(text);
 
 //    m_spans.insert(text);
 //    return *m_spans.find(text);
+
+//    return *m_spans.insert(QStringView(text), text);
+    return m_spans.try_emplace(text, text).first->second;
 }
 
 QString Parser::spanText(QString &&text) {
 //    return text;
-    return *m_spans.insert(std::move(text));
+//    return *m_spans.insert(std::move(text));
 
 //    m_spans.insert(std::move(text));
 //    return *m_spans.find(text);
+
+//    return *m_spans.insert(QStringView(text), text);
+    return m_spans.try_emplace(text, text).first->second;
 }
 
 QString Parser::spanText(int start) {
-    return spanText(m_text.mid(start, m_pos - start));
+    return spanText(m_text.midRef(start, m_pos - start));
 }
 
 bool Parser::parse() {

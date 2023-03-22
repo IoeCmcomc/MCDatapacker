@@ -469,14 +469,6 @@ namespace Command {
     }
 
 /*!
- * \brief Returns a shared pointer to the parsing result as a \c RootNode.
- */
-    SchemaParser::Result SchemaParser::parsingResult() {
-        return Result{ m_tree, m_spans };
-    }
-
-
-/*!
  * \brief Returns the next literal string (word) without advancing the current pos.
  */
     QString SchemaParser::peekLiteral() const {
@@ -648,7 +640,7 @@ namespace Command {
 
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {
         return QSharedPointer<LiteralNode>::create(
-            spanText(getUntil(QChar::Space)));
+            spanText(getUntilRef(QChar::Space)));
     }
 
     QSharedPointer<StringNode> SchemaParser::brigadier_string(

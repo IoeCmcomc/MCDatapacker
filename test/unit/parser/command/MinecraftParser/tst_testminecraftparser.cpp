@@ -4,7 +4,7 @@
 #include "../../../../../src/parsers/command/minecraftparser.h"
 #include "../../../../../src/parsers/command/visitors/reprprinter.h"
 
-#define QBENCHMARK          if (true)
+//#define QBENCHMARK          if (true)
 
 #define DECLARE_TAG_VARS    int i = 0; int c = 0; QString cat;
 #define SET_TAG(x)    i = 0; cat =#x;
@@ -62,7 +62,7 @@ void TestMinecraftParser::cleanupTestCase() {
 }
 
 void TestMinecraftParser::genRepr_data() {
-//    QSKIP("");
+    QSKIP("");
     //DECLARE_TAG_VARS;
 
     //QTest::addColumn<QString>("command");

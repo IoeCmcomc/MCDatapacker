@@ -139,30 +139,35 @@ namespace Command {
             case PT::Rotation:
             case PT::Vec2: {
                 auto *axes = static_cast<TwoAxesNode *>(node);
-                axes->setFirstAxis(
-                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
-                                             peekLiteral(), options, isLocal));
+//                axes->setFirstAxis(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setFirstAxis(parseAxis(options, isLocal));
                 axes->firstAxis()->setTrailingTrivia(eat(' '));
-                axes->setSecondAxis(
-                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
-                                             peekLiteral(), options, isLocal));
+//                axes->setSecondAxis(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setSecondAxis(parseAxis(options, isLocal));
                 break;
             }
 
             case PT::BlockPos:
             case PT::Vec3: {
                 auto *axes = static_cast<XyzNode *>(node);
-                axes->setX(
-                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
-                                             peekLiteral(), options, isLocal));
+//                axes->setX(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setX(parseAxis(options, isLocal));
                 axes->x()->setTrailingTrivia(eat(' '));
-                axes->setY(
-                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
-                                             peekLiteral(), options, isLocal));
+//                axes->setY(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setY(parseAxis(options, isLocal));
                 axes->y()->setTrailingTrivia(eat(' '));
-                axes->setZ(
-                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
-                                             peekLiteral(), options, isLocal));
+//                axes->setZ(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setZ(parseAxis(options, isLocal));
                 break;
             }
 
