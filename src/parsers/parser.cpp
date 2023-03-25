@@ -38,10 +38,6 @@ bool Parser::Error::operator==(const Error &o) const {
 Parser::Parser() {
 }
 
-Parser::Parser(const QString &input) : m_text(input) {
-    setPos(0);
-}
-
 int Parser::pos() const {
     return m_pos;
 }
@@ -64,6 +60,14 @@ void Parser::setPos(int pos) {
  * \brief Returns the text which is parsed.
  */
 QString Parser::text() const {
+    if (!m_srcText.isNull()) {
+        return m_srcText;
+    } else {
+        return m_text.toString();
+    }
+}
+
+QStringView Parser::textView() const {
     return m_text;
 }
 
@@ -71,13 +75,19 @@ QString Parser::text() const {
  * \brief Sets the text which is parsed and resets the current position.
  */
 void Parser::setText(const QString &text) {
-    m_text = text;
+    m_srcText = text;
+    m_text    = m_srcText;
     setPos(0);
 }
 
 void Parser::setText(QString &&newText) {
-    m_text = std::move(newText);
+    m_srcText = std::move(newText);
+    m_text    = m_srcText;
     setPos(0);
+}
+
+void Parser::setText(QStringView text) {
+    m_text = text;
 }
 
 Parser::Errors Parser::errors() const {
@@ -133,6 +143,14 @@ void Parser::advance(int n) {
 }
 
 /*!
+ * \brief Advances the current position using the string view \a sv.
+ */
+QStringView Parser::advanceView(QStringView sv) {
+    advance(sv.length());
+    return sv;
+}
+
+/*!
  * \brief Throws a \c error if the char \a chr isn't equal to the current character.
  */
 bool Parser::expect(QChar chr) {
@@ -177,25 +195,18 @@ QString Parser::eat(QChar chr, EatOptions options) {
 /*!
  * \brief Returns the substring from the current character until it meets the character \a chr (exclusive).
  */
-QString Parser::getUntil(QChar chr) {
-    const QStringRef &ref = peekUntil(chr);
+QStringView Parser::getUntil(QChar chr) {
+    const auto view = peekUntil(chr);
 
-    advance(ref.length());
-    return ref.toString();
-}
-
-QStringRef Parser::getUntilRef(QChar chr) {
-    const QStringRef &ref = peekUntil(chr);
-
-    advance(ref.length());
-    return ref;
+    advance(view.length());
+    return view;
 }
 
 /*!
  * \brief Returns the remaining substring from the current character.
  */
-QStringRef Parser::getRest() {
-    const auto &rest = m_text.midRef(m_pos);
+QStringView Parser::getRest() {
+    const auto rest = m_text.mid(m_pos);
 
     advance(rest.length());
     return rest;
@@ -204,55 +215,69 @@ QStringRef Parser::getRest() {
 /*!
  * \brief Returns the substring from the current character with the given (regex) \a charset.
  */
-QString Parser::getWithCharset(const QString &charset) {
+QStringView Parser::getWithCharset(const QString &charset) {
     return getWithRegex("["_QL1 + charset + "]+"_QL1);
 }
 
-QString Parser::getWithCharset(const QLatin1String &charset) {
+QStringView Parser::getWithCharset(const QLatin1String &charset) {
     return getWithRegex("["_QL1 + charset + "]+"_QL1);
 }
 
 /*!
  * \brief Returns the substring from the current character with the given regex \a pattern.
  */
-QString Parser::getWithRegex(const QString &pattern) {
+QStringView Parser::getWithRegex(const QString &pattern) {
     return getWithRegex(QRegularExpression(pattern));
 }
 
 /*!
  * \brief Returns the substring from the current character with the given \a regex.
  */
-QString Parser::getWithRegex(const QRegularExpression &regex) {
-    QString ret;
-
-    const auto &match = regex.match(m_text, m_pos,
-                                    QRegularExpression::NormalMatch,
-                                    QRegularExpression::AnchoredMatchOption);
+QStringView Parser::getWithRegex(const QRegularExpression &regex) {
+    const auto &&match = regex.match(m_text, m_pos,
+                                     QRegularExpression::NormalMatch,
+                                     QRegularExpression::AnchoredMatchOption);
 
     if (match.hasMatch()) {
-        ret = match.captured();
-        advance(ret.length());
+        const int start = m_pos;
+        advance(match.capturedLength());
+// match.capturedView() return an invalid QStringView when a debugger is attached.
+// return match.capturedView();
+        return m_text.mid(start, match.capturedLength());
+    } else {
+        return QStringView();
     }
-    return ret;
 }
 
 /*!
  * \brief Returns \a n next characters (including the current character) without
  * advancing the current position.
  */
-QStringRef Parser::peek(int n) const {
-    return m_text.midRef(m_pos, n);
+QStringView Parser::peek(int n) const {
+    return m_text.mid(m_pos, n);
+}
+
+/*!
+ * \brief Returns \a n next characters (excluding the current character) without
+ * advancing the current position.
+ */
+QStringView Parser::peekNext(int n) const {
+    return m_text.mid(m_pos + 1, n);
 }
 
 /*!
  * \brief Returns the substring from the current character until it meets the
  * character \a chr (exclusive). It will not advances the current position.
  */
-QStringRef Parser::peekUntil(QChar chr) const {
+QStringView Parser::peekUntil(QChar chr) const {
     const int start = m_pos;
     const int index = m_text.indexOf(chr, start);
 
-    return m_text.midRef(start, qMax(-1, index - start));
+    return m_text.mid(start, (index > -1) ? index - start : m_text.size());
+}
+
+QStringView Parser::peekRest() const {
+    return m_text.mid(m_pos);
 }
 
 /*!
@@ -359,52 +384,54 @@ QString Parser::getQuotedString() {
     return value;
 }
 
-QString Parser::spanText(const QStringRef &textRef) {
-//    return spanText(textRef.toString());
+QString Parser::spanText(QStringView textView) {
+//    return spanText(textView.toString());
 
-//    const auto &&it = m_spans.constFind(QStringView(textRef));
-
-//    if (it != m_spans.cend()) {
-//        return *it;
-//    } else {
-//        const QString &&copy = textRef.toString();
-//        return *m_spans.insert(QStringView(copy), copy);
-//    }
-
-    const auto &&it = m_spans.find(textRef);
+    const auto &&it = m_spans.constFind(textView);
 
     if (it != m_spans.cend()) {
-        return it->second;
+        return *it;
     } else {
-        const QString &&copy = textRef.toString();
-        return m_spans.try_emplace(copy, std::move(copy)).first->second;
+        const QString &&copy = textView.toString();
+        return *m_spans.insert(copy, std::move(copy));
     }
+
+//    const auto &&it = m_spans.find(textView);
+
+//    if (it != m_spans.cend()) {
+//        return it->second;
+//    } else {
+//        const QString &&copy = textView.toString();
+//        return m_spans.emplace(copy, std::move(copy)).first->second;
+//    }
 }
 
 QString Parser::spanText(const QString &text) {
 //    return text;
+
 //    return *m_spans.insert(text);
 
 //    m_spans.insert(text);
 //    return *m_spans.find(text);
 
-//    return *m_spans.insert(QStringView(text), text);
-    return m_spans.try_emplace(text, text).first->second;
+    return *m_spans.insert(text, text);
+//    return m_spans.try_emplace(text, text).first->second;
 }
 
 QString Parser::spanText(QString &&text) {
 //    return text;
+
 //    return *m_spans.insert(std::move(text));
 
 //    m_spans.insert(std::move(text));
 //    return *m_spans.find(text);
 
-//    return *m_spans.insert(QStringView(text), text);
-    return m_spans.try_emplace(text, text).first->second;
+    return *m_spans.insert(text, std::move(text));
+//    return m_spans.try_emplace(text, std::move(text)).first->second;
 }
 
 QString Parser::spanText(int start) {
-    return spanText(m_text.midRef(start, m_pos - start));
+    return spanText(m_text.mid(start, m_pos - start));
 }
 
 bool Parser::parse() {
@@ -423,3 +450,7 @@ bool Parser::parse(QString &&text) {
     return parse();
 }
 
+bool Parser::parse(QStringView text) {
+    setText(text);
+    return parse();
+}

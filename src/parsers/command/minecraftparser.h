@@ -17,6 +17,7 @@
 
 #include <QVersionNumber>
 
+
 namespace Command {
     class MinecraftParser final : public SchemaParser  {
         Q_GADGET;
@@ -70,9 +71,9 @@ private:
                 if (name.isEmpty()) {
                     setPos(keyPos);
                     if (keyCharset.isNull()) {
-                        name = getLiteralString();
+                        name = getLiteralString().toString();
                     } else {
-                        name = this->getWithCharset(keyCharset);
+                        name = getWithCharset(keyCharset).toString();
                     }
                 }
                 if (name.isEmpty())

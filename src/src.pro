@@ -63,6 +63,7 @@ SOURCES += \
     newdatapackdialog.cpp \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
+    parsers/command/re2c_generated_functions.cpp \
     parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
     parsers/command/nodes/axesnode.cpp \
@@ -178,6 +179,8 @@ HEADERS += \
     parsers/command/nodes/timenode.h \
     parsers/command/parsenodecache.h \
     parsers/command/minecraftparser.h \
+    parsers/command/re2c_functions.re \
+    parsers/command/re2c_generated_functions.h \
     parsers/command/schema/schemaargumentnode.h \
     parsers/command/schema/schemaliteralnode.h \
     parsers/command/schema/schemanode.h \

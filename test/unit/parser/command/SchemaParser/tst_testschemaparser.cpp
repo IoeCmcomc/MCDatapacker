@@ -27,6 +27,8 @@ private slots:
     void useLoopToParseStringLiteral();
     void useLoopToParseStringLiteral2();
     void useLoopToParseStringLiteral3();
+    void stringViewToDec();
+    void qStringViewToDec();
 };
 
 TestSchemaParser::TestSchemaParser() {
@@ -51,9 +53,7 @@ void TestSchemaParser::test_case1() {
 }
 
 void TestSchemaParser::parseBool() {
-    const QString input("true");
-
-    SchemaParser             parser(input);
+    SchemaParser             parser("true");
     QSharedPointer<BoolNode> result(parser.brigadier_bool());
 
     QVERIFY(result->isValid());
@@ -412,6 +412,64 @@ void TestSchemaParser::useLoopToParseStringLiteral3() {
         ret = parseWithoutRegex3(input);
     }
     QCOMPARE(ret, result);
+}
+
+void TestSchemaParser::stringViewToDec() {
+    bool ok;
+
+    QCOMPARE(strToDec<char>(u"127", ok), 127);
+    QVERIFY(ok);
+    QCOMPARE(strToDec<short>(u"1234", ok), 1234);
+    QVERIFY(ok);
+    QCOMPARE(strToDec<int>(u"-2147483648", ok), -2147483648);
+    QVERIFY(ok);
+    QCOMPARE(strToDec<long long>(u"78187493520", ok), 78187493520);
+    QVERIFY(ok);
+    QCOMPARE(strToDec<int>(u"0", ok), 0);
+    QVERIFY(ok);
+    QCOMPARE(strToDec<int>(u"4g", ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(strToDec<short>(u"142857", ok), 0);
+    QVERIFY(!ok);
+
+    QBENCHMARK {
+        strToDec<char>(u"127", ok);
+        strToDec<short>(u"1234", ok);
+        strToDec<int>(u"-2147483648", ok);
+        strToDec<long long>(u"78187493520", ok);
+        strToDec<int>(u"0", ok);
+        strToDec<int>(u"4g", ok);
+        strToDec<short>(u"142857", ok);
+    }
+}
+
+void TestSchemaParser::qStringViewToDec() {
+    bool ok;
+
+    QCOMPARE(QStringView(u"127").toShort(&ok), 127);
+    QVERIFY(ok);
+    QCOMPARE(QStringView(u"1234").toShort(&ok), 1234);
+    QVERIFY(ok);
+    QCOMPARE(QStringView(u"-2147483648").toInt(&ok), -2147483648);
+    QVERIFY(ok);
+    QCOMPARE(QStringView(u"78187493520").toLongLong(&ok), 78187493520);
+    QVERIFY(ok);
+    QCOMPARE(QStringView(u"0").toInt(&ok), 0);
+    QVERIFY(ok);
+    QCOMPARE(QStringView(u"4g").toInt(&ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(QStringView(u"142857").toShort(&ok), 0);
+    QVERIFY(!ok);
+
+    QBENCHMARK {
+        QStringView(u"127").toShort(&ok);
+        QStringView(u"1234").toShort(&ok);
+        QStringView(u"-2147483648").toInt(&ok);
+        QStringView(u"78187493520").toLongLong(&ok);
+        QStringView(u"0").toInt(&ok);
+        QStringView(u"4g").toInt(&ok);
+        QStringView(u"142857").toShort(&ok);
+    }
 }
 
 QTEST_GUILESS_MAIN(TestSchemaParser)

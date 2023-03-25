@@ -16,27 +16,26 @@ namespace Command {
 
         const auto &&tree  = QSharedPointer<FileNode>::create();
         const auto &&txt   = text(); // This prevent crash in release build
-        const auto &&lines = txt.splitRef(QChar::LineFeed);
+        const auto &&lines = QStringView(txt).split(QChar::LineFeed);
 
         m_commandParser.m_spans = std::move(m_spans);
 
         QElapsedTimer timer;
         timer.start();
 
-        for (const auto &line: lines) {
-            const int   linePos = pos();
-            const auto &trimmed = line.trimmed();
+        for (const auto line: lines) {
+            const int  linePos = pos();
+            const auto trimmed = line.trimmed();
             if (trimmed.isEmpty() || trimmed[0] == '#') {
                 const auto &&span = SpanPtr::create(spanText(line));
                 span->setIsValid(true);
                 tree->append(std::move(span));
             } else {
-                const auto &&lineText = line.toString();
-                NodePtr      command;
+                NodePtr command;
 //                CacheKey     key{ typeId, lineText };
 //                if (!m_cache.contains(key)
 //                    || !(command = m_cache[key].lock())) {
-                m_commandParser.setText(lineText);
+                m_commandParser.setText(line);
                 command = m_commandParser.parse();
 //                    if (command->isValid()) {
 //                        m_cache.emplace(typeId, lineText, WeakNodePtr(command));

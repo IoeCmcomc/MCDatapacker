@@ -19,7 +19,8 @@ SOURCES +=  tst_testschemaparser.cpp \
     ../../../../../src/parsers/command/schema/schemaliteralnode.cpp \
     ../../../../../src/parsers/command/schema/schemanode.cpp \
     ../../../../../src/parsers/command/schema/schemarootnode.cpp \
-    ../../../../../src/parsers/parser.cpp
+    ../../../../../src/parsers/parser.cpp \
+    ../../../../../src/parsers/command/re2c_generated_functions.cpp
 
 HEADERS += \
     ../../../../../src/parsers/command/nodes/argumentnode.h \
@@ -34,7 +35,8 @@ HEADERS += \
     ../../../../../src/parsers/command/schema/schemaliteralnode.h \
     ../../../../../src/parsers/command/schema/schemanode.h \
     ../../../../../src/parsers/command/schema/schemarootnode.h \
-    ../../../../../src/parsers/parser.h
+    ../../../../../src/parsers/parser.h \
+    ../../../../../src/parsers/command/re2c_generated_functions.h
 
 RESOURCES += \
     ../../../../../resource/minecraft/info/1.15/1.15.qrc

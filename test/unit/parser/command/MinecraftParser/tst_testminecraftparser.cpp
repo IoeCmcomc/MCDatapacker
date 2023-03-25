@@ -4,7 +4,7 @@
 #include "../../../../../src/parsers/command/minecraftparser.h"
 #include "../../../../../src/parsers/command/visitors/reprprinter.h"
 
-//#define QBENCHMARK          if (true)
+#define QBENCHMARK          if (true)
 
 #define DECLARE_TAG_VARS    int i = 0; int c = 0; QString cat;
 #define SET_TAG(x)    i = 0; cat =#x;
@@ -53,6 +53,8 @@ void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setGameVer(QVersionNumber(1, 18, 2));
     Command::MinecraftParser::setTestMode(true);
 
+
+
     timer.start();
 //    QThread::sleep(5);
 }
@@ -62,7 +64,7 @@ void TestMinecraftParser::cleanupTestCase() {
 }
 
 void TestMinecraftParser::genRepr_data() {
-    QSKIP("");
+//    QSKIP("");
     //DECLARE_TAG_VARS;
 
     //QTest::addColumn<QString>("command");
@@ -109,8 +111,8 @@ void TestMinecraftParser::commands_data() {
     localTimer.start();
 
     SET_TAG(test)
-    QTest::newRow(GEN_TAG) << "tp IoeCmcomc" <<
-        "RootNode[2](LiteralNode(tp), EntityNode[single](StringNode(\"IoeCmcomc\")))";
+    QTest::newRow(GEN_TAG) << "tag 0-0-0-0-0 add 5.BlockChecker" <<
+        "RootNode[4](LiteralNode(tag), EntityNode[](UuidNode({00000000-0000-0000-0000-000000000000})), LiteralNode(add), StringNode(\"5.BlockChecker\"))";
 
     SET_TAG(advancement)
     QTest::newRow(GEN_TAG) <<
@@ -329,6 +331,10 @@ void TestMinecraftParser::commands_data() {
     QTest::newRow(GEN_TAG) << "give @a[distance=..5, nbt={Air:300s}] stone" <<
         "RootNode[3](LiteralNode(give), EntityNode[player](TargetSelectorNode(@a){MapNode(KeyNode(\"distance\"): FloatRangeNode(..5), KeyNode(\"nbt\"): EntityArgumentValueNode(NbtCompoundNode(KeyNode(\"Air\"): NbtShortNode(300))))}), ItemStackNode(ResourceLocationNode(stone)))";
 
+    SET_TAG(kill)
+    QTest::newRow(GEN_TAG) << R"(kill 1-2-3-4-5)" <<
+        "RootNode[2](LiteralNode(kill), EntityNode[](UuidNode({00000001-0002-0003-0004-000000000005})))";
+
     SET_TAG(locate)
     QTest::newRow(GEN_TAG) << "locate mansion" <<
         "RootNode[2](LiteralNode(locate), ResourceLocationNode(mansion))";
@@ -408,6 +414,11 @@ void TestMinecraftParser::commands_data() {
         R"(summon villager ~ ~ ~ {Offers:{Recipes:[{buy:{id:dirt,Count:1},sell:{id:diamond,Count:1},rewardExp:false}]}})"
                            <<
         "RootNode[4](LiteralNode(summon), EntitySummonNode(villager), Vec3Node(x: AngleNode(~), y: AngleNode(~), z: AngleNode(~)), NbtCompoundNode(KeyNode(\"Offers\"): NbtCompoundNode(KeyNode(\"Recipes\"): NbtListNode[1](NbtCompoundNode(KeyNode(\"buy\"): NbtCompoundNode(KeyNode(\"id\"): NbtStringNode(\"dirt\"), KeyNode(\"Count\"): NbtIntNode(1)), KeyNode(\"sell\"): NbtCompoundNode(KeyNode(\"id\"): NbtStringNode(\"diamond\"), KeyNode(\"Count\"): NbtIntNode(1)), KeyNode(\"rewardExp\"): NbtByteNode(0))))))";
+
+    SET_TAG(tag)
+    QTest::newRow(GEN_TAG) << "tag 0-0-0-0-0 add 5.BlockChecker" <<
+        "RootNode[4](LiteralNode(tag), EntityNode[](UuidNode({00000000-0000-0000-0000-000000000000})), LiteralNode(add), StringNode(\"5.BlockChecker\"))";
+
 
     SET_TAG(team)
     QTest::newRow(GEN_TAG) << R"(team modify m.Purple color dark_purple)" <<

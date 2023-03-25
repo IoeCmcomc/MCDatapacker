@@ -47,7 +47,8 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/visitors/nodevisitor.cpp \
     ../../../../../src/parsers/command/visitors/overloadnodevisitor.cpp \
     ../../../../../src/parsers/command/visitors/reprprinter.cpp \
-    ../../../../../src/parsers/parser.cpp
+    ../../../../../src/parsers/parser.cpp \
+    ../../../../../src/parsers/command/re2c_generated_functions.cpp
 
 HEADERS += \
     ../../../../../src/parsers/command/minecraftparser.h \
@@ -83,7 +84,8 @@ HEADERS += \
     ../../../../../src/parsers/command/visitors/nodevisitor.h \
     ../../../../../src/parsers/command/visitors/overloadnodevisitor.h \
     ../../../../../src/parsers/command/visitors/reprprinter.h \
-    ../../../../../src/parsers/parser.h
+    ../../../../../src/parsers/parser.h \
+    ../../../../../src/parsers/command/re2c_generated_functions.h
 
 RESOURCES += \
     ../../../../../resource/minecraft/info/1.18.2/1.18.2.qrc

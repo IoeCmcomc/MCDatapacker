@@ -207,8 +207,7 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                 continue;
             }
 
-            m_parser->setText(line);
-
+            m_parser->setText(QStringView(line));
             const auto &result = m_parser->parse();
             if (result->isValid()) {
                 m_nodeCounter.startVisiting(result.get());

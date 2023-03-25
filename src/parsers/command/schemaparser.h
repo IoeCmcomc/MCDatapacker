@@ -14,6 +14,62 @@
 
 #include <stdexcept>
 
+template<typename T>
+T strToDec(QStringView v, bool &ok) {
+    std::make_unsigned_t<T> value = 0;
+    int                     sign  = 1;
+
+    switch (v.at(0).toLatin1()) {
+        case '-': {
+            sign = -1;
+            v    = v.mid(1);
+            break;
+        }
+        case '+': {
+            sign = 1;
+            v    = v.mid(1);
+            break;
+        }
+    }
+
+    ok = false;
+    for (int i = 0; i < v.length(); ++i) {
+        if (value > std::numeric_limits<T>::max() / 10) {
+            ok = false;
+            return 0;
+        }
+        value *= 10;
+        const char ch = v[i].toLatin1();
+        switch (ch) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
+                const uchar digit = ch - '0';
+                value += digit;
+                ok     = true;
+                break;
+            }
+            default: {
+                ok = false;
+                return 0;
+            }
+        }
+        if (((sign == 1) && (value > std::numeric_limits<T>::max()))
+            || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
+            ok = false;
+            return 0;
+        }
+    }
+    return value * sign;
+}
+
 namespace Command {
     class SchemaParser : public Parser {
         Q_GADGET
@@ -58,7 +114,10 @@ protected:
         };
 
         QString peekLiteral() const;
-        QString getLiteralString();
+        QStringView getLiteralString();
+
+        QPair<QStringView, int> parseInteger(bool &ok);
+        QPair<QStringView, float> parseFloat(bool &ok);
 
         bool canContinue(Schema::Node **schemaNode, int depth);
         void parseBySchema(const Schema::Node *schemaNode, int depth = 0);
@@ -129,8 +188,8 @@ protected:
 private:
         ParseNodeCache m_cache;
         QSharedPointer<Command::RootNode> m_tree;
-        static inline const QRegularExpression m_decimalNumRegex{
-            QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
+//        static inline const QRegularExpression m_decimalNumRegex{
+//            QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
         static inline Schema::RootNode m_schemaGraph;
     };
 }

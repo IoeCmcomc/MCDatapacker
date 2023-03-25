@@ -4,6 +4,8 @@
 #include "schema/schemaargumentnode.h"
 #include "schema/schemaliteralnode.h"
 
+#include "re2c_generated_functions.h"
+
 #include "uberswitch/include/uberswitch/uberswitch.hpp"
 
 #include <QCoreApplication>
@@ -475,7 +477,7 @@ namespace Command {
         return peekUntil(QChar::Space).toString();
     }
 
-    QString SchemaParser::getLiteralString() {
+    QStringView SchemaParser::getLiteralString() {
         const int start = pos();
 
         while (true) {
@@ -550,10 +552,38 @@ namespace Command {
                     break;
                 }
                 default: {
-                    return text().mid(start, pos() - start);
+                    return textView().mid(start, pos() - start);
                 }
             }
         }
+    }
+
+    QPair<QStringView, int> SchemaParser::parseInteger(bool &ok) {
+        const int start = pos();
+
+        if (curChar() == '-' || curChar() == '+') {
+            advance();
+        }
+
+        while (curChar().isDigit()) {
+            advance();
+        }
+
+        const QStringView raw   = textView().mid(start, pos() - start);
+        const int         value = strToDec<int>(raw, ok);
+        return { raw, value };
+    }
+
+    QPair<QStringView, float> SchemaParser::parseFloat(bool &ok) {
+        ok = false;
+        const QStringView raw   = re2c::decimal(peekRest());
+        int               value = raw.toFloat(&ok);
+
+        if (ok) {
+            advance(raw.length());
+        }
+
+        return { raw, value };
     }
 
     QSharedPointer<BoolNode> SchemaParser::brigadier_bool() {
@@ -576,13 +606,18 @@ namespace Command {
 
     QSharedPointer<DoubleNode> SchemaParser::brigadier_double(
         const QVariantMap &props) {
-        const QString &&raw   = getWithRegex(m_decimalNumRegex);
-        bool            ok    = false;
-        double          value = raw.toDouble(&ok);
+//        const auto raw   = getWithRegex(m_decimalNumRegex);
+        const QStringView raw   = re2c::decimal(peekRest());
+        bool              ok    = false;
+        double            value = raw.toDouble(&ok);
 
         if (!ok) {
-            reportError(QT_TR_NOOP("%1 is not a vaild double number"), { raw });
+            reportError(QT_TR_NOOP(
+                            "%1 is not a vaild double number"),
+                        { raw.toString() });
             return QSharedPointer<DoubleNode>::create(spanText(raw), false);
+        } else {
+            advance(raw.length());
         }
         if (const QVariant &vari = props.value(QStringLiteral(
                                                    "min")); vari.isValid()) {
@@ -597,13 +632,18 @@ namespace Command {
 
     QSharedPointer<FloatNode> SchemaParser::brigadier_float(
         const QVariantMap &props) {
-        const QString &&raw   = getWithRegex(m_decimalNumRegex);
-        bool            ok    = false;
-        float           value = raw.toFloat(&ok);
+        //const auto raw   = getWithRegex(m_decimalNumRegex);
+        const QStringView raw   = re2c::decimal(peekRest());
+        bool              ok    = false;
+        float             value = raw.toFloat(&ok);
 
         if (!ok) {
-            reportError(QT_TR_NOOP("%1 is not a vaild float number"), { raw });
+            reportError(QT_TR_NOOP(
+                            "%1 is not a vaild float number"),
+                        { raw.toString() });
             return QSharedPointer<FloatNode>::create(spanText(raw), false);
+        } else {
+            advance(raw.length());
         }
         if (const QVariant &vari = props.value(QStringLiteral(
                                                    "min")); vari.isValid()) {
@@ -618,13 +658,13 @@ namespace Command {
 
     QSharedPointer<IntegerNode> SchemaParser::brigadier_integer(
         const QVariantMap &props) {
-        const QString &&raw   = getWithRegex(QStringLiteral(R"([+-]?\d+)"));
-        bool            ok    = false;
-        int             value = raw.toFloat(&ok);
+        bool ok;
+
+        auto [raw, value] = parseInteger(ok);
 
         if (!ok) {
             reportError(QT_TR_NOOP("%1 is not a vaild integer number"),
-                        { raw });
+                        { raw.toString() });
             return QSharedPointer<IntegerNode>::create(spanText(raw), false);
         }
         if (const QVariant &vari = props.value(QStringLiteral(
@@ -640,7 +680,7 @@ namespace Command {
 
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {
         return QSharedPointer<LiteralNode>::create(
-            spanText(getUntilRef(QChar::Space)));
+            spanText(getUntil(QChar::Space)));
     }
 
     QSharedPointer<StringNode> SchemaParser::brigadier_string(
@@ -666,7 +706,7 @@ namespace Command {
                 }
             }
             ucase ("word"_QL1): {
-                const QString &&literal = getLiteralString();
+                const auto literal = getLiteralString();
                 return QSharedPointer<StringNode>::create(
                     spanText(literal),
                     errorIfNot(
@@ -684,8 +724,6 @@ namespace Command {
     QSharedPointer<ParseNode> SchemaParser::parse() {
         m_tree = QSharedPointer<RootNode>::create();
         m_errors.clear();
-        const QString &txt = text();
-
         if (m_schemaGraph.isEmpty()) {
             qWarning() << "The parser schema hasn't been initialized yet.";
             return m_tree;
@@ -693,10 +731,11 @@ namespace Command {
 
         setPos(0);
         try {
-            m_tree->setLeadingTrivia(skipWs());
+            m_tree->setLeadingTrivia(skipWs(false));
             parseBySchema(&m_schemaGraph);
+
             m_tree->setLength(pos() - 1);
-            m_tree->setTrailingTrivia(skipWs());
+            m_tree->setTrailingTrivia(skipWs(false));
 //                const auto &treeChildren = m_tree->children();
 //                for (auto it = treeChildren.cbegin();
 //                     it != treeChildren.cend(); ++it) {
@@ -709,7 +748,7 @@ namespace Command {
 //                }
         } catch (const SchemaParser::Error &err) {
             qDebug() << "Command::Parser::parse: errors detected";
-            qDebug() << text();
+            qDebug() << textView();
             m_errors << err;
             for (const auto &error: m_errors) {
                 qDebug() << error.toLocalizedMessage();

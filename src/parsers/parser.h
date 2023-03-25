@@ -6,8 +6,8 @@
 
 #include <stdexcept>
 
-//using StringHash = QHash<QStringView, QString>;
-using StringHash = std::unordered_map<QStringView, QString>;
+using StringHash = QHash<QStringView, QString>;
+//using StringHash = std::unordered_map<QStringView, QString>;
 
 //using StringHash = QSet<QString>;
 
@@ -45,7 +45,14 @@ public:
     using Errors = QVector<Error>;
 
     Parser();
-    explicit Parser(const QString &input);
+    explicit Parser(const QString &text) : m_srcText(text) {
+        m_text = m_srcText;
+        setPos(0);
+    };
+    explicit Parser(QString &&text) : m_srcText(text) {
+        m_text = m_srcText;
+        setPos(0);
+    };
 
     int pos() const;
     void setPos(int newPos);
@@ -55,17 +62,19 @@ public:
     }
 
     QString text() const;
+    QStringView textView() const;
     void setText(const QString &newText);
     void setText(QString &&newText);
+    void setText(QStringView text);
 
     bool parse();
     bool parse(const QString &text);
     bool parse(QString &&text);
+    bool parse(QStringView text);
 
     Errors errors() const;
 
     StringHash spans() const;
-
 
 
 protected:
@@ -90,23 +99,25 @@ protected:
                                  int pos, int length = 0);
 
     void advance(int n = 1);
+    QStringView advanceView(QStringView sv);
 
     bool expect(QChar chr);
     QString eat(QChar chr, EatOptions options = NoOption);
-    QString getUntil(QChar chr);
-    QStringRef getUntilRef(QChar chr);
-    QStringRef getRest();
-    QString getWithCharset(const QString &charset);
-    QString getWithCharset(const QLatin1String &charset);
-    QString getWithRegex(const QString &pattern);
-    QString getWithRegex(const QRegularExpression &regex);
-    QStringRef peek(int n) const;
-    QStringRef peekUntil(QChar chr) const;
+    QStringView getUntil(QChar chr);
+    QStringView getRest();
+    QStringView getWithCharset(const QString &charset);
+    QStringView getWithCharset(const QLatin1String &charset);
+    QStringView getWithRegex(const QString &pattern);
+    QStringView getWithRegex(const QRegularExpression &regex);
+    QStringView peek(int n) const;
+    QStringView peekNext(int n) const;
+    QStringView peekUntil(QChar chr) const;
+    QStringView peekRest() const;
     QString skipWs(bool once = true);
 
     QString getQuotedString();
 
-    QString spanText(const QStringRef& textRef);
+    QString spanText(QStringView textView);
     QString spanText(const QString& text);
     QString spanText(QString&& text);
     QString spanText(int start);
@@ -116,7 +127,8 @@ protected:
     };
 
 private:
-    QString m_text;
+    QStringView m_text;
+    QString m_srcText;
     int m_pos = 0;
     QChar m_curChar;
 };

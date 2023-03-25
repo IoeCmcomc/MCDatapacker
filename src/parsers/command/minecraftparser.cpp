@@ -1,9 +1,9 @@
 #include "minecraftparser.h"
 
+#include "re2c_generated_functions.h"
+
 #include "json/single_include/nlohmann/json.hpp"
 #include "uberswitch/include/uberswitch/uberswitch.hpp"
-
-#include <QMetaEnum>
 
 using json = nlohmann::json;
 
@@ -31,17 +31,17 @@ namespace Command {
 
     QString MinecraftParser::oneOf(const QLatin1StringVector &strArr) {
         const int         start   = pos();
-        const QStringRef &curText = text().midRef(pos());
+        const QStringView curText = peekRest();
 
         for (const auto &str: qAsConst(strArr)) {
             if (curText.startsWith(str)) {
-                this->advance(str.size());
+                advance(str.size());
                 return str;
             }
         }
-        this->reportError(QT_TR_NOOP("Only accept one of the following: %1"),
-                          { join(strArr) }, start,
-                          peekLiteral().length());
+        reportError(QT_TR_NOOP("Only accept one of the following: %1"),
+                    { join(strArr) }, start,
+                    peekLiteral().length());
         return QString();
     }
 
@@ -51,7 +51,7 @@ namespace Command {
         while (curChar().isSpace()) {
             advance();
         }
-        if (this->curChar() != endChr) {
+        if (curChar() != endChr) {
             expect(sepChr);
             advance();
             while (curChar().isSpace()) {
@@ -69,61 +69,62 @@ namespace Command {
 
         const bool canBeLocal = options & AxisParseOption::CanBeLocal;
         const bool onlyInt    = options & AxisParseOption::OnlyInteger;
-        bool       valid      = true;
+        bool       isValid    = true;
 
         const auto axisVal =
-            [this, onlyInt, &valid](AngleNode *axis) {
+            [this](AngleNode *axis, bool onlyInt, bool &valid) {
                 if (onlyInt) {
-                    const auto &&intNode = brigadier_integer();
-                    valid = intNode->isValid();
-                    axis->setValue(intNode->value());
+                    auto [_, value] = parseInteger(valid);
+                    axis->setValue(value);
                 } else {
-                    const auto &&floatNode = brigadier_float();
-                    valid = floatNode->isValid();
-                    axis->setValue(floatNode->value());
+                    auto [_, value] = parseFloat(valid);
+                    axis->setValue(value);
                 }
             };
 
         const int start     = pos();
         bool      hasPrefix = false;
         AnglePtr  axis;
-        if (this->curChar() == '~') {
+        if (curChar() == '~') {
             if (!isLocal) {
                 axis      = AnglePtr::create(AxisType::Relative);
                 hasPrefix = true;
                 isLocal   = false;
-                this->advance();
+                advance();
             } else {
-                this->throwError(mixCoordErrMsg);
+                throwError(mixCoordErrMsg);
             }
-        } else if (this->curChar() == '^') {
+        } else if (curChar() == '^') {
             if (isLocal == false)
                 isLocal = true;
             if (canBeLocal && isLocal) {
                 axis      = AnglePtr::create(AxisType::Local);
                 hasPrefix = true;
-                this->advance();
+                advance();
             } else if (!isLocal) {
-                this->throwError(mixCoordErrMsg);
+                throwError(mixCoordErrMsg);
             }
         } else {
             axis = AnglePtr::create(AxisType::Absolute);
         }
         if (hasPrefix) {
-            if ((!this->curChar().isNull()) && (this->curChar() != ' ')) {
-                axisVal(axis.get());
+            if ((!curChar().isNull()) && (curChar() != ' ')) {
+                axisVal(axis.get(), onlyInt, isValid);
             }
         } else {
             if (isLocal) {
-                if (this->curChar() != ' ') {
-                    this->throwError(mixCoordErrMsg);
+                if (curChar() != ' ') {
+                    throwError(mixCoordErrMsg);
                 }
             } else {
-                axisVal(axis.get());
+                axisVal(axis.get(), onlyInt, isValid);
             }
         }
         axis->setText(spanText(start));
-        axis->setIsValid(valid);
+        axis->setIsValid(isValid);
+        if (!isValid) {
+            reportError("Invalid axis value", {}, start, axis->length());
+        }
         return axis;
     }
 
@@ -196,7 +197,7 @@ namespace Command {
 
             case '[': {
                 advance();
-                if (text().midRef(pos() + 1, 1) == ';') {
+                if (peekNext(1) == ';') {
                     switch (curChar().toLower().toLatin1()) {
                         case 'b': {
                             return parseArrayTag<NbtByteArrayNode, NbtByteNode>(
@@ -261,7 +262,7 @@ namespace Command {
             }
 
             default: {
-                const QString &&value = getLiteralString();
+                const auto value = getLiteralString();
                 if (value.isEmpty()) {
                     reportError(QT_TR_NOOP("Invalid empty tag value"));
                 } else {
@@ -274,85 +275,104 @@ namespace Command {
     }
 
     QSharedPointer<NbtNode> MinecraftParser::parseNumericTag() {
-        const int    start  = pos();
-        const auto &&number = brigadier_double();
+        const int start = pos();
 
-        const QString &&literal = number->text();
-        bool            ok      = false;
+        const QStringView literal = advanceView(re2c::decimal(peekRest()));
+        bool              ok      = false;
 
         switch (curChar().toLower().toLatin1()) {
             case 'b': {
                 advance();
-                short int integer = literal.toShort(&ok);
-                if (ok && integer <= 128 && integer >= -127) {
+//                const short int value = literal.toShort(&ok);
+                const int8_t value = strToDec<int8_t>(literal, ok);
+                if (ok) {
                     return QSharedPointer<NbtByteNode>::create(
-                        spanText(start), (int8_t)integer, true);
+                        spanText(start), value, true);
                 } else {
                     throwError(QT_TR_NOOP("%1 is not a vaild SNBT byte tag"),
-                               { literal }, start, number->length());
+                               { literal.toString() }, start, literal.length());
                     break;
                 }
             }
 
             case 'd': {
                 advance();
-                return QSharedPointer<NbtDoubleNode>::create(
-                    spanText(start), number->value(), true);
+                const double value = literal.toDouble(&ok);
+                if (ok) {
+                    return QSharedPointer<NbtDoubleNode>::create(
+                        spanText(start), value, true);
+                } else {
+                    throwError(QT_TR_NOOP("%1 is not a vaild SNBT double tag"),
+                               { literal.toString() }, start, literal.length());
+                    break;
+                }
             }
 
             case 'f': {
                 advance();
-                float value = literal.toFloat(&ok);
+                const double value = literal.toFloat(&ok);
                 if (ok) {
                     return QSharedPointer<NbtFloatNode>::create(
                         spanText(start), value, true);
                 } else {
                     throwError(QT_TR_NOOP("%1 is not a vaild SNBT float tag"),
-                               { literal }, start, number->length());
+                               { literal.toString() }, start, literal.length());
                     break;
                 }
             }
 
             case 'l': {
                 advance();
-                int64_t value = literal.toLongLong(&ok);
+//                const long long value = literal.toLongLong(&ok);
+                const long long value = strToDec<long long>(literal, ok);
                 if (ok) {
                     return QSharedPointer<NbtLongNode>::create(
                         spanText(start), value, true);
                 } else {
                     throwError(QT_TR_NOOP("%1 is not a vaild SNBT long tag"),
-                               { literal }, start, number->length());
+                               { literal.toString() }, start, literal.length());
                     break;
                 }
             }
 
             case 's': {
                 advance();
-                short int value = literal.toShort(&ok);
+                const short int value = literal.toShort(&ok);
                 if (ok) {
                     return QSharedPointer<NbtShortNode>::create(
                         spanText(start), value, true);
                 } else {
                     throwError(QT_TR_NOOP("%1 is not a vaild SNBT short tag"),
-                               { literal }, start, number->length());
+                               { literal.toString() }, start, literal.length());
                     break;
                 }
             }
 
             default: {
                 if (literal.contains('.')) {
-                    return QSharedPointer<NbtDoubleNode>::create(
-                        literal, number->value(), true);
+                    const double value = literal.toDouble(&ok);
+                    if (ok) {
+                        return QSharedPointer<NbtDoubleNode>::create(
+                            spanText(start), value, true);
+                    } else {
+                        throwError(QT_TR_NOOP(
+                                       "%1 is not a vaild SNBT double tag"),
+                                   { literal.toString() },
+                                   start,
+                                   literal.length());
+                        break;
+                    }
                 } else {
-                    int value = literal.toInt(&ok);
+//                    const int value = literal.toInt(&ok);
+                    const int value = strToDec<int>(literal, ok);
                     if (ok) {
                         return QSharedPointer<NbtIntNode>::create(
-                            literal, value, true);
+                            spanText(start), value, true);
                     } else {
                         throwError(
                             QT_TR_NOOP(
                                 "%1 is not a vaild SNBT integer tag"),
-                            { literal }, start, number->length());
+                            { literal.toString() }, start, literal.length());
                     }
                 }
             }
@@ -393,7 +413,7 @@ namespace Command {
     parseEntityAdvancements() {
         return parseMap<MapNode, ParseNode>('{', '}', '=',
                                             [this](const QString &) -> NodePtr {
-            if (this->curChar() == '{') {
+            if (curChar() == '{') {
                 return parseMap<MapNode, BoolNode>(
                     '{', '}', '=', [this](const QString &) ->
                     QSharedPointer<BoolNode> {
@@ -406,7 +426,7 @@ namespace Command {
     }
 
     QSharedPointer<MapNode> MinecraftParser::parseEntityArguments() {
-        return this->parseMap<MapNode, ParseNode>(
+        return parseMap<MapNode, ParseNode>(
             '[', ']', '=', [this](
                 const QString &key) -> QSharedPointer<ParseNode> {
             uswitch (key) {
@@ -437,16 +457,16 @@ namespace Command {
                 }
                 ucase ("sort"_QL1): {
                     const QString &&literal =
-                        this->oneOf({ "nearest"_QL1, "furthest"_QL1,
-                                      "random"_QL1, "arbitrary"_QL1 });
+                        oneOf({ "nearest"_QL1, "furthest"_QL1,
+                                "random"_QL1, "arbitrary"_QL1 });
                     return QSharedPointer<StringNode>::create(
                         spanText(literal), !literal.isEmpty());
                 }
                 ucase ("gamemode"_QL1): {
                     const auto &&ret        = parseNegEntityArg();
                     const QString &&literal =
-                        this->oneOf({ "adventure"_QL1, "creative"_QL1,
-                                      "spectator"_QL1, "survival"_QL1 });
+                        oneOf({ "adventure"_QL1, "creative"_QL1,
+                                "spectator"_QL1, "survival"_QL1 });
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(literal), !literal.isEmpty()));
                     return ret;
@@ -458,7 +478,7 @@ namespace Command {
                     if (curChar() == '"' || curChar() == '\'') {
                         literal = getQuotedString();
                     } else {
-                        literal = getLiteralString();
+                        literal = getLiteralString().toString();
                     }
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(start), literal,
@@ -483,8 +503,8 @@ namespace Command {
                 }
                 ucase ("tag"_QL1):
                 ucase ("team"_QL1): {
-                    const auto &&ret  = parseNegEntityArg();
-                    QString &&literal = getLiteralString();
+                    const auto &&ret    = parseNegEntityArg();
+                    QStringView literal = getLiteralString();
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(literal), true));
                     return ret;
@@ -499,9 +519,9 @@ namespace Command {
                     return parseEntityAdvancements();
                 }
                 default: {
-                    this->throwError(QT_TR_NOOP(
-                                         "Unknown entity argument name: %1"),
-                                     { key });
+                    throwError(QT_TR_NOOP(
+                                   "Unknown entity argument name: %1"),
+                               { key });
                 }
             }
             return nullptr;
@@ -599,7 +619,7 @@ namespace Command {
             }
 
             default: {
-                const auto &&name = getWithCharset("0-9a-zA-Z-_+"_QL1);
+                const auto name = advanceView(re2c::nbtPathKey(peekRest()));
                 ret->setName(QSharedPointer<StringNode>::create(
                                  spanText(name),
                                  errorIfNot(!name.isEmpty(),
@@ -649,8 +669,8 @@ namespace Command {
 
     void MinecraftParser::parseResourceLocation(ResourceLocationNode *node,
                                                 bool acceptTag) {
-        const static QRegularExpression charsetRegex{ QStringLiteral(
-                                                          "[0-9a-z-_\\/.]*") };
+//        const static QRegularExpression charsetRegex{ QStringLiteral(
+//                                                          "[0-9a-z-_\\/.]*") };
 
         bool      hasError = false;
         const int start    = pos();
@@ -668,11 +688,13 @@ namespace Command {
             node->setLeftText(spanText(start));
         }
 
-        id = SpanPtr::create(spanText(getWithRegex(charsetRegex)));
-        if (this->curChar() == ':') {
-            this->advance();
+        const auto idStrView = advanceView(re2c::resLocPart(peekRest()));
+        id = SpanPtr::create(spanText(idStrView));
+        if (curChar() == ':') {
+            advance();
             nspace = std::move(id);
-            id     = SpanPtr::create(spanText(getWithRegex(charsetRegex)));
+            id     = SpanPtr::create(
+                spanText(advanceView(re2c::resLocPart(peekRest()))));
             id->setLeadingTrivia(spanText(QStringLiteral(":")));
         }
         if (nspace) {
@@ -687,7 +709,7 @@ namespace Command {
         }
         Q_ASSERT(id != nullptr);
         if (id->leftText().isNull() && id->text().isEmpty()) {
-            this->reportError(QT_TR_NOOP("Invalid empty namespaced ID"));
+            reportError(QT_TR_NOOP("Invalid empty namespaced ID"));
         } else {
             id->setIsValid(true);
         }
@@ -707,7 +729,7 @@ namespace Command {
         parseResourceLocation(resLoc.get(), acceptTag);
         node->setResLoc(std::move(resLoc));
 
-        if (this->curChar() == '[') {
+        if (curChar() == '[') {
             node->setStates(
                 parseMap<MapNode, ParseNode>('[', ']', '=',
                                              [this](const QString &) {
@@ -715,26 +737,49 @@ namespace Command {
                 return brigadier_string(props);
             }));
         }
-        if (this->curChar() == '{')
+        if (curChar() == '{')
             node->setNbt(parseCompoundTag());
     }
 
     void Command::MinecraftParser::parseEntity(Command::EntityNode *node,
                                                bool allowFakePlayer) {
-        int curPos = pos();
+        const int curPos = pos();
 
-        if (this->curChar() == '@') {
-            node->setNode(parseTargetSelector());
-        } else {
-            auto &&uuid = minecraft_uuid();
-            if (uuid->isValid()) {
-                node->setNode(std::move(uuid));
-            } else {
-                setPos(curPos);
-                m_errors.pop_back();
-                const QString &&literal = allowFakePlayer
-                        ? getUntil(QChar::Space)
-                        : getWithCharset("0-9a-zA-Z_"_QL1);
+        switch (curChar().toLower().toLatin1()) {
+            case '@': {
+                node->setNode(parseTargetSelector());
+                break;
+            }
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f': {
+                auto &&uuid = minecraft_uuid();
+                if (uuid->isValid()) {
+                    node->setNode(std::move(uuid));
+                    break;
+                } else {
+                    setPos(curPos);
+                    m_errors.pop_back();
+                    [[fallthrough]];
+                }
+            }
+            default: {
+                const auto literal = allowFakePlayer
+                    ? getUntil(QChar::Space)
+                    : advanceView(re2c::realPlayerName(peekRest()));
 
                 node->setNode(QSharedPointer<StringNode>::create(
                                   spanText(literal),
@@ -933,27 +978,27 @@ namespace Command {
         const auto &&ret    = QSharedPointer<FloatRangeNode>::create(0);
         bool         hasMax = false;
 
-        if (this->peek(2) == QLatin1String("..")) {
+        if (peek(2) == QLatin1String("..")) {
             hasMax = true;
-            this->advance(2);
+            advance(2);
         }
 
-        const auto &&num1 = this->brigadier_float();
+        const auto &&num1 = brigadier_float();
         if (!hasMax) {
             bool hasDoubleDot = false;
-            if (this->peek(2) == ".."_QL1) {
-                this->advance(2);
+            if (peek(2) == ".."_QL1) {
+                advance(2);
                 hasDoubleDot = true;
             } else if (!num1->text().isEmpty() && num1->text().back() == '.'_QL1
                        && curChar() == '.'_QL1) {
-                this->advance();
+                advance();
                 num1->chopTrailingDot();
                 hasDoubleDot = true;
             }
             if (hasDoubleDot) {
                 if (curChar().isDigit() || curChar() == '.' ||
                     curChar() == '-') { // "min..max"
-                    ret->setMaxValue(this->brigadier_float(), true);
+                    ret->setMaxValue(brigadier_float(), true);
                 }
                 num1->setTrailingTrivia(spanText(QStringLiteral("..")));
                 ret->setMinValue(std::move(num1), true); // "min.."
@@ -991,14 +1036,14 @@ namespace Command {
         const auto &&ret    = QSharedPointer<IntRangeNode>::create(0);
         bool         hasMax = false;
 
-        if (this->peek(2) == ".."_QL1) {
+        if (peek(2) == ".."_QL1) {
             hasMax = true;
-            this->advance(2);
+            advance(2);
         }
-        const auto &&num1 = this->brigadier_integer();
+        const auto &&num1 = brigadier_integer();
         if (!hasMax) {
-            if (this->peek(2) == ".."_QL1) {
-                this->advance(2);
+            if (peek(2) == ".."_QL1) {
+                advance(2);
                 if (curChar().isDigit() || curChar() == '-') { // "min..max"
                     ret->setMaxValue(brigadier_integer(), false);
                 }
@@ -1025,7 +1070,7 @@ namespace Command {
 
     QSharedPointer<ItemSlotNode> MinecraftParser::
     minecraft_itemSlot() {
-        const QString &&slot = this->getWithCharset("a-z0-9._"_QL1);
+        const auto slot = advanceView(re2c::itemSlot(peekRest()));
 
         return QSharedPointer<ItemSlotNode>::create(
             spanText(slot), errorIfNot(!slot.isEmpty(),
@@ -1040,7 +1085,7 @@ namespace Command {
         parseResourceLocation(resLoc.get());
         ret->setResLoc(std::move(resLoc));
 
-        if (this->curChar() == '{') {
+        if (curChar() == '{') {
             ret->setNbt(parseCompoundTag());
         }
         ret->setLength(pos() - start);
@@ -1056,7 +1101,7 @@ namespace Command {
         parseResourceLocation(resLoc.get(), true);
         ret->setResLoc(std::move(resLoc));
 
-        if (this->curChar() == '{') {
+        if (curChar() == '{') {
             ret->setNbt(parseCompoundTag());
         }
         ret->setLength(pos() - start);
@@ -1114,9 +1159,9 @@ namespace Command {
 
     QSharedPointer<ObjectiveNode> MinecraftParser::
     minecraft_objective() {
-        const int curPos  = pos();
-        QString &&objname = this->getWithCharset("0-9a-zA-Z-+_.#"_QL1);
-        bool      valid   = true;
+        const int   curPos  = pos();
+        QStringView objname = advanceView(re2c::objective(peekRest()));
+        bool        valid   = true;
 
         if (objname.isEmpty()) {
             reportError("Invalid empty objective");
@@ -1125,7 +1170,7 @@ namespace Command {
                    (gameVer < QVersionNumber(1, 18, 2))) {
             reportError(QT_TR_NOOP(
                             "Objective '%1' must be less than 16 characters"),
-                        { objname }, curPos, objname.length());
+                        { objname.toString() }, curPos, objname.length());
             valid = false;
         }
         return QSharedPointer<ObjectiveNode>::create(spanText(objname), valid);
@@ -1133,7 +1178,7 @@ namespace Command {
 
     QSharedPointer<ObjectiveCriteriaNode> MinecraftParser::
     minecraft_objectiveCriteria() {
-        const QString &&criteria = this->getWithCharset("-\\w.:"_QL1);
+        const auto criteria = advanceView(re2c::objectiveCriteria(peekRest()));
 
         return QSharedPointer<ObjectiveCriteriaNode>::create(
             spanText(criteria), errorIfNot(!criteria.isEmpty(),
@@ -1282,7 +1327,7 @@ namespace Command {
             "sidebar"_QL1,
         };
 
-        const QString &&slot = this->oneOf(scoreboardSlots);
+        const QString &&slot = oneOf(scoreboardSlots);
 
         return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),
                                                           !slot.isEmpty());
@@ -1294,7 +1339,7 @@ namespace Command {
         SwizzleNode::Axes axes;
         QString           acceptedChars = QStringLiteral("xyz");
 
-        while (acceptedChars.contains(this->curChar())) {
+        while (acceptedChars.contains(curChar())) {
             switch (curChar().toLatin1()) {
                 case 'x': {
                     axes |= SwizzleNode::Axis::X;
@@ -1311,15 +1356,14 @@ namespace Command {
                     break;
                 }
             }
-            acceptedChars = acceptedChars.replace(this->curChar(), QString());
-            this->advance();
+            acceptedChars = acceptedChars.replace(curChar(), QString());
+            advance();
         }
         return QSharedPointer<SwizzleNode>::create(spanText(start), axes);
     }
 
     QSharedPointer<TeamNode> MinecraftParser::minecraft_team() {
-        const QString &&literal =
-            this->getWithCharset("-+\\w.:"_QL1);
+        const auto literal = getLiteralString();
 
         return QSharedPointer<TeamNode>::create(spanText(literal),
                                                 errorIfNot(!literal.isEmpty(),
@@ -1327,11 +1371,16 @@ namespace Command {
     }
 
     QSharedPointer<TimeNode> MinecraftParser::minecraft_time() {
-        const int    curPos = pos();
-        auto         unit   = TimeNode::Unit::ImplicitTick;
-        const auto &&number = brigadier_float();
+        const int curPos = pos();
+        auto      unit   = TimeNode::Unit::ImplicitTick;
+        bool      ok;
 
-        switch (this->curChar().toLatin1()) {
+        auto [raw, value] = parseFloat(ok);
+        if (!ok) {
+            reportError("Invalid time number", {}, curPos, raw.length());
+        }
+
+        switch (curChar().toLatin1()) {
             case 'd': {
                 unit = TimeNode::Unit::Day;
                 advance();
@@ -1352,36 +1401,19 @@ namespace Command {
         }
 
         auto &&ret = QSharedPointer<TimeNode>::create(spanText(curPos),
-                                                      number->value(), unit);
-        ret->setIsValid(number->isValid());
+                                                      value, unit);
+        ret->setIsValid(ok);
         return ret;
     }
 
     QSharedPointer<UuidNode> MinecraftParser::minecraft_uuid() {
-        const int                       curPos = pos();
-        static const QRegularExpression regex(
-            QStringLiteral(
-                R"(([\da-fA-F]{1,8})-([\da-fA-F]{1,4})-([\da-fA-F]{1,4})-([\da-fA-F]{1,4})-([\da-fA-F]{1,12}))"));
-        const auto &&match =
-            regex.match(text(), curPos, QRegularExpression::NormalMatch,
-                        QRegularExpression::AnchoredMatchOption);
+        QUuid uuid;
+        auto  raw = re2c::uuid(peekRest(), uuid);
 
-        if (match.hasMatch()) {
-            advance(match.capturedLength());
-            QStringList hexList;
-            hexList << match.captured(1).rightJustified(8, '0');
-            hexList << match.captured(2).rightJustified(4, '0');
-            hexList << match.captured(3).rightJustified(4, '0');
-            hexList << match.captured(4).rightJustified(4, '0');
-            hexList << match.captured(5).rightJustified(12, '0');
-            const QUuid uuid(hexList.join('-'));
-            if (uuid.isNull()) {
-                reportError("Invalid null UUID");
-                return QSharedPointer<UuidNode>::create(QString(),
-                                                        std::move(uuid), false);
-            }
+        if (!raw.isNull()) { // 0-0-0-0-0 is a null but valid UUID
+            advance(raw.length());
             return QSharedPointer<UuidNode>::create(
-                spanText(match.capturedRef()), std::move(uuid), true);
+                spanText(raw), std::move(uuid), true);
         } else {
             reportError("Invalid UUID");
             return QSharedPointer<UuidNode>::create(QString(), QUuid(), false);
