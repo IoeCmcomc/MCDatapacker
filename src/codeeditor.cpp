@@ -619,6 +619,7 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
 }
 
 void CodeEditor::onCursorPositionChanged() {
+//    qDebug() << "CodeEditor::onCursorPositionChanged";
     setExtraSelections({});
     highlightCurrentLine();
     matchParentheses();
@@ -780,6 +781,7 @@ void CodeEditor::insertCompletion(const QString &completion) {
 }
 
 void CodeEditor::onTextChanged() {
+//    qDebug() << "CodeEditor::onTextChanged";
     if (m_parser) {
         bool ok = m_parser->parse(toPlainText());
         m_problems.clear();
@@ -910,10 +912,10 @@ void CodeEditor::matchParentheses() {
     TextBlockData *data =
         dynamic_cast<TextBlockData *>(textCursor().block().userData());
 
-    if (!data || !m_highlighter)
+    if (!m_highlighter || !data)
         return;
 
-    QVector<BracketInfo *> && infos = data->brackets();
+    const QVector<BracketInfo *> && infos = data->brackets();
 
     int pos = textCursor().block().position();
 

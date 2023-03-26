@@ -58,17 +58,21 @@ public:
         MultilineComment,
     };
 
-    Highlighter(QTextDocument *parent);
+    explicit Highlighter(QTextDocument *parent);
 
     using QSyntaxHighlighter::rehighlightBlock;
+
+    void rehighlight();
     void rehighlightBlock(const QTextBlock &block);
 
     QVector<QTextBlock> changedBlocks() const;
     void onDocChanged();
 
+    bool isManualHighlight() const;
+
 protected:
-    QMap<QChar, QTextCharFormat> quoteHighlightRules;
-    QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
+    QHash<QChar, QTextCharFormat> quoteHighlightRules;
+    QHash<QChar, QTextCharFormat> singleCommentHighlightRules;
     QVector<BracketPair> bracketPairs;
     QRegularExpression namespacedIdRegex{ QStringLiteral(
                                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };
@@ -85,8 +89,10 @@ private:
     QTextCharFormat m_invisSpaceFmt;
     bool m_highlightManually      = false;
     bool m_highlightingFirstBlock = false;
+    bool m_curDirExists           = false;
 
-    void collectNamespacedIds(const QString &text, TextBlockData *data);
+    void collectBracket(int i, QChar ch, TextBlockData *data);
+    void collectNamespacedIds(QStringView sv, TextBlockData *data);
     QString locateNamespacedId(QString id);
 };
 

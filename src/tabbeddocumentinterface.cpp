@@ -207,6 +207,7 @@ void TabbedDocumentInterface::addFile(const QString &path) {
             return;
 
         auto *codeEditor = new CodeEditor(this);
+        codeEditor->setPlainText(text);
 
         if (newFile.fileType == CodeFile::Function) {
             auto &&parser = std::make_unique<Command::McfunctionParser>();
@@ -220,7 +221,6 @@ void TabbedDocumentInterface::addFile(const QString &path) {
             codeEditor->setParser(std::make_unique<JsonParser>());
         }
 
-        codeEditor->setPlainText(text);
         codeEditor->setFileType(newFile.fileType);
 
         connect(codeEditor->document(), &QTextDocument::modificationChanged,

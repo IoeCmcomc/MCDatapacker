@@ -5,6 +5,7 @@
 #include "parsers/command/visitors/sourceprinter.h"
 
 #include <QTextDocument>
+#include <QAbstractTextDocumentLayout>
 #include <QDebug>
 
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
@@ -73,7 +74,7 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
             setFormat(info->start, info->length, fmt);
         }
 
-        if (m_formats.isEmpty()) {
+        if (!isManualHighlight()) {
             for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
                 QRegularExpressionMatchIterator &&matchIterator =
                     rule.pattern.globalMatch(text);
@@ -84,19 +85,33 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                 }
             }
         } else {
-            for (const auto &range: qAsConst(m_formats)) {
+            for (const auto &range:
+                 qAsConst(m_formats.at(m_curChangedBlockIndex))) {
                 mergeFormat(range.start, range.length, range.format);
             }
+            ++m_curChangedBlockIndex;
         }
     }
 }
 
-void McfunctionHighlighter::rehighlightBlock(const QTextBlock &block,
-                                             const QVector<QTextLayout::FormatRange> &formats)
-{
-    m_formats = formats;
-    Highlighter::rehighlightBlock(block);
+void McfunctionHighlighter::rehighlightChangedBlocks() {
+    const auto &&blocks = changedBlocks();
+
+    if (blocks.isEmpty()) {
+        return;
+    } else if (blocks.size() == 1) {
+        Highlighter::rehighlightBlock(blocks.at(0));
+    } else if ((blocks.first() == document()->firstBlock()) &&
+               (blocks.last() == document()->lastBlock())) {
+        Highlighter::rehighlight();
+    } else {
+        for (const auto &block: blocks) {
+            Highlighter::rehighlightBlock(block);
+        }
+    }
+
     m_formats.clear();
+    m_curChangedBlockIndex = 0;
 }
 
 void McfunctionHighlighter::rehighlightDelayed() {
@@ -105,8 +120,11 @@ void McfunctionHighlighter::rehighlightDelayed() {
     const auto &&result      = m_parser->syntaxTree();
     const auto &&resultLines = result->lines();
     const auto &&blocks      = changedBlocks();
+    m_formats.resize(blocks.size());
 
+    int i = -1;
     for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
+        ++i;
         const QString &&lineText   = iter->text();
         auto           *lineResult = resultLines[iter->blockNumber()].get();
         if (lineResult->kind() == Command::ParseNode::Kind::Root) {
@@ -119,12 +137,14 @@ void McfunctionHighlighter::rehighlightDelayed() {
 
             Command::NodeFormatter formatter;
             formatter.startVisiting(lineResult);
-            /*qDebug() << "rehighlight manually" << block.firstLineNumber(); */
-            document()->blockSignals(true);
-            rehighlightBlock(*iter, formatter.formatRanges());
-            document()->blockSignals(false);
-        }
 
-        /*emit document()->documentLayout()->updateBlock(block); */
+            m_formats[i] = formatter.formatRanges();
+        }
     }
+
+    document()->blockSignals(true);
+    document()->documentLayout()->blockSignals(true);
+    rehighlightChangedBlocks();
+    document()->documentLayout()->blockSignals(false);
+    document()->blockSignals(false);
 }
