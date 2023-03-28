@@ -1,9 +1,11 @@
 #include "itemconditiondialog.h"
 #include "ui_itemconditiondialog.h"
 
-#include "game.h"
 #include "numberproviderdelegate.h"
 #include "inventoryslot.h"
+
+#include "game.h"
+#include "platforms/windows.h"
 
 #include <QJsonObject>
 
@@ -11,6 +13,7 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
+    Windows::setDarkFrameIfDarkMode(this);
 
     from_1_17 = Game::version() >= Game::v1_17;
 
@@ -57,7 +60,6 @@ QJsonObject ItemConditionDialog::toJson() const {
                             ui->itemSlot->getItem().getNamespacedID());
             }
         }
-
     } else {
         if (!ui->itemTagEdit->text().isEmpty())
             root.insert(QStringLiteral("tag"), ui->itemTagEdit->text());

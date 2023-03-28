@@ -2,6 +2,7 @@
 #include "ui_blockitemselectordialog.h"
 
 #include "game.h"
+#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QIcon>
@@ -10,6 +11,7 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent,
                                                  SelectCategory category)
     : QDialog(parent), ui(new Ui::BlockItemSelectorDialog) {
     ui->setupUi(this);
+    Windows::setDarkFrameIfDarkMode(this);
     /*
        setStyleSheet(
        "#listView {"
@@ -36,10 +38,14 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent,
             this, [ = ](const QString &input) {
         filterModel.setFilterRegularExpression(input);
     });
-    connect(ui->filterByBlockCheck, &QCheckBox::toggled, this, [ = ](bool checked) {
+    connect(ui->filterByBlockCheck, &QCheckBox::toggled, this,
+            [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::BlockItems, checked);
     });
-    connect(ui->filterByItemCheck, &QCheckBox::toggled, this, [ = ](bool checked) {
+    connect(ui->filterByItemCheck,
+            &QCheckBox::toggled,
+            this,
+            [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::NonblockItem, checked);
     });
     connect(ui->obtainableBlocksCheck, &QCheckBox::toggled,
@@ -164,15 +170,15 @@ void BlockItemSelectorDialog::setCategory(const SelectCategory &category) {
     m_category   = category;
     using Filter = InventoryItemFilterModel::Filter;
     switch (m_category) {
-    case SelectCategory::Blocks: {
-        filterModel.setFilters(Filter::ObtainableBlocks
-                               | Filter::ObtainableBlocks);
-        break;
-    }
+        case SelectCategory::Blocks: {
+            filterModel.setFilters(Filter::ObtainableBlocks
+                                   | Filter::ObtainableBlocks);
+            break;
+        }
 
-    case SelectCategory::ObtainableItems: {
-        filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
-    }
+        case SelectCategory::ObtainableItems: {
+            filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
+        }
     }
     ui->stackedWidget->setCurrentIndex((int)m_category);
 }

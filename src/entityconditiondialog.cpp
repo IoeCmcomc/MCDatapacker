@@ -5,7 +5,9 @@
 #include "numberproviderdelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
+
 #include "game.h"
+#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -15,14 +17,16 @@ static const QVector<QString> gamemodes = {
 };
 
 static const QVector<QString> catVariants = {
-    "", "all_black", "black", "british_shorthair",
-    "calico", "jellie", "persian", "ragdoll", "red",
-    "siamese", "tabby", "tuxedo", "white",
+    "",       "all_black",       "black",            "british_shorthair",
+    "calico", "jellie",          "persian",          "ragdoll",
+    "red",    "siamese",         "tabby",            "tuxedo",
+    "white",
 };
 
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
+    Windows::setDarkFrameIfDarkMode(this);
 
     initComboModelView(QStringLiteral("entity"), entityModel,
                        ui->entityTypeCombo);
@@ -75,7 +79,6 @@ EntityConditionDialog::~EntityConditionDialog() {
 }
 
 QJsonObject EntityConditionDialog::toJson() const {
-
     QJsonObject root;
 
     if (ui->entityTypeCombo->currentIndex() != 0)
@@ -131,14 +134,16 @@ QJsonObject EntityConditionDialog::toJson() const {
     if (!ui->locatPropBtn->getData().isEmpty())
         root.insert(QStringLiteral("location"), ui->locatPropBtn->getData());
     if (!ui->vehicleBtn->getData().isEmpty()
-            && (Game::version() >= Game::v1_16)) {
+        && (Game::version() >= Game::v1_16)) {
         root.insert(QStringLiteral("vehicle"), ui->vehicleBtn->getData());
     }
     if (Game::version() >= Game::v1_17) {
         if (!ui->passengerBtn->getData().isEmpty())
-            root.insert(QStringLiteral("passenger"), ui->passengerBtn->getData());
+            root.insert(QStringLiteral("passenger"),
+                        ui->passengerBtn->getData());
         if (!ui->steppingOnBtn->getData().isEmpty())
-            root.insert(QStringLiteral("stepping_on"), ui->steppingOnBtn->getData());
+            root.insert(QStringLiteral("stepping_on"),
+                        ui->steppingOnBtn->getData());
     }
 
     QJsonObject effects;
@@ -178,7 +183,8 @@ QJsonObject EntityConditionDialog::toJson() const {
                           ui->playerLevelInput->toJson());
         if (Game::version() >= Game::v1_17) {
             if (!ui->lookingAtBtn->getData().isEmpty())
-                player.insert(QStringLiteral("looking_at"), ui->lookingAtBtn->getData());
+                player.insert(QStringLiteral("looking_at"),
+                              ui->lookingAtBtn->getData());
         }
 
         QJsonObject advancements;
@@ -223,16 +229,18 @@ QJsonObject EntityConditionDialog::toJson() const {
     }
 
     if ((isNotSelected || (entityId == QStringLiteral("minecraft:cat")))
-            && (ui->catVariantCombo->currentIndex() > 0)) {
+        && (ui->catVariantCombo->currentIndex() > 0)) {
         const auto &variant = catVariants[ui->catVariantCombo->currentIndex()];
-        root.insert(QStringLiteral("catType"), QStringLiteral("textures/entity/cat/%1.png").arg(variant));
+        root.insert(QStringLiteral("catType"),
+                    QStringLiteral("textures/entity/cat/%1.png").arg(variant));
     }
 
     if ((isNotSelected ||
          (entityId == QStringLiteral("minecraft:fishing_bobber")))
         && (Game::version() >= Game::v1_16)) {
         QJsonObject fishingHook;
-        ui->inOpenWaterCheck->insertToJsonObject(fishingHook, QStringLiteral("in_open_water"));
+        ui->inOpenWaterCheck->insertToJsonObject(fishingHook,
+                                                 QStringLiteral("in_open_water"));
         if (!fishingHook.isEmpty())
             root["fishing_hook"] = fishingHook;
     }
@@ -242,10 +250,12 @@ QJsonObject EntityConditionDialog::toJson() const {
         && (Game::version() >= Game::v1_17)) {
         QJsonObject lightningBolt;
         if (!ui->blocksOnFireInput->isCurrentlyUnset()) {
-            lightningBolt.insert("lightning_bolt", ui->blocksOnFireInput->toJson());
+            lightningBolt.insert("lightning_bolt",
+                                 ui->blocksOnFireInput->toJson());
         }
         if (!ui->entityStruckBtn->getData().isEmpty())
-            lightningBolt.insert(QStringLiteral("entity_struck"), ui->entityStruckBtn->getData());
+            lightningBolt.insert(QStringLiteral("entity_struck"),
+                                 ui->entityStruckBtn->getData());
         if (!lightningBolt.isEmpty())
             root["lightning_bolt"] = lightningBolt;
     }
@@ -311,15 +321,19 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
         ui->locatPropBtn->setData(value[QStringLiteral("location")].toObject());
     if (Game::version() >= Game::v1_16) {
         if (value.contains(QStringLiteral("vehicle")))
-            ui->locatPropBtn->setData(value[QStringLiteral("vehicle")].toObject());
+            ui->locatPropBtn->setData(value[QStringLiteral(
+                                                "vehicle")].toObject());
         if (value.contains(QStringLiteral("targeted_entity")))
-            ui->targetEntityBtn->setData(value[QStringLiteral("targeted_entity")].toObject());
+            ui->targetEntityBtn->setData(value[QStringLiteral(
+                                                   "targeted_entity")].toObject());
     }
     if (Game::version() >= Game::v1_17) {
         if (value.contains(QStringLiteral("passenger")))
-            ui->passengerBtn->setData(value[QStringLiteral("passenger")].toObject());
+            ui->passengerBtn->setData(value[QStringLiteral(
+                                                "passenger")].toObject());
         if (value.contains(QStringLiteral("stepping_on")))
-            ui->steppingOnBtn->setData(value[QStringLiteral("stepping_on")].toObject());
+            ui->steppingOnBtn->setData(value[QStringLiteral(
+                                                 "stepping_on")].toObject());
     }
 
     if (value.contains(QStringLiteral("effects"))) {
@@ -357,14 +371,16 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("player"))) {
         auto player = value[QStringLiteral("player")].toObject();
         if (player.contains("gamemode")) {
-            const int index = gamemodes.indexOf(player[QStringLiteral("gamemode")].toString());
+            const int index =
+                gamemodes.indexOf(player[QStringLiteral("gamemode")].toString());
             if (index != -1) {
                 ui->gameModeCombo->setCurrentIndex(index);
             }
         }
         if ((Game::version() >= Game::v1_17)
-                && value.contains(QStringLiteral("looking_on"))) {
-            ui->lookingAtBtn->setData(value[QStringLiteral("looking_on")].toObject());
+            && value.contains(QStringLiteral("looking_on"))) {
+            ui->lookingAtBtn->setData(value[QStringLiteral(
+                                                "looking_on")].toObject());
         }
         if (player.contains(QStringLiteral("level")))
             ui->playerLevelInput->fromJson(player[QStringLiteral("level")]);
@@ -405,7 +421,9 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("catType"))) {
         const auto &variantStr = value[QStringLiteral("catType")].toString();
         for (int i = 1; i < catVariants.size(); ++i) {
-            if (variantStr == QStringLiteral("textures/entity/cat/%1.png").arg(catVariants[i])) {
+            if (variantStr ==
+                QStringLiteral("textures/entity/cat/%1.png").arg(catVariants[i]))
+            {
                 ui->catVariantCombo->setCurrentIndex(i);
                 break;
             }
@@ -413,17 +431,20 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     }
     if (value.contains(QStringLiteral("fishing_hook"))
         && (Game::version() >= Game::v1_16)) {
-        const auto &fishingHook = value[QStringLiteral("fishing_hook")].toObject();
+        const auto &fishingHook =
+            value[QStringLiteral("fishing_hook")].toObject();
         ui->inOpenWaterCheck->setupFromJsonObject(fishingHook, "in_open_water");
     }
     if (value.contains(QStringLiteral("lightning_bolt"))
         && (Game::version() >= Game::v1_17)) {
-        const auto &lightningBolt = value[QStringLiteral("lightning_bolt")].toObject();
+        const auto &lightningBolt =
+            value[QStringLiteral("lightning_bolt")].toObject();
         if (lightningBolt.contains("blocks_set_on_fire")) {
             ui->blocksOnFireInput->fromJson(lightningBolt["blocks_set_on_fire"]);
         }
         if (lightningBolt.contains("entity_struck")) {
-            ui->entityStruckBtn->setData(lightningBolt["entity_struck"].toObject());
+            ui->entityStruckBtn->setData(
+                lightningBolt["entity_struck"].toObject());
         }
     }
 }
@@ -505,14 +526,21 @@ void EntityConditionDialog::onEntityTypeChanged() {
         Qt::UserRole + 1).toString();
     const bool isNotSelected = ui->entityTypeCombo->currentIndex() == 0;
 
-    ui->tabWidget->setTabEnabled(0, isNotSelected || entityId == QStringLiteral("minecraft:player"));
-    ui->tabWidget->setTabEnabled(1, isNotSelected || entityId == QStringLiteral("minecraft:cat"));
+    ui->tabWidget->setTabEnabled(0, isNotSelected ||
+                                 entityId ==
+                                 QStringLiteral("minecraft:player"));
+    ui->tabWidget->setTabEnabled(1, isNotSelected ||
+                                 entityId == QStringLiteral("minecraft:cat"));
 
     if ((Game::version() >= Game::v1_16)) {
-        ui->tabWidget->setTabEnabled(2, isNotSelected || entityId == QStringLiteral("minecraft:fishing_bobber"));
+        ui->tabWidget->setTabEnabled(2, isNotSelected ||
+                                     entityId ==
+                                     QStringLiteral("minecraft:fishing_bobber"));
     }
     if ((Game::version() >= Game::v1_17)) {
-        ui->tabWidget->setTabEnabled(3, isNotSelected || entityId == QStringLiteral("minecraft:lightning_bolt"));
+        ui->tabWidget->setTabEnabled(3, isNotSelected ||
+                                     entityId ==
+                                     QStringLiteral("minecraft:lightning_bolt"));
     }
 }
 

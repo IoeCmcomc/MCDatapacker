@@ -2,13 +2,18 @@
 #define WINDOWS_H
 
 #include <QtGlobal>
+#include <QOperatingSystemVersion>
 
-#ifdef Q_OS_WIN
-#include <QtWin>
-#endif
-
+QT_BEGIN_NAMESPACE
 class QWidget;
+QT_END_NAMESPACE
 
-void extendFrameOnWindows(QWidget *w, const QString &className);
+namespace Windows {
+    bool isWindows11();
+    bool isDarkMode();
+    void extendFrame(QWidget *w, const QString &className);
+    void setDarkFrame(QWidget *w);
+    void setDarkFrameIfDarkMode(QWidget *w);
+}
 
 #endif // WINDOWS_H

@@ -16,9 +16,6 @@
     <height>600</height>
    </size>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::GroupedDragging|QMainWindow::VerticalTabs</set>
   </property>

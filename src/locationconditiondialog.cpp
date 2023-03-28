@@ -3,7 +3,9 @@
 
 #include "globalhelpers.h"
 #include "inventoryitem.h"
+
 #include "game.h"
+#include "platforms/windows.h"
 
 #include <QVariant>
 #include <QJsonObject>
@@ -13,6 +15,7 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
     ui(new Ui::LocationConditionDialog) {
     ui->setupUi(this);
+    Windows::setDarkFrameIfDarkMode(this);
 
     const auto typeFlags = NumberProvider::Exact
                            | NumberProvider::Range;
@@ -29,7 +32,8 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     initComboModelView("biome", biomesModel, ui->biomeCombo);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
     if (Game::version() >= Game::v1_18_2) {
-        initComboModelViewFromRegistry("worldgen/configured_structure_feature", featuresModel,
+        initComboModelViewFromRegistry("worldgen/configured_structure_feature",
+                                       featuresModel,
                                        ui->featureCombo);
     } else {
         initComboModelView("feature", featuresModel, ui->featureCombo);
@@ -90,15 +94,19 @@ QJsonObject LocationConditionDialog::toJson() const {
             if (from_1_17) {
                 QJsonArray blocks;
                 for (int i = 0; i < ui->blocksList->count(); ++i) {
-                    blocks << ui->blocksList->item(i)->data(Qt::UserRole + 1).value<InventoryItem>().getNamespacedID();
+                    blocks <<
+                        ui->blocksList->item(i)->data(Qt::UserRole +
+                                                      1).value<InventoryItem>().
+                        getNamespacedID();
                 }
                 if (!blocks.isEmpty()) {
                     block.insert(QStringLiteral("blocks"), blocks);
                 }
             } else {
                 auto invItem = ui->blockCombo->currentData(Qt::UserRole + 1)
-                           .value<InventoryItem>();
-                block.insert(QStringLiteral("block"), invItem.getNamespacedID());
+                               .value<InventoryItem>();
+                block.insert(QStringLiteral("block"),
+                             invItem.getNamespacedID());
             }
         } else if (!ui->blockTagEdit->text().isEmpty()) {
             block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
@@ -163,11 +171,16 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
                 auto &&blockId = block.toString();
                 if (!blockId.startsWith(QStringLiteral("minecraft:")))
                     blockId.prepend(QStringLiteral("minecraft:"));
-                const auto &vari = QVariant::fromValue(InventoryItem(blockId));
-                const auto &itemList = blocksModel.match(blocksModel.index(0, 0), Qt::UserRole + 1, vari, 1, Qt::MatchExactly);
+                const auto &vari = QVariant::fromValue(InventoryItem(
+                                                           blockId));
+                const auto &itemList = blocksModel.match(
+                    blocksModel.index(0, 0), Qt::UserRole + 1, vari,
+                    1, Qt::MatchExactly);
                 if (!itemList.isEmpty()) {
                     const auto &index = itemList.at(0);
-                    auto *item = new QListWidgetItem(index.data().toString(), ui->blocksList);
+                    auto       *item  = new QListWidgetItem(
+                        index.data().toString(),
+                        ui->blocksList);
                     item->setData(Qt::UserRole + 1, vari);
                     item->setIcon(index.data(Qt::DecorationRole).value<QIcon>());
                     ui->blocksList->addItem(item);
@@ -270,9 +283,13 @@ void LocationConditionDialog::initBlockGroup() {
         ui->blocksCombo->setModel(&blocksModel);
         ui->blocksList->installEventFilter(&viewFilter);
         connect(ui->addBlockBtn, &QToolButton::clicked, this, [this](){
-            auto *item = new QListWidgetItem(ui->blocksCombo->currentText(), ui->blocksList);
-            item->setData(Qt::UserRole + 1, ui->blocksCombo->currentData(Qt::UserRole + 1));
-            item->setIcon(ui->blocksCombo->itemIcon(ui->blocksCombo->currentIndex()));
+            auto *item =
+                new QListWidgetItem(ui->blocksCombo->currentText(),
+                                    ui->blocksList);
+            item->setData(Qt::UserRole + 1,
+                          ui->blocksCombo->currentData(Qt::UserRole + 1));
+            item->setIcon(ui->blocksCombo->itemIcon(ui->blocksCombo->
+                                                    currentIndex()));
             ui->blocksList->addItem(item);
         });
     }

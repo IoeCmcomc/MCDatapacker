@@ -3,13 +3,15 @@ TEMPLATE = app
 
 TARGET = MCDatapacker
 
-QT += core gui uitools svg
+QT += core gui uitools svg widgets-private gui-private
 win32:QT += winextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17 lrelease embed_translations conan_basic_setup
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
+win32:LIBS += -lDwmapi
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -31,6 +33,7 @@ SOURCES += \
     codeeditor.cpp \
     codefile.cpp \
     codegutter.cpp \
+    darkfusionstyle.cpp \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
     datawidgetinterface.cpp \
@@ -123,6 +126,7 @@ HEADERS += \
     codeeditor.h \
     codefile.h \
     codegutter.h \
+    darkfusionstyle.h \
     datapackfileiconprovider.h \
     datapacktreeview.h \
     datawidgetinterface.h \

@@ -2,10 +2,11 @@
 #include "ui_visualrecipeeditordock.h"
 
 #include "inventoryitem.h"
-
 #include "mainwindow.h"
+
 #include "globalhelpers.h"
 #include "game.h"
+#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QMap>
@@ -45,6 +46,7 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     connect(ui->readRecipeBtn, &QPushButton::clicked, this,
             &VisualRecipeEditorDock::readRecipe);
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool) {
+        Windows::setDarkFrameIfDarkMode(this);
         adjustSize();
     });
 

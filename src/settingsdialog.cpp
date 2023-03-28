@@ -15,9 +15,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
 
-    qDebug() << qApp->style()->objectName();
-
-    extendFrameOnWindows(this, "SettingsDialog");
+    Windows::extendFrame(this, QStringLiteral("SettingsDialog"));
+    Windows::setDarkFrameIfDarkMode(this);
 
     setupLanguageSetting();
 
@@ -52,7 +51,7 @@ void SettingsDialog::setupLanguageSetting() {
     }
 
     auto &&curLocale =
-        QLocale(qobject_cast<MainWindow*>(parent())->getCurLocale());
+        QLocale(qobject_cast<MainWindow *>(parent())->getCurLocale());
     auto &&currLang = QString("%1 (%2)").arg(
         curLocale.languageToString(curLocale.language()),
         curLocale.nativeLanguageName());
@@ -91,6 +90,7 @@ void SettingsDialog::initSettings() {
     QSettings settings;
 
     const auto &&styles = QStyleFactory::keys();
+
     for (const auto &style: styles) {
         ui->themeCombo->addItem(style);
     }
@@ -101,12 +101,14 @@ void SettingsDialog::initSettings() {
     ui->reloadExternChangesCombo->setCurrentIndex
         (settings.value(QStringLiteral("reloadExternChanges"), 0).toInt());
 
-    const auto &versionFinfos = QDir(QStringLiteral(":/minecraft")).entryInfoList({ "1.*" });
+    const auto &versionFinfos =
+        QDir(QStringLiteral(":/minecraft")).entryInfoList({ "1.*" });
     for (const auto &finfo: versionFinfos)
         ui->gameVersionCombo->addItem(finfo.fileName());
     ui->gameVersionCombo->setCurrentText(settings.value(QStringLiteral(
                                                             "gameVersion"),
-                                                        Game::defaultVersionString).toString());
+                                                        Game::
+                                                        defaultVersionString).toString());
     settings.endGroup();
 
     settings.beginGroup(QStringLiteral("editor"));

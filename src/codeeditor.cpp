@@ -553,9 +553,6 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 
 bool CodeEditor::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
-        /*QToolTip::hideText(); */
-        /*qDebug() << "QEvent::ToolTip"; */
-
         auto *helpEvent = static_cast<QHelpEvent *>(event);
         auto  globalPos = mapToGlobal(helpEvent->pos());
         auto  pos       = helpEvent->pos();
@@ -638,7 +635,7 @@ void CodeEditor::highlightCurrentLine() {
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(237, 236, 223, 127);
+        QColor lineColor = QColor(237, 236, 223, 63);
 
         selection.format = QTextCharFormat();
         selection.format.setBackground(lineColor);

@@ -19,7 +19,8 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     m_mainWin = parent;
     ui->setupUi(this);
 
-    extendFrameOnWindows(this, "StatisticsDialog");
+    Windows::extendFrame(this, QStringLiteral("StatisticsDialog"));
+    Windows::setDarkFrameIfDarkMode(this);
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
                                    QDir::current().dirName(),

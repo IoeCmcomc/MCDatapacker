@@ -4,8 +4,10 @@
 #include "mainwindow.h"
 #include "loottablepool.h"
 #include "loottablefunction.h"
+
 #include "globalhelpers.h"
 #include "game.h"
+#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -39,6 +41,14 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
             this, &LootTableEditorDock::updatePoolsTab);
     connect(ui->functionsInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTableEditorDock::updateFunctionsTab);
+
+    connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
+        adjustSize();
+        if (floating) {
+            Windows::setDarkFrameIfDarkMode(this);
+            resize(minimumWidth(), height());
+        }
+    });
 
     auto *pool = new LootTablePool();
     ui->poolsInterface->setupMainWidget(pool);

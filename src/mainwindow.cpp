@@ -14,7 +14,10 @@
 #include "itemmodifierdock.h"
 #include "statisticsdialog.h"
 #include "rawjsontextedit.h"
+#include "darkfusionstyle.h"
+
 #include "game.h"
+#include "platforms/windows.h"
 
 #include "QSimpleUpdater.h"
 #include "miniz-cpp/zip.hpp"
@@ -33,7 +36,6 @@
 #include <QClipboard>
 #include <QProgressDialog>
 #include <QSaveFile>
-
 
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
@@ -374,9 +376,18 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     const QString &style = settings.value(QStringLiteral("theme"),
                                           qApp->style()->objectName()).toString();
 
-    if (style.toLower() != qApp->style()->objectName()) {
-        qApp->setStyle(style);
+    qInfo() << "Initial application style:" << qApp->style()->objectName();
+
+    if (!Windows::isDarkMode()) {
+        if (style.toLower() != qApp->style()->objectName()) {
+            qApp->setStyle(style);
+        }
+    } else {
+        qApp->setStyle(new DarkFusionStyle);
+        Windows::setDarkFrame(this);
     }
+
+    qInfo() << "The application style has been set to" << qApp->style();
 
     settings.beginGroup(QStringLiteral("general"));
     loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
