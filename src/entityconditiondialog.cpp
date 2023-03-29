@@ -7,7 +7,6 @@
 #include "locationconditiondialog.h"
 
 #include "game.h"
-#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -26,7 +25,6 @@ static const QVector<QString> catVariants = {
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
-    Windows::setDarkFrameIfDarkMode(this);
 
     initComboModelView(QStringLiteral("entity"), entityModel,
                        ui->entityTypeCombo);

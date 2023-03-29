@@ -11,6 +11,8 @@
 #include <QShortcut>
 #include <QScrollBar>
 
+const static int cellSize = 47;
+
 ImgViewer::ImgViewer(QWidget *parent) :
     QGraphicsView(parent), m_rotateAngle(0), m_IsFitWindow(false),
     m_IsViewInitialized(false) {
@@ -223,7 +225,7 @@ void ImgViewer::paintEvent(QPaintEvent *e) {
     {
         QPainter painter(viewport());
 
-        if (progress >= 47)
+        if (progress >= cellSize)
             progress = 0;
         else
             progress += 1;
@@ -261,7 +263,7 @@ void ImgViewer::paintEvent(QPaintEvent *e) {
 }
 
 void ImgViewer::drawForeground(QPainter *painter, const QRectF &) {
-    QPen pen(QBrush(Qt::black), 1);
+    QPen pen(palette().windowText(), 1);
 
     pen.setCosmetic(true);
     painter->setPen(pen);
@@ -271,18 +273,16 @@ void ImgViewer::drawForeground(QPainter *painter, const QRectF &) {
     /*qDebug() << "drawBackground rect:" << rect; */
 }
 
+// Re:Draw the transparency checkerboard as the fixed background
 void ImgViewer::redrawBg() {
-    /* Re:Draw the transparency checkerboard as the fixed background */
-
-    const int cellSize = 47;
+    const QColor &base    = palette().base().color();
+    const QBrush &altBase = palette().alternateBase();
 
     m_bg = QPixmap(size() + QSize(cellSize, cellSize));
-    m_bg.fill(Qt::white);
+    m_bg.fill(base);
     QPainter painter(&m_bg);
 
-    static QBrush whiteSmokeBrush(QColor(245, 245, 245));
-
-    painter.setBrush(whiteSmokeBrush);
+    painter.setBrush(altBase);
     painter.setPen(Qt::NoPen);
     bool xWhite = false;
     for (int x = 0; x - cellSize < width(); x += cellSize) {

@@ -15,8 +15,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
 
-    Windows::extendFrame(this, QStringLiteral("SettingsDialog"));
-    Windows::setDarkFrameIfDarkMode(this);
+    Windows::extendFrame(this);
 
     setupLanguageSetting();
 

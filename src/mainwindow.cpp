@@ -21,6 +21,7 @@
 
 #include "QSimpleUpdater.h"
 #include "miniz-cpp/zip.hpp"
+#include "SystemThemeHelper.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -41,9 +42,11 @@ static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+    : QMainWindow(parent), ui(new Ui::MainWindow),
+    m_systemThemeHelper{new libqdark::SystemThemeHelper(this)} {
     ui->setupUi(this);
 
+    m_initialStyleId = style()->objectName();
     readSettings();
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
@@ -94,6 +97,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     updater->setNotifyOnFinish(updateDefUrl, false);
     updater->checkForUpdates(updateDefUrl);
+
+    QObject::connect(m_systemThemeHelper,
+                     &libqdark::SystemThemeHelper::signalLightTheme,
+                     this, [this]{
+        onColorModeChanged(false);
+    });
+    QObject::connect(m_systemThemeHelper,
+                     &libqdark::SystemThemeHelper::signalDarkTheme,
+                     this, [this]{
+        onColorModeChanged(true);
+    });
+    m_systemThemeHelper->setEnabled(true);
 }
 
 void MainWindow::initDocks() {
@@ -373,19 +388,20 @@ void MainWindow::readSettings() {
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
-    const QString &style = settings.value(QStringLiteral("theme"),
-                                          qApp->style()->objectName()).toString();
+    const QString &styleId = settings.value(QStringLiteral("theme"),
+                                            style()->objectName()).toString();
 
     qInfo() << "Initial application style:" << qApp->style()->objectName();
 
     if (!Windows::isDarkMode()) {
-        if (style.toLower() != qApp->style()->objectName()) {
-            qApp->setStyle(style);
+        if (styleId.toLower() != qApp->style()->objectName()) {
+            qApp->setStyle(styleId);
         }
     } else {
         qApp->setStyle(new DarkFusionStyle);
         Windows::setDarkFrame(this);
     }
+    qApp->setPalette(style()->standardPalette());
 
     qInfo() << "The application style has been set to" << qApp->style();
 
@@ -798,6 +814,26 @@ void MainWindow::installUpdate(const QString &url, const QString &filepath) {
                   qApp->arguments()[0].replace('\\', '/'));
 
     restart();
+}
+
+void MainWindow::onColorModeChanged(const bool isDark) {
+    Windows::setDarkFrame(this, isDark);
+    for (auto *child: children()) {
+        auto *widget = qobject_cast<QWidget *>(child);
+        if (widget) {
+            Windows::setDarkFrame(widget, isDark);
+        }
+    }
+
+    if (isDark) {
+        qApp->setStyle(new DarkFusionStyle);
+    } else {
+        QSettings     settings;
+        const QString styleId = settings.value(QStringLiteral("theme"),
+                                               m_initialStyleId).toString();
+        qApp->setStyle(styleId);
+    }
+    qApp->setPalette(style()->standardPalette());
 }
 
 void MainWindow::newDatapack() {

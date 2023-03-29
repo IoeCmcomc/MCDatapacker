@@ -13,7 +13,6 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
-    Windows::setDarkFrameIfDarkMode(this);
 
     from_1_17 = Game::version() >= Game::v1_17;
 

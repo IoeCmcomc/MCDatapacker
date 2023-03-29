@@ -4,7 +4,9 @@
 #include "globalhelpers.h"
 #include "tabbeddocumentinterface.h"
 #include "imgviewer.h"
+
 #include "game.h"
+#include "platforms/windows.h"
 
 #include <QScrollBar>
 #include <QLabel>
@@ -18,6 +20,7 @@ StatusBar::StatusBar(MainWindow *parent,
     m_tabbedInterface = tabInterface;
 
     setStyleSheet("QStatusBar {border-top: 1px outset grey;}");
+    installEventFilter(Windows::styleSheetReapplier);
 
     m_gameVerLabel = new QLabel(this);
     m_gameVerLabel->setText(tr("Minecraft %1",

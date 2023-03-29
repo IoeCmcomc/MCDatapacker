@@ -2,7 +2,6 @@
 #include "ui_blockitemselectordialog.h"
 
 #include "game.h"
-#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QIcon>
@@ -11,7 +10,6 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent,
                                                  SelectCategory category)
     : QDialog(parent), ui(new Ui::BlockItemSelectorDialog) {
     ui->setupUi(this);
-    Windows::setDarkFrameIfDarkMode(this);
     /*
        setStyleSheet(
        "#listView {"

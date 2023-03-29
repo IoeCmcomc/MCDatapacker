@@ -17,6 +17,10 @@ int main(int argc, char *argv[]) {
 
     /*Q_INIT_RESOURCE(application); */
 
+#ifdef Q_OS_WIN
+    qputenv("QT_QPA_PLATFORM", "windows:darkmode=1");
+#endif
+
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
 

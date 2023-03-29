@@ -4,6 +4,9 @@
 
 #include <QtWin>
 #include <QSettings>
+#include <QTimer>
+//#include <QDebug>
+#include <QEvent>
 
 #include "dwmapi.h"
 
@@ -13,23 +16,42 @@
 
 #endif
 
+const static QString transparentStyleSheet = QStringLiteral(
+    "%1, QLabel, QTabWidget::tab-bar { background: transparent; }");
+
 static const QOperatingSystemVersion Windows11 =
 { QOperatingSystemVersion::OSType::Windows, 10, 0, 22000 };
 
 namespace Windows {
+    bool StyleSheetReapplier::eventFilter(QObject *object, QEvent *event) {
+        if (event->type() == QEvent::StyleChange && !m_updated) {
+            auto *widget = qobject_cast<QWidget *>(object);
+            QTimer::singleShot(100, this, [widget, this]{
+                m_updated = true;
+                if (widget) {
+                    widget->setStyleSheet(widget->styleSheet());
+                }
+            });
+        }
+        if (m_updated && event->type() == QEvent::LayoutRequest) {
+            m_updated = false;
+        }
+        return QObject::eventFilter(object, event);
+    }
+
     bool isWindows11() {
         return QOperatingSystemVersion::current() >= Windows11;
     }
 
-    void extendFrame(QWidget *w, const QString &className) {
+    void extendFrame(QWidget *w) {
 #ifdef Q_OS_WIN
         if (QtWin::isCompositionEnabled()) {
             w->setAttribute(Qt::WA_TranslucentBackground, true);
             w->setAttribute(Qt::WA_NoSystemBackground, false);
-            w->setStyleSheet(QStringLiteral(
-                                 "%1, QLabel, QTabWidget::tab-bar { background: transparent; }").arg(
-                                 className));
+            w->setStyleSheet(transparentStyleSheet.arg(
+                                 w->metaObject()->className()));
             QtWin::extendFrameIntoClientArea(w, -1, -1, -1, -1);
+            w->installEventFilter(styleSheetReapplier);
         } else {
             w->setAttribute(Qt::WA_TranslucentBackground, false);
             QtWin::resetExtendedFrame(w);
@@ -37,9 +59,9 @@ namespace Windows {
 #endif
     }
 
-    void setDarkFrame(QWidget *w) {
+    void setDarkFrame(QWidget *w, const bool dark) {
 #ifdef Q_OS_WIN
-        BOOL value = TRUE;
+        BOOL value = dark;
         ::DwmSetWindowAttribute((HWND)w->winId(), DWMWA_USE_IMMERSIVE_DARK_MODE,
                                 &value, sizeof(value));
 #endif

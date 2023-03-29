@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
-    <height>416</height>
+    <width>349</width>
+    <height>450</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,18 +19,14 @@
   <property name="minimumSize">
    <size>
     <width>293</width>
-    <height>416</height>
+    <height>420</height>
    </size>
   </property>
   <property name="font">
    <font>
-    <weight>50</weight>
     <bold>false</bold>
     <kerning>true</kerning>
    </font>
-  </property>
-  <property name="features">
-   <set>QDockWidget::AllDockWidgetFeatures</set>
   </property>
   <property name="allowedAreas">
    <set>Qt::AllDockWidgetAreas</set>
@@ -96,9 +92,6 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
          </property>
          <property name="styleSheet">
           <string notr="true">#customTabFrame {
@@ -856,9 +849,6 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
                <property name="currentIndex">
                 <number>0</number>
                </property>
@@ -1021,9 +1011,6 @@
                    </property>
                    <property name="layoutDirection">
                     <enum>Qt::RightToLeft</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">margin-left: -1px;</string>
                    </property>
                    <property name="text">
                     <string>Cooking time:</string>

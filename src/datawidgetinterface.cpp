@@ -1,6 +1,8 @@
 #include "datawidgetinterface.h"
 #include "ui_datawidgetinterface.h"
 
+#include "platforms/windows.h"
+
 #include <QJsonObject>
 #include <QMouseEvent>
 #include <QShortcut>
@@ -34,6 +36,8 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
     ui->scrollArea->verticalScrollBar()->hide();
     ui->scrollArea->verticalScrollBar()->setStyleSheet(QStringLiteral(
                                                            "QScrollBar{width:0px;}"));
+    ui->scrollArea->verticalScrollBar()->installEventFilter(
+        Windows::styleSheetReapplier);
 
     m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
     m_animation   = new QPropertyAnimation(ui->sidebar, "maximumWidth");
@@ -51,8 +55,8 @@ void DataWidgetInterface::setMainWidget(QWidget *widget) {
     widget->setParent(this);
     widget->setMouseTracking(true);
     for (auto *child :
-         widget->findChildren<QWidget*>(QString(),
-                                        Qt::FindDirectChildrenOnly)) {
+         widget->findChildren<QWidget *>(QString(),
+                                         Qt::FindDirectChildrenOnly)) {
         child->setMouseTracking(true);
     }
 
@@ -64,7 +68,7 @@ void DataWidgetInterface::setMainWidget(QWidget *widget) {
     adjustSize();
 }
 
-QWidget *DataWidgetInterface::mainWidget() const {
+QWidget * DataWidgetInterface::mainWidget() const {
     return m_mainWidget;
 }
 
@@ -121,7 +125,7 @@ void DataWidgetInterface::mouseMoveEvent(QMouseEvent *e) {
 
 void DataWidgetInterface::enterEvent(QEvent *e) {
     QWidget::enterEvent(e);
-    if (const auto *event = static_cast<QEnterEvent*>(e)) {
+    if (const auto *event = static_cast<QEnterEvent *>(e)) {
         if (!m_sidebarRect.contains(event->pos()))
             hideSidebar();
     }

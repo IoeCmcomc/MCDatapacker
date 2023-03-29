@@ -45,10 +45,11 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
             &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this,
             &VisualRecipeEditorDock::readRecipe);
-    connect(this, &QDockWidget::topLevelChanged, [ = ](bool) {
+    connect(this, &QDockWidget::topLevelChanged, this, [this](bool) {
         Windows::setDarkFrameIfDarkMode(this);
         adjustSize();
     });
+    ui->customTabFrame->installEventFilter(Windows::styleSheetReapplier);
 
     setupCustomTab();
 }

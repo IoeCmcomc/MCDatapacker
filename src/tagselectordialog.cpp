@@ -4,7 +4,6 @@
 #include "globalhelpers.h"
 
 #include "game.h"
-#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QDir>
@@ -15,7 +14,6 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
     QDialog(parent),
     ui(new Ui::TagSelectorDialog) {
     ui->setupUi(this);
-    Windows::setDarkFrameIfDarkMode(this);
 
     filterModel.setParent(ui->tagListView);
     model.setParent(this);

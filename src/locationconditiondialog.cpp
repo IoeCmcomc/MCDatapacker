@@ -5,7 +5,6 @@
 #include "inventoryitem.h"
 
 #include "game.h"
-#include "platforms/windows.h"
 
 #include <QVariant>
 #include <QJsonObject>
@@ -15,7 +14,6 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
     ui(new Ui::LocationConditionDialog) {
     ui->setupUi(this);
-    Windows::setDarkFrameIfDarkMode(this);
 
     const auto typeFlags = NumberProvider::Exact
                            | NumberProvider::Range;

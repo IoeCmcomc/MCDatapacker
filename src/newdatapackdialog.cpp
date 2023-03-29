@@ -2,7 +2,6 @@
 #include "ui_newdatapackdialog.h"
 
 #include "game.h"
-#include "platforms/windows.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -14,7 +13,6 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
     ui(new Ui::NewDatapackDialog) {
     ui->setupUi(this);
     ui->locationInput->setText(QDir::currentPath());
-    Windows::setDarkFrameIfDarkMode(this);
 
     const auto &&gameVer = Game::version();
 

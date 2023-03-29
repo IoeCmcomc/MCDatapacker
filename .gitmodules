@@ -55,3 +55,6 @@
 [submodule "lib/uberswitch/uberswitch"]
 	path = lib/uberswitch/uberswitch
 	url = https://github.com/falemagn/uberswitch.git
+[submodule "lib/libqdark/libqdark"]
+	path = lib/libqdark/libqdark
+	url = https://github.com/suratovvlad/libqdark.git

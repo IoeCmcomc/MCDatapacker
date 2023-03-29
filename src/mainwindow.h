@@ -23,6 +23,10 @@ class PredicateDock;
 class ItemModifierDock;
 class StatusBar;
 
+namespace libqdark {
+    class SystemThemeHelper;
+}
+
 struct PackMetaInfo {
     QString description;
     int     packFormat = 0;
@@ -77,6 +81,7 @@ private /*slots*/ :
     void onDatapackChanged();
     void updateWindowTitle(bool changed);
     void installUpdate(const QString &url, const QString &filepath);
+    void onColorModeChanged(const bool isDark);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
@@ -90,15 +95,17 @@ private:
     QTranslator m_translator;
     QTranslator m_translatorQt;
     PackMetaInfo m_packInfo;
-    QMessageBox *uniqueMessageBox                  = nullptr;
-    StatusBar *m_statusBar                         = nullptr;
-    VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
-    LootTableEditorDock *lootTableEditorDock       = nullptr;
-    PredicateDock *predicateDock                   = nullptr;
-    ItemModifierDock *itemModifierDock             = nullptr;
+    QMessageBox *uniqueMessageBox                    = nullptr;
+    StatusBar *m_statusBar                           = nullptr;
+    VisualRecipeEditorDock *visualRecipeEditorDock   = nullptr;
+    LootTableEditorDock *lootTableEditorDock         = nullptr;
+    PredicateDock *predicateDock                     = nullptr;
+    ItemModifierDock *itemModifierDock               = nullptr;
+    libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
     QLocale curLocale;
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
+    QString m_initialStyleId;
     const int maxRecentFoldersActions = 10;
 
     void initDocks();

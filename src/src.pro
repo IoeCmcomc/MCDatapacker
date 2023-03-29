@@ -264,7 +264,8 @@ RC_ICONS = ../resource/app/icon/favicon.ico
 
 include(widgets/mcdatapackerwidgets/mcdatapackerwidgets.pri)
 
-include ($$PWD/../lib/QSimpleUpdater/QSimpleUpdater.pri)
+include($$PWD/../lib/QSimpleUpdater/QSimpleUpdater.pri)
+include($$PWD/../lib/libqdark/libqdark.pri)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

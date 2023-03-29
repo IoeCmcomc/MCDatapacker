@@ -2,7 +2,6 @@
 
 #include "blockitemselectordialog.h"
 #include "tagselectordialog.h"
-#include "mainwindow.h"
 #include "globalhelpers.h"
 #include "inventorysloteditor.h"
 #include "codefile.h"
@@ -48,10 +47,8 @@ InventorySlot::InventorySlot(QWidget *parent, const InventoryItem &item)
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InventorySlot::customContextMenuRequested, this,
             &InventorySlot::onCustomContextMenu);
-    connect(this,
-            &InventorySlot::itemChanged,
-            this,
-            &InventorySlot::onItemChanged);
+    connect(this, &InventorySlot::itemChanged,
+            this, &InventorySlot::onItemChanged);
     connect(&InventorySlot::m_timer, &QTimer::timeout, this,
             &InventorySlot::onTimerTimeout);
 
@@ -376,7 +373,7 @@ void InventorySlot::paintEvent(QPaintEvent *event) {
                 if (!isEnabled()) {
                     auto &&image = pixmap.toImage();
 
-                    QRgb         *st         = (QRgb*)image.bits(); // Detach the image
+                    QRgb         *st         = (QRgb *)image.bits(); // Detach the image
                     const quint64 pixelCount = image.width() * image.height();
 
                     for (quint64 p = 0; p < pixelCount; ++p) {
@@ -404,7 +401,7 @@ void InventorySlot::dragEnterEvent(QDragEnterEvent *event) {
     }
 
     if (event->mimeData()->hasFormat("application/x-inventoryitem")) {
-        const auto *source = qobject_cast<InventorySlot*>(event->source());
+        const auto *source = qobject_cast<InventorySlot *>(event->source());
 
         if (source->isCreative) {
             event->setDropAction(Qt::CopyAction);
@@ -444,7 +441,8 @@ void InventorySlot::dragLeaveEvent(QDragLeaveEvent *event) {
 void InventorySlot::dropEvent(QDropEvent *event) {
     if (!isCreative) {
         if (event->mimeData()->hasFormat("application/x-inventoryitem")) {
-            auto      *source   = qobject_cast<InventorySlot*>(event->source());
+            auto *source =
+                qobject_cast<InventorySlot *>(event->source());
             QByteArray itemData = event->mimeData()->data(
                 "application/x-inventoryitem");
             QDataStream dataStream(&itemData, QIODevice::ReadOnly);

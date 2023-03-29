@@ -2,10 +2,12 @@
 
 #include "private/qfusionstyle_p.h"
 
+#include <QStyleOption>
+#include <QDebug>
+
 DarkFusionStyle::DarkFusionStyle() {
     setObjectName(QStringLiteral("darkfusion"));
     setBaseStyle(new QFusionStyle);
-    qApp->setPalette(DarkFusionStyle::standardPalette());
 }
 
 // The dark palette is based on:
@@ -14,6 +16,7 @@ QPalette DarkFusionStyle::standardPalette() const {
     QPalette palette = qt_fusionPalette();
 
     const QColor darkGray(53, 53, 53);
+    const QColor darkGray2(48, 48, 48);
     const QColor gray(128, 128, 128);
     const QColor black(25, 25, 25);
     const QColor blue(42, 130, 218);
@@ -21,7 +24,7 @@ QPalette DarkFusionStyle::standardPalette() const {
     palette.setColor(QPalette::Window, darkGray);
     palette.setColor(QPalette::WindowText, Qt::white);
     palette.setColor(QPalette::Base, black);
-    palette.setColor(QPalette::AlternateBase, darkGray);
+    palette.setColor(QPalette::AlternateBase, darkGray2);
     palette.setColor(QPalette::ToolTipBase, blue);
     palette.setColor(QPalette::ToolTipText, Qt::white);
     palette.setColor(QPalette::Text, Qt::white);
@@ -42,4 +45,30 @@ QPalette DarkFusionStyle::standardPalette() const {
     palette.setColor(QPalette::Disabled, QPalette::Light, darkGray);
 
     return palette;
+}
+
+QIcon DarkFusionStyle::standardIcon(StandardPixmap standardIcon,
+                                    const QStyleOption *option,
+                                    const QWidget *widget) const {
+//    qDebug() << standardIcon << option << widget;
+    if (standardIcon == QStyle::SP_DialogCloseButton) {
+        auto &&icon   = QProxyStyle::standardIcon(standardIcon, option, widget);
+        auto &&pixmap = icon.pixmap(option->rect.size());
+        auto &&image  = pixmap.toImage();
+
+        QRgb         *st         = (QRgb *)image.bits(); // Detach the image
+        const quint64 pixelCount = image.width() * image.height();
+
+        for (quint64 p = 0; p < pixelCount; ++p) {
+            const auto pixel = st[p];
+            int        red   = 255 - qRed(pixel);
+            int        green = 255 - qGreen(pixel);
+            int        blue  = 255 - qBlue(pixel);
+            int        alpha = qAlpha(pixel);
+            st[p] = qRgba(red, green, blue, alpha);
+        }
+
+        return QPixmap::fromImage(image);
+    }
+    return QProxyStyle::standardIcon(standardIcon, option, widget);
 }
