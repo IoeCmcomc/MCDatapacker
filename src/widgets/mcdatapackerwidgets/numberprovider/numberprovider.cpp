@@ -1,6 +1,8 @@
 #include "numberprovider.h"
 #include "ui_numberprovider.h"
 
+#include "stylesheetreapplier.h"
+
 #include <QJsonObject>
 #include <QDebug>
 #include <QVector>
@@ -17,6 +19,8 @@ NumberProvider::NumberProvider(QWidget *parent) :
             this, &NumberProvider::onMinMaxEdited);
     connect(ui->maxSpinBox, &QSpinBox::editingFinished,
             this, &NumberProvider::onMinMaxEdited);
+
+    ui->inputTypeButton->installEventFilter(styleSheetReapplier);
 }
 
 NumberProvider::~NumberProvider() {
@@ -38,8 +42,8 @@ void NumberProvider::mouseReleaseEvent(QMouseEvent *event) {
     auto cursorWidget = qApp->widgetAt(mapToGlobal(event->pos()));
 
     if (cursorWidget != nullptr
-        && qobject_cast<QAbstractSpinBox*>(cursorWidget) == nullptr
-        && qobject_cast<QToolButton*>(cursorWidget) == nullptr) {
+        && qobject_cast<QAbstractSpinBox *>(cursorWidget) == nullptr
+        && qobject_cast<QToolButton *>(cursorWidget) == nullptr) {
         interpretText();
         emit editingFinished();
         return;
@@ -92,37 +96,37 @@ QJsonValue NumberProvider::toJson() {
     QJsonValue value;
 
     switch (ui->stackedWidget->currentIndex()) {
-    case 0: { /* Exactly */
-        value =
-            (ui->spinBox->isUnset()) ? QJsonValue() : ui->spinBox->value();
-        break;
-    }
+        case 0: { /* Exactly */
+            value =
+                (ui->spinBox->isUnset()) ? QJsonValue() : ui->spinBox->value();
+            break;
+        }
 
-    case 1: { /* Range */
-        QJsonObject root;
+        case 1: { /* Range */
+            QJsonObject root;
 /*
           qDebug() << ui->minSpinBox->isUnset() <<
               ui->maxSpinBox->isUnset();
  */
-        if (!ui->minSpinBox->isUnset())
-            root.insert(QLatin1String("min"), ui->minSpinBox->value());
-        if (!ui->maxSpinBox->isUnset())
-            root.insert(QLatin1String("max"), ui->maxSpinBox->value());
-        value = root;
-        break;
-    }
+            if (!ui->minSpinBox->isUnset())
+                root.insert(QLatin1String("min"), ui->minSpinBox->value());
+            if (!ui->maxSpinBox->isUnset())
+                root.insert(QLatin1String("max"), ui->maxSpinBox->value());
+            value = root;
+            break;
+        }
 
-    case 2: { /*Binomial */
-        QJsonObject root;
-        root.insert(QLatin1String("type"),
-                    QLatin1String("minecraft:binomial"));
-        root.insert("n", ui->numSpinBox->value());
-        root.insert("p", ui->probSpinBox->value());
-        value = root;
-        break;
-    }
+        case 2: { /*Binomial */
+            QJsonObject root;
+            root.insert(QLatin1String("type"),
+                        QLatin1String("minecraft:binomial"));
+            root.insert("n", ui->numSpinBox->value());
+            root.insert("p", ui->probSpinBox->value());
+            value = root;
+            break;
+        }
 
-    default: break;
+        default: break;
     }
     return value;
 }
@@ -228,17 +232,17 @@ void NumberProvider::minimizeMinLimit() {
 
 bool NumberProvider::isCurrentlyUnset() const {
     switch (ui->stackedWidget->currentIndex()) {
-    case 0: /* Exactly */
-        return ui->spinBox->isUnset();
+        case 0: /* Exactly */
+            return ui->spinBox->isUnset();
 
-    case 1: /* Range */
-        return (ui->minSpinBox->isUnset() && ui->maxSpinBox->isUnset());
+        case 1: /* Range */
+            return (ui->minSpinBox->isUnset() && ui->maxSpinBox->isUnset());
 
-    case 2: /*Binomial */
-        return true;
+        case 2: /*Binomial */
+            return true;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 }
 

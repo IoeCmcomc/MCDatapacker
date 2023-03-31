@@ -3,6 +3,7 @@
 
 #include "inventoryitem.h"
 #include "mainwindow.h"
+#include "stylesheetreapplier.h"
 
 #include "globalhelpers.h"
 #include "game.h"
@@ -49,7 +50,7 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
         Windows::setDarkFrameIfDarkMode(this);
         adjustSize();
     });
-    ui->customTabFrame->installEventFilter(Windows::styleSheetReapplier);
+    ui->customTabFrame->installEventFilter(styleSheetReapplier);
 
     setupCustomTab();
 }

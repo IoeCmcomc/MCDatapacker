@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>303</width>
-    <height>26</height>
+    <height>29</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,9 +48,6 @@
     <widget class="QToolButton" name="inputTypeButton">
      <property name="styleSheet">
       <string notr="true">QToolButton::menu-indicator { image: none; }</string>
-     </property>
-     <property name="text">
-      <string/>
      </property>
      <property name="arrowType">
       <enum>Qt::DownArrow</enum>

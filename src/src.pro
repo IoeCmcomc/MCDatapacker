@@ -113,6 +113,7 @@ SOURCES += \
     statisticsdialog.cpp \
     statusbar.cpp \
     stripedscrollbar.cpp \
+    stylesheetreapplier.cpp \
     tabbeddocumentinterface.cpp \
     tagselectordialog.cpp \
     truefalsebox.cpp \
@@ -206,6 +207,7 @@ HEADERS += \
     statisticsdialog.h \
     statusbar.h \
     stripedscrollbar.h \
+    stylesheetreapplier.h \
     tabbeddocumentinterface.h \
     tagselectordialog.h \
     truefalsebox.h \

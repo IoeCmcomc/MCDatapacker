@@ -16,19 +16,21 @@ QPalette DarkFusionStyle::standardPalette() const {
     QPalette palette = qt_fusionPalette();
 
     const QColor darkGray(53, 53, 53);
-    const QColor darkGray2(48, 48, 48);
-    const QColor gray(128, 128, 128);
+    const QColor gray(127, 127, 127);
     const QColor black(25, 25, 25);
-    const QColor blue(42, 130, 218);
+    const QColor altBlack(39, 39, 39);
+    const QColor blue(24, 165, 229);
+    const QColor button(62, 62, 62);
+    const QColor yellowGreen(200, 200, 53);
 
     palette.setColor(QPalette::Window, darkGray);
     palette.setColor(QPalette::WindowText, Qt::white);
     palette.setColor(QPalette::Base, black);
-    palette.setColor(QPalette::AlternateBase, darkGray2);
+    palette.setColor(QPalette::AlternateBase, altBlack);
     palette.setColor(QPalette::ToolTipBase, blue);
     palette.setColor(QPalette::ToolTipText, Qt::white);
     palette.setColor(QPalette::Text, Qt::white);
-    palette.setColor(QPalette::Button, darkGray);
+    palette.setColor(QPalette::Button, button);
     palette.setColor(QPalette::ButtonText, Qt::white);
     palette.setColor(QPalette::Link, Qt::cyan);
     palette.setColor(QPalette::Highlight, blue);
@@ -36,9 +38,9 @@ QPalette DarkFusionStyle::standardPalette() const {
 
     palette.setColor(QPalette::Midlight, darkGray);
     palette.setColor(QPalette::Mid, gray);
-    palette.setColor(QPalette::Shadow, QColor(200, 200, 53));
+    palette.setColor(QPalette::Shadow, yellowGreen);
 
-    palette.setColor(QPalette::Active, QPalette::Button, gray.darker());
+    palette.setColor(QPalette::Active, QPalette::Button, button.darker());
     palette.setColor(QPalette::Disabled, QPalette::ButtonText, gray);
     palette.setColor(QPalette::Disabled, QPalette::WindowText, gray);
     palette.setColor(QPalette::Disabled, QPalette::Text, gray);

@@ -1,7 +1,7 @@
 #include "datawidgetinterface.h"
 #include "ui_datawidgetinterface.h"
 
-#include "platforms/windows.h"
+#include "stylesheetreapplier.h"
 
 #include <QJsonObject>
 #include <QMouseEvent>
@@ -36,8 +36,7 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
     ui->scrollArea->verticalScrollBar()->hide();
     ui->scrollArea->verticalScrollBar()->setStyleSheet(QStringLiteral(
                                                            "QScrollBar{width:0px;}"));
-    ui->scrollArea->verticalScrollBar()->installEventFilter(
-        Windows::styleSheetReapplier);
+    ui->scrollArea->verticalScrollBar()->installEventFilter(styleSheetReapplier);
 
     m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
     m_animation   = new QPropertyAnimation(ui->sidebar, "maximumWidth");

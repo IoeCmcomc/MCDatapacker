@@ -25,6 +25,8 @@ SOURCES     = \
     multipagewidget/multipagewidgetextensionfactory.cpp \
     mcdatapackerwidgets.cpp
 
+INCLUDEPATH += ../../..
+
 LIBS        += -L. 
 
 greaterThan(QT_MAJOR_VERSION, 4) {

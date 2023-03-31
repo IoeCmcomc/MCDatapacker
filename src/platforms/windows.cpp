@@ -2,11 +2,10 @@
 
 #ifdef Q_OS_WIN
 
+#include "stylesheetreapplier.h"
+
 #include <QtWin>
 #include <QSettings>
-#include <QTimer>
-//#include <QDebug>
-#include <QEvent>
 
 #include "dwmapi.h"
 
@@ -23,22 +22,6 @@ static const QOperatingSystemVersion Windows11 =
 { QOperatingSystemVersion::OSType::Windows, 10, 0, 22000 };
 
 namespace Windows {
-    bool StyleSheetReapplier::eventFilter(QObject *object, QEvent *event) {
-        if (event->type() == QEvent::StyleChange && !m_updated) {
-            auto *widget = qobject_cast<QWidget *>(object);
-            QTimer::singleShot(100, this, [widget, this]{
-                m_updated = true;
-                if (widget) {
-                    widget->setStyleSheet(widget->styleSheet());
-                }
-            });
-        }
-        if (m_updated && event->type() == QEvent::LayoutRequest) {
-            m_updated = false;
-        }
-        return QObject::eventFilter(object, event);
-    }
-
     bool isWindows11() {
         return QOperatingSystemVersion::current() >= Windows11;
     }
