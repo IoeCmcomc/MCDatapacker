@@ -1,10 +1,10 @@
 #ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
 
+#include "codepalette.h"
+
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
-
-#include <optional>
 
 struct BracketInfo {
     int  pos       = 0;
@@ -70,16 +70,19 @@ public:
 
     bool isManualHighlight() const;
 
+    void setPalette(const CodePalette &newPalette);
+
 protected:
     QHash<QChar, QTextCharFormat> quoteHighlightRules;
     QHash<QChar, QTextCharFormat> singleCommentHighlightRules;
     QVector<BracketPair> bracketPairs;
     QRegularExpression namespacedIdRegex{ QStringLiteral(
                                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };
+    CodePalette m_palette;
 
     friend class CodeEditor;
 
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
     void mergeFormat(int start, int count, const QTextCharFormat &fmt);
     virtual void rehighlightDelayed() {
     };

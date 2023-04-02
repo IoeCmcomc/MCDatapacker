@@ -38,9 +38,9 @@ public:
             Item = ItemStack, // Obsolete
             Message,
             MobEffect,
-            NbtCompoundTag,
             NbtPath,
             NbtTag,
+            NbtCompoundTag = NbtTag + 20,
             Objective,
             ObjectiveCriteria,
             Operation,

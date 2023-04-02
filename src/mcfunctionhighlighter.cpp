@@ -121,6 +121,7 @@ void McfunctionHighlighter::rehighlightDelayed() {
     const auto &&resultLines = result->lines();
     const auto &&blocks      = changedBlocks();
     m_formats.resize(blocks.size());
+    Command::NodeFormatter formatter(m_palette);
 
     int i = -1;
     for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
@@ -135,10 +136,9 @@ void McfunctionHighlighter::rehighlightDelayed() {
                 qDebug() << printer.source();
             }
 
-            Command::NodeFormatter formatter;
             formatter.startVisiting(lineResult);
-
             m_formats[i] = formatter.formatRanges();
+            formatter.reset();
         }
     }
 

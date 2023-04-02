@@ -710,6 +710,7 @@ namespace Command {
         Q_ASSERT(id != nullptr);
         if (id->leftText().isNull() && id->text().isEmpty()) {
             reportError(QT_TR_NOOP("Invalid empty namespaced ID"));
+            hasError = true;
         } else {
             id->setIsValid(true);
         }

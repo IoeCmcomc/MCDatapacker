@@ -16,6 +16,11 @@
 
 template<typename T>
 T strToDec(QStringView v, bool &ok) {
+    if (v.isEmpty()) {
+        ok = false;
+        return 0;
+    }
+
     std::make_unsigned_t<T> value = 0;
     int                     sign  = 1;
 

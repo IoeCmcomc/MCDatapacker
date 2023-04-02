@@ -33,6 +33,7 @@ SOURCES += \
     codeeditor.cpp \
     codefile.cpp \
     codegutter.cpp \
+    codepalette.cpp \
     darkfusionstyle.cpp \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
@@ -113,7 +114,7 @@ SOURCES += \
     statisticsdialog.cpp \
     statusbar.cpp \
     stripedscrollbar.cpp \
-    stylesheetreapplier.cpp \
+#    stylesheetreapplier.cpp \
     tabbeddocumentinterface.cpp \
     tagselectordialog.cpp \
     truefalsebox.cpp \
@@ -127,6 +128,7 @@ HEADERS += \
     codeeditor.h \
     codefile.h \
     codegutter.h \
+    codepalette.h \
     darkfusionstyle.h \
     datapackfileiconprovider.h \
     datapacktreeview.h \
@@ -207,7 +209,7 @@ HEADERS += \
     statisticsdialog.h \
     statusbar.h \
     stripedscrollbar.h \
-    stylesheetreapplier.h \
+#    stylesheetreapplier.h \ # Already added in mcdatapackerwidgets.pri
     tabbeddocumentinterface.h \
     tagselectordialog.h \
     truefalsebox.h \

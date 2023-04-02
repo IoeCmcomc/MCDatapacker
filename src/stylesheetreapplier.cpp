@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QPointer>
-#include "qevent.h"
+#include <QEvent>
 
 bool StyleSheetReapplier::eventFilter(QObject *object, QEvent *event) {
     if ((event->type() == QEvent::StyleChange) && !m_reapplying) {

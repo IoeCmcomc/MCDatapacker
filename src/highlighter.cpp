@@ -36,7 +36,7 @@ void TextBlockData::insert(NamespacedIdInfo *info) {
 
 
 Highlighter::Highlighter(QTextDocument *parent)
-    : QSyntaxHighlighter(parent) {
+    : QSyntaxHighlighter(parent), m_palette{defaultCodePalette} {
     connect(parent, &QTextDocument::contentsChanged,
             this, &Highlighter::onDocChanged);
 
@@ -75,6 +75,10 @@ bool Highlighter::isManualHighlight() const {
     return m_highlightManually;
 }
 
+void Highlighter::setPalette(const CodePalette &newPalette) {
+    m_palette = newPalette;
+}
+
 void Highlighter::onDocChanged() {
     //qDebug() << "Highlighter::onDocChanged";
     m_highlightingFirstBlock = true;
@@ -85,8 +89,7 @@ QVector<QTextBlock> Highlighter::changedBlocks() const {
 }
 
 void Highlighter::highlightBlock(const QString &text) {
-//    qDebug() << "Highlighter::highlightBlock" << currentBlock().blockNumber() <<
-//        text;
+//    qDebug() << "Highlighter::highlightBlock" << currentBlock().blockNumber();
     Q_ASSERT(document() != nullptr);
 
     TextBlockData *data = nullptr;
@@ -113,7 +116,7 @@ void Highlighter::highlightBlock(const QString &text) {
     if ((!sv.isEmpty()) &&
         singleCommentHighlightRules.contains(sv[0])) {
         setCurrentBlockState(Comment);
-        setFormat(0, sv.length(), singleCommentHighlightRules[sv[0]]);
+        setFormat(0, sv.length(), m_palette[CodePalette::Comment]);
     } else {
         QChar curQuoteChar = '\0';
         int   quoteStart   = 0;
@@ -125,9 +128,8 @@ void Highlighter::highlightBlock(const QString &text) {
                 if (!backslash) {
                     if (curChar == curQuoteChar) {
                         setCurrentBlockState(Normal);
-                        setFormat(quoteStart,
-                                  quoteLength + 1,
-                                  quoteHighlightRules[curQuoteChar]);
+                        setFormat(quoteStart, quoteLength + 1,
+                                  m_palette[CodePalette::QuotedString]);
                         curQuoteChar = '\0';
                         quoteLength  = 0;
                     } else if (currentBlockState() == Normal) {
