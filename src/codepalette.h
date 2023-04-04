@@ -174,5 +174,6 @@ private:
 };
 
 const extern CodePalette defaultCodePalette;
+const extern CodePalette defaultDarkCodePalette;
 
 #endif // CODEPALETTE_H

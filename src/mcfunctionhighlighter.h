@@ -13,8 +13,8 @@ class McfunctionHighlighter : public Highlighter {
 public:
     using FormatRanges = QVector<QVector<QTextLayout::FormatRange> >;
 
-    McfunctionHighlighter(QTextDocument *parent,
-                          Command::McfunctionParser *parser = nullptr);
+    explicit McfunctionHighlighter(QTextDocument *parent,
+                                   Command::McfunctionParser *parser = nullptr);
 
 protected slots:
     void highlightBlock(const QString &text) override;
@@ -24,17 +24,6 @@ protected slots:
 
 private:
     void setupRules();
-
-    struct HighlightingRule {
-        QRegularExpression pattern;
-        QTextCharFormat    format;
-    };
-
-    QTextCharFormat keywordFormat;
-    QTextCharFormat numberFormat;
-    QTextCharFormat entitySelectorFormat;
-    QTextCharFormat namespacedIDFormat;
-    QTextCharFormat commentFormat;
 
     QVector<HighlightingRule> highlightingRules;
     FormatRanges m_formats;

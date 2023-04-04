@@ -102,6 +102,32 @@ QStringList loadMinecraftCompletionInfo() {
     return ret;
 }
 
+// Adapted from: https://stackoverflow.com/a/56678483/12682038
+qreal perceivedLightness(const QColor &color) {
+    const static auto sRGBtoLin =
+        [](qreal colorChannel) {
+            if (colorChannel <= 0.04045) {
+                return colorChannel / 12.92;
+            } else {
+                return pow(((colorChannel + 0.055) / 1.055), 2.4);
+            }
+        };
+
+    const qreal vR = color.redF();
+    const qreal vG = color.greenF();
+    const qreal vB = color.blueF();
+
+    const qreal Y = (0.2126 * sRGBtoLin(vR) + 0.7152 * sRGBtoLin(vG)
+                     + 0.0722 * sRGBtoLin(vB));
+
+    if (Y <= (216. / 24389)) {
+        return Y * (24389. / 27);
+    } else {
+        return pow(Y, (1. / 3)) * 116 - 16;
+    }
+}
+
+
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     m_gutter = new CodeGutter(this);
     setAttribute(Qt::WA_Hover);
@@ -615,6 +641,22 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
     QPlainTextEdit::focusInEvent(e);
 }
 
+void CodeEditor::changeEvent(QEvent *e) {
+    if (e->type() == QEvent::PaletteChange) {
+        if (m_highlighter) {
+            if (perceivedLightness(palette().base().color()) < 50) {
+                m_highlighter->setPalette(defaultDarkCodePalette);
+            } else {
+                m_highlighter->setPalette(defaultCodePalette);
+            }
+            onCursorPositionChanged();
+            m_highlighter->ensureDelayedRehighlightAll();
+            m_highlighter->rehighlightDelayed();
+        }
+    }
+    QPlainTextEdit::changeEvent(e);
+}
+
 void CodeEditor::onCursorPositionChanged() {
 //    qDebug() << "CodeEditor::onCursorPositionChanged";
     setExtraSelections({});
@@ -635,7 +677,13 @@ void CodeEditor::highlightCurrentLine() {
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(237, 236, 223, 63);
+        const int factor    = 105;
+        QColor    lineColor = palette().base().color();
+        if (perceivedLightness(lineColor) < 50) {
+            lineColor = lineColor.lighter(factor);
+        } else {
+            lineColor = lineColor.darker(factor);
+        }
 
         selection.format = QTextCharFormat();
         selection.format.setBackground(lineColor);
@@ -680,7 +728,7 @@ void CodeEditor::openReplaceDialog() {
 
 void CodeEditor::toggleComment() {
     if (!m_highlighter ||
-        m_highlighter->singleCommentHighlightRules.isEmpty())
+        m_highlighter->m_singleCommentCharset.isEmpty())
         return;
 
     auto       txtCursor    = textCursor();
@@ -715,7 +763,7 @@ void CodeEditor::toggleComment() {
     int         anchorCharAdded     = 0;
     int         posCharAdded        = 0;
     const QChar commentChar         =
-        m_highlighter->singleCommentHighlightRules.cbegin().key();
+        m_highlighter->m_singleCommentCharset[0];
 
     for (int i = 0; i < count; i++) {
         txtCursor.movePosition(QTextCursor::StartOfLine);
@@ -846,6 +894,11 @@ bool CodeEditor::getCanUndo() const {
 
 void CodeEditor::setHighlighter(Highlighter *value) {
     m_highlighter = value;
+    if (perceivedLightness(palette().base().color()) < 50) {
+        m_highlighter->setPalette(defaultDarkCodePalette);
+    } else {
+        m_highlighter->setPalette(defaultCodePalette);
+    }
 }
 
 void CodeEditor::displayErrors() {

@@ -58,6 +58,11 @@ public:
         MultilineComment,
     };
 
+    struct HighlightingRule {
+        QRegularExpression pattern;
+        CodePalette::Role  formatRole;
+    };
+
     explicit Highlighter(QTextDocument *parent);
 
     using QSyntaxHighlighter::rehighlightBlock;
@@ -69,12 +74,13 @@ public:
     void onDocChanged();
 
     bool isManualHighlight() const;
+    void ensureDelayedRehighlightAll();
 
     void setPalette(const CodePalette &newPalette);
 
 protected:
-    QHash<QChar, QTextCharFormat> quoteHighlightRules;
-    QHash<QChar, QTextCharFormat> singleCommentHighlightRules;
+    QString m_quoteDelimiters = QStringLiteral("\"");
+    QString m_singleCommentCharset;
     QVector<BracketPair> bracketPairs;
     QRegularExpression namespacedIdRegex{ QStringLiteral(
                                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };

@@ -56,7 +56,6 @@ public:
     QCompleter * completer() const;
 
     void setParser(std::unique_ptr<Parser> newParser);
-
     Parser * parser() const;
 
 signals:
@@ -78,6 +77,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
     bool event(QEvent *event) override;
     void focusInEvent(QFocusEvent *e) override;
+    void changeEvent(QEvent *e) override;
 
 private /*slots*/ :
     void updateGutterWidth(int newBlockCount);

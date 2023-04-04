@@ -15,46 +15,21 @@ McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
 }
 
 void McfunctionHighlighter::setupRules() {
-    auto fmt = QTextCharFormat();
+    m_singleCommentCharset += QStringLiteral("#");
 
-    fmt.setForeground(QColor(62, 195, 0));
-    singleCommentHighlightRules.insert('#', fmt);
+    const QRegularExpression keywordRegex{ QStringLiteral(
+                                               R"((?<=^| )(?>(?>a)(?>dvancement|ttribute)|b(?>an(?>-ip|list|)|ossbar)|cl(?>ear|one)|d(?>ata(?:pack)?|e(?>bug|faultgamemode|op)|ifficulty)|e(?>chant|ffect|x(?>ecute|perience))|f(?>ill|orceload|unction)|g(?>ame(?>mode|rule)|ive)|help|item|jfr|ki(?>ck|ll)|l(?>ist|o(?>cate(?:biome)?|ot))|m(?>e|sg)|op|p(?>ar(?>don(?:-ip)?|ticle)|erf|laysound|ublish)|re(?>cipe|load|placeitem)|s(?>a(?>ve-(?>all|o(?>ff|n))|y)|c(?>hedule|oreboard)|e(?>ed|t(?>block|idletimeout|worldspawn))|p(?>awnpoint|ectate|readplayer)|top(?:sound)?|ummon)|t(?>ag|e(?>am(?:msg)?|l(?>eport|l(?:raw)?))|i(?>me|tle)|m|p|rigger)|w(?>eather|hitelist|orldborder|)|xp)(?= |$))") };
+    highlightingRules.append({ keywordRegex, CodePalette::Keyword });
 
-    HighlightingRule rule;
+    const QRegularExpression numberRegex{ QStringLiteral(
+                                              R"((?<!\w)-?\d+(?:\.\d+)?[bBsSlLfFdD]?(?!\w))") };
+    highlightingRules.append({ numberRegex, CodePalette::Number });
 
-    keywordFormat.setForeground(Qt::blue);
-    keywordFormat.setFontWeight(QFont::Bold);
-/*    keywordFormat.setToolTip("minecraft command"); */
+    highlightingRules.append({ namespacedIdRegex,
+                               CodePalette::ResourceLocation });
 
-    const static QRegularExpression keywordRegex{ QStringLiteral(
-                                                      R"((?<=^| )(?>(?>a)(?>dvancement|ttribute)|b(?>an(?>-ip|list|)|ossbar)|cl(?>ear|one)|d(?>ata(?:pack)?|e(?>bug|faultgamemode|op)|ifficulty)|e(?>chant|ffect|x(?>ecute|perience))|f(?>ill|orceload|unction)|g(?>ame(?>mode|rule)|ive)|help|item|jfr|ki(?>ck|ll)|l(?>ist|o(?>cate(?:biome)?|ot))|m(?>e|sg)|op|p(?>ar(?>don(?:-ip)?|ticle)|erf|laysound|ublish)|re(?>cipe|load|placeitem)|s(?>a(?>ve-(?>all|o(?>ff|n))|y)|c(?>hedule|oreboard)|e(?>ed|t(?>block|idletimeout|worldspawn))|p(?>awnpoint|ectate|readplayer)|top(?:sound)?|ummon)|t(?>ag|e(?>am(?:msg)?|l(?>eport|l(?:raw)?))|i(?>me|tle)|m|p|rigger)|w(?>eather|hitelist|orldborder|)|xp)(?= |$))") };
-    rule.pattern = keywordRegex;
-    rule.format  = keywordFormat;
-    highlightingRules.append(rule);
-
-
-    numberFormat.setForeground(QColor(47, 151, 193));
-    const static QRegularExpression numberRegex{ QStringLiteral(
-                                                     R"((?<!\w)-?\d+(?:\.\d+)?[bBsSlLfFdD]?(?!\w))") };
-    rule.pattern = numberRegex;
-    rule.format  = numberFormat;
-    highlightingRules.append(rule);
-
-    namespacedIDFormat.setForeground(QColor(69, 80, 59));
-    rule.pattern = namespacedIdRegex;
-    rule.format  = namespacedIDFormat;
-    highlightingRules.append(rule);
-
-    auto quoteFmt = QTextCharFormat();
-    quoteFmt.setForeground(QColor(163, 22, 33));
-
-    quoteHighlightRules.insert('\'', quoteFmt);
-
-    commentFormat.setForeground(Qt::darkGreen);
     const static QRegularExpression commentRegex{ QStringLiteral(R"(^\s*#.*)") };
-    rule.pattern = commentRegex;
-    rule.format  = commentFormat;
-    highlightingRules.append(rule);
+    highlightingRules.append({ commentRegex, CodePalette::Comment });
 }
 
 void McfunctionHighlighter::highlightBlock(const QString &text) {
@@ -67,8 +42,8 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 
         const auto &infos = data->namespacedIds();
 
+        auto fmt = m_palette[CodePalette::ResourceLocation];
         for (const auto info: infos) {
-            auto fmt = namespacedIDFormat;
             fmt.setFontUnderline(true);
             fmt.setToolTip(info->link);
             setFormat(info->start, info->length, fmt);
@@ -81,7 +56,7 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                 while (matchIterator.hasNext()) {
                     QRegularExpressionMatch &&match = matchIterator.next();
                     setFormat(match.capturedStart(), match.capturedLength(),
-                              rule.format);
+                              m_palette[rule.formatRole]);
                 }
             }
         } else {
@@ -101,8 +76,7 @@ void McfunctionHighlighter::rehighlightChangedBlocks() {
         return;
     } else if (blocks.size() == 1) {
         Highlighter::rehighlightBlock(blocks.at(0));
-    } else if ((blocks.first() == document()->firstBlock()) &&
-               (blocks.last() == document()->lastBlock())) {
+    } else if (blocks.size() == document()->blockCount()) {
         Highlighter::rehighlight();
     } else {
         for (const auto &block: blocks) {

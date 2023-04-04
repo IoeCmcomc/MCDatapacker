@@ -42,12 +42,6 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     m_curDirExists = QDir::current().exists();
 
-    auto fmt = QTextCharFormat();
-
-    fmt.setForeground(QColor(QStringLiteral("#A31621")));
-
-    quoteHighlightRules.insert('"', fmt);
-
     bracketPairs.append({ '{', '}' });
     bracketPairs.append({ '[', ']' });
 
@@ -73,6 +67,17 @@ void Highlighter::rehighlightBlock(const QTextBlock &block) {
 
 bool Highlighter::isManualHighlight() const {
     return m_highlightManually;
+}
+
+void Highlighter::ensureDelayedRehighlightAll() {
+    if (m_changedBlocks.size() < document()->blockCount()) {
+        m_changedBlocks.clear();
+        m_changedBlocks.reserve(document()->blockCount());
+        for (auto &&block = document()->begin(); block != document()->end();
+             block = block.next()) {
+            m_changedBlocks << block;
+        }
+    }
 }
 
 void Highlighter::setPalette(const CodePalette &newPalette) {
@@ -114,7 +119,7 @@ void Highlighter::highlightBlock(const QString &text) {
 
     const QStringView sv{ text };
     if ((!sv.isEmpty()) &&
-        singleCommentHighlightRules.contains(sv[0])) {
+        m_singleCommentCharset.contains(sv[0])) {
         setCurrentBlockState(Comment);
         setFormat(0, sv.length(), m_palette[CodePalette::Comment]);
     } else {
@@ -124,7 +129,7 @@ void Highlighter::highlightBlock(const QString &text) {
         bool  backslash    = false;
         for (int i = 0; i < sv.length(); i++) {
             auto curChar = sv[i];
-            if (quoteHighlightRules.contains(curChar)) {
+            if (m_quoteDelimiters.contains(curChar)) {
                 if (!backslash) {
                     if (curChar == curQuoteChar) {
                         setCurrentBlockState(Normal);

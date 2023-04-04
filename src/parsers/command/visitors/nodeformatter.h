@@ -301,17 +301,6 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(BlockPosNode *node) override {
-            m_pos += node->leadingTrivia().length();
-
-//            auto                     fmt = defaultFormat(node);
-//            FormatRange range{ m_pos, node->length(),
-//                                            std::move(fmt) };
-
-//            m_formatRanges << std::move(range);
-
-            m_pos += node->length() + node->trailingTrivia().length();
-        }
         virtual void visit(BlockPredicateNode *node) override {
             m_pos += node->leadingTrivia().length();
 
@@ -331,50 +320,6 @@ public:
                 node->nbt()->accept(this, m_order);
 
             m_pos += node->trailingTrivia().length();
-        }
-        virtual void visit(ColumnPosNode *node) override {
-            m_pos += node->leadingTrivia().length();
-
-//            auto                     fmt = defaultFormat(node);
-//            FormatRange range{ m_pos, node->length(),
-//                                            std::move(fmt) };
-
-//            m_formatRanges << std::move(range);
-
-            m_pos += node->length() + node->trailingTrivia().length();
-        }
-        virtual void visit(RotationNode *node) override {
-            m_pos += node->leadingTrivia().length();
-
-//            auto                     fmt = defaultFormat(node);
-//            FormatRange range{ m_pos, node->length(),
-//                                            std::move(fmt) };
-
-//            m_formatRanges << std::move(range);
-
-            m_pos += node->length() + node->trailingTrivia().length();
-        }
-        virtual void visit(Vec2Node *node) override {
-            m_pos += node->leadingTrivia().length();
-
-//            auto                     fmt = defaultFormat(node);
-//            FormatRange range{ m_pos, node->length(),
-//                                            std::move(fmt) };
-
-//            m_formatRanges << std::move(range);
-
-            m_pos += node->length() + node->trailingTrivia().length();
-        }
-        virtual void visit(Vec3Node *node) override {
-            m_pos += node->leadingTrivia().length();
-
-//            auto                     fmt = defaultFormat(node);
-//            FormatRange range{ m_pos, node->length(),
-//                                            std::move(fmt) };
-
-//            m_formatRanges << std::move(range);
-
-            m_pos += node->length() + node->trailingTrivia().length();
         }
 
         virtual void visit(TargetSelectorNode *node) override {
