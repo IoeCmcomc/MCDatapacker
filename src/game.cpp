@@ -15,7 +15,7 @@ QVersionNumber Game::version() {
 }
 
 QString Game::versionString() {
-    return QSettings().value(QStringLiteral("general/gameVersion"),
+    return QSettings().value(QStringLiteral("game/version"),
                              defaultVersionString).toString();
 }
 

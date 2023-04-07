@@ -6,7 +6,7 @@
 #include <QDebug>
 
 DarkFusionStyle::DarkFusionStyle() {
-    setObjectName(QStringLiteral("darkfusion"));
+    setObjectName(QStringLiteral("DarkFusion"));
     setBaseStyle(new QFusionStyle);
 }
 

@@ -7,25 +7,22 @@
 
 #include <QOperatingSystemVersion>
 #include <QFontDatabase>
-#include <QSettings>
 #include <QStyleFactory>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SettingsDialog) {
+    QDialog(parent), ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
 
     Windows::extendFrame(this);
 
     setupLanguageSetting();
-
     initSettings();
 
     connect(this, &QDialog::accepted, this, &SettingsDialog::onAccepted);
 }
 
 void SettingsDialog::setupLanguageSetting() {
-    ui->languageCombo->addItem(tr("<Default>"), QString());
+    ui->languageCombo->addItem(tr("(System locale)"), QString());
 
     QDir dir(QStringLiteral(":/i18n"));
     dir.setNameFilters({ QStringLiteral("MCDatapacker_*.qm") });
@@ -49,88 +46,102 @@ void SettingsDialog::setupLanguageSetting() {
         ui->languageCombo->addItem(lang, localeCode);
     }
 
-    auto &&curLocale =
-        QLocale(qobject_cast<MainWindow *>(parent())->getCurLocale());
-    auto &&currLang = QString("%1 (%2)").arg(
-        curLocale.languageToString(curLocale.language()),
-        curLocale.nativeLanguageName());
-    if (currLang.isEmpty())
+    const QString &localeCode =
+        m_settings.value(QStringLiteral("interface/locale"),
+                         QString()).toString();
+    if (localeCode.isEmpty()) {
         ui->languageCombo->setCurrentText(0);
-    else
+    } else {
+        const QLocale &&curLocale = localeCode;
+        auto          &&currLang  = QString("%1 (%2)").arg(
+            curLocale.languageToString(curLocale.language()),
+            curLocale.nativeLanguageName());
         ui->languageCombo->setCurrentText(currLang);
+    }
 }
 
 void SettingsDialog::onAccepted() {
-    QSettings settings;
+    m_settings.beginGroup("general");
+    m_settings.setValue("reloadExternChanges",
+                        ui->reloadExternChangesCombo->currentIndex());
+    m_settings.endGroup();
 
-    settings.setValue("theme", ui->themeCombo->currentText());
-    settings.beginGroup("general");
-    settings.setValue("locale", ui->languageCombo->currentData().toString());
-    settings.setValue("reloadExternChanges",
-                      ui->reloadExternChangesCombo->currentIndex());
-    settings.setValue("gameVersion",
-                      ui->gameVersionCombo->currentText());
-    settings.endGroup();
-    settings.beginGroup("editor");
-    settings.setValue("textSize", ui->editorTextSizeSpin->value());
-    settings.setValue("textFont", ui->editorTextFontCombo->currentFont());
-    settings.setValue("wrap", ui->editorWrapCheck->isChecked());
-    settings.setValue("toggleComments",
-                      ui->commentToggleModeRadio->isChecked());
-    settings.setValue("tabSize", ui->editorTabSizeSpin->value());
-    settings.setValue("insertTabAsSpaces",
-                      ui->editorTabAsSpacesCheck->isChecked());
-    settings.setValue("showSpacesAndTabs",
-                      ui->editorShowSpacesCheck->isChecked());
-    settings.endGroup();
+    m_settings.beginGroup("interface");
+    m_settings.setValue("locale", ui->languageCombo->currentData().toString());
+    m_settings.setValue("style", ui->themeCombo->currentText());
+    m_settings.setValue("darkStyle", ui->darkThemeCombo->currentText());
+    m_settings.endGroup();
+
+    m_settings.beginGroup("game");
+    m_settings.setValue("version", ui->gameVersionCombo->currentText());
+    m_settings.endGroup();
+
+    m_settings.beginGroup("editor");
+    m_settings.setValue("textSize", ui->editorTextSizeSpin->value());
+    m_settings.setValue("textFont", ui->editorTextFontCombo->currentFont());
+    m_settings.setValue("wrap", ui->editorWrapCheck->isChecked());
+    m_settings.setValue("toggleComments",
+                        ui->commentToggleModeRadio->isChecked());
+    m_settings.setValue("tabSize", ui->editorTabSizeSpin->value());
+    m_settings.setValue("insertTabAsSpaces",
+                        ui->editorTabAsSpacesCheck->isChecked());
+    m_settings.setValue("showSpacesAndTabs",
+                        ui->editorShowSpacesCheck->isChecked());
+    m_settings.endGroup();
+
+    m_settings.sync();
 }
 
 void SettingsDialog::initSettings() {
-    QSettings settings;
-
-    const auto &&styles = QStyleFactory::keys();
-
-    for (const auto &style: styles) {
-        ui->themeCombo->addItem(style);
-    }
-    ui->themeCombo->setCurrentText(settings.value(QStringLiteral("theme"),
-                                                  qApp->style()->objectName()).toString());
-
-    settings.beginGroup(QStringLiteral("general"));
+    m_settings.beginGroup(QStringLiteral("general"));
     ui->reloadExternChangesCombo->setCurrentIndex
-        (settings.value(QStringLiteral("reloadExternChanges"), 0).toInt());
+        (m_settings.value(QStringLiteral("reloadExternChanges"), 0).toInt());
+    m_settings.endGroup();
 
+    m_settings.beginGroup(QStringLiteral("interface"));
+    auto &&styles = QStyleFactory::keys();
+    styles << QStringLiteral("DarkFusion");
+
+    ui->themeCombo->addItems(styles);
+    ui->darkThemeCombo->addItems(styles);
+
+    ui->themeCombo->setCurrentText(
+        m_settings.value(QStringLiteral("style"),
+                         qApp->style()->objectName()).toString());
+    ui->darkThemeCombo->setCurrentText(
+        m_settings.value(QStringLiteral("darkStyle"),
+                         QStringLiteral("DarkFusion")).toString());
+    m_settings.endGroup();
+
+    m_settings.beginGroup(QStringLiteral("game"));
     const auto &versionFinfos =
         QDir(QStringLiteral(":/minecraft")).entryInfoList({ "1.*" });
     for (const auto &finfo: versionFinfos)
         ui->gameVersionCombo->addItem(finfo.fileName());
-    ui->gameVersionCombo->setCurrentText(settings.value(QStringLiteral(
-                                                            "gameVersion"),
-                                                        Game::
-                                                        defaultVersionString).toString());
-    settings.endGroup();
+    ui->gameVersionCombo->setCurrentText(
+        m_settings.value(QStringLiteral("version"),
+                         Game::defaultVersionString).toString());
+    m_settings.endGroup();
 
-    settings.beginGroup(QStringLiteral("editor"));
-    ui->editorTextSizeSpin->setValue(settings.value(QStringLiteral("textSize"),
-                                                    13).toInt());
-    if (settings.contains(QStringLiteral("textFont"))) {
-        ui->editorTextFontCombo->setCurrentFont(qvariant_cast<QFont>(settings.
-                                                                     value(
-                                                                         QStringLiteral(
-                                                                             "textFont"))));
+    m_settings.beginGroup(QStringLiteral("editor"));
+    ui->editorTextSizeSpin->setValue(m_settings.value(QStringLiteral("textSize"),
+                                                      13).toInt());
+    if (m_settings.contains(QStringLiteral("textFont"))) {
+        ui->editorTextFontCombo->setCurrentFont(
+            qvariant_cast<QFont>(m_settings.value(QStringLiteral("textFont"))));
     } else {
         ui->editorTextFontCombo->setCurrentFont(QFontDatabase::systemFont(
                                                     QFontDatabase::FixedFont));
     }
-    ui->editorWrapCheck->setChecked(settings.value("wrap", false).toBool());
-    if (settings.value(QStringLiteral("toggleComments"), false).toBool())
+    ui->editorWrapCheck->setChecked(m_settings.value("wrap", false).toBool());
+    if (m_settings.value(QStringLiteral("toggleComments"), false).toBool())
         ui->commentToggleModeRadio->setChecked(true);
-    ui->editorTabSizeSpin->setValue(settings.value("tabSize", 4).toInt());
-    if (!settings.value(QStringLiteral("insertTabAsSpaces"), true).toBool())
+    ui->editorTabSizeSpin->setValue(m_settings.value("tabSize", 4).toInt());
+    if (!m_settings.value(QStringLiteral("insertTabAsSpaces"), true).toBool())
         ui->editorTabAsSpacesCheck->setChecked(false);
-    if (settings.value(QStringLiteral("showSpacesAndTabs"), false).toBool())
+    if (m_settings.value(QStringLiteral("showSpacesAndTabs"), false).toBool())
         ui->editorShowSpacesCheck->setChecked(true);
-    settings.endGroup();
+    m_settings.endGroup();
 }
 
 SettingsDialog::~SettingsDialog() {

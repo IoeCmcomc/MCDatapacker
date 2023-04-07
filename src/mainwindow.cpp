@@ -47,7 +47,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     m_initialStyleId = style()->objectName();
+    moveOldSettings();
     readSettings();
+    loadLanguage(locale().name());
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
@@ -259,7 +261,7 @@ void MainWindow::pref_settings() {
     SettingsDialog dialog(this);
 
     if (dialog.exec() == QDialog::Accepted) {
-        QSettings settings{};
+        QSettings settings;
         readPrefSettings(settings, true);
     }
 }
@@ -300,8 +302,8 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
         }
     }
 
-    auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
-                                                 0);
+    auto reloadExternChanges = QSettings().value(
+        "general/reloadExternChanges", 0);
     if (reloadExternChanges == 1) {
         if (uniqueMessageBox != nullptr) return;
 
@@ -388,30 +390,22 @@ void MainWindow::readSettings() {
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
-    const QString &styleId = settings.value(QStringLiteral("theme"),
-                                            style()->objectName()).toString();
+    settings.beginGroup(QStringLiteral("interface"));
 
-    qInfo() << "Initial application style:" << qApp->style()->objectName();
-
-    if (!Windows::isDarkMode()) {
-        if (styleId.toLower() != qApp->style()->objectName()) {
-            qApp->setStyle(styleId);
-        }
-    } else {
-        qApp->setStyle(new DarkFusionStyle);
-        Windows::setDarkFrame(this);
-    }
-    qApp->setPalette(style()->standardPalette());
+    Windows::setDarkFrame(this, Windows::isDarkMode());
+    changeAppStyle(Windows::isDarkMode());
 
     qInfo() << "The application style has been set to" << qApp->style();
 
-    settings.beginGroup(QStringLiteral("general"));
-    loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
-                 true);
-    const QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
-                                             Game::defaultVersionString).
-                              toString();
+    const QString &localeCode =
+        settings.value(QStringLiteral("locale"), QString()).toString();
+    setLocale(localeCode.isEmpty() ? QLocale::system().name() : localeCode);
+    settings.endGroup();
 
+    settings.beginGroup(QStringLiteral("game"));
+    const QString &&gameVer = settings.value(
+        QStringLiteral("version"),
+        Game::defaultVersionString).toString();
     if (gameVer != tempGameVerStr) {
         if (fromDialog) {
             QMessageBox msgBox(QMessageBox::Warning,
@@ -429,10 +423,10 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
             if (msgBox.clickedButton() == restartBtn) {
                 restart();
             } else {
-                settings.setValue("gameVersion", tempGameVerStr); // Set value explicitly
+                settings.setValue("version", tempGameVerStr); // Set value explicitly
             }
         } else {
-            settings.setValue(QStringLiteral("gameVersion"), gameVer); // Set value explicitly
+            settings.setValue(QStringLiteral("version"), gameVer); // Set value explicitly
             tempGameVerStr = gameVer;
             Command::MinecraftParser::setGameVer(Game::version());
 
@@ -441,13 +435,12 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
         }
     }
     settings.endGroup();
-    //emit settingsChanged();
+
     emit ui->tabbedInterface->settingsChanged();
 }
 
 void MainWindow::writeSettings() {
-    QSettings settings(QCoreApplication::organizationName(),
-                       QCoreApplication::applicationName());
+    QSettings settings;
 
     settings.beginGroup("geometry");
     settings.setValue("isMaximized", isMaximized());
@@ -456,6 +449,25 @@ void MainWindow::writeSettings() {
         settings.setValue("pos", pos());
     }
     settings.endGroup();
+}
+
+void MainWindow::moveSetting(QSettings &settings, const QString &oldKey,
+                             const QString &newKey) {
+    if (settings.contains(oldKey)) {
+        settings.setValue(newKey, settings.value(oldKey));
+        settings.remove(oldKey);
+    }
+}
+
+void MainWindow::moveOldSettings() {
+    QSettings settings;
+
+    moveSetting(settings, QStringLiteral("theme"),
+                QStringLiteral("interface/style"));
+    moveSetting(settings, QStringLiteral("general/gameVersion"),
+                QStringLiteral("game/version"));
+    moveSetting(settings, QStringLiteral("general/locale"),
+                QStringLiteral("interface/locale"));
 }
 
 bool MainWindow::maybeSave() {
@@ -613,21 +625,12 @@ PackMetaInfo MainWindow::readPackMcmeta(const QString &filepath,
     return ret;
 }
 
-QString MainWindow::getCurLocale() {
-    return this->curLocale.name();
-}
-
-void MainWindow::loadLanguage(const QString &rLanguage, bool atStartup) {
-    if ((curLocale.bcp47Name() != rLanguage) || atStartup) {
-        curLocale = (rLanguage.isEmpty()) ? QLocale::system() : QLocale(
-            rLanguage);
-        QLocale::setDefault(curLocale);
-        const QString &&langCode        = curLocale.bcp47Name();
-        QString       &&translationFile = QString("MCDatapacker_%1").arg(
-            langCode);
-        switchTranslator(m_translatorQt, QString("qt_%1").arg(langCode));
-        switchTranslator(m_translator, translationFile);
-    }
+void MainWindow::loadLanguage(const QString &langCode) {
+    QLocale::setDefault(locale());
+    QString &&translationFile = QString("MCDatapacker_%1").arg(
+        langCode);
+    switchTranslator(m_translatorQt, QString("qt_%1").arg(langCode));
+    switchTranslator(m_translator, translationFile);
 }
 
 void MainWindow::switchTranslator(QTranslator &translator,
@@ -715,21 +718,47 @@ void MainWindow::updateEditMenu() {
     }
 }
 
+void MainWindow::changeAppStyle(const bool darkMode) {
+    QSettings      settings;
+    const QString &styleId = settings.value(
+        QStringLiteral("interface/style"),
+        qApp->style()->objectName()).toString();
+
+    if (!darkMode) {
+        if (styleId.toLower() != qApp->style()->objectName()) {
+            qApp->setStyle(styleId);
+        }
+    } else {
+        const QString &darkStyleId = settings.value(
+            QStringLiteral("interface/darkStyle"), "DarkFusion").toString();
+        if (darkStyleId.toLower() != qApp->style()->objectName()) {
+            if (darkStyleId == QLatin1String("DarkFusion")) {
+                qApp->setStyle(new DarkFusionStyle);
+            } else {
+                qApp->setStyle(darkStyleId);
+            }
+        }
+    }
+    qApp->setPalette(style()->standardPalette());
+}
+
 void MainWindow::changeEvent(QEvent *event) {
     if (event != nullptr) {
         switch (event->type()) {
-            /* this event is send if a translator is loaded */
+            /* this event is sent if a translator is loaded */
             case QEvent::LanguageChange: {
                 /*qDebug() << "QEvent::LanguageChange"; */
                 ui->retranslateUi(this);
                 break;
             }
 
-            /* this event is send, if the system language changes */
+            /* this event is sent if the system locale changes (internal locale changes on Windows) */
             case QEvent::LocaleChange: {
-                /*qDebug() << "QEvent::LocaleChange"; */
-                QString locale = QLocale::system().name();
-                loadLanguage(locale);
+                qDebug() << "QEvent::LocaleChange" << locale();
+                const QString &locale = QSettings().value("interface/locale",
+                                                          QString()).toString();
+                loadLanguage(
+                    locale.isEmpty() ? QLocale::system().name() : locale);
                 break;
             }
 
@@ -825,15 +854,7 @@ void MainWindow::onColorModeChanged(const bool isDark) {
         }
     }
 
-    if (isDark) {
-        qApp->setStyle(new DarkFusionStyle);
-    } else {
-        QSettings     settings;
-        const QString styleId = settings.value(QStringLiteral("theme"),
-                                               m_initialStyleId).toString();
-        qApp->setStyle(styleId);
-    }
-    qApp->setPalette(style()->standardPalette());
+    changeAppStyle(isDark);
 }
 
 void MainWindow::newDatapack() {

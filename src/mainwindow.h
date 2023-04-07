@@ -40,7 +40,6 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
     void readPrefSettings(QSettings &settings, bool fromDialog = false);
@@ -102,7 +101,6 @@ private:
     PredicateDock *predicateDock                     = nullptr;
     ItemModifierDock *itemModifierDock               = nullptr;
     libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
-    QLocale curLocale;
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
     QString m_initialStyleId;
@@ -112,6 +110,7 @@ private:
     void initMenu();
     void readSettings();
     void writeSettings();
+    void moveOldSettings();
     bool maybeSave();
     void openFolder(const QString &dirpath);
     void loadFolder(const QString &dirPath, const PackMetaInfo &packInfo);
@@ -120,11 +119,14 @@ private:
                                 QString &errorMsg) const;
 
     bool isPathRelativeTo(const QString &path, const QString &catDir);
-    void loadLanguage(const QString& rLanguage, bool atStartup = false);
+    void loadLanguage(const QString& langCode);
     void switchTranslator(QTranslator& translator, const QString& filename);
+    void moveSetting(QSettings &settings, const QString &oldKey,
+                     const QString &newKey);
     void adjustForCurFolder(const QString &path);
     void updateRecentFolders();
     void updateEditMenu();
+    void changeAppStyle(const bool darkMode);
 };
 
 #endif /* MAINWINDOW_H */

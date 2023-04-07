@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QSettings>
 
 namespace Ui {
     class SettingsDialog;
@@ -20,6 +21,7 @@ protected slots:
 
 private:
     Ui::SettingsDialog *ui;
+    QSettings m_settings;
 
     void initSettings();
     void setupLanguageSetting();
