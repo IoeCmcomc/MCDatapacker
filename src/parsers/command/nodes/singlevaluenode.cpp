@@ -22,6 +22,8 @@ namespace Command {
     DEFINE_ACCEPT_METHOD(OperationNode)
     DEFINE_ACCEPT_METHOD(ScoreboardSlotNode)
     DEFINE_ACCEPT_METHOD(TeamNode)
+    DEFINE_ACCEPT_METHOD(TemplateMirrorNode)
+    DEFINE_ACCEPT_METHOD(TemplateRotationNode)
 
     DEFINE_ACCEPT_METHOD(UuidNode)
 }

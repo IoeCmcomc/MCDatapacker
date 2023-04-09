@@ -8,7 +8,7 @@ ids_soup = BeautifulSoup(req.read(), "html.parser")
 info = dict()
 
 def find_tr_tags(tag):
-    return (tag.name == "tr") and (tag.th is None) \
+    return (tag.name == "tr") and (tag.find('th', recursive=False) is None) \
            and (("upcoming" not in tag.find("td").text) or ("only" in tag.find("td").text))
 
 def get_html(tag):
@@ -22,7 +22,7 @@ def get_per_h3(h3_id):
     print(h3.name)
     global info
     table = h3.find_next_sibling("table")
-    tr_tags = table.find_all(find_tr_tags)
+    tr_tags = table.tbody.find_all(find_tr_tags, recursive=False)
     for tr_tag in tr_tags:
         td_tags = tr_tag.find_all("td")
         name = td_tags[0].get_text(strip=True)

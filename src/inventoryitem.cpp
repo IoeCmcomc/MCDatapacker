@@ -1,6 +1,5 @@
 #include "inventoryitem.h"
 
-#include "inventoryslot.h"
 #include "game.h"
 
 #include "globalhelpers.h"
@@ -73,14 +72,14 @@ void InventoryItem::setupItem(QString id) {
 
     if (!iconpix) {
         /*qWarning() << "unknown ID: " + id; */
-        const static QColor magenta(100, 0, 86);
+        const static QColor magenta = QColor(248, 0, 248);
         iconpix = QPixmap(16, 16);
         iconpix.fill(magenta);
         {
             QPainter            painter(&iconpix);
             const static QBrush brush(Qt::black);
-            painter.fillRect(8, 0, 8, 8, brush);
-            painter.fillRect(0, 8, 8, 8, brush);
+            painter.fillRect(0, 0, 8, 8, brush);
+            painter.fillRect(8, 8, 8, 8, brush);
             painter.end();
         }
     }

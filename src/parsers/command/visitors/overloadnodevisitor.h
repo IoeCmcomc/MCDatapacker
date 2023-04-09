@@ -200,6 +200,12 @@ public:
         virtual void visit(TeamNode *node) override {
             _visit(node);
         }
+        virtual void visit(TemplateMirrorNode *node) override {
+            _visit(node);
+        }
+        virtual void visit(TemplateRotationNode *node) override {
+            _visit(node);
+        }
         virtual void visit(SwizzleNode *node) override {
             _visit(node);
         }

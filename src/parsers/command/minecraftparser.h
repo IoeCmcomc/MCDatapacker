@@ -189,6 +189,8 @@ private:
         QSharedPointer<SwizzleNode> minecraft_swizzle();
         QSharedPointer<TeamNode> minecraft_team();
         QSharedPointer<TimeNode> minecraft_time();
+        QSharedPointer<TemplateMirrorNode> minecraft_templateMirror();
+        QSharedPointer<TemplateRotationNode> minecraft_templateRotation();
         QSharedPointer<UuidNode> minecraft_uuid();
         QSharedPointer<Vec2Node> minecraft_vec2();
         QSharedPointer<Vec3Node> minecraft_vec3();

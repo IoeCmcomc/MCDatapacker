@@ -847,6 +847,11 @@ namespace Command {
             }
             case ParserType::Swizzle: { return minecraft_swizzle(); }
             case ParserType::Team: { return minecraft_team(); }
+            case ParserType::TemplateMirror: { return minecraft_templateMirror();
+            }
+            case ParserType::TemplateRotation: { return
+                                                     minecraft_templateRotation();
+            }
             case ParserType::Time: { return minecraft_time(); }
             case ParserType::Uuid: { return minecraft_uuid(); }
             case ParserType::Vec2: { return minecraft_vec2(); }
@@ -1405,6 +1410,25 @@ namespace Command {
                                                       value, unit);
         ret->setIsValid(ok);
         return ret;
+    }
+
+    QSharedPointer<TemplateMirrorNode> MinecraftParser::minecraft_templateMirror()
+    {
+        const QString &&literal = oneOf({ "none"_QL1, "front_back"_QL1,
+                                          "left_right"_QL1, });
+
+        return QSharedPointer<TemplateMirrorNode>::create(spanText(literal),
+                                                          !literal.isEmpty());
+    }
+
+    QSharedPointer<TemplateRotationNode> MinecraftParser::
+    minecraft_templateRotation() {
+        const QString &&literal = oneOf({ "none"_QL1, "clockwise_90"_QL1,
+                                          "counterclockwise_90"_QL1,
+                                          "180"_QL1 });
+
+        return QSharedPointer<TemplateRotationNode>::create(spanText(literal),
+                                                            !literal.isEmpty());
     }
 
     QSharedPointer<UuidNode> MinecraftParser::minecraft_uuid() {

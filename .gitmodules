@@ -58,3 +58,9 @@
 [submodule "lib/libqdark/libqdark"]
 	path = lib/libqdark/libqdark
 	url = https://github.com/suratovvlad/libqdark.git
+[submodule "resource/minecraft/info/1.19/summary"]
+	path = resource/minecraft/info/1.19/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.19/registries"]
+	path = resource/minecraft/info/1.19/registries
+	url = https://github.com/misode/mcmeta.git

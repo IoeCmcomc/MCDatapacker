@@ -21,17 +21,18 @@ regex = re.compile(r"-(\d+)px -(\d+)px")
 info = dict()
 icons = list()
 
-table = ids_soup.find("table")
-print(table.name)
+table = ids_soup.find_all("table")[1]
 
 tr_tags = table.find_all(find_tr_tags)
 for tr_tag in tr_tags:
     td_tags = tr_tag.find_all("td")
-    first_td = td_tags[0]
-    unobtainable = first_td.has_attr("style")
-    name = first_td.get_text(strip=True)
-    id = td_tags[1].get_text(strip=True)
-    #print(id, name, unobtainable)
+    icon_td = td_tags[0]
+    id_td = td_tags[1]
+    name_td = td_tags[2]
+    unobtainable = td_tags[3].has_attr("style")
+    name = name_td.get_text(strip=True)
+    id = id_td.get_text(strip=True)
+    # print(id, name, unobtainable)
     entry = {"name": name}
     if unobtainable:
         entry["unobtainable"] = True
@@ -44,13 +45,15 @@ for tr_tag in tr_tags:
         pos = (int(i) for i in pos_match.groups())
         icons.append((id, pos,))
     else:
-        icon = first_td.find("img")
+        icon = icon_td.find("img")
         if icon:
-            icons.append((id, icon["src"],))
+            icon_src: str = icon["data-src"];
+            icon_src = re.sub(r"/scale-to-width-down/.+", "", icon_src)
+            icons.append((id, icon_src,))
         
     #print(icon_text)
 
-sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/44/InvSprite.png/revision/latest?cb=20210321101300"
+sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/44/InvSprite.png"
 with urllib.request.urlopen(sheet_url) as url:
     f = BytesIO(url.read())
 sheet_img = Image.open(f)
@@ -63,12 +66,13 @@ for element in icons:
         x, y = next(element[1]), next(element[1])
         print(id, x, y)
         icon = sheet_img.crop((x, y, x+32, y +32))
-        icon.save("texture/inv_item/{}.png".format(id))
+        icon.save("texture/inv_item/{}.png".format(id), optimize=True)
     else:
         print(id, element[1])
-        with urllib.request.urlopen(element[1]) as response, open("texture/block/{}.png".format(id), 'wb') as out_file:
-            data = response.read() # a `bytes` object
-            out_file.write(data)
+        with urllib.request.urlopen(element[1]) as response:
+            icon = Image.open(BytesIO(response.read()))
+            icon.thumbnail((32, 32))
+            icon.save("texture/block/{}.png".format(id), optimize=True)
     
 with open("block.json", "w+") as f:
     f.write(json.dumps({"added" : info}, sort_keys=True))

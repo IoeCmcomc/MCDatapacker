@@ -61,6 +61,8 @@ namespace Command {
     class OperationNode;
     class ScoreboardSlotNode;
     class TeamNode;
+    class TemplateMirrorNode;
+    class TemplateRotationNode;
     class SwizzleNode;
     class TargetSelectorNode;
     class TimeNode;
@@ -141,6 +143,8 @@ public:
         virtual void visit(SwizzleNode *node)             = 0;
         virtual void visit(TargetSelectorNode *node)      = 0;
         virtual void visit(TimeNode *node)                = 0;
+        virtual void visit(TemplateMirrorNode *node)      = 0;
+        virtual void visit(TemplateRotationNode *node)    = 0;
         virtual void visit(UuidNode *node)                = 0;
         virtual void visit(ParticleNode *node)            = 0;
         virtual void visit(ParticleColorNode *node)       = 0;

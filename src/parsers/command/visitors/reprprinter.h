@@ -337,6 +337,13 @@ public:
         virtual void visit(TeamNode *node) override {
             m_repr += QString("TeamNode(\"%1\")").arg(node->value());
         };
+        virtual void visit(TemplateMirrorNode *node) override {
+            m_repr += QString("TemplateMirrorNode(\"%1\")").arg(node->value());
+        };
+        virtual void visit(TemplateRotationNode *node) override {
+            m_repr +=
+                QString("TemplateRotationNode(\"%1\")").arg(node->value());
+        };
         virtual void visit(SwizzleNode *node) override {
             m_repr += QString("SwizzleNode(%1)").arg(node->text());
         };
