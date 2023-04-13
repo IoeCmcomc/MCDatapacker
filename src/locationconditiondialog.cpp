@@ -76,9 +76,17 @@ QJsonObject LocationConditionDialog::toJson() const {
         root.insert(QStringLiteral("dimension"),
                     ui->dimensionCombo->currentData(
                         Qt::UserRole + 1).toString());
-    if (ui->featureCombo->currentIndex() != 0)
-        root.insert(QStringLiteral("feature"), ui->featureCombo->currentData(
-                        Qt::UserRole + 1).toString());
+    if (ui->featureCombo->currentText() != 0) {
+        if (Game::version() >= Game::v1_19) {
+            root.insert(QStringLiteral("structure"),
+                        ui->featureCombo->currentData(
+                            Qt::UserRole + 1).toString());
+        } else {
+            root.insert(QStringLiteral("feature"),
+                        ui->featureCombo->currentData(
+                            Qt::UserRole + 1).toString());
+        }
+    }
     if (!ui->lightInput->isCurrentlyUnset())
         root.insert(QStringLiteral("light"), { { "light",
                         ui->lightInput->toJson() } });
@@ -124,7 +132,7 @@ QJsonObject LocationConditionDialog::toJson() const {
         } else if (!ui->fluidTagEdit->text().isEmpty()) {
             fluid.insert(QStringLiteral("tag"), ui->fluidTagEdit->text());
         }
-        QJsonObject fluidStates = jsonFromStateTable(ui->stateTable);;
+        QJsonObject fluidStates = jsonFromStateTable(ui->stateTable);
         if (!fluidStates.isEmpty() && ui->stateGroup->isChecked())
             fluid.insert(QStringLiteral("state"), fluidStates);
         root.insert(QStringLiteral("fluid"), fluid);
@@ -145,17 +153,25 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     }
 
     if (value.contains(QStringLiteral("biome")))
-        setupComboFrom(ui->biomeCombo, value[QStringLiteral("biome")]);
+        setComboValueFrom(ui->biomeCombo, value[QStringLiteral("biome")]);
     if (value.contains(QStringLiteral("dimension")))
-        setupComboFrom(ui->dimensionCombo, value[QStringLiteral("dimension")]);
-    if (value.contains(QStringLiteral("feature")))
-        setupComboFrom(ui->featureCombo, value[QStringLiteral("feature")]);
+        setComboValueFrom(ui->dimensionCombo,
+                          value[QStringLiteral("dimension")]);
+    if (value.contains(QStringLiteral("feature"))) {
+        if (Game::version() >= Game::v1_19) {
+            setComboValueFrom(ui->featureCombo,
+                              value[QStringLiteral("structure")]);
+        } else {
+            setComboValueFrom(ui->featureCombo,
+                              value[QStringLiteral("feature")]);
+        }
+    }
     if (value.contains(QStringLiteral("light"))) {
         auto light = value[QStringLiteral("light")].toObject();
         if (light.contains(QStringLiteral("light")))
             ui->lightInput->fromJson(light[QStringLiteral("light")]);
     }
-    if (Game::version() >= QVersionNumber(1, 16)) {
+    if (Game::version() >= Game::v1_16) {
         ui->smokeyCheck->setupFromJsonObject(value, "smokey");
     }
 
@@ -187,7 +203,7 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         } else if (block.contains(QStringLiteral("block"))) {
             InventoryItem invItem(block[QStringLiteral("block")].toString());
             /*qDebug() << invItem; */
-            setupComboFrom(ui->blockCombo, QVariant::fromValue(invItem));
+            setComboValueFrom(ui->blockCombo, QVariant::fromValue(invItem));
         } else if (block.contains(QStringLiteral("tag"))) {
             if (block.contains(QStringLiteral("tag")))
                 ui->blockTagEdit->setText(block[QStringLiteral(
@@ -205,8 +221,8 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         QJsonObject fluid = value[QStringLiteral("fluid")].toObject();
         ui->fluid_tagRadio->setChecked(fluid.contains(QStringLiteral("tag")));
         if (fluid.contains(QStringLiteral("fluid"))) {
-            InventoryItem invItem(fluid[QStringLiteral("fluid")].toString());
-            setupComboFrom(ui->fluidCombo, QVariant::fromValue(invItem));
+            setComboValueFrom(ui->fluidCombo,
+                              fluid[QStringLiteral("fluid")].toString());
         } else if (fluid.contains(QStringLiteral("tag"))) {
             ui->blockTagEdit->setText(fluid[QStringLiteral("tag")].toString());
         }
@@ -298,7 +314,7 @@ void LocationConditionDialog::initBlockGroup() {
         ui->stateGroup->setEnabled(checked);
     });
     connect(ui->block_blockRadio, &QRadioButton::toggled,
-            ui->blockCombo, &QWidget::setEnabled);
+            ui->blockStackWidget, &QWidget::setEnabled);
     connect(ui->block_tagRadio, &QRadioButton::toggled,
             ui->blockTagEdit, &QWidget::setEnabled);
 }

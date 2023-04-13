@@ -127,7 +127,7 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("nbt")))
         ui->NBTEdit->setText(value[QStringLiteral("nbt")].toString());
     if (value.contains(QStringLiteral("potion"))) {
-        setupComboFrom(ui->potionCombo, value[QStringLiteral("potion")]);
+        setComboValueFrom(ui->potionCombo, value[QStringLiteral("potion")]);
     }
 
     if (value.contains(QStringLiteral("enchantments"))) {

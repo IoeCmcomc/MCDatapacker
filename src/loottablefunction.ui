@@ -957,6 +957,23 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="set_instrument">
+       <layout class="QFormLayout" name="formLayout_16">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_42">
+          <property name="text">
+           <string>Instrument:</string>
+          </property>
+          <property name="buddy">
+           <cstring>setInst_lineEdit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="setInst_lineEdit"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="set_loot_table">
        <layout class="QFormLayout" name="formLayout_3">
         <item row="0" column="0">
@@ -1314,6 +1331,11 @@
       <item>
        <property name="text">
         <string>Set enchantments</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set instrument</string>
        </property>
       </item>
       <item>

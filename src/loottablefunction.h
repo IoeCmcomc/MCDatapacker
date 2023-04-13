@@ -52,6 +52,7 @@ private:
         SetCount,
         SetDamage,
         SetEnchantments,
+        SetInstrument,
         SetLootTable,
         SetLore,
         SetName,
@@ -79,6 +80,7 @@ private:
       "fill_player_head", "limit_count",         "looting_enchant",
       "set_attributes",   "set_banner_pattern",  "set_contents",
       "set_count",        "set_damage",          "set_enchantments",
+      "set_instrument",
       "set_loot_table",   "set_lore",            "set_name",
       "set_nbt",          "set_potion",          "set_stew_effect",
       "copy_name",        "explosion_decay",     "furnace_smelt" };

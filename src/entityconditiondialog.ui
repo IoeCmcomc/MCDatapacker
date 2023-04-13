@@ -29,6 +29,9 @@
      <property name="text">
       <string>Entity type:</string>
      </property>
+     <property name="buddy">
+      <cstring>entityTypeCombo</cstring>
+     </property>
     </widget>
    </item>
    <item row="0" column="1" colspan="3">
@@ -57,7 +60,7 @@
         <x>0</x>
         <y>0</y>
         <width>565</width>
-        <height>450</height>
+        <height>467</height>
        </rect>
       </property>
       <attribute name="label">
@@ -81,7 +84,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="minLimit" stdset="0">
+            <property name="minLimit">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -94,7 +97,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="minLimit" stdset="0">
+            <property name="minLimit">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -107,7 +110,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="minLimit" stdset="0">
+            <property name="minLimit">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -120,7 +123,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="minLimit" stdset="0">
+            <property name="minLimit">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -133,7 +136,7 @@
               <height>22</height>
              </size>
             </property>
-            <property name="minLimit" stdset="0">
+            <property name="minLimit">
              <number>-2147483647</number>
             </property>
            </widget>
@@ -214,6 +217,9 @@
            <property name="text">
             <string>NBT:</string>
            </property>
+           <property name="buddy">
+            <cstring>NBTEdit</cstring>
+           </property>
           </widget>
          </item>
          <item row="1" column="1">
@@ -224,29 +230,29 @@
        <item row="1" column="0" colspan="3">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="DialogDataButton" name="vehicleBtn" native="true">
-           <property name="text" stdset="0">
+          <widget class="DialogDataButton" name="vehicleBtn">
+           <property name="text">
             <string>Vehicle...</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="DialogDataButton" name="targetEntityBtn" native="true">
-           <property name="text" stdset="0">
+          <widget class="DialogDataButton" name="targetEntityBtn">
+           <property name="text">
             <string>Targeted entity...</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="DialogDataButton" name="passengerBtn" native="true">
-           <property name="text" stdset="0">
+          <widget class="DialogDataButton" name="passengerBtn">
+           <property name="text">
             <string>Passenger...</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="DialogDataButton" name="steppingOnBtn" native="true">
-           <property name="text" stdset="0">
+          <widget class="DialogDataButton" name="steppingOnBtn">
+           <property name="text">
             <string>Stepping on...</string>
            </property>
           </widget>
@@ -322,79 +328,79 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="1">
-           <widget class="DialogDataButton" name="headPropBtn" native="true">
+           <widget class="DialogDataButton" name="headPropBtn">
             <property name="minimumSize">
              <size>
               <width>0</width>
               <height>30</height>
              </size>
             </property>
-            <property name="text" stdset="0">
+            <property name="text">
              <string>Head...</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="DialogDataButton" name="offhandPropBtn" native="true">
+           <widget class="DialogDataButton" name="offhandPropBtn">
             <property name="minimumSize">
              <size>
               <width>0</width>
               <height>30</height>
              </size>
             </property>
-            <property name="text" stdset="0">
+            <property name="text">
              <string>Offhand...</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="DialogDataButton" name="chestPropBtn" native="true">
+           <widget class="DialogDataButton" name="chestPropBtn">
             <property name="minimumSize">
              <size>
               <width>0</width>
               <height>30</height>
              </size>
             </property>
-            <property name="text" stdset="0">
+            <property name="text">
              <string>Chest...</string>
             </property>
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="DialogDataButton" name="mainhandPropBtn" native="true">
+           <widget class="DialogDataButton" name="mainhandPropBtn">
             <property name="minimumSize">
              <size>
               <width>0</width>
               <height>30</height>
              </size>
             </property>
-            <property name="text" stdset="0">
+            <property name="text">
              <string>Mainhand...</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="DialogDataButton" name="legsPropBtn" native="true">
+           <widget class="DialogDataButton" name="legsPropBtn">
             <property name="minimumSize">
              <size>
               <width>0</width>
               <height>30</height>
              </size>
             </property>
-            <property name="text" stdset="0">
+            <property name="text">
              <string>Legs…</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="DialogDataButton" name="feetPropBtn" native="true">
+           <widget class="DialogDataButton" name="feetPropBtn">
             <property name="minimumSize">
              <size>
               <width>0</width>
               <height>30</height>
              </size>
             </property>
-            <property name="text" stdset="0">
+            <property name="text">
              <string>Feet...</string>
             </property>
            </widget>
@@ -403,7 +409,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="DialogDataButton" name="locatPropBtn" native="true">
+        <widget class="DialogDataButton" name="locatPropBtn">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -416,7 +422,7 @@
            <height>30</height>
           </size>
          </property>
-         <property name="text" stdset="0">
+         <property name="text">
           <string>Location...</string>
          </property>
         </widget>
@@ -429,7 +435,7 @@
         <x>0</x>
         <y>0</y>
         <width>565</width>
-        <height>450</height>
+        <height>467</height>
        </rect>
       </property>
       <attribute name="label">
@@ -440,6 +446,9 @@
         <widget class="QLabel" name="label_21">
          <property name="text">
           <string>Duration:</string>
+         </property>
+         <property name="buddy">
+          <cstring>effectDuraInput</cstring>
          </property>
         </widget>
        </item>
@@ -478,6 +487,9 @@
          <property name="text">
           <string>Amplifier:</string>
          </property>
+         <property name="buddy">
+          <cstring>effectAmpInput</cstring>
+         </property>
         </widget>
        </item>
        <item row="7" column="0" colspan="3">
@@ -507,6 +519,9 @@
          <property name="text">
           <string>Status effect:</string>
          </property>
+         <property name="buddy">
+          <cstring>effectCombo</cstring>
+         </property>
         </widget>
        </item>
        <item row="6" column="0" colspan="3">
@@ -531,7 +546,7 @@
         <x>0</x>
         <y>0</y>
         <width>544</width>
-        <height>565</height>
+        <height>545</height>
        </rect>
       </property>
       <attribute name="label">
@@ -642,8 +657,8 @@
               </widget>
              </item>
              <item>
-              <widget class="DialogDataButton" name="lookingAtBtn" native="true">
-               <property name="text" stdset="0">
+              <widget class="DialogDataButton" name="lookingAtBtn">
+               <property name="text">
                 <string>Looking at...</string>
                </property>
               </widget>
@@ -1028,9 +1043,77 @@
             <widget class="NumberProvider" name="blocksOnFireInput"/>
            </item>
            <item row="1" column="0" colspan="2">
-            <widget class="DialogDataButton" name="entityStruckBtn" native="true">
-             <property name="text" stdset="0">
+            <widget class="DialogDataButton" name="entityStruckBtn">
+             <property name="text">
               <string>Entity struck...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="frog">
+          <attribute name="title">
+           <string>Frog</string>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout_5">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Variant:</string>
+             </property>
+             <property name="buddy">
+              <cstring>frogVariantCombo</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="frogVariantCombo">
+             <item>
+              <property name="text">
+               <string>(not set)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Cold</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Temperate</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Warm</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>Slime</string>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout_6">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Size:</string>
+             </property>
+             <property name="buddy">
+              <cstring>slimeSizeInput</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="NumberProvider" name="slimeSizeInput">
+             <property name="modes">
+              <set>NumberProvider::ExactAndRange</set>
+             </property>
+             <property name="minLimit">
+              <number>1</number>
              </property>
             </widget>
            </item>
@@ -1071,8 +1154,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>565</x>
-     <y>712</y>
+     <x>575</x>
+     <y>634</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -1087,8 +1170,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>608</x>
-     <y>712</y>
+     <x>575</x>
+     <y>634</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

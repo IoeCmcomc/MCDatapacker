@@ -43,6 +43,7 @@ private:
     void initPlayerStat();
     void setupGrantedTableFromJson(const QJsonObject &json,
                                    QStandardItemModel &model);
+    void playerFromJson(const QJsonObject &player);
 };
 
 #endif /* ENTITYCONDITIONDIALOG_H */

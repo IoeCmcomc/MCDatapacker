@@ -85,7 +85,7 @@ void initComboModelViewFromRegistry(const QString &registry,
     combo->setModel(&model);
 }
 
-void setupComboFrom(QComboBox *combo, const QVariant &vari, int role) {
+void setComboValueFrom(QComboBox *combo, const QVariant &vari, int role) {
     const auto *model = qobject_cast<QStandardItemModel*>(combo->model());
 
     if (vari.canConvert<QString>()) {

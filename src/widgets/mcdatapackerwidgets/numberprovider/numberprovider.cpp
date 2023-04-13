@@ -9,8 +9,7 @@
 #include <QResizeEvent>
 
 NumberProvider::NumberProvider(QWidget *parent) :
-    QFrame(parent),
-    ui(new Ui::NumberProvider) {
+    QFrame(parent), ui(new Ui::NumberProvider) {
     ui->setupUi(this);
 
     setModes(Exact | Range | Binomial);

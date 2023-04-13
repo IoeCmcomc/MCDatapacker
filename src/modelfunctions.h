@@ -21,7 +21,7 @@ void initComboModelViewFromRegistry(const QString &registry,
                         QStandardItemModel &model, QComboBox *combo,
                         bool optional = true, bool append = true);
 
-void setupComboFrom(QComboBox *combo, const QVariant &vari,
+void setComboValueFrom(QComboBox *combo, const QVariant &vari,
                     int role = Qt:: UserRole + 1);
 
 void appendRowToTableWidget(QTableWidget *table,

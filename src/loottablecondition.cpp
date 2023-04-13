@@ -297,7 +297,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     switch (condIndex) {
         case 0: { /*Block states */
             if (value.contains("block"))
-                setupComboFrom(ui->blockState_blockCombo, QVariant::fromValue
+                setComboValueFrom(ui->blockState_blockCombo, QVariant::fromValue
                                    (InventoryItem(value["block"].toString())));
             if (value.contains("properties")) {
                 QJsonObject states = value["properties"].toObject();
@@ -466,7 +466,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
 
         case 11: {/*Table bonus */
             if (value.contains("enchantment"))
-                setupComboFrom(ui->tableBonus_enchantCombo,
+                setComboValueFrom(ui->tableBonus_enchantCombo,
                                value["enchantment"].toString());
             if (value.contains("chances")) {
                 QJsonArray chances = value["chances"].toArray();

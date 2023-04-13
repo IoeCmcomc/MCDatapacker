@@ -5,8 +5,10 @@
 #include "numberproviderdelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
+#include "uberswitch/uberswitch.hpp"
 
 #include "game.h"
+#include "globalhelpers.h"
 
 #include <QDebug>
 #include <QScrollArea>
@@ -22,6 +24,10 @@ static const QVector<QString> catVariants = {
     "white",
 };
 
+static const QVector<QString> frogVariants = {
+    "", "cold", "temperate", "warm",
+};
+
 EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
@@ -35,6 +41,8 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
 
     ui->tabWidget->setTabVisible(2, Game::version() >= Game::v1_16);
     ui->tabWidget->setTabVisible(3, Game::version() >= Game::v1_17);
+    ui->tabWidget->setTabVisible(4, Game::version() >= Game::v1_19);
+    ui->tabWidget->setTabVisible(5, Game::version() >= Game::v1_19);
 
     ui->headPropBtn->assignDialogClass<ItemConditionDialog>();
     ui->chestPropBtn->assignDialogClass<ItemConditionDialog>();
@@ -66,6 +74,12 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     initPlayerAdv();
     initPlayerRecipe();
     initPlayerStat();
+
+    for (int i = 0; i < frogVariants.size(); ++i) {
+        const QString &&fullId = QStringLiteral("minecraft:") + frogVariants.at(
+            i);
+        ui->frogVariantCombo->setItemData(i, fullId, Qt::UserRole + 1);
+    }
 
     connect(ui->entityTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
@@ -222,15 +236,28 @@ QJsonObject EntityConditionDialog::toJson() const {
         }
         if (!stats.isEmpty())
             player.insert(QStringLiteral("stats"), stats);
-        if (!player.isEmpty())
-            root.insert(QStringLiteral("player"), player);
+        if (!player.isEmpty()) {
+            if (Game::version() >= Game::v1_19) {
+                player.insert("type", "player");
+                root.insert("type_specific", player);
+            } else {
+                root.insert(QStringLiteral("player"), player);
+            }
+        }
     }
 
     if ((isNotSelected || (entityId == QStringLiteral("minecraft:cat")))
         && (ui->catVariantCombo->currentIndex() > 0)) {
         const auto &variant = catVariants[ui->catVariantCombo->currentIndex()];
-        root.insert(QStringLiteral("catType"),
-                    QStringLiteral("textures/entity/cat/%1.png").arg(variant));
+        if (Game::version() >= Game::v1_19) {
+            QJsonObject cat({ { "type", "cat" } });
+            cat.insert("variant", QString("minecraft:" + variant));
+            root.insert("type_specific", cat);
+        } else {
+            root.insert(QStringLiteral("catType"),
+                        QStringLiteral("textures/entity/cat/%1.png").arg(
+                            variant));
+        }
     }
 
     if ((isNotSelected ||
@@ -239,8 +266,14 @@ QJsonObject EntityConditionDialog::toJson() const {
         QJsonObject fishingHook;
         ui->inOpenWaterCheck->insertToJsonObject(fishingHook,
                                                  QStringLiteral("in_open_water"));
-        if (!fishingHook.isEmpty())
-            root["fishing_hook"] = fishingHook;
+        if (!fishingHook.isEmpty()) {
+            if (Game::version() >= Game::v1_19) {
+                fishingHook["type"]   = "fishing_hook";
+                root["type_specific"] = fishingHook;
+            } else {
+                root["fishing_hook"] = fishingHook;
+            }
+        }
     }
 
     if ((isNotSelected ||
@@ -254,16 +287,91 @@ QJsonObject EntityConditionDialog::toJson() const {
         if (!ui->entityStruckBtn->getData().isEmpty())
             lightningBolt.insert(QStringLiteral("entity_struck"),
                                  ui->entityStruckBtn->getData());
-        if (!lightningBolt.isEmpty())
-            root["lightning_bolt"] = lightningBolt;
+        if (!lightningBolt.isEmpty()) {
+            if (Game::version() >= Game::v1_19) {
+                lightningBolt["type"] = "lightning";
+                root["type_specific"] = lightningBolt;
+            } else {
+                root["lightning_bolt"] = lightningBolt;
+            }
+        }
+    }
+
+    if ((isNotSelected || (entityId == QStringLiteral("minecraft:frog")))
+        && (Game::version() >= Game::v1_19)
+        && (ui->frogVariantCombo->currentIndex() != 0)) {
+        QJsonObject frog{ { "type", "frog" } };
+        frog.insert(QStringLiteral("variant"),
+                    ui->frogVariantCombo->currentData(
+                        Qt::UserRole + 1).toString());
+        root["type_specific"] = frog;
+    }
+
+    if ((isNotSelected ||
+         (entityId == QStringLiteral("minecraft:slime") ||
+          entityId == QStringLiteral("minecraft:magma_cube")))
+        && (Game::version() >= Game::v1_19)) {
+        QJsonObject slime{ { "type", "slime" } };
+        slime["size"]         = ui->slimeSizeInput->toJson();
+        root["type_specific"] = slime;
     }
 
     return root;
 }
 
+void EntityConditionDialog::playerFromJson(const QJsonObject &player) {
+    if (player.contains("gamemode")) {
+        const int index =
+            gamemodes.indexOf(player[QStringLiteral("gamemode")].toString());
+        if (index != -1) {
+            ui->gameModeCombo->setCurrentIndex(index);
+        }
+    }
+    if ((Game::version() >= Game::v1_17)
+        && player.contains(QStringLiteral("looking_at"))) {
+        ui->lookingAtBtn->setData(player[QStringLiteral(
+                                             "looking_at")].toObject());
+    }
+    if (player.contains(QStringLiteral("level")))
+        ui->playerLevelInput->fromJson(player[QStringLiteral("level")]);
+    if (player.contains(QStringLiteral("advancements")))
+        setupGrantedTableFromJson(player[QStringLiteral(
+                                             "advancements")].toObject(),
+                                  playerAdvanModel);
+    if (player.contains(QStringLiteral("recipes")))
+        setupGrantedTableFromJson(player[QStringLiteral(
+                                             "recipes")].toObject(),
+                                  playerRecipeModel);
+    if (player.contains(QStringLiteral("stats"))) {
+        auto stats = player[QStringLiteral("stats")].toArray();
+        for (auto stat : stats) {
+            QJsonObject statObj = stat.toObject();
+            if (statObj.isEmpty())
+                continue;
+            QString statType = statObj[QStringLiteral("type")].toString();
+            if (!statType.contains(QStringLiteral(":")))
+                statType = QStringLiteral("minecraft:") + statType;
+            auto indexes = statTypeModel.match(
+                statTypeModel.index(0, 0), Qt::UserRole + 1, statType);
+            if (indexes.isEmpty()) continue;
+            auto *typeItem = new QStandardItem();
+            typeItem->setData(statType);
+            typeItem->setText(statType);
+            typeItem->setEditable(false);
+            auto *statItem = new QStandardItem();
+            statItem->setText(statObj[QStringLiteral("stat")].toString());
+            auto *valueItem = new QStandardItem();
+            valueItem->setData(statObj.value(QStringLiteral("value")),
+                               ExtendedRole::NumberProviderRole);
+
+            playerStatModel.appendRow({ typeItem, statItem, valueItem });
+        }
+    }
+}
+
 void EntityConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("type")))
-        setupComboFrom(ui->entityTypeCombo, value[QStringLiteral("type")]);
+        setComboValueFrom(ui->entityTypeCombo, value[QStringLiteral("type")]);
     if (value.contains(QStringLiteral("team")))
         ui->teamEdit->setText(value[QStringLiteral("team")].toString());
     if (value.contains(QStringLiteral("nbt")))
@@ -336,7 +444,7 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
 
     if (value.contains(QStringLiteral("effects"))) {
         auto effects = value[QStringLiteral("effects")].toObject();
-        for (auto effectID : effects.keys()) {
+        for (auto &&effectID : effects.keys()) {
             if (!effectID.contains(QStringLiteral(":")))
                 effectID = QStringLiteral("minecraft:") + effectID;
             auto indexes = effectModel.match(
@@ -366,83 +474,90 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
         }
     }
     onEntityTypeChanged();
-    if (value.contains(QStringLiteral("player"))) {
-        auto player = value[QStringLiteral("player")].toObject();
-        if (player.contains("gamemode")) {
-            const int index =
-                gamemodes.indexOf(player[QStringLiteral("gamemode")].toString());
-            if (index != -1) {
-                ui->gameModeCombo->setCurrentIndex(index);
+    if (Game::version() >= Game::v1_19) {
+        if (value.contains("type_specific")) {
+            const auto &typeSpecific = value["type_specific"].toObject();
+            uswitch (typeSpecific["type"].toString()) {
+                ucase ("player"_QL1): {
+                    playerFromJson(typeSpecific);
+                    break;
+                }
+                ucase ("cat"_QL1): {
+                    auto &&variantStr =
+                        typeSpecific[QStringLiteral("variant")].toString();
+                    Glhp::removePrefix(variantStr, "minecraft:"_QL1);
+                    for (int i = 1; i < catVariants.size(); ++i) {
+                        if (variantStr == catVariants[i]) {
+                            ui->catVariantCombo->setCurrentIndex(i);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                ucase ("fishing_hook"_QL1): {
+                    ui->inOpenWaterCheck->setupFromJsonObject(typeSpecific,
+                                                              "in_open_water");
+                    break;
+                }
+                ucase ("lightning"_QL1): {
+                    if (typeSpecific.contains("blocks_set_on_fire")) {
+                        ui->blocksOnFireInput->fromJson(typeSpecific[
+                                                            "blocks_set_on_fire"]);
+                    }
+                    if (typeSpecific.contains("entity_struck")) {
+                        ui->entityStruckBtn->setData(
+                            typeSpecific["entity_struck"].toObject());
+                    }
+                    break;
+                }
+                ucase ("frog"_QL1): {
+                    setComboValueFrom(ui->frogVariantCombo,
+                                      typeSpecific[QStringLiteral("variant")]);
+                    break;
+                }
+                ucase ("slime"_QL1): {
+                    ui->slimeSizeInput->fromJson(
+                        typeSpecific[QStringLiteral("size")]);
+                    break;
+                }
             }
         }
-        if ((Game::version() >= Game::v1_17)
-            && value.contains(QStringLiteral("looking_on"))) {
-            ui->lookingAtBtn->setData(value[QStringLiteral(
-                                                "looking_on")].toObject());
+    } else {
+        if (value.contains(QStringLiteral("player"))) {
+            auto player = value[QStringLiteral("player")].toObject();
+            playerFromJson(player);
         }
-        if (player.contains(QStringLiteral("level")))
-            ui->playerLevelInput->fromJson(player[QStringLiteral("level")]);
-        if (player.contains(QStringLiteral("advancements")))
-            setupGrantedTableFromJson(player[QStringLiteral(
-                                                 "advancements")].toObject(),
-                                      playerAdvanModel);
-        if (player.contains(QStringLiteral("recipes")))
-            setupGrantedTableFromJson(player[QStringLiteral(
-                                                 "recipes")].toObject(),
-                                      playerRecipeModel);
-        if (player.contains(QStringLiteral("stats"))) {
-            auto stats = player[QStringLiteral("stats")].toArray();
-            for (auto stat : stats) {
-                QJsonObject statObj = stat.toObject();
-                if (statObj.isEmpty())
-                    continue;
-                QString statType = statObj[QStringLiteral("type")].toString();
-                if (!statType.contains(QStringLiteral(":")))
-                    statType = QStringLiteral("minecraft:") + statType;
-                auto indexes = statTypeModel.match(
-                    statTypeModel.index(0, 0), Qt::UserRole + 1, statType);
-                if (indexes.isEmpty()) continue;
-                auto *typeItem = new QStandardItem();
-                typeItem->setData(statType);
-                typeItem->setText(statType);
-                typeItem->setEditable(false);
-                auto *statItem = new QStandardItem();
-                statItem->setText(statObj[QStringLiteral("stat")].toString());
-                auto *valueItem = new QStandardItem();
-                valueItem->setData(statObj.value(QStringLiteral("value")),
-                                   ExtendedRole::NumberProviderRole);
-
-                playerStatModel.appendRow({ typeItem, statItem, valueItem });
+        if (value.contains(QStringLiteral("catType"))) {
+            const auto &variantStr =
+                value[QStringLiteral("catType")].toString();
+            for (int i = 1; i < catVariants.size(); ++i) {
+                if (variantStr ==
+                    QStringLiteral("textures/entity/cat/%1.png").arg(catVariants
+                                                                     [i])) {
+                    ui->catVariantCombo->setCurrentIndex(i);
+                    break;
+                }
             }
         }
-    }
-    if (value.contains(QStringLiteral("catType"))) {
-        const auto &variantStr = value[QStringLiteral("catType")].toString();
-        for (int i = 1; i < catVariants.size(); ++i) {
-            if (variantStr ==
-                QStringLiteral("textures/entity/cat/%1.png").arg(catVariants[i]))
-            {
-                ui->catVariantCombo->setCurrentIndex(i);
-                break;
+        if (value.contains(QStringLiteral("fishing_hook"))
+            && (Game::version() >= Game::v1_16)) {
+            const auto &fishingHook =
+                value[QStringLiteral("fishing_hook")].toObject();
+            ui->inOpenWaterCheck->setupFromJsonObject(fishingHook,
+                                                      "in_open_water");
+        }
+        if (value.contains(QStringLiteral("lightning_bolt"))
+            && (Game::version() >= Game::v1_17)) {
+            const auto &lightningBolt =
+                value[QStringLiteral("lightning_bolt")].toObject();
+            if (lightningBolt.contains("blocks_set_on_fire")) {
+                ui->blocksOnFireInput->fromJson(lightningBolt[
+                                                    "blocks_set_on_fire"]);
             }
-        }
-    }
-    if (value.contains(QStringLiteral("fishing_hook"))
-        && (Game::version() >= Game::v1_16)) {
-        const auto &fishingHook =
-            value[QStringLiteral("fishing_hook")].toObject();
-        ui->inOpenWaterCheck->setupFromJsonObject(fishingHook, "in_open_water");
-    }
-    if (value.contains(QStringLiteral("lightning_bolt"))
-        && (Game::version() >= Game::v1_17)) {
-        const auto &lightningBolt =
-            value[QStringLiteral("lightning_bolt")].toObject();
-        if (lightningBolt.contains("blocks_set_on_fire")) {
-            ui->blocksOnFireInput->fromJson(lightningBolt["blocks_set_on_fire"]);
-        }
-        if (lightningBolt.contains("entity_struck")) {
-            ui->entityStruckBtn->setData(
-                lightningBolt["entity_struck"].toObject());
+            if (lightningBolt.contains("entity_struck")) {
+                ui->entityStruckBtn->setData(
+                    lightningBolt["entity_struck"].toObject());
+            }
         }
     }
 }
