@@ -1433,5 +1433,9 @@
         <file>texture/item/mangrove_chest_boat.png</file>
         <file>texture/item/oak_chest_boat.png</file>
         <file>texture/item/spruce_chest_boat.png</file>
+        <file>texture/item/ender_dragon_spawn_egg.png</file>
+        <file>texture/item/iron_golem_spawn_egg.png</file>
+        <file>texture/item/snow_golem_spawn_egg.png</file>
+        <file>texture/item/wither_spawn_egg.png</file>
     </qresource>
 </RCC>

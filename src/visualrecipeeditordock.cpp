@@ -4,9 +4,10 @@
 #include "inventoryitem.h"
 #include "mainwindow.h"
 #include "stylesheetreapplier.h"
+#include "modelfunctions.h"
 
-#include "globalhelpers.h"
 #include "game.h"
+#include "globalhelpers.h"
 #include "platforms/windows.h"
 
 #include <QDebug>
@@ -36,14 +37,12 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
                                    ui->craftingSlot_9 });
 
     connect(ui->customTabBar, &QTabBar::currentChanged,
-            this,
-            &VisualRecipeEditorDock::onRecipeTabChanged);
+            this, &VisualRecipeEditorDock::onRecipeTabChanged);
     connect(ui->cookTimeCheck, &QCheckBox::toggled, this, [this](bool checked) {
         ui->cookTimeInput->setEnabled(checked);
     });
     connect(ui->writeRecipeBtn, &QPushButton::clicked,
-            this,
-            &VisualRecipeEditorDock::writeRecipe);
+            this, &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this,
             &VisualRecipeEditorDock::readRecipe);
     connect(this, &QDockWidget::topLevelChanged, this, [this](bool) {
@@ -53,6 +52,7 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     ui->customTabFrame->installEventFilter(styleSheetReapplier);
 
     setupCustomTab();
+    setupCategoryCombo();
 }
 
 VisualRecipeEditorDock::~VisualRecipeEditorDock() {
@@ -71,10 +71,26 @@ void VisualRecipeEditorDock::setupCustomTab() {
     ui->customTabWidgetLayout->removeWidget(ui->customTabBar);
     ui->customTabWidgetLayout->removeWidget(ui->customTabFrame);
     ui->customTabWidgetLayout->addWidget(ui->customTabBar, 0, 0, Qt::AlignTop);
-    ui->customTabWidgetLayout->addWidget(ui->customTabFrame, 0, 0, 0);
+    ui->customTabWidgetLayout->addWidget(ui->customTabFrame, 0, 0);
     ui->customTabBar->raise();
     ui->customTabBar->setExpanding(false);
     /*ui->customTabBar->setMovable(true); */
+}
+
+void VisualRecipeEditorDock::setupCategoryCombo() {
+    if (Game::version() >= Game::v1_19_3) {
+        appendRowToModel(m_craftCategories, tr("Miscellaneous"), "misc");
+        appendRowToModel(m_craftCategories, tr("Building"), "building");
+        appendRowToModel(m_craftCategories, tr("Equipment"), "equipment");
+        appendRowToModel(m_craftCategories, tr("Redstone"), "redstone");
+        appendRowToModel(m_smeltCategories, tr("Miscellaneous"), "misc");
+        appendRowToModel(m_smeltCategories, tr("Blocks"), "blocks");
+        appendRowToModel(m_smeltCategories, tr("Food"), "food");
+        ui->recipeCategoryCombo->setModel(&m_craftCategories);
+    } else {
+        ui->recipeCategoryLabel->hide();
+        ui->recipeCategoryCombo->hide();
+    }
 }
 
 void VisualRecipeEditorDock::retranslate() {
@@ -85,6 +101,16 @@ void VisualRecipeEditorDock::retranslate() {
     ui->customTabBar->setTabText(2, tr("Stonecutting"));
     if (Game::version() >= Game::v1_16)
         ui->customTabBar->setTabText(3, tr("Smithing"));
+
+    if (Game::version() >= Game::v1_19) {
+        m_craftCategories.item(0)->setText(tr("Miscellaneous"));
+        m_craftCategories.item(1)->setText(tr("Building"));
+        m_craftCategories.item(2)->setText(tr("Equipment"));
+        m_craftCategories.item(3)->setText(tr("Redstone"));
+        m_smeltCategories.item(0)->setText(tr("Miscellaneous"));
+        m_smeltCategories.item(1)->setText(tr("Blocks"));
+        m_smeltCategories.item(2)->setText(tr("Food"));
+    }
 }
 
 void VisualRecipeEditorDock::changeEvent(QEvent *event) {
@@ -96,18 +122,33 @@ void VisualRecipeEditorDock::changeEvent(QEvent *event) {
 void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
     Q_ASSERT(index >= 0 && index < 4);
     ui->stackedRecipeWidget->setCurrentIndex(index);
-    if ((Game::version() >= Game::v1_16))
-        ui->stackedOptions->setCurrentIndex(qMin(index, 3));
-    else
-        ui->stackedOptions->setCurrentIndex(qMin(index, 2));
+    ui->resultCountInput->setEnabled(index != 1);
+    ui->stackedOptions->setCurrentIndex(qMin(index, 2));
+
+    if (Game::version() >= Game::v1_19) {
+        ui->recipeCategoryLabel->setEnabled(index <= 1);
+        ui->recipeCategoryCombo->setEnabled(index <= 1);
+        if (index == 0) {
+            ui->recipeCategoryCombo->setModel(&m_craftCategories);
+        } else if (index == 1) {
+            ui->recipeCategoryCombo->setModel(&m_smeltCategories);
+        }
+    }
 }
 
 void VisualRecipeEditorDock::writeRecipe() {
-    int         index = ui->customTabBar->currentIndex();
+    const int   index = ui->customTabBar->currentIndex();
     QJsonObject root;
 
     if (!ui->recipeGroupInput->text().isEmpty())
         root.insert("group", ui->recipeGroupInput->text());
+
+    if ((index <= 1) && (Game::version() >= Game::v1_19_3)
+        && (ui->recipeCategoryCombo->currentIndex() != -1)) {
+        root.insert("category", ui->recipeCategoryCombo->currentData(
+                        Qt::UserRole + 1).toString());
+    }
+
     QJsonDocument jsonDoc;
     switch (index) {
         case 0:
@@ -140,8 +181,9 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
 
         QMap< QVector<InventoryItem>, QString> keys;
         QString                                patternStr;
-        QString                                patternChars = "123456789";
-        int                                    pattCharIdx  = -1;
+        const QString                          patternChars = QStringLiteral(
+            "123456789");
+        int pattCharIdx = -1;
         for (auto *slot : qAsConst(craftingSlots)) {
             const auto &items = slot->getItems();
             if (!items.isEmpty()) {
@@ -168,12 +210,12 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
                 int xend   = 0;
                 int ystart = 3;
                 int yend   = 0;
-                for (auto row : pattern) {
+                for (const auto &row : pattern) {
                     width = qMax(row.toString().length(), width);
                 }
                 for (int y = 0; y < width; ++y) {
                     for (int x = 0; x < pattern.count(); ++x) {
-                        QChar c = pattern[y].toString()[x];
+                        const QChar c = pattern[y].toString()[x];
                         if (c != ' ') {
                             xstart = qMin(x, xstart);
                             xend   = qMax(x, xend);
@@ -182,16 +224,15 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
                         }
                     }
                 }
+                const int  xlen = xend - xstart + 1;
                 QJsonArray tmpPattern;
                 for (int y = 0; y < 3; ++y) {
                     if (y >= ystart && y <= yend) {
-                        tmpPattern.push_back(pattern[y]);
+                        const auto &&row = pattern[y].toString();
+                        tmpPattern.push_back(row.mid(xstart, xlen));
                     }
                 }
                 pattern = tmpPattern;
-                for (auto row : qAsConst(pattern)) {
-                    row = row.toString().mid(xstart, xend - xstart + 1);
-                }
             }
         }
         root.insert("pattern", pattern);
@@ -316,8 +357,8 @@ void VisualRecipeEditorDock::readRecipe() {
     if (root.isEmpty())
         return;
 
-    if (root.contains(QStringLiteral("group")))
-        ui->recipeGroupInput->setText(root[QStringLiteral("group")].toString());
+    ui->resultCountInput->setValue(1);
+    ui->recipeGroupInput->setText(root[QStringLiteral("group")].toString());
 
     static const QString craftingTypes[] = {
         QStringLiteral("crafting_shaped"), QStringLiteral("crafting_shapeless")
@@ -337,26 +378,32 @@ void VisualRecipeEditorDock::readRecipe() {
         if (type == craftingType) {
             ui->customTabBar->setCurrentIndex(0);
             readCraftingJson(root);
-            return;
+            goto FINALIZE;
         }
     }
     for (const QString &smeltingType : smeltingTypes) {
         if (type == smeltingType) {
             ui->customTabBar->setCurrentIndex(1);
             readSmeltingJson(root);
-            return;
+            goto FINALIZE;
         }
     }
     if (type == QStringLiteral("stonecutting")) {
         ui->customTabBar->setCurrentIndex(2);
         readStonecuttingJson(root);
-        return;
-    }
-
-    if (type == QStringLiteral("smithing")
-        && (Game::version() >= Game::v1_16)) {
+    } else if (type == QStringLiteral("smithing")
+               && (Game::version() >= Game::v1_16)) {
         ui->customTabBar->setCurrentIndex(3);
         readSmithingJson(root);
+    }
+
+ FINALIZE:
+    if (root.contains(QStringLiteral("category"))
+        && (Game::version() >= Game::v1_19_3)) {
+        const QString &&category = root[QStringLiteral("category")].toString();
+        const int       index    = ui->recipeCategoryCombo->findData(
+            category, Qt::UserRole + 1);
+        ui->recipeCategoryCombo->setCurrentIndex(index);
     }
 }
 
@@ -429,8 +476,7 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
         ui->outputSlot->clearItems();
-    if (result.contains(QStringLiteral("count")))
-        ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt());
+    ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt(1));
 }
 
 void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
@@ -498,25 +544,28 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
 void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
     if (!root.contains(QStringLiteral("base"))) return;
 
-    const QJsonValue base = root[QStringLiteral("base")];
+    const QJsonValue &&base = root[QStringLiteral("base")];
     ui->smithingSlot_0->setItems(JsonToIngredients(base));
 
     if (!root.contains(QStringLiteral("addition"))) return;
 
-    QJsonValue addition = root[QStringLiteral("addition")];
+    const QJsonValue &&addition = root[QStringLiteral("addition")];
     ui->smithingSlot_1->setItems(JsonToIngredients(addition));
 
     if (!root.contains(QStringLiteral("result"))) return;
 
-    QString itemID = root[QStringLiteral("result")].toString();
+    const QJsonObject &&result = root[QStringLiteral("result")].toObject();
+    if (!result.contains(QStringLiteral("item"))) return;
+
+    const QString &&itemID = result[QStringLiteral("item")].toString();
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
         ui->outputSlot->clearItems();
 
-    if (!root.contains(QStringLiteral("count"))) return;
-
-    ui->resultCountInput->setValue(root[QStringLiteral("count")].toInt());
+    if (result.contains(QStringLiteral("count"))) {
+        ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt());
+    }
 }
 
 QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {

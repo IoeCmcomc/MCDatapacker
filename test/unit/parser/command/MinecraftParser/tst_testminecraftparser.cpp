@@ -124,11 +124,11 @@ void TestMinecraftParser::commands_data() {
     SET_TAG(attribute)
     QTest::newRow(GEN_TAG) <<
         "attribute @s minecraft:generic.armor base set 5" <<
-        "RootNode[6](LiteralNode(attribute), EntityNode[single](TargetSelectorNode(@s)), ResourceLocationNode(minecraft:generic.armor), LiteralNode(base), LiteralNode(set), DoubleNode(5))";
+        "RootNode[6](LiteralNode(attribute), EntityNode[single](TargetSelectorNode(@s)), ResourceNode(minecraft:generic.armor), LiteralNode(base), LiteralNode(set), DoubleNode(5))";
     QTest::newRow(GEN_TAG) <<
         "attribute @s generic.max_health modifier remove 8b138417-eccd-429b-a080-4beb98b7aa30"
                            <<
-        "RootNode[6](LiteralNode(attribute), EntityNode[single](TargetSelectorNode(@s)), ResourceLocationNode(generic.max_health), LiteralNode(modifier), LiteralNode(remove), UuidNode({8b138417-eccd-429b-a080-4beb98b7aa30}))";
+        "RootNode[6](LiteralNode(attribute), EntityNode[single](TargetSelectorNode(@s)), ResourceNode(generic.max_health), LiteralNode(modifier), LiteralNode(remove), UuidNode({8b138417-eccd-429b-a080-4beb98b7aa30}))";
 
     SET_TAG(clear)
     QTest::newRow(GEN_TAG) << "clear" << "RootNode[1](LiteralNode(clear))";
@@ -238,7 +238,7 @@ void TestMinecraftParser::commands_data() {
         "execute in minecraft:the_nether positioned as @s run tp ~ ~ ~" <<
         "RootNode[9](LiteralNode(execute), LiteralNode(in), DimensionNode(minecraft:the_nether), LiteralNode(positioned), LiteralNode(as), EntityNode[](TargetSelectorNode(@s)), LiteralNode(run), LiteralNode(tp), Vec3Node(x: AngleNode(~), y: AngleNode(~), z: AngleNode(~)))";
     QTest::newRow(GEN_TAG) << "execute positioned 0 64 0 run locate village" <<
-        "RootNode[6](LiteralNode(execute), LiteralNode(positioned), Vec3Node(x: AngleNode(0), y: AngleNode(64), z: AngleNode(0)), LiteralNode(run), LiteralNode(locate), ResourceLocationNode(village))";
+        "RootNode[6](LiteralNode(execute), LiteralNode(positioned), Vec3Node(x: AngleNode(0), y: AngleNode(64), z: AngleNode(0)), LiteralNode(run), LiteralNode(locate), ResourceOrTagNode(village))";
     QTest::newRow(GEN_TAG) <<
         "execute as @e[type=sheep] positioned as @s rotated as @p run tp @s ^ ^ ^1"
                            <<
@@ -337,11 +337,11 @@ void TestMinecraftParser::commands_data() {
 
     SET_TAG(locate)
     QTest::newRow(GEN_TAG) << "locate mansion" <<
-        "RootNode[2](LiteralNode(locate), ResourceLocationNode(mansion))";
+        "RootNode[2](LiteralNode(locate), ResourceOrTagNode(mansion))";
 
     SET_TAG(locatebiome)
     QTest::newRow(GEN_TAG) << "locatebiome desert" <<
-        "RootNode[2](LiteralNode(locatebiome), ResourceLocationNode(desert))";
+        "RootNode[2](LiteralNode(locatebiome), ResourceOrTagNode(desert))";
 
     SET_TAG(loot)
     QTest::newRow(GEN_TAG) <<

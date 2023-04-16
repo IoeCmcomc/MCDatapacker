@@ -79,6 +79,7 @@ const CodePalette defaultCodePalette{
           QFont::DemiBold)->ok() },
     { CP::TargetSelector_Arguments, CharFormatBuilder().bg("#aafaf0f5")->ok() },
     { CP::Key, CharFormatBuilder().fg("#B89C3D")->ok() },
+    { CP::Gamemode, CharFormatBuilder().fg("#152769")->bold(true)->ok() },
 };
 
 const CodePalette defaultDarkCodePalette{
@@ -148,4 +149,5 @@ const CodePalette defaultDarkCodePalette{
           QFont::DemiBold)->ok() },
     { CP::TargetSelector_Arguments, CharFormatBuilder().bg("#aa341123")->ok() },
     { CP::Key, CharFormatBuilder().fg("#B89C3D")->ok() },
+    { CP::Gamemode, CharFormatBuilder().fg("#BBC6F1")->bold(true)->ok() },
 };

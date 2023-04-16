@@ -9,6 +9,7 @@
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
+#include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
 #include "../nodes/intrangenode.h"
@@ -140,6 +141,18 @@ public:
         virtual void visit(ResourceLocationNode *node) override {
             _visit(node);
         }
+        virtual void visit(ResourceNode *node) override {
+            _visit(node);
+        }
+        virtual void visit(ResourceKeyNode *node) override {
+            _visit(node);
+        }
+        virtual void visit(ResourceOrTagNode *node) override {
+            _visit(node);
+        }
+        virtual void visit(ResourceOrTagKeyNode *node) override {
+            _visit(node);
+        }
         virtual void visit(BlockPosNode *node) override {
             _visit(node);
         }
@@ -236,6 +249,10 @@ public:
         }
 
         virtual void visit(XyzNode *node) override {
+            _visit(node);
+        }
+
+        virtual void visit(GamemodeNode *node) override {
             _visit(node);
         }
 

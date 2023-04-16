@@ -34,12 +34,15 @@ private slots:
 private:
     Ui::VisualRecipeEditorDock *ui;
 
-    QVector<InventorySlot*> craftingSlots;
-    bool isResizing    = false;
+    QStandardItemModel m_craftCategories;
+    QStandardItemModel m_smeltCategories;
+    QVector<InventorySlot *> craftingSlots;
     int lastTabIndex   = 0;
     int lastStackIndex = 0;
+    bool isResizing    = false;
 
     void setupCustomTab();
+    void setupCategoryCombo();
     QJsonObject genCraftingJson(QJsonObject root);
     QJsonObject genSmeltingJson(QJsonObject root);
     QJsonObject genStonecuttingJson(QJsonObject root);

@@ -67,6 +67,7 @@ SOURCES += \
     newdatapackdialog.cpp \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
+    parsers/command/nodes/gamemodenode.cpp \
     parsers/command/re2c_generated_functions.cpp \
     parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
@@ -168,6 +169,7 @@ HEADERS += \
     parsers/command/nodes/entitynode.h \
     parsers/command/nodes/filenode.h \
     parsers/command/nodes/floatrangenode.h \
+    parsers/command/nodes/gamemodenode.h \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
@@ -258,6 +260,7 @@ RESOURCES += \
     ../resource/minecraft/info/1.18/1.18.qrc \
     ../resource/minecraft/info/1.18.2/1.18.2.qrc \
     ../resource/minecraft/info/1.19/1.19.qrc \
+    ../resource/minecraft/info/1.19.3/1.19.3.qrc \
     ../resource/minecraft/minecraft.qrc \
     ../resource/app/icons/default/default.qrc
 

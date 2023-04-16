@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>349</width>
-    <height>450</height>
+    <height>483</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -792,9 +792,6 @@
                   <height>0</height>
                  </size>
                 </property>
-                <property name="suffix">
-                 <string/>
-                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -877,6 +874,9 @@
                    <property name="text">
                     <string>Type:</string>
                    </property>
+                   <property name="buddy">
+                    <cstring>craftTypeInput</cstring>
+                   </property>
                   </widget>
                  </item>
                  <item row="0" column="1">
@@ -900,7 +900,7 @@
                  </item>
                 </layout>
                </widget>
-               <widget class="QWidget" name="SmeltOptions">
+               <widget class="QWidget" name="smeltOptions">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -939,6 +939,9 @@
                   <widget class="QLabel" name="label">
                    <property name="text">
                     <string>Block:</string>
+                   </property>
+                   <property name="buddy">
+                    <cstring>smeltBlockInput</cstring>
                    </property>
                   </widget>
                  </item>
@@ -982,6 +985,9 @@
                   <widget class="QLabel" name="experienceLabel">
                    <property name="text">
                     <string>Experience:</string>
+                   </property>
+                   <property name="buddy">
+                    <cstring>experienceInput</cstring>
                    </property>
                   </widget>
                  </item>
@@ -1056,12 +1062,15 @@
                <property name="text">
                 <string>Group:</string>
                </property>
+               <property name="buddy">
+                <cstring>recipeGroupInput</cstring>
+               </property>
               </widget>
              </item>
              <item row="1" column="1">
               <widget class="QLineEdit" name="recipeGroupInput"/>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="3" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QPushButton" name="readRecipeBtn">
@@ -1078,6 +1087,19 @@
                 </widget>
                </item>
               </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="recipeCategoryLabel">
+               <property name="text">
+                <string>Category:</string>
+               </property>
+               <property name="buddy">
+                <cstring>recipeCategoryCombo</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="recipeCategoryCombo"/>
              </item>
             </layout>
            </widget>

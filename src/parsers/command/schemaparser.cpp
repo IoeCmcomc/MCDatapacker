@@ -402,7 +402,8 @@ namespace Command {
 
         timer.start();
         loadSchema(filepath);
-        qDebug() << "Schema loaded in" << timer.elapsed() << "ms";
+        qDebug() << "Schema loaded in" << timer.elapsed() << "ms (path:" <<
+            filepath << ")";
     }
 
     void resolveRedirects(const json &j, Schema::Node *node,
@@ -702,10 +703,11 @@ namespace Command {
                     return QSharedPointer<StringNode>::create(
                         spanText(start), str, true);
                 } else {
-                    throwError(QT_TR_NOOP("A quoted string is required."));
+                    goto SINGLE_WORD;
                 }
             }
             ucase ("word"_QL1): {
+ SINGLE_WORD:
                 const auto literal = getLiteralString();
                 return QSharedPointer<StringNode>::create(
                     spanText(literal),

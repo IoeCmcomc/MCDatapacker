@@ -38,8 +38,10 @@ namespace Command {
     class NbtStringNode;
     class NbtPathNode;
     class NbtPathStepNode;
-    //class ResourceNode;
-    //class ResourceOrTagNode;
+    class ResourceNode;
+    class ResourceKeyNode;
+    class ResourceOrTagNode;
+    class ResourceOrTagKeyNode;
     class ResourceLocationNode;
     class BlockPosNode;
     class BlockPredicateNode;
@@ -73,6 +75,7 @@ namespace Command {
     class KeyNode;
     class TwoAxesNode;
     class XyzNode;
+    class GamemodeNode;
 
     enum VisitOrder: int { Preorder, Postorder, LetTheVisitorDecide };
 
@@ -120,6 +123,10 @@ public:
         virtual void visit(NbtPathNode *node)             = 0;
         virtual void visit(NbtPathStepNode *node)         = 0;
         virtual void visit(ResourceLocationNode *node)    = 0;
+        virtual void visit(ResourceNode *node)            = 0;
+        virtual void visit(ResourceKeyNode *node)         = 0;
+        virtual void visit(ResourceOrTagNode *node)       = 0;
+        virtual void visit(ResourceOrTagKeyNode *node)    = 0;
         virtual void visit(BlockPosNode *node)            = 0;
         virtual void visit(BlockPredicateNode *node)      = 0;
         virtual void visit(ColumnPosNode *node)           = 0;
@@ -152,6 +159,7 @@ public:
         virtual void visit(KeyNode *node)                 = 0;
         virtual void visit(TwoAxesNode *node)             = 0;
         virtual void visit(XyzNode *node)                 = 0;
+        virtual void visit(GamemodeNode *node)            = 0;
 
 protected:
         VisitOrder m_order = VisitOrder::Postorder;

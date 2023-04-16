@@ -79,6 +79,7 @@ namespace re2c {
     }
 
     QStringView decimal(QStringView input);
+    QStringView snbtNumber(QStringView input);
     QStringView itemSlot(QStringView input);
     QStringView nbtPathKey(QStringView input);
     QStringView resLocPart(QStringView input);
@@ -95,16 +96,31 @@ namespace re2c {
 
 #define YYCTYPE    QChar
 
+/*!rules:re2c:decimal
+    d = [0-9];
+    decimal = ( [+-]? ( d+ '.' d+ | '.' d+ | d+ '.' | d+ ) );
+ */
+
 namespace re2c {
     QStringView decimal(QStringView input) {
         const QChar *YYCURSOR = input.cbegin();
         const QChar *YYMARKER = nullptr;
 
-        /*!local:re2c
-            d = [0-9];
-            decimal = ( [+-]? ( d+ '.' d+ | '.' d+ | d+ '.' | d+ ) );
-
+        /*!use:re2c:decimal
             decimal { return QStringView(input.cbegin(), YYCURSOR); }
+         *       { return QStringView(); }
+         */
+    }
+
+    QStringView snbtNumber(QStringView input) {
+        const QChar *YYCURSOR = input.cbegin();
+        const QChar *YYMARKER = nullptr;
+
+        /*!local:re2c
+            !use:decimal;
+            number = decimal ( [eE] [-+]? d+ )?;
+
+            number { return QStringView(input.cbegin(), YYCURSOR); }
          *       { return QStringView(); }
          */
     }

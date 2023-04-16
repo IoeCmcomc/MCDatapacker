@@ -86,6 +86,7 @@ public:
         EntitySummon,
         FloatRange,
         Function,
+        Gamemode,
         GameProfile,
         IntRange,
         ItemEnchantment,

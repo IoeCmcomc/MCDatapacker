@@ -75,10 +75,7 @@ namespace Command {
         m_isValid &= node->isValid();
         if (isEmpty())
             m_prefix = node->tagType();
-        if (node->tagType() == m_prefix)
-            m_vector << std::move(node);
-        else
-            qWarning() << "Incompatible node type";
+        m_vector << std::move(node);
     }
     NbtNode::TagType NbtListNode::prefix() const {
         return m_prefix;

@@ -29,6 +29,7 @@ public:
             EntitySummon,
             FloatRange,
             Function,
+            Gamemode,
             GameProfile,
             IntRange,
             ItemEnchantment,
@@ -46,10 +47,10 @@ public:
             Operation,
             Particle,
             Resource,
-            ResourceKey, // Not documented online
+            ResourceKey,
             ResourceLocation,
             ResourceOrTag,
-            ResourceOrTagKey, // Not documented online
+            ResourceOrTagKey,
             Rotation,
             ScoreHolder,
             ScoreboardSlot,

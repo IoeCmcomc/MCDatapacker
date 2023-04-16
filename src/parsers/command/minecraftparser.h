@@ -5,6 +5,7 @@
 #include "nodes/axesnode.h"
 #include "nodes/blockstatenode.h"
 #include "nodes/componentnode.h"
+#include "nodes/gamemodenode.h"
 #include "nodes/entitynode.h"
 #include "nodes/floatrangenode.h"
 #include "nodes/intrangenode.h"
@@ -17,6 +18,103 @@
 
 #include <QVersionNumber>
 
+template<typename T>
+T strWithExpToDec(QStringView v, bool &ok) {
+    if (v.isEmpty()) {
+        ok = false;
+        return 0;
+    }
+
+    std::make_unsigned_t<T> value = 0;
+    int                     sign  = 1;
+
+    switch (v.at(0).toLatin1()) {
+        case '-': {
+            sign = -1;
+            v    = v.mid(1);
+            break;
+        }
+        case '+': {
+            sign = 1;
+            v    = v.mid(1);
+            break;
+        }
+    }
+
+    ok = false;
+    for (int i = 0; i < v.length(); ++i) {
+        if (value > std::numeric_limits<T>::max() / 10) {
+            ok = false;
+            return 0;
+        }
+        value *= 10;
+        const char ch = v[i].toLatin1();
+        switch (ch) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
+                const uchar digit = ch - '0';
+                value += digit;
+                ok     = true;
+                break;
+            }
+            case 'E':
+            case 'e': {
+                if (i > 0) {
+                    bool        expOk;
+                    QStringView expView = v.mid(i + 1);
+                    const int   exp     = strToDec<int>(expView, expOk);
+                    if (!expOk) {
+                        ok = false;
+                        return 0;
+                    }
+                    i += expView.length();
+                    if (exp == 0 || value == 0) {
+                        ok = true;
+                        break;
+                    } else if (exp > 0) {
+                        for (int j = 0; j < abs(exp); ++j) {
+                            if (value > std::numeric_limits<T>::max() / 10) {
+                                ok = false;
+                                return 0;
+                            }
+                            value *= 10;
+                        }
+                    } else {
+                        for (int j = 0; j < abs(exp); ++j) {
+                            if (value > std::numeric_limits<T>::min() * 10) {
+                                ok = false;
+                                return 0;
+                            }
+                            value /= 10;
+                        }
+                    }
+                    break;
+                } else {
+                    ok = false;
+                    return 0;
+                }
+            }
+            default: {
+                ok = false;
+                return 0;
+            }
+        }
+        if (((sign == 1) && (value > std::numeric_limits<T>::max()))
+            || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
+            ok = false;
+            return 0;
+        }
+    }
+    return value * sign;
+}
 
 namespace Command {
     class MinecraftParser final : public SchemaParser  {
@@ -161,6 +259,7 @@ private:
         QSharedPointer<FloatRangeNode> minecraft_floatRange(
             const QVariantMap &props = {});
         QSharedPointer<FunctionNode> minecraft_function();
+        QSharedPointer<GamemodeNode> minecraft_gamemode();
         QSharedPointer<GameProfileNode> minecraft_gameProfile();
         QSharedPointer<IntRangeNode> minecraft_intRange(
             const QVariantMap &props = {});
@@ -179,7 +278,11 @@ private:
         QSharedPointer<ParticleNode> minecraft_particle();
         QSharedPointer<ResourceNode> minecraft_resource(
             const QVariantMap &props);
+        QSharedPointer<ResourceKeyNode> minecraft_resourceKey(
+            const QVariantMap &props);
         QSharedPointer<ResourceOrTagNode> minecraft_resourceOrTag(
+            const QVariantMap &props);
+        QSharedPointer<ResourceOrTagKeyNode> minecraft_resourceOrTagKey(
             const QVariantMap &props);
         QSharedPointer<ResourceLocationNode> minecraft_resourceLocation();
         QSharedPointer<RotationNode> minecraft_rotation();

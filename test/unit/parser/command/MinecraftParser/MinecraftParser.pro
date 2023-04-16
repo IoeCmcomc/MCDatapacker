@@ -22,6 +22,7 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/blockstatenode.cpp \
     ../../../../../src/parsers/command/nodes/componentnode.cpp \
     ../../../../../src/parsers/command/nodes/entitynode.cpp \
+    ../../../../../src/parsers/command/nodes/gamemodenode.cpp \
     ../../../../../src/parsers/command/nodes/singlevaluenode.cpp \
     ../../../../../src/parsers/command/nodes/floatrangenode.cpp \
     ../../../../../src/parsers/command/nodes/intrangenode.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/blockstatenode.h \
     ../../../../../src/parsers/command/nodes/componentnode.h \
     ../../../../../src/parsers/command/nodes/entitynode.h \
+    ../../../../../src/parsers/command/nodes/gamemodenode.h \
     ../../../../../src/parsers/command/nodes/singlevaluenode.h \
     ../../../../../src/parsers/command/nodes/floatrangenode.h \
     ../../../../../src/parsers/command/nodes/intrangenode.h \

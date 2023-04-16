@@ -9,6 +9,7 @@
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
+#include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
 #include "../nodes/intrangenode.h"
@@ -254,6 +255,22 @@ public:
             m_repr += "ResourceLocationNode";
             reprResourceLocation(node);
         };
+        virtual void visit(ResourceNode *node) override {
+            m_repr += "ResourceNode";
+            reprResourceLocation(node);
+        };
+        virtual void visit(ResourceKeyNode *node) override {
+            m_repr += "ResourceKeyNode";
+            reprResourceLocation(node);
+        };
+        virtual void visit(ResourceOrTagNode *node) override {
+            m_repr += "ResourceOrTagNode";
+            reprResourceLocation(node);
+        };
+        virtual void visit(ResourceOrTagKeyNode *node) override {
+            m_repr += "ResourceOrTagKeyNode";
+            reprResourceLocation(node);
+        };
         virtual void visit(BlockPosNode *node) override {
             m_repr += "BlockPosNode";
             reprAxes(node);
@@ -414,6 +431,9 @@ public:
             m_repr += "XyzNode";
             reprAxes(node);
         }
+        virtual void visit(GamemodeNode *node) override {
+            m_repr += QString("GamemodeNode(\"%1\")").arg(node->text());
+        };
 
         QString repr() const;
 

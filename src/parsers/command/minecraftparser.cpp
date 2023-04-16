@@ -277,14 +277,14 @@ namespace Command {
     QSharedPointer<NbtNode> MinecraftParser::parseNumericTag() {
         const int start = pos();
 
-        const QStringView literal = advanceView(re2c::decimal(peekRest()));
+        const QStringView literal = advanceView(re2c::snbtNumber(peekRest()));
         bool              ok      = false;
 
         switch (curChar().toLower().toLatin1()) {
             case 'b': {
                 advance();
 //                const short int value = literal.toShort(&ok);
-                const int8_t value = strToDec<int8_t>(literal, ok);
+                const int8_t value = strWithExpToDec<int8_t>(literal, ok);
                 if (ok) {
                     return QSharedPointer<NbtByteNode>::create(
                         spanText(start), value, true);
@@ -298,7 +298,7 @@ namespace Command {
             case 'd': {
                 advance();
                 const double value = literal.toDouble(&ok);
-                if (ok) {
+                if (ok || std::isinf(value)) {
                     return QSharedPointer<NbtDoubleNode>::create(
                         spanText(start), value, true);
                 } else {
@@ -311,7 +311,7 @@ namespace Command {
             case 'f': {
                 advance();
                 const double value = literal.toFloat(&ok);
-                if (ok) {
+                if (ok || std::isinf(value)) {
                     return QSharedPointer<NbtFloatNode>::create(
                         spanText(start), value, true);
                 } else {
@@ -323,8 +323,7 @@ namespace Command {
 
             case 'l': {
                 advance();
-//                const long long value = literal.toLongLong(&ok);
-                const long long value = strToDec<long long>(literal, ok);
+                const long long value = strWithExpToDec<long long>(literal, ok);
                 if (ok) {
                     return QSharedPointer<NbtLongNode>::create(
                         spanText(start), value, true);
@@ -337,7 +336,7 @@ namespace Command {
 
             case 's': {
                 advance();
-                const short int value = literal.toShort(&ok);
+                const short int value = strWithExpToDec<short>(literal, ok);
                 if (ok) {
                     return QSharedPointer<NbtShortNode>::create(
                         spanText(start), value, true);
@@ -351,7 +350,7 @@ namespace Command {
             default: {
                 if (literal.contains('.')) {
                     const double value = literal.toDouble(&ok);
-                    if (ok) {
+                    if (ok || std::isinf(value)) {
                         return QSharedPointer<NbtDoubleNode>::create(
                             spanText(start), value, true);
                     } else {
@@ -364,7 +363,7 @@ namespace Command {
                     }
                 } else {
 //                    const int value = literal.toInt(&ok);
-                    const int value = strToDec<int>(literal, ok);
+                    const int value = strWithExpToDec<int>(literal, ok);
                     if (ok) {
                         return QSharedPointer<NbtIntNode>::create(
                             spanText(start), value, true);
@@ -398,8 +397,8 @@ namespace Command {
             if (first || (elem->tagType() == ret->prefix())) {
                 first = false;
             } else {
-                reportError(QT_TR_NOOP(
-                                "Type of elements in this list tag must be the same"));
+//                reportError(QT_TR_NOOP(
+//                                "Type of elements in this list tag must be the same"));
             }
             elem->setTrailingTrivia(eatListSep(',', ']'));
             ret->append(elem);
@@ -812,6 +811,7 @@ namespace Command {
             case ParserType::EntitySummon: { return minecraft_entitySummon(); }
             case ParserType::FloatRange: { return minecraft_floatRange(props); }
             case ParserType::Function: { return minecraft_function(); }
+            case ParserType::Gamemode: { return minecraft_gamemode(); }
             case ParserType::GameProfile: { return minecraft_gameProfile(); }
             case ParserType::IntRange: { return minecraft_intRange(props); }
             case ParserType::ItemEnchantment: { return minecraft_itemEnchantment();
@@ -833,8 +833,13 @@ namespace Command {
             case ParserType::Operation: { return minecraft_operation(); }
             case ParserType::Particle: { return minecraft_particle(); }
             case ParserType::Resource: { return minecraft_resource(props); }
+            case ParserType::ResourceKey: { return minecraft_resourceKey(props);
+            }
             case ParserType::ResourceOrTag: {
                 return minecraft_resourceOrTag(props);
+            }
+            case ParserType::ResourceOrTagKey: {
+                return minecraft_resourceOrTagKey(props);
             }
             case ParserType::ResourceLocation: {
                 return minecraft_resourceLocation();
@@ -902,9 +907,9 @@ namespace Command {
         const static QLatin1StringVector colors {
             "aqua"_QL1, "black"_QL1, "blue"_QL1,
             "dark_aqua"_QL1, "dark_blue"_QL1,
-            "dark_green"_QL1, "dark_grey"_QL1,
+            "dark_green"_QL1, "dark_gray"_QL1,
             "dark_purple"_QL1, "dark_red"_QL1,
-            "gold"_QL1, "green"_QL1, "grey"_QL1,
+            "gold"_QL1, "green"_QL1, "gray"_QL1,
             "light_purple"_QL1, "red"_QL1,
             "reset"_QL1, "white"_QL1, "yellow"_QL1,
         };
@@ -1025,6 +1030,35 @@ namespace Command {
 
         parseResourceLocation(ret.get(), true);
         return ret;
+    }
+
+    QSharedPointer<GamemodeNode> MinecraftParser::minecraft_gamemode() {
+        const QString &&literal = oneOf({ "creative"_QL1, "survival"_QL1,
+                                          "adventure"_QL1, "spectator"_QL1 });
+        GamemodeNode::Mode mode = GamemodeNode::Mode::Unknown;
+
+        if (!literal.isEmpty()) {
+            uswitch (literal) {
+                ucase ("creative"): {
+                    mode = GamemodeNode::Mode::Creative;
+                    break;
+                }
+                ucase ("survival"): {
+                    mode = GamemodeNode::Mode::Survival;
+                    break;
+                }
+                ucase ("adventure"): {
+                    mode = GamemodeNode::Mode::Adventure;
+                    break;
+                }
+                ucase ("spectator"): {
+                    mode = GamemodeNode::Mode::Spectator;
+                    break;
+                }
+            }
+        }
+        return QSharedPointer<GamemodeNode>::create(spanText(literal), mode,
+                                                    !literal.isEmpty());
     }
 
     QSharedPointer<GameProfileNode> MinecraftParser::minecraft_gameProfile() {
@@ -1253,6 +1287,23 @@ namespace Command {
                 ret->setParams(minecraft_itemStack());
                 break;
             }
+            ucase ("sculk_charge"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                ret->setParams(brigadier_float());
+                break;
+            }
+            ucase ("shriek"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                ret->setParams(brigadier_integer());
+                break;
+            }
+            ucase ("vibration"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                const auto &&pos = minecraft_vec3();
+                pos->setTrailingTrivia(eat(' '));
+                ret->setParams(std::move(pos), brigadier_integer());
+                break;
+            }
         }
         ret->setResLoc(std::move(resLoc));
         ret->setLength(pos() - start);
@@ -1267,9 +1318,25 @@ namespace Command {
         return ret;
     }
 
+    QSharedPointer<ResourceKeyNode> MinecraftParser::minecraft_resourceKey(
+        const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<ResourceKeyNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
     QSharedPointer<ResourceOrTagNode> MinecraftParser::
     minecraft_resourceOrTag(const QVariantMap &props) {
         const auto &&ret = QSharedPointer<ResourceOrTagNode>::create(0);
+
+        parseResourceLocation(ret.get(), true);
+        return ret;
+    }
+
+    QSharedPointer<ResourceOrTagKeyNode> MinecraftParser::
+    minecraft_resourceOrTagKey(const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<ResourceOrTagKeyNode>::create(0);
 
         parseResourceLocation(ret.get(), true);
         return ret;
@@ -1319,18 +1386,19 @@ namespace Command {
             "sidebar.team.dark_aqua"_QL1,
             "sidebar.team.dark_blue"_QL1,
             "sidebar.team.dark_green"_QL1,
-            "sidebar.team.dark_grey"_QL1,
+            "sidebar.team.dark_gray"_QL1,
             "sidebar.team.dark_purple"_QL1,
             "sidebar.team.dark_red"_QL1,
             "sidebar.team.gold"_QL1,
             "sidebar.team.green"_QL1,
-            "sidebar.team.grey"_QL1,
+            "sidebar.team.gray"_QL1,
             "sidebar.team.light_purple"_QL1,
             "sidebar.team.red"_QL1,
             "sidebar.team.reset"_QL1,
             "sidebar.team.white"_QL1,
             "sidebar.team.yellow"_QL1,
             "sidebar"_QL1,
+            "list"_QL1,
         };
 
         const QString &&slot = oneOf(scoreboardSlots);
