@@ -1,69 +1,123 @@
 #ifndef RAWJSONTEXTEDIT_H
 #define RAWJSONTEXTEDIT_H
 
-#include <QFrame>
+#include "lru/lru.hpp"
+
 #include <QTextEdit>
-#include <QMenu>
-#include <QColor>
-#include  <QJsonValue>
+#include <QTextFragment>
+#include <QPainterPath>
+#include <QTimer>
 
-namespace Ui {
-    class RawJsonTextEdit;
-}
-
-class RawJsonTextEdit : public QFrame
-{
-    Q_OBJECT
-
-public:
-    explicit RawJsonTextEdit(QWidget *parent = nullptr);
-    ~RawJsonTextEdit();
-
-    QTextEdit* getTextEdit();
-    void setDarkMode(bool value);
-    void setOneLine(bool value);
-
-    QJsonValue toJson() const;
-    void fromJson(const QJsonValue &root);
-
-public /*slots*/ :
-    void setBold(bool bold);
-    void setItalic(bool italic);
-    void setUnderline(bool underline);
-    void setStrike(bool strike);
-    void setColor(QColor color);
-    void colorBtnToggled(bool checked);
-
-protected:
-    void mergeCurrentFormat(const QTextCharFormat &format);
-    bool eventFilter(QObject *obj, QEvent *event) override;
-
-private /*slots*/ :
-    enum SourceFormat {
-        JSON,
-        HTML,
-        Markdown,
-    };
-
-    void updateFormatButtons();
-    void selectCustomColor();
-    void updateEditors(int tabIndex);
-    void readSourceEditor(int format);
-    void writeSourceEditor(int format);
-
-private:
-    Ui::RawJsonTextEdit *ui;
-    QJsonValue m_json;
-    QMenu colorMenu;
-    bool isDarkMode      = false;
-    bool isOneLine       = false;
-    QColor currTextColor = QColor(85, 255, 85);
-
-    void initColorMenu();
-    QJsonObject JsonToComponent(const QJsonValue &root);
-    void appendJsonObject(const QJsonObject &root,
-                          const QTextCharFormat &optFmt = QTextCharFormat());
-    void checkColorBtn();
+struct Subfragment {
+    QRectF  rect;
+    QString text;
 };
 
-#endif /* RAWJSONTEXTEDIT_H */
+using Subfragments = QVector<Subfragment>;
+
+struct FragmentRegion {
+    QTextFragment fragment;
+    Subfragments  subfragments;
+
+    inline QVariant formatProperty(int propId) const {
+        return fragment.charFormat().penProperty(propId);
+    }
+};
+
+struct BorderPath {
+    QPainterPath path;
+    QPen         pen;
+
+    bool inline operator==(const BorderPath &o) const {
+        return (path == o.path) && (pen == o.pen);
+    }
+};
+
+inline const int boldCharMask = 32768;
+
+struct RenderChar {
+    QChar ch;
+    bool  bold;
+
+    bool inline operator==(const RenderChar &o) const {
+        return (ch == o.ch) && (bold == o.bold);
+    }
+};
+
+using FormatRange = QTextLayout::FormatRange;
+Q_DECLARE_METATYPE(QTextLayout::FormatRange)
+
+QDataStream &operator<<(QDataStream & out,
+                        const QTextLayout::FormatRange & obj);
+QDataStream &operator>>(QDataStream &in, QTextLayout::FormatRange &obj);
+
+namespace std {
+//    template<> struct hash<QChar> {
+//        using argument_type = QChar;
+//        using result_type   = std::size_t;
+
+//        result_type operator()(argument_type const& key) const {
+//            return key.unicode();
+//        }
+//    };
+
+    template<> struct hash<RenderChar> {
+        using argument_type = RenderChar;
+        using result_type   = std::size_t;
+
+        result_type operator()(argument_type const& key) const {
+            return key.ch.unicode() | (boldCharMask * key.bold);
+        }
+    };
+}
+
+class RawJsonTextEdit : public QTextEdit {
+    Q_OBJECT
+public:
+    enum FormatProperty {
+        BorderProperty = QTextCharFormat::UserProperty + 0x100,
+        TextObfuscated,
+    };
+    using FragmentRegions = QVector<FragmentRegion>;
+    using BorderPaths     = QVector<BorderPath>;
+
+    explicit RawJsonTextEdit(QWidget *parent = nullptr);
+    bool joinBorders() const;
+    void setJoinBorders(bool newJoinBorders);
+
+    bool renderObfuscation() const;
+    void setRenderObfuscation(bool newRenderObfuscation);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void focusInEvent(QFocusEvent *event) override;
+    void focusOutEvent(QFocusEvent *event) override;
+    QMimeData * createMimeDataFromSelection() const override;
+    void insertFromMimeData(const QMimeData *source) override;
+
+private:
+    const QStringView m_obfuscatedCharset =
+        u"(!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~£ƒªº¬«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀∅∈≡±≥≤⌠⌡÷≈°∙·√ⁿ²■";
+
+    FragmentRegions m_fragRegions;
+    BorderPaths m_borderPaths;
+    LRU::Cache<RenderChar, int> m_charWidths;
+    QMap<int, QString> m_similarWidthCharGroups;
+    QTimer *m_obfuscatedTimer     = new QTimer(this);
+    QTimer *m_updateRegionsTimer  = new QTimer(this);
+    QTimer *m_blinkCursorTimer    = new QTimer(this);
+    QTextDocument *m_renderingDoc = nullptr;
+    bool m_joinBorders            = true;
+    bool m_drawTextCursor         = true;
+    bool m_renderObfuscation      = true;
+
+    void initSimilarWidthCharGroups(const QFont &font, bool isBold);
+    void scheduleRegionsUpdate();
+    void updateFragmentRegions();
+    void updateRenderingDoc();
+    void onCursorPositionChanged();
+    void ensureCursorVisible();
+};
+
+#endif // RAWJSONTEXTEDIT_H

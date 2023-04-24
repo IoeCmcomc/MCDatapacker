@@ -110,6 +110,7 @@ SOURCES += \
     predicatedock.cpp \
     problemarea.cpp \
     rawjsontextedit.cpp \
+    rawjsontexteditor.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
     statisticsdialog.cpp \
@@ -206,6 +207,7 @@ HEADERS += \
     predicatedock.h \
     problemarea.h \
     rawjsontextedit.h \
+    rawjsontexteditor.h \
     settingsdialog.h \
     stackedwidget.h \
     statisticsdialog.h \
@@ -236,7 +238,7 @@ FORMS += \
     inventorysloteditor.ui \
     newdatapackdialog.ui \
     predicatedock.ui \
-    rawjsontextedit.ui \
+    rawjsontexteditor.ui \
     settingsdialog.ui \
     statisticsdialog.ui \
     tabbeddocumentinterface.ui \
@@ -266,7 +268,7 @@ RESOURCES += \
 
 DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
-    ../resource/app/fonts/Monocraft/LICENSE
+    ../resource/app/fonts/LICENSE_Monocraft.txt
 
 RC_ICONS = ../resource/app/icon/favicon.ico
 

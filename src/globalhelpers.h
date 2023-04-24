@@ -18,7 +18,11 @@ QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
 namespace Glhp {
     bool isPathRelativeTo(const QString &dirpath, QStringView path,
                           QStringView category);
-    QString randStr(int length = 5);
+
+    QChar randChr(QStringView charset);
+    QString randStr(int length                      = 6);
+    QString randStr(QStringView charset, int length = 6);
+
     QString relPath(const QString &dirpath, QString path);
     QString relNamespace(const QString &dirpath, QString path);
 

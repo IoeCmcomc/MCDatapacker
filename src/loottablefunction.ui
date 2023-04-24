@@ -1077,7 +1077,7 @@
          </widget>
         </item>
         <item row="1" column="0" colspan="4">
-         <widget class="RawJsonTextEdit" name="setLore_textEdit">
+         <widget class="RawJsonTextEditor" name="setLore_textEdit">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -1124,7 +1124,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="RawJsonTextEdit" name="setName_textEdit">
+         <widget class="RawJsonTextEditor" name="setName_textEdit">
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
@@ -1448,9 +1448,9 @@
    <header location="global">optionalspinbox.h</header>
   </customwidget>
   <customwidget>
-   <class>RawJsonTextEdit</class>
+   <class>RawJsonTextEditor</class>
    <extends>QFrame</extends>
-   <header location="global">rawjsontextedit.h</header>
+   <header location="global">rawjsontexteditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

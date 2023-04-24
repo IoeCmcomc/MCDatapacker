@@ -1,472 +1,505 @@
 #include "rawjsontextedit.h"
-#include "ui_rawjsontextedit.h"
 
 #include "globalhelpers.h"
-#include "game.h"
 
-#include <QToolButton>
-#include <QSignalBlocker>
-#include <QPixmap>
-#include <QPalette>
+#include <QTextDocument>
 #include <QPainter>
-#include <QKeyEvent>
-#include <QSizePolicy>
-#include <QLineEdit>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QTextBlock>
-#include <QShortcut>
-#include <QColorDialog>
-#include <QJsonDocument>
+#include <QScrollBar>
+#include <QAbstractTextDocumentLayout>
+#include <QTextDocumentFragment>
+#include <QMimeData>
 
+QDataStream &operator<<(QDataStream &out,
+                        const QTextLayout::FormatRange &obj) {
+    out << obj.start << obj.length << obj.format;
+    return out;
+}
 
-RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) :
-    QFrame(parent),
-    ui(new Ui::RawJsonTextEdit) {
-    ui->setupUi(this);
+QDataStream &operator>>(QDataStream &in, QTextLayout::FormatRange &obj) {
+    in >> obj.start >> obj.length >> obj.format;
+    return in;
+}
 
-    ui->textEdit->installEventFilter(this);
-    QFont font;
+RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) : QTextEdit(parent),
+    m_charWidths{256}     {
+    setWordWrapMode(QTextOption::WrapAnywhere);
+
     /*
        QTextMarkdownWriter doesn't output other formattings with monospaced fonts.
-       Therefore, normal font will be used instead.
      */
-    /* font.setFixedPitch(true); */
-    /* font.setStyleHint(QFont::Monospace); */
-    font.setPointSize(10);
-    ui->textEdit->setFont(std::move(font));
+    QFont newFont("monospace");
+    newFont.setFixedPitch(true);
+    newFont.setStyleHint(QFont::Monospace);
+    newFont.setPointSize(10);
+    document()->setDefaultFont(newFont);
+    setFont(newFont);
 
-    initColorMenu();
-    QPixmap pixmap(16, 16);
-    pixmap.fill(currTextColor);
-    ui->colorBtn->setIcon(pixmap);
+    QFont curFont = font();
+    initSimilarWidthCharGroups(curFont, false);
+    curFont.setBold(true);
+    initSimilarWidthCharGroups(curFont, true);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_B), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->boldBtn->toggle();
-    });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_I), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->italicBtn->toggle();
-    });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_U), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->underlineBtn->toggle();
-    });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_K), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->strikeBtn->toggle();
+    //    QTextCharFormat fmt = currentCharFormat();
+    //    fmt.setProperty(BorderProperty, QPen(Qt::red));
+    //    setCurrentCharFormat(std::move(fmt));
+
+    m_updateRegionsTimer->setSingleShot(true);
+    m_updateRegionsTimer->setInterval(0);
+    connect(m_updateRegionsTimer, &QTimer::timeout,
+            this, &RawJsonTextEdit::updateFragmentRegions);
+
+    connect(m_obfuscatedTimer, &QTimer::timeout, this,
+            &RawJsonTextEdit::updateRenderingDoc);
+    m_obfuscatedTimer->start(200);
+
+    m_blinkCursorTimer->setInterval(500);
+    connect(m_blinkCursorTimer, &QTimer::timeout, this, [this](){
+        m_drawTextCursor = !m_drawTextCursor;
+        update(cursorRect());
     });
 
-    connect(ui->boldBtn, &QToolButton::toggled, this,
-            &RawJsonTextEdit::setBold);
-    connect(ui->italicBtn, &QToolButton::toggled,
-            this, &RawJsonTextEdit::setItalic);
-    connect(ui->underlineBtn, &QToolButton::toggled,
-            this, &RawJsonTextEdit::setUnderline);
-    connect(ui->strikeBtn, &QToolButton::toggled,
-            this, &RawJsonTextEdit::setStrike);
-    connect(ui->colorBtn, &QToolButton::toggled,
-            this, &RawJsonTextEdit::colorBtnToggled);
-    connect(ui->textEdit, &QTextEdit::cursorPositionChanged,
-            this, &RawJsonTextEdit::updateFormatButtons);
-    connect(ui->tabWidget, &QTabWidget::currentChanged,
-            this, &RawJsonTextEdit::updateEditors);
-    connect(ui->sourceFormatCombo,
-            qOverload<int>(&QComboBox::currentIndexChanged),
-            this, &RawJsonTextEdit::writeSourceEditor);
+    connect(this, &QTextEdit::cursorPositionChanged,
+            this, &RawJsonTextEdit::onCursorPositionChanged);
+
+    connect(document()->documentLayout(),
+            &QAbstractTextDocumentLayout::updateBlock,
+            this, &RawJsonTextEdit::scheduleRegionsUpdate);
+    connect(document(), &QTextDocument::contentsChange,
+            this, &RawJsonTextEdit::scheduleRegionsUpdate);
+    updateFragmentRegions();
 }
 
-RawJsonTextEdit::~RawJsonTextEdit() {
-    delete ui;
+bool RawJsonTextEdit::joinBorders() const {
+    return m_joinBorders;
 }
 
-QTextEdit* RawJsonTextEdit::getTextEdit() {
-    return ui->textEdit;
+void RawJsonTextEdit::setJoinBorders(bool newJoinBorders) {
+    if (newJoinBorders != m_joinBorders) {
+        m_joinBorders = newJoinBorders;
+        updateFragmentRegions();
+    }
 }
 
-void RawJsonTextEdit::setDarkMode(bool value) {
-    QPalette textEditPatt = ui->textEdit->palette();
+void RawJsonTextEdit::paintEvent(QPaintEvent *event) {
+    ensurePolished();
 
-    textEditPatt.setColor(QPalette::Base, (value) ? Qt::darkGray : Qt::white);
-    textEditPatt.setColor(QPalette::Text, (value) ? Qt::white : Qt::black);
-    ui->textEdit->setPalette(textEditPatt);
+    QPainter      qp(viewport());
+    const QPointF offset(-horizontalScrollBar()->value(),
+                         -verticalScrollBar()->value());
 
-    isDarkMode = value;
-}
+    qp.setRenderHint(qp.Antialiasing);
+    qp.translate(offset);
 
-void RawJsonTextEdit::setOneLine(bool value) {
-    ui->textEdit->setVerticalScrollBarPolicy(
-        (value) ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
-    if (value) {
-        QLineEdit lineEdit(this);
-        ui->textEdit->setFixedHeight(lineEdit.height());
+    if (!m_borderPaths.isEmpty()) {
+        const auto &rect = QRectF(event->rect()).translated(-offset);
+        if (m_borderPaths.last().path.boundingRect().bottom() >= rect.y()) {
+            BorderPaths toDraw;
+            for (const auto &borderPath: qAsConst(m_borderPaths)) {
+                const auto &path = borderPath.path;
+                if (!path.intersects(rect)) {
+                    if (path.boundingRect().top() > rect.bottom()) {
+                        break;
+                    }
+                    continue;
+                }
+                toDraw.append(borderPath);
+            }
+            if (!toDraw.isEmpty()) {
+                for (const auto &borderPath: toDraw) {
+                    qp.setPen(borderPath.pen);
+                    qp.drawPath(borderPath.path);
+                }
+            }
+        }
+    }
+
+    QAbstractTextDocumentLayout::Selection selection;
+    const auto                           &&cursor = textCursor();
+    selection.cursor = cursor;
+
+    QTextCharFormat fmt;
+    fmt.setForeground(palette().highlightedText());
+    fmt.setBackground(palette().highlight());
+    selection.format = fmt;
+
+    QAbstractTextDocumentLayout::PaintContext ctx;
+    if (m_drawTextCursor && hasFocus())
+        ctx.cursorPosition = cursor.position();
+    ctx.selections = { selection };
+
+    if (m_renderingDoc && (m_renderingDoc != document())) {
+        m_renderingDoc->documentLayout()->draw(&qp, ctx);
     } else {
-        ui->textEdit->setMaximumHeight(0);
+        document()->documentLayout()->draw(&qp, ctx);
     }
 
-    auto sizePolicy = ui->textEdit->sizePolicy();
-    sizePolicy.setVerticalPolicy(
-        (value) ? QSizePolicy::Fixed : QSizePolicy::Expanding);
-    ui->textEdit->setSizePolicy(sizePolicy);
+    qp.end();
 
-    ui->textEdit->adjustSize();
+    //    QTextEdit::paintEvent(event);
 
-    isOneLine = value;
+    //    {
+    //        QPainter      p(viewport());
+    //        const QPointF offset(
+    //            -horizontalScrollBar()->value(),
+    //            -verticalScrollBar()->value());
+    //        const auto &eventRect = QRectF(event->rect()).translated(-offset);
+    //        p.setRenderHint(QPainter::Antialiasing);
+    //        p.translate(offset);
+    //        for (const auto &fragRegion: qAsConst(m_fragRegions)) {
+    //            int i = 0;
+    //            for (const auto &subfragment: fragRegion.subfragments) {
+    //                const auto &rect = subfragment.rect;
+    //                const auto &text = subfragment.text;
+    ////                qDebug() << rect << text;
+    //                if (eventRect.intersects(rect)) {
+    //                    p.drawRoundedRect(rect, 5, 5);
+    //                    p.drawText(rect, text);
+    //                    ++i;
+    //                } else if (rect.top() > eventRect.bottom()) {
+    //                    goto BREAK_FRAG_REGIONS;
+    //                }
+    //            }
+    //        }
+    //    }
+    // BREAK_FRAG_REGIONS:
+    //    return;
 }
 
-QJsonValue RawJsonTextEdit::toJson() const {
-    if (!ui->textEdit->document()->isModified()) {
-        return m_json;
+void RawJsonTextEdit::resizeEvent(QResizeEvent *event) {
+    QTextEdit::resizeEvent(event);
+    scheduleRegionsUpdate();
+}
+
+void RawJsonTextEdit::focusInEvent(QFocusEvent *event) {
+    ensureCursorVisible();
+    QTextEdit::focusInEvent(event);
+}
+
+void RawJsonTextEdit::focusOutEvent(QFocusEvent *event) {
+    m_blinkCursorTimer->stop();
+    QTextEdit::focusOutEvent(event);
+}
+
+QMimeData * RawJsonTextEdit::createMimeDataFromSelection() const {
+    auto *mime = QTextEdit::createMimeDataFromSelection();
+
+    const auto &&cursor   = textCursor();
+    const int    selStart = cursor.selectionStart();
+    const int    selEnd   = qMax(0, cursor.selectionEnd() - 1);
+
+    QVector<QTextLayout::FormatRange> ranges;
+
+    for (const auto &fragRegion: m_fragRegions) {
+        const auto &fragment = fragRegion.fragment;
+        if (!fragment.isValid()) {
+            continue;
+        }
+        const int fragStart    = fragment.position();
+        const int fragEnd      = fragStart + fragment.length() - 1;
+        const int overlapStart = qMax(selStart, fragStart);
+        const int overlapEnd   = qMin(selEnd, fragEnd);
+        if (overlapStart <= overlapEnd) {
+            const int   pos    = overlapStart - selStart;
+            const int   length = overlapEnd - overlapStart + 1;
+            const auto &format = fragment.charFormat();
+
+            if (format.boolProperty(TextObfuscated)) {
+                ranges.append({ pos, length, format });
+            }
+        }
     }
 
-    QJsonArray arr = { "" };
+    QByteArray  bytes;
+    QDataStream ds(&bytes, QIODevice::WriteOnly);
+    ds << ranges;
 
-    QTextDocument *doc = ui->textEdit->document();
+    mime->setData("application/octet-stream", bytes);
 
-    for (QTextBlock currBlock = doc->begin(); currBlock != doc->end();
-         currBlock = currBlock.next()) {
-        if (currBlock != doc->begin())
-            arr << QJsonObject({ { "text", "\n" } });
+    return mime;
+}
 
-        QTextBlock::iterator it;
-        for (it = currBlock.begin(); !(it.atEnd()); ++it) {
-            QTextFragment currFragment = it.fragment();
-            if (currFragment.isValid()) {
-                QString txt = currFragment.text();
-                auto    fmt = currFragment.charFormat();
+void RawJsonTextEdit::insertFromMimeData(const QMimeData *source) {
+    auto    &&cursor   = textCursor();
+    const int selStart = cursor.selectionStart();
 
-                QJsonObject component;
+    QTextEdit::insertFromMimeData(source);
 
-                component.insert("text", txt);
-                if (fmt.fontWeight() >= 75)
-                    component.insert(QLatin1String("bold"), true);
-                if (fmt.fontItalic())
-                    component.insert(QLatin1String("italic"), true);
-                if (fmt.fontUnderline())
-                    component.insert(QLatin1String("underlined"), true);
-                if (fmt.fontStrikeOut())
-                    component.insert(QLatin1String("strikethrough"), true);
-                if (fmt.foreground().style() == Qt::SolidPattern) {
-                    const QString &&key = Glhp::colorHexes.key(
-                        fmt.foreground().color().name());
-                    if (!key.isEmpty()) {
-                        component.insert(QLatin1String("color"), key);
-                    } else if (Game::version() >=
-                               Game::v1_16) {
-                        component.insert(QLatin1String("color"),
-                                         fmt.foreground().color().name());
+    QVector<QTextLayout::FormatRange> ranges;
+
+    const QByteArray &&bytes = source->data("application/octet-stream");
+    QDataStream        ds(bytes);
+    ds >> ranges;
+
+    cursor.joinPreviousEditBlock();
+
+    for (const auto &range: qAsConst(ranges)) {
+        cursor.setPosition(selStart + range.start);
+        cursor.setPosition(selStart + range.start + range.length,
+                           QTextCursor::KeepAnchor);
+        cursor.setCharFormat(range.format);
+    }
+
+    cursor.setPosition(selStart);
+    cursor.endEditBlock();
+    setTextCursor(cursor);
+}
+
+bool RawJsonTextEdit::renderObfuscation() const {
+    return m_renderObfuscation;
+}
+
+void RawJsonTextEdit::setRenderObfuscation(bool newRenderObfuscation) {
+    m_renderObfuscation = newRenderObfuscation;
+    if (newRenderObfuscation) {
+        m_obfuscatedTimer->start();
+    } else {
+        m_obfuscatedTimer->stop();
+    }
+    viewport()->update();
+}
+
+void RawJsonTextEdit::initSimilarWidthCharGroups(const QFont &font,
+                                                 bool isBold) {
+    struct CharWidth {
+        QChar ch;
+        int   width;
+    };
+
+    QVector<CharWidth> charWidths;
+    const QFontMetrics metrics(font);
+    const int          mask = isBold * boldCharMask;
+
+    for (const auto &ch: m_obfuscatedCharset) {
+        if (metrics.inFont(ch)) {
+            const int width = metrics.horizontalAdvance(ch);
+            //            m_charWidths.emplace(ch, width);
+            charWidths.append({ ch, width });
+        }
+    }
+
+    std::sort(charWidths.begin(), charWidths.end(),
+              [](const CharWidth &o1, const CharWidth &o2) {
+        return o1.width < o2.width;
+    });
+
+    int     lastWidth = charWidths.first().width;
+    QString charGroup;
+    for (const auto &charWidth: charWidths) {
+        if (charWidth.width != lastWidth) {
+            m_similarWidthCharGroups[lastWidth | mask] = charGroup;
+            charGroup.clear();
+            lastWidth = charWidth.width;
+        }
+        charGroup.append(charWidth.ch);
+    }
+}
+
+void RawJsonTextEdit::scheduleRegionsUpdate() {
+    ensureCursorVisible();
+    m_updateRegionsTimer->start();
+}
+
+// Adapted from: https://stackoverflow.com/a/72746121/12682038
+void RawJsonTextEdit::updateFragmentRegions() {
+    if (toPlainText().isEmpty()) {
+        if (!m_fragRegions.isEmpty()) {
+            m_fragRegions.clear();
+            viewport()->update();
+        }
+        if (!m_borderPaths.isEmpty()) {
+            m_borderPaths.clear();
+            viewport()->update();
+        }
+        return;
+    }
+    const auto *doc       = document();
+    auto        block     = doc->begin();
+    const auto &end       = doc->end();
+    const auto *docLayout = doc->documentLayout();
+
+    FragmentRegions fragRegions;
+    Subfragments    lastSubfragments;
+    QTextFragment   lastFragment;
+    while (block != end) {
+        if (block.text().isEmpty()) {
+            block = block.next();
+            continue;
+        }
+
+        const auto &blockRect = docLayout->blockBoundingRect(block);
+        const qreal blockX    = blockRect.x();
+        const qreal blockY    = blockRect.y();
+
+        for (auto it = block.begin(); !it.atEnd(); ++it) {
+            const auto &fragment = it.fragment();
+            if (!fragment.isValid()) {
+                continue;
+            }
+            const auto &fmt = fragment.charFormat();
+
+            if (!lastSubfragments.isEmpty()) {
+                fragRegions.append({ lastFragment, lastSubfragments });
+                lastSubfragments.clear();
+            }
+
+            if ((fmt.property(BorderProperty).type() == QVariant::Pen)
+                || (fmt.boolProperty(TextObfuscated))) {
+                const auto *blockLayout = block.layout();
+                int         fragPos     = fragment.position() -
+                                          block.position();
+                const int       fragEnd      = fragPos + fragment.length();
+                const QString &&text         = fragment.text();
+                const int       fragRelStart = fragment.position() -
+                                               block.position();
+                while (true) {
+                    const auto &line = blockLayout->lineForTextPosition(
+                        fragPos);
+                    if (line.isValid()) {
+                        qreal  x       = line.cursorToX(fragPos);
+                        int    lineEnd = fragEnd;
+                        qreal  right   = line.cursorToX(&lineEnd);
+                        QRectF rect(
+                            blockX + x, blockY + line.y(),
+                            right - x, line.height());
+
+                        const int textPos = qMax(0,
+                                                 line.textStart() -
+                                                 fragRelStart);
+                        const auto &&subtext =
+                            text.mid(textPos, qMin(line.textLength(),
+                                                   fragment.length() -
+                                                   textPos));
+                        lastSubfragments.append({ rect, subtext });
+                        if (lineEnd != fragEnd) {
+                            fragPos = lineEnd;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
                     }
                 }
-
-                arr << component;
             }
+            lastFragment = fragment;
         }
+        block = block.next();
     }
 
-    return arr;
-}
-
-void RawJsonTextEdit::fromJson(const QJsonValue &root) {
-    m_json = root;
-    ui->textEdit->clear();
-    appendJsonObject(JsonToComponent(root));
-}
-
-QJsonObject RawJsonTextEdit::JsonToComponent(const QJsonValue &root) {
-    QJsonObject component;
-
-    switch (root.type()) {
-    case QJsonValue::Object: {
-        return root.toObject();
+    if (!lastSubfragments.isEmpty() && lastFragment.isValid()) {
+        fragRegions.append({ lastFragment, lastSubfragments });
     }
 
-    case QJsonValue::Bool: {
-        component.insert(QLatin1String("text"),
-                         (root.toBool()) ? QStringLiteral(
-                             "true") : QStringLiteral("false"));
-        break;
-    }
+    m_fragRegions = fragRegions;
 
-    case QJsonValue::Double: {
-        component.insert(QLatin1String("text"),
-                         QString::number(root.toDouble()));
-        break;
-    }
-
-    case QJsonValue::String: {
-        component.insert(QLatin1String("text"), root.toString());
-        break;
-    }
-
-    case QJsonValue::Array: {
-        auto arr = root.toArray();
-        if (arr.count() > 0) {
-            component = JsonToComponent(arr[0]);
-            if (arr.count() > 1) {
-                arr.removeAt(0);
-                component.insert(QLatin1String("extra"), arr);
+    BorderPaths borderPaths;
+    if (!m_joinBorders) {
+        for (const auto &fragRegion: qAsConst(fragRegions)) {
+            QPainterPath path;
+            for (const auto &subfragment: fragRegion.subfragments) {
+                path.addRect(subfragment.rect.adjusted(0, 0, -1, -1));
             }
+            path.translate(.5, .5);
+            borderPaths.append({ path, fragRegion.formatProperty(
+                                     BorderProperty).value<QPen>() });
         }
-        break;
-    }
-
-    default: {
-        break;
-    }
-    }
-    return component;
-}
-
-void RawJsonTextEdit::appendJsonObject(const QJsonObject &root,
-                                       const QTextCharFormat &optFmt) {
-    auto cursor = ui->textEdit->textCursor();
-    auto fmt    = optFmt;
-
-    if (root.contains(QLatin1String("bold")))
-        fmt.setFontWeight((root.value(
-                               QLatin1String(
-                                   "bold")).toBool()) ? QFont::Bold : QFont::Normal);
-    if (root.contains(QLatin1String("italic")))
-        fmt.setFontItalic(root.value(QLatin1String("italic")).toBool());
-    if (root.contains(QLatin1String("underlined")))
-        fmt.setFontUnderline(root.value(QLatin1String("underlined")).toBool());
-    if (root.contains(QLatin1String("strikethrough")))
-        fmt.setFontStrikeOut(root.value(QLatin1String("strikethrough")).toBool());
-    if (root.contains(QLatin1String("color"))) {
-        const QString &&color = Glhp::colorHexes.value(root.value(
-                                                           QLatin1String(
-                                                               "color")).toString());
-        if (!color.isEmpty()) {
-            fmt.setForeground(QBrush(QColor(color)));
-        } else if (Game::version() >= Game::v1_16) {
-            static QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
-            const auto       &&match
-                = regex.match(root.value(QLatin1String("color")).toString(), 0,
-                              QRegularExpression::NormalMatch,
-                              QRegularExpression::AnchoredMatchOption);
-            if (match.hasMatch()) {
-                fmt.setForeground(QBrush(QColor(match.captured())));
-            }
-        }
-    }
-
-    cursor.beginEditBlock();
-
-    if (root.contains(QLatin1String("text"))) {
-        cursor.setCharFormat(fmt);
-        cursor.insertText(root.value(QLatin1String("text")).toString());
-    }
-
-    if (root.contains(QLatin1String("extra"))) {
-        auto extra = root.value(QLatin1String("extra")).toArray();
-        for (auto compRef: extra) {
-            appendJsonObject(JsonToComponent(compRef), fmt);
-        }
-    }
-
-    cursor.endEditBlock();
-    ui->textEdit->setTextCursor(cursor);
-}
-
-
-void RawJsonTextEdit::setBold(bool bold) {
-    ui->textEdit->setFontWeight((bold) ? QFont::Bold : QFont::Normal);
-    ui->textEdit->setFocus();
-}
-
-void RawJsonTextEdit::setItalic(bool italic) {
-    ui->textEdit->setFontItalic(italic);
-    ui->textEdit->setFocus();
-}
-
-void RawJsonTextEdit::setUnderline(bool underline) {
-    ui->textEdit->setFontUnderline(underline);
-    ui->textEdit->setFocus();
-}
-
-void RawJsonTextEdit::setStrike(bool strike) {
-    QTextCharFormat fmt;
-
-    fmt.setFontStrikeOut(strike);
-    mergeCurrentFormat(fmt);
-    ui->textEdit->setFocus();
-}
-
-void RawJsonTextEdit::setColor(QColor color) {
-    ui->textEdit->setTextColor(color);
-    QPixmap pixmap(16, 16);
-    pixmap.fill(color);
-    ui->colorBtn->setIcon(pixmap);
-}
-
-void RawJsonTextEdit::colorBtnToggled(bool checked) {
-    if (checked) {
-        setColor(currTextColor);
     } else {
-        auto &&fmt = ui->textEdit->currentCharFormat();
-        fmt.clearForeground();
-        ui->textEdit->setCurrentCharFormat(std::move(fmt));
+        for (const auto &fragRegion: qAsConst(fragRegions)) {
+            QPainterPath path;
+            for (const auto &subfragment: fragRegion.subfragments) {
+                path.addRect(subfragment.rect);
+            }
+            path.translate(.5, .5);
+            path = path.simplified();
+            QPainterPath                         fixPath;
+            std::optional<QPainterPath::Element> last;
+            // Shrink each rectangle to avoid overlapping
+            for (int i = 0; i < path.elementCount(); ++i) {
+                auto element = path.elementAt(i);
+                if (element.type != QPainterPath::MoveToElement) {
+                    if (element.x < last->x) {
+                        last->y   -= 1;
+                        element.y -= 1;
+                    } else if (element.y > last->y) {
+                        last->x   -= 1;
+                        element.x -= 1;
+                    }
+                }
+                if (last) {
+                    if (last->isMoveTo()) {
+                        fixPath.moveTo(last->x, last->y);
+                    } else{
+                        fixPath.lineTo(last->x, last->y);
+                    }
+                }
+                last = element;
+            }
+            if (last->isLineTo()) {
+                fixPath.lineTo(last->x, last->y);
+            }
+            borderPaths.append({ fixPath,
+                                 fragRegion.formatProperty(
+                                     BorderProperty).value<QPen>() });
+        }
     }
-    ui->textEdit->setFocus();
+
+    if (m_renderObfuscation) {
+        m_renderingDoc = document();
+        m_obfuscatedTimer->start();
+    }
+
+    viewport()->update();
 }
 
-void RawJsonTextEdit::mergeCurrentFormat(const QTextCharFormat &format) {
-    QTextCursor cursor = ui->textEdit->textCursor();
+void RawJsonTextEdit::updateRenderingDoc() {
+    if (!isVisible()) {
+        return;
+    }
+    if (m_renderingDoc && (m_renderingDoc != document())) {
+        m_renderingDoc->deleteLater();
+    }
+    m_renderingDoc = document()->clone();
 
-    cursor.mergeCharFormat(format);
-    ui->textEdit->mergeCurrentCharFormat(format);
-}
-
-bool RawJsonTextEdit::eventFilter(QObject *obj, QEvent *event) {
-    if (isOneLine) {
-        if (event->type() == QEvent::KeyPress) {
-            auto *key = dynamic_cast<QKeyEvent*>(event);
-            if ((key->key() == Qt::Key_Enter) ||
-                (key->key() == Qt::Key_Return)) {
-                /* Do nothing */
+    for (const auto &fragRegion: qAsConst(m_fragRegions)) {
+        const auto &fragment = fragRegion.fragment;
+        if (!fragment.charFormat().boolProperty(TextObfuscated)) {
+            continue;
+        }
+        const auto       &&font = fragment.charFormat().font();
+        const QFontMetrics metrics(font);
+        const bool         isBold = font.bold();
+        QTextCursor        cursor(m_renderingDoc);
+        cursor.setPosition(fragment.position());
+        cursor.setPosition(fragment.position() + fragment.length(),
+                           QTextCursor::KeepAnchor);
+        const QString &&fragText   = fragment.text();
+        QString         obfuscated = fragText;
+        int             i          = 0;
+        for (const auto &ch: fragText) {
+            int              width = INT_MIN;
+            const RenderChar key{ ch, isBold };
+            if (m_charWidths.contains(key)) {
+                width = m_charWidths.lookup(key);
             } else {
-                return QObject::eventFilter(obj, event);
+                width = metrics.horizontalAdvance(ch);
+                m_charWidths.emplace(key, width | (boldCharMask * isBold));
             }
-            return true;
-        } else {
-            return QObject::eventFilter(obj, event);
+            if (m_similarWidthCharGroups.contains(width)) {
+                obfuscated[i] = Glhp::randChr(m_similarWidthCharGroups[width]);
+            }
+            ++i;
         }
-    } else {
-        return QObject::eventFilter(obj, event);
+        cursor.insertText(obfuscated);
     }
-    return false;
+
+    viewport()->update();
 }
 
-void RawJsonTextEdit::checkColorBtn() {
-    if (ui->colorBtn->isChecked()) {
-        colorBtnToggled(true);
-    } else {
-        ui->colorBtn->setChecked(true);
-    }
+void RawJsonTextEdit::onCursorPositionChanged() {
+    ensureCursorVisible();
 }
 
-void RawJsonTextEdit::updateFormatButtons() {
-    auto   cursor = ui->textEdit->textCursor();
-    auto &&fmt    = cursor.charFormat();
-    {
-        const QSignalBlocker blocker1(ui->boldBtn);
-        ui->boldBtn->setChecked(fmt.fontWeight() >= 75);
-        const QSignalBlocker blocker2(ui->italicBtn);
-        ui->italicBtn->setChecked(fmt.fontItalic());
-        const QSignalBlocker blocker3(ui->underlineBtn);
-        ui->underlineBtn->setChecked(fmt.fontUnderline());
-        const QSignalBlocker blocker4(ui->strikeBtn);
-        ui->strikeBtn->setChecked(fmt.fontStrikeOut());
-        const QSignalBlocker blocker5(ui->colorBtn);
-        if (fmt.foreground().style() == Qt::SolidPattern) {
-            currTextColor = fmt.foreground().color();
-            checkColorBtn();
-        } else {
-            colorBtnToggled(false);
-            ui->colorBtn->setChecked(false);
-        }
-    }
-}
-
-void RawJsonTextEdit::selectCustomColor() {
-    QColor &&color = QColorDialog::getColor(Qt::green, this);
-
-    if (color.isValid()) {
-        currTextColor = color;
-        checkColorBtn();
-    }
-}
-
-void RawJsonTextEdit::updateEditors(int tabIndex) {
-    if (tabIndex == 0) { /* "Edit" tab */
-        readSourceEditor(ui->sourceFormatCombo->currentIndex());
-    } else {             /* "Source" tab */
-        writeSourceEditor(ui->sourceFormatCombo->currentIndex());
-    }
-}
-
-void RawJsonTextEdit::readSourceEditor(int format) {
-    switch (format) {
-    case JSON: {
-        const auto &doc = QJsonDocument::fromJson(
-            ui->sourceEdit->toPlainText().toUtf8());
-        if (doc.isObject()) {
-            fromJson(doc.object());
-        } else if (doc.isArray()) {
-            fromJson(doc.array());
-        } else {
-            fromJson(QJsonValue());
-        }
-
-        break;
-    }
-
-    case HTML: {
-        ui->textEdit->setHtml(ui->sourceEdit->toPlainText());
-        break;
-    }
-
-    case Markdown: {
-        ui->textEdit->setMarkdown(ui->sourceEdit->toPlainText());
-        break;
-    }
-    }
-}
-
-void RawJsonTextEdit::writeSourceEditor(int format) {
-    switch (format) {
-    case JSON: {
-        const auto  &&json = toJson();
-        QJsonDocument jsonDoc;
-        switch (json.type()) {
-        case QJsonValue::Object: {
-            jsonDoc = QJsonDocument(json.toObject());
-            break;
-        }
-
-        case QJsonValue::Array: {
-            jsonDoc = QJsonDocument(json.toArray());
-            break;
-        }
-
-        default:
-            break;
-        }
-        ui->sourceEdit->setPlainText(jsonDoc.toJson());
-        break;
-    }
-
-    case HTML: {
-        ui->sourceEdit->setPlainText(ui->textEdit->toHtml());
-        break;
-    }
-
-    case Markdown: {
-        ui->sourceEdit->setPlainText(ui->textEdit->toMarkdown(QTextDocument::
-                                                              MarkdownDialectCommonMark));
-        break;
-    }
-    }
-}
-
-void RawJsonTextEdit::initColorMenu() {
-    for (const auto &colorCode : qAsConst(Glhp::colorHexes)) {
-        QPixmap pixmap(16, 16);
-        pixmap.fill(colorCode);
-        colorMenu.addAction(pixmap, QString(), this, [ = ]() {
-            currTextColor = QColor(colorCode);
-            checkColorBtn();
-        });
-    }
-    if (Game::version() >= Game::v1_16) {
-        colorMenu.addAction(tr("Select color..."), this,
-                            &RawJsonTextEdit::selectCustomColor);
-    }
-
-    ui->colorBtn->setMenu(&colorMenu);
+void RawJsonTextEdit::ensureCursorVisible() {
+    m_blinkCursorTimer->start();
+    m_drawTextCursor = true;
+    viewport()->update(cursorRect());
 }

@@ -13,7 +13,7 @@
 #include "predicatedock.h"
 #include "itemmodifierdock.h"
 #include "statisticsdialog.h"
-#include "rawjsontextedit.h"
+#include "rawjsontexteditor.h"
 #include "darkfusionstyle.h"
 
 #include "game.h"
@@ -249,7 +249,7 @@ void MainWindow::statistics() {
 }
 
 void MainWindow::rawJsonTextEditor() {
-    auto *editor = new RawJsonTextEdit(this);
+    auto *editor = new RawJsonTextEditor(this);
 
     editor->setWindowFlags(Qt::Tool);
     editor->setAttribute(Qt::WA_DeleteOnClose);

@@ -10,15 +10,25 @@
 
 using namespace Glhp;
 
-QString Glhp::randStr(int length) {
-    static const QLatin1String charset("abcdefghijklmnopqrstuvwxyz0123456789");
-    QString                    r;
+QChar Glhp::randChr(QStringView charset) {
+    return charset.at(QRandomGenerator::global()->bounded(charset.size()));
+}
 
-    for (int i = 0; i < (length + 1); ++i) {
-        int index = QRandomGenerator::global()->bounded(charset.size());
-        r.append(charset.at(index));
+QString Glhp::randStr(QStringView charset, int length) {
+    QString result;
+
+    for (int i = 0; i < length; ++i) {
+        const int index = QRandomGenerator::global()->bounded(charset.size());
+        result.append(charset.at(index));
     }
-    return r;
+    return result;
+}
+
+QString Glhp::randStr(int length) {
+    static const QString charset = QStringLiteral(
+        "abcdefghijklmnopqrstuvwxyz0123456789");
+
+    return randStr(charset, length);
 }
 
 QString Glhp::relPath(const QString &dirpath, QString path) {
