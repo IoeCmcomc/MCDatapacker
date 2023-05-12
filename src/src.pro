@@ -111,6 +111,7 @@ SOURCES += \
     problemarea.cpp \
     rawjsontextedit.cpp \
     rawjsontexteditor.cpp \
+    rawjsontextobjectinterface.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
     statisticsdialog.cpp \
@@ -208,6 +209,7 @@ HEADERS += \
     problemarea.h \
     rawjsontextedit.h \
     rawjsontexteditor.h \
+    rawjsontextobjectinterface.h \
     settingsdialog.h \
     stackedwidget.h \
     statisticsdialog.h \

@@ -1,11 +1,11 @@
 #include "rawjsontextedit.h"
 
+#include "rawjsontextobjectinterface.h"
 #include "globalhelpers.h"
 
 #include <QTextDocument>
 #include <QPainter>
 #include <QScrollBar>
-#include <QAbstractTextDocumentLayout>
 #include <QTextDocumentFragment>
 #include <QMimeData>
 
@@ -24,10 +24,17 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) : QTextEdit(parent),
     m_charWidths{256}     {
     setWordWrapMode(QTextOption::WrapAnywhere);
 
+    auto *doc     = new QTextDocument(this);
+    auto *tempDoc = doc->clone(this);
+
+    setDocument(doc);
+    m_tempDoc = tempDoc;
+    m_tempDoc->setObjectName("m_tempDoc");
+
     /*
        QTextMarkdownWriter doesn't output other formattings with monospaced fonts.
      */
-    QFont newFont("monospace");
+    QFont newFont(QStringLiteral("monospace"));
     newFont.setFixedPitch(true);
     newFont.setStyleHint(QFont::Monospace);
     newFont.setPointSize(10);
@@ -39,9 +46,13 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) : QTextEdit(parent),
     curFont.setBold(true);
     initSimilarWidthCharGroups(curFont, true);
 
-    //    QTextCharFormat fmt = currentCharFormat();
-    //    fmt.setProperty(BorderProperty, QPen(Qt::red));
-    //    setCurrentCharFormat(std::move(fmt));
+    QTextCharFormat fmt = currentCharFormat();
+    fmt.setProperty(BorderProperty, QPen(Qt::red));
+    setCurrentCharFormat(std::move(fmt));
+
+    registerInterface<TranslateTextObjectInterface>(TextObject::Translate);
+    registerInterface<ScoreboardTextObjectInterface>(TextObject::Scoreboard);
+    registerInterface<KeybindTextObjectInterface>(TextObject::Keybind);
 
     m_updateRegionsTimer->setSingleShot(true);
     m_updateRegionsTimer->setInterval(0);
@@ -49,7 +60,7 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) : QTextEdit(parent),
             this, &RawJsonTextEdit::updateFragmentRegions);
 
     connect(m_obfuscatedTimer, &QTimer::timeout, this,
-            &RawJsonTextEdit::updateRenderingDoc);
+            &RawJsonTextEdit::updateTempDoc);
     m_obfuscatedTimer->start(200);
 
     m_blinkCursorTimer->setInterval(500);
@@ -86,12 +97,12 @@ void RawJsonTextEdit::paintEvent(QPaintEvent *event) {
     QPainter      qp(viewport());
     const QPointF offset(-horizontalScrollBar()->value(),
                          -verticalScrollBar()->value());
+    const auto &rect = QRectF(event->rect()).translated(-offset);
 
-    qp.setRenderHint(qp.Antialiasing);
     qp.translate(offset);
+    qp.setRenderHint(QPainter::Antialiasing);
 
     if (!m_borderPaths.isEmpty()) {
-        const auto &rect = QRectF(event->rect()).translated(-offset);
         if (m_borderPaths.last().path.boundingRect().bottom() >= rect.y()) {
             BorderPaths toDraw;
             for (const auto &borderPath: qAsConst(m_borderPaths)) {
@@ -126,13 +137,17 @@ void RawJsonTextEdit::paintEvent(QPaintEvent *event) {
     if (m_drawTextCursor && hasFocus())
         ctx.cursorPosition = cursor.position();
     ctx.selections = { selection };
+//    ctx.clip       = rect;
 
-    if (m_renderingDoc && (m_renderingDoc != document())) {
+    qp.save();
+    qp.setRenderHint(QPainter::TextAntialiasing);
+//    qp.setClipRect(rect, Qt::IntersectClip);
+
+    if (m_renderingDoc) {
         m_renderingDoc->documentLayout()->draw(&qp, ctx);
-    } else {
-        document()->documentLayout()->draw(&qp, ctx);
     }
 
+    qp.restore();
     qp.end();
 
     //    QTextEdit::paintEvent(event);
@@ -441,6 +456,7 @@ void RawJsonTextEdit::updateFragmentRegions() {
                                      BorderProperty).value<QPen>() });
         }
     }
+    m_borderPaths = borderPaths;
 
     if (m_renderObfuscation) {
         m_renderingDoc = document();
@@ -450,14 +466,49 @@ void RawJsonTextEdit::updateFragmentRegions() {
     viewport()->update();
 }
 
-void RawJsonTextEdit::updateRenderingDoc() {
+void RawJsonTextEdit::obfuscateString(QString &string,
+                                      const bool isBold,
+                                      const QFontMetrics &metrics) {
+    if (!m_renderObfuscation)
+        return;
+
+    int i = 0;
+    for (const auto &ch: string) {
+        int              width = INT_MIN;
+        const RenderChar key{ ch, isBold };
+        if (m_charWidths.contains(key)) {
+            width = m_charWidths.lookup(key);
+        } else {
+            width = metrics.horizontalAdvance(ch);
+            m_charWidths.emplace(key, width | (boldCharMask * isBold));
+        }
+        if (m_similarWidthCharGroups.contains(width)) {
+            string[i] = Glhp::randChr(
+                m_similarWidthCharGroups[width]);
+        }
+
+        ++i;
+    }
+}
+
+void RawJsonTextEdit::updateTempDoc() {
     if (!isVisible()) {
         return;
     }
-    if (m_renderingDoc && (m_renderingDoc != document())) {
-        m_renderingDoc->deleteLater();
-    }
-    m_renderingDoc = document()->clone();
+    Q_ASSERT(m_tempDoc != nullptr);
+
+    m_tempDoc->clear();
+    m_tempDoc->setDefaultFont(document()->defaultFont());
+    m_tempDoc->setDefaultTextOption(document()->defaultTextOption());
+    m_tempDoc->setTextWidth(document()->textWidth());
+
+    auto &&cursor = textCursor();
+    cursor.select(QTextCursor::Document);
+    const auto &&selection = cursor.selection();
+
+    QTextCursor tempCursor(m_tempDoc);
+    tempCursor.beginEditBlock();
+    tempCursor.insertFragment(selection);
 
     for (const auto &fragRegion: qAsConst(m_fragRegions)) {
         const auto &fragment = fragRegion.fragment;
@@ -467,30 +518,20 @@ void RawJsonTextEdit::updateRenderingDoc() {
         const auto       &&font = fragment.charFormat().font();
         const QFontMetrics metrics(font);
         const bool         isBold = font.bold();
-        QTextCursor        cursor(m_renderingDoc);
-        cursor.setPosition(fragment.position());
-        cursor.setPosition(fragment.position() + fragment.length(),
-                           QTextCursor::KeepAnchor);
-        const QString &&fragText   = fragment.text();
-        QString         obfuscated = fragText;
-        int             i          = 0;
-        for (const auto &ch: fragText) {
-            int              width = INT_MIN;
-            const RenderChar key{ ch, isBold };
-            if (m_charWidths.contains(key)) {
-                width = m_charWidths.lookup(key);
-            } else {
-                width = metrics.horizontalAdvance(ch);
-                m_charWidths.emplace(key, width | (boldCharMask * isBold));
-            }
-            if (m_similarWidthCharGroups.contains(width)) {
-                obfuscated[i] = Glhp::randChr(m_similarWidthCharGroups[width]);
-            }
-            ++i;
+        tempCursor.setPosition(fragment.position());
+        tempCursor.setPosition(fragment.position() + fragment.length(),
+                               QTextCursor::KeepAnchor);
+        const QString &&fragText = fragment.text();
+        if (fragText == QChar::ObjectReplacementCharacter) {
+            continue;
         }
-        cursor.insertText(obfuscated);
+        QString obfuscated = fragText;
+        obfuscateString(obfuscated, isBold, metrics);
+        tempCursor.insertText(obfuscated);
     }
+    tempCursor.endEditBlock();
 
+    m_renderingDoc = m_tempDoc;
     viewport()->update();
 }
 

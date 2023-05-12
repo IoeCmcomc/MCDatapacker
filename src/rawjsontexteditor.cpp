@@ -1,6 +1,7 @@
 #include "rawjsontexteditor.h"
 #include "ui_rawjsontexteditor.h"
 
+#include "rawjsontextobjectinterface.h"
 #include "game.h"
 #include "globalhelpers.h"
 
@@ -111,6 +112,8 @@ void RawJsonTextEditor::setOneLine(bool value) {
 }
 
 QJsonValue RawJsonTextEditor::toJson() const {
+    using Property = RawJsonProperty;
+
     if (!ui->textEdit->document()->isModified()) {
         return m_json;
     }
@@ -133,7 +136,48 @@ QJsonValue RawJsonTextEditor::toJson() const {
 
                 QJsonObject component;
 
-                component.insert("text", txt);
+                if (txt == QChar::ObjectReplacementCharacter) {
+                    if (fmt.hasProperty(Property::TranslateKey)) {
+                        component.insert("translate",
+                                         fmt.stringProperty(Property::
+                                                            TranslateKey));
+                        if (fmt.hasProperty(Property::TranslateArgs)) {
+                            component.insert("with",
+                                             fmt.property(
+                                                 Property::TranslateArgs).toJsonArray());
+                        }
+                    } else if (fmt.hasProperty(Property::ScoreboardObjective)
+                               || fmt.hasProperty(Property::ScoreboardValue)) {
+                        QJsonObject score;
+
+                        if (!fmt.stringProperty(Property::ScoreboardObjective).
+                            isEmpty()) {
+                            score.insert("objective",
+                                         fmt.stringProperty(Property::
+                                                            ScoreboardObjective));
+
+                            if (fmt.hasProperty(Property::ScoreboardName)) {
+                                score.insert("name",
+                                             fmt.stringProperty(Property::
+                                                                ScoreboardName));
+                            }
+                        }
+                        if (fmt.hasProperty(Property::ScoreboardValue)) {
+                            score.insert("value",
+                                         fmt.stringProperty(
+                                             Property::ScoreboardValue));
+                        }
+
+                        if (!score.isEmpty()) {
+                            component[QLatin1String("score")] = score;
+                        }
+                    } else if (fmt.hasProperty(Property::Keybind)) {
+                        component.insert("keybind",
+                                         fmt.stringProperty(Property::Keybind));
+                    }
+                } else {
+                    component.insert(QLatin1String("text"), txt);
+                }
                 if (fmt.fontWeight() >= 75)
                     component.insert(QLatin1String("bold"), true);
                 if (fmt.fontItalic())
@@ -231,7 +275,7 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
     if (root.contains(QLatin1String("strikethrough")))
         fmt.setFontStrikeOut(root.value(QLatin1String("strikethrough")).toBool());
     if (root.contains(QLatin1String("obfuscated")))
-        fmt.setProperty(Property::TextObfuscated,
+        fmt.setProperty(RawJsonProperty::TextObfuscated,
                         root.value(QLatin1String("obfuscated")).toBool());
     if (root.contains(QLatin1String("color"))) {
         const QString &&color = Glhp::colorHexes.value(root.value(
@@ -256,6 +300,40 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
     if (root.contains(QLatin1String("text"))) {
         cursor.setCharFormat(fmt);
         cursor.insertText(root.value(QLatin1String("text")).toString());
+    } else if (root.contains(QLatin1String("translate"))) {
+        auto objFmt = fmt;
+        objFmt.setObjectType(TextObject::Translate);
+        objFmt.setProperty(RawJsonProperty::TranslateKey,
+                           root.value(QLatin1String("translate")).toString());
+        objFmt.setProperty(RawJsonProperty::TranslateArgs,
+                           root.value(QLatin1String(
+                                          "with")).toArray());
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
+        cursor.setCharFormat(fmt);
+    } else if (root.contains(QLatin1String("score"))) {
+        const auto &score =
+            root.value(QLatin1String("score")).toObject();
+        auto objFmt = fmt;
+        objFmt.setObjectType(TextObject::Scoreboard);
+        if (score.contains("value")) {
+            objFmt.setProperty(RawJsonProperty::ScoreboardValue,
+                               score.value(QLatin1String("value")).toString());
+        }
+        objFmt.setProperty(RawJsonProperty::ScoreboardName,
+                           score.value(QLatin1String("name")).toString());
+        objFmt.setProperty(RawJsonProperty::ScoreboardObjective,
+                           score.value(QLatin1String(
+                                           "objective")).toString());
+
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
+        cursor.setCharFormat(fmt);
+    } else if (root.contains(QLatin1String("keybind"))) {
+        auto objFmt = fmt;
+        objFmt.setObjectType(TextObject::Keybind);
+        objFmt.setProperty(RawJsonProperty::Keybind,
+                           root.value(QLatin1String("keybind")).toString());
+        cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
+        cursor.setCharFormat(fmt);
     }
 
     if (root.contains(QLatin1String("extra"))) {
@@ -296,7 +374,7 @@ void RawJsonTextEditor::setStrike(bool strike) {
 void RawJsonTextEditor::setObfuscated(bool obfuscated) {
     QTextCharFormat fmt;
 
-    fmt.setProperty(Property::TextObfuscated, obfuscated);
+    fmt.setProperty(RawJsonProperty::TextObfuscated, obfuscated);
     mergeCurrentFormat(fmt);
     ui->textEdit->setFocus();
 }
@@ -367,7 +445,8 @@ void RawJsonTextEditor::updateFormatButtons() {
     ui->italicBtn->setChecked(fmt.fontItalic());
     ui->underlineBtn->setChecked(fmt.fontUnderline());
     ui->strikeBtn->setChecked(fmt.fontStrikeOut());
-    ui->obfuscatedBtn->setChecked(fmt.boolProperty(Property::TextObfuscated));
+    ui->obfuscatedBtn->setChecked(fmt.boolProperty(RawJsonProperty::
+                                                   TextObfuscated));
     if (fmt.foreground().style() == Qt::SolidPattern) {
         ui->colorBtn->setChecked(true);
         setColorBtnIcon(fmt.foreground().color());

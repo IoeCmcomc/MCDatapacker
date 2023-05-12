@@ -26,6 +26,8 @@ int main(int argc, char *argv[]) {
 
     QFontDatabase::addApplicationFont(QStringLiteral(
                                           ":/fonts/Monocraft.otf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(
+                                          ":/fonts/MCDatapacker-Icons.ttf"));
 
     QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(
                                       ":/icon"));

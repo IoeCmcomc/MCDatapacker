@@ -7,6 +7,7 @@
 #include <QTextFragment>
 #include <QPainterPath>
 #include <QTimer>
+#include <QAbstractTextDocumentLayout>
 
 struct Subfragment {
     QRectF  rect;
@@ -75,9 +76,17 @@ class RawJsonTextEdit : public QTextEdit {
     Q_OBJECT
 public:
     enum FormatProperty {
-        BorderProperty = QTextCharFormat::UserProperty + 0x100,
-        TextObfuscated,
+        BorderProperty = QTextCharFormat::UserProperty + 0x10,
     };
+
+    enum TextObject {
+        Translate = 1,
+        Scoreboard,
+        EntityNames,
+        Keybind,
+        Nbt,
+    };
+
     using FragmentRegions = QVector<FragmentRegion>;
     using BorderPaths     = QVector<BorderPath>;
 
@@ -97,6 +106,8 @@ protected:
     void insertFromMimeData(const QMimeData *source) override;
 
 private:
+    friend class RawJsonTextObjectInterface;
+
     const QStringView m_obfuscatedCharset =
         u"(!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~£ƒªº¬«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀∅∈≡±≥≤⌠⌡÷≈°∙·√ⁿ²■";
 
@@ -107,15 +118,26 @@ private:
     QTimer *m_obfuscatedTimer     = new QTimer(this);
     QTimer *m_updateRegionsTimer  = new QTimer(this);
     QTimer *m_blinkCursorTimer    = new QTimer(this);
+    QTextDocument *m_tempDoc      = nullptr;
     QTextDocument *m_renderingDoc = nullptr;
     bool m_joinBorders            = true;
     bool m_drawTextCursor         = true;
     bool m_renderObfuscation      = true;
 
+    template<class T>
+    void registerInterface(const TextObject objectType) {
+        auto *interface = new T(this);
+
+        document()->documentLayout()->registerHandler(objectType, interface);
+        m_tempDoc->documentLayout()->registerHandler(objectType, interface);
+    }
+
     void initSimilarWidthCharGroups(const QFont &font, bool isBold);
     void scheduleRegionsUpdate();
     void updateFragmentRegions();
-    void updateRenderingDoc();
+    void obfuscateString(QString &string, const bool isBold,
+                         const QFontMetrics &metrics);
+    void updateTempDoc();
     void onCursorPositionChanged();
     void ensureCursorVisible();
 };

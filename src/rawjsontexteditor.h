@@ -47,7 +47,8 @@ private /*slots*/ :
         Markdown,
     };
 
-    using Property = RawJsonTextEdit::FormatProperty;
+    using Property   = RawJsonTextEdit::FormatProperty;
+    using TextObject = RawJsonTextEdit::TextObject;
 
     void updateFormatButtons();
     void selectCustomColor();

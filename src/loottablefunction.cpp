@@ -189,7 +189,7 @@ QJsonObject LootTableFunction::toJson() const {
             }
             QJsonArray ops;
             for (int i = 0; i < ui->copyNBT_table->rowCount(); ++i) {
-                auto source = ui->copyNBT_table->item(i, 0)->text();
+                auto source = ui->copyNBT_table->item(i, 0)->text(); // Potential crash
                 auto op     = ui->copyNBT_table->item(i, 1)
                               ->data(Qt::UserRole + 1).toString();
                 auto target = ui->copyNBT_table->item(i, 2)->text();
@@ -445,8 +445,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         case ApplyBonus: { /*Apply bonus */
             if (!(root.contains("enchantment") && root.contains("formula")))
                 return;
-            
-            setComboValueFrom(ui->bonus_enchantCombo, root.value("enchantment"));
+
+            setComboValueFrom(ui->bonus_enchantCombo,
+                              root.value("enchantment"));
             int formulaIndex =
                 formulaTypes.indexOf(root.value("formula").toString());
 
@@ -524,7 +525,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
             QVariant vari;
             vari.setValue(InventoryItem(root.value("block").toString()));
-            
+
             setComboValueFrom(ui->copyState_blockCombo, vari);
 
             if (root.contains("properties")) {
@@ -570,9 +571,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
         case ExplorationMap: { /* Exploration map */
             setComboValueFrom(ui->map_destCombo,
-                           root.value("destination").toString());
+                              root.value("destination").toString());
             setComboValueFrom(ui->map_decoCombo,
-                           root.value("decoration").toString());
+                              root.value("decoration").toString());
 
             if (root.contains("zoom"))
                 ui->map_zoomSpin->setValue(root.value("zoom").toInt());
@@ -707,7 +708,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     return;
                 }
                 setComboValueFrom(ui->setContents_typeCombo,
-                               root["type"].toString());
+                                  root["type"].toString());
             }
 
             if (root.contains("entries")) {
@@ -765,7 +766,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     return;
                 }
                 setComboValueFrom(ui->lootTable_typeCombo,
-                               root["type"].toString());
+                                  root["type"].toString());
             }
 
             ui->lootTable_idEdit->setText(root.value("name").toString());
@@ -816,7 +817,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
             if (Game::version() >= Game::v1_18) {
                 setComboValueFrom(ui->setPotion_potionCombo,
-                               root["potion"].toString());
+                                  root["potion"].toString());
             }
             break;
         }
