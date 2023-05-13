@@ -142,9 +142,9 @@ namespace re2c {
         const QChar *YYMARKER = nullptr;
 
         /*!local:re2c
-            id = [0-9a-zA-Z-_+]+;
+            key = [^ "[\].{}\x00]+;
 
-            id { return QStringView(input.cbegin(), YYCURSOR); }
+            key { return QStringView(input.cbegin(), YYCURSOR); }
          *       { return QStringView(); }
          */
     }
@@ -166,7 +166,7 @@ namespace re2c {
         const QChar *YYMARKER = nullptr;
 
         /*!local:re2c
-            id = [A-Za-z0-9_-.:]+;
+            id = [0-9a-zA-Z-_.:]+;
 
             id { return QStringView(input.cbegin(), YYCURSOR); }
          *       { return QStringView(); }
@@ -190,7 +190,7 @@ namespace re2c {
         const QChar *YYMARKER = nullptr;
 
         /*!local:re2c
-            id = [0-9a-z-_\\/.]*;
+            id = [0-9a-z-_\\/.]+;
 
             id { return QStringView(input.cbegin(), YYCURSOR); }
          *       { return QStringView(); }

@@ -595,6 +595,7 @@ namespace Command {
 
             case '[': {
                 ret->setType(StepType::Index);
+                ret->setIsValid(true);
                 const int leftPos = pos();
                 advance();
                 const QString &&trivia = skipWs(false);

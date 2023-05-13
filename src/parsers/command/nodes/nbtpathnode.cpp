@@ -66,8 +66,10 @@ namespace Command {
     }
 
     void NbtPathStepNode::setFilter(QSharedPointer<NbtCompoundNode> filter) {
-        m_isValid &= filter->isValid();
-        m_filter   = std::move(filter);
+        m_isValid = (m_type == Type::Root)
+                        ? filter->isValid()
+                        : (m_isValid && filter->isValid());
+        m_filter = std::move(filter);
     }
 
     NbtPathStepNode::Type NbtPathStepNode::type() const {
@@ -75,8 +77,7 @@ namespace Command {
     }
 
     void NbtPathStepNode::setType(const Type &type) {
-        m_type    = type;
-        m_isValid = true;
+        m_type = type;
     }
 
     NbtPathNode::NbtPathNode(int length)

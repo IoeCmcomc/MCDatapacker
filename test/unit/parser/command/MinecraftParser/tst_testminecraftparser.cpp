@@ -4,7 +4,7 @@
 #include "../../../../../src/parsers/command/minecraftparser.h"
 #include "../../../../../src/parsers/command/visitors/reprprinter.h"
 
-#define QBENCHMARK          if (true)
+//#define QBENCHMARK          if (true)
 
 #define DECLARE_TAG_VARS    int i = 0; int c = 0; QString cat;
 #define SET_TAG(x)    i = 0; cat =#x;
@@ -53,8 +53,6 @@ void TestMinecraftParser::initTestCase() {
     Command::MinecraftParser::setGameVer(QVersionNumber(1, 18, 2));
     Command::MinecraftParser::setTestMode(true);
 
-
-
     timer.start();
 //    QThread::sleep(5);
 }
@@ -64,7 +62,7 @@ void TestMinecraftParser::cleanupTestCase() {
 }
 
 void TestMinecraftParser::genRepr_data() {
-//    QSKIP("");
+    QSKIP("");
     //DECLARE_TAG_VARS;
 
     //QTest::addColumn<QString>("command");
@@ -111,8 +109,9 @@ void TestMinecraftParser::commands_data() {
     localTimer.start();
 
     SET_TAG(test)
-    QTest::newRow(GEN_TAG) << "tag 0-0-0-0-0 add 5.BlockChecker" <<
-        "RootNode[4](LiteralNode(tag), EntityNode[](UuidNode({00000000-0000-0000-0000-000000000000})), LiteralNode(add), StringNode(\"5.BlockChecker\"))";
+    QTest::newRow(GEN_TAG) <<
+        "data modify storage foo:a * set from storage foo:b *" <<
+        "RootNode[10](LiteralNode(data), LiteralNode(modify), LiteralNode(storage), ResourceLocationNode(foo:a), NbtPathNode[1](NbtPathStepNode<Key>(StringNode(\"*\"))), LiteralNode(set), LiteralNode(from), LiteralNode(storage), ResourceLocationNode(foo:b), NbtPathNode[1](NbtPathStepNode<Key>(StringNode(\"*\"))))";
 
     SET_TAG(advancement)
     QTest::newRow(GEN_TAG) <<
@@ -178,6 +177,10 @@ void TestMinecraftParser::commands_data() {
         "data merge entity @e[type=zombie,limit=1,sort=nearest] {HandDropChances: [0f, 0.8f]}"
                            <<
         "RootNode[5](LiteralNode(data), LiteralNode(merge), LiteralNode(entity), EntityNode[single](TargetSelectorNode(@e){MapNode(KeyNode(\"type\"): EntityArgumentValueNode(ResourceLocationNode(zombie)), KeyNode(\"limit\"): IntegerNode(1), KeyNode(\"sort\"): StringNode(\"nearest\"))}), NbtCompoundNode(KeyNode(\"HandDropChances\"): NbtListNode[2](NbtFloatNode(0), NbtFloatNode(0.8))))";
+    QTest::newRow(GEN_TAG) <<
+        "data modify storage foo:a * set from storage foo:b *"
+                           <<
+        "RootNode[10](LiteralNode(data), LiteralNode(modify), LiteralNode(storage), ResourceLocationNode(foo:a), NbtPathNode[1](NbtPathStepNode<Key>(StringNode(\"*\"))), LiteralNode(set), LiteralNode(from), LiteralNode(storage), ResourceLocationNode(foo:b), NbtPathNode[1](NbtPathStepNode<Key>(StringNode(\"*\"))))";
 
     SET_TAG(difficulty)
     QTest::newRow(GEN_TAG) << "difficulty hard" <<
