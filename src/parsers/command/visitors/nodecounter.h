@@ -16,9 +16,9 @@ public:
         NodeCounter() : OverloadNodeVisitor(Postorder) {
         };
 
-        void visit(LiteralNode *node) override;
-        void visit(TargetSelectorNode *node) override;
-        void visit(EntityArgumentValueNode *node) override;
+        void visit(LiteralNode *node) final;
+        void visit(TargetSelectorNode *node) final;
+        void visit(EntityArgumentValueNode *node) final;
 
         UintHash commandCounts() const;
         SelectorHash targetSelectorCounts() const;

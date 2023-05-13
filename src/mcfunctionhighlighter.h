@@ -17,10 +17,10 @@ public:
                                    Command::McfunctionParser *parser = nullptr);
 
 protected slots:
-    void highlightBlock(const QString &text) override;
+    void highlightBlock(const QString &text) final;
     void rehighlightChangedBlocks();
 
-    void rehighlightDelayed() override;
+    void rehighlightDelayed() final;
 
 private:
     void setupRules();

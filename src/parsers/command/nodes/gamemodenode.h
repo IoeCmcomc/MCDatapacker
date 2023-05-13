@@ -18,7 +18,7 @@ public:
         GamemodeNode(const QString &text, const Mode &value,
                      const bool isValid = false);
 
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         inline Mode value() const {
             return m_value;

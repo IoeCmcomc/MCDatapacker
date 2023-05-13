@@ -26,14 +26,14 @@ namespace Command {
 public:
         explicit ReprPrinter();
 
-        virtual void visit(ParseNode *node) override {
+        void visit(ParseNode *node) final {
             m_repr += QString("ParseNode[%1]").arg(node->length());
             qWarning() << "ReprPrinter: Unknown ParseNode detected.";
         };
-        virtual void visit(ErrorNode *node) override {
+        void visit(ErrorNode *node) final {
             m_repr += QString("ErrorNode[%1]").arg(node->length());
         };
-        virtual void visit(RootNode *node) override {
+        void visit(RootNode *node) final {
             m_repr += QString("RootNode[%1](").arg(node->size());
             for (const auto &child: node->children()) {
                 child->accept(this, m_order);
@@ -43,33 +43,33 @@ public:
             }
             m_repr += ')';
         };
-        virtual void visit(ArgumentNode *node) override {
+        void visit(ArgumentNode *node) final {
             m_repr += QString("ArgumentNode[%1]").arg(node->length());
             qWarning() << "ReprPrinter: Unknown ArgumentNode detected.";
         };
-        virtual void visit(BoolNode *node) override {
+        void visit(BoolNode *node) final {
             m_repr += QString("BoolNode(%1)").arg(
                 node->value() ? "true" : "false");
         };
-        virtual void visit(DoubleNode *node) override {
+        void visit(DoubleNode *node) final {
             m_repr += QString("DoubleNode(%1)").arg(node->value());
         };
-        virtual void visit(FloatNode *node) override {
+        void visit(FloatNode *node) final {
             m_repr += QString("FloatNode(%1)").arg(node->value());
         };
-        virtual void visit(IntegerNode *node) override {
+        void visit(IntegerNode *node) final {
             m_repr += QString("IntegerNode(%1)").arg(node->value());
         };
-        virtual void visit(StringNode *node) override {
+        void visit(StringNode *node) final {
             m_repr += QString("StringNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(LiteralNode *node) override {
+        void visit(LiteralNode *node) final {
             m_repr += QString("LiteralNode(%1)").arg(node->text());
         };
-        virtual void visit(AngleNode *node) override {
+        void visit(AngleNode *node) final {
             m_repr += QString("AngleNode(%1)").arg(node->text());
         };
-        virtual void visit(BlockStateNode *node) override {
+        void visit(BlockStateNode *node) final {
             m_repr += "BlockStateNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
@@ -84,19 +84,19 @@ public:
                 m_repr += '}';
             }
         };
-        virtual void visit(ComponentNode *node) override {
+        void visit(ComponentNode *node) final {
             m_repr += QString("ComponentNode(%1)").arg(
                 node->value().dump().c_str());
         };
-        virtual void visit(EntityNode *node) override {
+        void visit(EntityNode *node) final {
             m_repr += "EntityNode";
             reprEntityNode(node);
         };
-        virtual void visit(GameProfileNode *node) override {
+        void visit(GameProfileNode *node) final {
             m_repr += "GameProfileNode";
             reprEntityNode(node);
         };
-        virtual void visit(ScoreHolderNode *node) override {
+        void visit(ScoreHolderNode *node) final {
             m_repr += "ScoreHolderNode";
             if (node->isAll()) {
                 m_repr += "(*)";
@@ -104,13 +104,13 @@ public:
                 reprEntityNode(node);
             }
         };
-        virtual void visit(FloatRangeNode *node) override {
+        void visit(FloatRangeNode *node) final {
             m_repr += QString("FloatRangeNode(%1)").arg(node->format());
         };
-        virtual void visit(IntRangeNode *node) override {
+        void visit(IntRangeNode *node) final {
             m_repr += QString("IntRangeNode(%1)").arg(node->format());
         };
-        virtual void visit(ItemStackNode *node) override {
+        void visit(ItemStackNode *node) final {
             m_repr += "ItemStackNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
@@ -120,7 +120,7 @@ public:
                 m_repr += '}';
             }
         };
-        virtual void visit(MapNode *node) override {
+        void visit(MapNode *node) final {
             m_repr += "MapNode(";
 
             const auto &&pairs = node->pairs();
@@ -134,7 +134,7 @@ public:
 
             m_repr += ')';
         };
-        virtual void visit(EntityArgumentValueNode *node) override {
+        void visit(EntityArgumentValueNode *node) final {
             m_repr += "EntityArgumentValueNode";
             if (node->isNegative())
                 m_repr += "[!]";
@@ -143,18 +143,18 @@ public:
                 node->getNode()->accept(this, m_order);
             m_repr += ')';
         }
-        virtual void visit(NbtNode *node) override {
+        void visit(NbtNode *node) final {
             m_repr += QString("NbtNode[%1]").arg(node->length());
             qWarning() << "ReprPrinter: Unknown NbtNode detected.";
         };
-        virtual void visit(NbtByteArrayNode *node) override {
+        void visit(NbtByteArrayNode *node) final {
             m_repr += QString("NbtByteArrayNode[%1]").arg(node->size());
             reprList(node->children());
         };
-        virtual void visit(NbtByteNode *node) override {
+        void visit(NbtByteNode *node) final {
             m_repr += QString("NbtByteNode(%1)").arg(node->value());
         };
-        virtual void visit(NbtCompoundNode *node) override {
+        void visit(NbtCompoundNode *node) final {
             m_repr += "NbtCompoundNode(";
 
             const auto &&pairs = node->pairs();
@@ -168,41 +168,41 @@ public:
 
             m_repr += ')';
         }
-        virtual void visit(NbtDoubleNode *node) override {
+        void visit(NbtDoubleNode *node) final {
             m_repr += QString("NbtDoubleNode(%1)").arg(node->value());
         };
-        virtual void visit(NbtFloatNode *node) override {
+        void visit(NbtFloatNode *node) final {
             m_repr += QString("NbtFloatNode(%1)").arg(node->value());
         };
-        virtual void visit(NbtIntArrayNode *node) override {
+        void visit(NbtIntArrayNode *node) final {
             m_repr += QString("NbtIntArrayNode[%1]").arg(node->size());
             reprList(node->children());
         };
-        virtual void visit(NbtIntNode *node) override {
+        void visit(NbtIntNode *node) final {
             m_repr += QString("NbtIntNode(%1)").arg(node->value());
         };
-        virtual void visit(NbtListNode *node) override {
+        void visit(NbtListNode *node) final {
             m_repr += QString("NbtListNode[%1]").arg(node->size());
             reprList(node->children());
         };
-        virtual void visit(NbtLongArrayNode *node) override {
+        void visit(NbtLongArrayNode *node) final {
             m_repr += QString("NbtLongArrayNode[%1]").arg(node->size());
             reprList(node->children());
         };
-        virtual void visit(NbtLongNode *node) override {
+        void visit(NbtLongNode *node) final {
             m_repr += QString("NbtLongNode(%1)").arg(node->value());
         };
-        virtual void visit(NbtShortNode *node) override {
+        void visit(NbtShortNode *node) final {
             m_repr += QString("NbtShortNode(%1)").arg(node->value());
         };
-        virtual void visit(NbtStringNode *node) override {
+        void visit(NbtStringNode *node) final {
             m_repr += QString("NbtStringNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(NbtPathNode *node) override {
+        void visit(NbtPathNode *node) final {
             m_repr += QString("NbtPathNode[%1]").arg(node->size());
             reprList(node->steps());
         };
-        virtual void visit(NbtPathStepNode *node)  override {
+        void visit(NbtPathStepNode *node)  final {
             using Type = NbtPathStepNode::Type;
             static const QMap<Type, QString> type2Name {
                 { Type::Index, "Index" },
@@ -251,31 +251,31 @@ public:
 
             m_repr += ')';
         };
-        virtual void visit(ResourceLocationNode *node) override {
+        void visit(ResourceLocationNode *node) final {
             m_repr += "ResourceLocationNode";
             reprResourceLocation(node);
         };
-        virtual void visit(ResourceNode *node) override {
+        void visit(ResourceNode *node) final {
             m_repr += "ResourceNode";
             reprResourceLocation(node);
         };
-        virtual void visit(ResourceKeyNode *node) override {
+        void visit(ResourceKeyNode *node) final {
             m_repr += "ResourceKeyNode";
             reprResourceLocation(node);
         };
-        virtual void visit(ResourceOrTagNode *node) override {
+        void visit(ResourceOrTagNode *node) final {
             m_repr += "ResourceOrTagNode";
             reprResourceLocation(node);
         };
-        virtual void visit(ResourceOrTagKeyNode *node) override {
+        void visit(ResourceOrTagKeyNode *node) final {
             m_repr += "ResourceOrTagKeyNode";
             reprResourceLocation(node);
         };
-        virtual void visit(BlockPosNode *node) override {
+        void visit(BlockPosNode *node) final {
             m_repr += "BlockPosNode";
             reprAxes(node);
         }
-        virtual void visit(BlockPredicateNode *node) override {
+        void visit(BlockPredicateNode *node) final {
             m_repr += "BlockPredicateNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
@@ -290,81 +290,81 @@ public:
                 m_repr += '}';
             }
         };
-        virtual void visit(ColumnPosNode *node) override {
+        void visit(ColumnPosNode *node) final {
             m_repr += "ColumnPosNode";
             reprAxes(node, "x", "z");
         }
-        virtual void visit(RotationNode *node) override {
+        void visit(RotationNode *node) final {
             m_repr += "RotationNode";
             reprAxes(node, "yaw", "pitch");
         }
-        virtual void visit(Vec2Node *node) override {
+        void visit(Vec2Node *node) final {
             m_repr += "Vec2Node";
             reprAxes(node, "x", "y");
         }
-        virtual void visit(Vec3Node *node) override {
+        void visit(Vec3Node *node) final {
             m_repr += "Vec3Node";
             reprAxes(node);
         }
-        virtual void visit(DimensionNode *node) override {
+        void visit(DimensionNode *node) final {
             m_repr += "DimensionNode";
             reprResourceLocation(node);
         };
-        virtual void visit(EntitySummonNode *node) override {
+        void visit(EntitySummonNode *node) final {
             m_repr += "EntitySummonNode";
             reprResourceLocation(node);
         };
-        virtual void visit(FunctionNode *node) override {
+        void visit(FunctionNode *node) final {
             m_repr += "FunctionNode";
             reprResourceLocation(node);
         };
-        virtual void visit(ItemEnchantmentNode *node) override {
+        void visit(ItemEnchantmentNode *node) final {
             m_repr += "ItemEnchantmentNode";
             reprResourceLocation(node);
         };
-        virtual void visit(MobEffectNode *node) override {
+        void visit(MobEffectNode *node) final {
             m_repr += "MobEffectNode";
             reprResourceLocation(node);
         };
-        virtual void visit(ColorNode *node) override {
+        void visit(ColorNode *node) final {
             m_repr += QString("ColorNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(EntityAnchorNode *node) override {
+        void visit(EntityAnchorNode *node) final {
             m_repr += QString("EntityAnchorNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(ItemSlotNode *node) override {
+        void visit(ItemSlotNode *node) final {
             m_repr += QString("ItemSlotNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(MessageNode *node) override {
+        void visit(MessageNode *node) final {
             m_repr += QString("MessageNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(ObjectiveNode *node) override {
+        void visit(ObjectiveNode *node) final {
             m_repr += QString("ObjectiveNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(ObjectiveCriteriaNode *node) override {
+        void visit(ObjectiveCriteriaNode *node) final {
             m_repr +=
                 QString("ObjectiveCriteriaNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(OperationNode *node) override {
+        void visit(OperationNode *node) final {
             m_repr += QString("OperationNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(ScoreboardSlotNode *node) override {
+        void visit(ScoreboardSlotNode *node) final {
             m_repr += QString("ScoreboardSlotNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(TeamNode *node) override {
+        void visit(TeamNode *node) final {
             m_repr += QString("TeamNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(TemplateMirrorNode *node) override {
+        void visit(TemplateMirrorNode *node) final {
             m_repr += QString("TemplateMirrorNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(TemplateRotationNode *node) override {
+        void visit(TemplateRotationNode *node) final {
             m_repr +=
                 QString("TemplateRotationNode(\"%1\")").arg(node->value());
         };
-        virtual void visit(SwizzleNode *node) override {
+        void visit(SwizzleNode *node) final {
             m_repr += QString("SwizzleNode(%1)").arg(node->text());
         };
-        virtual void visit(TargetSelectorNode *node) override {
+        void visit(TargetSelectorNode *node) final {
             using Variable = TargetSelectorNode::Variable;
             const static QMap<TargetSelectorNode::Variable, char> variableMap =
             {   { Variable::A, 'a' },
@@ -383,14 +383,14 @@ public:
                 m_repr += '}';
             }
         };
-        virtual void visit(TimeNode *node) override {
+        void visit(TimeNode *node) final {
             m_repr += QString("TimeNode(%1)").arg(node->text());
         };
-        virtual void visit(UuidNode *node) override {
+        void visit(UuidNode *node) final {
             m_repr +=
                 QString("UuidNode(%1)").arg(node->value().toString());
         };
-        virtual void visit(ParticleNode *node) override {
+        void visit(ParticleNode *node) final {
             m_repr += "ParticleNode(id: ";
             node->resLoc()->accept(this, m_order);
             if (!node->params().isEmpty()) {
@@ -399,7 +399,7 @@ public:
             }
             m_repr += ')';
         }
-        virtual void visit(ParticleColorNode *node) override {
+        void visit(ParticleColorNode *node) final {
             m_repr += "ParticleColorNode(";
             node->r()->accept(this, m_order);
             m_repr += ", ";
@@ -408,7 +408,7 @@ public:
             node->b()->accept(this, m_order);
             m_repr += ')';
         };
-        virtual void visit(ItemPredicateNode *node) override {
+        void visit(ItemPredicateNode *node) final {
             m_repr += "ItemPredicateNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
@@ -418,20 +418,20 @@ public:
                 m_repr += '}';
             }
         };
-        virtual void visit(KeyNode *node) override {
+        void visit(KeyNode *node) final {
             m_repr += QString("KeyNode(\"%1\")").arg(node->value());
         };
 
-        virtual void visit(TwoAxesNode *node) override {
+        void visit(TwoAxesNode *node) final {
             m_repr += "TwoAxesNode";
             reprAxes(node, "first", "second");
         }
 
-        virtual void visit(XyzNode *node) override {
+        void visit(XyzNode *node) final {
             m_repr += "XyzNode";
             reprAxes(node);
         }
-        virtual void visit(GamemodeNode *node) override {
+        void visit(GamemodeNode *node) final {
             m_repr += QString("GamemodeNode(\"%1\")").arg(node->text());
         };
 

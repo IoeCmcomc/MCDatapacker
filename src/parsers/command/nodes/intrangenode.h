@@ -9,7 +9,7 @@ namespace Command {
 public:
         explicit IntRangeNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
     };
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, IntRange)

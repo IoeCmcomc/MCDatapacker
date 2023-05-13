@@ -12,7 +12,7 @@ public:
         QSharedPointer<FileNode> syntaxTree() const;
 
 protected:
-        bool parseImpl() override;
+        bool parseImpl() final;
 
 private:
         MinecraftParser m_commandParser;

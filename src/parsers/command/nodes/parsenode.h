@@ -71,7 +71,7 @@ public:
         explicit ErrorNode(const QString &text) : ParseNode(Kind::Error, text) {
         };
 
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
     };
 
     class SpanNode : public ParseNode {

@@ -30,229 +30,229 @@ public:
         explicit OverloadNodeVisitor(VisitOrder order) : NodeVisitor(order) {
         };
 
-        virtual void visit([[maybe_unused]] ParseNode *node) override {
+        void visit([[maybe_unused]] ParseNode *node) override {
         }
-        virtual void visit(ErrorNode *node) override {
+        void visit(ErrorNode *node) override {
             _visit(node);
             //visit(static_cast<ParseNode*>(node));
         }
-        virtual void visit(RootNode *node) override {
+        void visit(RootNode *node) override {
             _visit(node);
         }
-        virtual void visit(ArgumentNode *node) override {
+        void visit(ArgumentNode *node) override {
             _visit(node);
         }
-        virtual void visit(BoolNode *node) override {
+        void visit(BoolNode *node) override {
             _visit(node);
         }
-        virtual void visit(DoubleNode *node) override {
+        void visit(DoubleNode *node) override {
             _visit(node);
         }
-        virtual void visit(FloatNode *node) override {
+        void visit(FloatNode *node) override {
             _visit(node);
         }
-        virtual void visit(IntegerNode *node) override {
+        void visit(IntegerNode *node) override {
             _visit(node);
         }
-        virtual void visit(StringNode *node) override {
+        void visit(StringNode *node) override {
             _visit(node);
         }
-        virtual void visit(LiteralNode *node) override {
+        void visit(LiteralNode *node) override {
             _visit(node);
         }
-        virtual void visit(AngleNode *node) override {
+        void visit(AngleNode *node) override {
             _visit(node);
         }
-        virtual void visit(BlockStateNode *node) override {
+        void visit(BlockStateNode *node) override {
             _visit(node);
         }
-        virtual void visit(ComponentNode *node) override {
+        void visit(ComponentNode *node) override {
             _visit(node);
         }
-        virtual void visit(EntityNode *node) override {
+        void visit(EntityNode *node) override {
             _visit(node);
         }
-        virtual void visit(GameProfileNode *node) override {
+        void visit(GameProfileNode *node) override {
             _visit(node);
         }
-        virtual void visit(ScoreHolderNode *node) override {
+        void visit(ScoreHolderNode *node) override {
             _visit(node);
         }
-        virtual void visit(FloatRangeNode *node) override {
+        void visit(FloatRangeNode *node) override {
             _visit(node);
         }
-        virtual void visit(IntRangeNode *node) override {
+        void visit(IntRangeNode *node) override {
             _visit(node);
         }
-        virtual void visit(ItemStackNode *node) override {
+        void visit(ItemStackNode *node) override {
             _visit(node);
         }
-        virtual void visit(MapNode *node) override {
+        void visit(MapNode *node) override {
             _visit(node);
         }
-        virtual void visit(EntityArgumentValueNode *node) override {
+        void visit(EntityArgumentValueNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtNode *node) override {
+        void visit(NbtNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtByteArrayNode *node) override {
+        void visit(NbtByteArrayNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtByteNode *node) override {
+        void visit(NbtByteNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtCompoundNode *node) override {
+        void visit(NbtCompoundNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtDoubleNode *node) override {
+        void visit(NbtDoubleNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtFloatNode *node) override {
+        void visit(NbtFloatNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtIntArrayNode *node) override {
+        void visit(NbtIntArrayNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtIntNode *node) override {
+        void visit(NbtIntNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtListNode *node) override {
+        void visit(NbtListNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtLongArrayNode *node) override {
+        void visit(NbtLongArrayNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtLongNode *node) override {
+        void visit(NbtLongNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtShortNode *node) override {
+        void visit(NbtShortNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtStringNode *node) override {
+        void visit(NbtStringNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtPathNode *node) override {
+        void visit(NbtPathNode *node) override {
             _visit(node);
         }
-        virtual void visit(NbtPathStepNode *node) override {
+        void visit(NbtPathStepNode *node) override {
             _visit(node);
         }
-        virtual void visit(ResourceLocationNode *node) override {
+        void visit(ResourceLocationNode *node) override {
             _visit(node);
         }
-        virtual void visit(ResourceNode *node) override {
+        void visit(ResourceNode *node) override {
             _visit(node);
         }
-        virtual void visit(ResourceKeyNode *node) override {
+        void visit(ResourceKeyNode *node) override {
             _visit(node);
         }
-        virtual void visit(ResourceOrTagNode *node) override {
+        void visit(ResourceOrTagNode *node) override {
             _visit(node);
         }
-        virtual void visit(ResourceOrTagKeyNode *node) override {
+        void visit(ResourceOrTagKeyNode *node) override {
             _visit(node);
         }
-        virtual void visit(BlockPosNode *node) override {
+        void visit(BlockPosNode *node) override {
             _visit(node);
         }
-        virtual void visit(BlockPredicateNode *node) override {
+        void visit(BlockPredicateNode *node) override {
             _visit(node);
         }
-        virtual void visit(ColumnPosNode *node) override {
+        void visit(ColumnPosNode *node) override {
             _visit(node);
         }
-        virtual void visit(RotationNode *node) override {
+        void visit(RotationNode *node) override {
             _visit(node);
         }
-        virtual void visit(Vec2Node *node) override {
+        void visit(Vec2Node *node) override {
             _visit(node);
         }
-        virtual void visit(Vec3Node *node) override {
+        void visit(Vec3Node *node) override {
             _visit(node);
         }
-        virtual void visit(DimensionNode *node) override {
+        void visit(DimensionNode *node) override {
             _visit(node);
         }
-        virtual void visit(EntitySummonNode *node) override {
+        void visit(EntitySummonNode *node) override {
             _visit(node);
         }
-        virtual void visit(FunctionNode *node) override {
+        void visit(FunctionNode *node) override {
             _visit(node);
         }
-        virtual void visit(ItemEnchantmentNode *node) override {
+        void visit(ItemEnchantmentNode *node) override {
             _visit(node);
         }
-        virtual void visit(MobEffectNode *node) override {
+        void visit(MobEffectNode *node) override {
             _visit(node);
         }
-        virtual void visit(ColorNode *node) override {
+        void visit(ColorNode *node) override {
             _visit(node);
         }
-        virtual void visit(EntityAnchorNode *node) override {
+        void visit(EntityAnchorNode *node) override {
             _visit(node);
         }
-        virtual void visit(ItemSlotNode *node) override {
+        void visit(ItemSlotNode *node) override {
             _visit(node);
         }
-        virtual void visit(MessageNode *node) override {
+        void visit(MessageNode *node) override {
             _visit(node);
         }
-        virtual void visit(ObjectiveNode *node) override {
+        void visit(ObjectiveNode *node) override {
             _visit(node);
         }
-        virtual void visit(ObjectiveCriteriaNode *node) override {
+        void visit(ObjectiveCriteriaNode *node) override {
             _visit(node);
         }
-        virtual void visit(OperationNode *node) override {
+        void visit(OperationNode *node) override {
             _visit(node);
         }
-        virtual void visit(ScoreboardSlotNode *node) override {
+        void visit(ScoreboardSlotNode *node) override {
             _visit(node);
         }
-        virtual void visit(TeamNode *node) override {
+        void visit(TeamNode *node) override {
             _visit(node);
         }
-        virtual void visit(TemplateMirrorNode *node) override {
+        void visit(TemplateMirrorNode *node) override {
             _visit(node);
         }
-        virtual void visit(TemplateRotationNode *node) override {
+        void visit(TemplateRotationNode *node) override {
             _visit(node);
         }
-        virtual void visit(SwizzleNode *node) override {
+        void visit(SwizzleNode *node) override {
             _visit(node);
         }
-        virtual void visit(TargetSelectorNode *node) override {
+        void visit(TargetSelectorNode *node) override {
             _visit(node);
         }
-        virtual void visit(TimeNode *node) override {
+        void visit(TimeNode *node) override {
             _visit(node);
         }
-        virtual void visit(UuidNode *node) override {
+        void visit(UuidNode *node) override {
             _visit(node);
         }
-        virtual void visit(ParticleNode *node) override {
+        void visit(ParticleNode *node) override {
             _visit(node);
         }
-        virtual void visit(ParticleColorNode *node) override {
+        void visit(ParticleColorNode *node) override {
             _visit(node);
         }
-        virtual void visit(ItemPredicateNode *node) override {
+        void visit(ItemPredicateNode *node) override {
             _visit(node);
         }
-        virtual void visit(KeyNode *node) override {
+        void visit(KeyNode *node) override {
             _visit(node);
         }
 
-        virtual void visit(TwoAxesNode *node) override {
+        void visit(TwoAxesNode *node) override {
             _visit(node);
         }
 
-        virtual void visit(XyzNode *node) override {
+        void visit(XyzNode *node) override {
             _visit(node);
         }
 
-        virtual void visit(GamemodeNode *node) override {
+        void visit(GamemodeNode *node) override {
             _visit(node);
         }
 

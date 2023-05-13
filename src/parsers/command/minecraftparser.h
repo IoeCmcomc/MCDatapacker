@@ -240,7 +240,7 @@ private:
         void parseEntity(EntityNode *node, bool allowFakePlayer);
 
         NodePtr invokeMethod(ArgumentNode::ParserType parserType,
-                             const QVariantMap &props) override;
+                             const QVariantMap &props) final;
 
         /* Direct parsing methods */
         QSharedPointer<AngleNode> minecraft_angle();

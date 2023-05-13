@@ -15,8 +15,7 @@ public:
 
         explicit NbtPathStepNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order)
-        override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         QSharedPointer<StringNode> name() const;
         void setName(QSharedPointer<StringNode> name);
@@ -43,7 +42,7 @@ public:
 
         explicit NbtPathNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         bool isEmpty();
         int size() const;

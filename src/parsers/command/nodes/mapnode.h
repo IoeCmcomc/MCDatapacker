@@ -7,7 +7,7 @@ namespace Command {
     class KeyNode : public StringNode {
 public:
         using StringNode::StringNode;
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
     };
 
     using KeyPtr = QSharedPointer<KeyNode>;
@@ -31,7 +31,7 @@ public:
 
         explicit MapNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         int size() const;
         bool isEmpty() const;

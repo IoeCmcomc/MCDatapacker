@@ -11,7 +11,7 @@ public:
 
         explicit RootNode(int nodeLength = 0);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         bool isEmpty() const;
         int size() const;

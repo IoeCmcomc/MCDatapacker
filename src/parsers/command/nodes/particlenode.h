@@ -9,7 +9,7 @@ namespace Command {
 public:
         explicit ParticleColorNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         QSharedPointer<FloatNode> r() const;
         void setR(QSharedPointer<FloatNode> r);
@@ -32,7 +32,7 @@ public:
 
         explicit ParticleNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         ParamVector params() const;
 

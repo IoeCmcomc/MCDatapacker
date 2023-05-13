@@ -21,8 +21,7 @@ namespace Command::Schema {
     class LiteralNode;
     class ArgumentNode;
 
-    class Node
-    {
+    class Node {
 public:
         enum class Kind: uint16_t {
             Root,

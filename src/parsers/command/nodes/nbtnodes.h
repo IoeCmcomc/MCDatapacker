@@ -49,7 +49,7 @@ public:                                                                         
                 : SingleValueNode(text, value, isValid) {                                    \
                 m_tagType = TagType::Name;                                                   \
             };                                                                               \
-            void accept(NodeVisitor * visitor, VisitOrder) override;                         \
+            void accept(NodeVisitor * visitor, VisitOrder) final;                            \
         };                                                                                   \
 
     DECLARE_PRIMITIVE_TAG_NBTNODE(Byte, int8_t)
@@ -75,7 +75,7 @@ public:
             : SingleValueNode(text, text, isValid) {
             m_tagType = TagType::String;
         };
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
     };
 
     template<class T>
@@ -114,16 +114,16 @@ protected:
         QVector<QSharedPointer<T> > m_vector;
     };
 
-#define DECLARE_ARRAY_NBTNODE(Name, ValueType)                             \
-        class Nbt ## Name ## Node : public NbtNode,                        \
-            public NbtListlikeNode<ValueType> {                            \
-public:                                                                    \
-            explicit Nbt ## Name ## Node(int length)                       \
-                : NbtNode(ParserType::NbtTag, TagType::Name, length) {     \
-                m_isValid = true;                                          \
-            };                                                             \
-            void accept(NodeVisitor * visitor, VisitOrder order) override; \
-        };                                                                 \
+#define DECLARE_ARRAY_NBTNODE(Name, ValueType)                          \
+        class Nbt ## Name ## Node : public NbtNode,                     \
+            public NbtListlikeNode<ValueType> {                         \
+public:                                                                 \
+            explicit Nbt ## Name ## Node(int length)                    \
+                : NbtNode(ParserType::NbtTag, TagType::Name, length) {  \
+                m_isValid = true;                                       \
+            };                                                          \
+            void accept(NodeVisitor * visitor, VisitOrder order) final; \
+        };                                                              \
 
     DECLARE_ARRAY_NBTNODE(ByteArray, NbtByteNode)
     DECLARE_ARRAY_NBTNODE(IntArray, NbtIntNode)
@@ -137,8 +137,8 @@ public:                                                                    \
 public:
         explicit NbtListNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
-        void append(NbtPtr node) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
+        void append(NbtPtr node) final;
 
         TagType prefix() const;
         void setPrefix(TagType prefix);
@@ -155,7 +155,7 @@ public:
 
         explicit NbtCompoundNode(int length = 0);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         int size() const;
         bool isEmpty() const;

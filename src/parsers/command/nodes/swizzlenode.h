@@ -17,7 +17,7 @@ public:
         SwizzleNode(const QString &text, bool hasX, bool hasY, bool hasZ);
         SwizzleNode(const QString &text, Axes axes);
 
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         Axes axes() const;
         void setAxes(const Axes &axes);

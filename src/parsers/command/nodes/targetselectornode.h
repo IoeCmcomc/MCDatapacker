@@ -18,7 +18,7 @@ public:
 
         explicit TargetSelectorNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         Variable variable() const;
         void setVariable(const Variable &variable);

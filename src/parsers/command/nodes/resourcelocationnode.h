@@ -37,16 +37,16 @@ protected:
 }
 
 
-#define DECLARE_RESOURCE_LOCATION_NODE_CLASS(Name)                       \
-        namespace Command {                                              \
-            class Name ## Node : public ResourceLocationNode  {          \
-public:                                                                  \
-                explicit Name ## Node(int length)                        \
-                    : ResourceLocationNode(ParserType::Name, length) {   \
-                };                                                       \
-                void accept(NodeVisitor * visitor, VisitOrder) override; \
-            };                                                           \
-        }                                                                \
+#define DECLARE_RESOURCE_LOCATION_NODE_CLASS(Name)                     \
+        namespace Command {                                            \
+            class Name ## Node : public ResourceLocationNode  {        \
+public:                                                                \
+                explicit Name ## Node(int length)                      \
+                    : ResourceLocationNode(ParserType::Name, length) { \
+                };                                                     \
+                void accept(NodeVisitor * visitor, VisitOrder) final;  \
+            };                                                         \
+        }                                                              \
 
 DECLARE_RESOURCE_LOCATION_NODE_CLASS(Dimension)
 DECLARE_RESOURCE_LOCATION_NODE_CLASS(EntitySummon)

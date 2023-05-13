@@ -15,7 +15,7 @@ public:
         };
         TimeNode(const QString &text,
                  int v, Unit unit = Unit::ImplicitTick);
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         float value() const;
         void setValue(float value);

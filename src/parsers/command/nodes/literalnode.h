@@ -9,7 +9,7 @@ namespace Command {
 public:
         explicit LiteralNode(const QString &txt);
 
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         bool isCommand() const;
         void setIsCommand(bool isCommand);

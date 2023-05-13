@@ -23,9 +23,9 @@ namespace Command {
         using FormatRange = QTextLayout::FormatRange;
 
 public:
-        NodeFormatter(const CodePalette &palette);
+        explicit NodeFormatter(const CodePalette &palette);
 
-        virtual void visit(ParseNode *node) override {
+        void visit(ParseNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             const auto &fmt = m_palette[node->kind()];
@@ -40,7 +40,7 @@ public:
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        virtual void visit(ArgumentNode *node) override {
+        void visit(ArgumentNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             const auto &fmt = m_palette[node->parserType()];
@@ -55,12 +55,12 @@ public:
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        virtual void visit(ErrorNode *node) override {
+        void visit(ErrorNode *node) final {
             m_pos += node->leadingTrivia().length();
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        virtual void visit(RootNode *node) override {
+        void visit(RootNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             for (const auto &child: node->children()) {
@@ -69,7 +69,7 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
-        virtual void visit(BoolNode *node) override {
+        void visit(BoolNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             const FormatRange range{
@@ -83,7 +83,7 @@ public:
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        virtual void visit(LiteralNode *node) override {
+        void visit(LiteralNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             const FormatRange range{
@@ -97,7 +97,7 @@ public:
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        virtual void visit(BlockStateNode *node) override {
+        void visit(BlockStateNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->resLoc()->length(),
@@ -117,13 +117,13 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(EntityNode *node) override {
+        void visit(EntityNode *node) final {
             m_pos += node->leadingTrivia().length();
             node->getNode()->accept(this, m_order);
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(ScoreHolderNode *node) override {
+        void visit(ScoreHolderNode *node) final {
             m_pos += node->leadingTrivia().length();
             if (!node->isAll()) {
                 node->getNode()->accept(this, m_order);
@@ -133,7 +133,7 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(ItemStackNode *node) override {
+        void visit(ItemStackNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->resLoc()->length(),
@@ -145,7 +145,7 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
-        virtual void visit(MapNode *node) override {
+        void visit(MapNode *node) final {
             m_pos += node->leadingTrivia().length() + node->leftText().length();
 
             const auto &pairs = node->pairs();
@@ -159,14 +159,14 @@ public:
                      node->trailingTrivia().length();
         }
 
-        virtual void visit(EntityArgumentValueNode *node) override {
+        void visit(EntityArgumentValueNode *node) final {
             m_pos += node->leadingTrivia().length();
             m_pos += node->leftText().length();
             node->getNode()->accept(this, m_order);
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(NbtNode *node) override {
+        void visit(NbtNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             const auto &fmt = m_palette[node->tagType()];
@@ -181,7 +181,7 @@ public:
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        virtual void visit(NbtByteArrayNode *node) override {
+        void visit(NbtByteArrayNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),
@@ -195,7 +195,7 @@ public:
             m_pos += node->rightText().length() +
                      node->trailingTrivia().length();
         }
-        virtual void visit(NbtCompoundNode *node) override {
+        void visit(NbtCompoundNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),
@@ -213,7 +213,7 @@ public:
             m_pos += node->rightText().length() +
                      node->trailingTrivia().length();
         }
-        virtual void visit(NbtIntArrayNode *node) override {
+        void visit(NbtIntArrayNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),
@@ -227,7 +227,7 @@ public:
             m_pos += node->rightText().length() +
                      node->trailingTrivia().length();
         }
-        virtual void visit(NbtListNode *node) override {
+        void visit(NbtListNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),
@@ -242,7 +242,7 @@ public:
             m_pos += node->rightText().length() +
                      node->trailingTrivia().length();
         }
-        virtual void visit(NbtLongArrayNode *node) override {
+        void visit(NbtLongArrayNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),
@@ -258,7 +258,7 @@ public:
                      node->trailingTrivia().length();
         }
 
-        virtual void visit(NbtPathNode *node) override {
+        void visit(NbtPathNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             for (const auto &child: node->steps()) {
@@ -267,7 +267,7 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
-        virtual void visit(NbtPathStepNode *node) override {
+        void visit(NbtPathStepNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),
@@ -301,7 +301,7 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(BlockPredicateNode *node) override {
+        void visit(BlockPredicateNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{
@@ -322,7 +322,7 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(TargetSelectorNode *node) override {
+        void visit(TargetSelectorNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             /* Only colorize the '@x' part */
@@ -343,7 +343,7 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(ParticleNode *node) override {
+        void visit(ParticleNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->resLoc()->length(),
@@ -359,7 +359,7 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
-        virtual void visit(ParticleColorNode *node) override {
+        void visit(ParticleColorNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             node->r()->accept(this, m_order);
@@ -368,7 +368,7 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
-        virtual void visit(ItemPredicateNode *node) override {
+        void visit(ItemPredicateNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->resLoc()->length(),
@@ -381,7 +381,7 @@ public:
             m_pos += node->trailingTrivia().length();
         }
 
-        virtual void visit(KeyNode *node) override {
+        void visit(KeyNode *node) final {
             m_pos += node->leadingTrivia().length();
 
             m_formatRanges << FormatRange{ m_pos, node->length(),

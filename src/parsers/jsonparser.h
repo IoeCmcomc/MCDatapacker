@@ -8,7 +8,7 @@ public:
     JsonParser();
 
 protected:
-    bool parseImpl() override;
+    bool parseImpl() final;
 };
 
 #endif // JSONPARSER_H

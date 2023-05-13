@@ -36,7 +36,10 @@ protected:
     };
 }
 
-// Template classes can't be forward declared easily, therefore creating subclasses is necessary.
+/*
+ * Template classes can't be forward declared easily and can't have virtual overrides,
+ * therefore creating subclasses is necessary.
+ */
 #define DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Name, T)                                    \
         namespace Command {                                                             \
             class Name ## Node : public SingleValueNode<ArgumentNode, T,                \
@@ -44,7 +47,7 @@ protected:
             {                                                                           \
 public:                                                                                 \
                 using SingleValueNode::SingleValueNode;                                 \
-                void accept(NodeVisitor * visitor, VisitOrder) override;                \
+                void accept(NodeVisitor * visitor, VisitOrder) final;                   \
             };                                                                          \
             DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)                           \
         }                                                                               \
@@ -55,7 +58,7 @@ namespace Command {
     {
 public:
         using SingleValueNode::SingleValueNode;
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
         void chopTrailingDot();
     };
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Float)

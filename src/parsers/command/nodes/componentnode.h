@@ -10,7 +10,7 @@ namespace Command {
 public:
         explicit ComponentNode(const QString &text);
 
-        void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         nlohmann::json value() const;
         void setValue(nlohmann::json value);

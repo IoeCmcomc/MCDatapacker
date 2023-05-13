@@ -64,7 +64,7 @@ public:
             Vec3,
         };
 
-        virtual void accept(NodeVisitor *visitor, VisitOrder) override;
+        void accept(NodeVisitor *visitor, VisitOrder) override;
 
         ParserType parserType() const;
 

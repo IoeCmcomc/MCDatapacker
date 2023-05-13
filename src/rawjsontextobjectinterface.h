@@ -29,11 +29,11 @@ public:
     RawJsonTextObjectInterface(RawJsonTextEdit *textEdit,
                                const QString &iconStr);
 
-    virtual QSizeF intrinsicSize(QTextDocument *doc, int posInDocument,
-                                 const QTextFormat& format) override;
-    virtual void drawObject(QPainter *painter, const QRectF& rect,
-                            QTextDocument *doc, int posInDocument,
-                            const QTextFormat& format) override;
+    QSizeF intrinsicSize(QTextDocument *doc, int posInDocument,
+                         const QTextFormat& format) override;
+    void drawObject(QPainter *painter, const QRectF& rect,
+                    QTextDocument *doc, int posInDocument,
+                    const QTextFormat& format) override;
     virtual QString displayText(const QTextFormat& format) const = 0;
 
 protected:
@@ -48,7 +48,7 @@ class TranslateTextObjectInterface : public RawJsonTextObjectInterface {
 public:
     explicit TranslateTextObjectInterface(RawJsonTextEdit *textEdit);
 
-    QString displayText(const QTextFormat &format) const override;
+    QString displayText(const QTextFormat &format) const final;
 };
 
 class ScoreboardTextObjectInterface : public RawJsonTextObjectInterface {
@@ -58,7 +58,7 @@ class ScoreboardTextObjectInterface : public RawJsonTextObjectInterface {
 public:
     explicit ScoreboardTextObjectInterface(RawJsonTextEdit *textEdit);
 
-    QString displayText(const QTextFormat &format) const override;
+    QString displayText(const QTextFormat &format) const final;
 };
 
 class KeybindTextObjectInterface : public RawJsonTextObjectInterface {
@@ -68,7 +68,7 @@ class KeybindTextObjectInterface : public RawJsonTextObjectInterface {
 public:
     explicit KeybindTextObjectInterface(RawJsonTextEdit *textEdit);
 
-    QString displayText(const QTextFormat &format) const override;
+    QString displayText(const QTextFormat &format) const final;
 };
 
 #endif // RAWJSONTEXTOBJECTINTERFACE_H

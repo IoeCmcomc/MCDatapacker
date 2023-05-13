@@ -49,16 +49,16 @@ private:
     };
 }
 
-#define DECLARE_NODE_CLASS(Name, Base)                                   \
-        namespace Command {                                              \
-            class Name ## Node : public Base {                           \
-public:                                                                  \
-                explicit Name ## Node(int length) : Base(                \
-                        ArgumentNode::ParserType::Name, length) {}       \
-                void accept(NodeVisitor * visitor, VisitOrder) override; \
-            };                                                           \
-            DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)            \
-        }                                                                \
+#define DECLARE_NODE_CLASS(Name, Base)                                \
+        namespace Command {                                           \
+            class Name ## Node : public Base {                        \
+public:                                                               \
+                explicit Name ## Node(int length) : Base(             \
+                        ArgumentNode::ParserType::Name, length) {}    \
+                void accept(NodeVisitor * visitor, VisitOrder) final; \
+            };                                                        \
+            DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)         \
+        }                                                             \
 
 DECLARE_NODE_CLASS(BlockPos, XyzNode)
 DECLARE_NODE_CLASS(ColumnPos, TwoAxesNode)

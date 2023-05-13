@@ -20,9 +20,7 @@ public:
         explicit AngleNode(AxisType type = AxisType::Absolute);
         explicit AngleNode(const QString &text);
 
-        void accept(NodeVisitor *visitor,
-                    VisitOrder order)
-        override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         QString format() const;
 

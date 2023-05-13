@@ -44,14 +44,14 @@ protected:
 public:
         explicit GameProfileNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
     };
 
     class ScoreHolderNode final : public EntityNode {
 public:
         explicit ScoreHolderNode(int length);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         bool isAll() const;
         void setAll(bool all);
@@ -66,7 +66,7 @@ public:
 
         explicit EntityArgumentValueNode(bool negative = false);
 
-        void accept(NodeVisitor *visitor, VisitOrder order) override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         bool isNegative() const;
         void setNegative(bool negative);
