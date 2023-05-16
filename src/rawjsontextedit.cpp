@@ -259,6 +259,55 @@ void RawJsonTextEdit::insertFromMimeData(const QMimeData *source) {
     setTextCursor(cursor);
 }
 
+void RawJsonTextEdit::mouseReleaseEvent(QMouseEvent *event) {
+    QTextEdit::mouseReleaseEvent(event);
+
+    const QPoint &&eventPos = event->pos();
+    QTextCursor  &&cursor   = cursorForPosition(eventPos);
+
+    const QRect &&rect = cursorRect(cursor);
+    if (rect.x() > eventPos.x()) {
+        cursor.movePosition(QTextCursor::Left);
+    }
+
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+    const auto &selection = cursor.selectedText();
+    if ((!selection.isEmpty()) &&
+        (selection[0] == QChar::ObjectReplacementCharacter)) {
+        setTextCursor(cursor);
+    }
+}
+
+void RawJsonTextEdit::mouseDoubleClickEvent(QMouseEvent *event) {
+    QTextCursor &&cursor    = textCursor();
+    const auto   &selection = cursor.selectedText();
+
+    if ((selection.length() == 1) &&
+        (selection[0] == QChar::ObjectReplacementCharacter)) {
+        auto    &&fmt     = cursor.charFormat();
+        const int objType = fmt.objectType();
+
+        if (objType > TextObject::_begin && objType < TextObject::_end) {
+            const auto *handler = static_cast<RawJsonTextObjectInterface *>(
+                document()->documentLayout()->handlerForObject(fmt.objectType()));
+
+            const auto &&bottomRight = cursorRect(cursor).bottomRight();
+            cursor.setPosition(cursor.anchor());
+            const auto &&topLeft = cursorRect(cursor).topLeft();
+            const QRect  objRect{ topLeft, bottomRight };
+
+            if (handler && handler->editObject(fmt, objRect)) {
+                setCurrentCharFormat(fmt);
+            }
+            event->accept();
+        } else {
+            QTextEdit::mouseDoubleClickEvent(event);
+        }
+    } else {
+        QTextEdit::mouseDoubleClickEvent(event);
+    }
+}
+
 bool RawJsonTextEdit::renderObfuscation() const {
     return m_renderObfuscation;
 }

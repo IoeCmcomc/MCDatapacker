@@ -4,10 +4,14 @@
 
 #include <QFontMetrics>
 #include <QPainter>
+#include <QLineEdit>
+#include <QDebug>
+#include <QEventLoop>
 
 RawJsonTextObjectInterface::RawJsonTextObjectInterface(
     RawJsonTextEdit *textEdit, const QString &iconStr)
     : QObject(textEdit), m_iconStr(iconStr), m_textEdit(textEdit) {
+    Q_ASSERT(textEdit != nullptr);
 }
 
 QSizeF RawJsonTextObjectInterface::intrinsicSize(QTextDocument *doc,
@@ -117,4 +121,45 @@ KeybindTextObjectInterface::KeybindTextObjectInterface(
 QString KeybindTextObjectInterface::displayText(const QTextFormat &format)
 const {
     return format.stringProperty(RawJsonProperty::Keybind);
+}
+
+bool KeybindTextObjectInterface::editObject(QTextFormat &format,
+                                            const QRectF &rect) const {
+    QLineEdit *edit = new QLineEdit(m_textEdit);
+
+    edit->setWindowFlags(Qt::ToolTip | Qt::Window);
+    edit->setAttribute(Qt::WA_DeleteOnClose);
+
+    bool textChanged = false;
+    edit->setText(displayText(format));
+    connect(edit, &QLineEdit::textEdited, edit, [&textChanged](){
+        textChanged = true;
+    });
+
+    QRect displayRect{ m_textEdit->mapToGlobal(rect.topLeft().toPoint()),
+                       rect.size().toSize() };
+    const QRect editorRect{ m_textEdit->mapToGlobal({ 0, 0 }),
+                            m_textEdit->size() };
+    if (displayRect.left() < editorRect.left()) {
+        displayRect.setLeft(editorRect.left());
+    }
+    if (displayRect.right() > editorRect.right()) {
+        displayRect.setRight(editorRect.right());
+    }
+
+    edit->setGeometry(displayRect);
+    edit->show();
+    edit->activateWindow();
+    edit->grabKeyboard();
+    edit->setFocus(Qt::PopupFocusReason);
+
+    QEventLoop loop;
+    connect(edit, &QLineEdit::editingFinished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (textChanged) {
+        format.setProperty(RawJsonProperty::Keybind, edit->text());
+    }
+    edit->close();
+    return textChanged;
 }

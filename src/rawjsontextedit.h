@@ -8,6 +8,7 @@
 #include <QPainterPath>
 #include <QTimer>
 #include <QAbstractTextDocumentLayout>
+#include <QRubberBand>
 
 struct Subfragment {
     QRectF  rect;
@@ -80,11 +81,13 @@ public:
     };
 
     enum TextObject {
+        _begin    = 0,
         Translate = 1,
         Scoreboard,
         EntityNames,
         Keybind,
         Nbt,
+        _end,
     };
 
     using FragmentRegions = QVector<FragmentRegion>;
@@ -104,6 +107,8 @@ protected:
     void focusOutEvent(QFocusEvent *event) override;
     QMimeData * createMimeDataFromSelection() const override;
     void insertFromMimeData(const QMimeData *source) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
     friend class RawJsonTextObjectInterface;

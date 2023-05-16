@@ -35,6 +35,10 @@ public:
                     QTextDocument *doc, int posInDocument,
                     const QTextFormat& format) override;
     virtual QString displayText(const QTextFormat& format) const = 0;
+    virtual bool editObject([[maybe_unused]] QTextFormat& format,
+                            [[maybe_unused]] const QRectF& rect) const {
+        return false;
+    };
 
 protected:
     QString m_iconStr;
@@ -69,6 +73,7 @@ public:
     explicit KeybindTextObjectInterface(RawJsonTextEdit *textEdit);
 
     QString displayText(const QTextFormat &format) const final;
+    bool editObject(QTextFormat& format, const QRectF& rect) const final;
 };
 
 #endif // RAWJSONTEXTOBJECTINTERFACE_H
