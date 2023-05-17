@@ -106,7 +106,7 @@ SOURCES += \
     parsers/command/visitors/sourceprinter.cpp \
     parsers/jsonparser.cpp \
     parsers/parser.cpp \
-    platforms/windows.cpp \
+    platforms/windows_specific.cpp \
     predicatedock.cpp \
     problemarea.cpp \
     rawjsontextedit.cpp \
@@ -159,6 +159,7 @@ HEADERS += \
     loottablefunction.h \
     loottablepool.h \
     mainwindow.h \
+    mcdatapacker_pch.h \
     mcfunctionhighlighter.h \
     modelfunctions.h \
     newdatapackdialog.h \
@@ -204,7 +205,7 @@ HEADERS += \
     parsers/command/visitors/sourceprinter.h \
     parsers/jsonparser.h \
     parsers/parser.h \
-    platforms/windows.h \
+    platforms/windows_specific.h \
     predicatedock.h \
     problemarea.h \
     rawjsontextedit.h \
@@ -278,6 +279,12 @@ include(widgets/mcdatapackerwidgets/mcdatapackerwidgets.pri)
 
 include($$PWD/../lib/QSimpleUpdater/QSimpleUpdater.pri)
 include($$PWD/../lib/libqdark/libqdark.pri)
+include($$PWD/../lib/json/json.pri)
+include($$PWD/../lib/uberswitch/uberswitch.pri)
+include($$PWD/../lib/lru-cache/lru-cache.pri)
+include($$PWD/../lib/miniz/miniz.pri)
+
+#PRECOMPILED_HEADER = mcdatapacker_pch.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -289,37 +296,7 @@ QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
 QMAKE_TARGET_DESCRIPTION = MCDatapacker - Minecraft datapack editor
-QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2022 IoeCmcomc
-
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/json/release/ -ljson
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/json/debug/ -ljson
-else:unix: LIBS += -L$$OUT_PWD/../lib/json/ -ljson
-
-INCLUDEPATH += $$PWD/../lib/json \
-    $$PWD/../lib/json/json/single_include
-DEPENDPATH += $$PWD/../lib/json
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/release/libjson.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/debug/libjson.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/release/json.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/debug/json.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/json/libjson.a
-
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/lru-cache/release/ -llru-cache
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/lru-cache/debug/ -llru-cache
-else:unix: LIBS += -L$$OUT_PWD/../lib/lru-cache/ -llru-cache
-
-INCLUDEPATH += $$PWD/../lib/lru-cache \
-    $$PWD/../lib/lru-cache/lru-cache/include
-DEPENDPATH += $$PWD/../lib/lru-cache
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/release/liblru-cache.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/debug/liblru-cache.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/release/lru-cache.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/debug/lru-cache.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/liblru-cache.a
+QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2023 IoeCmcomc
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt
@@ -351,32 +328,8 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/libQFindDialogs.a
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/miniz/release/ -lminiz
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/miniz/debug/ -lminiz
-else:unix: LIBS += -L$$OUT_PWD/../lib/miniz/ -lminiz
-
-INCLUDEPATH += $$PWD/../lib/miniz
-DEPENDPATH += $$PWD/../lib/miniz
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/release/libminiz.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/libminiz.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/release/miniz.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/miniz.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/libminiz.a
-
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/uberswitch/release/ -luberswitch
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/uberswitch/debug/ -luberswitch
-else:unix: LIBS += -L$$OUT_PWD/../lib/uberswitch/ -luberswitch
-
-INCLUDEPATH += $$PWD/../lib/uberswitch \
-    $$PWD/../lib/uberswitch/uberswitch/include
-DEPENDPATH += $$PWD/../lib/uberswitch
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/release/libuberswitch.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/debug/libuberswitch.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/release/uberswitch.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/debug/uberswitch.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/uberswitch/libuberswitch.a
+msvc: {
+win32: LIBS += -lAdvAPI32
+}
 
 #message($$INCLUDEPATH)

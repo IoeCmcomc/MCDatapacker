@@ -1,4 +1,4 @@
-#include "windows.h"
+#include "windows_specific.h"
 
 #ifdef Q_OS_WIN
 
@@ -7,7 +7,7 @@
 #include <QtWin>
 #include <QSettings>
 
-#include "dwmapi.h"
+#include <dwmapi.h>
 
 #ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
 #define DWMWA_USE_IMMERSIVE_DARK_MODE    20

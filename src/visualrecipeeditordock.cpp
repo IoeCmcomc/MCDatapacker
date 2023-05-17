@@ -8,7 +8,7 @@
 
 #include "game.h"
 #include "globalhelpers.h"
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 
 #include <QDebug>
 #include <QMap>

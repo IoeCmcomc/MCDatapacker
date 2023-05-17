@@ -1,5 +1,5 @@
-#ifndef WINDOWS_H
-#define WINDOWS_H
+#ifndef WINDOWS_SPECIFIC_H
+#define WINDOWS_SPECIFIC_H
 
 #include <QOperatingSystemVersion>
 
@@ -15,4 +15,4 @@ namespace Windows {
     void setDarkFrameIfDarkMode(QWidget *w);
 }
 
-#endif // WINDOWS_H
+#endif // WINDOWS_SPECIFIC_H

@@ -5,7 +5,7 @@
 #include "numberproviderdelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
-#include "uberswitch/uberswitch.hpp"
+#include "uberswitch.hpp"
 
 #include "game.h"
 #include "globalhelpers.h"

@@ -15,7 +15,7 @@
 	url = git@github.com:goldsborough/lru-cache.git
 [submodule "lib/QSimpleUpdater"]
 	path = lib/QSimpleUpdater
-	url = https://github.com/ultravires/QSimpleUpdater.git
+	url = https://github.com/alex-spataru/QSimpleUpdater.git
 [submodule "lib/miniz-cpp"]
 	path = lib/miniz/miniz-cpp
 	url = https://github.com/vishal-ahirwar/miniz-cpp.git
@@ -54,7 +54,7 @@
 	url = https://github.com/falemagn/uberswitch.git
 [submodule "lib/libqdark/libqdark"]
 	path = lib/libqdark/libqdark
-	url = https://github.com/suratovvlad/libqdark.git
+	url = https://github.com/IoeCmcomc/libqdark.git
 [submodule "resource/minecraft/info/1.19/summary"]
 	path = resource/minecraft/info/1.19/summary
 	url = https://github.com/misode/mcmeta.git

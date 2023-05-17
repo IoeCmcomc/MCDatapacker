@@ -2,7 +2,7 @@
 #include "ui_settingsdialog.h"
 
 #include "mainwindow.h"
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 #include "game.h"
 
 #include <QOperatingSystemVersion>

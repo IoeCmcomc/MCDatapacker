@@ -5,7 +5,7 @@
 #include "globalhelpers.h"
 #include "parsers/command/minecraftparser.h"
 #include "parsers/command/visitors/sourceprinter.h"
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 
 #include <QDirIterator>
 #include <QProgressDialog>

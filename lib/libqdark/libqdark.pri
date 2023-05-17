@@ -13,3 +13,5 @@ win32 {
     SOURCES += \
         $$PWD/libqdark/src/windows10themenotifier.cpp
 }
+
+DISTFILES += $$PWD/libqdark/LICENSE

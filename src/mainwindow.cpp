@@ -17,10 +17,10 @@
 #include "darkfusionstyle.h"
 
 #include "game.h"
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 
 #include "QSimpleUpdater.h"
-#include "miniz-cpp/zip.hpp"
+#include "zip.hpp"
 #include "SystemThemeHelper.h"
 
 #include <QDebug>

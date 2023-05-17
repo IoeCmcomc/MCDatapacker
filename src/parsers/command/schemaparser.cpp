@@ -6,7 +6,7 @@
 
 #include "re2c_generated_functions.h"
 
-#include "uberswitch/include/uberswitch/uberswitch.hpp"
+#include "uberswitch.hpp"
 
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -578,7 +578,7 @@ namespace Command {
     QPair<QStringView, float> SchemaParser::parseFloat(bool &ok) {
         ok = false;
         const QStringView raw   = re2c::decimal(peekRest());
-        int               value = raw.toFloat(&ok);
+        const float       value = raw.toFloat(&ok);
 
         if (ok) {
             advance(raw.length());

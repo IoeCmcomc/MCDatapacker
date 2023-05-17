@@ -5,7 +5,7 @@
 #include "loottablefunction.h"
 
 #include "game.h"
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>

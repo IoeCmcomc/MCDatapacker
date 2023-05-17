@@ -2,8 +2,8 @@
 
 #include "re2c_generated_functions.h"
 
-#include "json/single_include/nlohmann/json.hpp"
-#include "uberswitch/include/uberswitch/uberswitch.hpp"
+#include "nlohmann/json.hpp"
+#include "uberswitch.hpp"
 
 using json = nlohmann::json;
 

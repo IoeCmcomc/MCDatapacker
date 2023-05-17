@@ -1,7 +1,7 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 
 #include <QOperatingSystemVersion>
 #include <QGraphicsOpacityEffect>

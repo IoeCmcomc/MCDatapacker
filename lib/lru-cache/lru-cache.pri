@@ -1,13 +1,4 @@
-# Created by and for Qt Creator This file was created for editing the project sources only.
-# You may attempt to use it for building too, by modifying this file here.
-
-#TARGET = lru-cache
-
-TEMPLATE = lib
-
-CONFIG += staticlib
-
-HEADERS = \
+HEADERS += \
    $$PWD/lru-cache/include/lru/internal/base-cache.hpp \
    $$PWD/lru-cache/include/lru/internal/base-iterator.hpp \
    $$PWD/lru-cache/include/lru/internal/base-ordered-iterator.hpp \
@@ -34,10 +25,8 @@ HEADERS = \
    $$PWD/lru-cache/include/lru/timed-cache.hpp \
    $$PWD/lru-cache/include/lru/wrap.hpp
 
-DISTFILES = \
+DISTFILES += \
    $$PWD/lru-cache/LICENSE
 
 INCLUDEPATH += $$PWD/lru-cache/include
-
-#DEFINES = 
 
