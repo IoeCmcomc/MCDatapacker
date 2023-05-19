@@ -134,8 +134,12 @@ void RawJsonTextEdit::paintEvent(QPaintEvent *event) {
     selection.format = fmt;
 
     QAbstractTextDocumentLayout::PaintContext ctx;
-    if (m_drawTextCursor && hasFocus())
+    if (m_isMouseDragging) {
+        ctx.cursorPosition =
+            cursorForPosition(mapFromGlobal(QCursor::pos())).position();
+    } else if (m_drawTextCursor && hasFocus()) {
         ctx.cursorPosition = cursor.position();
+    }
     ctx.selections = { selection };
 //    ctx.clip       = rect;
 
@@ -259,7 +263,13 @@ void RawJsonTextEdit::insertFromMimeData(const QMimeData *source) {
     setTextCursor(cursor);
 }
 
+void RawJsonTextEdit::dragMoveEvent(QDragMoveEvent *event) {
+    m_isMouseDragging = true;
+    QTextEdit::dragMoveEvent(event);
+}
+
 void RawJsonTextEdit::mouseReleaseEvent(QMouseEvent *event) {
+    m_isMouseDragging = false;
     QTextEdit::mouseReleaseEvent(event);
 
     const QPoint &&eventPos = event->pos();

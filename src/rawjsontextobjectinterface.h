@@ -8,6 +8,7 @@ enum RawJsonProperty {
     TextObfuscated = QTextCharFormat::UserProperty + 0x100, // bool
     TranslateKey,                                           // QString
     TranslateArgs,
+    TranslateFallback,                                      // QString
     ScoreboardName,                                         // QString
     ScoreboardObjective,                                    // QString
     ScoreboardValue,                                        //QString
@@ -35,10 +36,7 @@ public:
                     QTextDocument *doc, int posInDocument,
                     const QTextFormat& format) override;
     virtual QString displayText(const QTextFormat& format) const = 0;
-    virtual bool editObject([[maybe_unused]] QTextFormat& format,
-                            [[maybe_unused]] const QRectF& rect) const {
-        return false;
-    };
+    virtual bool editObject(QTextFormat& format, const QRectF& rect) const;
 
 protected:
     QString m_iconStr;

@@ -107,6 +107,7 @@ protected:
     void focusOutEvent(QFocusEvent *event) override;
     QMimeData * createMimeDataFromSelection() const override;
     void insertFromMimeData(const QMimeData *source) override;
+    void dragMoveEvent(QDragMoveEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
@@ -128,6 +129,7 @@ private:
     bool m_joinBorders            = true;
     bool m_drawTextCursor         = true;
     bool m_renderObfuscation      = true;
+    bool m_isMouseDragging        = false;
 
     template<class T>
     void registerInterface(const TextObject objectType) {

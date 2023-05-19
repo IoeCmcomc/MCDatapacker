@@ -13,17 +13,18 @@
 #include <QSizePolicy>
 #include <QLineEdit>
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QTextBlock>
 #include <QShortcut>
 #include <QColorDialog>
 #include <QJsonDocument>
+
 
 RawJsonTextEditor::RawJsonTextEditor(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::RawJsonTextEditor) {
     ui->setupUi(this);
 
+    m_gameVer = Game::version();
     ui->textEdit->installEventFilter(this);
 
     initColorMenu();
@@ -111,6 +112,29 @@ void RawJsonTextEditor::setOneLine(bool value) {
     isOneLine = value;
 }
 
+void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
+                                             const QTextCharFormat &fmt) const {
+    using Property = RawJsonProperty;
+
+    if (fmt.hasProperty(Property::TranslateKey)) {
+        component.insert("translate",
+                         fmt.stringProperty(Property::TranslateKey));
+        insertNonEmptyProp<QJsonArray>(component, "with", fmt, TranslateArgs);
+        insertNonEmptyProp<QString>(component, "fallback", fmt,
+                                    Property::TranslateFallback);
+    } else if (fmt.hasProperty(Property::ScoreboardObjective)
+               && fmt.hasProperty(Property::ScoreboardName)) {
+        QJsonObject score{
+            { "objective", fmt.stringProperty(Property::ScoreboardObjective) },
+            { "name", fmt.stringProperty(Property::ScoreboardName) },
+        };
+        insertNonEmptyProp<QString>(score, "value", fmt, ScoreboardValue);
+        component.insert("score", score);
+    } else if (fmt.hasProperty(Property::Keybind)) {
+        component.insert("keybind", fmt.stringProperty(Property::Keybind));
+    }
+}
+
 QJsonValue RawJsonTextEditor::toJson() const {
     using Property = RawJsonProperty;
 
@@ -118,7 +142,7 @@ QJsonValue RawJsonTextEditor::toJson() const {
         return m_json;
     }
 
-    QJsonArray arr = { "" };
+    QJsonArray arr{ QString() };
 
     QTextDocument *doc = ui->textEdit->document();
 
@@ -137,44 +161,7 @@ QJsonValue RawJsonTextEditor::toJson() const {
                 QJsonObject component;
 
                 if (txt == QChar::ObjectReplacementCharacter) {
-                    if (fmt.hasProperty(Property::TranslateKey)) {
-                        component.insert("translate",
-                                         fmt.stringProperty(Property::
-                                                            TranslateKey));
-                        if (fmt.hasProperty(Property::TranslateArgs)) {
-                            component.insert("with",
-                                             fmt.property(
-                                                 Property::TranslateArgs).toJsonArray());
-                        }
-                    } else if (fmt.hasProperty(Property::ScoreboardObjective)
-                               || fmt.hasProperty(Property::ScoreboardValue)) {
-                        QJsonObject score;
-
-                        if (!fmt.stringProperty(Property::ScoreboardObjective).
-                            isEmpty()) {
-                            score.insert("objective",
-                                         fmt.stringProperty(Property::
-                                                            ScoreboardObjective));
-
-                            if (fmt.hasProperty(Property::ScoreboardName)) {
-                                score.insert("name",
-                                             fmt.stringProperty(Property::
-                                                                ScoreboardName));
-                            }
-                        }
-                        if (fmt.hasProperty(Property::ScoreboardValue)) {
-                            score.insert("value",
-                                         fmt.stringProperty(
-                                             Property::ScoreboardValue));
-                        }
-
-                        if (!score.isEmpty()) {
-                            component[QLatin1String("score")] = score;
-                        }
-                    } else if (fmt.hasProperty(Property::Keybind)) {
-                        component.insert("keybind",
-                                         fmt.stringProperty(Property::Keybind));
-                    }
+                    mergeObjectComponent(component, fmt);
                 } else {
                     component.insert(QLatin1String("text"), txt);
                 }
@@ -193,8 +180,7 @@ QJsonValue RawJsonTextEditor::toJson() const {
                         fmt.foreground().color().name());
                     if (!key.isEmpty()) {
                         component.insert(QLatin1String("color"), key);
-                    } else if (Game::version() >=
-                               Game::v1_16) {
+                    } else if (m_gameVer >= Game::v1_16) {
                         component.insert(QLatin1String("color"),
                                          fmt.foreground().color().name());
                     }
@@ -205,7 +191,18 @@ QJsonValue RawJsonTextEditor::toJson() const {
         }
     }
 
-    return arr;
+    switch (arr.size()) {
+        case 0:
+        case 1: { // No text fragment
+            return QJsonObject();
+        }
+        case 2: { // One text fragment
+            return arr[1];
+        }
+        default: { // Multiple text fragments
+            return arr;
+        }
+    }
 }
 
 void RawJsonTextEditor::fromJson(const QJsonValue &root) {
@@ -283,7 +280,7 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
                                                                "color")).toString());
         if (!color.isEmpty()) {
             fmt.setForeground(QBrush(QColor(color)));
-        } else if (Game::version() >= Game::v1_16) {
+        } else if (m_gameVer >= Game::v1_16) {
             static QRegularExpression regex(R"(#[0-9a-fA-F]{6})");
             const auto              &&match
                 = regex.match(root.value(QLatin1String("color")).toString(), 0,
@@ -306,8 +303,9 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
         objFmt.setProperty(RawJsonProperty::TranslateKey,
                            root.value(QLatin1String("translate")).toString());
         objFmt.setProperty(RawJsonProperty::TranslateArgs,
-                           root.value(QLatin1String(
-                                          "with")).toArray());
+                           root.value(QLatin1String("with")).toArray());
+        objFmt.setProperty(RawJsonProperty::TranslateFallback,
+                           root.value(QLatin1String("fallback")).toString());
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
         cursor.setCharFormat(fmt);
     } else if (root.contains(QLatin1String("score"))) {
@@ -322,8 +320,7 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
         objFmt.setProperty(RawJsonProperty::ScoreboardName,
                            score.value(QLatin1String("name")).toString());
         objFmt.setProperty(RawJsonProperty::ScoreboardObjective,
-                           score.value(QLatin1String(
-                                           "objective")).toString());
+                           score.value(QLatin1String("objective")).toString());
 
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
         cursor.setCharFormat(fmt);
@@ -538,15 +535,17 @@ void RawJsonTextEditor::writeSourceEditor(int format) {
 }
 
 void RawJsonTextEditor::initColorMenu() {
-    for (const auto &colorCode : qAsConst(Glhp::colorHexes)) {
-        QPixmap pixmap(16, 16);
+    for (auto it = Glhp::colorHexes.cbegin(); it != Glhp::colorHexes.cend();
+         ++it) {
+        const auto &colorCode = it.value();
+        QPixmap     pixmap(16, 16);
         pixmap.fill(colorCode);
-        colorMenu.addAction(pixmap, QString(), this, [ = ]() {
+        colorMenu.addAction(pixmap, it.key(), this, [ this, colorCode ]() {
             currTextColor = QColor(colorCode);
             checkColorBtn();
         });
     }
-    if (Game::version() >= Game::v1_16) {
+    if (m_gameVer >= Game::v1_16) {
         colorMenu.addAction(tr("Select color..."), this,
                             &RawJsonTextEditor::selectCustomColor);
     }

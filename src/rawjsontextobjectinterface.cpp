@@ -14,9 +14,9 @@ RawJsonTextObjectInterface::RawJsonTextObjectInterface(
     Q_ASSERT(textEdit != nullptr);
 }
 
-QSizeF RawJsonTextObjectInterface::intrinsicSize(QTextDocument *doc,
-                                                 int posInDocument,
-                                                 const QTextFormat &format) {
+QSizeF RawJsonTextObjectInterface::intrinsicSize(
+    [[maybe_unused]] QTextDocument *doc, [[maybe_unused]] int posInDocument,
+    const QTextFormat &format) {
     const QTextCharFormat &charFormat = format.toCharFormat();
     const QString        &&text       = displayText(format);
 
@@ -34,8 +34,8 @@ QSizeF RawJsonTextObjectInterface::intrinsicSize(QTextDocument *doc,
 }
 
 void RawJsonTextObjectInterface::drawObject(
-    QPainter *painter, const QRectF &rect, QTextDocument *doc,
-    int posInDocument, const QTextFormat &format) {
+    QPainter *painter, const QRectF &rect, [[maybe_unused]] QTextDocument *doc,
+    [[maybe_unused]] int posInDocument, const QTextFormat &format) {
     const QTextCharFormat &charFmt = format.toCharFormat();
     const auto            &font    = charFmt.font();
 
@@ -88,6 +88,12 @@ void RawJsonTextObjectInterface::drawObject(
     layout.endLayout();
 
     layout.draw(painter, textRect.topLeft());
+}
+
+bool RawJsonTextObjectInterface::editObject(
+    [[maybe_unused]] QTextFormat &format, [[maybe_unused]] const QRectF &rect)
+const {
+    return false;
 }
 
 TranslateTextObjectInterface::TranslateTextObjectInterface(

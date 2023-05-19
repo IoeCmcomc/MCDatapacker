@@ -535,7 +535,7 @@ void MainWindow::loadFolder(const QString &dirPath,
     m_statusBar->onCurDirChanged();
     adjustForCurFolder(dirPath);
 
-    ui->menuTools->setEnabled(true);
+    ui->actionStatistics->setEnabled(true);
 
 #ifndef QT_NO_CURSOR
     QGuiApplication::restoreOverrideCursor();

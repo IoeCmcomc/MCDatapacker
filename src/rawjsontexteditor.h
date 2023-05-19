@@ -4,10 +4,10 @@
 #include "rawjsontextedit.h"
 
 #include <QFrame>
-#include <QTextEdit>
 #include <QMenu>
 #include <QColor>
-#include <QJsonValue>
+#include <QVersionNumber>
+#include <QJsonObject>
 
 namespace Ui {
     class RawJsonTextEditor;
@@ -58,11 +58,20 @@ private /*slots*/ :
 
 private:
     Ui::RawJsonTextEditor *ui;
-    QJsonValue m_json;
     QMenu colorMenu;
-    bool isDarkMode      = false;
-    bool isOneLine       = false;
+    QJsonValue m_json;
     QColor currTextColor = QColor(85, 255, 85);
+    QVersionNumber m_gameVer;
+    bool isDarkMode = false;
+    bool isOneLine  = false;
+
+    template<typename T>
+    void insertNonEmptyProp(QJsonObject &obj, const char *key,
+                            const QTextFormat &fmt, const int propId) const {
+        if (const T && v = fmt.property(propId).value<T>(); !v.isEmpty()) {
+            obj.insert(QLatin1String(key), v);
+        }
+    }
 
     void initColorMenu();
     QJsonObject JsonToComponent(const QJsonValue &root);
@@ -70,6 +79,8 @@ private:
                           const QTextCharFormat &optFmt = QTextCharFormat());
     void checkColorBtn();
     void setColorBtnIcon(const QColor &color);
+    void mergeObjectComponent(QJsonObject &component,
+                              const QTextCharFormat &fmt) const;
 };
 
 #endif /* RAWJSONTEXTEDITOR_H */

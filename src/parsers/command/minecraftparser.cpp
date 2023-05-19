@@ -1173,6 +1173,7 @@ namespace Command {
 
         ret->append(parseNbtPathStep());
         auto last = ret->last();
+        // TODO: Allow single-quoted key in 1.20+
         while (last->trailingTrivia() == '.' || curChar() == '[' ||
                curChar() == '"') {
             const auto &&step = parseNbtPathStep();
@@ -1181,8 +1182,7 @@ namespace Command {
                 && (!(last->trailingTrivia() == '.'))) {
                 reportError(QT_TR_NOOP(
                                 "Missing character '.' before a named tag"),
-                            {},
-                            start + last->length() - 1);
+                            {}, start + last->length() - 1);
             }
             ret->append(step);
             last = ret->last();
