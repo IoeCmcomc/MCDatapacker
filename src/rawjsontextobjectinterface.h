@@ -15,7 +15,7 @@ enum RawJsonProperty {
     Selector,                                               // QString
     Separator,                                              // QJsonValue
     Keybind,                                                // QString
-    NbtPath,                                                    // QString
+    NbtPath,                                                // QString
     NbtInterpret,                                           // bool
     NbtBlock,                                               // QString
     NbtEntity,                                              // QString
@@ -67,6 +67,7 @@ public:
     explicit ScoreboardTextObjectInterface(RawJsonTextEdit *textEdit);
 
     QString displayText(const QTextFormat &format) const final;
+    bool editObject(QTextFormat& format, const QRectF& rect) final;
 };
 
 class EntityNamesTextObjectInterface : public RawJsonTextObjectInterface {
@@ -77,6 +78,7 @@ public:
     explicit EntityNamesTextObjectInterface(RawJsonTextEdit *textEdit);
 
     QString displayText(const QTextFormat &format) const final;
+    bool editObject(QTextFormat& format, const QRectF& rect) final;
 };
 
 class KeybindTextObjectInterface : public RawJsonTextObjectInterface {
@@ -98,6 +100,7 @@ public:
     explicit NbtTextObjectInterface(RawJsonTextEdit *textEdit);
 
     QString displayText(const QTextFormat &format) const final;
+    bool editObject(QTextFormat& format, const QRectF& rect) final;
 };
 
 #endif // RAWJSONTEXTOBJECTINTERFACE_H

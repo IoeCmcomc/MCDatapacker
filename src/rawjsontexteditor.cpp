@@ -81,6 +81,10 @@ QTextEdit * RawJsonTextEditor::getTextEdit() {
     return ui->textEdit;
 }
 
+bool RawJsonTextEditor::isEmpty() const {
+    return ui->textEdit->document()->isEmpty();
+}
+
 void RawJsonTextEditor::setDarkMode(bool value) {
     QPalette textEditPatt = ui->textEdit->palette();
 

@@ -21,6 +21,7 @@ public:
     ~RawJsonTextEditor();
 
     QTextEdit * getTextEdit();
+    bool isEmpty() const;
     void setDarkMode(bool value);
     void setOneLine(bool value);
 

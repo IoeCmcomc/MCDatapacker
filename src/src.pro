@@ -40,6 +40,7 @@ SOURCES += \
     datawidgetinterface.cpp \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
+    entitynamestextobjectdialog.cpp \
     filenamedelegate.cpp \
     fileswitcher.cpp \
     game.cpp \
@@ -64,6 +65,7 @@ SOURCES += \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
+    nbttextobjectdialog.cpp \
     newdatapackdialog.cpp \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
@@ -112,6 +114,7 @@ SOURCES += \
     rawjsontextedit.cpp \
     rawjsontexteditor.cpp \
     rawjsontextobjectinterface.cpp \
+    scoreboardtextobjectdialog.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
     statisticsdialog.cpp \
@@ -140,6 +143,7 @@ HEADERS += \
     datawidgetinterface.h \
     disclaimerdialog.h \
     entityconditiondialog.h \
+    entitynamestextobjectdialog.h \
     filenamedelegate.h \
     fileswitcher.h \
     game.h \
@@ -164,6 +168,7 @@ HEADERS += \
     mcdatapacker_pch.h \
     mcfunctionhighlighter.h \
     modelfunctions.h \
+    nbttextobjectdialog.h \
     newdatapackdialog.h \
     parsers/command/mcfunctionparser.h \
     parsers/command/nodes/anglenode.h \
@@ -213,6 +218,7 @@ HEADERS += \
     rawjsontextedit.h \
     rawjsontexteditor.h \
     rawjsontextobjectinterface.h \
+    scoreboardtextobjectdialog.h \
     settingsdialog.h \
     stackedwidget.h \
     statisticsdialog.h \
@@ -232,6 +238,7 @@ FORMS += \
     datawidgetinterface.ui \
     disclaimerdialog.ui \
     entityconditiondialog.ui \
+    entitynamestextobjectdialog.ui \
     itemconditiondialog.ui \
     itemmodifierdock.ui \
     locationconditiondialog.ui \
@@ -242,9 +249,11 @@ FORMS += \
     loottablepool.ui \
     mainwindow.ui \
     inventorysloteditor.ui \
+    nbttextobjectdialog.ui \
     newdatapackdialog.ui \
     predicatedock.ui \
     rawjsontexteditor.ui \
+    scoreboardtextobjectdialog.ui \
     settingsdialog.ui \
     statisticsdialog.ui \
     tabbeddocumentinterface.ui \
