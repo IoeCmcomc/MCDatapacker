@@ -1,12 +1,14 @@
 #include "rawjsontextobjectinterface.h"
 
 #include "rawjsontextedit.h"
+#include "translatedtextobjectdialog.h"
 
 #include <QFontMetrics>
 #include <QPainter>
 #include <QLineEdit>
 #include <QDebug>
 #include <QEventLoop>
+#include <QJsonObject>
 
 RawJsonTextObjectInterface::RawJsonTextObjectInterface(
     RawJsonTextEdit *textEdit, const QString &iconStr)
@@ -91,19 +93,39 @@ void RawJsonTextObjectInterface::drawObject(
 }
 
 bool RawJsonTextObjectInterface::editObject(
-    [[maybe_unused]] QTextFormat &format, [[maybe_unused]] const QRectF &rect)
-const {
+    [[maybe_unused]] QTextFormat &format, [[maybe_unused]] const QRectF &rect) {
     return false;
 }
 
-TranslateTextObjectInterface::TranslateTextObjectInterface(
+bool RawJsonTextObjectInterface::execEditorDialog(QTextFormat &format,
+                                                  AbstractTextObjectDialog *dialog)
+{
+    QScopedPointer<AbstractTextObjectDialog,
+                   QScopedPointerDeleteLater> pointer{ dialog };
+
+    dialog->fromTextFormat(format);
+
+    if (dialog->exec() == QDialog::Accepted) {
+        format = dialog->toTextFormat();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+TranslatedTextObjectInterface::TranslatedTextObjectInterface(
     RawJsonTextEdit *textEdit)
     : RawJsonTextObjectInterface(textEdit, QStringLiteral("translate")) {
 }
 
-QString TranslateTextObjectInterface::displayText(const QTextFormat &format)
+QString TranslatedTextObjectInterface::displayText(const QTextFormat &format)
 const {
     return format.stringProperty(RawJsonProperty::TranslateKey);
+}
+
+bool TranslatedTextObjectInterface::editObject(QTextFormat &format,
+                                               const QRectF &rect) {
+    return execEditorDialog(format, new TranslatedTextObjectDialog(m_textEdit));
 }
 
 ScoreboardTextObjectInterface::ScoreboardTextObjectInterface(
@@ -119,6 +141,16 @@ const {
     return format.stringProperty(RawJsonProperty::ScoreboardObjective);
 }
 
+EntityNamesTextObjectInterface::EntityNamesTextObjectInterface(
+    RawJsonTextEdit *textEdit)
+    : RawJsonTextObjectInterface(textEdit, QStringLiteral("entity")) {
+}
+
+QString EntityNamesTextObjectInterface::displayText(const QTextFormat &format)
+const {
+    return format.stringProperty(RawJsonProperty::Selector);
+}
+
 KeybindTextObjectInterface::KeybindTextObjectInterface(
     RawJsonTextEdit *textEdit)
     : RawJsonTextObjectInterface(textEdit, QStringLiteral("keyboard")) {
@@ -130,7 +162,7 @@ const {
 }
 
 bool KeybindTextObjectInterface::editObject(QTextFormat &format,
-                                            const QRectF &rect) const {
+                                            const QRectF &rect) {
     QLineEdit *edit = new QLineEdit(m_textEdit);
 
     edit->setWindowFlags(Qt::ToolTip | Qt::Window);
@@ -168,4 +200,12 @@ bool KeybindTextObjectInterface::editObject(QTextFormat &format,
     }
     edit->close();
     return textChanged;
+}
+
+NbtTextObjectInterface::NbtTextObjectInterface(RawJsonTextEdit *textEdit)
+    : RawJsonTextObjectInterface(textEdit, QStringLiteral("snbt")) {
+}
+
+QString NbtTextObjectInterface::displayText(const QTextFormat &format) const {
+    return format.stringProperty(RawJsonProperty::NbtPath);
 }

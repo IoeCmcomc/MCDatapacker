@@ -50,9 +50,11 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) : QTextEdit(parent),
     fmt.setProperty(BorderProperty, QPen(Qt::red));
     setCurrentCharFormat(std::move(fmt));
 
-    registerInterface<TranslateTextObjectInterface>(TextObject::Translate);
+    registerInterface<TranslatedTextObjectInterface>(TextObject::Translate);
     registerInterface<ScoreboardTextObjectInterface>(TextObject::Scoreboard);
+    registerInterface<EntityNamesTextObjectInterface>(TextObject::EntityNames);
     registerInterface<KeybindTextObjectInterface>(TextObject::Keybind);
+    registerInterface<NbtTextObjectInterface>(TextObject::Nbt);
 
     m_updateRegionsTimer->setSingleShot(true);
     m_updateRegionsTimer->setInterval(0);
@@ -298,7 +300,7 @@ void RawJsonTextEdit::mouseDoubleClickEvent(QMouseEvent *event) {
         const int objType = fmt.objectType();
 
         if (objType > TextObject::_begin && objType < TextObject::_end) {
-            const auto *handler = static_cast<RawJsonTextObjectInterface *>(
+            auto *handler = static_cast<RawJsonTextObjectInterface *>(
                 document()->documentLayout()->handlerForObject(fmt.objectType()));
 
             const auto &&bottomRight = cursorRect(cursor).bottomRight();

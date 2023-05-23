@@ -61,15 +61,32 @@ private:
     QMenu colorMenu;
     QJsonValue m_json;
     QColor currTextColor = QColor(85, 255, 85);
-    QVersionNumber m_gameVer;
-    bool isDarkMode = false;
-    bool isOneLine  = false;
+    bool isDarkMode      = false;
+    bool isOneLine       = false;
 
     template<typename T>
     void insertNonEmptyProp(QJsonObject &obj, const char *key,
                             const QTextFormat &fmt, const int propId) const {
         if (const T && v = fmt.property(propId).value<T>(); !v.isEmpty()) {
             obj.insert(QLatin1String(key), v);
+        }
+    }
+    template<>
+    void insertNonEmptyProp<QJsonValue>(QJsonObject &obj, const char *key,
+                                        const QTextFormat &fmt,
+                                        const int propId) const {
+        using T = QJsonValue;
+        if (const T && v = fmt.property(propId).value<T>();
+            !v.isUndefined() && !v.isNull()) {
+            obj.insert(QLatin1String(key), v);
+        }
+    }
+    template<>
+    void insertNonEmptyProp<bool>(QJsonObject &obj, const char *key,
+                                  const QTextFormat &fmt,
+                                  const int propId) const {
+        if (fmt.hasProperty(propId)) {
+            obj.insert(QLatin1String(key), fmt.boolProperty(propId));
         }
     }
 

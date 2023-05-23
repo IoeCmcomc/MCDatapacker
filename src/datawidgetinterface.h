@@ -11,8 +11,7 @@ namespace Ui {
     class DataWidgetInterface;
 }
 
-class DataWidgetInterface : public QFrame
-{
+class DataWidgetInterface : public QFrame {
     Q_OBJECT
 
 public:
@@ -20,7 +19,7 @@ public:
     ~DataWidgetInterface();
 
     void setMainWidget(QWidget *widget);
-    QWidget *mainWidget() const;
+    QWidget * mainWidget() const;
 
     QJsonArray json();
     void setJson(const QJsonArray &json);
@@ -43,6 +42,14 @@ public:
 
     template<typename Class = QObject>
     void mapToGetter(QJsonObject (Class::*funcPtr)() const, Class *that) {
+        connect(this, &DataWidgetInterface::getterCallRequested,
+                [this, that, funcPtr]() {
+            if (m_currentIndex < m_json.size() && m_currentIndex >= 0)
+                m_json[m_currentIndex] = (that->*funcPtr)();
+        });
+    }
+    template<typename Class = QObject>
+    void mapToGetter(QJsonValue (Class::*funcPtr)() const, Class *that) {
         connect(this, &DataWidgetInterface::getterCallRequested,
                 [this, that, funcPtr]() {
             if (m_currentIndex < m_json.size() && m_currentIndex >= 0)

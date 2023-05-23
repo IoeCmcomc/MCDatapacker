@@ -120,12 +120,14 @@ SOURCES += \
 #    stylesheetreapplier.cpp \
     tabbeddocumentinterface.cpp \
     tagselectordialog.cpp \
+    translatedtextobjectdialog.cpp \
     truefalsebox.cpp \
     vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
 HEADERS += \
     aboutdialog.h \
+    abstracttextobjectdialog.h \
     basecondition.h \
     blockitemselectordialog.h \
     codeeditor.h \
@@ -219,6 +221,7 @@ HEADERS += \
 #    stylesheetreapplier.h \ # Already added in mcdatapackerwidgets.pri
     tabbeddocumentinterface.h \
     tagselectordialog.h \
+    translatedtextobjectdialog.h \
     truefalsebox.h \
     vieweventfilter.h \
     visualrecipeeditordock.h
@@ -246,6 +249,7 @@ FORMS += \
     statisticsdialog.ui \
     tabbeddocumentinterface.ui \
     tagselectordialog.ui \
+    translatedtextobjectdialog.ui \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \
