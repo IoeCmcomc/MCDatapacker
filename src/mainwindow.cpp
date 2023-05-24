@@ -404,8 +404,7 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
 
     settings.beginGroup(QStringLiteral("game"));
     const QString &&gameVer = settings.value(
-        QStringLiteral("version"),
-        Game::defaultVersionString).toString();
+        QStringLiteral("version"), Game::defaultVersionString).toString();
     if (gameVer != tempGameVerStr) {
         if (fromDialog) {
             QMessageBox msgBox(QMessageBox::Warning,
@@ -725,13 +724,19 @@ void MainWindow::changeAppStyle(const bool darkMode) {
         qApp->style()->objectName()).toString();
 
     if (!darkMode) {
-        if (styleId.toLower() != qApp->style()->objectName()) {
-            qApp->setStyle(styleId);
+        if (styleId.toCaseFolded() !=
+            qApp->style()->objectName().toCaseFolded()) {
+            if (styleId == QLatin1String("DarkFusion")) {
+                qApp->setStyle(new DarkFusionStyle);
+            } else {
+                qApp->setStyle(styleId);
+            }
         }
     } else {
         const QString &darkStyleId = settings.value(
             QStringLiteral("interface/darkStyle"), "DarkFusion").toString();
-        if (darkStyleId.toLower() != qApp->style()->objectName()) {
+        if (darkStyleId.toCaseFolded() !=
+            qApp->style()->objectName().toCaseFolded()) {
             if (darkStyleId == QLatin1String("DarkFusion")) {
                 qApp->setStyle(new DarkFusionStyle);
             } else {
@@ -905,13 +910,13 @@ void MainWindow::newDatapack() {
         dir.mkpath(dirPath + QStringLiteral("/data"));
         QString namesp = dialog->getName()
                          .toLower()
-                         .replace(" ", "_").replace("/", "_")
-                         .replace(".", "_").replace(":", "_");
+                         .replace(' ', '_').replace('/', '_')
+                         .replace('.', '_').replace(':', '_');
         dir.mkpath(dirPath + QStringLiteral("/data/") + namesp);
 
         loadFolder(dirPath,
                    PackMetaInfo{ dialog->getDesc(), dialog->getFormat() });
-        ui->tabbedInterface->openFile("pack.mcmeta");
+        ui->tabbedInterface->openFile(QStringLiteral("pack.mcmeta"));
     }
     delete dialog;
 }

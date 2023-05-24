@@ -229,7 +229,7 @@ void DataWidgetInterface::sidebarAnimFinished() {
 void DataWidgetInterface::loadData(int index) {
     if (index < m_json.size() && index >= 0) {
         /* Call the mapped setter function with the specified data */
-        emit setterCallRequested(m_json[index].toObject());
+        emit setterCallRequested(m_json.at(index));
     }
 }
 

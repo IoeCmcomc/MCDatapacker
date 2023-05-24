@@ -42,7 +42,7 @@ const {
     }
 
     return invItem.getNamespacedID().contains(filterRegularExpression()) ||
-           invItem.getName().toLower().contains(filterRegularExpression());
+           invItem.getName().toCaseFolded().contains(filterRegularExpression());
 }
 
 InventoryItemFilterModel::Filters InventoryItemFilterModel::filters() const {
