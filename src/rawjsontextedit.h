@@ -81,8 +81,8 @@ public:
     };
 
     enum TextObject {
-        _begin    = 0,
-        Translate = 1,
+        _begin = QTextFormat::UserObject + 1,
+        Translate,
         Scoreboard,
         EntityNames,
         Keybind,

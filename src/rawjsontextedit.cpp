@@ -224,7 +224,10 @@ QMimeData * RawJsonTextEdit::createMimeDataFromSelection() const {
             const int   length = overlapEnd - overlapStart + 1;
             const auto &format = fragment.charFormat();
 
-            if (format.boolProperty(TextObfuscated)) {
+            const int objType = format.objectType();
+            if (format.boolProperty(TextObfuscated)
+                || (objType > TextObject::_begin &&
+                    objType < TextObject::_end)) {
                 ranges.append({ pos, length, format });
             }
         }
@@ -234,7 +237,7 @@ QMimeData * RawJsonTextEdit::createMimeDataFromSelection() const {
     QDataStream ds(&bytes, QIODevice::WriteOnly);
     ds << ranges;
 
-    mime->setData("application/octet-stream", bytes);
+    mime->setData("application/x-rawjsontextedit.format", bytes);
 
     return mime;
 }
@@ -247,17 +250,24 @@ void RawJsonTextEdit::insertFromMimeData(const QMimeData *source) {
 
     QVector<QTextLayout::FormatRange> ranges;
 
-    const QByteArray &&bytes = source->data("application/octet-stream");
-    QDataStream        ds(bytes);
+    const QByteArray &&bytes =
+        source->data("application/x-rawjsontextedit.format");
+    QDataStream ds(bytes);
     ds >> ranges;
 
     cursor.joinPreviousEditBlock();
 
     for (const auto &range: qAsConst(ranges)) {
+        const auto &fmt     = range.format;
+        const int   objType = range.format.objectType();
         cursor.setPosition(selStart + range.start);
-        cursor.setPosition(selStart + range.start + range.length,
-                           QTextCursor::KeepAnchor);
-        cursor.setCharFormat(range.format);
+        if (objType > TextObject::_begin && objType < TextObject::_end) {
+            cursor.insertText(QString(QChar::ObjectReplacementCharacter), fmt);
+        } else {
+            cursor.setPosition(selStart + range.start + range.length,
+                               QTextCursor::KeepAnchor);
+            cursor.setCharFormat(fmt);
+        }
     }
 
     cursor.setPosition(selStart);
@@ -418,8 +428,11 @@ void RawJsonTextEdit::updateFragmentRegions() {
                 lastSubfragments.clear();
             }
 
+            const int objType = fmt.objectType();
             if ((fmt.property(BorderProperty).type() == QVariant::Pen)
-                || (fmt.boolProperty(TextObfuscated))) {
+                || (fmt.boolProperty(TextObfuscated))
+                || (objType > TextObject::_begin &&
+                    objType < TextObject::_end)) {
                 const auto *blockLayout = block.layout();
                 int         fragPos     = fragment.position() -
                                           block.position();
