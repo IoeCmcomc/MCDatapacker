@@ -850,6 +850,14 @@ Parser * CodeEditor::parser() const {
     return m_parser.get();
 }
 
+void CodeEditor::goToLine(const int lineNo) {
+    auto &&cursor = textCursor();
+
+    cursor.setPosition(document()->findBlockByLineNumber(lineNo).position());
+    setTextCursor(cursor);
+    centerCursor();
+}
+
 void CodeEditor::setParser(std::unique_ptr<Parser> newParser) {
     m_parser = std::move(newParser);
 }

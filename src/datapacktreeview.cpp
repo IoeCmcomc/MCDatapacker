@@ -134,6 +134,10 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
 
             addNewFileAction(newMenu, tr("Advancement"), jsonExt,
                              QLatin1String("advancements"));
+            if (Game::version() >= Game::v1_19_3) {
+                addNewFileAction(newMenu, tr("Chat type"), jsonExt,
+                                 QLatin1String("chat_type"));
+            }
             if (Game::version() >= Game::v1_16) {
                 addNewFileAction(newMenu, tr("Dimension"), jsonExt,
                                  QLatin1String("dimension"));
@@ -207,6 +211,12 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                                  QLatin1String("worldgen/configured_carver"));
                 addNewFileAction(worldMenu, tr("Feature"), jsonExt,
                                  QLatin1String("worldgen/configured_feature"));
+                if (Game::version() >= Game::v1_19) {
+                    addNewFileAction(worldMenu,
+                                     tr("Flat world generator preset"), jsonExt,
+                                     QLatin1String(
+                                         "worldgen/flat_level_generator_preset"));
+                }
                 addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
                                  QLatin1String(
                                      "worldgen/configured_structure_feature"));
@@ -421,6 +431,8 @@ void DatapackTreeView::contextMenuOnNew(const QString &ext,
 
     if (index.isValid()) {
         setCurrentIndex(index);
+        const auto fileInfo = dirModel.fileInfo(index);
+        emit       openFileRequested(fileInfo.absoluteFilePath());
         edit(index);
     }
 }

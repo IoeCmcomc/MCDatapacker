@@ -40,6 +40,7 @@ public /*slots*/ :
 protected:
     void mergeCurrentFormat(const QTextCharFormat &format);
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void changeEvent(QEvent *) override;
 
 private /*slots*/ :
     enum SourceFormat {

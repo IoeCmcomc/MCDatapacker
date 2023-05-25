@@ -55,9 +55,9 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    static const QStringList imageExts =
-    { QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
-      QStringLiteral("bmp") };
+    static const QStringList imageExts{
+        QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
+        QStringLiteral("bmp") };
 
     static const QVector<QPair<QString,
                                CodeFile::FileType> > catPathToFileType {
@@ -66,6 +66,9 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         { QStringLiteral("predicates"), CodeFile::Predicate },
         { QStringLiteral("item_modifiers"), CodeFile::ItemModifier },
         { QStringLiteral("recipes"), CodeFile::Recipe },
+        { QStringLiteral("dimension"), CodeFile::Dimension },
+        { QStringLiteral("dimension_type"), CodeFile::DimensionType },
+        { QStringLiteral("chat_type"), CodeFile::ChatType },
         { QStringLiteral("tags/blocks"), CodeFile::BlockTag },
         { QStringLiteral("tags/entity_types"), CodeFile::EntityTypeTag },
         { QStringLiteral("tags/fluids"), CodeFile::FluidTag },
@@ -82,6 +85,8 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
           CodeFile::StructureFeature },
         { QStringLiteral("worldgen/configured_surface_builder"),
           CodeFile::SurfaceBuilder },
+        { QStringLiteral("worldgen/flat_level_generator_preset"),
+          CodeFile::FlatLevelGenPreset },
         { QStringLiteral("worldgen/noise"), CodeFile::Noise },
         { QStringLiteral("worldgen/noise_settings"), CodeFile::NoiseSettings },
         { QStringLiteral("worldgen/placed_feature"), CodeFile::PlacedFeature },
@@ -91,7 +96,7 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         { QStringLiteral("worldgen"), CodeFile::WorldGen },
     };
 
-    QFileInfo       info(filepath);
+    const QFileInfo info(filepath);
     const QString &&fullSuffix = info.suffix();
 
     if (fullSuffix == QLatin1String("mcmeta")) {
@@ -253,6 +258,9 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
                 appendPerCategory(nspace, "predicates");
                 appendPerCategory(nspace, "item_modifiers");
                 appendPerCategory(nspace, "recipes");
+                appendPerCategory(nspace, "dimension");
+                appendPerCategory(nspace, "dimension_type");
+                appendPerCategory(nspace, "chat_type");
                 appendPerCategory(nspace, "tag");
                 appendPerCategory(nspace, "worldgen");
             }
@@ -310,37 +318,42 @@ const QMap<QString, QString> Glhp::colorHexes = {
 
 QString Glhp::fileTypeToName(const CodeFile::FileType type) {
     static QHash<CodeFile::FileType, const char *> const valueMap = {
-        { CodeFile::Binary,            QT_TR_NOOP("Binary")            },
-        { CodeFile::Structure,         QT_TR_NOOP("Structure")         },
-        { CodeFile::Image,             QT_TR_NOOP("Image")             },
-        { CodeFile::Text,              QT_TR_NOOP("Other")             },
-        { CodeFile::Function,          QT_TR_NOOP("Function")          },
-        { CodeFile::JsonText,          QT_TR_NOOP("JSON")              },
-        { CodeFile::Advancement,       QT_TR_NOOP("Advancement")       },
-        { CodeFile::LootTable,         QT_TR_NOOP("Loot table")        },
-        { CodeFile::Meta,              QT_TR_NOOP("Information")       },
-        { CodeFile::Predicate,         QT_TR_NOOP("Predicate")         },
-        { CodeFile::ItemModifier,      QT_TR_NOOP("Item modifier")     },
-        { CodeFile::Recipe,            QT_TR_NOOP("Recipe")            },
-        { CodeFile::BlockTag,          QT_TR_NOOP("Block tag")         },
-        { CodeFile::EntityTypeTag,     QT_TR_NOOP("Entity type tag")   },
-        { CodeFile::FluidTag,          QT_TR_NOOP("Fluid tag")         },
-        { CodeFile::FunctionTag,       QT_TR_NOOP("Function tag")      },
-        { CodeFile::ItemTag,           QT_TR_NOOP("Item tag")          },
-        { CodeFile::GameEventTag,      QT_TR_NOOP("Game event tag")    },
-        { CodeFile::Tag,               QT_TR_NOOP("Tag")               },
-        { CodeFile::WorldGen,          QT_TR_NOOP("World generation")  },
-        { CodeFile::Biome,             QT_TR_NOOP("Biome")             },
-        { CodeFile::ConfiguredCarver,  QT_TR_NOOP("Carver")            },
-        { CodeFile::ConfiguredFeature, QT_TR_NOOP("Feature")           },
-        { CodeFile::StructureFeature,  QT_TR_NOOP("Structure feature") },
-        { CodeFile::SurfaceBuilder,    QT_TR_NOOP("Surface builder")   },
-        { CodeFile::Noise,             QT_TR_NOOP("Noise")             },
-        { CodeFile::NoiseSettings,     QT_TR_NOOP("Noise settings")    },
-        { CodeFile::PlacedFeature,     QT_TR_NOOP("Placed feature")    },
-        { CodeFile::ProcessorList,     QT_TR_NOOP("Processor list")    },
-        { CodeFile::StructureSet,      QT_TR_NOOP("Structure set")     },
-        { CodeFile::TemplatePool,      QT_TR_NOOP("Jigsaw pool")       },
+        { CodeFile::Binary,             QT_TR_NOOP("Binary")            },
+        { CodeFile::Structure,          QT_TR_NOOP("Structure")         },
+        { CodeFile::Image,              QT_TR_NOOP("Image")             },
+        { CodeFile::Text,               QT_TR_NOOP("Other")             },
+        { CodeFile::Function,           QT_TR_NOOP("Function")          },
+        { CodeFile::JsonText,           QT_TR_NOOP("JSON")              },
+        { CodeFile::Advancement,        QT_TR_NOOP("Advancement")       },
+        { CodeFile::LootTable,          QT_TR_NOOP("Loot table")        },
+        { CodeFile::Meta,               QT_TR_NOOP("Information")       },
+        { CodeFile::Predicate,          QT_TR_NOOP("Predicate")         },
+        { CodeFile::ItemModifier,       QT_TR_NOOP("Item modifier")     },
+        { CodeFile::Recipe,             QT_TR_NOOP("Recipe")            },
+        { CodeFile::Dimension,          QT_TR_NOOP("Dimension")         },
+        { CodeFile::DimensionType,      QT_TR_NOOP("Dimension type")    },
+        { CodeFile::ChatType,           QT_TR_NOOP("Chat type")         },
+        { CodeFile::BlockTag,           QT_TR_NOOP("Block tag")         },
+        { CodeFile::EntityTypeTag,      QT_TR_NOOP("Entity type tag")   },
+        { CodeFile::FluidTag,           QT_TR_NOOP("Fluid tag")         },
+        { CodeFile::FunctionTag,        QT_TR_NOOP("Function tag")      },
+        { CodeFile::ItemTag,            QT_TR_NOOP("Item tag")          },
+        { CodeFile::GameEventTag,       QT_TR_NOOP("Game event tag")    },
+        { CodeFile::Tag,                QT_TR_NOOP("Tag")               },
+        { CodeFile::WorldGen,           QT_TR_NOOP("World generation")  },
+        { CodeFile::Biome,              QT_TR_NOOP("Biome")             },
+        { CodeFile::ConfiguredCarver,   QT_TR_NOOP("Carver")            },
+        { CodeFile::ConfiguredFeature,  QT_TR_NOOP("Feature")           },
+        { CodeFile::StructureFeature,   QT_TR_NOOP("Structure feature") },
+        { CodeFile::SurfaceBuilder,     QT_TR_NOOP("Surface builder")   },
+        { CodeFile::Noise,              QT_TR_NOOP("Noise")             },
+        { CodeFile::NoiseSettings,      QT_TR_NOOP("Noise settings")    },
+        { CodeFile::PlacedFeature,      QT_TR_NOOP("Placed feature")    },
+        { CodeFile::ProcessorList,      QT_TR_NOOP("Processor list")    },
+        { CodeFile::StructureSet,       QT_TR_NOOP("Structure set")     },
+        { CodeFile::TemplatePool,       QT_TR_NOOP("Jigsaw pool")       },
+        { CodeFile::FlatLevelGenPreset,
+          QT_TR_NOOP("Flat world generator preset") },
     };
 
     if (type < 0)

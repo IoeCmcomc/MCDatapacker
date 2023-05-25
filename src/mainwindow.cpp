@@ -245,7 +245,10 @@ void MainWindow::restart() {
 }
 
 void MainWindow::statistics() {
-    new StatisticsDialog(this);
+    auto *dialog = new StatisticsDialog(this);
+
+    connect(dialog, &StatisticsDialog::openFileWithLineRequested,
+            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFileWithLine);
 }
 
 void MainWindow::rawJsonTextEditor() {

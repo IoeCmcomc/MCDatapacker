@@ -482,6 +482,13 @@ bool RawJsonTextEditor::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
+void RawJsonTextEditor::changeEvent(QEvent *event) {
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+    }
+}
+
 void RawJsonTextEditor::checkColorBtn() {
     if (ui->colorBtn->isChecked()) {
         colorBtnToggled(true);

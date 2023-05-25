@@ -32,12 +32,28 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     collectAndSetupData();
     ui->timeLabel->setText(tr("Total processing time: %Ln second(s)",
                               nullptr, timer.elapsed() / 1000.0));
+    connect(ui->syntaxErrorTable, &QTableWidget::cellDoubleClicked,
+            this, &StatisticsDialog::onErrorTableDoubleClicked);
     setAttribute(Qt::WA_DeleteOnClose, true);
 }
 
 StatisticsDialog::~StatisticsDialog() {
     delete m_parser;
     delete ui;
+}
+
+void StatisticsDialog::onErrorTableDoubleClicked(int row,
+                                                 [[maybe_unused]] int column) {
+    const QString &&path = m_dirPath + '/' +
+                           ui->syntaxErrorTable->item(row, 0)->data(
+        Qt::DisplayRole).toString();
+
+    const int lineNo =
+        ui->syntaxErrorTable->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
+
+    emit openFileWithLineRequested(path, lineNo);
+
+    m_mainWin->activateWindow();
 }
 
 void StatisticsDialog::collectAndSetupData() {

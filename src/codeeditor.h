@@ -58,6 +58,8 @@ public:
     void setParser(std::unique_ptr<Parser> newParser);
     Parser * parser() const;
 
+    void goToLine(const int lineNo);
+
 signals:
     void openFileRequest(const QString &filepath);
     void updateStatusBarRequest(CodeEditor *editor);

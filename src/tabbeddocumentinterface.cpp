@@ -19,8 +19,7 @@
 #include <QDirIterator>
 
 void openAllFiles(TabbedDocumentInterface *widget,
-                  CodeFile::FileType minType,
-                  CodeFile::FileType maxType) {
+                  CodeFile::FileType minType, CodeFile::FileType maxType) {
     QDir          &&dir     = QDir::current();
     const QString &&dirPath = dir.path();
 
@@ -55,7 +54,7 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
             this, &TabbedDocumentInterface::onTabMoved);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         onCloseFile(getCurIndex());
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this),
@@ -68,12 +67,12 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O,
                                        Qt::Key_F), this),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         openAllFiles(this, CodeFile::Function, CodeFile::Function);
     });
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_O,
                                        Qt::Key_J), this),
-            &QShortcut::activated, [this]() {
+            &QShortcut::activated, this, [this]() {
         openAllFiles(this, CodeFile::JsonText, CodeFile::JsonText_end);
     });
 }
@@ -339,6 +338,15 @@ void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
         }
     }
     openFile(filepath);
+}
+
+void TabbedDocumentInterface::onOpenFileWithLine(const QString &filepath,
+                                                 const int lineNo) {
+    qDebug() << filepath << lineNo;
+    onOpenFile(filepath);
+    if (auto *editor = getCodeEditor()) {
+        editor->goToLine(lineNo);
+    }
 }
 
 bool TabbedDocumentInterface::saveCurFile(const QString &path) {

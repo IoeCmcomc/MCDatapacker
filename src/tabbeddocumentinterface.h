@@ -39,6 +39,7 @@ public:
 
 public /*slots*/ :
     void onOpenFile(const QString &filepath);
+    void onOpenFileWithLine(const QString &filepath, const int lineNo);
     bool saveCurFile();
     bool saveCurFile(const QString &path);
     bool saveAllFile();

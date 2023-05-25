@@ -30,6 +30,12 @@ public:
     explicit StatisticsDialog(MainWindow *parent = nullptr);
     ~StatisticsDialog();
 
+signals:
+    void openFileWithLineRequested(const QString &path, const int lineNo);
+
+private /*slots*/ :
+    void onErrorTableDoubleClicked(int row, int column);
+
 private:
     QVector<SyntaxErrorInfo> m_syntaxErrorsInfo;
     QString m_dirPath;

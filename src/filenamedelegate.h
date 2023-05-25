@@ -7,7 +7,7 @@ class FileNameDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    FileNameDelegate(QObject *parent = nullptr);
+    explicit FileNameDelegate(QObject *parent = nullptr);
 
     void setEditorData(QWidget *editor,
                        const QModelIndex &index) const override;
