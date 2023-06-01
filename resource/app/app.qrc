@@ -13,5 +13,6 @@
         <file>icon/gutter/error-and-warning.svg</file>
         <file>fonts/Monocraft.otf</file>
         <file>fonts/MCDatapacker-Icons.ttf</file>
+        <file>icon/format-text-obfuscated.png</file>
     </qresource>
 </RCC>

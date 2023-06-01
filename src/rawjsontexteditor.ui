@@ -117,8 +117,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="obfuscatedBtn">
-           <property name="text">
-            <string>�</string>
+           <property name="icon">
+            <iconset resource="../resource/app/app.qrc">
+             <normaloff>:/icon/format-text-obfuscated.png</normaloff>:/icon/format-text-obfuscated.png</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -255,6 +256,8 @@
    <header>rawjsontextedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resource/app/app.qrc"/>
+ </resources>
  <connections/>
 </ui>
