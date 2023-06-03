@@ -297,34 +297,50 @@ void RawJsonTextEdit::mouseReleaseEvent(QMouseEvent *event) {
     if ((!selection.isEmpty()) &&
         (selection[0] == QChar::ObjectReplacementCharacter)) {
         setTextCursor(cursor);
+        emit textObjectSelected();
     }
 }
 
+bool RawJsonTextEdit::editTextObject(QTextCharFormat &fmt, QTextCursor cursor) {
+    const int defaultRectWidth = 100;
+
+    auto *handler = static_cast<RawJsonTextObjectInterface *>(
+        document()->documentLayout()->handlerForObject(fmt.objectType()));
+
+    const auto &&bottomRight = cursorRect(cursor).bottomRight();
+
+    cursor.setPosition(cursor.anchor());
+    const auto &&topLeft = cursorRect(cursor).topLeft();
+    QRect        objRect{ topLeft, bottomRight };
+    if (!cursor.hasSelection()) {
+        objRect.setWidth(defaultRectWidth);
+    }
+
+    return (handler && handler->editObject(fmt, objRect));
+}
+
+bool RawJsonTextEdit::isSelectingObject(const QTextCursor &cursor) const {
+    const auto &selection = cursor.selectedText();
+
+    if ((selection.length() != 1) ||
+        (selection[0] != QChar::ObjectReplacementCharacter)) {
+        return false;
+    }
+    const auto &&fmt     = cursor.charFormat();
+    const int    objType = fmt.objectType();
+
+    return (objType > TextObject::_begin && objType < TextObject::_end);
+}
+
 void RawJsonTextEdit::mouseDoubleClickEvent(QMouseEvent *event) {
-    QTextCursor &&cursor    = textCursor();
-    const auto   &selection = cursor.selectedText();
+    QTextCursor &&cursor = textCursor();
 
-    if ((selection.length() == 1) &&
-        (selection[0] == QChar::ObjectReplacementCharacter)) {
-        auto    &&fmt     = cursor.charFormat();
-        const int objType = fmt.objectType();
-
-        if (objType > TextObject::_begin && objType < TextObject::_end) {
-            auto *handler = static_cast<RawJsonTextObjectInterface *>(
-                document()->documentLayout()->handlerForObject(fmt.objectType()));
-
-            const auto &&bottomRight = cursorRect(cursor).bottomRight();
-            cursor.setPosition(cursor.anchor());
-            const auto &&topLeft = cursorRect(cursor).topLeft();
-            const QRect  objRect{ topLeft, bottomRight };
-
-            if (handler && handler->editObject(fmt, objRect)) {
-                setCurrentCharFormat(fmt);
-            }
-            event->accept();
-        } else {
-            QTextEdit::mouseDoubleClickEvent(event);
+    if (isSelectingObject(cursor)) {
+        auto &&fmt = cursor.charFormat();
+        if (editTextObject(fmt, cursor)) {
+            setCurrentCharFormat(fmt);
         }
+        event->accept();
     } else {
         QTextEdit::mouseDoubleClickEvent(event);
     }

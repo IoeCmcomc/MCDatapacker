@@ -64,7 +64,26 @@ RawJsonTextEditor::RawJsonTextEditor(QWidget *parent) :
             this, &RawJsonTextEditor::setObfuscated);
     connect(ui->colorBtn, &QToolButton::clicked,
             this, &RawJsonTextEditor::colorBtnToggled);
+
+    connect(ui->translatedTextBtn, &QToolButton::clicked, this, [this](){
+        this->insertObjectBtnClicked(TextObject::Translate);
+    });
+    connect(ui->scoreboardBtn, &QToolButton::clicked, this, [this](){
+        this->insertObjectBtnClicked(TextObject::Scoreboard);
+    });
+    connect(ui->entityNamesBtn, &QToolButton::clicked, this, [this](){
+        this->insertObjectBtnClicked(TextObject::EntityNames);
+    });
+    connect(ui->keyBindBtn, &QToolButton::clicked, this, [this](){
+        this->insertObjectBtnClicked(TextObject::Keybind);
+    });
+    connect(ui->snbtBtn, &QToolButton::clicked, this, [this](){
+        this->insertObjectBtnClicked(TextObject::Nbt);
+    });
+
     connect(ui->textEdit, &QTextEdit::cursorPositionChanged,
+            this, &RawJsonTextEditor::updateFormatButtons);
+    connect(ui->textEdit, &RawJsonTextEdit::textObjectSelected,
             this, &RawJsonTextEditor::updateFormatButtons);
     connect(ui->tabWidget, &QTabWidget::currentChanged,
             this, &RawJsonTextEditor::updateEditors);
@@ -455,6 +474,25 @@ void RawJsonTextEditor::colorBtnToggled(bool checked) {
     ui->textEdit->setFocus();
 }
 
+void RawJsonTextEditor::insertObjectBtnClicked(
+    RawJsonTextEdit::TextObject objectId) {
+    QTextCursor &&cursor = ui->textEdit->textCursor();
+
+    if (!cursor.hasSelection()) {
+        auto &&fmt = ui->textEdit->currentCharFormat();
+        fmt.setObjectType(objectId);
+        if (ui->textEdit->editTextObject(fmt, cursor)) {
+            cursor.insertText(QString(QChar::ObjectReplacementCharacter), fmt);
+            ui->textEdit->setTextCursor(cursor);
+        }
+    } else if (ui->textEdit->isSelectingObject(cursor)) {
+        auto &&fmt = cursor.charFormat();
+        if (ui->textEdit->editTextObject(fmt, cursor)) {
+            ui->textEdit->setCurrentCharFormat(fmt);
+        }
+    }
+}
+
 void RawJsonTextEditor::mergeCurrentFormat(const QTextCharFormat &format) {
     QTextCursor cursor = ui->textEdit->textCursor();
 
@@ -513,6 +551,18 @@ void RawJsonTextEditor::updateFormatButtons() {
     } else {
         ui->colorBtn->setChecked(false);
     }
+
+    const bool isntObject = !ui->textEdit->isSelectingObject(cursor);
+    ui->translatedTextBtn->setEnabled(
+        isntObject || fmt.objectType() == TextObject::Translate);
+    ui->scoreboardBtn->setEnabled(
+        isntObject || fmt.objectType() == TextObject::Scoreboard);
+    ui->entityNamesBtn->setEnabled(
+        isntObject || fmt.objectType() == TextObject::EntityNames);
+    ui->keyBindBtn->setEnabled(
+        isntObject || fmt.objectType() == TextObject::Keybind);
+    ui->snbtBtn->setEnabled(
+        isntObject || fmt.objectType() == TextObject::Nbt);
 }
 
 void RawJsonTextEditor::selectCustomColor() {

@@ -36,6 +36,7 @@ public /*slots*/ :
     void setObfuscated(bool obfuscated);
     void setColor(QColor color);
     void colorBtnToggled(bool checked);
+    void insertObjectBtnClicked(RawJsonTextEdit::TextObject objectId);
 
 protected:
     void mergeCurrentFormat(const QTextCharFormat &format);

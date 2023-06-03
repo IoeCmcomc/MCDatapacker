@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>248</height>
+    <width>397</width>
+    <height>252</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -136,6 +136,53 @@
            </property>
            <property name="popupMode">
             <enum>QToolButton::MenuButtonPopup</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="translatedTextBtn">
+           <property name="icon">
+            <iconset resource="../resource/app/app.qrc">
+             <normaloff>:/icon/object-text-translate.png</normaloff>:/icon/object-text-translate.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="scoreboardBtn">
+           <property name="icon">
+            <iconset resource="../resource/app/app.qrc">
+             <normaloff>:/icon/object-text-scoreboard.png</normaloff>:/icon/object-text-scoreboard.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="entityNamesBtn">
+           <property name="icon">
+            <iconset resource="../resource/app/app.qrc">
+             <normaloff>:/icon/object-text-entity.png</normaloff>:/icon/object-text-entity.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="keyBindBtn">
+           <property name="icon">
+            <iconset resource="../resource/app/app.qrc">
+             <normaloff>:/icon/object-text-keybind.png</normaloff>:/icon/object-text-keybind.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="snbtBtn">
+           <property name="icon">
+            <iconset resource="../resource/app/app.qrc">
+             <normaloff>:/icon/object-text-snbt.png</normaloff>:/icon/object-text-snbt.png</iconset>
            </property>
           </widget>
          </item>

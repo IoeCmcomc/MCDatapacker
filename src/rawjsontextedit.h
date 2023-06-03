@@ -100,6 +100,12 @@ public:
     bool renderObfuscation() const;
     void setRenderObfuscation(bool newRenderObfuscation);
 
+    bool editTextObject(QTextCharFormat &fmt, QTextCursor cursor);
+    bool isSelectingObject(const QTextCursor &cursor) const;
+
+signals:
+    void textObjectSelected();
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
