@@ -3,11 +3,11 @@ from bs4 import BeautifulSoup
 import json
 from pathlib import Path
 
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Tag?diff=prev&oldid=2204046') 
+req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Tag') 
 soup = BeautifulSoup(req.read(), "html.parser")
 
-h2 = soup.find("span", id="List_of_tags").parent
-print(h2.name)
+h3 = soup.find("span", id="Java_Edition_2").parent
+print(h3.name)
 
 def find_tr_tags(tag):
     return (tag.name == "tr") and (tag.th is None) \
@@ -19,14 +19,14 @@ def get_html(tag):
         html += str(child)
     return html
 
-h3 = h2
-while (h3 := h3.find_next_sibling("h3")) != None:
-    print(h3.name)
-    tag_category = h3.span.text.lower().replace(" ", "_")[:-1] + ".json"
+h4 = h3
+while (h4 := h4.find_next_sibling("h4")) != None and h4.text != 'Removed Tags':
+    print(h4.name, h4.text)
+    tag_category = h4.span.text.lower().replace(" ", "_")[:-1] + ".json"
     info = dict()
-    table = h3.find_next_sibling("table")
+    table = h4.find_next_sibling("table")
     tr_tags = table.find_all(find_tr_tags)
-    if (tag_category != 'function.json'):
+    if not tag_category in ('function.json'):
         for tr_tag in tr_tags:
             td_tags = tr_tag.find_all("td")
             details = get_html(td_tags[2]).strip()
