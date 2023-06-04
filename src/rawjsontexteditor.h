@@ -47,7 +47,7 @@ private /*slots*/ :
     enum SourceFormat {
         JSON,
         HTML,
-        Markdown,
+        InlineJSON,
     };
 
     using Property   = RawJsonTextEdit::FormatProperty;

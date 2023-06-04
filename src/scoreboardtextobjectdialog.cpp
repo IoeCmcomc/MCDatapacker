@@ -25,6 +25,8 @@ void ScoreboardTextObjectDialog::fromTextFormat(const QTextFormat &format) {
     ui->nameEdit->setText(format.stringProperty(ScoreboardName));
     ui->objectiveEdit->setText(format.stringProperty(ScoreboardObjective));
     ui->valueEdit->setText(format.stringProperty(ScoreboardValue));
+
+    updateOkButton();
 }
 
 QTextFormat ScoreboardTextObjectDialog::toTextFormat() const {

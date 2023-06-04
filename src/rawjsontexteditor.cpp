@@ -31,27 +31,6 @@ RawJsonTextEditor::RawJsonTextEditor(QWidget *parent) :
     pixmap.fill(currTextColor);
     ui->colorBtn->setIcon(pixmap);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_B), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->boldBtn->click();
-    });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_I), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->italicBtn->click();
-    });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_U), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->underlineBtn->click();
-    });
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_K), this, nullptr,
-                          nullptr, Qt::WidgetWithChildrenShortcut),
-            &QShortcut::activated, this, [this]() {
-        ui->strikeBtn->click();
-    });
-
     connect(ui->boldBtn, &QToolButton::clicked, this,
             &RawJsonTextEditor::setBold);
     connect(ui->italicBtn, &QToolButton::clicked,
@@ -584,7 +563,8 @@ void RawJsonTextEditor::updateEditors(int tabIndex) {
 
 void RawJsonTextEditor::readSourceEditor(int format) {
     switch (format) {
-        case JSON: {
+        case JSON:
+        case InlineJSON: {
             const auto &doc = QJsonDocument::fromJson(
                 ui->sourceEdit->toPlainText().toUtf8());
             if (doc.isObject()) {
@@ -602,17 +582,13 @@ void RawJsonTextEditor::readSourceEditor(int format) {
             ui->textEdit->setHtml(ui->sourceEdit->toPlainText());
             break;
         }
-
-        case Markdown: {
-            ui->textEdit->setMarkdown(ui->sourceEdit->toPlainText());
-            break;
-        }
     }
 }
 
 void RawJsonTextEditor::writeSourceEditor(int format) {
     switch (format) {
-        case JSON: {
+        case JSON:
+        case InlineJSON: {
             const auto  &&json = toJson();
             QJsonDocument jsonDoc;
             switch (json.type()) {
@@ -629,19 +605,17 @@ void RawJsonTextEditor::writeSourceEditor(int format) {
                 default:
                     break;
             }
-            ui->sourceEdit->setPlainText(jsonDoc.toJson());
+            if (format == JSON) {
+                ui->sourceEdit->setPlainText(jsonDoc.toJson());
+            } else {
+                ui->sourceEdit->setPlainText(jsonDoc.toJson(
+                                                 QJsonDocument::Compact));
+            }
             break;
         }
 
         case HTML: {
             ui->sourceEdit->setPlainText(ui->textEdit->toHtml());
-            break;
-        }
-
-        case Markdown: {
-            ui->sourceEdit->setPlainText(
-                ui->textEdit->toMarkdown(
-                    QTextDocument::MarkdownDialectCommonMark));
             break;
         }
     }

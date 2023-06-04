@@ -46,9 +46,10 @@ RawJsonTextEdit::RawJsonTextEdit(QWidget *parent) : QTextEdit(parent),
     curFont.setBold(true);
     initSimilarWidthCharGroups(curFont, true);
 
-    QTextCharFormat fmt = currentCharFormat();
-    fmt.setProperty(BorderProperty, QPen(Qt::red));
-    setCurrentCharFormat(std::move(fmt));
+    // Un-comment these lines to debug
+//    QTextCharFormat fmt = currentCharFormat();
+//    fmt.setProperty(BorderProperty, QPen(Qt::red));
+//    setCurrentCharFormat(std::move(fmt));
 
     registerInterface<TranslatedTextObjectInterface>(TextObject::Translate);
     registerInterface<ScoreboardTextObjectInterface>(TextObject::Scoreboard);
@@ -154,36 +155,6 @@ void RawJsonTextEdit::paintEvent(QPaintEvent *event) {
     }
 
     qp.restore();
-    qp.end();
-
-    //    QTextEdit::paintEvent(event);
-
-    //    {
-    //        QPainter      p(viewport());
-    //        const QPointF offset(
-    //            -horizontalScrollBar()->value(),
-    //            -verticalScrollBar()->value());
-    //        const auto &eventRect = QRectF(event->rect()).translated(-offset);
-    //        p.setRenderHint(QPainter::Antialiasing);
-    //        p.translate(offset);
-    //        for (const auto &fragRegion: qAsConst(m_fragRegions)) {
-    //            int i = 0;
-    //            for (const auto &subfragment: fragRegion.subfragments) {
-    //                const auto &rect = subfragment.rect;
-    //                const auto &text = subfragment.text;
-    ////                qDebug() << rect << text;
-    //                if (eventRect.intersects(rect)) {
-    //                    p.drawRoundedRect(rect, 5, 5);
-    //                    p.drawText(rect, text);
-    //                    ++i;
-    //                } else if (rect.top() > eventRect.bottom()) {
-    //                    goto BREAK_FRAG_REGIONS;
-    //                }
-    //            }
-    //        }
-    //    }
-    // BREAK_FRAG_REGIONS:
-    //    return;
 }
 
 void RawJsonTextEdit::resizeEvent(QResizeEvent *event) {

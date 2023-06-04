@@ -34,6 +34,8 @@ void NbtTextObjectDialog::fromTextFormat(const QTextFormat &format) {
     ui->entityEdit->setText(format.stringProperty(NbtEntity));
     ui->storageEdit->setText(format.stringProperty(NbtStorage));
     ui->rawJsonEditor->fromJson(format.property(Separator).toJsonValue());
+
+    updateOkButton();
 }
 
 QTextFormat NbtTextObjectDialog::toTextFormat() const {

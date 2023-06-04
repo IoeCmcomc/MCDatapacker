@@ -22,6 +22,8 @@ void EntityNamesTextObjectDialog::fromTextFormat(const QTextFormat &format) {
 
     ui->selectorEdit->setText(format.stringProperty(Selector));
     ui->rawJsonEditor->fromJson(format.property(Separator).toJsonValue());
+
+    onSelectorEditChanged(ui->selectorEdit->text());
 }
 
 QTextFormat EntityNamesTextObjectDialog::toTextFormat() const {

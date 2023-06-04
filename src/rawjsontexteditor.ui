@@ -77,6 +77,9 @@
             <iconset theme="format-text-bold">
              <normaloff>.</normaloff>.</iconset>
            </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+B</string>
+           </property>
            <property name="checkable">
             <bool>true</bool>
            </property>
@@ -87,6 +90,9 @@
            <property name="icon">
             <iconset theme="format-text-italic">
              <normaloff>.</normaloff>.</iconset>
+           </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+I</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -99,6 +105,9 @@
             <iconset theme="format-text-underline">
              <normaloff>.</normaloff>.</iconset>
            </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+U</string>
+           </property>
            <property name="checkable">
             <bool>true</bool>
            </property>
@@ -109,6 +118,9 @@
            <property name="icon">
             <iconset theme="format-text-strikethrough">
              <normaloff>.</normaloff>.</iconset>
+           </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+K</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -121,6 +133,9 @@
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/format-text-obfuscated.png</normaloff>:/icon/format-text-obfuscated.png</iconset>
            </property>
+           <property name="shortcut">
+            <string>Ctrl+S</string>
+           </property>
            <property name="checkable">
             <bool>true</bool>
            </property>
@@ -130,6 +145,9 @@
           <widget class="QToolButton" name="colorBtn">
            <property name="text">
             <string/>
+           </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+F</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -152,6 +170,9 @@
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-translate.png</normaloff>:/icon/object-text-translate.png</iconset>
            </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+T</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -159,6 +180,9 @@
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-scoreboard.png</normaloff>:/icon/object-text-scoreboard.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+R</string>
            </property>
           </widget>
          </item>
@@ -168,6 +192,9 @@
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-entity.png</normaloff>:/icon/object-text-entity.png</iconset>
            </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+E</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -176,6 +203,9 @@
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-keybind.png</normaloff>:/icon/object-text-keybind.png</iconset>
            </property>
+           <property name="shortcut">
+            <string notr="true">Ctrl+Shift+Y</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -183,6 +213,9 @@
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-snbt.png</normaloff>:/icon/object-text-snbt.png</iconset>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+Shift+N</string>
            </property>
           </widget>
          </item>
@@ -276,7 +309,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Markdown</string>
+           <string>Single-line JSON</string>
           </property>
          </item>
         </widget>

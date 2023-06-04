@@ -31,6 +31,8 @@ void TranslatedTextObjectDialog::fromTextFormat(const QTextFormat &format) {
     ui->translateIdEdit->setText(format.stringProperty(TranslateKey));
     ui->fallbackEdit->setText(format.stringProperty(TranslateFallback));
     ui->widgetInterface->setJson(format.property(TranslateArgs).toJsonArray());
+
+    onTranslateIdChanged(ui->translateIdEdit->text());
 }
 
 QTextFormat TranslatedTextObjectDialog::toTextFormat() const {
