@@ -140,8 +140,10 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
         case RawJsonTextEdit::EntityNames: {
             component.insert("selector",
                              fmt.stringProperty(Property::Selector));
-            insertNonEmptyProp<QJsonValue>(component, "separator",
-                                           fmt, Property::Separator);
+            if (Game::version() >= Game::v1_17) {
+                insertNonEmptyProp<QJsonValue>(component, "separator",
+                                               fmt, Property::Separator);
+            }
             break;
         }
         case RawJsonTextEdit::Keybind: {
@@ -154,8 +156,10 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
             insertNonEmptyProp<QString>(component, "entity", fmt, NbtEntity);
             insertNonEmptyProp<QString>(component, "storage", fmt, NbtStorage);
             insertNonEmptyProp<bool>(component, "interpret", fmt, NbtInterpret);
-            insertNonEmptyProp<QJsonValue>(component, "separator",
-                                           fmt, Property::Separator);
+            if (Game::version() >= Game::v1_17) {
+                insertNonEmptyProp<QJsonValue>(component, "separator",
+                                               fmt, Property::Separator);
+            }
             break;
         }
     }
@@ -355,8 +359,10 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
         objFmt.setObjectType(TextObject::EntityNames);
         objFmt.setProperty(RawJsonProperty::Selector,
                            root.value(QLatin1String("selector")).toString());
-        objFmt.setProperty(RawJsonProperty::Separator,
-                           root.value(QLatin1String("separator")));
+        if (Game::version() >= Game::v1_17) {
+            objFmt.setProperty(RawJsonProperty::Separator,
+                               root.value(QLatin1String("separator")));
+        }
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
         cursor.setCharFormat(fmt);
     } else if (root.contains(QLatin1String("keybind"))) {
@@ -381,8 +387,10 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
             objFmt.setProperty(RawJsonProperty::NbtInterpret,
                                root.value(QLatin1String("interpret")).toBool());
         }
-        objFmt.setProperty(RawJsonProperty::Separator,
-                           root.value(QLatin1String("separator")));
+        if (Game::version() >= Game::v1_17) {
+            objFmt.setProperty(RawJsonProperty::Separator,
+                               root.value(QLatin1String("separator")));
+        }
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
         cursor.setCharFormat(fmt);
     }

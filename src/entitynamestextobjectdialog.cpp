@@ -3,6 +3,8 @@
 
 #include "rawjsontextobjectinterface.h"
 
+#include "game.h"
+
 #include <QPushButton>
 
 EntityNamesTextObjectDialog::EntityNamesTextObjectDialog(QWidget *parent) :
@@ -11,6 +13,11 @@ EntityNamesTextObjectDialog::EntityNamesTextObjectDialog(QWidget *parent) :
 
     connect(ui->selectorEdit, &QLineEdit::textChanged, this,
             &EntityNamesTextObjectDialog::onSelectorEditChanged);
+
+    if (Game::version() < Game::v1_17) {
+        ui->groupBox->hide();
+        adjustSize();
+    }
 }
 
 EntityNamesTextObjectDialog::~EntityNamesTextObjectDialog() {
@@ -21,7 +28,9 @@ void EntityNamesTextObjectDialog::fromTextFormat(const QTextFormat &format) {
     m_format = format;
 
     ui->selectorEdit->setText(format.stringProperty(Selector));
-    ui->rawJsonEditor->fromJson(format.property(Separator).toJsonValue());
+    if (Game::version() >= Game::v1_17) {
+        ui->rawJsonEditor->fromJson(format.property(Separator).toJsonValue());
+    }
 
     onSelectorEditChanged(ui->selectorEdit->text());
 }
@@ -30,10 +39,12 @@ QTextFormat EntityNamesTextObjectDialog::toTextFormat() const {
     QTextFormat format = m_format;
 
     format.setProperty(Selector, ui->selectorEdit->text());
-    if (!ui->rawJsonEditor->isEmpty()) {
-        format.setProperty(Separator, ui->rawJsonEditor->toJson());
-    } else {
-        format.clearProperty(RawJsonProperty::Separator);
+    if (Game::version() >= Game::v1_17) {
+        if (!ui->rawJsonEditor->isEmpty()) {
+            format.setProperty(Separator, ui->rawJsonEditor->toJson());
+        } else {
+            format.clearProperty(RawJsonProperty::Separator);
+        }
     }
 
     return format;

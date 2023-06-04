@@ -3,6 +3,8 @@
 
 #include "rawjsontextobjectinterface.h"
 
+#include "game.h"
+
 #include <QPushButton>
 
 NbtTextObjectDialog::NbtTextObjectDialog(QWidget *parent) :
@@ -17,6 +19,11 @@ NbtTextObjectDialog::NbtTextObjectDialog(QWidget *parent) :
             this, &NbtTextObjectDialog::updateOkButton);
     connect(ui->storageEdit, &QLineEdit::textChanged,
             this, &NbtTextObjectDialog::updateOkButton);
+
+    if (Game::version() < Game::v1_17) {
+        ui->groupBox_2->hide();
+        adjustSize();
+    }
 }
 
 NbtTextObjectDialog::~NbtTextObjectDialog() {
@@ -33,8 +40,9 @@ void NbtTextObjectDialog::fromTextFormat(const QTextFormat &format) {
     ui->blockEdit->setText(format.stringProperty(NbtBlock));
     ui->entityEdit->setText(format.stringProperty(NbtEntity));
     ui->storageEdit->setText(format.stringProperty(NbtStorage));
-    ui->rawJsonEditor->fromJson(format.property(Separator).toJsonValue());
-
+    if (Game::version() >= Game::v1_17) {
+        ui->rawJsonEditor->fromJson(format.property(Separator).toJsonValue());
+    }
     updateOkButton();
 }
 
@@ -58,10 +66,12 @@ QTextFormat NbtTextObjectDialog::toTextFormat() const {
     format.setProperty(RawJsonProperty::NbtBlock, ui->blockEdit->text());
     format.setProperty(RawJsonProperty::NbtEntity, ui->entityEdit->text());
     format.setProperty(RawJsonProperty::NbtStorage, ui->storageEdit->text());
-    if (!ui->rawJsonEditor->isEmpty()) {
-        format.setProperty(Separator, ui->rawJsonEditor->toJson());
-    } else {
-        format.clearProperty(RawJsonProperty::Separator);
+    if (Game::version() >= Game::v1_17) {
+        if (!ui->rawJsonEditor->isEmpty()) {
+            format.setProperty(Separator, ui->rawJsonEditor->toJson());
+        } else {
+            format.clearProperty(RawJsonProperty::Separator);
+        }
     }
 
     return format;
