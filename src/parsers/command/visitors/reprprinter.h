@@ -332,6 +332,9 @@ public:
         void visit(EntityAnchorNode *node) final {
             m_repr += QString("EntityAnchorNode(\"%1\")").arg(node->value());
         };
+        void visit(HeightmapNode *node) final {
+            m_repr += QString("HeightmapNode(\"%1\")").arg(node->value());
+        };
         void visit(ItemSlotNode *node) final {
             m_repr += QString("ItemSlotNode(\"%1\")").arg(node->value());
         };

@@ -88,6 +88,7 @@ public:
         Function,
         Gamemode,
         GameProfile,
+        Heightmap,
         IntRange,
         ItemEnchantment,
         ItemPredicate,

@@ -192,6 +192,9 @@ public:
         void visit(EntityAnchorNode *node) override {
             _visit(node);
         }
+        void visit(HeightmapNode *node) override {
+            _visit(node);
+        }
         void visit(ItemSlotNode *node) override {
             _visit(node);
         }

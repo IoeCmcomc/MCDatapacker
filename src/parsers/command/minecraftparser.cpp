@@ -814,6 +814,7 @@ namespace Command {
             case ParserType::Function: { return minecraft_function(); }
             case ParserType::Gamemode: { return minecraft_gamemode(); }
             case ParserType::GameProfile: { return minecraft_gameProfile(); }
+            case ParserType::Heightmap: { return minecraft_heightmap(); }
             case ParserType::IntRange: { return minecraft_intRange(props); }
             case ParserType::ItemEnchantment: { return minecraft_itemEnchantment();
             }
@@ -1069,6 +1070,18 @@ namespace Command {
 
         parseEntity(ret.get(), false);
         return ret;
+    }
+
+    QSharedPointer<HeightmapNode> MinecraftParser::minecraft_heightmap() {
+        const QString &&literal = oneOf({
+            "motion_blocking_no_leaves"_QL1,
+            "motion_blocking"_QL1,
+            "ocean_floor"_QL1,
+            "world_surface"_QL1,
+        });
+
+        return QSharedPointer<HeightmapNode>::create(spanText(literal),
+                                                     !literal.isEmpty());
     }
 
     QSharedPointer<IntRangeNode> MinecraftParser::

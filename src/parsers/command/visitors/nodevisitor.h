@@ -56,6 +56,7 @@ namespace Command {
     class MobEffectNode;
     class ColorNode;
     class EntityAnchorNode;
+    class HeightmapNode;
     class ItemSlotNode;
     class MessageNode;
     class ObjectiveNode;
@@ -140,6 +141,7 @@ public:
         virtual void visit(MobEffectNode *node)           = 0;
         virtual void visit(ColorNode *node)               = 0;
         virtual void visit(EntityAnchorNode *node)        = 0;
+        virtual void visit(HeightmapNode *node)           = 0;
         virtual void visit(ItemSlotNode *node)            = 0;
         virtual void visit(MessageNode *node)             = 0;
         virtual void visit(ObjectiveNode *node)           = 0;

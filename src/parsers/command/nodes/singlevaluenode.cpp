@@ -15,6 +15,7 @@ namespace Command {
 
     DEFINE_ACCEPT_METHOD(ColorNode)
     DEFINE_ACCEPT_METHOD(EntityAnchorNode)
+    DEFINE_ACCEPT_METHOD(HeightmapNode)
     DEFINE_ACCEPT_METHOD(ItemSlotNode)
     DEFINE_ACCEPT_METHOD(MessageNode)
     DEFINE_ACCEPT_METHOD(ObjectiveNode)

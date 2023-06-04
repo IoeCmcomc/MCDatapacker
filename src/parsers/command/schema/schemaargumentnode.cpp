@@ -45,6 +45,7 @@ namespace Command::Schema {
             { QStringLiteral("minecraft:function"), PT::Function },
             { QStringLiteral("minecraft:gamemode"), PT::Gamemode },
             { QStringLiteral("minecraft:game_profile"), PT::GameProfile },
+            { QStringLiteral("minecraft:heightmap"), PT::Heightmap },
             { QStringLiteral("minecraft:int_range"), PT::IntRange },
             { QStringLiteral("minecraft:item_enchantment"),
               PT::ItemEnchantment },

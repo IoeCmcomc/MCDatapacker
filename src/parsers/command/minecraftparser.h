@@ -261,6 +261,7 @@ private:
         QSharedPointer<FunctionNode> minecraft_function();
         QSharedPointer<GamemodeNode> minecraft_gamemode();
         QSharedPointer<GameProfileNode> minecraft_gameProfile();
+        QSharedPointer<HeightmapNode> minecraft_heightmap();
         QSharedPointer<IntRangeNode> minecraft_intRange(
             const QVariantMap &props = {});
         QSharedPointer<ItemEnchantmentNode> minecraft_itemEnchantment();

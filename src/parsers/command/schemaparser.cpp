@@ -16,7 +16,8 @@
 #include <QElapsedTimer>
 
 /* These classes are for benchmarking deserialization methods.
- * For now, deserializing from JSON using QJsonDocument (faster than from MessagePack).
+ * For now, deserializing from JSON using QJsonDocument
+ * is faster than from MessagePack.
 
  #include <QStack>
 
