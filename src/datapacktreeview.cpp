@@ -138,6 +138,10 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                 addNewFileAction(newMenu, tr("Chat type"), jsonExt,
                                  QLatin1String("chat_type"));
             }
+            if (Game::version() >= Game::v1_19_4) {
+                addNewFileAction(newMenu, tr("Damage type"), jsonExt,
+                                 QLatin1String("damage_type"));
+            }
             if (Game::version() >= Game::v1_16) {
                 addNewFileAction(newMenu, tr("Dimension"), jsonExt,
                                  QLatin1String("dimension"));
