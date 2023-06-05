@@ -66,7 +66,7 @@ for element in icons:
         x, y = next(element[1]), next(element[1])
         print(id, x, y)
         icon = sheet_img.crop((x, y, x+32, y +32))
-        icon.save("texture/inv_item/{}.png".format(id), optimize=True)
+        icon.save("texture/inv_item/{}.png".format(id.lower()), optimize=True)
     else:
         print(id, element[1])
         with urllib.request.urlopen(element[1]) as response:

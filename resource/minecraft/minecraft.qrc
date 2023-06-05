@@ -1408,7 +1408,6 @@
         <file>texture/inv_item/packed_mud.png</file>
         <file>texture/inv_item/pearlescent_froglight.png</file>
         <file>texture/inv_item/reinforced_deepslate.png</file>
-        <file>texture/inv_item/Sculk.png</file>
         <file>texture/inv_item/sculk_catalyst.png</file>
         <file>texture/inv_item/sculk_shrieker.png</file>
         <file>texture/inv_item/sculk_vein.png</file>
@@ -1437,5 +1436,20 @@
         <file>texture/item/iron_golem_spawn_egg.png</file>
         <file>texture/item/snow_golem_spawn_egg.png</file>
         <file>texture/item/wither_spawn_egg.png</file>
+        <file>texture/block/mangrove_wall_sign.png</file>
+        <file>texture/inv_item/mangrove_button.png</file>
+        <file>texture/inv_item/mangrove_door.png</file>
+        <file>texture/inv_item/mangrove_fence.png</file>
+        <file>texture/inv_item/mangrove_fence_gate.png</file>
+        <file>texture/inv_item/mangrove_pressure_plate.png</file>
+        <file>texture/inv_item/mangrove_sign.png</file>
+        <file>texture/inv_item/mangrove_slab.png</file>
+        <file>texture/inv_item/mangrove_stairs.png</file>
+        <file>texture/inv_item/mangrove_trapdoor.png</file>
+        <file>texture/inv_item/mud_brick_slab.png</file>
+        <file>texture/inv_item/mud_brick_stairs.png</file>
+        <file>texture/inv_item/mud_brick_wall.png</file>
+        <file>texture/inv_item/mud_bricks.png</file>
+        <file>texture/inv_item/sculk.png</file>
     </qresource>
 </RCC>
