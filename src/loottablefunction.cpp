@@ -189,7 +189,7 @@ QJsonObject LootTableFunction::toJson() const {
             }
             QJsonArray ops;
             for (int i = 0; i < ui->copyNBT_table->rowCount(); ++i) {
-                auto source = ui->copyNBT_table->item(i, 0)->text(); // Potential crash
+                auto source = ui->copyNBT_table->item(i, 0)->text();
                 auto op     = ui->copyNBT_table->item(i, 1)
                               ->data(Qt::UserRole + 1).toString();
                 auto target = ui->copyNBT_table->item(i, 2)->text();
@@ -364,7 +364,7 @@ QJsonObject LootTableFunction::toJson() const {
             root.insert("entity",
                         entityTargets[ui->setLore_entityCombo->currentIndex()]);
             ui->setLore_replaceCheck->insertToJsonObject(root, "replace");
-            root.insert("lore", ui->setLore_textEdit->toJson());
+            root.insert("lore", ui->setLore_textEdit->toJsonObjects());
             break;
         }
 
@@ -491,6 +491,8 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
             if (root.contains("ops")) {
                 ui->copyNBT_table->clearContents();
+                // clearContents() does not change the row count
+                ui->copyNBT_table->setRowCount(0);
                 QJsonArray ops = root.value("ops").toArray();
                 for (auto opRef: ops) {
                     if (!opRef.isObject())
@@ -784,7 +786,8 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             ui->setLore_replaceCheck->setupFromJsonObject(root, "replace");
 
             if (root.contains("lore")) {
-                ui->setLore_textEdit->fromJson(root.value("lore").toArray());
+                ui->setLore_textEdit->fromJsonObjects(
+                    root.value("lore").toArray());
             }
             break;
         }

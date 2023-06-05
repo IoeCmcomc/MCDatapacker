@@ -165,60 +165,64 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
     }
 }
 
-QJsonValue RawJsonTextEditor::toJson() const {
-    using Property = RawJsonProperty;
+void RawJsonTextEditor::appendBlockToArray(QJsonArray &arr,
+                                           const QTextBlock &block) const {
+    QTextBlock::iterator it;
 
-    if (!ui->textEdit->document()->isModified()) {
+    for (it = block.begin(); !(it.atEnd()); ++it) {
+        QTextFragment currFragment = it.fragment();
+        if (currFragment.isValid()) {
+            QString txt = currFragment.text();
+            auto    fmt = currFragment.charFormat();
+
+            QJsonObject component;
+
+            if (txt == QChar::ObjectReplacementCharacter) {
+                mergeObjectComponent(component, fmt);
+            } else {
+                component.insert(QLatin1String("text"), txt);
+            }
+            if (fmt.fontWeight() >= 75)
+                component.insert(QLatin1String("bold"), true);
+            if (fmt.fontItalic())
+                component.insert(QLatin1String("italic"), true);
+            if (fmt.fontUnderline())
+                component.insert(QLatin1String("underlined"), true);
+            if (fmt.boolProperty(RawJsonProperty::TextObfuscated))
+                component.insert(QLatin1String("obfuscated"), true);
+            if (fmt.fontStrikeOut())
+                component.insert(QLatin1String("strikethrough"), true);
+            if (fmt.foreground().style() == Qt::SolidPattern) {
+                const QString &&key = Glhp::colorHexes.key(
+                    fmt.foreground().color().name());
+                if (!key.isEmpty()) {
+                    component.insert(QLatin1String("color"), key);
+                } else if (Game::version() >= Game::v1_16) {
+                    component.insert(QLatin1String("color"),
+                                     fmt.foreground().color().name());
+                }
+            }
+
+            arr << component;
+        }
+    }
+}
+
+QJsonValue RawJsonTextEditor::toJson() const {
+    const QTextDocument *doc = ui->textEdit->document();
+
+    if (!doc->isModified()) {
         return m_json;
     }
 
     QJsonArray arr{ QString() };
-
-    QTextDocument *doc = ui->textEdit->document();
 
     for (QTextBlock currBlock = doc->begin(); currBlock != doc->end();
          currBlock = currBlock.next()) {
         if (currBlock != doc->begin())
             arr << QJsonObject({ { "text", "\n" } });
 
-        QTextBlock::iterator it;
-        for (it = currBlock.begin(); !(it.atEnd()); ++it) {
-            QTextFragment currFragment = it.fragment();
-            if (currFragment.isValid()) {
-                QString txt = currFragment.text();
-                auto    fmt = currFragment.charFormat();
-
-                QJsonObject component;
-
-                if (txt == QChar::ObjectReplacementCharacter) {
-                    mergeObjectComponent(component, fmt);
-                } else {
-                    component.insert(QLatin1String("text"), txt);
-                }
-                if (fmt.fontWeight() >= 75)
-                    component.insert(QLatin1String("bold"), true);
-                if (fmt.fontItalic())
-                    component.insert(QLatin1String("italic"), true);
-                if (fmt.fontUnderline())
-                    component.insert(QLatin1String("underlined"), true);
-                if (fmt.boolProperty(Property::TextObfuscated))
-                    component.insert(QLatin1String("obfuscated"), true);
-                if (fmt.fontStrikeOut())
-                    component.insert(QLatin1String("strikethrough"), true);
-                if (fmt.foreground().style() == Qt::SolidPattern) {
-                    const QString &&key = Glhp::colorHexes.key(
-                        fmt.foreground().color().name());
-                    if (!key.isEmpty()) {
-                        component.insert(QLatin1String("color"), key);
-                    } else if (Game::version() >= Game::v1_16) {
-                        component.insert(QLatin1String("color"),
-                                         fmt.foreground().color().name());
-                    }
-                }
-
-                arr << component;
-            }
-        }
+        appendBlockToArray(arr, currBlock);
     }
 
     switch (arr.size()) {
@@ -239,6 +243,39 @@ void RawJsonTextEditor::fromJson(const QJsonValue &root) {
     m_json = root;
     ui->textEdit->clear();
     appendJsonObject(JsonToComponent(root));
+}
+
+QJsonArray RawJsonTextEditor::toJsonObjects() const {
+    const QTextDocument *doc = ui->textEdit->document();
+
+    if (!doc->isModified()) {
+        return m_json.toArray();
+    }
+
+    QJsonArray arr{};
+
+    for (QTextBlock currBlock = doc->begin(); currBlock != doc->end();
+         currBlock = currBlock.next()) {
+        QJsonArray line{ QString() };
+        appendBlockToArray(line, currBlock);
+        arr << line;
+    }
+
+    return arr;
+}
+
+void RawJsonTextEditor::fromJsonObjects(const QJsonArray &arr) {
+    m_json = arr;
+    ui->textEdit->clear();
+    bool isFirst = true;
+    for (const auto &&line: arr) {
+        if (isFirst) {
+            isFirst = !isFirst;
+        } else {
+            appendJsonObject({ { "text", "\n" } });
+        }
+        appendJsonObject(JsonToComponent(line));
+    }
 }
 
 QJsonObject RawJsonTextEditor::JsonToComponent(const QJsonValue &root) {

@@ -28,6 +28,9 @@ public:
     QJsonValue toJson() const;
     void fromJson(const QJsonValue &root);
 
+    QJsonArray toJsonObjects() const;
+    void fromJsonObjects(const QJsonArray &arr);
+
 public /*slots*/ :
     void setBold(bool bold);
     void setItalic(bool italic);
@@ -101,6 +104,7 @@ private:
     void setColorBtnIcon(const QColor &color);
     void mergeObjectComponent(QJsonObject &component,
                               const QTextCharFormat &fmt) const;
+    void appendBlockToArray(QJsonArray &arr, const QTextBlock &block) const;
 };
 
 #endif /* RAWJSONTEXTEDITOR_H */
