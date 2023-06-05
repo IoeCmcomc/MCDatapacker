@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
-    <height>483</height>
+    <width>347</width>
+    <height>513</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1070,7 +1070,7 @@
              <item row="1" column="1">
               <widget class="QLineEdit" name="recipeGroupInput"/>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="4" column="0" colspan="2">
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QPushButton" name="readRecipeBtn">
@@ -1100,6 +1100,13 @@
              </item>
              <item row="2" column="1">
               <widget class="QComboBox" name="recipeCategoryCombo"/>
+             </item>
+             <item row="3" column="0" colspan="2">
+              <widget class="TrueFalseBox" name="showNotifCheck">
+               <property name="text">
+                <string>Show notification when unlocked</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -1147,6 +1154,11 @@
    <extends>QStackedWidget</extends>
    <header location="global">stackedwidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -53,6 +53,9 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
 
     setupCustomTab();
     setupCategoryCombo();
+    if (Game::version() < Game::v1_19_4) {
+        ui->showNotifCheck->hide();
+    }
 }
 
 VisualRecipeEditorDock::~VisualRecipeEditorDock() {
@@ -147,6 +150,9 @@ void VisualRecipeEditorDock::writeRecipe() {
         && (ui->recipeCategoryCombo->currentIndex() != -1)) {
         root.insert("category", ui->recipeCategoryCombo->currentData(
                         Qt::UserRole + 1).toString());
+    }
+    if (Game::version() >= Game::v1_19_4) {
+        ui->showNotifCheck->insertToJsonObject(root, "show_notification");
     }
 
     QJsonDocument jsonDoc;
@@ -404,6 +410,9 @@ void VisualRecipeEditorDock::readRecipe() {
         const int       index    = ui->recipeCategoryCombo->findData(
             category, Qt::UserRole + 1);
         ui->recipeCategoryCombo->setCurrentIndex(index);
+    }
+    if (Game::version() >= Game::v1_19_4) {
+        ui->showNotifCheck->setupFromJsonObject(root, "show_notification");
     }
 }
 
