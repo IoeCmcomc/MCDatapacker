@@ -123,8 +123,10 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
                              fmt.stringProperty(Property::TranslateKey));
             insertNonEmptyProp<QJsonArray>(component, "with", fmt,
                                            TranslateArgs);
-            insertNonEmptyProp<QString>(component, "fallback", fmt,
-                                        Property::TranslateFallback);
+            if (Game::version() >= Game::v1_19_4) {
+                insertNonEmptyProp<QString>(component, "fallback", fmt,
+                                            Property::TranslateFallback);
+            }
             break;
         }
         case RawJsonTextEdit::Scoreboard: {
@@ -371,8 +373,10 @@ void RawJsonTextEditor::appendJsonObject(const QJsonObject &root,
                            root.value(QLatin1String("translate")).toString());
         objFmt.setProperty(RawJsonProperty::TranslateArgs,
                            root.value(QLatin1String("with")).toArray());
-        objFmt.setProperty(RawJsonProperty::TranslateFallback,
-                           root.value(QLatin1String("fallback")).toString());
+        if (Game::version() >= Game::v1_19_4) {
+            objFmt.setProperty(RawJsonProperty::TranslateFallback,
+                               root.value(QLatin1String("fallback")).toString());
+        }
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), objFmt);
         cursor.setCharFormat(fmt);
     } else if (root.contains(QLatin1String("score"))) {

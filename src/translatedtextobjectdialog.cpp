@@ -19,6 +19,11 @@ TranslatedTextObjectDialog::TranslatedTextObjectDialog(QWidget *parent)
 
     connect(ui->translateIdEdit, &QLineEdit::textChanged,
             this, &TranslatedTextObjectDialog::onTranslateIdChanged);
+
+    if (Game::version() < Game::v1_19_4) {
+        ui->fallbackEdit->hide();
+        ui->label_2->hide();
+    }
 }
 
 TranslatedTextObjectDialog::~TranslatedTextObjectDialog() {
@@ -30,7 +35,10 @@ void TranslatedTextObjectDialog::fromTextFormat(const QTextFormat &format) {
 
     ui->translateIdEdit->setText(format.stringProperty(TranslateKey));
     ui->fallbackEdit->setText(format.stringProperty(TranslateFallback));
-    ui->widgetInterface->setJson(format.property(TranslateArgs).toJsonArray());
+    if (Game::version() >= Game::v1_19_4) {
+        ui->widgetInterface->setJson(format.property(
+                                         TranslateArgs).toJsonArray());
+    }
 
     onTranslateIdChanged(ui->translateIdEdit->text());
 }
@@ -40,7 +48,9 @@ QTextFormat TranslatedTextObjectDialog::toTextFormat() const {
 
     format.setProperty(TranslateKey, ui->translateIdEdit->text());
     format.setProperty(TranslateFallback, ui->fallbackEdit->text());
-    format.setProperty(TranslateArgs, ui->widgetInterface->json());
+    if (Game::version() >= Game::v1_19_4) {
+        format.setProperty(TranslateArgs, ui->widgetInterface->json());
+    }
 
     return format;
 }
