@@ -63,6 +63,7 @@ private:
     void clearModelExceptHeaders(QStandardItemModel &model);
 
     void initBlockStatesPage();
+    void initDamageSrcPage();
     void initEntityScoresPage();
     void initNestedCondPage();
     void initRandChancePage();

@@ -43,8 +43,7 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
             this, &LootTableCondition::setupRefCombo);
 
     initBlockStatesPage();
-    ui->damageSrc_entityPropBtn->assignDialogClass<EntityConditionDialog>();
-    ui->damageSrc_directPropBtn->assignDialogClass<EntityConditionDialog>();
+    initDamageSrcPage();
     ui->entity_propBtn->assignDialogClass<EntityConditionDialog>();
     initEntityScoresPage();
     ui->matchTool_propBtn->assignDialogClass<ItemConditionDialog>();
@@ -84,18 +83,22 @@ QJsonObject LootTableCondition::toJson() const {
 
         case 1: { /*Damage sources */
             QJsonObject pred;
-            ui->damageSrc_explosionCheck->insertToJsonObject(pred,
-                                                             "is_explosion");
-            ui->damageSrc_projectileCheck->insertToJsonObject(pred,
-                                                              "is_projectile");
-            ui->damageSrc_fireCheck->insertToJsonObject(pred, "is_fire");
-            ui->damageSrc_lightningCheck->insertToJsonObject(pred,
-                                                             "is_lightning");
-            ui->damageSrc_magicCheck->insertToJsonObject(pred, "is_magic");
-            ui->damageSrc_starvationCheck->insertToJsonObject(pred,
-                                                              "bypasses_magic");
-            ui->damageSrc_bypassArmorCheck->insertToJsonObject(pred,
-                                                               "bypasses_invulnerability");
+            if (Game::version() < Game::v1_19_4) {
+                ui->damageSrc_explosionCheck->insertToJsonObject(pred,
+                                                                 "is_explosion");
+                ui->damageSrc_projectileCheck->insertToJsonObject(pred,
+                                                                  "is_projectile");
+                ui->damageSrc_fireCheck->insertToJsonObject(pred, "is_fire");
+                ui->damageSrc_lightningCheck->insertToJsonObject(pred,
+                                                                 "is_lightning");
+                ui->damageSrc_magicCheck->insertToJsonObject(pred, "is_magic");
+                ui->damageSrc_starvationCheck->insertToJsonObject(pred,
+                                                                  "bypasses_magic");
+                ui->damageSrc_bypassArmorCheck->insertToJsonObject(pred,
+                                                                   "bypasses_invulnerability");
+            } else {
+                pred["tags"] = ui->damageSrc_table->toJsonArray();
+            }
 
             if (!ui->damageSrc_entityPropBtn->getData().isEmpty())
                 pred.insert("source_entity",
@@ -298,7 +301,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         case 0: { /*Block states */
             if (value.contains("block"))
                 setComboValueFrom(ui->blockState_blockCombo, QVariant::fromValue
-                                   (InventoryItem(value["block"].toString())));
+                                      (InventoryItem(value["block"].toString())));
             if (value.contains("properties")) {
                 QJsonObject states = value["properties"].toObject();
                 LocationConditionDialog::setupStateTableFromJson(
@@ -312,18 +315,24 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         case 1: { /*Damage sources */
             if (value.contains("predicate")) {
                 QJsonObject pred = value["predicate"].toObject();
-                ui->damageSrc_explosionCheck->setupFromJsonObject(pred,
-                                                                  "is_explosion");
-                ui->damageSrc_projectileCheck->setupFromJsonObject(pred,
-                                                                   "is_projectile");
-                ui->damageSrc_fireCheck->setupFromJsonObject(pred, "is_fire");
-                ui->damageSrc_lightningCheck->setupFromJsonObject(pred,
-                                                                  "is_lightning");
-                ui->damageSrc_magicCheck->setupFromJsonObject(pred, "is_magic");
-                ui->damageSrc_starvationCheck->setupFromJsonObject(pred,
-                                                                   "bypasses_magic");
-                ui->damageSrc_bypassArmorCheck->setupFromJsonObject(pred,
-                                                                    "bypasses_invulnerability");
+                if (Game::version() < Game::v1_19_4) {
+                    ui->damageSrc_explosionCheck->setupFromJsonObject(pred,
+                                                                      "is_explosion");
+                    ui->damageSrc_projectileCheck->setupFromJsonObject(pred,
+                                                                       "is_projectile");
+                    ui->damageSrc_fireCheck->setupFromJsonObject(pred,
+                                                                 "is_fire");
+                    ui->damageSrc_lightningCheck->setupFromJsonObject(pred,
+                                                                      "is_lightning");
+                    ui->damageSrc_magicCheck->setupFromJsonObject(pred,
+                                                                  "is_magic");
+                    ui->damageSrc_starvationCheck->setupFromJsonObject(pred,
+                                                                       "bypasses_magic");
+                    ui->damageSrc_bypassArmorCheck->setupFromJsonObject(pred,
+                                                                        "bypasses_invulnerability");
+                } else {
+                    ui->damageSrc_table->fromJson(pred["tags"].toArray());
+                }
 
                 if (pred.contains("source_entity"))
                     ui->damageSrc_entityPropBtn->setData(
@@ -467,7 +476,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         case 11: {/*Table bonus */
             if (value.contains("enchantment"))
                 setComboValueFrom(ui->tableBonus_enchantCombo,
-                               value["enchantment"].toString());
+                                  value["enchantment"].toString());
             if (value.contains("chances")) {
                 QJsonArray chances = value["chances"].toArray();
                 for (auto chanceRef : chances) {
@@ -784,6 +793,20 @@ void LootTableCondition::initBlockStatesPage() {
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,
             this, &LootTableCondition::blockStates_onAdded);
+}
+
+void LootTableCondition::initDamageSrcPage() {
+    if (Game::version() < Game::v1_19_4) {
+        ui->damageSrc_stackWidget->setCurrentIndex(0);
+    } else {
+        ui->damageSrc_stackWidget->setCurrentIndex(1);
+        ui->damageSrc_table->setJsonMode(ExtendedTableWidget::JsonMode::List);
+        ui->damageSrc_table->appendColumnMapping("id", ui->damageSrc_tagEdit);
+        ui->damageSrc_table->appendColumnMapping("expected",
+                                                 ui->damageSrc_expectedCheck);
+    }
+    ui->damageSrc_entityPropBtn->assignDialogClass<EntityConditionDialog>();
+    ui->damageSrc_directPropBtn->assignDialogClass<EntityConditionDialog>();
 }
 
 void LootTableCondition::initEntityScoresPage() {
