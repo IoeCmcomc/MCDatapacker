@@ -13,6 +13,12 @@ namespace Ui {
     class RawJsonTextEditor;
 }
 
+// Adapted from: https://stackoverflow.com/a/3057522/12682038
+template<typename T>
+struct identity {
+    using type = T;
+};
+
 class RawJsonTextEditor : public QFrame {
     Q_OBJECT
 
@@ -73,24 +79,31 @@ private:
     template<typename T>
     void insertNonEmptyProp(QJsonObject &obj, const char *key,
                             const QTextFormat &fmt, const int propId) const {
+        insertNonEmptyProp(obj, key, fmt, propId, identity<T>());
+    }
+
+    template<typename T>
+    void insertNonEmptyProp(QJsonObject &obj, const char *key,
+                            const QTextFormat &fmt, const int propId,
+                            identity<T>) const {
         if (const T && v = fmt.property(propId).value<T>(); !v.isEmpty()) {
             obj.insert(QLatin1String(key), v);
         }
     }
-    template<>
-    void insertNonEmptyProp<QJsonValue>(QJsonObject &obj, const char *key,
-                                        const QTextFormat &fmt,
-                                        const int propId) const {
+
+    void insertNonEmptyProp(QJsonObject &obj, const char *key,
+                            const QTextFormat &fmt,
+                            const int propId, identity<QJsonValue>) const {
         using T = QJsonValue;
         if (const T && v = fmt.property(propId).value<T>();
             !v.isUndefined() && !v.isNull()) {
             obj.insert(QLatin1String(key), v);
         }
     }
-    template<>
-    void insertNonEmptyProp<bool>(QJsonObject &obj, const char *key,
-                                  const QTextFormat &fmt,
-                                  const int propId) const {
+
+    void insertNonEmptyProp(QJsonObject &obj, const char *key,
+                            const QTextFormat &fmt,
+                            const int propId, identity<bool>) const {
         if (fmt.hasProperty(propId)) {
             obj.insert(QLatin1String(key), fmt.boolProperty(propId));
         }
