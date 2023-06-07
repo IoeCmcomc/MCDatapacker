@@ -107,7 +107,7 @@ void InventorySlotEditor::onNewItemTag() {
     TagSelectorDialog dialog(this, CodeFile::ItemTag);
 
     if (dialog.exec()) {
-        auto invItem = InventoryItem(dialog.getSelectedID());
+        InventoryItem invItem(dialog.getSelectedID());
         if ((!slot->getItems().contains(invItem)) && slot->getAcceptTag()) {
             slot->appendItem(invItem);
             if (!slot->getItems().contains(invItem)) return;

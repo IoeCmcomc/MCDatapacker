@@ -31,7 +31,7 @@ QTimer InventorySlot::m_timer = QTimer(qApp);
 [[maybe_unused]] const char _ = _initTimer(InventorySlot::m_timer);
 
 
-InventorySlot::InventorySlot(QWidget *parent, const InventoryItem &item)
+InventorySlot::InventorySlot(QWidget *parent)
     : QFrame(parent) {
     setAcceptDrops(true);
     /*setMinimumSize(sizeHint()); */
@@ -39,10 +39,6 @@ InventorySlot::InventorySlot(QWidget *parent, const InventoryItem &item)
     setBackground();
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     setLineWidth(2);
-
-    clearItems();
-    if (!item.isEmpty())
-        setItem(item);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InventorySlot::customContextMenuRequested, this,
@@ -104,7 +100,24 @@ void InventorySlot:: setItem(const InventoryItem &item) {
     }
 }
 
+void InventorySlot::setItem(InventoryItem &&item) {
+    if (checkAcceptableItem(item)) {
+        clearItems();
+        items.push_back(item);
+        showItem();
+        emit itemChanged();
+    }
+}
+
 void InventorySlot::appendItem(const InventoryItem &item) {
+    if (!checkAcceptableItem(item) || items.contains(item))
+        return;
+
+    items.push_back(item);
+    emit itemChanged();
+}
+
+void InventorySlot::appendItem(InventoryItem &&item) {
     if (!checkAcceptableItem(item) || items.contains(item))
         return;
 
@@ -193,11 +206,13 @@ QString InventorySlot::toolTipText() {
 }
 
 bool InventorySlot::checkAcceptableItem(const InventoryItem &item) {
-    if ((!getAcceptTag() && item.isTag())
-        || (((m_selectCategory == SelectCategory::ObtainableItems) &&
-             !item.isItem())
-            || ((m_selectCategory == SelectCategory::Blocks) &&
-                !item.isBlock()))) {
+    if (getAcceptTag() && item.isTag()) {
+        return true;
+    }
+    if (((m_selectCategory == SelectCategory::ObtainableItems) &&
+         !item.isItem())
+        || ((m_selectCategory == SelectCategory::Blocks) &&
+            !item.isBlock())) {
         return false;
     } else {
         return true;
@@ -212,20 +227,26 @@ bool InventorySlot::checkAcceptableItems(const QVector<InventoryItem> &items) {
     static const auto hasTagPred = [](const InventoryItem &item) {
                                        return item.isTag();
                                    };
-    static const auto hasUnobtainablePred = [](const InventoryItem &item) {
-                                                return !item.isItem();
-                                            };
-    bool onlyBlocks =
+    static const auto hasUnobtainablePred =
+        [](const InventoryItem &item) {
+            return item.getFlags() == InventoryItem::Block;
+        };
+    const bool onlyBlocks =
         std::all_of(items.constBegin(), items.constEnd(), onlyBlocksPred);
-    bool hasTag = std::any_of(items.constBegin(), items.constEnd(),
-                              hasTagPred);
-    bool hasUnobtainable = std::any_of(items.constBegin(), items.constEnd(),
-                                       hasUnobtainablePred);
+    const bool hasTag = std::any_of(items.constBegin(), items.constEnd(),
+                                    hasTagPred);
+    const bool hasUnobtainable = std::any_of(items.constBegin(),
+                                             items.constEnd(),
+                                             hasUnobtainablePred);
 
-    if ((!getAcceptMultiple() && (items.size() > 1))
-        || (!getAcceptTag() && hasTag)
-        || ((m_selectCategory == SelectCategory::ObtainableItems) &&
-            hasUnobtainable)
+    if (!getAcceptMultiple() && (items.size() > 1)) {
+        return false;
+    }
+    if (!getAcceptTag() && hasTag) {
+        return false;
+    }
+    if (((m_selectCategory == SelectCategory::ObtainableItems) &&
+         hasUnobtainable)
         || ((m_selectCategory == SelectCategory::Blocks) &&
             !onlyBlocks)) {
         return false;
@@ -479,7 +500,7 @@ void InventorySlot::dropEvent(QDropEvent *event) {
                     if (event->keyboardModifiers() & Qt::ControlModifier)
                         appendItem(newItem);
                     else
-                        setItem(newItem);
+                        setItem(std::move(newItem));
 
                     event->setDropAction(Qt::LinkAction);
                     event->accept();
@@ -490,7 +511,7 @@ void InventorySlot::dropEvent(QDropEvent *event) {
             if (!id.isEmpty()) {
                 InventoryItem newItem(id);
                 if (getAcceptTag() || (!newItem.isTag())) {
-                    setItem(newItem);
+                    setItem(std::move(newItem));
 
                     event->setDropAction(Qt::LinkAction);
                     event->accept();

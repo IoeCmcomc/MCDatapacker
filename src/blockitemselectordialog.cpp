@@ -138,7 +138,7 @@ QString BlockItemSelectorDialog::getSelectedID() {
 
     QStandardItem *item =
         model.itemFromIndex(filterModel.mapToSource(indexes[0]));
-    auto invItem = item->data(Qt::UserRole + 1).value<InventoryItem>();
+    auto &&invItem = item->data(Qt::UserRole + 1).value<InventoryItem>();
     return invItem.getNamespacedID();
 }
 
@@ -152,7 +152,7 @@ QVector<InventoryItem> BlockItemSelectorDialog::getSelectedItems() {
     for (const auto &index : qAsConst(indexes)) {
         QStandardItem *item =
             model.itemFromIndex(filterModel.mapToSource(index));
-        const auto &&invItem =
+        auto &&invItem =
             item->data(Qt::UserRole + 1).value<InventoryItem>();
         if (items.contains(invItem)) continue;
         items.push_back(invItem);
