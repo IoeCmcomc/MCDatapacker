@@ -11,14 +11,14 @@
 using namespace Glhp;
 
 QChar Glhp::randChr(QStringView charset) {
-    return charset.at(QRandomGenerator::global()->bounded(charset.size()));
+    return charset.at(QRandomGenerator::global()->bounded((int)charset.size()));
 }
 
 QString Glhp::randStr(QStringView charset, int length) {
     QString result;
 
     for (int i = 0; i < length; ++i) {
-        const int index = QRandomGenerator::global()->bounded(charset.size());
+        const int index = QRandomGenerator::global()->bounded((int)charset.size());
         result.append(charset.at(index));
     }
     return result;

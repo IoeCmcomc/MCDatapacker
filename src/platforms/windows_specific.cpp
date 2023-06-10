@@ -13,6 +13,8 @@
 #define DWMWA_USE_IMMERSIVE_DARK_MODE    20
 #endif
 
+#else
+#include <QString>
 #endif
 
 const static QString transparentStyleSheet = QStringLiteral(
