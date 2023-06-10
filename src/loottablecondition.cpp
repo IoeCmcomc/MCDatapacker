@@ -158,19 +158,33 @@ QJsonObject LootTableCondition::toJson() const {
             QJsonArray terms;
             int        childCount = ui->nested_dataInterface->entriesCount();
             if (childCount != 0) {
-                for (const auto child : ui->nested_dataInterface->json()) {
-                    auto &&cond = child.toObject();
-                    if (ui->nested_andRadio->isChecked())
-                        addInvertCondition(cond);
-                    terms.push_back(cond);
-                }
-                root.insert("terms", terms);
-                if (ui->nested_invertedCheck->isChecked()) {
-                    if (ui->nested_orRadio->isChecked())
-                        addInvertCondition(root);
+                if (Game::version() < Game::v1_20) {
+                    for (const auto child : ui->nested_dataInterface->json()) {
+                        auto &&cond = child.toObject();
+                        if (ui->nested_andRadio->isChecked())
+                            addInvertCondition(cond);
+                        terms.push_back(cond);
+                    }
+                    root.insert("terms", terms);
+                    if (ui->nested_invertedCheck->isChecked()) {
+                        if (ui->nested_orRadio->isChecked())
+                            addInvertCondition(root);
+                    } else {
+                        if (ui->nested_andRadio->isChecked())
+                            addInvertCondition(root);
+                    }
                 } else {
-                    if (ui->nested_andRadio->isChecked())
+                    terms = ui->nested_dataInterface->json();
+                    root.insert("terms", terms);
+                    if (ui->nested_orRadio->isChecked()) {
+                        root["condition"] = "minecraft:any_of";
+                    } else {
+                        root["condition"] = "minecraft:all_of";
+                    }
+                    root.remove("alternative");
+                    if (ui->nested_invertedCheck->isChecked()) {
                         addInvertCondition(root);
+                    }
                 }
                 auto rootMap = root.toVariantMap();
                 simplifyCondition(rootMap);
@@ -275,24 +289,38 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     simplifyCondition(valueMap);
     auto value = QJsonObject::fromVariantMap(valueMap);
 
-    QString condType = value["condition"].toString();
+    QString &&condType = value["condition"].toString();
     Glhp::removePrefix(condType, "minecraft:"_QL1);
 
     bool isRandChanceWithLoot = false;
-    bool singleInverted       = false;
-    if (condType.endsWith("random_chance_with_looting")) {
+    auto nestedMode           = NestedMode::Invalid;
+    if (condType == "random_chance_with_looting") {
         condType             = "random_chance";
         isRandChanceWithLoot = true;
-    } else if (condType.endsWith("inverted")) {
-        condType       = "alternative";
-        singleInverted = true;
+    } else if (condType == "alternative" && Game::version() < Game::v1_20) {
+        condType   = "alternative";
+        nestedMode = NestedMode::Alternative;
+    } else if (condType == "inverted") {
+        condType   = "alternative";
+        nestedMode = NestedMode::SingleInvert;
+    } else if (Game::version() >= Game::v1_20) {
+        if (condType == "all_of") {
+            condType   = "alternative";
+            nestedMode = NestedMode::AllOf;
+        } else if (condType == "any_of") {
+            condType   = "alternative";
+            nestedMode = NestedMode::AnyOf;
+        }
     }
 
-    int          condIndex = condTypes.indexOf(condType);
-    const auto &&model     =
+    const int condIndex = condTypes.indexOf(condType);
+    if (condIndex == -1) {
+        return;
+    }
+    const auto &&model =
         static_cast<QStandardItemModel *>(ui->conditionTypeCombo->model());
     const auto &&item = model->item(condIndex, 0);
-    if (!item->isEnabled())
+    if (item && !item->isEnabled())
         return;
 
     ui->conditionTypeCombo->setCurrentIndex(condIndex);
@@ -393,7 +421,11 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         }
 
         case 6: { /*Nested conditions */
-            if (singleInverted && value.contains("term")) {
+            if (nestedMode == NestedMode::Invalid) {
+                return;
+            }
+            if (nestedMode == NestedMode::SingleInvert
+                && value.contains("term")) {
                 ui->nested_dataInterface->setJson({ value["term"].toObject() });
                 ui->nested_orRadio->setChecked(true);
                 ui->nested_invertedCheck->setChecked(true);
@@ -427,6 +459,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                 ui->nested_dataInterface->setJson(terms);
 
                 if (redirected) {
+                    qDebug() << "redirected";
                     if (areTermsInverted) {
                         ui->nested_andRadio->setChecked(true);
                         ui->nested_invertedCheck->setChecked(false);
@@ -435,9 +468,9 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                         ui->nested_invertedCheck->setChecked(true);
                     }
                 } else {
-                    if (areTermsInverted) {
+                    if (areTermsInverted || nestedMode == NestedMode::AllOf) {
                         ui->nested_andRadio->setChecked(true);
-                        ui->nested_invertedCheck->setChecked(true);
+                        ui->nested_invertedCheck->setChecked(false);
                     } else {
                         ui->nested_orRadio->setChecked(true);
                         ui->nested_invertedCheck->setChecked(false);
