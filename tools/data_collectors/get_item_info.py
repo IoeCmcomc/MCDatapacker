@@ -52,7 +52,7 @@ get_icon_info("uncraftable-potion", "potion")
 get_icon_info("uncraftable-splash-potion", "splash_potion")
 get_icon_info("uncraftable-lingering-potion", "lingering_potion")
 
-sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f5/ItemCSS.png"
+sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f5/ItemCSS.png/revision/latest?cb=20230607112659"
 with urllib.request.urlopen(sheet_url) as url:
     f = BytesIO(url.read())
 sheet_img = Image.open(f)

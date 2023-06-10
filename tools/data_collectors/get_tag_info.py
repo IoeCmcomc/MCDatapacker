@@ -20,9 +20,12 @@ def get_html(tag):
     return html
 
 h4 = h3
-while (h4 := h4.find_next_sibling("h4")) != None and h4.text != 'Removed Tags':
-    print(h4.name, h4.text)
-    tag_category = h4.span.text.lower().replace(" ", "_")[:-1] + ".json"
+while (h4 := h4.find_next_sibling("h4")) != None:
+    h4_title = h4.span.text
+    print(h4.name, h4_title)
+    if h4_title.strip().casefold() == 'removed tags':
+        break
+    tag_category = h4_title.lower().replace(" ", "_")[:-1] + ".json"
     info = dict()
     table = h4.find_next_sibling("table")
     tr_tags = table.find_all(find_tr_tags)

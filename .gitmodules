@@ -73,3 +73,9 @@
 [submodule "resource/minecraft/info/1.19.4/summary"]
 	path = resource/minecraft/info/1.19.4/summary
 	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.20/registries"]
+	path = resource/minecraft/info/1.20/registries
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.20/summary"]
+	path = resource/minecraft/info/1.20/summary
+	url = https://github.com/misode/mcmeta.git

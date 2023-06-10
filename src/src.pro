@@ -280,6 +280,7 @@ RESOURCES += \
     ../resource/minecraft/info/1.19/1.19.qrc \
     ../resource/minecraft/info/1.19.3/1.19.3.qrc \
     ../resource/minecraft/info/1.19.4/1.19.4.qrc \
+    ../resource/minecraft/info/1.20/1.20.qrc \
     ../resource/minecraft/minecraft.qrc \
     ../resource/app/icons/default/default.qrc
 
