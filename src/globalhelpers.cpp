@@ -18,7 +18,8 @@ QString Glhp::randStr(QStringView charset, int length) {
     QString result;
 
     for (int i = 0; i < length; ++i) {
-        const int index = QRandomGenerator::global()->bounded((int)charset.size());
+        const int index = QRandomGenerator::global()->bounded(
+            (int)charset.size());
         result.append(charset.at(index));
     }
     return result;
@@ -70,6 +71,8 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         { QStringLiteral("dimension_type"), CodeFile::DimensionType },
         { QStringLiteral("chat_type"), CodeFile::ChatType },
         { QStringLiteral("damage_type"), CodeFile::DamageType },
+        { QStringLiteral("trim_material"), CodeFile::TrimMaterial },
+        { QStringLiteral("trim_pattern"), CodeFile::TrimPattern },
         { QStringLiteral("tags/blocks"), CodeFile::BlockTag },
         { QStringLiteral("tags/entity_types"), CodeFile::EntityTypeTag },
         { QStringLiteral("tags/fluids"), CodeFile::FluidTag },
@@ -262,6 +265,8 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
                 appendPerCategory(nspace, "dimension");
                 appendPerCategory(nspace, "dimension_type");
                 appendPerCategory(nspace, "chat_type");
+                appendPerCategory(nspace, "trim_material");
+                appendPerCategory(nspace, "trim_pattern");
                 appendPerCategory(nspace, "tag");
                 appendPerCategory(nspace, "worldgen");
             }
@@ -335,6 +340,8 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
         { CodeFile::DimensionType,      QT_TR_NOOP("Dimension type")    },
         { CodeFile::ChatType,           QT_TR_NOOP("Chat type")         },
         { CodeFile::DamageType,         QT_TR_NOOP("Damage type")       },
+        { CodeFile::TrimMaterial,       QT_TR_NOOP("Trim material")     },
+        { CodeFile::TrimPattern,        QT_TR_NOOP("Trim pattern")      },
         { CodeFile::BlockTag,           QT_TR_NOOP("Block tag")         },
         { CodeFile::EntityTypeTag,      QT_TR_NOOP("Entity type tag")   },
         { CodeFile::FluidTag,           QT_TR_NOOP("Fluid tag")         },

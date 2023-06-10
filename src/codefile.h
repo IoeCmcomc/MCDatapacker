@@ -23,6 +23,8 @@ struct CodeFile {
         DimensionType,      /* 1.16.2+ */
         ChatType,           // 1.19.3+
         DamageType,         // 1.19.4+
+        TrimMaterial,       // 1.20+
+        TrimPattern,        // 1.20+
         WorldGen,           /* 1.16.2+ */
         Biome,              /* 1.16.2+ */
         ConfiguredCarver,   /* 1.16.2+ */

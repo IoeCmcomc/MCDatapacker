@@ -164,6 +164,12 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
             addNewFileAction(newMenu, tr("Structure"),
                              QLatin1String(".nbt"),
                              QLatin1String("structures"));
+            if (Game::version() >= Game::v1_20) {
+                addNewFileAction(newMenu, tr("Trim material"), jsonExt,
+                                 QLatin1String("trim_material"));
+                addNewFileAction(newMenu, tr("Trim pattern"), jsonExt,
+                                 QLatin1String("trim_pattern"));
+            }
 
             /*"Tag" menu */
             QMenu *tagMenu = new QMenu(tr("Tag"), newMenu);
