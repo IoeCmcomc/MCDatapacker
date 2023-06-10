@@ -32,6 +32,10 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
             }
         }
     }
+    if (Game::version() < Game::v1_20) {
+        ui->randomSeqEdit->hide();
+        ui->randomSeqLabel->hide();
+    }
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
             this, &LootTableEditorDock::writeJson);
@@ -68,6 +72,12 @@ void LootTableEditorDock::writeJson() {
                            types[ui->lootTableTypeCombo->currentIndex()];
 
     root.insert("type", type);
+
+    if (Game::version() >= Game::v1_20) {
+        if (auto &&sequence = ui->randomSeqEdit->text(); !sequence.isEmpty()) {
+            root["random_sequence"] = sequence;
+        }
+    }
 
     QJsonArray pools = ui->poolsInterface->json();
     if (!pools.isEmpty())
@@ -106,6 +116,10 @@ void LootTableEditorDock::readJson() {
             return;
 
         ui->lootTableTypeCombo->setCurrentIndex(index);
+    }
+
+    if (Game::version() >= Game::v1_20) {
+        ui->randomSeqEdit->setText(root.value("random_sequence").toString());
     }
 
     ui->poolsInterface->setJson(root.value("pools").toArray());
