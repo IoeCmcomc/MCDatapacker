@@ -111,6 +111,16 @@
           <string>Predicates in advancements</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Archaeology</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Advancement location</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>

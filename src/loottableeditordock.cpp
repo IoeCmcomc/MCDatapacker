@@ -16,25 +16,30 @@
 #include <QJsonDocument>
 #include <QListView>
 
+void hideComboRow(QComboBox *comboBox, int row) {
+    if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
+        auto *model = static_cast<QStandardItemModel *>(comboBox->model());
+        view->setRowHidden(row, true);
+        model->item(row, 0)->setEnabled(false);
+    }
+}
+
 LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
     if (Game::version() < Game::v1_16) {
-        if (auto *view =
-                qobject_cast<QListView *>(ui->lootTableTypeCombo->view())) {
-            const auto &&model =
-                static_cast<QStandardItemModel *>(ui->lootTableTypeCombo->model());
-            for (int i = 8; i < view->model()->rowCount(); ++i) {
-                view->setRowHidden(i, true);
-                model->item(i, 0)->setEnabled(false);
-            }
-        }
+        hideComboRow(ui->lootTableTypeCombo, 8);
+        hideComboRow(ui->lootTableTypeCombo, 9);
+        hideComboRow(ui->lootTableTypeCombo, 10);
+        hideComboRow(ui->lootTableTypeCombo, 11);
     }
     if (Game::version() < Game::v1_20) {
         ui->randomSeqEdit->hide();
         ui->randomSeqLabel->hide();
+        hideComboRow(ui->lootTableTypeCombo, 12);
+        hideComboRow(ui->lootTableTypeCombo, 13);
     }
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
@@ -68,6 +73,9 @@ LootTableEditorDock::~LootTableEditorDock() {
 void LootTableEditorDock::writeJson() {
     QJsonObject root;
 
+    if (ui->lootTableTypeCombo->currentIndex() == 0) {
+        return;
+    }
     const QString &&type = QStringLiteral("minecraft:") +
                            types[ui->lootTableTypeCombo->currentIndex()];
 
