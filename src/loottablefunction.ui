@@ -553,6 +553,23 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="reference">
+       <layout class="QFormLayout" name="formLayout_17">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_43">
+          <property name="text">
+           <string>Name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>ref_nameEdit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="ref_nameEdit"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="set_attributes">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="0">
@@ -1301,6 +1318,11 @@
       <item>
        <property name="text">
         <string>Looting enchant</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Reference</string>
        </property>
       </item>
       <item>

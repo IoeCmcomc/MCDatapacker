@@ -5,6 +5,7 @@
 #include "loottablepool.h"
 #include "loottablefunction.h"
 
+#include "modelfunctions.h"
 #include "globalhelpers.h"
 #include "game.h"
 #include "platforms/windows_specific.h"
@@ -16,13 +17,6 @@
 #include <QJsonDocument>
 #include <QListView>
 
-void hideComboRow(QComboBox *comboBox, int row) {
-    if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
-        auto *model = static_cast<QStandardItemModel *>(comboBox->model());
-        view->setRowHidden(row, true);
-        model->item(row, 0)->setEnabled(false);
-    }
-}
 
 LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     QDockWidget(parent),

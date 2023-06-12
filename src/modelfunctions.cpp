@@ -3,6 +3,7 @@
 #include "game.h"
 #include "extendedtablewidget.h"
 
+#include <QListView>
 #include <QApplication>
 
 void initModelView(QStandardItemModel &model,
@@ -136,4 +137,12 @@ void appendRowToModel(QStandardItemModel &model, const QString &text,
 
     item->setData(data, role);
     model.appendRow(item);
+}
+
+void hideComboRow(QComboBox *comboBox, const int row) {
+    if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
+        auto *model = static_cast<QStandardItemModel *>(comboBox->model());
+        view->setRowHidden(row, true);
+        model->item(row, 0)->setEnabled(false);
+    }
 }

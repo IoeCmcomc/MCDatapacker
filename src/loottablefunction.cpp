@@ -19,21 +19,15 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     ui->setupUi(this);
     updateConditionsTab(0);
 
-    auto *view  = qobject_cast<QListView *>(ui->functionTypeCombo->view());
-    auto *model =
-        static_cast<QStandardItemModel *>(ui->functionTypeCombo->model());
     if (Game::version() < Game::v1_17) {
-        view->setRowHidden(SetEnchantments, true);
-        model->item(SetEnchantments, 0)->setEnabled(false);
-        view->setRowHidden(SetBannerPattern, true);
-        model->item(SetBannerPattern, 0)->setEnabled(false);
+        hideComboRow(ui->functionTypeCombo, SetEnchantments);
+        hideComboRow(ui->functionTypeCombo, SetBannerPattern);
 
         ui->setCount_addCheck->hide();
         ui->setDamage_addCheck->hide();
     }
     if (Game::version() < Game::v1_18) {
-        view->setRowHidden(SetPotion, true);
-        model->item(SetPotion, 0)->setEnabled(false);
+        hideComboRow(ui->functionTypeCombo, SetPotion);
 
         ui->setContent_typeLabel->hide();
         ui->setContents_typeCombo->hide();
@@ -46,8 +40,7 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
         ui->lootTable_typeCombo->setModel(&blockEntityTypesModel);
     }
     if (Game::version() < Game::v1_19) {
-        view->setRowHidden(SetInstrument, true);
-        model->item(SetInstrument, 0)->setEnabled(false);
+        hideComboRow(ui->functionTypeCombo, SetInstrument);
     }
 
     connect(ui->functionTypeCombo,
@@ -265,6 +258,15 @@ QJsonObject LootTableFunction::toJson() const {
             root.insert("count", ui->lootEnchant_countInput->toJson());
             root.insert("limit", ui->lootEnchant_limitSpin->value());
             break;
+        }
+
+        case Reference: {
+            if (Game::version() >= Game::v1_20) {
+                if (const auto &&name = ui->ref_nameEdit->text();
+                    !name.isEmpty()) {
+                    root["name"] = name;
+                }
+            }
         }
 
         case SetAttributes: { /* Set attributes */
@@ -613,6 +615,14 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             if (root.contains("limit"))
                 ui->lootEnchant_limitSpin->setValue(root.value("limit").toInt());
             break;
+        }
+
+        case Reference: {
+            if (Game::version() >= Game::v1_20) {
+                if (root.contains("name")) {
+                    ui->ref_nameEdit->setText(root.value("name").toString());
+                }
+            }
         }
 
         case SetAttributes: { /* Set attributes */

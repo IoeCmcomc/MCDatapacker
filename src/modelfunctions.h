@@ -29,6 +29,9 @@ void appendRowToTableWidget(QTableWidget *table,
 void appendRowToModel(QStandardItemModel &model, const QString &text,
                       const QVariant &data, int role = Qt::UserRole + 1);
 
+void hideComboRow(QComboBox *comboBox, const int row);
+
+
 const QString deletiveToolTip = QStringLiteral(QT_TRANSLATE_NOOP("toolTip",
                                                                  "Right click this row to delete."));
 
