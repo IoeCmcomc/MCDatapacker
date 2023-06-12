@@ -12,8 +12,7 @@ namespace Ui {
     class VisualRecipeEditorDock;
 }
 
-class VisualRecipeEditorDock : public QDockWidget
-{
+class VisualRecipeEditorDock : public QDockWidget {
     Q_OBJECT
 
 public:
@@ -54,7 +53,8 @@ private:
     void readSmithingJson(const QJsonObject &root);
 };
 
-QJsonValue ingredientsToJson(const QVector<InventoryItem> &items);
+QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
+                             const bool emptyAsArray = false);
 QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal);
 
 #endif /* VISUALRECIPEEDITORDOCK_H */

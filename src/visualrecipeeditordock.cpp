@@ -38,9 +38,17 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
 
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this, &VisualRecipeEditorDock::onRecipeTabChanged);
-    connect(ui->cookTimeCheck, &QCheckBox::toggled, this, [this](bool checked) {
-        ui->cookTimeInput->setEnabled(checked);
+    connect(ui->smithTypeCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            ui->outputSlot, [this](int index){
+        if (index == 0) {
+            ui->outputSlot->setDisabled(false);
+        } else {
+            ui->outputSlot->clearItems();
+            ui->outputSlot->setDisabled(true);
+        }
     });
+    connect(ui->smithTypeCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            ui->resultCountInput, &QWidget::setDisabled);
     connect(ui->writeRecipeBtn, &QPushButton::clicked,
             this, &VisualRecipeEditorDock::writeRecipe);
     connect(ui->readRecipeBtn, &QPushButton::clicked, this,
@@ -55,6 +63,13 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     setupCategoryCombo();
     if (Game::version() < Game::v1_19_4) {
         ui->showNotifCheck->hide();
+    }
+    if (Game::version() < Game::v1_20) {
+        ui->smithingSlot_2->hide();
+        ui->smithTypeCombo->hide();
+        ui->label_3->hide();
+    } else {
+        ui->smithingPlus->hide();
     }
 }
 
@@ -126,7 +141,7 @@ void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
     Q_ASSERT(index >= 0 && index < 4);
     ui->stackedRecipeWidget->setCurrentIndex(index);
     ui->resultCountInput->setEnabled(index != 1);
-    ui->stackedOptions->setCurrentIndex(qMin(index, 2));
+    ui->stackedOptions->setCurrentIndex(qMin(index, 3));
 
     if (Game::version() >= Game::v1_19) {
         ui->recipeCategoryLabel->setEnabled(index <= 1);
@@ -136,6 +151,10 @@ void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
         } else if (index == 1) {
             ui->recipeCategoryCombo->setModel(&m_smeltCategories);
         }
+    }
+    if (Game::version() >= Game::v1_20) {
+        ui->outputSlot->setEnabled((index != 3) ||
+                                   (ui->smithTypeCombo->currentIndex() == 0));
     }
 }
 
@@ -308,24 +327,45 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
 }
 
 QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
-    root.insert(QStringLiteral("type"),
-                QStringLiteral("minecraft:smithing"));
+    const bool from_v1_20 = Game::version() >= Game::v1_20;
+
+    if (from_v1_20) {
+        root.insert(QStringLiteral("type"),
+                    (ui->smithTypeCombo->currentIndex() == 0)
+                        ? QStringLiteral("minecraft:smithing_transform")
+                        : QStringLiteral("minecraft:smithing_trim"));
+    } else {
+        root.insert(QStringLiteral("type"),
+                    QStringLiteral("minecraft:smithing"));
+    }
 
     if (ui->smithingSlot_0->isEmpty())
         return root;
 
     const auto &base = ui->smithingSlot_0->getItems();
-    root.insert(QStringLiteral("base"), ingredientsToJson(base));
+    root.insert(QStringLiteral("base"), ingredientsToJson(base, from_v1_20));
     const auto &addition = ui->smithingSlot_1->getItems();
-    root.insert(QStringLiteral("addition"), ingredientsToJson(addition));
+    root.insert(QStringLiteral("addition"),
+                ingredientsToJson(addition, from_v1_20));
+    if (from_v1_20) {
+        const auto &templates = ui->smithingSlot_2->getItems();
+        root.insert(QStringLiteral("template"),
+                    ingredientsToJson(templates, true));
+    }
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
-    root.insert(QStringLiteral("count"), ui->resultCountInput->value());
+    if (!from_v1_20 || (ui->smithTypeCombo->currentIndex() == 0)) {
+        QJsonObject result;
+        result.insert(QStringLiteral("item"),
+                      ui->outputSlot->itemNamespacedID());
+        result.insert(QStringLiteral("count"), ui->resultCountInput->value());
+        root.insert(QStringLiteral("result"), result);
+    }
 
     return root;
 }
 
-QJsonValue ingredientsToJson(const QVector<InventoryItem> &items) {
+QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
+                             const bool emptyAsArray) {
     QJsonArray keyItems;
 
     for (const auto &item : items) {
@@ -343,11 +383,11 @@ QJsonValue ingredientsToJson(const QVector<InventoryItem> &items) {
     }
     /*qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems; */
     if (keyItems.isEmpty()) {
-        return QJsonValue();
+        return emptyAsArray ? QJsonArray() : QJsonValue();
     } else if (keyItems.count() == 1) {
-        return QJsonValue(keyItems.at(0));
+        return keyItems.at(0);
     } else {
-        return QJsonValue(keyItems);
+        return keyItems;
     }
 }
 
@@ -398,7 +438,13 @@ void VisualRecipeEditorDock::readRecipe() {
         ui->customTabBar->setCurrentIndex(2);
         readStonecuttingJson(root);
     } else if (type == QStringLiteral("smithing")
-               && (Game::version() >= Game::v1_16)) {
+               && (Game::version() >= Game::v1_16)
+               && (Game::version() < Game::v1_20)) {
+        ui->customTabBar->setCurrentIndex(3);
+        readSmithingJson(root);
+    } else if ((type == QStringLiteral("smithing_transform") ||
+                type == QStringLiteral("smithing_trim"))
+               && (Game::version() >= Game::v1_20)) {
         ui->customTabBar->setCurrentIndex(3);
         readSmithingJson(root);
     }
@@ -551,29 +597,46 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
 }
 
 void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
-    if (!root.contains(QStringLiteral("base"))) return;
+    bool isArmorTrimMode = false;
 
+    if (Game::version() < Game::v1_20) {
+        if (!root.contains(QStringLiteral("base"))) return;
+    } else {
+        QString type = root.value("type").toString();
+        Glhp::removePrefix(type, "minecraft:"_QL1);
+        isArmorTrimMode = type == "smithing_trim"_QL1;
+        ui->smithTypeCombo->setCurrentIndex(isArmorTrimMode);
+    }
     const QJsonValue &&base = root[QStringLiteral("base")];
     ui->smithingSlot_0->setItems(JsonToIngredients(base));
 
-    if (!root.contains(QStringLiteral("addition"))) return;
-
+    if (Game::version() < Game::v1_20) {
+        if (!root.contains(QStringLiteral("addition"))) return;
+    }
     const QJsonValue &&addition = root[QStringLiteral("addition")];
     ui->smithingSlot_1->setItems(JsonToIngredients(addition));
 
-    if (!root.contains(QStringLiteral("result"))) return;
+    if (root.contains("template")) {
+        const QJsonValue &&templates = root[QStringLiteral("template")];
+        ui->smithingSlot_2->setItems(JsonToIngredients(templates));
+    }
 
-    const QJsonObject &&result = root[QStringLiteral("result")].toObject();
-    if (!result.contains(QStringLiteral("item"))) return;
+    if (!isArmorTrimMode) {
+        if (!root.contains(QStringLiteral("result"))) return;
 
-    const QString &&itemID = result[QStringLiteral("item")].toString();
-    if (!itemID.isEmpty())
-        ui->outputSlot->setItem(InventoryItem(itemID));
-    else
-        ui->outputSlot->clearItems();
+        const QJsonObject &&result = root[QStringLiteral("result")].toObject();
+        if (!result.contains(QStringLiteral("item"))) return;
 
-    if (result.contains(QStringLiteral("count"))) {
-        ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt());
+        const QString &&itemID = result[QStringLiteral("item")].toString();
+        if (!itemID.isEmpty())
+            ui->outputSlot->setItem(InventoryItem(itemID));
+        else
+            ui->outputSlot->clearItems();
+
+        if (result.contains(QStringLiteral("count"))) {
+            ui->resultCountInput->setValue(result[QStringLiteral(
+                                                      "count")].toInt());
+        }
     }
 }
 
