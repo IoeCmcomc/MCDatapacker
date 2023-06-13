@@ -52,15 +52,17 @@ QStringList loadMinecraftCommandLiterals(
 
     QStringList ret;
 
-    for (auto it = node->literalChildren().cbegin();
-         it != node->literalChildren().cend(); ++it) {
+    const auto &&literalChidrens = node->literalChildren();
+    for (auto it = literalChidrens.cbegin();
+         it != literalChidrens.cend(); ++it) {
         ret << it.key();
         ret += loadMinecraftCommandLiterals(it.value(), depth + 1);
     }
 
     // cppcheck-suppress iterators3
-    for (auto it = node->argumentChildren().cbegin();
-         it != node->argumentChildren().cend(); ++it) {
+    const auto &&argumentChildren = node->literalChildren();
+    for (auto it = argumentChildren.cbegin();
+         it != argumentChildren.cend(); ++it) {
         // cppcheck-suppress danglingTemporaryLifetime
         ret += loadMinecraftCommandLiterals(*it, depth + 1);
     }
@@ -99,6 +101,7 @@ QStringList loadMinecraftCompletionInfo() {
     ret += Game::getRegistry(QStringLiteral("sound_event"));
 
     ret.sort(Qt::CaseInsensitive);
+    ret.removeDuplicates();
     return ret;
 }
 
@@ -127,6 +130,7 @@ qreal perceivedLightness(const QColor &color) {
     }
 }
 
+QStringList CodeEditor::minecraftCompletionInfo = {};
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     m_gutter = new CodeGutter(this);
@@ -183,10 +187,13 @@ void CodeEditor::initCompleter() {
     auto *completer = new QCompleter(this);
 
     if (m_fileType == CodeFile::Function) {
-        minecraftCompletionInfo = loadMinecraftCompletionInfo();
+        if (minecraftCompletionInfo.isEmpty()) {
+            minecraftCompletionInfo = loadMinecraftCompletionInfo();
+            qDebug() << "Minecraft completions loaded (" <<
+                minecraftCompletionInfo.size() << "items)";
+        }
     }
-    completer->setModel(new QStringListModel(minecraftCompletionInfo,
-                                             this));
+    completer->setModel(new QStringListModel(minecraftCompletionInfo, this));
     completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
@@ -327,7 +334,9 @@ void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
         tc.movePosition(QTextCursor::PreviousCharacter,
                         QTextCursor::KeepAnchor);
         //debugTextCursor(tc);
-        const QChar &curChar = *tc.selectedText().constBegin();
+        // This fixes garbage characters in debug mode
+        const QString &&selectedText = tc.selectedText();
+        const QChar    &curChar      = selectedText.front();
 
         if (extendedAcceptedCharsset.contains(curChar)) {
             tc.movePosition(QTextCursor::PreviousCharacter);
@@ -479,6 +488,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
 
     if (completionPrefix != m_completer->completionPrefix()) {
         if (m_completer->popup()->isHidden()) {
+            qDebug() << "Combining final completions";
             QStringList completionInfo = minecraftCompletionInfo;
 
             const QVector<QString> &&idList = Glhp::fileIdList(
@@ -487,8 +497,9 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
                 completionInfo << item;
             }
 
-            completionInfo.removeDuplicates();
             completionInfo.sort(Qt::CaseInsensitive);
+            completionInfo.removeDuplicates();
+
             if (auto *model =
                     qobject_cast<QStringListModel *>(m_completer->model())) {
                 model->setStringList(completionInfo);
@@ -1138,7 +1149,5 @@ QString CodeEditor::textUnderCursorExtended(QTextCursor tc) const {
 }
 
 QString CodeEditor::textUnderCursor() const {
-    QTextCursor tc = textCursor();
-
-    return textUnderCursorExtended(tc);
+    return textUnderCursorExtended(textCursor());
 }

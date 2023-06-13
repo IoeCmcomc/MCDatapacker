@@ -94,10 +94,11 @@ private /*slots*/ :
     void onTextChanged();
 
 private:
+    static QStringList minecraftCompletionInfo;
+
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
-    QStringList minecraftCompletionInfo;
     CodeGutter *m_gutter;
     QCompleter *m_completer          = nullptr;
     Highlighter *m_highlighter       = nullptr;

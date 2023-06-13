@@ -118,8 +118,9 @@ void Highlighter::highlightBlock(const QString &text) {
     }
 
     const QStringView sv{ text };
-    if ((!sv.isEmpty()) &&
-        m_singleCommentCharset.contains(sv[0])) {
+    const QStringView trimmed = sv.trimmed();
+    if ((!trimmed.isEmpty()) &&
+        m_singleCommentCharset.contains(trimmed[0])) {
         setCurrentBlockState(Comment);
         setFormat(0, sv.length(), m_palette[CodePalette::Comment]);
     } else {
