@@ -46,6 +46,13 @@ namespace Command {
                         std::forward_as_tuple(node));
     }
 
+    void ParseNodeCache::emplace(const int typeId, QString &&literalStr,
+                                 WeakNodePtr node) {
+        m_cache.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(typeId, literalStr),
+                        std::forward_as_tuple(node));
+    }
+
     void ParseNodeCache::emplace(const int typeId, const QString &literalStr,
                                  const QVariantMap &props, WeakNodePtr node) {
         m_cache.emplace(std::piecewise_construct,

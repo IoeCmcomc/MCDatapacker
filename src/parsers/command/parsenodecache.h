@@ -75,6 +75,7 @@ public:
         const WeakNodePtr &lookup(const CacheKey &key) const;
         void emplace(const int typeId, const QString &literalStr,
                      WeakNodePtr node);
+        void emplace(const int typeId, QString &&literalStr, WeakNodePtr node);
         void emplace(const int typeId, const QString &literalStr,
                      const QVariantMap &props, WeakNodePtr node);
         WeakNodePtr &operator[](const CacheKey &key);
