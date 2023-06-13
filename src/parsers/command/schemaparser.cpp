@@ -793,7 +793,6 @@ namespace Command {
 
         return true;
     }
-
     void SchemaParser::parseBySchema(const Schema::Node *schemaNode,
                                      int depth) {
         NodePtr ret;
@@ -931,22 +930,62 @@ namespace Command {
         if (reportInvalidCommand) {
             if (literal.isEmpty()) {
                 if (isRoot) {
-                    reportError(QT_TR_NOOP("Invalid empty command"), {},
-                                start, literal.length());
+                    const QString &cmdGuide = commandGuideStr(schemaNode);
+                    reportError(QT_TR_NOOP("Available commands: %1"),
+                                { cmdGuide }, start, literal.length());
                 } else {
-                    reportError(QT_TR_NOOP("Invalid empty sub-command"), {},
-                                start, literal.length());
+                    if (!schemaNode->isEmpty() && !schemaNode->redirect()) {
+                        const QString &cmdGuide = commandGuideStr(schemaNode);
+                        reportError(QT_TR_NOOP("Available sub-commands: %1"),
+                                    { cmdGuide }, start,
+                                    literal.length());
+                    } else {
+                        reportError(QT_TR_NOOP("Invalid empty sub-command"), {},
+                                    start, literal.length());
+                    }
                 }
             } else {
                 if (isRoot) {
-                    reportError(QT_TR_NOOP("Unknown command '%1'"), { literal },
-                                start, literal.length());
+                    if (!schemaNode->isEmpty() && !schemaNode->redirect()) {
+                        const QString &cmdGuide = commandGuideStr(schemaNode);
+                        reportError(QT_TR_NOOP(
+                                        "Unknown command '%1'. Available commands: %2"),
+                                    { literal, cmdGuide },
+                                    start,
+                                    literal.length());
+                    } else {
+                        reportError(QT_TR_NOOP(
+                                        "Unknown command '%1'"), { literal },
+                                    start, literal.length());
+                    }
                 } else {
-                    reportError(QT_TR_NOOP("Unknown sub-command '%1'"),
-                                { literal },
-                                start, literal.length());
+                    if (!schemaNode->isEmpty() && !schemaNode->redirect()) {
+                        const QString &cmdGuide = commandGuideStr(schemaNode);
+                        reportError(QT_TR_NOOP(
+                                        "Unknown sub-command '%1'. Available sub-commands: %2"),
+                                    { literal, cmdGuide },
+                                    start,
+                                    literal.length());
+                    } else {
+                        reportError(QT_TR_NOOP("Unknown sub-command '%1'"),
+                                    { literal }, start, literal.length());
+                    }
                 }
             }
         }
+    }
+
+    const QString Command::SchemaParser::commandGuideStr(
+        const Schema::Node *schemaNode) {
+        QStringList subcommands;
+
+        const auto &literalChildren = schemaNode->literalChildren();
+
+        for (auto it = literalChildren.cbegin();
+             it != literalChildren.cend(); ++it) {
+            subcommands << it.key();
+        }
+
+        return subcommands.join(", ");
     }
 }

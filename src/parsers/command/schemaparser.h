@@ -196,6 +196,8 @@ private:
 //        static inline const QRegularExpression m_decimalNumRegex{
 //            QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
         static inline Schema::RootNode m_schemaGraph;
+
+        const QString commandGuideStr(const Schema::Node *schemaNode);
     };
 }
 
