@@ -134,7 +134,7 @@
              <normaloff>:/icon/format-text-obfuscated.png</normaloff>:/icon/format-text-obfuscated.png</iconset>
            </property>
            <property name="shortcut">
-            <string>Ctrl+S</string>
+            <string notr="true">Ctrl+S</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -215,7 +215,7 @@
              <normaloff>:/icon/object-text-snbt.png</normaloff>:/icon/object-text-snbt.png</iconset>
            </property>
            <property name="shortcut">
-            <string>Ctrl+Shift+N</string>
+            <string notr="true">Ctrl+Alt+N</string>
            </property>
           </widget>
          </item>
