@@ -37,6 +37,7 @@
 #include <QClipboard>
 #include <QProgressDialog>
 #include <QSaveFile>
+#include <QDesktopServices>
 
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
@@ -176,12 +177,13 @@ void MainWindow::initMenu() {
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
     /* Help menu */
+    initResourcesMenu();
     connect(ui->actionAboutApp, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionCheckForUpdates, &QAction::triggered,
             this, &MainWindow::checkForUpdates);
     connect(ui->actionDisclaimer, &QAction::triggered, this,
             &MainWindow::disclaimer);
-    connect(ui->actionAboutQt, &QAction::triggered, [this]() {
+    connect(ui->actionAboutQt, &QAction::triggered, this, [this]() {
         QMessageBox::aboutQt(this);
     });
 
@@ -192,6 +194,42 @@ void MainWindow::initMenu() {
     connect(qApp->clipboard(), &QClipboard::changed, this,
             &MainWindow::updateEditMenu);
     ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+}
+
+void MainWindow::connectActionLink(QAction *action, const QString &&url) {
+    connect(action, &QAction::triggered, this, [url](){
+        QDesktopServices::openUrl(QUrl(url));
+    });
+}
+
+void MainWindow::initResourcesMenu() {
+    // Online tools
+    connectActionLink(ui->actionUuidConverter, QStringLiteral(
+                          R"(https://www.soltoder.com/mc-uuid-converter/)"));
+    connectActionLink(ui->actionSnowcapped, QStringLiteral(
+                          R"(https://snowcapped.jacobsjo.eu/)"));
+    connectActionLink(ui->actionGenerators, QStringLiteral(
+                          R"(https://misode.github.io/)"));
+    connectActionLink(ui->actionUpgrader, QStringLiteral(
+                          R"(https://misode.github.io/upgrader/)"));
+    connectActionLink(ui->actionMcstacker, QStringLiteral(
+                          R"(https://mcstacker.net/)"));
+    connectActionLink(ui->actionMinecraft_Tools, QStringLiteral(
+                          R"(https://minecraft.tools/en/)"));
+    // Offline tools
+    connectActionLink(ui->actionPackSquash, QStringLiteral(
+                          R"(https://github.com/ComunidadAylas/PackSquash/)"));
+    // Minecraft mods
+    connectActionLink(ui->actionBetterCommandBlockUi, QStringLiteral(
+                          R"(https://modrinth.com/mod/bettercommandblockui/)"));
+    connectActionLink(ui->actionDataReload, QStringLiteral(
+                          R"(https://modrinth.com/mod/data-reload/)"));
+    connectActionLink(ui->actionNbtAutocomplete, QStringLiteral(
+                          R"(https://modrinth.com/mod/nbt-autocomplete/)"));
+    connectActionLink(ui->actionCommandHelper, QStringLiteral(
+                          R"(https://github.com/SomeKitten/CommandHelper/)"));
+    connectActionLink(ui->actionNbtTooltips, QStringLiteral(
+                          R"(https://modrinth.com/mod/nbttooltips)"));
 }
 
 void MainWindow::open() {

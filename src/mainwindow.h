@@ -108,6 +108,8 @@ private:
 
     void initDocks();
     void initMenu();
+    void connectActionLink(QAction *action, const QString &&url);
+    void initResourcesMenu();
     void readSettings();
     void writeSettings();
     void moveOldSettings();
