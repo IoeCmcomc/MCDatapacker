@@ -292,7 +292,16 @@ void MainWindow::statistics() {
 void MainWindow::rawJsonTextEditor() {
     auto *editor = new RawJsonTextEditor(this);
 
-    editor->setWindowFlags(Qt::Tool);
+#ifdef Q_OS_LINUX
+    editor->setWindowFlags(
+        Qt::Window | Qt::FramelessWindowHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint |
+        Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+#else
+    editor->setWindowFlags(
+        Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint |
+        Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+#endif
+    editor->setWindowModality(Qt::NonModal);
     editor->setAttribute(Qt::WA_DeleteOnClose);
     editor->show();
     editor->activateWindow();

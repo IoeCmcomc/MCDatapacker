@@ -1,20 +1,25 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
-#include "mainwindow.h"
+//#include "mainwindow.h"
 #include "platforms/windows_specific.h"
 #include "game.h"
 
 #include <QOperatingSystemVersion>
 #include <QFontDatabase>
 #include <QStyleFactory>
+#include <QDir>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::SettingsDialog) {
     ui->setupUi(this);
 
+#ifdef Q_OS_WIN
     Windows::extendFrame(this);
-
+#else
+    ui->darkThemeLabel->hide();
+    ui->darkThemeCombo->hide();
+#endif
     setupLanguageSetting();
     initSettings();
 

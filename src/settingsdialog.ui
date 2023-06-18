@@ -111,7 +111,7 @@
        <item row="1" column="1">
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="1" column="1">
-          <widget class="QLabel" name="label_9">
+          <widget class="QLabel" name="darkThemeLabel">
            <property name="text">
             <string>Automatically switch to the below theme if system dark mode is detected:</string>
            </property>
