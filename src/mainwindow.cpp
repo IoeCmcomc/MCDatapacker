@@ -101,9 +101,10 @@ MainWindow::MainWindow(QWidget *parent)
     if (QFile::exists(oldProgramFile))
         QFile::remove(oldProgramFile);
 
-    updater->setNotifyOnFinish(updateDefUrl, false);
-    updater->checkForUpdates(updateDefUrl);
+//    updater->setNotifyOnFinish(updateDefUrl, false);
+//    updater->checkForUpdates(updateDefUrl);
 
+#ifdef Q_OS_WIN
     QObject::connect(m_systemThemeHelper,
                      &libqdark::SystemThemeHelper::signalLightTheme,
                      this, [this]{
@@ -115,6 +116,7 @@ MainWindow::MainWindow(QWidget *parent)
         onColorModeChanged(true);
     });
     m_systemThemeHelper->setEnabled(true);
+#endif
 }
 
 void MainWindow::initDocks() {
