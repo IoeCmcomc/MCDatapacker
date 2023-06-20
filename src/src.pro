@@ -306,12 +306,21 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-VERSION = 0.6.0
+VERSION_MAJOR = 0
+VERSION_MINOR = 6
+VERSION_PATCH = 0
+
+VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
 QMAKE_TARGET_DESCRIPTION = MCDatapacker - Minecraft datapack editor
 QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2023 IoeCmcomc
+
+DEFINES += APP_VERSION=\\\"$$VERSION\\\" \
+    APP_VERSION_MAJOR=$$VERSION_MAJOR \
+    APP_VERSION_MINOR=$$VERSION_MINOR \
+    APP_VERSION_PATCH=$$VERSION_PATCH
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt

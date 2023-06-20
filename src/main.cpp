@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
-    QCoreApplication::setApplicationVersion("0.6.0");
+    QCoreApplication::setApplicationVersion(APP_VERSION);
 
     /*Q_INIT_RESOURCE(application); */
 

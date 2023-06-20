@@ -85,6 +85,9 @@ MainWindow::MainWindow(QWidget *parent)
     initDocks();
 
     auto *updater = QSimpleUpdater::getInstance();
+#ifdef Q_OS_WIN64
+    updater->setPlatformKey(updateDefUrl, "windows-x64");
+#endif
     updater->setModuleVersion(updateDefUrl,
                               QCoreApplication::applicationVersion());
     updater->setUseCustomInstallProcedures(updateDefUrl, true);
