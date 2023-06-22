@@ -1,13 +1,12 @@
 #include "inventoryitem.h"
 
-#include "inventoryslot.h"
 #include "game.h"
-
 #include "globalhelpers.h"
 
 #include <QPainter>
 #include <QApplication>
 #include <QGraphicsColorizeEffect>
+
 
 char _init() {
     qRegisterMetaType<InventoryItem>();
@@ -15,42 +14,75 @@ char _init() {
     QMetaType::registerComparators<InventoryItem>();
     return 0;
 };
-const auto _ = _init();
+[[maybe_unused]] const auto _ = _init();
 
 InventoryItem::InventoryItem(const QString &id) {
 /*    qDebug() << "Calling normal constructor" << this; */
-    setEmpty(id.isEmpty());
-    if (!isEmpty()) {
+    if (!id.isEmpty())
         setNamespacedID(id);
+}
+
+InventoryItem::InventoryItem(InventoryItem &&other)
+    : m_pixmap{std::move(other.m_pixmap)},
+    m_name{std::move(other.m_name)},
+    m_namespacedId{std::move(other.m_namespacedId)},
+    m_flags{other.m_flags} {
+}
+
+InventoryItem &InventoryItem::operator=(InventoryItem &&other) {
+    if (this != &other) {
+        m_flags        = std::exchange(other.m_flags, Null);
+        m_pixmap       = std::move(other.m_pixmap);
+        m_name         = std::move(other.m_name);
+        m_namespacedId = std::move(other.m_namespacedId);
     }
-}
-
-InventoryItem::InventoryItem() {
-    /*qDebug() << "Calling void constructor" << this; */
-    setEmpty(true);
-}
-
-InventoryItem::InventoryItem(const InventoryItem &other) {
-/*    qDebug() << "Calling copy constructor" << this; */
-    setEmpty(other.isEmpty());
-    if (!isEmpty()) {
-        setNamespacedID(other.getNamespacedID());
-        setName((other.getName()));
-    }
-}
-
-InventoryItem::~InventoryItem() {
-    /*qDebug() << this << "is going to be deleted."; */
+    return *this;
 }
 
 void InventoryItem::setupItem(QString id) {
-    QString iconpath;
-    QPixmap iconpix;
-
-    Glhp::removePrefix(id, QStringLiteral("minecraft:"));
+    Glhp::removePrefix(id, "minecraft:"_QL1);
 
     const auto &&MCRItemInfo  = Game::getInfo(QStringLiteral("item"));
     const auto &&MCRBlockInfo = Game::getInfo(QStringLiteral("block"));
+
+    if (MCRItemInfo.contains(id)) {
+        setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
+                                                        "name")).toString());
+        m_flags = Item;
+    } else if (MCRBlockInfo.contains(id)) {
+        const auto &blockMap = MCRBlockInfo.value(id).toMap();
+        setIsItem(!blockMap.contains(QStringLiteral("unobtainable")));
+        setName(blockMap.value(QStringLiteral("name")).toString());
+        setIsBlock(true);
+    }
+}
+
+QPixmap InventoryItem::loadPixmap(QString id) const {
+    if (id.isEmpty()) {
+        return {};
+    }
+
+    if (isTag()) {
+        QPixmap iconpix(32, 32);
+        iconpix.fill(Qt::transparent);
+        {
+            QPainter painter(&iconpix);
+            QFont    font = painter.font();
+            font.setPixelSize(32);
+            painter.setFont(font);
+            painter.drawText(QRect(0, 0, 32, 32), Qt::AlignCenter,
+                             QStringLiteral("#"));
+            painter.end();
+        }
+        return iconpix;
+    }
+
+
+    QPixmap iconpix;
+    QString iconpath;
+
+    Glhp::removePrefix(id, "minecraft:"_QL1);
+    const auto &&MCRItemInfo = Game::getInfo(QStringLiteral("item"));
 
     if (id.endsWith(QLatin1String("banner_pattern"))) {
         iconpath = ":/minecraft/texture/item/banner_pattern.png";
@@ -71,16 +103,15 @@ void InventoryItem::setupItem(QString id) {
         iconpix = QPixmap(iconpath);
     }
 
-    if (!iconpix) {
-        /*qWarning() << "unknown ID: " + id; */
-        const static QColor magenta(100, 0, 86);
+    if (!iconpix) { // Draw missing texture
+        const static QColor magenta = QColor(248, 0, 248);
         iconpix = QPixmap(16, 16);
         iconpix.fill(magenta);
         {
             QPainter            painter(&iconpix);
             const static QBrush brush(Qt::black);
-            painter.fillRect(8, 0, 8, 8, brush);
-            painter.fillRect(0, 8, 8, 8, brush);
+            painter.fillRect(0, 0, 8, 8, brush);
+            painter.fillRect(8, 8, 8, 8, brush);
             painter.end();
         }
     }
@@ -98,22 +129,12 @@ void InventoryItem::setupItem(QString id) {
         }
         iconpix = centeredPix;
     }
-    setPixmap(iconpix);
 
-    if (MCRItemInfo.contains(id)) {
-        setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
-                                                        "name")).toString());
-        m_flags = Item;
-    } else if (MCRBlockInfo.contains(id)) {
-        const auto blockMap = MCRBlockInfo.value(id).toMap();
-        setIsItem(!blockMap.contains(QStringLiteral("unobtainable")));
-        setName(blockMap.value(QStringLiteral("name")).toString());
-        setIsBlock(true);
-    }
+    return iconpix;
 }
 
-bool InventoryItem::isEmpty() const {
-    return m_isEmpty;
+bool InventoryItem::isNull() const {
+    return m_flags == Null;
 }
 
 InventoryItem::Flags InventoryItem::getFlags() const {
@@ -122,32 +143,6 @@ InventoryItem::Flags InventoryItem::getFlags() const {
 
 void InventoryItem::setFlags(const Flags &flags) {
     m_flags = flags;
-}
-
-void InventoryItem::setEmpty(const bool &value) {
-    m_isEmpty = value;
-    if (isEmpty()) {
-        m_namespacedId.clear();
-        setName(QString());
-        setIsBlock(false);
-        m_flags &= ~Flag::Tag;
-        m_pixmap = QPixmap();
-    }
-}
-
-InventoryItem &InventoryItem::operator=(const InventoryItem &other) {
-/*    qDebug() << "Calling operator ="; */
-
-    if (&other == this)
-        return *this;
-
-    setEmpty(other.isEmpty());
-    if (!isEmpty()) {
-        setNamespacedID(other.getNamespacedID());
-        setName((other.getName()));
-    }
-
-    return *this;
 }
 
 bool InventoryItem::operator==(const InventoryItem &other) {
@@ -195,33 +190,18 @@ QString InventoryItem::getNamespacedID() const {
 void InventoryItem::setNamespacedID(const QString &id) {
 /*    qDebug() << "setNamespacedID" << id; */
     if (id.isEmpty()) {
-        qWarning() << "Can't set namespacedID to en empty InventoryItem";
+        qWarning() << "Empty namespaced ID";
         return;
     }
 
-    setEmpty(id.isEmpty());
-
     if (id.startsWith('#')) {
-        QPixmap iconpix(32, 32);
-        iconpix.fill(Qt::transparent);
-        {
-            QPainter painter(&iconpix);
-            QFont    font = painter.font();
-            font.setPixelSize(32);
-            painter.setFont(font);
-            painter.drawText(QRect(0, 0, 32, 32),
-                             Qt::AlignCenter,
-                             QStringLiteral("#"));
-            painter.end();
-        }
-        setPixmap(iconpix);
-        auto idNoTag = id.mid(1);
+        const auto idNoTag = id.midRef(1);
         if (!idNoTag.contains(':'))
             this->m_namespacedId = QStringLiteral("#minecraft:") + idNoTag;
         else
             this->m_namespacedId = QStringLiteral("#") + idNoTag;
         setName(QCoreApplication::translate("InventoryItem",
-                                            "Item tag: ") + id.midRef(1));
+                                            "Item tag: ") + idNoTag);
         m_flags |= Tag;
     } else {
         m_flags &= ~Tag;
@@ -254,15 +234,19 @@ bool InventoryItem::isTag() const {
 }
 
 QPixmap InventoryItem::getPixmap() const {
+    if (!m_pixmap) {
+        m_pixmap = loadPixmap(m_namespacedId);
+    }
     return m_pixmap;
 }
 
-void InventoryItem::setPixmap(const QPixmap &value) {
-    m_pixmap = value;
+void InventoryItem::setPixmap(const QPixmap &newPixmap) {
+    m_pixmap = newPixmap;
 }
 
+
 QString InventoryItem::toolTip() const {
-    if (isEmpty()) {
+    if (isNull()) {
         return QCoreApplication::translate("InventoryItem", "Empty item");
     } else if (!m_name.isEmpty()) {
         if (isTag())
@@ -296,7 +280,7 @@ QDebug operator<<(QDebug debug, const InventoryItem &item) {
     QDebugStateSaver saver(debug);
 
     debug.nospace() << "InventoryItem(";
-    if (!item.isEmpty()) {
+    if (!item.isNull()) {
         debug.nospace() << item.getNamespacedID();
         if (!item.getName().isEmpty())
             debug.nospace() << ", " << item.getName();

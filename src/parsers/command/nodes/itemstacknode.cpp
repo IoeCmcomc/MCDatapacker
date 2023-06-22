@@ -1,69 +1,62 @@
 #include "itemstacknode.h"
+#include "../visitors/nodevisitor.h"
 
-static const int _ItemStackNode =
-    qRegisterMetaType<QSharedPointer<Command::ItemStackNode> >();
+namespace Command {
+    ItemStackNode::ItemStackNode(int length)
+        : ArgumentNode(ParserType::ItemStack, length) {
+    }
 
-Command::ItemStackNode::ItemStackNode(int pos, const QString &nspace,
-                                      const QString &id)
-    : Command::ResourceLocationNode(pos, nspace, id) {
-}
+    void ItemStackNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (m_resLoc)
+            m_resLoc->accept(visitor, order);
+        if (m_nbt)
+            m_nbt->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 
-QString Command::ItemStackNode::toString() const {
-    auto ret =
-        QString("ItemStackNode(%1)").arg(ResourceLocationNode::fullId());
+    QSharedPointer<NbtCompoundNode> ItemStackNode::nbt() const {
+        return m_nbt;
+    }
 
-    if (m_nbt)
-        ret += '{' + m_nbt->toString() + '}';
-    return ret;
-}
+    void ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
+        m_isValid &= nbt->isValid();
+        m_nbt      = std::move(nbt);
+    }
 
-bool Command::ItemStackNode::isVaild() const {
-    return ResourceLocationNode::isVaild() && m_nbt;
-}
+    QSharedPointer<ResourceLocationNode> ItemStackNode::resLoc() const {
+        return m_resLoc;
+    }
 
-void Command::ItemStackNode::accept(Command::NodeVisitor *visitor,
-                                    Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (m_nbt)
-        m_nbt->accept(visitor, order);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
+    void ItemStackNode::setResLoc(
+        QSharedPointer<ResourceLocationNode> newResLoc) {
+        m_resLoc  = std::move(newResLoc);
+        m_isValid = m_resLoc->isValid();
+    }
 
-QSharedPointer<Command::NbtCompoundNode> Command::ItemStackNode::nbt() const {
-    return m_nbt;
-}
+    ItemPredicateNode::ItemPredicateNode(int length)
+        : ItemStackNode(length) {
+        m_parserType = ParserType::ItemPredicate;
+    }
 
-void Command::ItemStackNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
-    m_nbt = nbt;
-}
-
-static const int _ItemPredicateNode =
-    qRegisterMetaType<QSharedPointer<Command::ItemPredicateNode> >();
-
-Command::ItemPredicateNode::ItemPredicateNode(int pos, const QString &nspace,
-                                              const QString &id)
-    : Command::ItemStackNode(pos, nspace, id) {
-    setParserId("minecraft:item_predicate");
-}
-
-Command::ItemPredicateNode::ItemPredicateNode(Command::ItemStackNode *other)
-    : Command::ItemStackNode(other->pos(), other->nspace(), other->id()) {
-    setParserId("minecraft:item_predicate");
-    setLength(other->length());
-}
-
-QString Command::ItemPredicateNode::toString() const {
-    return ItemStackNode::toString().replace(0, 13, "ItemPredicateNode");
-}
-
-void Command::ItemPredicateNode::accept(Command::NodeVisitor *visitor,
-                                        Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (nbt())
-        nbt()->accept(visitor, order);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
+    void ItemPredicateNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (resLoc())
+            resLoc()->accept(visitor, order);
+        if (nbt())
+            nbt()->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 }

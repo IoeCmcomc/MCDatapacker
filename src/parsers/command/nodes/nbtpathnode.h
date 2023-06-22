@@ -1,27 +1,21 @@
 #ifndef NBTPATHNODE_H
 #define NBTPATHNODE_H
 
-#include "integernode.h"
 #include "nbtnodes.h"
 #include "stringnode.h"
 
 namespace Command {
     class NbtPathStepNode : public ParseNode {
-        Q_GADGET
 public:
-        enum class Type : unsigned char {
+        enum class Type {
             Root,
             Key,
             Index,
         };
-        Q_ENUM(Type)
 
-        NbtPathStepNode(int pos);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
+        explicit NbtPathStepNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         QSharedPointer<StringNode> name() const;
         void setName(QSharedPointer<StringNode> name);
@@ -35,27 +29,23 @@ public:
         Type type() const;
         void setType(const Type &type);
 
-        bool hasTrailingDot() const;
-        void setHasTrailingDot(bool hasTrailingDot);
-
 private:
-        QSharedPointer<StringNode> m_name        = nullptr;
-        QSharedPointer<IntegerNode> m_index      = nullptr;
-        QSharedPointer<NbtCompoundNode> m_filter = nullptr;
-        Type m_type                              = Type::Root;
-        bool m_hasTrailingDot                    = false;
+        QSharedPointer<StringNode> m_name;
+        QSharedPointer<IntegerNode> m_index;
+        QSharedPointer<NbtCompoundNode> m_filter;
+        Type m_type = Type::Root;
     };
 
-    class NbtPathNode : public ArgumentNode
-    {
+    class NbtPathNode : public ArgumentNode {
 public:
-        NbtPathNode(int pos);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        using Steps = QVector<QSharedPointer<NbtPathStepNode> >;
+
+        explicit NbtPathNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         bool isEmpty();
-        int size();
+        int size() const;
 
         void append(QSharedPointer<NbtPathStepNode> node);
         void remove(int i);
@@ -65,14 +55,13 @@ public:
         QSharedPointer<NbtPathStepNode> &operator[](int index);
         const QSharedPointer<NbtPathStepNode> operator[](int index) const;
 
-        QVector<QSharedPointer<NbtPathStepNode> > steps() const;
+        Steps steps() const;
 
 private:
-        QVector<QSharedPointer<NbtPathStepNode> > m_steps;
+        Steps m_steps;
     };
-}
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathStepNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtPathNode>)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, NbtPath)
+}
 
 #endif /* NBTPATHNODE_H */

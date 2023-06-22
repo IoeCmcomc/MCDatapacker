@@ -10,40 +10,37 @@
 namespace Command {
     template<typename T>
     class RangeNode : public ArgumentNode {
-        enum class PrimaryValueRole : unsigned char {
+        enum class PrimaryValueRole : uint8_t {
             ExactValueRole,
             MinValueRole,
             MaxValueRole,
         };
+
 public:
-        RangeNode(int pos, int length = 0, const QString &parserId = "")
-            : ArgumentNode(pos, length, parserId) {
-            setExactValue(QSharedPointer<T>::create(pos, length, 0));
-        };
         QString format() const {
             if (hasMinValue() || hasMaxValue()) {
                 QStringList parts;
                 parts <<
-                    ((hasMinValue()) ? QString::number(minValue()->value()) : "");
+                    ((hasMinValue()) ? QString::number(minValue()->value()) :
+                     QString());
                 parts <<
-                    ((hasMaxValue()) ? QString::number(maxValue()->value()) : "");
+                    ((hasMaxValue()) ? QString::number(maxValue()->value()) :
+                     QString());
                 return parts.join(QStringLiteral(".."));
             } else {
                 return QString::number(exactValue()->value());
             }
         };
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override {
-            if (order == NodeVisitor::Order::Preorder)
-                visitor->visit(this);
-            m_primary->accept(visitor, order);
-            if (m_secondary)
-                m_secondary->accept(visitor, order);
-            if (order == NodeVisitor::Order::Postorder)
-                visitor->visit(this);
-        }
 
-        void setExactValue(QSharedPointer<T> value) {
-            m_primary        = value;
+        template <typename _T = T>
+        static constexpr bool is_same_pointer_type = std::is_same_v<std::decay_t<_T>,
+                                                                    QSharedPointer<T> >;
+
+        template <typename _T = T>
+        typename std::enable_if_t<is_same_pointer_type<_T> >
+        setExactValue(_T &&value) {
+            m_isValid        = value->isValid();
+            m_primary        = std::forward<_T>(value);
             m_primaryValRole = PrimaryValueRole::ExactValueRole;
             if (m_secondary)
                 m_secondary = nullptr;
@@ -56,49 +53,62 @@ public:
             }
         };
 
-        void setMinValue(QSharedPointer<T> value, bool keepMax) {
-            if (keepMax) {
-                if (!m_secondary)
-                    m_secondary = m_primary;
+        template <typename _T = T>
+        typename std::enable_if_t<is_same_pointer_type<_T> >
+        setMinValue(_T &&value, bool keepMax) {
+            if (m_secondary) {
+                m_isValid &= value->isValid();
             } else {
-                if (m_secondary)
-                    m_secondary = nullptr;
+                m_isValid = value->isValid();
             }
-            m_primary        = value;
+            if (keepMax) {
+                if (!m_secondary) {
+                    m_secondary = std::move(m_primary);
+                }
+            } else {
+                if (m_secondary) {
+                    m_secondary = nullptr;
+                }
+            }
+            m_primary        = std::forward<_T>(value);
             m_primaryValRole = PrimaryValueRole::MinValueRole;
         };
         QSharedPointer<T> minValue() const {
-            if (m_primaryValRole == PrimaryValueRole::MinValueRole) {
-                return m_primary;
-            } else {
-                return nullptr;
-            }
+            return hasMinValue() ? m_primary : nullptr;
         };
         inline bool hasMinValue() const {
             return m_primaryValRole == PrimaryValueRole::MinValueRole;
         };
 
-        void setMaxValue(QSharedPointer<T> value, bool keepMin) {
+        template <typename _T = T>
+        typename std::enable_if_t<is_same_pointer_type<_T> >
+        setMaxValue(_T &&value, bool keepMin) {
+            if (m_secondary) {
+                m_isValid &= value->isValid();
+            } else {
+                m_isValid = value->isValid();
+            }
             if (keepMin) {
-                m_secondary      = value;
+                m_secondary      = std::forward<_T>(value);
                 m_primaryValRole = PrimaryValueRole::MinValueRole;
             } else {
-                if (m_secondary)
+                if (m_secondary) {
                     m_secondary = nullptr;
-                m_primary        = value;
+                }
+                m_primary        = std::forward<_T>(value);
                 m_primaryValRole = PrimaryValueRole::MaxValueRole;
             }
         };
         QSharedPointer<T> maxValue() const {
             switch (m_primaryValRole) {
-            case PrimaryValueRole::MinValueRole:
-                return m_secondary;
+                case PrimaryValueRole::MinValueRole:
+                    return m_secondary;
 
-            case PrimaryValueRole::MaxValueRole:
-                return m_primary;
+                case PrimaryValueRole::MaxValueRole:
+                    return m_primary;
 
-            case PrimaryValueRole::ExactValueRole:
-                return nullptr;
+                case PrimaryValueRole::ExactValueRole:
+                    return nullptr;
             }
             return nullptr;
         };
@@ -108,15 +118,23 @@ public:
         };
 
 protected:
+        using ArgumentNode::ArgumentNode;
+
         QSharedPointer<T> primary() const {
             return m_primary;
         }
         QSharedPointer<T> secondary() const {
             return m_secondary;
         }
+
+        RangeNode(ParserType parserType, int length)
+            : ArgumentNode(parserType, length) {
+            setExactValue(QSharedPointer<T>::create(QString(), 0));
+            m_primary->setIsValid(false);
+        };
 private:
-        QSharedPointer<T> m_secondary = nullptr;
-        QSharedPointer<T> m_primary   = nullptr;
+        QSharedPointer<T> m_secondary;
+        QSharedPointer<T> m_primary;
         PrimaryValueRole m_primaryValRole;
     };
 }

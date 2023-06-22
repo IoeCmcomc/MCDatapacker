@@ -4,23 +4,89 @@
 #include "parsenode.h"
 
 namespace Command {
-    class ArgumentNode : public ParseNode
-    {
+    class ArgumentNode : public ParseNode {
 public:
-        explicit ArgumentNode(int pos, int length, const QString &parserId);
+        enum class ParserType {
+            Unknown = static_cast<int>(ParseNode::Kind::Argument),
+            Bool,
+            Double,
+            Float,
+            Integer,
+            Literal, // Obsolete
+            Long,    // Not used inside Minecraft
+            String,
+            Angle,
+            BlockPos,
+            BlockPredicate,
+            BlockState,
+            Block = BlockState, // Obsolete
+            Color,
+            ColumnPos,
+            Component,
+            Dimension,
+            Entity,
+            EntityAnchor,
+            EntitySummon,
+            FloatRange,
+            Function,
+            Gamemode,
+            GameProfile,
+            Heightmap,
+            IntRange,
+            ItemEnchantment,
+            ItemPredicate,
+            ItemSlot,
+            ItemStack,
+            Item = ItemStack, // Obsolete
+            Message,
+            MobEffect,
+            NbtPath,
+            NbtTag,
+            NbtCompoundTag = NbtTag + 20,
+            Objective,
+            ObjectiveCriteria,
+            Operation,
+            Particle,
+            Resource,
+            ResourceKey,
+            ResourceLocation,
+            ResourceOrTag,
+            ResourceOrTagKey,
+            Rotation,
+            ScoreHolder,
+            ScoreboardSlot,
+            Swizzle,
+            Team,
+            TemplateMirror,
+            TemplateRotation,
+            Time,
+            Uuid,
+            Vec2,
+            Vec3,
+        };
 
-        virtual QString toString() const override;
-        QString parserId() const;
+        void accept(NodeVisitor *visitor, VisitOrder) override;
 
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        ParserType parserType() const;
+
 protected:
-        void setParserId(const QString &parserId);
+        ParserType m_parserType = ParserType::Unknown;
 
-private:
-        QString m_parserId;
+        explicit ArgumentNode(ParserType parserType)
+            : ParseNode(Kind::Argument), m_parserType(parserType) {
+        };
+        explicit ArgumentNode(ParserType parserType, int length)
+            : ParseNode(Kind::Argument, length), m_parserType(parserType) {
+        };
+        explicit ArgumentNode(ParserType parserType, const QString &text)
+            : ParseNode(Kind::Argument, text), m_parserType(parserType) {
+        };
     };
-}
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ArgumentNode>);
+    template <class T>
+    constexpr ArgumentNode::ParserType nodeTypeEnum<T,
+                                                    ArgumentNode::ParserType> =
+        ArgumentNode::ParserType::Unknown;
+}
 
 #endif /* ARGUMENTNODE_H */

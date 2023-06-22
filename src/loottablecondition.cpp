@@ -19,9 +19,9 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     ui->setupUi(this);
 
     if (Game::version() < Game::v1_17) {
-        qobject_cast<QListView*>(ui->conditionTypeCombo->view())
+        qobject_cast<QListView *>(ui->conditionTypeCombo->view())
         ->setRowHidden(15, true);
-        static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model())->item(
+        static_cast<QStandardItemModel *>(ui->conditionTypeCombo->model())->item(
             15, 0)->setEnabled(false);
     }
 
@@ -31,7 +31,7 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     MainWindow *mainWin = nullptr;
     for (auto *wid : qApp->topLevelWidgets()) {
         if (wid->objectName() == QStringLiteral("MainWindow")) {
-            mainWin = qobject_cast<MainWindow*>(wid);
+            mainWin = qobject_cast<MainWindow *>(wid);
             break;
         }
     }
@@ -43,8 +43,7 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
             this, &LootTableCondition::setupRefCombo);
 
     initBlockStatesPage();
-    ui->damageSrc_entityPropBtn->assignDialogClass<EntityConditionDialog>();
-    ui->damageSrc_directPropBtn->assignDialogClass<EntityConditionDialog>();
+    initDamageSrcPage();
     ui->entity_propBtn->assignDialogClass<EntityConditionDialog>();
     initEntityScoresPage();
     ui->matchTool_propBtn->assignDialogClass<ItemConditionDialog>();
@@ -84,18 +83,22 @@ QJsonObject LootTableCondition::toJson() const {
 
         case 1: { /*Damage sources */
             QJsonObject pred;
-            ui->damageSrc_explosionCheck->insertToJsonObject(pred,
-                                                             "is_explosion");
-            ui->damageSrc_projectileCheck->insertToJsonObject(pred,
-                                                              "is_projectile");
-            ui->damageSrc_fireCheck->insertToJsonObject(pred, "is_fire");
-            ui->damageSrc_lightningCheck->insertToJsonObject(pred,
-                                                             "is_lightning");
-            ui->damageSrc_magicCheck->insertToJsonObject(pred, "is_magic");
-            ui->damageSrc_starvationCheck->insertToJsonObject(pred,
-                                                              "bypasses_magic");
-            ui->damageSrc_bypassArmorCheck->insertToJsonObject(pred,
-                                                               "bypasses_invulnerability");
+            if (Game::version() < Game::v1_19_4) {
+                ui->damageSrc_explosionCheck->insertToJsonObject(pred,
+                                                                 "is_explosion");
+                ui->damageSrc_projectileCheck->insertToJsonObject(pred,
+                                                                  "is_projectile");
+                ui->damageSrc_fireCheck->insertToJsonObject(pred, "is_fire");
+                ui->damageSrc_lightningCheck->insertToJsonObject(pred,
+                                                                 "is_lightning");
+                ui->damageSrc_magicCheck->insertToJsonObject(pred, "is_magic");
+                ui->damageSrc_starvationCheck->insertToJsonObject(pred,
+                                                                  "bypasses_magic");
+                ui->damageSrc_bypassArmorCheck->insertToJsonObject(pred,
+                                                                   "bypasses_invulnerability");
+            } else {
+                pred["tags"] = ui->damageSrc_table->toJsonArray();
+            }
 
             if (!ui->damageSrc_entityPropBtn->getData().isEmpty())
                 pred.insert("source_entity",
@@ -155,19 +158,33 @@ QJsonObject LootTableCondition::toJson() const {
             QJsonArray terms;
             int        childCount = ui->nested_dataInterface->entriesCount();
             if (childCount != 0) {
-                for (const auto child : ui->nested_dataInterface->json()) {
-                    auto &&cond = child.toObject();
-                    if (ui->nested_andRadio->isChecked())
-                        addInvertCondition(cond);
-                    terms.push_back(cond);
-                }
-                root.insert("terms", terms);
-                if (ui->nested_invertedCheck->isChecked()) {
-                    if (ui->nested_orRadio->isChecked())
-                        addInvertCondition(root);
+                if (Game::version() < Game::v1_20) {
+                    for (const auto child : ui->nested_dataInterface->json()) {
+                        auto &&cond = child.toObject();
+                        if (ui->nested_andRadio->isChecked())
+                            addInvertCondition(cond);
+                        terms.push_back(cond);
+                    }
+                    root.insert("terms", terms);
+                    if (ui->nested_invertedCheck->isChecked()) {
+                        if (ui->nested_orRadio->isChecked())
+                            addInvertCondition(root);
+                    } else {
+                        if (ui->nested_andRadio->isChecked())
+                            addInvertCondition(root);
+                    }
                 } else {
-                    if (ui->nested_andRadio->isChecked())
+                    terms = ui->nested_dataInterface->json();
+                    root.insert("terms", terms);
+                    if (ui->nested_orRadio->isChecked()) {
+                        root["condition"] = "minecraft:any_of";
+                    } else {
+                        root["condition"] = "minecraft:all_of";
+                    }
+                    root.remove("alternative");
+                    if (ui->nested_invertedCheck->isChecked()) {
                         addInvertCondition(root);
+                    }
                 }
                 auto rootMap = root.toVariantMap();
                 simplifyCondition(rootMap);
@@ -272,24 +289,38 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     simplifyCondition(valueMap);
     auto value = QJsonObject::fromVariantMap(valueMap);
 
-    QString condType = value["condition"].toString();
-    Glhp::removePrefix(condType, "minecraft:");
+    QString &&condType = value["condition"].toString();
+    Glhp::removePrefix(condType, "minecraft:"_QL1);
 
     bool isRandChanceWithLoot = false;
-    bool singleInverted       = false;
-    if (condType.endsWith("random_chance_with_looting")) {
+    auto nestedMode           = NestedMode::Invalid;
+    if (condType == "random_chance_with_looting") {
         condType             = "random_chance";
         isRandChanceWithLoot = true;
-    } else if (condType.endsWith("inverted")) {
-        condType       = "alternative";
-        singleInverted = true;
+    } else if (condType == "alternative" && Game::version() < Game::v1_20) {
+        condType   = "alternative";
+        nestedMode = NestedMode::Alternative;
+    } else if (condType == "inverted") {
+        condType   = "alternative";
+        nestedMode = NestedMode::SingleInvert;
+    } else if (Game::version() >= Game::v1_20) {
+        if (condType == "all_of") {
+            condType   = "alternative";
+            nestedMode = NestedMode::AllOf;
+        } else if (condType == "any_of") {
+            condType   = "alternative";
+            nestedMode = NestedMode::AnyOf;
+        }
     }
 
-    int          condIndex = condTypes.indexOf(condType);
-    const auto &&model     =
-        static_cast<QStandardItemModel*>(ui->conditionTypeCombo->model());
+    const int condIndex = condTypes.indexOf(condType);
+    if (condIndex == -1) {
+        return;
+    }
+    const auto &&model =
+        static_cast<QStandardItemModel *>(ui->conditionTypeCombo->model());
     const auto &&item = model->item(condIndex, 0);
-    if (!item->isEnabled())
+    if (item && !item->isEnabled())
         return;
 
     ui->conditionTypeCombo->setCurrentIndex(condIndex);
@@ -297,8 +328,8 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     switch (condIndex) {
         case 0: { /*Block states */
             if (value.contains("block"))
-                setupComboFrom(ui->blockState_blockCombo, QVariant::fromValue
-                                   (InventoryItem(value["block"].toString())));
+                setComboValueFrom(ui->blockState_blockCombo, QVariant::fromValue
+                                      (InventoryItem(value["block"].toString())));
             if (value.contains("properties")) {
                 QJsonObject states = value["properties"].toObject();
                 LocationConditionDialog::setupStateTableFromJson(
@@ -312,18 +343,24 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         case 1: { /*Damage sources */
             if (value.contains("predicate")) {
                 QJsonObject pred = value["predicate"].toObject();
-                ui->damageSrc_explosionCheck->setupFromJsonObject(pred,
-                                                                  "is_explosion");
-                ui->damageSrc_projectileCheck->setupFromJsonObject(pred,
-                                                                   "is_projectile");
-                ui->damageSrc_fireCheck->setupFromJsonObject(pred, "is_fire");
-                ui->damageSrc_lightningCheck->setupFromJsonObject(pred,
-                                                                  "is_lightning");
-                ui->damageSrc_magicCheck->setupFromJsonObject(pred, "is_magic");
-                ui->damageSrc_starvationCheck->setupFromJsonObject(pred,
-                                                                   "bypasses_magic");
-                ui->damageSrc_bypassArmorCheck->setupFromJsonObject(pred,
-                                                                    "bypasses_invulnerability");
+                if (Game::version() < Game::v1_19_4) {
+                    ui->damageSrc_explosionCheck->setupFromJsonObject(pred,
+                                                                      "is_explosion");
+                    ui->damageSrc_projectileCheck->setupFromJsonObject(pred,
+                                                                       "is_projectile");
+                    ui->damageSrc_fireCheck->setupFromJsonObject(pred,
+                                                                 "is_fire");
+                    ui->damageSrc_lightningCheck->setupFromJsonObject(pred,
+                                                                      "is_lightning");
+                    ui->damageSrc_magicCheck->setupFromJsonObject(pred,
+                                                                  "is_magic");
+                    ui->damageSrc_starvationCheck->setupFromJsonObject(pred,
+                                                                       "bypasses_magic");
+                    ui->damageSrc_bypassArmorCheck->setupFromJsonObject(pred,
+                                                                        "bypasses_invulnerability");
+                } else {
+                    ui->damageSrc_table->fromJson(pred["tags"].toArray());
+                }
 
                 if (pred.contains("source_entity"))
                     ui->damageSrc_entityPropBtn->setData(
@@ -384,7 +421,11 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         }
 
         case 6: { /*Nested conditions */
-            if (singleInverted && value.contains("term")) {
+            if (nestedMode == NestedMode::Invalid) {
+                return;
+            }
+            if (nestedMode == NestedMode::SingleInvert
+                && value.contains("term")) {
                 ui->nested_dataInterface->setJson({ value["term"].toObject() });
                 ui->nested_orRadio->setChecked(true);
                 ui->nested_invertedCheck->setChecked(true);
@@ -418,6 +459,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                 ui->nested_dataInterface->setJson(terms);
 
                 if (redirected) {
+                    qDebug() << "redirected";
                     if (areTermsInverted) {
                         ui->nested_andRadio->setChecked(true);
                         ui->nested_invertedCheck->setChecked(false);
@@ -426,9 +468,9 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                         ui->nested_invertedCheck->setChecked(true);
                     }
                 } else {
-                    if (areTermsInverted) {
+                    if (areTermsInverted || nestedMode == NestedMode::AllOf) {
                         ui->nested_andRadio->setChecked(true);
-                        ui->nested_invertedCheck->setChecked(true);
+                        ui->nested_invertedCheck->setChecked(false);
                     } else {
                         ui->nested_orRadio->setChecked(true);
                         ui->nested_invertedCheck->setChecked(false);
@@ -466,8 +508,8 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
 
         case 11: {/*Table bonus */
             if (value.contains("enchantment"))
-                setupComboFrom(ui->tableBonus_enchantCombo,
-                               value["enchantment"].toString());
+                setComboValueFrom(ui->tableBonus_enchantCombo,
+                                  value["enchantment"].toString());
             if (value.contains("chances")) {
                 QJsonArray chances = value["chances"].toArray();
                 for (auto chanceRef : chances) {
@@ -668,7 +710,7 @@ void LootTableCondition::reset(int index) {
 }
 
 void LootTableCondition::clearModelExceptHeaders(QStandardItemModel &model) {
-    QVector<QStandardItem*> headers;
+    QVector<QStandardItem *> headers;
 
     for (int i = 0; i < model.columnCount(); ++i) {
         headers << model.takeHorizontalHeaderItem(i);
@@ -724,8 +766,8 @@ void LootTableCondition::setupRefCombo() {
     /*qDebug() << "setupRefCombo"; */
     if (condRefsModel.rowCount() > 0)
         condRefsModel.clear();
-    auto predRefIDs = Glhp::fileIdList(QDir::currentPath(),
-                                       "predicates");
+    auto predRefIDs =
+        Glhp::fileIdList(QDir::currentPath(), QStringLiteral("predicates"));
 
     for (const auto &predRef : qAsConst(predRefIDs))
         condRefsModel.appendRow(new QStandardItem(predRef));
@@ -784,6 +826,20 @@ void LootTableCondition::initBlockStatesPage() {
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,
             this, &LootTableCondition::blockStates_onAdded);
+}
+
+void LootTableCondition::initDamageSrcPage() {
+    if (Game::version() < Game::v1_19_4) {
+        ui->damageSrc_stackWidget->setCurrentIndex(0);
+    } else {
+        ui->damageSrc_stackWidget->setCurrentIndex(1);
+        ui->damageSrc_table->setJsonMode(ExtendedTableWidget::JsonMode::List);
+        ui->damageSrc_table->appendColumnMapping("id", ui->damageSrc_tagEdit);
+        ui->damageSrc_table->appendColumnMapping("expected",
+                                                 ui->damageSrc_expectedCheck);
+    }
+    ui->damageSrc_entityPropBtn->assignDialogClass<EntityConditionDialog>();
+    ui->damageSrc_directPropBtn->assignDialogClass<EntityConditionDialog>();
 }
 
 void LootTableCondition::initEntityScoresPage() {

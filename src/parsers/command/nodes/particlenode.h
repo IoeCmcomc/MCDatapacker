@@ -1,17 +1,15 @@
 #ifndef PARTICLENODE_H
 #define PARTICLENODE_H
 
-#include "floatnode.h"
+#include "singlevaluenode.h"
 #include "resourcelocationnode.h"
 
 namespace Command {
-
     class ParticleColorNode : public ParseNode {
 public:
-        ParticleColorNode(int pos);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ParticleColorNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         QSharedPointer<FloatNode> r() const;
         void setR(QSharedPointer<FloatNode> r);
@@ -23,30 +21,36 @@ public:
         void setB(QSharedPointer<FloatNode> b);
 
 private:
-        QSharedPointer<FloatNode> m_r    = nullptr;
-        QSharedPointer<FloatNode> m_g    = nullptr;
-        QSharedPointer<FloatNode> m_b    = nullptr;
+        QSharedPointer<FloatNode> m_r;
+        QSharedPointer<FloatNode> m_g;
+        QSharedPointer<FloatNode> m_b;
     };
 
-    class ParticleNode : public ResourceLocationNode
-    {
+    class ParticleNode : public ArgumentNode {
 public:
-        using ParamVector = QVector<QSharedPointer<ParseNode>>;
+        using ParamVector = QVector<NodePtr>;
 
-        ParticleNode(int pos, const QString &nspace,
-                     const QString &id);
-        ParticleNode(ResourceLocationNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ParticleNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         ParamVector params() const;
-        void setParams(std::initializer_list<QSharedPointer<ParseNode>> params);
+
+        template <typename ...Args>
+        void setParams(Args&& ... params) {
+            m_isValid = (params->isValid() && ...);
+            (m_params << ... << std::forward<Args>(params));
+        };
+
+        QSharedPointer<ResourceLocationNode> resLoc() const;
+        void setResLoc(QSharedPointer<ResourceLocationNode> newResLoc);
+
 private:
+        QSharedPointer<ResourceLocationNode> m_resLoc;
         ParamVector m_params;
     };
-}
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ParticleColorNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::ParticleNode>)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Particle)
+}
 
 #endif /* PARTICLENODE_H */

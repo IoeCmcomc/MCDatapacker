@@ -9,6 +9,8 @@ TEMPLATE = lib
 
 CONFIG += staticlib
 
+msvc:DEFINES += and="\"&&\"" or="\"||\""
+
 HEADERS = \
    $$PWD/QFindDialogs/src/finddialog.h \
    $$PWD/QFindDialogs/src/findreplacedialog.h

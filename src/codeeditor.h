@@ -7,36 +7,41 @@
 #include <QStringList>
 
 #include "codefile.h"
+#include "parsers/parser.h"
 
 QT_BEGIN_NAMESPACE
 class QCompleter;
 QT_END_NAMESPACE
 
 class CodeGutter;
+class Highlighter;
+class Parser;
 
-struct TextFileData {
-    CodeFile               *parent      = nullptr;
-    QPointer<QTextDocument> doc         = new QTextDocument();
-    QTextCursor             textCursor  = QTextCursor(doc);
-    Highlighter            *highlighter = nullptr;
+struct ProblemInfo {
+    enum class Type {
+        Invalid,
+        Warning,
+        Error,
+    };
 
-    TextFileData(QTextDocument * doc, CodeFile * parent = nullptr);
-    TextFileData()                     = default;
-    TextFileData(const TextFileData &) = default;
-    ~TextFileData()                    = default;
+    Type    type   = Type::Invalid;
+    int     pos    = 0;
+    int     length = 1;
+    QString message;
 };
 
-Q_DECLARE_METATYPE(TextFileData)
-
-class CodeEditor : public QPlainTextEdit
-{
+class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
 
 public:
-    CodeEditor(QWidget *parent = nullptr);
+    using Problems = QVector<ProblemInfo>;
 
-    void setFilePath(const QString &path);
-    void setCurHighlighter(Highlighter *value);
+    explicit CodeEditor(QWidget *parent = nullptr);
+
+    void setFileType(CodeFile::FileType type);
+
+    Highlighter * highlighter() const;
+    void setHighlighter(Highlighter *value);
 
     void displayErrors();
     void updateErrorSelections();
@@ -50,6 +55,10 @@ public:
     void setCompleter(QCompleter *c);
     QCompleter * completer() const;
 
+    void setParser(std::unique_ptr<Parser> newParser);
+    Parser * parser() const;
+
+    void goToLine(const int lineNo);
 
 signals:
     void openFileRequest(const QString &filepath);
@@ -59,15 +68,18 @@ signals:
 protected:
     friend class LineNumberArea;
     friend class ProblemArea;
+    friend class StripedScrollBar;
 
     void resizeEvent(QResizeEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *e) override;;
     void keyPressEvent(QKeyEvent *e) override;
     void wheelEvent(QWheelEvent *e) override;
     void dropEvent(QDropEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
     bool event(QEvent *event) override;
     void focusInEvent(QFocusEvent *e) override;
+    void changeEvent(QEvent *e) override;
 
 private /*slots*/ :
     void updateGutterWidth(int newBlockCount);
@@ -79,23 +91,27 @@ private /*slots*/ :
     void onUndoAvailable(bool value);
     void onRedoAvailable(bool value);
     void insertCompletion(const QString &completion);
+    void onTextChanged();
 
 private:
-    QFont monoFont;
+    static QStringList minecraftCompletionInfo;
+
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;
     QTextCharFormat warningHighlightRule;
-    QSettings settings;
-    QStringList minecraftCompletionInfo;
     CodeGutter *m_gutter;
-    QCompleter *m_completer = nullptr;
-    QString filepath;
-    Highlighter *curHighlighter;
+    QCompleter *m_completer          = nullptr;
+    Highlighter *m_highlighter       = nullptr;
+    std::unique_ptr<Parser> m_parser = nullptr;
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
+    Problems m_problems;
     int problemSelectionStartIndex;
-    CodeFile::FileType curFileType = CodeFile::Text;
-    bool canUndo                   = false;
-    bool canRedo                   = false;
+    int m_fontSize                = 13;
+    int m_tabSize                 = 4;
+    CodeFile::FileType m_fileType = CodeFile::Text;
+    bool canUndo                  = false;
+    bool canRedo                  = false;
+    bool m_insertTabAsSpaces      = true;
 
     void highlightCurrentLine();
     void matchParentheses();
@@ -111,6 +127,9 @@ private:
     QString textUnderCursor() const;
     void handleKeyPressEvent(QKeyEvent *e);
     void indentOnNewLine(QKeyEvent *e);
+    void initCompleter();
+    void startOfWordExtended(QTextCursor &tc) const;
+    QString textUnderCursorExtended(QTextCursor tc) const;
 };
 
 

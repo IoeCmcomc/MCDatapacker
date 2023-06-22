@@ -6,24 +6,19 @@
 #include "nlohmann/json.hpp"
 
 namespace Command {
-    class ComponentNode final : public ArgumentNode
-    {
+    class ComponentNode final : public ArgumentNode {
 public:
-        ComponentNode(int pos, int length);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
+        explicit ComponentNode(const QString &text);
+
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         nlohmann::json value() const;
-        void setValue(const nlohmann::json &value);
+        void setValue(nlohmann::json value);
 
 private:
         nlohmann::json m_value;
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Component)
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::ComponentNode>)
-
 #endif /* COMPONENTNODE_H */

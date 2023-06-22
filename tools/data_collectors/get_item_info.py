@@ -12,14 +12,17 @@ def find_tr_tags(tag):
            and (("upcoming" not in tag.find("td").text) or ("only" in tag.find("td").text))
 
 
-def get_icon_info(id, alt_name=None):
+def get_icon_info(id: str, alt_name: str = None, name: str = None):
     global icons
     icon_text = icons_soup.find("li", text=id.replace('_', '-'))
+    if (not icon_text) and name:
+        icon_text = icons_soup.find("li", text=name.lower().replace(' ', '-'))
     if icon_text:
         icon = icon_text.parent.previous_sibling.find("span")
         pos_match = regex.search(icon['style'])
         pos = (int(i) for i in pos_match.groups())
         icons.append((alt_name if alt_name else id, pos,))
+
 
 req = urllib.request.urlopen("https://minecraft.fandom.com/wiki/Java_Edition_data_values/Items")
 ids_soup = BeautifulSoup(req.read(), "lxml")
@@ -43,13 +46,13 @@ for tr_tag in tr_tags:
     print(id, name)
     entry = {"name": name}
     info[id] = entry
-    get_icon_info(id)
+    get_icon_info(id, name=name)
 get_icon_info("banner_pattern")
 get_icon_info("uncraftable-potion", "potion")
 get_icon_info("uncraftable-splash-potion", "splash_potion")
 get_icon_info("uncraftable-lingering-potion", "lingering_potion")
 
-sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f5/ItemCSS.png"
+sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f5/ItemCSS.png/revision/latest?cb=20230607112659"
 with urllib.request.urlopen(sheet_url) as url:
     f = BytesIO(url.read())
 sheet_img = Image.open(f)

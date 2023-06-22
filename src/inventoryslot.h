@@ -26,14 +26,15 @@ public:
 
     static QTimer m_timer;
 
-    explicit InventorySlot(QWidget *parent           = nullptr,
-                           const InventoryItem &item = InventoryItem());
+    explicit InventorySlot(QWidget *parent = nullptr);
 
     QSize sizeHint() const override;
 
     void setItems(const QVector<InventoryItem> &items);
     void setItem(const InventoryItem &item);
+    void setItem(InventoryItem &&item);
     void appendItem(const InventoryItem &item);
+    void appendItem(InventoryItem &&item);
     void appendItems(const QVector<InventoryItem> &items);
     void insertItem(const int index, const InventoryItem &item);
     void removeItem(const int index);

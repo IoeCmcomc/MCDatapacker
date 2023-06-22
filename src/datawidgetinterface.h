@@ -2,6 +2,7 @@
 #define DATAWIDGETINTERFACE_H
 
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QVBoxLayout>
 #include <QFrame>
 
@@ -11,8 +12,7 @@ namespace Ui {
     class DataWidgetInterface;
 }
 
-class DataWidgetInterface : public QFrame
-{
+class DataWidgetInterface : public QFrame {
     Q_OBJECT
 
 public:
@@ -20,7 +20,7 @@ public:
     ~DataWidgetInterface();
 
     void setMainWidget(QWidget *widget);
-    QWidget *mainWidget() const;
+    QWidget * mainWidget() const;
 
     QJsonArray json();
     void setJson(const QJsonArray &json);
@@ -37,8 +37,21 @@ public:
 
     template<typename Class = QObject, typename Func>
     void mapToSetter(Class *that, Func funcPtr) {
-        connect(this, &DataWidgetInterface::setterCallRequested,
-                that, funcPtr);
+        using SetterType   = QtPrivate::FunctionPointer<Func>;
+        using Args         = typename SetterType::Arguments;
+        using FirstArg     = typename QtPrivate::List_Select<Args, 0>::Value;
+        using FirstArgType = std::decay_t<FirstArg>;
+        if constexpr (std::is_same_v<FirstArgType, QJsonValue>) {
+            connect(this, &DataWidgetInterface::setterCallRequested,
+                    that, funcPtr);
+        } else if constexpr (std::is_same_v<FirstArgType, QJsonObject>) {
+            connect(this, &DataWidgetInterface::setterCallRequested,
+                    that, [that, funcPtr](const QJsonValue &value){
+                (that->*funcPtr)(value.toObject());
+            });
+        } else {
+            Q_UNREACHABLE();
+        }
     }
 
     template<typename Class = QObject>
@@ -49,11 +62,18 @@ public:
                 m_json[m_currentIndex] = (that->*funcPtr)();
         });
     }
+    template<typename Class = QObject>
+    void mapToGetter(QJsonValue (Class::*funcPtr)() const, Class *that) {
+        connect(this, &DataWidgetInterface::getterCallRequested,
+                [this, that, funcPtr]() {
+            if (m_currentIndex < m_json.size() && m_currentIndex >= 0)
+                m_json[m_currentIndex] = (that->*funcPtr)();
+        });
+    }
     template<typename Class = QWidget>
     void setupMainWidget(Class *widget) {
         setMainWidget(widget);
-        connect(this, &DataWidgetInterface::setterCallRequested,
-                widget, &Class::fromJson);
+        mapToSetter<Class>(widget, &Class::fromJson);
         mapToGetter<Class>(&Class::toJson, widget);
     }
 
@@ -63,7 +83,7 @@ public slots:
 
 signals:
     void getterCallRequested();
-    void setterCallRequested(const QJsonObject &obj);
+    void setterCallRequested(const QJsonValue &obj);
     void entriesCountChanged(int value);
 
 protected:

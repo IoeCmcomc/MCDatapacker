@@ -1,19 +1,18 @@
 #ifndef INTRANGENODE_H
 #define INTRANGENODE_H
 
-#include "integernode.h"
+#include "singlevaluenode.h"
 #include "rangenode.h"
 
 namespace Command {
-/* I hadn't been used to using composition yet. */
-    class IntRangeNode : public RangeNode<Command::IntegerNode>
-    {
+    class IntRangeNode : public RangeNode<IntegerNode> {
 public:
-        IntRangeNode(int pos, int length);
-        QString toString() const override;
-    };
-}
+        explicit IntRangeNode(int length);
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::IntRangeNode>);
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
+    };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, IntRange)
+}
 
 #endif /* INTRANGENODE_H */

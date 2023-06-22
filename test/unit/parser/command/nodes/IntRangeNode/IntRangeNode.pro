@@ -8,12 +8,12 @@ TEMPLATE = app
 
 SOURCES +=  tst_testintrangenode.cpp \
     ../../../../../../src/parsers/command/nodes/argumentnode.cpp \
-    ../../../../../../src/parsers/command/nodes/integernode.cpp \
+    ../../../../../../src/parsers/command/nodes/singlevaluenode.cpp \
     ../../../../../../src/parsers/command/nodes/intrangenode.cpp \
     ../../../../../../src/parsers/command/nodes/parsenode.cpp
 
 HEADERS += \
     ../../../../../../src/parsers/command/nodes/argumentnode.h \
-    ../../../../../../src/parsers/command/nodes/integernode.h \
+    ../../../../../../src/parsers/command/nodes/singlevaluenode.h \
     ../../../../../../src/parsers/command/nodes/intrangenode.h \
     ../../../../../../src/parsers/command/nodes/parsenode.h

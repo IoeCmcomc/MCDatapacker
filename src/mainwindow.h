@@ -13,7 +13,6 @@
 #include <QLocale>
 #include <QJsonObject>
 
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -23,6 +22,10 @@ class LootTableEditorDock;
 class PredicateDock;
 class ItemModifierDock;
 class StatusBar;
+
+namespace libqdark {
+    class SystemThemeHelper;
+}
 
 struct PackMetaInfo {
     QString description;
@@ -34,10 +37,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    QString getCurLocale();
     void setCodeEditorText(const QString &text);
     QString getCodeEditorText();
     void readPrefSettings(QSettings &settings, bool fromDialog = false);
@@ -46,7 +48,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    void changeEvent(QEvent* event) override;
+    void changeEvent(QEvent *event) override;
 
 signals:
     void curFileChanged(const QString &filepath);
@@ -78,6 +80,7 @@ private /*slots*/ :
     void onDatapackChanged();
     void updateWindowTitle(bool changed);
     void installUpdate(const QString &url, const QString &filepath);
+    void onColorModeChanged(const bool isDark);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
@@ -91,21 +94,25 @@ private:
     QTranslator m_translator;
     QTranslator m_translatorQt;
     PackMetaInfo m_packInfo;
-    QMessageBox *uniqueMessageBox                  = nullptr;
-    StatusBar *m_statusBar                         = nullptr;
-    VisualRecipeEditorDock *visualRecipeEditorDock = nullptr;
-    LootTableEditorDock *lootTableEditorDock       = nullptr;
-    PredicateDock *predicateDock                   = nullptr;
-    ItemModifierDock *itemModifierDock             = nullptr;
-    QLocale curLocale;
-    QVector<QAction*> recentFoldersActions;
+    QMessageBox *uniqueMessageBox                    = nullptr;
+    StatusBar *m_statusBar                           = nullptr;
+    VisualRecipeEditorDock *visualRecipeEditorDock   = nullptr;
+    LootTableEditorDock *lootTableEditorDock         = nullptr;
+    PredicateDock *predicateDock                     = nullptr;
+    ItemModifierDock *itemModifierDock               = nullptr;
+    libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
+    QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
+    QString m_initialStyleId;
     const int maxRecentFoldersActions = 10;
 
     void initDocks();
     void initMenu();
+    void connectActionLink(QAction *action, const QString &&url);
+    void initResourcesMenu();
     void readSettings();
     void writeSettings();
+    void moveOldSettings();
     bool maybeSave();
     void openFolder(const QString &dirpath);
     void loadFolder(const QString &dirPath, const PackMetaInfo &packInfo);
@@ -114,11 +121,14 @@ private:
                                 QString &errorMsg) const;
 
     bool isPathRelativeTo(const QString &path, const QString &catDir);
-    void loadLanguage(const QString& rLanguage, bool atStartup = false);
+    void loadLanguage(const QString& langCode);
     void switchTranslator(QTranslator& translator, const QString& filename);
+    void moveSetting(QSettings &settings, const QString &oldKey,
+                     const QString &newKey);
     void adjustForCurFolder(const QString &path);
     void updateRecentFolders();
     void updateEditMenu();
+    void changeAppStyle(const bool darkMode);
 };
 
 #endif /* MAINWINDOW_H */

@@ -6,6 +6,13 @@
       "download-url": "https://github.com/IoeCmcomc/MCDatapacker/releases/download/v0.6.0/MCDatapacker_v0.6.0_win32.zip",
       "changelog": "",
       "mandatory": false
+    },
+    "windows-x64": {
+      "open-url": "",
+      "latest-version": "0.6.0",
+      "download-url": "https://github.com/IoeCmcomc/MCDatapacker/releases/download/v0.6.0/MCDatapacker_v0.6.0_win64.zip",
+      "changelog": "",
+      "mandatory": false
     }
   }
 }

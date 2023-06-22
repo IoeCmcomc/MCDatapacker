@@ -1,0 +1,1 @@
+{"added": {"occludes_vibration_signals": "<ul><li>Blocks in this tag will prevent sculk sensors from hearing vibrations if the block is between the sculk sensor and the vibration.</li></ul>", "smelts_to_glass": "<ul><li>Blocks with this tag give glass when smelted in a furnace.</li></ul>"}, "base": "1.19.3"}

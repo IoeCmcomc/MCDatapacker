@@ -16,7 +16,7 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void test_case1();
+    void general();
     void minValue();
     void maxValue();
     void exactValue();
@@ -34,35 +34,41 @@ void TestIntRangeNode::initTestCase() {
 void TestIntRangeNode::cleanupTestCase() {
 }
 
-void TestIntRangeNode::test_case1() {
-    IntRangeNode node(2, 5);
+void TestIntRangeNode::general() {
+    IntRangeNode node(0);
 
-    node.setMinValue(QSharedPointer<IntegerNode>::create(0, 1, 7), false);
-    node.setMaxValue(QSharedPointer<IntegerNode>::create(0, 1, 12), true);
+    node.setMinValue(QSharedPointer<IntegerNode>::create("7", 7), false);
+    node.setMaxValue(QSharedPointer<IntegerNode>::create("12", 12), true);
 
-    QCOMPARE(node.toString(), "IntRangeNode(7..12)");
+    QCOMPARE(node.kind(), ParseNode::Kind::Argument);
+    QCOMPARE(node.parserType(), ArgumentNode::ParserType::IntRange);
+    QCOMPARE(node.length(), 0);
+    QCOMPARE(node.hasMinValue(), true);
+    QCOMPARE(node.hasMaxValue(), true);
+    QCOMPARE(node.minValue()->value(), 7);
+    QCOMPARE(node.maxValue()->value(), 12);
 }
 
 void TestIntRangeNode::minValue() {
-    IntRangeNode node(0, 0);
+    IntRangeNode node(0);
 
-    node.setMinValue(QSharedPointer<IntegerNode>::create(0, 1, 1), false);
+    node.setMinValue(QSharedPointer<IntegerNode>::create("1", 1), false);
     QCOMPARE(node.hasMinValue(), true);
     QCOMPARE(node.minValue()->value(), 1);
 }
 
 void TestIntRangeNode::maxValue() {
-    IntRangeNode node(0, 0);
+    IntRangeNode node(0);
 
-    node.setMaxValue(QSharedPointer<IntegerNode>::create(0, 1, 22), false);
+    node.setMaxValue(QSharedPointer<IntegerNode>::create("22", 22), false);
     QCOMPARE(node.hasMaxValue(), true);
     QCOMPARE(node.maxValue()->value(), 22);
 }
 
 void TestIntRangeNode::exactValue() {
-    IntRangeNode node(0, 0);
+    IntRangeNode node(0);
 
-    node.setExactValue(QSharedPointer<IntegerNode>::create(0, 2, -9));
+    node.setExactValue(QSharedPointer<IntegerNode>::create("-9", -9));
     QCOMPARE(node.hasMinValue(), false);
     QCOMPARE(node.hasMaxValue(), false);
     QCOMPARE(node.exactValue()->value(), -9);

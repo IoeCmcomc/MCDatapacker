@@ -1,51 +1,46 @@
 #include "nodecounter.h"
 
-#include "../minecraftparser.h"
+//#include "../minecraftparser.h"
 
-void Command::NodeCounterImpl::operator()(Command::ParseNode *node) {
-}
+namespace Command {
+    void NodeCounter::visit(LiteralNode *node) {
+        if (!node->isCommand())
+            return;
 
-void Command::NodeCounterImpl::operator()(Command::LiteralNode *node) {
-    if (!node->isCommand())
-        return;
+        const QString &&command = node->text();
 
-    const QString &&command = node->text();
+        if (m_commandCounts.contains(command))
+            ++m_commandCounts[command];
+        else
+            m_commandCounts[command] = 1;
+    }
 
-    if (commandCounts.contains(command))
-        ++commandCounts[command];
-    else
-        commandCounts[command] = 1;
-}
+    void NodeCounter::visit(TargetSelectorNode *node) {
+        const auto varType = node->variable();
 
-void Command::NodeCounterImpl::operator()(Command::TargetSelectorNode *node) {
-    const auto varType = node->variable();
+        if (m_targetSelectorCounts.contains(varType))
+            ++m_targetSelectorCounts[varType];
+        else
+            m_targetSelectorCounts[varType] = 1;
+    }
 
-    if (targetSelectorCounts.contains(varType))
-        ++targetSelectorCounts[varType];
-    else
-        targetSelectorCounts[varType] = 1;
-}
+    void NodeCounter::visit(
+        EntityArgumentValueNode *node) {
+        if (node->getNode() && (node->getNode()->parserType() ==
+                                ArgumentNode::ParserType::NbtCompoundTag)) {
+            ++m_nbtAccessCount;
+        }
+    }
 
-void Command::NodeCounterImpl::operator()(
-    Command::EntityArgumentValueNode *node) {
-    if (dynamic_cast<Command::NbtCompoundNode*>(node->value().get()))
-        ++nbtAccessCount;
-}
+    UintHash NodeCounter::commandCounts() const {
+        return m_commandCounts;
+    }
 
+    SelectorHash NodeCounter::targetSelectorCounts() const {
+        return m_targetSelectorCounts;
+    }
 
-
-void Command::NodeCounter::startVisiting(Command::ParseNode *node) {
-    node->accept(this, NodeVisitor::Order::Preorder);
-}
-
-UintHash Command::NodeCounter::commandCounts() const {
-    return impl.commandCounts;
-}
-
-SelectorHash Command::NodeCounter::targetSelectorCounts() const {
-    return impl.targetSelectorCounts;
-}
-
-int Command::NodeCounter::nbtAccessCount() const {
-    return impl.nbtAccessCount;
+    int NodeCounter::nbtAccessCount() const {
+        return m_nbtAccessCount;
+    }
 }

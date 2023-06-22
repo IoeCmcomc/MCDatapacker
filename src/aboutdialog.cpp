@@ -1,7 +1,7 @@
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
-#include "platforms/windows.h"
+#include "platforms/windows_specific.h"
 
 #include <QOperatingSystemVersion>
 #include <QGraphicsOpacityEffect>
@@ -15,7 +15,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui->mainInfoLabel->setText(ui->mainInfoLabel->text().arg(qApp->
                                                              applicationVersion()));
 
-    extendFrameOnWindows(this, "AboutDialog");
+    Windows::extendFrame(this);
 
     auto *effect = new QGraphicsOpacityEffect(ui->logoLabel);
     ui->logoLabel->setGraphicsEffect(effect);

@@ -32,22 +32,25 @@ void TestMapNode::cleanupTestCase() {
 }
 
 void TestMapNode::test_case1() {
-    MapNode node(0, 999);
+    MapNode node(0);
 
-    QCOMPARE(node.size(), 0);;
-    node.insert(MapKey{ 2, "test" }, QSharedPointer<ParseNode>::create(0, 5));
-    node.insert(MapKey{ 1, "first" }, QSharedPointer<ParseNode>::create(0, 5));
+    QVERIFY(node.isValid() == true);
 
-    auto map = node.toMap();
-    auto it  = map.cbegin();
+    QCOMPARE(node.kind(), ParseNode::Kind::Container);
+    QCOMPARE(node.size(), 0);
 
-    while (it != map.cend()) {
-        qDebug() << it.key().text << *it.value();
-        ++it;
-    }
-    QCOMPARE(map.size(), 2);
-    QCOMPARE(node.toString(),
-             "MapNode(first: ParseNode(), test: ParseNode())");
+    node.insert(KeyPtr::create("same"),
+                QSharedPointer<SpanNode>::create("first"));
+
+    QVERIFY(node.contains("same"));
+
+    node.insert(KeyPtr::create("key"),
+                QSharedPointer<SpanNode>::create("value"));
+    node.insert(KeyPtr::create("same"),
+                QSharedPointer<SpanNode>::create("second"));
+
+    QCOMPARE(node.size(), 3);
+    QCOMPARE(node.find("same")->get()->second->text(), "first");
 }
 
 QTEST_MAIN(TestMapNode)

@@ -16,9 +16,6 @@
     <height>600</height>
    </size>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::GroupedDragging|QMainWindow::VerticalTabs</set>
   </property>
@@ -166,6 +163,43 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <widget class="QMenu" name="menuExtResources">
+     <property name="title">
+      <string>&amp;External resources</string>
+     </property>
+     <widget class="QMenu" name="menuOnlineTools">
+      <property name="title">
+       <string>Online &amp;tools</string>
+      </property>
+      <addaction name="actionUuidConverter"/>
+      <addaction name="actionSnowcapped"/>
+      <addaction name="actionGenerators"/>
+      <addaction name="actionUpgrader"/>
+      <addaction name="actionMcstacker"/>
+      <addaction name="actionMinecraft_Tools"/>
+     </widget>
+     <widget class="QMenu" name="menu_Offline_tools">
+      <property name="title">
+       <string>&amp;Offline tools</string>
+      </property>
+      <addaction name="actionPackSquash"/>
+     </widget>
+     <widget class="QMenu" name="menuMinecraft_mods">
+      <property name="title">
+       <string>Minecraft &amp;mods</string>
+      </property>
+      <addaction name="actionBetterCommandBlockUi"/>
+      <addaction name="actionDataReload"/>
+      <addaction name="actionNbtAutocomplete"/>
+      <addaction name="actionCommandHelper"/>
+      <addaction name="actionNbtTooltips"/>
+     </widget>
+     <addaction name="menuOnlineTools"/>
+     <addaction name="menu_Offline_tools"/>
+     <addaction name="menuMinecraft_mods"/>
+    </widget>
+    <addaction name="menuExtResources"/>
+    <addaction name="separator"/>
     <addaction name="actionAboutApp"/>
     <addaction name="actionCheckForUpdates"/>
     <addaction name="actionDisclaimer"/>
@@ -185,9 +219,6 @@
     <addaction name="actionPaste"/>
    </widget>
    <widget class="QMenu" name="menuTools">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
     <property name="title">
      <string>&amp;Tools</string>
     </property>
@@ -368,6 +399,9 @@
    </property>
   </action>
   <action name="actionStatistics">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Statistics</string>
    </property>
@@ -380,6 +414,69 @@
   <action name="actionCheckForUpdates">
    <property name="text">
     <string>&amp;Check for updates</string>
+   </property>
+  </action>
+  <action name="actionUuidConverter">
+   <property name="text">
+    <string>UUID converter</string>
+   </property>
+  </action>
+  <action name="actionSnowcapped">
+   <property name="text">
+    <string>Snowcapped – Dimension layout editor</string>
+   </property>
+  </action>
+  <action name="actionGenerators">
+   <property name="text">
+    <string>Generators for datapack</string>
+   </property>
+  </action>
+  <action name="actionUpgrader">
+   <property name="text">
+    <string>Datapack upgrader</string>
+   </property>
+  </action>
+  <action name="actionMcstacker">
+   <property name="text">
+    <string>MCStacker – Command generators</string>
+   </property>
+  </action>
+  <action name="actionPackSquash">
+   <property name="text">
+    <string>PackSquash – datapack optimizer</string>
+   </property>
+  </action>
+  <action name="actionBetterCommandBlockUi">
+   <property name="text">
+    <string>Better Command Block UI</string>
+   </property>
+   <property name="toolTip">
+    <string>Better Command Block UI</string>
+   </property>
+  </action>
+  <action name="actionDataReload">
+   <property name="text">
+    <string>Data Reload</string>
+   </property>
+  </action>
+  <action name="actionNbtAutocomplete">
+   <property name="text">
+    <string>NBT Autocomplete</string>
+   </property>
+  </action>
+  <action name="actionCommandHelper">
+   <property name="text">
+    <string>CommandHelper</string>
+   </property>
+  </action>
+  <action name="actionNbtTooltips">
+   <property name="text">
+    <string>NBTtooltips</string>
+   </property>
+  </action>
+  <action name="actionMinecraft_Tools">
+   <property name="text">
+    <string>Minecraft Tools</string>
    </property>
   </action>
  </widget>

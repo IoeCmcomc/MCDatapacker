@@ -1,10 +1,10 @@
 #ifndef HIGHLIGHTER_H
 #define HIGHLIGHTER_H
 
+#include "codepalette.h"
+
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
-
-#include <optional>
 
 struct BracketInfo {
     int  pos       = 0;
@@ -25,31 +25,12 @@ struct NamespacedIdInfo {
 };
 
 
-struct ProblemInfo {
-    enum class Type {
-        Invaild,
-        Warning,
-        Error,
-    };
-
-    Type    type   = Type::Invaild;
-    uint    line   = 0;
-    uint    col    = 0;
-    uint    length = 1;
-    QString message;
-};
-
-
-class TextBlockData : public QTextBlockUserData
-{
+class TextBlockData : public QTextBlockUserData {
 public:
     TextBlockData() = default;
-    ~TextBlockData() {
-        clear();
-    }
+    ~TextBlockData();
 
     void clear();
-    void clearProblems();
 
     QVector<BracketInfo *> brackets();
     QVector<NamespacedIdInfo *> namespacedIds();
@@ -57,66 +38,70 @@ public:
     void insert(BracketInfo *info);
     void insert(NamespacedIdInfo *info);
 
-    QVector<ProblemInfo> problems() const;
-    void setProblems(const QVector<ProblemInfo> &problems);
-
 private:
-    QVector<ProblemInfo> m_problems;
-    QVector<BracketInfo*> m_brackets;
-    QVector<NamespacedIdInfo*> m_namespaceIds;
+    QVector<BracketInfo *> m_brackets;
+    QVector<NamespacedIdInfo *> m_namespaceIds;
 };
 
 
 class CodeEditor;
+class Parser;
 
-
-class Highlighter : public QSyntaxHighlighter
-{
+class Highlighter : public QSyntaxHighlighter {
     Q_OBJECT
 
 public:
     enum BlockState {
-        Normal,
+        Normal = -1,
         QuotedString,
         Comment,
         MultilineComment,
     };
-    Highlighter(QTextDocument *parent);
 
-    QTextDocument *getParentDoc() const;
+    struct HighlightingRule {
+        QRegularExpression pattern;
+        CodePalette::Role  formatRole;
+    };
 
-    virtual void checkProblems(bool checkAll = false) = 0;
+    explicit Highlighter(QTextDocument *parent);
 
-public:
     using QSyntaxHighlighter::rehighlightBlock;
+
+    void rehighlight();
     void rehighlightBlock(const QTextBlock &block);
 
     QVector<QTextBlock> changedBlocks() const;
     void onDocChanged();
 
+    bool isManualHighlight() const;
+    void ensureDelayedRehighlightAll();
+
+    void setPalette(const CodePalette &newPalette);
 
 protected:
-    QMap<QChar, QTextCharFormat> quoteHighlightRules;
-    QMap<QChar, QTextCharFormat> singleCommentHighlightRules;
+    QString m_quoteDelimiters = QStringLiteral("\"");
+    QString m_singleCommentCharset;
     QVector<BracketPair> bracketPairs;
+    QRegularExpression namespacedIdRegex{ QStringLiteral(
+                                              R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };
+    CodePalette m_palette;
 
     friend class CodeEditor;
 
-    void highlightBlock(const QString &text);
+    void highlightBlock(const QString &text) override;
     void mergeFormat(int start, int count, const QTextCharFormat &fmt);
+    virtual void rehighlightDelayed() {
+    };
 
 private:
     QVector<QTextBlock> m_changedBlocks;
-    bool m_highlightMunually             = false;
-    bool m_highlightingFirstBlock        = false;
-    QRegularExpression namespacedIdRegex =
-        QRegularExpression(QStringLiteral(
-                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+\b)"));
-
-    QTextDocument *m_parentDoc;
     QTextCharFormat m_invisSpaceFmt;
+    bool m_highlightManually      = false;
+    bool m_highlightingFirstBlock = false;
+    bool m_curDirExists           = false;
 
-    void collectNamespacedIds(const QString &text, TextBlockData *data);
+    void collectBracket(int i, QChar ch, TextBlockData *data);
+    void collectNamespacedIds(QStringView sv, TextBlockData *data);
     QString locateNamespacedId(QString id);
 };
 

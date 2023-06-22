@@ -16,9 +16,8 @@ public:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void test_case1();
-    void text();
-    void setText();
+    void general();
+    void invalid();
 };
 
 TestLiteralNode::TestLiteralNode() {
@@ -33,27 +32,24 @@ void TestLiteralNode::initTestCase() {
 void TestLiteralNode::cleanupTestCase() {
 }
 
-void TestLiteralNode::test_case1() {
-    LiteralNode node(-1, "test_case1");
+void TestLiteralNode::general() {
+    LiteralNode node("test_case1");
 
-    QCOMPARE(node.toString(), "LiteralNode(test_case1)");
+    QVERIFY(node.isValid());
+    QCOMPARE(node.kind(), ParseNode::Kind::Literal);
+    QCOMPARE(node.hasText(), true);
+    QCOMPARE(node.text(), "test_case1");
+    QCOMPARE(node.length(), 10);
 }
 
-void TestLiteralNode::text() {
-    LiteralNode node(-1, "kill");
+void TestLiteralNode::invalid() {
+    LiteralNode node("invalid");
 
-    QCOMPARE(node.text(), "kill");
+    node.setIsValid(false);
+
+    QVERIFY(node.isValid() == false);
 }
 
-void TestLiteralNode::setText() {
-    LiteralNode node(-1, "ban");
-
-    QCOMPARE(node.text(), "ban");
-
-    node.setText("pardon");
-    QCOMPARE(node.text(), "pardon");
-}
-
-QTEST_MAIN(TestLiteralNode)
+QTEST_GUILESS_MAIN(TestLiteralNode)
 
 #include "tst_testliteralnode.moc"

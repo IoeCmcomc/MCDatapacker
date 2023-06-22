@@ -9,7 +9,8 @@
 class InventoryItem
 {
 public:
-    enum Flag : unsigned char {
+    enum Flag : unsigned int {
+        Null      = 0,
         Block     = 1,
         Item      = 2,
         BlockItem = Block | Item,
@@ -17,12 +18,16 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 
-    InventoryItem();
-    InventoryItem(const QString &id);
-    InventoryItem(const InventoryItem &other);
-    ~InventoryItem();
+    InventoryItem()                           = default;
+    ~InventoryItem()                          = default;
+    InventoryItem(const InventoryItem &other) = default;
+    InventoryItem(InventoryItem &&other);
 
-    InventoryItem &operator=(const InventoryItem &other);
+    InventoryItem(const QString &id);
+
+    InventoryItem &operator=(const InventoryItem &other) = default;
+    InventoryItem &operator=(InventoryItem &&other);;
+
     bool operator==(const InventoryItem &other);
     bool operator==(const InventoryItem &other) const;
 
@@ -46,11 +51,11 @@ public:
     bool isTag() const;
 
     QPixmap getPixmap() const;
-    void setPixmap(const QPixmap &value);
+    void setPixmap(const QPixmap &newPixmap);
 
     QString toolTip() const;
 
-    bool isEmpty() const;
+    bool isNull() const;
 
     Flags getFlags() const;
     void setFlags(const Flags &flags);
@@ -58,19 +63,19 @@ public:
     friend QDataStream &operator<<(QDataStream &out, const InventoryItem &obj);
     friend QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
 
+
 private:
-    QPixmap m_pixmap;
+    mutable QPixmap m_pixmap;
     QString m_name;
     QString m_namespacedId;
-    bool m_isEmpty = true;
-    Flags m_flags  = Flag::Item;
+    Flags m_flags = Flag::Null;
 
     void setupItem(QString id);
-    void setEmpty(const bool &value);
+    QPixmap loadPixmap(QString id) const;
 };
 
 Q_DECLARE_METATYPE(InventoryItem);
-Q_DECLARE_OPAQUE_POINTER(InventoryItem*)
+//Q_DECLARE_OPAQUE_POINTER(InventoryItem *)
 
 /*
    QDataStream & operator<<(QDataStream & out, const InventoryItem &obj);

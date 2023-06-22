@@ -4,32 +4,16 @@
 #include "highlighter.h"
 
 #include <QRegularExpression>
-#include <QTextDocument>
-#include <QJsonDocument>
 
-class JsonHighlighter : public Highlighter
-{
+class JsonHighlighter : public Highlighter {
 public:
-    JsonHighlighter(QTextDocument *parent = 0);
+    explicit JsonHighlighter(QTextDocument *parent);
 
 protected:
-    void highlightBlock(const QString &text) override;
-    void checkProblems(bool checkAll = false) override;
+    void highlightBlock(const QString &text) final;
 
 private:
-    struct HighlightingRule {
-        QRegularExpression pattern;
-        QTextCharFormat    format;
-    };
     QVector<HighlightingRule> highlightingRules;
-
-    QTextCharFormat keywordFormat;
-    QTextCharFormat numberFormat;
-    QTextCharFormat cBracketFormat;
-    QTextCharFormat rBracketFormat;
-    QTextCharFormat quotationFormat;
-
-    QJsonParseError jsonErr;
 
     void setupRules();
 };

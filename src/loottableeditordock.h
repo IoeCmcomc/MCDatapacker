@@ -28,13 +28,14 @@ protected:
 private:
     Ui::LootTableEditorDock *ui;
     const QStringList types = {
-        QStringLiteral("empty"),              QStringLiteral("entity"),
-        QStringLiteral("block"),              QStringLiteral("chest"),
-        QStringLiteral("fishing"),            QStringLiteral("gift"),
-        QStringLiteral("advancement_reward"), QStringLiteral("generic"),
-        QStringLiteral("barter"),             QStringLiteral("command"),
-        QStringLiteral("selector"),           QStringLiteral(
-            "advancement_entity")
+        QStringLiteral("empty"),                QStringLiteral("entity"),
+        QStringLiteral("block"),                QStringLiteral("chest"),
+        QStringLiteral("fishing"),              QStringLiteral("gift"),
+        QStringLiteral("advancement_reward"),   QStringLiteral("generic"),
+        QStringLiteral("barter"),               QStringLiteral("command"),
+        QStringLiteral("selector"),             QStringLiteral(
+            "advancement_entity"),              QStringLiteral("archaelogy"),
+        QStringLiteral("advancement_location"),
     };
 
 private /*slots*/ :

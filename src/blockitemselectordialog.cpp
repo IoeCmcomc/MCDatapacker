@@ -36,10 +36,14 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent,
             this, [ = ](const QString &input) {
         filterModel.setFilterRegularExpression(input);
     });
-    connect(ui->filterByBlockCheck, &QCheckBox::toggled, this, [ = ](bool checked) {
+    connect(ui->filterByBlockCheck, &QCheckBox::toggled, this,
+            [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::BlockItems, checked);
     });
-    connect(ui->filterByItemCheck, &QCheckBox::toggled, this, [ = ](bool checked) {
+    connect(ui->filterByItemCheck,
+            &QCheckBox::toggled,
+            this,
+            [ = ](bool checked) {
         filterModel.filtersRef().setFlag(FilterModel::NonblockItem, checked);
     });
     connect(ui->obtainableBlocksCheck, &QCheckBox::toggled,
@@ -134,7 +138,7 @@ QString BlockItemSelectorDialog::getSelectedID() {
 
     QStandardItem *item =
         model.itemFromIndex(filterModel.mapToSource(indexes[0]));
-    auto invItem = item->data(Qt::UserRole + 1).value<InventoryItem>();
+    auto &&invItem = item->data(Qt::UserRole + 1).value<InventoryItem>();
     return invItem.getNamespacedID();
 }
 
@@ -148,7 +152,7 @@ QVector<InventoryItem> BlockItemSelectorDialog::getSelectedItems() {
     for (const auto &index : qAsConst(indexes)) {
         QStandardItem *item =
             model.itemFromIndex(filterModel.mapToSource(index));
-        const auto &&invItem =
+        auto &&invItem =
             item->data(Qt::UserRole + 1).value<InventoryItem>();
         if (items.contains(invItem)) continue;
         items.push_back(invItem);
@@ -164,15 +168,15 @@ void BlockItemSelectorDialog::setCategory(const SelectCategory &category) {
     m_category   = category;
     using Filter = InventoryItemFilterModel::Filter;
     switch (m_category) {
-    case SelectCategory::Blocks: {
-        filterModel.setFilters(Filter::ObtainableBlocks
-                               | Filter::ObtainableBlocks);
-        break;
-    }
+        case SelectCategory::Blocks: {
+            filterModel.setFilters(Filter::ObtainableBlocks
+                                   | Filter::ObtainableBlocks);
+            break;
+        }
 
-    case SelectCategory::ObtainableItems: {
-        filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
-    }
+        case SelectCategory::ObtainableItems: {
+            filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
+        }
     }
     ui->stackedWidget->setCurrentIndex((int)m_category);
 }

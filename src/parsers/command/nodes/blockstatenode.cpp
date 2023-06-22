@@ -1,86 +1,77 @@
 #include "blockstatenode.h"
+#include "../visitors/nodevisitor.h"
 
-static const int _BlockStateNode =
-    qRegisterMetaType<QSharedPointer<Command::BlockStateNode> >();
-static const int _BlockPredicateNode =
-    qRegisterMetaType<QSharedPointer<Command::BlockPredicateNode> >();
+namespace Command {
+    BlockStateNode::BlockStateNode(int length)
+        : ArgumentNode(ParserType::BlockState, length) {
+    }
 
+    void BlockStateNode::accept(NodeVisitor *visitor,
+                                VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (m_resLoc)
+            m_resLoc->accept(visitor, order);
+        if (m_states)
+            m_states->accept(visitor, order);
+        if (m_nbt)
+            m_nbt->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 
-Command::BlockStateNode::BlockStateNode(int pos, const QString &nspace,
-                                        const QString &id)
-    : Command::ResourceLocationNode(pos, nspace, id) {
-}
+    QSharedPointer<MapNode> BlockStateNode::states() const {
+        return m_states;
+    }
 
-QString Command::BlockStateNode::toString() const {
-    auto ret =
-        QString("BlockStateNode(%1)").arg(ResourceLocationNode::fullId());
+    void BlockStateNode::setStates(QSharedPointer<MapNode> states) {
+        m_isValid &= states->isValid();
+        m_states   = std::move(states);
+    }
 
-    if (m_states)
-        ret += '[' + m_states->toString() + ']';
-    if (m_nbt)
-        ret += '{' + m_nbt->toString() + '}';
-    return ret;
-}
+    QSharedPointer<NbtCompoundNode> BlockStateNode::nbt()  const {
+        return m_nbt;
+    }
 
-void Command::BlockStateNode::accept(Command::NodeVisitor *visitor,
-                                     Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (m_states)
-        m_states->accept(visitor, order);
-    if (m_nbt)
-        m_nbt->accept(visitor, order);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
+    void BlockStateNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
+        m_isValid &= nbt->isValid();
+        m_nbt      = std::move(nbt);
+    }
 
-bool Command::BlockStateNode::isVaild() const {
-    return ResourceLocationNode::isVaild() && m_states && m_nbt;
-}
+    QSharedPointer<ResourceLocationNode> BlockStateNode::resLoc() const {
+        return m_resLoc;
+    }
 
+    void BlockStateNode::setResLoc(
+        QSharedPointer<ResourceLocationNode> newResLoc) {
+        m_isValid = newResLoc->isValid();
+        m_resLoc  = std::move(newResLoc);
+    }
 
-QSharedPointer<Command::MapNode> Command::BlockStateNode::states() const {
-    return m_states;
-}
+    BlockPredicateNode::BlockPredicateNode(int length)
+        : BlockStateNode(length) {
+        m_parserType = ParserType::BlockPredicate;
+    }
 
-void Command::BlockStateNode::setStates(QSharedPointer<MapNode> states) {
-    m_states = states;
-}
-
-QSharedPointer<Command::NbtCompoundNode> Command::BlockStateNode::nbt() const {
-    return m_nbt;
-}
-
-void Command::BlockStateNode::setNbt(QSharedPointer<NbtCompoundNode> nbt) {
-    m_nbt = nbt;
-}
-
-Command::BlockPredicateNode::BlockPredicateNode(int pos, const QString &nspace,
-                                                const QString &id)
-    : Command::BlockStateNode(pos, nspace, id) {
-    setParserId("minecraft:block_predicate");
-}
-
-Command::BlockPredicateNode::BlockPredicateNode(Command::BlockStateNode *other)
-    : Command::BlockStateNode(other->pos(), other->nspace(), other->id()) {
-    setParserId("minecraft:block_predicate");
-    setLength(other->length());
-    setStates(other->states());
-    setNbt(other->nbt());
-}
-
-QString Command::BlockPredicateNode::toString() const {
-    return BlockStateNode::toString().replace(0, 14, "BlockPredicateNode");
-}
-
-void Command::BlockPredicateNode::accept(Command::NodeVisitor *visitor,
-                                         Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (states())
-        states()->accept(visitor, order);
-    if (nbt())
-        nbt()->accept(visitor, order);
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
+    void BlockPredicateNode::accept(NodeVisitor *visitor,
+                                    VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (resLoc())
+            resLoc()->accept(visitor, order);
+        if (states())
+            states()->accept(visitor, order);
+        if (nbt())
+            nbt()->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 }

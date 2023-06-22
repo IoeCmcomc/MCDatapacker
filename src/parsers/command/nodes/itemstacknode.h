@@ -5,32 +5,32 @@
 #include "resourcelocationnode.h"
 
 namespace Command {
-    class ItemStackNode : public ResourceLocationNode
-    {
+    class ItemStackNode : public ArgumentNode {
 public:
-        ItemStackNode(int pos, const QString &nspace, const QString &id);
-        virtual QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ItemStackNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
 
+        QSharedPointer<ResourceLocationNode> resLoc() const;
+        void setResLoc(QSharedPointer<ResourceLocationNode> newResLoc);
+
 private:
-        QSharedPointer<NbtCompoundNode> m_nbt = nullptr;
+        QSharedPointer<ResourceLocationNode> m_resLoc;
+        QSharedPointer<NbtCompoundNode> m_nbt;
     };
 
     class ItemPredicateNode final : public ItemStackNode {
 public:
-        ItemPredicateNode(int pos, const QString &nspace,
-                          const QString &id);
-        ItemPredicateNode(ItemStackNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
-    };
-}
+        explicit ItemPredicateNode(int length);
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::ItemStackNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::ItemPredicateNode>)
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
+    };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ItemStack)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ItemPredicate)
+}
 
 #endif /* ITEMSTACKNODE_H */

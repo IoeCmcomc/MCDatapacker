@@ -4,8 +4,8 @@
 #include "mainwindow.h"
 #include "loottablecondition.h"
 
-#include "globalhelpers.h"
 #include "game.h"
+#include "platforms/windows_specific.h"
 
 #include <QDebug>
 #include <QJsonDocument>
@@ -23,6 +23,7 @@ PredicateDock::PredicateDock(QWidget *parent) :
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
         adjustSize();
         if (floating) {
+            Windows::setDarkFrameIfDarkMode(this);
             resize(minimumWidth(), height());
         }
     });
@@ -51,7 +52,7 @@ void PredicateDock::changeEvent(QEvent *event) {
 
 void PredicateDock::onReadBtn() {
     QString &&input =
-        qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+        qobject_cast<MainWindow *>(parent())->getCodeEditorText();
     QJsonDocument &&json_doc = QJsonDocument::fromJson(input.toUtf8());
 
     if (json_doc.isNull() || json_doc.isEmpty())
@@ -79,5 +80,5 @@ void PredicateDock::onWriteBtn() {
         jsonDoc = QJsonDocument(ui->dataInterface->json()[0].toObject());
     }
 
-    qobject_cast<MainWindow*>(parent())->setCodeEditorText(jsonDoc.toJson());
+    qobject_cast<MainWindow *>(parent())->setCodeEditorText(jsonDoc.toJson());
 }

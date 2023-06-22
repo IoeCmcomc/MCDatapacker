@@ -1,55 +1,41 @@
 #include "targetselectornode.h"
+#include "../visitors/nodevisitor.h"
 
-#include <QMetaEnum>
-
-static const int _ =
-    qRegisterMetaType<QSharedPointer<Command::TargetSelectorNode> >();
-
-const QMap<Command::TargetSelectorNode::Variable, char>
-Command::TargetSelectorNode::variableMap =
-{   { Variable::A, 'a' },
-    { Variable::E, 'e' },
-    { Variable::P, 'p' },
-    { Variable::R, 'r' },
-    { Variable::S, 's' } };
-
-Command::TargetSelectorNode::TargetSelectorNode(int pos)
-    : Command::ParseNode(pos) {
-}
-
-QString Command::TargetSelectorNode::toString() const {
-    auto ret = QString("TargetSelectorNode(@%1)").arg(variableMap[m_variable]);
-
-    if (m_args)
-        ret += '{' + m_args->toString() + '}';
-    return ret;
-}
-
-void Command::TargetSelectorNode::accept(Command::NodeVisitor *visitor,
-                                         Command::NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    if (m_args) {
-        m_args->accept(visitor, order);
+namespace Command {
+    TargetSelectorNode::TargetSelectorNode(int length)
+        : ParseNode(Kind::Container, length) {
     }
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
 
-QSharedPointer<Command::MultiMapNode> Command::TargetSelectorNode::args() const
-{
-    return m_args;
-}
+    void TargetSelectorNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        if (m_args) {
+            m_args->accept(visitor, order);
+        }
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 
-void Command::TargetSelectorNode::setArgs(QSharedPointer<MultiMapNode> args) {
-    m_args = args;
-}
+    QSharedPointer<MapNode> TargetSelectorNode::args() const {
+        return m_args;
+    }
 
-Command::TargetSelectorNode::Variable Command::TargetSelectorNode::variable()
-const {
-    return m_variable;
-}
+    void TargetSelectorNode::setArgs(QSharedPointer<MapNode> args) {
+        m_isValid &= args->isValid();
+        m_args     = std::move(args);
+    }
 
-void Command::TargetSelectorNode::setVariable(const Variable &variable) {
-    m_variable = variable;
+    TargetSelectorNode::Variable TargetSelectorNode::variable()
+    const {
+        return m_variable;
+    }
+
+    void TargetSelectorNode::setVariable(const Variable &variable) {
+        m_isValid  = true;
+        m_variable = variable;
+    }
 }
