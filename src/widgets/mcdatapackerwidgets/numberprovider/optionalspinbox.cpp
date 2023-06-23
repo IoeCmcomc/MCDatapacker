@@ -17,7 +17,7 @@ int OptionalSpinBox::valueFromText(const QString &text) const {
     /*qDebug() << "valueFromText" << text << isUnset << minimum() << maximum(); */
     if (text == m_unsetDisplayStr) {
         m_isUnset = true;
-        return 0;
+        return qMax(0, minimum());
     } else {
         m_isUnset = false;
         return QSpinBox::valueFromText(text);
@@ -26,7 +26,7 @@ int OptionalSpinBox::valueFromText(const QString &text) const {
 
 QString OptionalSpinBox::textFromValue(int value) const {
     /*qDebug() << "textFromValue" << value << isUnset << minimum() << maximum(); */
-    if (m_isUnset && (value == 0))
+    if (m_isUnset && (value == qMax(0, minimum())))
         return m_unsetDisplayStr;
     else {
         m_isUnset = false;
@@ -64,5 +64,5 @@ bool OptionalSpinBox::isUnset() const {
 void OptionalSpinBox::unset() {
     m_isUnset = true;
     clear();
-    setValue(0);
+    setValue(qMax(0, minimum()));
 }

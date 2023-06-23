@@ -1,6 +1,7 @@
 #include "linenumberarea.h"
 
 #include "codegutter.h"
+#include "codeeditor.h"
 
 #include <QPainter>
 

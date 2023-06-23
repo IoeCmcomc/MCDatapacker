@@ -252,4 +252,32 @@
     <source>Save all</source>
     <target>Lưu tất cả</target>
 </phrase>
+<phrase>
+    <source>Chat type</source>
+    <target>Loại  trò chuyện</target>
+</phrase>
+<phrase>
+    <source>Damage type</source>
+    <target>Loại sát thương</target>
+</phrase>
+<phrase>
+    <source>Dimension</source>
+    <target>Chiều không gian</target>
+</phrase>
+<phrase>
+    <source>Dimension type</source>
+    <target>Loại chiều không gian</target>
+</phrase>
+<phrase>
+    <source>Trim material</source>
+    <target>Vật liệu trang trí</target>
+</phrase>
+<phrase>
+    <source>Trim pattern</source>
+    <target>Hoa văn trang trí</target>
+</phrase>
+<phrase>
+    <source>Redstone</source>
+    <target>Redstone</target>
+</phrase>
 </QPH>

@@ -7,18 +7,15 @@ namespace Command {
     class TimeNode : public ArgumentNode
     {
 public:
-        enum Unit : unsigned char {
+        enum class Unit : unsigned char {
             ImplicitTick,
             Tick,
             Second,
             Day,
         };
-        TimeNode(int pos, int length,
+        TimeNode(const QString &text,
                  int v, Unit unit = Unit::ImplicitTick);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         float value() const;
         void setValue(float value);
@@ -29,13 +26,11 @@ public:
         int toTick() const;
 
 private:
-        float m_value;
-        Unit m_unit = Unit::ImplicitTick;
-
-private:
+        float m_value = 0;
+        Unit m_unit   = Unit::ImplicitTick;
     };
-}
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::TimeNode>)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Time)
+}
 
 #endif /* TIMENODE_H */

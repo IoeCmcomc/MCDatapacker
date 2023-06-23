@@ -11,6 +11,13 @@
         <file>icon/gutter/error.svg</file>
         <file>icon/gutter/warning.svg</file>
         <file>icon/gutter/error-and-warning.svg</file>
-        <file>fonts/Monocraft/Monocraft.otf</file>
+        <file>fonts/Monocraft.otf</file>
+        <file>fonts/MCDatapacker-Icons.ttf</file>
+        <file>icon/format-text-obfuscated.png</file>
+        <file>icon/object-text-translate.png</file>
+        <file>icon/object-text-scoreboard.png</file>
+        <file>icon/object-text-entity.png</file>
+        <file>icon/object-text-keybind.png</file>
+        <file>icon/object-text-snbt.png</file>
     </qresource>
 </RCC>

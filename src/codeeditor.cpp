@@ -1,24 +1,24 @@
 #include "codeeditor.h"
 
 #include "codegutter.h"
-#include "datapacktreeview.h"
-#include "mainwindow.h"
+#include "highlighter.h"
 #include "globalhelpers.h"
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
 #include "stripedscrollbar.h"
 #include "parsers/command/minecraftparser.h"
+#include "parsers/command/schema/schemaliteralnode.h"
+#include "parsers/command/schema/schemaargumentnode.h"
 #include "game.h"
 
 #include <QPainter>
-#include <QFileInfo>
 #include <QMimeData>
 #include <QFont>
 #include <QJsonDocument>
 #include <QShortcut>
 #include <QToolTip>
 #include <QTextDocumentFragment>
-#include <QGuiApplication>
+#include <QApplication>
 #include <QTimer>
 #include <QPlainTextDocumentLayout>
 #include <QScroller>
@@ -26,14 +26,9 @@
 #include <QCompleter>
 #include <QStringListModel>
 #include <QElapsedTimer>
+#include <QAbstractItemView>
+#include <QMenu>
 
-
-TextFileData::TextFileData(QTextDocument *doc, CodeFile *parent) {
-    this->parent = parent;
-    this->doc    = doc;
-    doc->setDocumentLayout(new QPlainTextDocumentLayout(doc));
-    this->textCursor = QTextCursor(doc);
-}
 
 QStringList getMinecraftInfoKeys(const QString &key) {
 //    QElapsedTimer timer;
@@ -48,43 +43,42 @@ QStringList getMinecraftInfoKeys(const QString &key) {
     return infoMap.keys();
 }
 
-QStringList loadMinecraftCommandLiterals(const QJsonObject &obj = QJsonObject(),
-                                         ushort depth           = 0) {
-//    QElapsedTimer timer;
-//    timer.start();
+QStringList loadMinecraftCommandLiterals(
+    const Command::Schema::Node * const node, ushort depth = 0) {
+    QElapsedTimer timer;
 
-    QJsonObject root;
+    if (depth == 0)
+        timer.start();
 
-    if (obj.isEmpty()) {
-        root = Command::MinecraftParser::getSchema();
-    } else {
-        root = obj;
+    QStringList ret;
+
+    const auto &&literalChidrens = node->literalChildren();
+    for (auto it = literalChidrens.cbegin();
+         it != literalChidrens.cend(); ++it) {
+        ret << it.key();
+        ret += loadMinecraftCommandLiterals(it.value(), depth + 1);
     }
 
-    const auto &&children = root[QStringLiteral("children")].toObject();
-    QStringList  ret;
-    for (auto it = children.constBegin(); it != children.constEnd(); ++it) {
-        const auto   &&node     = it.value().toObject();
-        const QString &nodeType = node[QStringLiteral("type")].toString();
-        if (nodeType == QStringLiteral("literal")) {
-            ret << it.key();
-            /*qDebug() << "literal:" << it.key() << "depth:" << depth; */
-            ret += loadMinecraftCommandLiterals(node, depth + 1);
-        } else if (nodeType == QStringLiteral("argument")) {
-            /*qDebug() << "argument:" << it.key() << "depth:" << depth; */
-            ret += loadMinecraftCommandLiterals(node, depth + 1);
-        }
+    // cppcheck-suppress iterators3
+    const auto &&argumentChildren = node->literalChildren();
+    for (auto it = argumentChildren.cbegin();
+         it != argumentChildren.cend(); ++it) {
+        // cppcheck-suppress danglingTemporaryLifetime
+        ret += loadMinecraftCommandLiterals(*it, depth + 1);
     }
 
-//    qDebug() << "function literals" << ret.size();
-//    qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
-//        timer.nsecsElapsed() / 1e6;
+//    if (depth == 0) {
+//        qDebug() << "function literals" << ret.size();
+//        qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
+//            timer.nsecsElapsed() / 1e6;
+//    }
 
     return ret;
 }
 
 QStringList loadMinecraftCompletionInfo() {
-    QStringList &&ret = loadMinecraftCommandLiterals();
+    QStringList &&ret = loadMinecraftCommandLiterals(
+        Command::MinecraftParser::schema());
 
     ret += getMinecraftInfoKeys(QStringLiteral("attribute"));
     ret += getMinecraftInfoKeys(QStringLiteral("block"));
@@ -100,31 +94,62 @@ QStringList loadMinecraftCompletionInfo() {
         ret += getMinecraftInfoKeys(QStringLiteral("tag/game_event"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/fluid"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/item"));
-    ret << Game::getRegistry(QStringLiteral("advancement"));
-    ret << Game::getRegistry(QStringLiteral("recipe"));
-    ret << Game::getRegistry(QStringLiteral("loot_table"));
-    ret << Game::getRegistry(QStringLiteral("particle_type"));
-    ret << Game::getRegistry(QStringLiteral("sound_event"));
+    ret += Game::getRegistry(QStringLiteral("advancement"));
+    ret += Game::getRegistry(QStringLiteral("recipe"));
+    ret += Game::getRegistry(QStringLiteral("loot_table"));
+    ret += Game::getRegistry(QStringLiteral("particle_type"));
+    ret += Game::getRegistry(QStringLiteral("sound_event"));
 
     ret.sort(Qt::CaseInsensitive);
+    ret.removeDuplicates();
     return ret;
 }
+
+// Adapted from: https://stackoverflow.com/a/56678483/12682038
+qreal perceivedLightness(const QColor &color) {
+    const static auto sRGBtoLin =
+        [](qreal colorChannel) {
+            if (colorChannel <= 0.04045) {
+                return colorChannel / 12.92;
+            } else {
+                return pow(((colorChannel + 0.055) / 1.055), 2.4);
+            }
+        };
+
+    const qreal vR = color.redF();
+    const qreal vG = color.greenF();
+    const qreal vB = color.blueF();
+
+    const qreal Y = (0.2126 * sRGBtoLin(vR) + 0.7152 * sRGBtoLin(vG)
+                     + 0.0722 * sRGBtoLin(vB));
+
+    if (Y <= (216. / 24389)) {
+        return Y * (24389. / 27);
+    } else {
+        return pow(Y, (1. / 3)) * 116 - 16;
+    }
+}
+
+QStringList CodeEditor::minecraftCompletionInfo = {};
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     m_gutter = new CodeGutter(this);
     setAttribute(Qt::WA_Hover);
     setVerticalScrollBar(new StripedScrollBar(Qt::Vertical, this));
+    readPrefSettings();
 
-    connect(this, &CodeEditor::blockCountChanged,
+    connect(this, &QPlainTextEdit::blockCountChanged,
             this, &CodeEditor::updateGutterWidth);
-    connect(this, &CodeEditor::updateRequest,
+    connect(this, &QPlainTextEdit::updateRequest,
             this, &CodeEditor::updateGutter);
-    connect(this, &CodeEditor::cursorPositionChanged,
+    connect(this, &QPlainTextEdit::cursorPositionChanged,
             this, &CodeEditor::onCursorPositionChanged);
-    connect(this, &CodeEditor::undoAvailable,
+    connect(this, &QPlainTextEdit::undoAvailable,
             this, &CodeEditor::onUndoAvailable);
-    connect(this, &CodeEditor::redoAvailable,
+    connect(this, &QPlainTextEdit::redoAvailable,
             this, &CodeEditor::onRedoAvailable);
+    connect(document(), &QTextDocument::contentsChanged,
+            this, &CodeEditor::onTextChanged);
 
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
@@ -132,8 +157,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
             &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Slash), this),
             &QShortcut::activated, this, &CodeEditor::toggleComment);
-
-    /*readPrefSettings(); */
 
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
@@ -154,27 +177,35 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     onCursorPositionChanged();
 }
 
-void CodeEditor::readPrefSettings() {
-    {
-        auto *completer = new QCompleter(this);
-        minecraftCompletionInfo = loadMinecraftCompletionInfo();
-        completer->setModel(new QStringListModel(minecraftCompletionInfo,
-                                                 this));
-        completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-        completer->setCaseSensitivity(Qt::CaseInsensitive);
-        completer->setWrapAround(false);
-        setCompleter(completer);
+void CodeEditor::setFileType(CodeFile::FileType type) {
+    m_fileType = type;
 
+    initCompleter();
+}
 
-/*
-          qDebug() << minecraftCompletionInfo.size() <<
-              m_completer->model()->rowCount() <<
-              m_completer->completionModel()->rowCount();
- */
+void CodeEditor::initCompleter() {
+    auto *completer = new QCompleter(this);
+
+    if (m_fileType == CodeFile::Function) {
+        if (minecraftCompletionInfo.isEmpty()) {
+            minecraftCompletionInfo = loadMinecraftCompletionInfo();
+            qDebug() << "Minecraft completions loaded (" <<
+                minecraftCompletionInfo.size() << "items)";
+        }
     }
+    completer->setModel(new QStringListModel(minecraftCompletionInfo, this));
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    setCompleter(completer);
+}
+
+void CodeEditor::readPrefSettings() {
+    QSettings settings;
 
     settings.beginGroup("editor");
 
+    QFont monoFont;
     if (settings.contains("textFont")) {
         monoFont = qvariant_cast<QFont>(settings.value("textFont"));
     } else {
@@ -185,6 +216,8 @@ void CodeEditor::readPrefSettings() {
     monoFont.setPointSize(settings.value("textSize", 13).toInt());
 
     setFont(monoFont);
+    document()->setDefaultFont(monoFont);
+    m_fontSize = monoFont.pointSize();
 
     if (m_completer)
         m_completer->popup()->setFont(monoFont);
@@ -194,13 +227,14 @@ void CodeEditor::readPrefSettings() {
 
     setLineWrapMode(settings.value("wrap", false).toBool()
                         ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
-    setTabStopDistance(fontMetrics().horizontalAdvance(
-                           QString(' ').repeated(settings.value("tabSize",
-                                                                4).toInt())));
+    m_tabSize = settings.value("tabSize", 4).toInt();
+    setTabStopDistance(fontMetrics().horizontalAdvance(QString(' ').repeated(
+                                                           m_tabSize)));
 
     QTextOption &&option = document()->defaultTextOption();
-    using Flag = QTextOption::Flag;
-    option.setFlags(settings.value("showSpacesAndTabs", false).toBool()
+    using Flag          = QTextOption::Flag;
+    m_insertTabAsSpaces = settings.value("showSpacesAndTabs", false).toBool();
+    option.setFlags(m_insertTabAsSpaces
                         ? (option.flags() | Flag::ShowTabsAndSpaces)
                         : option.flags() & ~Flag::ShowTabsAndSpaces);
     document()->setDefaultTextOption(option);
@@ -217,7 +251,7 @@ void CodeEditor::wheelEvent(QWheelEvent *e) {
         if (m_gutter)
             m_gutter->setFont(font());
         emit showMessageRequest(tr("Zoom: %1%").arg(fontInfo().pointSize() * 100
-                                                    / monoFont.pointSize()),
+                                                    / m_fontSize),
                                 1500);
     } else {
         QPlainTextEdit::wheelEvent(e);
@@ -238,31 +272,89 @@ void CodeEditor::resizeEvent(QResizeEvent *e) {
 void CodeEditor::mousePressEvent(QMouseEvent *e) {
     QPlainTextEdit::mousePressEvent(e);
 
-    if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier
         || e->modifiers() & Qt::ControlModifier) {
         followNamespacedId(e);
     }
 }
 
-void startOfWordExtended(QTextCursor &tc) {
+void CodeEditor::mouseDoubleClickEvent(QMouseEvent *e) {
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier
+        || e->modifiers() & Qt::ShiftModifier) {
+        QTextCursor tc = textCursor();
+        //tc.select(QTextCursor::WordUnderCursor);
+        tc.movePosition(QTextCursor::EndOfWord);
+        const int oldPos = tc.position();
+        tc = textCursor(); // Reuse initial position
+        startOfWordExtended(tc);
+        tc.setPosition(oldPos, QTextCursor::KeepAnchor);
+        setTextCursor(tc);
+        e->accept();
+    } else {
+        QPlainTextEdit::mouseDoubleClickEvent(e);
+    }
+}
+
+void debugTextCursor(const QTextCursor &tc) {
+    //return;
+
+    const QString reprTemplate("'%1|%2' (pos: %3)");
+    const QString reprTemplate2("'%1%2%3%4%5' (anc: %6, pos: %7)");
+
+    const QString &&line   = tc.block().text();
+    const int       pos    = tc.positionInBlock();
+    const int       anchor = tc.anchor() - tc.block().position();
+
+    if (pos == anchor) {
+        qDebug() <<
+            reprTemplate.arg(line.leftRef(pos)).arg(line.midRef(pos)).arg(pos);
+    } else {
+        const int   left  = qMin(pos, anchor);
+        const int   right = qMax(pos, anchor);
+        const QChar lchar = (pos > anchor) ? '[' : '|';
+        const QChar rchar = (pos > anchor) ? '|' : ']';
+
+        qDebug() << reprTemplate2.arg(line.leftRef(left)).arg(lchar)
+            .arg(line.midRef(left, right - left)).arg(rchar)
+            .arg(line.midRef(right)).arg(anchor).arg(pos);
+    }
+}
+
+void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
     static const QString extendedAcceptedCharsset("#.:/");
+
+    //debugTextCursor(tc);
 
     while (true) {
         /* Move cursor to the left of the word */
-        tc.select(QTextCursor::WordUnderCursor);
-        tc.setPosition(tc.anchor());
+        tc.movePosition(QTextCursor::StartOfWord);
+        //debugTextCursor(tc);
 
         /* Get the character to the left of the cursor */
         tc.movePosition(QTextCursor::PreviousCharacter,
                         QTextCursor::KeepAnchor);
-        const QChar &curChar = *tc.selectedText().constBegin();
+        //debugTextCursor(tc);
+        // This fixes garbage characters in debug mode
+        const QString &&selectedText = tc.selectedText();
+        const QChar    &curChar      = selectedText.front();
 
         if (extendedAcceptedCharsset.contains(curChar)) {
             tc.movePosition(QTextCursor::PreviousCharacter);
-            tc.movePosition(QTextCursor::PreviousWord);
-            tc.movePosition(QTextCursor::NextCharacter);
+            //debugTextCursor(tc);
+            if (!tc.atBlockStart()) {
+                tc.movePosition(QTextCursor::PreviousWord);
+                //debugTextCursor(tc);
+                tc.movePosition(QTextCursor::NextCharacter);
+                //debugTextCursor(tc);
+            } else {
+                // Prevent infinite loop when '#' is at start of a line
+                tc.movePosition(QTextCursor::NextCharacter);
+                //debugTextCursor(tc);
+                return;
+            }
         } else {
             tc.movePosition(QTextCursor::NextCharacter);
+            //debugTextCursor(tc);
             return;
         }
     }
@@ -309,20 +401,19 @@ void CodeEditor::indentOnNewLine(QKeyEvent *e) {
 }
 
 void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
-    if (settings.value(QStringLiteral("editor/insertTabAsSpaces"), true)
-        .toBool()) {
+    if (m_insertTabAsSpaces) {
         /* Handle Tab and Backtab keys */
 
-        const int tabSize =
-            settings.value(QStringLiteral("editor/tabSize"), 4).toInt();
         auto cursor = textCursor();
         if (e->key() == Qt::Key_Tab) {
-            cursor.insertText(QString(' ').repeated(tabSize));
+            cursor.insertText(QString(' ').repeated(m_tabSize));
             setTextCursor(cursor);
+            e->accept();
+            return;
         } else if (e->key() == Qt::Key_Backtab) {
             cursor.beginEditBlock();
             const QString &&line = cursor.block().text();
-            for (int i = tabSize; i > 0; --i) {
+            for (int i = m_tabSize; i > 0; --i) {
                 if (cursor.atBlockStart())
                     break;
                 const QChar &&curChar = line[cursor.positionInBlock() - 1];
@@ -332,22 +423,21 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
             }
             cursor.endEditBlock();
             setTextCursor(cursor);
-        } else {
-            goto base;
+            e->accept();
+            return;
         }
-    } else {
- base:
-        if (e->key() == Qt::Key_Return) {
-            indentOnNewLine(e);
-        } else {
-            if ((e->key() == Qt::Key_Insert) &&
-                (e->modifiers() == Qt::NoModifier)) {
-                setOverwriteMode(!overwriteMode());
-                emit updateStatusBarRequest(this);
-            }
+    }
 
-            QPlainTextEdit::keyPressEvent(e);
+    if (e->key() == Qt::Key_Return) {
+        indentOnNewLine(e);
+    } else {
+        if ((e->key() == Qt::Key_Insert) &&
+            (e->modifiers() == Qt::NoModifier)) {
+            setOverwriteMode(!overwriteMode());
+            emit updateStatusBarRequest(this);
         }
+
+        QPlainTextEdit::keyPressEvent(e);
     }
 }
 
@@ -371,16 +461,20 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     const bool isShortcut =
         (e->modifiers().testFlag(Qt::ControlModifier) &&
          e->key() == Qt::Key_Space);  /* CTRL+Space */
+
     /* Do not process the shortcut when we have a completer */
-    if (!m_completer || !isShortcut)
+    if (!m_completer || !isShortcut) {
         handleKeyPressEvent(e);
+    }
 
     const bool ctrlOrShift = e->modifiers().testFlag(Qt::ControlModifier) ||
                              e->modifiers().testFlag(Qt::ShiftModifier);
-    if (!m_completer || (ctrlOrShift && e->text().isEmpty()))
-        return;
 
-    const static QString eow("~@$%^&*()+{}|\"<>?,;'[]\\-="); /* end of word */
+    if (!m_completer || (ctrlOrShift && e->text().isEmpty())) {
+        return;
+    }
+
+    const static QString eow(QStringLiteral("~@$%^&*()+{}|\"<>?,;'[]\\-=")); /* end of word */
     const bool           hasModifier =
         (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     const QString &&completionPrefix = textUnderCursor();
@@ -394,18 +488,25 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
 
     if (completionPrefix != m_completer->completionPrefix()) {
         if (m_completer->popup()->isHidden()) {
+            qDebug() << "Combining final completions";
             QStringList completionInfo = minecraftCompletionInfo;
-            completionInfo += Glhp::fileIdList(QDir::currentPath(), QString(),
-                                               QString(), false).toList();
-            completionInfo.removeDuplicates();
+
+            const QVector<QString> &&idList = Glhp::fileIdList(
+                QDir::currentPath(), QString(), QString(), false);
+            for (const auto &item: idList) {
+                completionInfo << item;
+            }
+
             completionInfo.sort(Qt::CaseInsensitive);
+            completionInfo.removeDuplicates();
+
             if (auto *model =
-                    qobject_cast<QStringListModel*>(m_completer->model())) {
+                    qobject_cast<QStringListModel *>(m_completer->model())) {
                 model->setStringList(completionInfo);
             }
-            qDebug() << minecraftCompletionInfo.size() <<
-                m_completer->model()->rowCount() <<
-                m_completer->completionModel()->rowCount();
+//            qDebug() << minecraftCompletionInfo.size() <<
+//                m_completer->model()->rowCount() <<
+//                m_completer->completionModel()->rowCount();
         }
 
         m_completer->setCompletionPrefix(completionPrefix);
@@ -464,11 +565,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     menu->addAction(sep1Action);
 
     QAction *formatAction = new QAction(tr("Format"), menu);
-    auto     dirpath      = QDir::currentPath();
-    auto     fileType     = Glhp::pathToFileType(dirpath, filepath);
 
-    formatAction->setDisabled(!((CodeFile::JsonText <= fileType) &&
-                                (fileType <= CodeFile::ItemTag)));
+    formatAction->setDisabled(!((CodeFile::JsonText <= m_fileType) &&
+                                (m_fileType <= CodeFile::JsonText_end)));
     if (formatAction->isEnabled()) {
         connect(formatAction, &QAction::triggered, [ = ]() {
             QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
@@ -491,10 +590,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 
 bool CodeEditor::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
-        /*QToolTip::hideText(); */
-        /*qDebug() << "QEvent::ToolTip"; */
-
-        auto *helpEvent = static_cast<QHelpEvent*>(event);
+        auto *helpEvent = static_cast<QHelpEvent *>(event);
         auto  globalPos = mapToGlobal(helpEvent->pos());
         auto  pos       = helpEvent->pos();
         bool  done      = false;
@@ -556,10 +652,26 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
     QPlainTextEdit::focusInEvent(e);
 }
 
+void CodeEditor::changeEvent(QEvent *e) {
+    if (e->type() == QEvent::PaletteChange) {
+        if (m_highlighter) {
+            if (perceivedLightness(palette().base().color()) < 50) {
+                m_highlighter->setPalette(defaultDarkCodePalette);
+            } else {
+                m_highlighter->setPalette(defaultCodePalette);
+            }
+            onCursorPositionChanged();
+            m_highlighter->ensureDelayedRehighlightAll();
+            m_highlighter->rehighlightDelayed();
+        }
+    }
+    QPlainTextEdit::changeEvent(e);
+}
+
 void CodeEditor::onCursorPositionChanged() {
-    /*qDebug() << "CodeEditor::onCursorPositionChanged"; */
+//    qDebug() << "CodeEditor::onCursorPositionChanged";
     setExtraSelections({});
-    /*highlightCurrentLine(); */
+    highlightCurrentLine();
     matchParentheses();
     problemSelectionStartIndex = extraSelections().size() - 1;
     if (!problemExtraSelections.isEmpty()) {
@@ -576,7 +688,13 @@ void CodeEditor::highlightCurrentLine() {
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(237, 236, 223, 127);
+        const int factor    = 105;
+        QColor    lineColor = palette().base().color();
+        if (perceivedLightness(lineColor) < 50) {
+            lineColor = lineColor.lighter(factor);
+        } else {
+            lineColor = lineColor.darker(factor);
+        }
 
         selection.format = QTextCharFormat();
         selection.format.setBackground(lineColor);
@@ -587,27 +705,6 @@ void CodeEditor::highlightCurrentLine() {
         selections.append(selection);
     }
     setExtraSelections(selections);
-}
-
-void CodeEditor::setFilePath(const QString &path) {
-    filepath = path;
-    auto *doc = document();
-
-    doc->setDefaultFont(font());
-    settings.beginGroup("editor");
-    /* The tab stop distance must be reset each time the current document is changed */
-    if (settings.value("insertTabAsSpaces", true).toBool()) {
-        setTabStopDistance(fontMetrics().horizontalAdvance(
-                               QString(' ').repeated(settings.value("tabSize",
-                                                                    4).toInt())));
-    }
-    QTextOption &&option = doc->defaultTextOption();
-    using Flag = QTextOption::Flag;
-    option.setFlags(settings.value("showSpacesAndTabs", false).toBool()
-                            ? (option.flags() | Flag::ShowTabsAndSpaces)
-                            : option.flags() & ~Flag::ShowTabsAndSpaces);
-    doc->setDefaultTextOption(option);
-    settings.endGroup();
 }
 
 void CodeEditor::updateGutterWidth(int /* newBlockCount */) {
@@ -641,8 +738,8 @@ void CodeEditor::openReplaceDialog() {
 }
 
 void CodeEditor::toggleComment() {
-    if (!curHighlighter ||
-        curHighlighter->singleCommentHighlightRules.isEmpty())
+    if (!m_highlighter ||
+        m_highlighter->m_singleCommentCharset.isEmpty())
         return;
 
     auto       txtCursor    = textCursor();
@@ -677,7 +774,7 @@ void CodeEditor::toggleComment() {
     int         anchorCharAdded     = 0;
     int         posCharAdded        = 0;
     const QChar commentChar         =
-        curHighlighter->singleCommentHighlightRules.cbegin().key();
+        m_highlighter->m_singleCommentCharset[0];
 
     for (int i = 0; i < count; i++) {
         txtCursor.movePosition(QTextCursor::StartOfLine);
@@ -739,6 +836,47 @@ void CodeEditor::insertCompletion(const QString &completion) {
     setTextCursor(tc);
 }
 
+void CodeEditor::onTextChanged() {
+//    qDebug() << "CodeEditor::onTextChanged";
+    if (m_parser) {
+        bool ok = m_parser->parse(toPlainText());
+        m_problems.clear();
+        if (!ok) {
+            m_problems.reserve(m_parser->errors().size());
+            for (const auto &error: m_parser->errors()) {
+                ProblemInfo problem{ ProblemInfo::Type::Error,
+                                     error.pos, error.length,
+                                     error.toLocalizedMessage() };
+                m_problems << std::move(problem);
+            }
+        }
+        if (m_highlighter) {
+            m_highlighter->rehighlightDelayed();
+        }
+        updateErrorSelections();
+    }
+}
+
+Parser * CodeEditor::parser() const {
+    return m_parser.get();
+}
+
+void CodeEditor::goToLine(const int lineNo) {
+    auto &&cursor = textCursor();
+
+    cursor.setPosition(document()->findBlockByLineNumber(lineNo).position());
+    setTextCursor(cursor);
+    centerCursor();
+}
+
+void CodeEditor::setParser(std::unique_ptr<Parser> newParser) {
+    m_parser = std::move(newParser);
+}
+
+Highlighter * CodeEditor::highlighter() const {
+    return m_highlighter;
+}
+
 bool CodeEditor::getCanRedo() const {
     return canRedo;
 }
@@ -756,6 +894,7 @@ void CodeEditor::setCompleter(QCompleter *c) {
     if (!m_completer)
         return;
 
+    m_completer->popup()->setFont(font());
     m_completer->setWidget(this);
     m_completer->setCompletionMode(QCompleter::PopupCompletion);
     m_completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -764,7 +903,7 @@ void CodeEditor::setCompleter(QCompleter *c) {
                      this, &CodeEditor::insertCompletion);
 }
 
-QCompleter *CodeEditor::completer() const {
+QCompleter * CodeEditor::completer() const {
     return m_completer;
 }
 
@@ -772,8 +911,13 @@ bool CodeEditor::getCanUndo() const {
     return canUndo;
 }
 
-void CodeEditor::setCurHighlighter(Highlighter *value) {
-    curHighlighter = value;
+void CodeEditor::setHighlighter(Highlighter *value) {
+    m_highlighter = value;
+    if (perceivedLightness(palette().base().color()) < 50) {
+        m_highlighter->setPalette(defaultDarkCodePalette);
+    } else {
+        m_highlighter->setPalette(defaultCodePalette);
+    }
 }
 
 void CodeEditor::displayErrors() {
@@ -785,7 +929,7 @@ void CodeEditor::displayErrors() {
 
         setExtraSelections(selections);
         if (auto *scrollbar =
-                qobject_cast<StripedScrollBar*>(verticalScrollBar())) {
+                qobject_cast<StripedScrollBar *>(verticalScrollBar())) {
             scrollbar->redrawStripes();
             scrollbar->update();
         }
@@ -797,37 +941,35 @@ void CodeEditor::displayErrors() {
 void CodeEditor::updateErrorSelections() {
     /*qDebug() << "CodeEditor::updateErrorSelections"; */
     if (!isReadOnly()) {
-        if (!document() || !curHighlighter)
+        if (!document() || !m_parser)
             return;
 
         problemExtraSelections.clear();
 
-        for (auto it = document()->firstBlock(); it != document()->end();
-             it = it.next()) {
-            if (TextBlockData *data =
-                    dynamic_cast<TextBlockData *>(it.userData())) {
-                for (const auto &problem: data->problems()) {
-                    QTextEdit::ExtraSelection selection;
-                    /* Point the cursor to the beginning of the current line */
-                    QTextCursor selCursor(it);
-                    selCursor.setPosition(selCursor.position() + problem.col);
-                    if (problem.length > 0) {
-                        if (selCursor.atBlockEnd()) {
-                            selCursor.select(QTextCursor::LineUnderCursor);
-                        } else {
-                            selCursor.setPosition(
-                                selCursor.position() + problem.length,
-                                QTextCursor::KeepAnchor);
-                        }
-                    } else {
-                        selCursor.select(QTextCursor::WordUnderCursor);
-                    }
-                    selection.cursor = selCursor;
-                    selection.format = errorHighlightRule;
-                    selection.format.setToolTip(problem.message);
-                    problemExtraSelections << selection;
+        QTextCursor tc = textCursor();
+        tc.movePosition(QTextCursor::End);
+        const int endPos = tc.position();
+
+        for (const auto &problem: m_problems) {
+            QTextEdit::ExtraSelection selection;
+            QTextCursor               selCursor = textCursor();
+            selCursor.setPosition(qBound(0, problem.pos, endPos));
+
+            if (problem.length > 0) {
+                if (selCursor.atBlockEnd()) {
+                    selCursor.select(QTextCursor::LineUnderCursor);
+                } else {
+                    selCursor.setPosition(
+                        selCursor.position() + problem.length,
+                        QTextCursor::KeepAnchor);
                 }
+            } else {
+                selCursor.select(QTextCursor::WordUnderCursor);
             }
+            selection.cursor = selCursor;
+            selection.format = errorHighlightRule;
+            selection.format.setToolTip(problem.message);
+            problemExtraSelections << selection;
         }
     }
     displayErrors();
@@ -839,10 +981,10 @@ void CodeEditor::matchParentheses() {
     TextBlockData *data =
         dynamic_cast<TextBlockData *>(textCursor().block().userData());
 
-    if (!data || !curHighlighter)
+    if (!m_highlighter || !data)
         return;
 
-    QVector<BracketInfo*> && infos = data->brackets();
+    const QVector<BracketInfo *> && infos = data->brackets();
 
     int pos = textCursor().block().position();
 
@@ -857,7 +999,7 @@ void CodeEditor::matchParentheses() {
         bool isOnTheLeftOfChar = info->pos == curPos;
 
         if (isOnTheLeftOfChar || (info->pos == curPos - 1)) {
-            for (const auto &pair: qAsConst(curHighlighter->bracketPairs)) {
+            for (const auto &pair: qAsConst(m_highlighter->bracketPairs)) {
                 if (info->character == pair.left) {
                     if (matchLeftBracket(textCursor().block(), i + 1,
                                          pair.left, pair.right,
@@ -977,7 +1119,7 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
     TextBlockData *data =
         dynamic_cast<TextBlockData *>(textCursor().block().userData());
 
-    if (!data || !curHighlighter)
+    if (!data || !m_highlighter)
         return;
 
     QVector<NamespacedIdInfo *> infos = data->namespacedIds();
@@ -996,7 +1138,7 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
     }
 }
 
-QString textUnderCursorExtended(QTextCursor tc) {
+QString CodeEditor::textUnderCursorExtended(QTextCursor tc) const {
     const int oldPos = tc.position();
 
     startOfWordExtended(tc);
@@ -1007,7 +1149,5 @@ QString textUnderCursorExtended(QTextCursor tc) {
 }
 
 QString CodeEditor::textUnderCursor() const {
-    QTextCursor tc = textCursor();
-
-    return textUnderCursorExtended(tc);
+    return textUnderCursorExtended(textCursor());
 }

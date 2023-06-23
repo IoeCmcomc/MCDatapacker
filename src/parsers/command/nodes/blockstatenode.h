@@ -6,13 +6,11 @@
 #include "resourcelocationnode.h"
 
 namespace Command {
-    class BlockStateNode : public ResourceLocationNode
-    {
+    class BlockStateNode : public ArgumentNode {
 public:
-        BlockStateNode(int pos, const QString &nspace, const QString &id);
-        virtual QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
-        bool isVaild() const override;
+        explicit BlockStateNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         QSharedPointer<MapNode> states() const;
         void setStates(QSharedPointer<MapNode> states);
@@ -20,22 +18,24 @@ public:
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
 
+        QSharedPointer<ResourceLocationNode> resLoc() const;
+        void setResLoc(QSharedPointer<ResourceLocationNode> newResLoc);
+
 private:
-        QSharedPointer<MapNode> m_states      = nullptr;
-        QSharedPointer<NbtCompoundNode> m_nbt = nullptr;
+        QSharedPointer<ResourceLocationNode> m_resLoc;
+        QSharedPointer<MapNode> m_states;
+        QSharedPointer<NbtCompoundNode> m_nbt;
     };
 
     class BlockPredicateNode final : public BlockStateNode {
 public:
-        BlockPredicateNode(int pos, const QString &nspace,
-                           const QString &id);
-        BlockPredicateNode(BlockStateNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
-    };
-}
+        explicit BlockPredicateNode(int length);
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::BlockStateNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::BlockPredicateNode>)
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
+    };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, BlockState)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, BlockPredicate)
+}
 
 #endif /* BLOCKSTATENODE_H */

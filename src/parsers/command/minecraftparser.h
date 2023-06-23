@@ -1,187 +1,303 @@
 #ifndef MINECRAFTPARSER_H
 #define MINECRAFTPARSER_H
 
-#include "parser.h"
+#include "schemaparser.h"
+#include "nodes/axesnode.h"
 #include "nodes/blockstatenode.h"
 #include "nodes/componentnode.h"
+#include "nodes/gamemodenode.h"
 #include "nodes/entitynode.h"
 #include "nodes/floatrangenode.h"
 #include "nodes/intrangenode.h"
 #include "nodes/itemstacknode.h"
-#include "nodes/multimapnode.h"
 #include "nodes/nbtpathnode.h"
 #include "nodes/particlenode.h"
-#include "nodes/similaraxesnodes.h"
-#include "nodes/similarresourcelocationnodes.h"
-#include "nodes/similarstringnodes.h"
 #include "nodes/swizzlenode.h"
 #include "nodes/timenode.h"
+#include "nodes/targetselectornode.h"
+
+#include <QVersionNumber>
+
+template<typename T>
+T strWithExpToDec(QStringView v, bool &ok) {
+    if (v.isEmpty()) {
+        ok = false;
+        return 0;
+    }
+
+    std::make_unsigned_t<T> value = 0;
+    int                     sign  = 1;
+
+    switch (v.at(0).toLatin1()) {
+        case '-': {
+            sign = -1;
+            v    = v.mid(1);
+            break;
+        }
+        case '+': {
+            sign = 1;
+            v    = v.mid(1);
+            break;
+        }
+    }
+
+    ok = false;
+    for (int i = 0; i < v.length(); ++i) {
+        if (value > std::numeric_limits<T>::max() / 10) {
+            ok = false;
+            return 0;
+        }
+        value *= 10;
+        const char ch = v[i].toLatin1();
+        switch (ch) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
+                const uchar digit = ch - '0';
+                value += digit;
+                ok     = true;
+                break;
+            }
+            case 'E':
+            case 'e': {
+                if (i > 0) {
+                    bool        expOk;
+                    QStringView expView = v.mid(i + 1);
+                    const int   exp     = strToDec<int>(expView, expOk);
+                    if (!expOk) {
+                        ok = false;
+                        return 0;
+                    }
+                    i += expView.length();
+                    if (exp == 0 || value == 0) {
+                        ok = true;
+                        break;
+                    } else if (exp > 0) {
+                        for (int j = 0; j < abs(exp); ++j) {
+                            if (value > std::numeric_limits<T>::max() / 10) {
+                                ok = false;
+                                return 0;
+                            }
+                            value *= 10;
+                        }
+                    } else {
+                        for (int j = 0; j < abs(exp); ++j) {
+                            if (value > std::numeric_limits<T>::min() * 10) {
+                                ok = false;
+                                return 0;
+                            }
+                            value /= 10;
+                        }
+                    }
+                    break;
+                } else {
+                    ok = false;
+                    return 0;
+                }
+            }
+            default: {
+                ok = false;
+                return 0;
+            }
+        }
+        if (((sign == 1) && (value > std::numeric_limits<T>::max()))
+            || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
+            ok = false;
+            return 0;
+        }
+    }
+    return value * sign;
+}
 
 namespace Command {
-    class MinecraftParser : public Parser
-    {
-        Q_OBJECT
+    class MinecraftParser final : public SchemaParser  {
+        Q_GADGET;
 public:
         enum class AxisParseOption : unsigned char {
             NoOption    = 0,
-            ParseY      = 1,
-            OnlyInteger = 2,
-            CanBeLocal  = 4,
+            OnlyInteger = 1,
+            CanBeLocal  = 2,
         };
         Q_DECLARE_FLAGS(AxisParseOptions, AxisParseOption);
-        static bool limitScoreboardObjectiveLength;
 
-        explicit MinecraftParser(QObject *parent      = nullptr,
-                                 const QString &input = "");
-protected:
-        QSharedPointer<ParseNode> QVariantToParseNodeSharedPointer(
-            const QVariant &vari);
+        using QLatin1StringVector = QVector<QLatin1String>;
+
+        MinecraftParser();
+        using SchemaParser::SchemaParser;
+
+        static void setGameVer(const QVersionNumber &newGameVer);
 
 private:
-        QString oneOf(const QStringList &strArr);
+        friend class McfunctionParser;
+
+        static inline QVersionNumber gameVer = QVersionNumber();
+
+        QString oneOf(const QLatin1StringVector &strArr);
+        QString eatListSep(QChar sepChr, QChar endChr);
 
         template<class Container, class Type>
-        QSharedPointer<Container> parseMap(const QChar &beginChar,
-                                           const QChar &endChar,
-                                           const QChar &sepChar,
+        QSharedPointer<Container> parseMap(QChar beginChar,
+                                           QChar endChar,
+                                           QChar sepChar,
                                            std::function<QSharedPointer<Type>(const QString &)> func,
-                                           bool acceptQuotation      = false,
-                                           const QString &keyCharset = R"(0-9a-zA-Z-_.+)")
+                                           bool acceptQuotation            = false,
+                                           const QLatin1String &keyCharset = QLatin1String())
         {
-            auto obj = QSharedPointer<Container>::create(pos());
+            auto    &&obj   = QSharedPointer<Container>::create(0);
+            const int start = pos();
 
-            this->eat(beginChar);
+            obj->setLeftText(this->eat(beginChar));
             while (this->curChar() != endChar) {
-                this->skipWs(false);
-                bool    isQuote = false;
-                int     KeyPos  = pos();
-                QString name;
+                const auto &&trivia = this->skipWs(false);
+                const int    keyPos = pos();
+                QString      name;
                 if (acceptQuotation &&
                     (curChar() == '"' || curChar() == '\'')) {
                     try {
-                        name    = getQuotedString();
-                        isQuote = true;
-                    } catch (const Command::Parser::Error &err) {
+                        name = getQuotedString();
+                    } catch (const SchemaParser::Error &err) {
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
-                if (name.isNull())
-                    name = this->getWithCharset(keyCharset);
-                if (name.isNull())
-                    error("Invaild empty key", {}, KeyPos);
-                this->skipWs(false);
-                this->eat(sepChar);
-                this->skipWs(false);
-                obj->insert(Command::MapKey{ KeyPos, name, isQuote, false },
-                            func(name));
-                this->skipWs(false);
+                if (name.isEmpty()) {
+                    setPos(keyPos);
+                    if (keyCharset.isNull()) {
+                        name = getLiteralString().toString();
+                    } else {
+                        name = getWithCharset(keyCharset).toString();
+                    }
+                }
+                if (name.isEmpty())
+                    reportError("Invalid empty key", {}, keyPos);
+                const auto &&key = KeyPtr::create(spanText(keyPos), name,
+                                                  !name.isEmpty());
+                key->setLeadingTrivia(trivia);
+                key->setTrailingTrivia(spanText(eat(sepChar, SkipLeftWs)));
+                const auto &&valueTrivia = skipWs(false);
+                //const int    valueStart  = pos();
+                const auto &&value = func(name);
+                //value->setLength(pos() - valueStart);
+                value->setLeadingTrivia(spanText(valueTrivia));
+                value->setTrailingTrivia(this->skipWs(false));
+                obj->insert(key, value);
                 if (this->curChar() != endChar) {
-                    this->eat(',');
-                    this->skipWs(false);
+                    obj->constLast()->setTrailingTrivia(eat(',', SkipRightWs));
                 }
             }
-            this->eat(endChar);
-            obj->setLength(pos() - obj->pos());
+            obj->setRightText(this->eat(endChar));
+            obj->setLength(pos() - start);
             return obj;
         }
 
-        QSharedPointer<AxisNode> parseAxis(AxisParseOptions options,
-                                           bool &isLocal);
-        QSharedPointer<AxesNode> parseAxes(AxisParseOptions options);
-        QSharedPointer<Command::NbtCompoundNode> parseCompoundTag();
-        QSharedPointer<Command::NbtNode> parseTagValue();
-        QSharedPointer<Command::NbtNode> parseNumericTag();
+        QSharedPointer<AngleNode> parseAxis(AxisParseOptions options,
+                                            bool &isLocal);
+        void parseAxes(ArgumentNode *node, AxisParseOptions options);
+        QSharedPointer<XyzNode> parseXyzAxes(AxisParseOptions options);
+        QSharedPointer<NbtCompoundNode> parseCompoundTag();
+        QSharedPointer<NbtNode> parseTagValue();
+        QSharedPointer<NbtNode> parseNumericTag();
 
         template<class Container, class Type>
-        QSharedPointer<Container> parseArrayTag(const QString &errorMsg) {
+        QSharedPointer<Container> parseArrayTag(const char *errorMsg) {
+            const int start = pos() - 1;
+
             advance();
-            if (curChar() == ';') {
-                auto ret = QSharedPointer<Container>::create(pos() - 3);
-                advance();
-                while (curChar() != ']') {
-                    skipWs(false);
-                    auto elem = qSharedPointerCast<Type>(
-                        parseNumericTag());
-                    if (elem)
-                        ret->append(elem);
-                    else
-                        error(QString(errorMsg));
-                    skipWs(false);
-                    if (this->curChar() != ']') {
-                        this->eat(',');
-                        skipWs(false);
-                    }
+            const auto &&ret = QSharedPointer<Container>::create(0);
+            advance();
+            ret->setLeftText(spanText(start));
+
+            while (curChar() != ']') {
+                const auto &&trivia = skipWs(false);
+                const auto &&numTag = parseNumericTag();
+                const auto &&elem   = qSharedPointerCast<Type>(numTag);
+                if (!elem) {
+                    reportError(errorMsg);
                 }
-                eat(']');
-                return ret;
-            } else {
-                error(QString(
-                          "Missing the character ';' after array type indicator"));
+                elem->setLeadingTrivia(trivia);
+                ret->append(elem);
+                elem->setTrailingTrivia(eatListSep(',', ']'));
             }
-            return nullptr;
+            ret->setRightText(eat(']'));
+            return ret;
         }
-        QSharedPointer<Command::NbtListNode> parseListTag();
-        QSharedPointer<Command::MapNode> parseEntityAdvancements();
-        QSharedPointer<Command::MultiMapNode> parseEntityArguments();
-        QSharedPointer<Command::TargetSelectorNode> parseTargetSelector();
-        QSharedPointer<Command::NbtPathStepNode> parseNbtPathStep();
-        QSharedPointer<Command::ParticleColorNode> parseParticleColor();
+        QSharedPointer<NbtListNode> parseListTag();
+        QSharedPointer<MapNode> parseEntityAdvancements();
+        QSharedPointer<MapNode> parseEntityArguments();
+        QSharedPointer<TargetSelectorNode> parseTargetSelector();
+        QSharedPointer<NbtPathStepNode> parseNbtPathStep();
+        QSharedPointer<ParticleColorNode> parseParticleColor();
+        QSharedPointer<EntityArgumentValueNode> parseNegEntityArg();
+        void parseResourceLocation(ResourceLocationNode *node,
+                                   bool acceptTag = false);
+        void parseBlock(BlockStateNode *node, bool acceptTag);
+        void parseEntity(EntityNode *node, bool allowFakePlayer);
+
+        NodePtr invokeMethod(ArgumentNode::ParserType parserType,
+                             const QVariantMap &props) final;
 
         /* Direct parsing methods */
-        Q_INVOKABLE QSharedPointer<Command::AngleNode> minecraft_angle();
-        Q_INVOKABLE QSharedPointer<Command::BlockPosNode> minecraft_blockPos();
-        Q_INVOKABLE QSharedPointer<Command::BlockStateNode> minecraft_blockState();
-        Q_INVOKABLE QSharedPointer<Command::BlockPredicateNode>
-        minecraft_blockPredicate();
-        Q_INVOKABLE QSharedPointer<Command::ColorNode> minecraft_color();
-        Q_INVOKABLE QSharedPointer<Command::ColumnPosNode> minecraft_columnPos();
-        Q_INVOKABLE QSharedPointer<Command::ComponentNode> minecraft_component();
-        Q_INVOKABLE QSharedPointer<Command::DimensionNode> minecraft_dimension();
-        Q_INVOKABLE QSharedPointer<Command::EntityNode> minecraft_entity(
+        QSharedPointer<AngleNode> minecraft_angle();
+        QSharedPointer<BlockPosNode> minecraft_blockPos();
+        QSharedPointer<BlockStateNode> minecraft_blockState();
+        QSharedPointer<BlockPredicateNode> minecraft_blockPredicate();
+        QSharedPointer<ColorNode> minecraft_color();
+        QSharedPointer<ColumnPosNode> minecraft_columnPos();
+        QSharedPointer<ComponentNode> minecraft_component();
+        QSharedPointer<DimensionNode> minecraft_dimension();
+        QSharedPointer<EntityNode> minecraft_entity(
             const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::EntityAnchorNode>
-        minecraft_entityAnchor();
-        Q_INVOKABLE QSharedPointer<Command::EntitySummonNode>
+        QSharedPointer<EntityAnchorNode> minecraft_entityAnchor();
+        QSharedPointer<EntitySummonNode>
         minecraft_entitySummon();
-        Q_INVOKABLE QSharedPointer<Command::FloatRangeNode> minecraft_floatRange(
+        QSharedPointer<FloatRangeNode> minecraft_floatRange(
             const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::FunctionNode> minecraft_function();
-        Q_INVOKABLE QSharedPointer<Command::GameProfileNode>
-        minecraft_gameProfile(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::IntRangeNode> minecraft_intRange(
+        QSharedPointer<FunctionNode> minecraft_function();
+        QSharedPointer<GamemodeNode> minecraft_gamemode();
+        QSharedPointer<GameProfileNode> minecraft_gameProfile();
+        QSharedPointer<HeightmapNode> minecraft_heightmap();
+        QSharedPointer<IntRangeNode> minecraft_intRange(
             const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ItemEnchantmentNode>
-        minecraft_itemEnchantment();
-        Q_INVOKABLE QSharedPointer<Command::ItemSlotNode> minecraft_itemSlot();
-        Q_INVOKABLE QSharedPointer<Command::ItemStackNode> minecraft_itemStack();
-        Q_INVOKABLE QSharedPointer<Command::ItemPredicateNode>
-        minecraft_itemPredicate();
-        Q_INVOKABLE QSharedPointer<Command::MessageNode> minecraft_message();
-        Q_INVOKABLE QSharedPointer<Command::MobEffectNode> minecraft_mobEffect();
-        Q_INVOKABLE QSharedPointer<Command::NbtCompoundNode>
-        minecraft_nbtCompoundTag();
-        Q_INVOKABLE QSharedPointer<Command::NbtPathNode> minecraft_nbtPath();
-        Q_INVOKABLE QSharedPointer<Command::NbtNode> minecraft_nbtTag();
-        Q_INVOKABLE QSharedPointer<Command::ObjectiveNode> minecraft_objective();
-        Q_INVOKABLE QSharedPointer<Command::ObjectiveCriteriaNode>
-        minecraft_objectiveCriteria();
-        Q_INVOKABLE QSharedPointer<Command::OperationNode> minecraft_operation();
-        Q_INVOKABLE QSharedPointer<Command::ParticleNode> minecraft_particle();
-        Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode> minecraft_resource(const QVariantMap &props);
-        Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode> minecraft_resourceOrTag(const QVariantMap &props);
-        Q_INVOKABLE QSharedPointer<Command::ResourceLocationNode>
-        minecraft_resourceLocation();
-        Q_INVOKABLE QSharedPointer<Command::RotationNode> minecraft_rotation();
-        Q_INVOKABLE QSharedPointer<Command::ScoreHolderNode>
-        minecraft_scoreHolder(const QVariantMap &props = {});
-        Q_INVOKABLE QSharedPointer<Command::ScoreboardSlotNode>
-        minecraft_scoreboardSlot();
-        Q_INVOKABLE QSharedPointer<Command::SwizzleNode> minecraft_swizzle();
-        Q_INVOKABLE QSharedPointer<Command::TeamNode> minecraft_team();
-        Q_INVOKABLE QSharedPointer<Command::TimeNode> minecraft_time();
-        Q_INVOKABLE QSharedPointer<Command::UuidNode> minecraft_uuid();
-        Q_INVOKABLE QSharedPointer<Command::Vec2Node> minecraft_vec2();
-        Q_INVOKABLE QSharedPointer<Command::Vec3Node> minecraft_vec3();
+        QSharedPointer<ItemEnchantmentNode> minecraft_itemEnchantment();
+        QSharedPointer<ItemSlotNode> minecraft_itemSlot();
+        QSharedPointer<ItemStackNode> minecraft_itemStack();
+        QSharedPointer<ItemPredicateNode> minecraft_itemPredicate();
+        QSharedPointer<MessageNode> minecraft_message();
+        QSharedPointer<MobEffectNode> minecraft_mobEffect();
+        QSharedPointer<NbtCompoundNode> minecraft_nbtCompoundTag();
+        QSharedPointer<NbtPathNode> minecraft_nbtPath();
+        QSharedPointer<NbtNode> minecraft_nbtTag();
+        QSharedPointer<ObjectiveNode> minecraft_objective();
+        QSharedPointer<ObjectiveCriteriaNode> minecraft_objectiveCriteria();
+        QSharedPointer<OperationNode> minecraft_operation();
+        QSharedPointer<ParticleNode> minecraft_particle();
+        QSharedPointer<ResourceNode> minecraft_resource(
+            const QVariantMap &props);
+        QSharedPointer<ResourceKeyNode> minecraft_resourceKey(
+            const QVariantMap &props);
+        QSharedPointer<ResourceOrTagNode> minecraft_resourceOrTag(
+            const QVariantMap &props);
+        QSharedPointer<ResourceOrTagKeyNode> minecraft_resourceOrTagKey(
+            const QVariantMap &props);
+        QSharedPointer<ResourceLocationNode> minecraft_resourceLocation();
+        QSharedPointer<RotationNode> minecraft_rotation();
+        QSharedPointer<ScoreHolderNode> minecraft_scoreHolder(
+            const QVariantMap &props = {});
+        QSharedPointer<ScoreboardSlotNode> minecraft_scoreboardSlot();
+        QSharedPointer<SwizzleNode> minecraft_swizzle();
+        QSharedPointer<TeamNode> minecraft_team();
+        QSharedPointer<TimeNode> minecraft_time();
+        QSharedPointer<TemplateMirrorNode> minecraft_templateMirror();
+        QSharedPointer<TemplateRotationNode> minecraft_templateRotation();
+        QSharedPointer<UuidNode> minecraft_uuid();
+        QSharedPointer<Vec2Node> minecraft_vec2();
+        QSharedPointer<Vec3Node> minecraft_vec3();
     };
 }
 

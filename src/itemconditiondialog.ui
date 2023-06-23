@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>662</width>
-    <height>553</height>
+    <height>557</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -301,12 +301,6 @@
    </item>
    <item row="0" column="2" rowspan="2">
     <widget class="Line" name="line">
-     <property name="styleSheet">
-      <string notr="true">QFrame {
-    margin-left: 16px;
-    margin-right: 16px;
-}</string>
-     </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>

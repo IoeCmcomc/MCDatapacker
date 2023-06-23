@@ -1,1242 +1,1549 @@
 #include "minecraftparser.h"
 
-#include "json/single_include/nlohmann/json.hpp"
+#include "re2c_generated_functions.h"
 
-#include <QMetaEnum>
+#include "nlohmann/json.hpp"
+#include "uberswitch.hpp"
 
 using json = nlohmann::json;
 
-bool Command::MinecraftParser::limitScoreboardObjectiveLength = true;
+namespace Command {
+    MinecraftParser::MinecraftParser() {
+        /*
+           connect(this, &QObject::destroyed, [ = ](QObject *obj) {
+           qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
+           });
+         */
+    }
 
-Command::MinecraftParser::MinecraftParser(QObject *parent,
-                                          const QString &input)
-    : Command::Parser(parent, input) {
-    /*printMethods(); */
-/*
-      connect(this, &QObject::destroyed, [ = ](QObject *obj) {
-          qDebug() << "MinecraftParser emit QObject destroyed:" << obj;
-      });
- */
-}
+    QString join(const MinecraftParser::QLatin1StringVector &vector) {
+        QString ret;
 
-QSharedPointer<Command::ParseNode> Command::MinecraftParser::
-QVariantToParseNodeSharedPointer(const QVariant &vari) {
-    if (auto ret = Parser::QVariantToParseNodeSharedPointer(vari))
+        for (auto it = vector.cbegin(); it != vector.cend();) {
+            ret += *it;
+            ++it;
+            if (it != vector.cend()) {
+                ret += ", "_QL1;
+            }
+        }
         return ret;
+    }
 
-    unsigned short int typeId = vari.userType();
-    QVARIANT_CAST_SHARED_POINTER_IF_BRANCH(AxisNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(AngleNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(AxesNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(BlockStateNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ComponentNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(EntityNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(GameProfileNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ScoreHolderNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(FloatRangeNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(IntRangeNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ItemStackNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(MapNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(MultiMapNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(EntityArgumentValueNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtByteArrayNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtByteNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtCompoundNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtDoubleNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtFloatNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtIntArrayNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtIntNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtListNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtLongArrayNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtLongNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtShortNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtStringNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtPathNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(NbtPathStepNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ResourceLocationNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(BlockPosNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(BlockPredicateNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ColumnPosNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(RotationNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(Vec2Node)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(Vec3Node)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(DimensionNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(EntitySummonNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(FunctionNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ItemEnchantmentNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(MobEffectNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ColorNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(EntityAnchorNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ItemSlotNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(MessageNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ObjectiveNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ObjectiveCriteriaNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(OperationNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ScoreboardSlotNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(TeamNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(SwizzleNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(TargetSelectorNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(TimeNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(UuidNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ParticleNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ParticleColorNode)
-    QVARIANT_CAST_SHARED_POINTER_ELSE_IF_BRANCH(ItemPredicateNode)
-    qWarning() << "Cannot cast" << vari << "to QSharedPointer<ParseNode>>";
-    return nullptr;
-}
+    QString MinecraftParser::oneOf(const QLatin1StringVector &strArr) {
+        const int         start   = pos();
+        const QStringView curText = peekRest();
 
-QString Command::MinecraftParser::oneOf(const QStringList &strArr) {
-    const int        start   = pos();
-    const QString &curText = this->text().mid(this->pos());
+        for (const auto &str: qAsConst(strArr)) {
+            if (curText.startsWith(str)) {
+                advance(str.size());
+                return str;
+            }
+        }
+        reportError(QT_TR_NOOP("Only accept one of the following: %1"),
+                    { join(strArr) }, start,
+                    peekLiteral().length());
+        return QString();
+    }
 
-    for (const QString &str: qAsConst(strArr)) {
-        if (curText.startsWith(str)) {
-            this->advance(str.length());
-            return str;
+    QString MinecraftParser::eatListSep(QChar sepChr, QChar endChr) {
+        const int start = pos();
+
+        while (curChar().isSpace()) {
+            advance();
+        }
+        if (curChar() != endChr) {
+            expect(sepChr);
+            advance();
+            while (curChar().isSpace()) {
+                advance();
+            }
+        }
+        return spanText(start);
+    }
+
+    QSharedPointer<AngleNode> MinecraftParser::parseAxis(
+        AxisParseOptions options, bool &isLocal) {
+        using AxisType = AngleNode::AxisType;
+        static const char *mixCoordErrMsg(QT_TR_NOOP(
+                                              "Cannot mix world & local coordinates (everything must either use ^ or not)."));
+
+        const bool canBeLocal = options & AxisParseOption::CanBeLocal;
+        const bool onlyInt    = options & AxisParseOption::OnlyInteger;
+        bool       isValid    = true;
+
+        const auto axisVal =
+            [this](AngleNode *axis, bool onlyInt, bool &valid) {
+                if (onlyInt) {
+                    auto [_, value] = parseInteger(valid);
+                    axis->setValue(value);
+                } else {
+                    auto [_, value] = parseFloat(valid);
+                    axis->setValue(value);
+                }
+            };
+
+        const int start     = pos();
+        bool      hasPrefix = false;
+        AnglePtr  axis;
+        if (curChar() == '~') {
+            if (!isLocal) {
+                axis      = AnglePtr::create(AxisType::Relative);
+                hasPrefix = true;
+                isLocal   = false;
+                advance();
+            } else {
+                throwError(mixCoordErrMsg);
+            }
+        } else if (curChar() == '^') {
+            if (isLocal == false)
+                isLocal = true;
+            if (canBeLocal && isLocal) {
+                axis      = AnglePtr::create(AxisType::Local);
+                hasPrefix = true;
+                advance();
+            } else if (!isLocal) {
+                throwError(mixCoordErrMsg);
+            }
+        } else {
+            axis = AnglePtr::create(AxisType::Absolute);
+        }
+        if (hasPrefix) {
+            if ((!curChar().isNull()) && (curChar() != ' ')) {
+                axisVal(axis.get(), onlyInt, isValid);
+            }
+        } else {
+            if (isLocal) {
+                if (curChar() != ' ') {
+                    throwError(mixCoordErrMsg);
+                }
+            } else {
+                axisVal(axis.get(), onlyInt, isValid);
+            }
+        }
+        axis->setText(spanText(start));
+        axis->setIsValid(isValid);
+        if (!isValid) {
+            reportError("Invalid axis value", {}, start, axis->length());
+        }
+        return axis;
+    }
+
+    void MinecraftParser::parseAxes(ArgumentNode *node,
+                                    AxisParseOptions options) {
+        using PT = ArgumentNode::ParserType;
+        bool      isLocal = false;
+        const int start   = pos();
+
+        /*axes->setX(parseAxis(options, isLocal)); */
+        switch (node->parserType()) {
+            case PT::ColumnPos:
+            case PT::Rotation:
+            case PT::Vec2: {
+                auto *axes = static_cast<TwoAxesNode *>(node);
+//                axes->setFirstAxis(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setFirstAxis(parseAxis(options, isLocal));
+                axes->firstAxis()->setTrailingTrivia(eat(' '));
+//                axes->setSecondAxis(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setSecondAxis(parseAxis(options, isLocal));
+                break;
+            }
+
+            case PT::BlockPos:
+            case PT::Vec3: {
+                auto *axes = static_cast<XyzNode *>(node);
+//                axes->setX(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setX(parseAxis(options, isLocal));
+                axes->x()->setTrailingTrivia(eat(' '));
+//                axes->setY(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setY(parseAxis(options, isLocal));
+                axes->y()->setTrailingTrivia(eat(' '));
+//                axes->setZ(
+//                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
+//                                             peekLiteral(), options, isLocal));
+                axes->setZ(parseAxis(options, isLocal));
+                break;
+            }
+
+            default:
+                break;
+        }
+
+        node->setLength(pos() - start);
+    }
+
+    QSharedPointer<NbtCompoundNode> MinecraftParser::
+    parseCompoundTag() {
+        return parseMap<NbtCompoundNode, NbtNode>('{', '}', ':',
+                                                  [this](const QString &) {
+            return parseTagValue();
+        }, true);
+    }
+
+    QSharedPointer<NbtNode> MinecraftParser::parseTagValue() {
+        const int start = pos();
+
+        switch (curChar().toLatin1()) {
+            case '{': {
+                return parseCompoundTag();
+            }
+
+            case '[': {
+                advance();
+                if (peekNext(1) == ';') {
+                    switch (curChar().toLower().toLatin1()) {
+                        case 'b': {
+                            return parseArrayTag<NbtByteArrayNode, NbtByteNode>(
+                                "Invalid SNBT tag in a byte array tag");
+                        }
+
+                        case 'i': {
+                            return parseArrayTag<NbtIntArrayNode, NbtIntNode>(
+                                "Invalid SNBT tag in an integer array tag");
+                        }
+
+                        case 'l': {
+                            return parseArrayTag<NbtLongArrayNode, NbtLongNode>(
+                                "Invalid SNBT tag in a long array tag");
+                        }
+
+                        default: {
+                            return parseListTag();
+                        }
+                    }
+                } else {
+                    return parseListTag();
+                }
+            }
+
+            case '"':
+            case '\'': {
+                const QString &&quoted = getQuotedString();
+                return QSharedPointer<NbtStringNode>::create(
+                    spanText(start), quoted, true);
+            }
+
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '-':
+            case '.': {
+                return parseNumericTag();
+            }
+
+            case 't': {
+                if (peek(4) == "true"_QL1) {
+                    advance(4);
+                    return QSharedPointer<NbtByteNode>::create(
+                        spanText(start), true, true);
+                }
+            }
+
+            case 'f': {
+                if (peek(5) == "false"_QL1) {
+                    advance(5);
+                    return QSharedPointer<NbtByteNode>::create(
+                        spanText(start), false, true);
+                }
+            }
+
+            default: {
+                const auto value = getLiteralString();
+                if (value.isEmpty()) {
+                    reportError(QT_TR_NOOP("Invalid empty tag value"));
+                } else {
+                    return QSharedPointer<NbtStringNode>::create(
+                        spanText(value), true);
+                }
+            }
+        }
+        return QSharedPointer<NbtStringNode>::create(QString(), false);
+    }
+
+    QSharedPointer<NbtNode> MinecraftParser::parseNumericTag() {
+        const int start = pos();
+
+        const QStringView literal = advanceView(re2c::snbtNumber(peekRest()));
+        bool              ok      = false;
+
+        switch (curChar().toLower().toLatin1()) {
+            case 'b': {
+                advance();
+//                const short int value = literal.toShort(&ok);
+                const int8_t value = strWithExpToDec<int8_t>(literal, ok);
+                if (ok) {
+                    return QSharedPointer<NbtByteNode>::create(
+                        spanText(start), value, true);
+                } else {
+                    throwError(QT_TR_NOOP("%1 is not a vaild SNBT byte tag"),
+                               { literal.toString() }, start, literal.length());
+                    break;
+                }
+            }
+
+            case 'd': {
+                advance();
+                const double value = literal.toDouble(&ok);
+                if (ok || std::isinf(value)) {
+                    return QSharedPointer<NbtDoubleNode>::create(
+                        spanText(start), value, true);
+                } else {
+                    throwError(QT_TR_NOOP("%1 is not a vaild SNBT double tag"),
+                               { literal.toString() }, start, literal.length());
+                    break;
+                }
+            }
+
+            case 'f': {
+                advance();
+                const double value = literal.toFloat(&ok);
+                if (ok || std::isinf(value)) {
+                    return QSharedPointer<NbtFloatNode>::create(
+                        spanText(start), value, true);
+                } else {
+                    throwError(QT_TR_NOOP("%1 is not a vaild SNBT float tag"),
+                               { literal.toString() }, start, literal.length());
+                    break;
+                }
+            }
+
+            case 'l': {
+                advance();
+                const long long value = strWithExpToDec<long long>(literal, ok);
+                if (ok) {
+                    return QSharedPointer<NbtLongNode>::create(
+                        spanText(start), value, true);
+                } else {
+                    throwError(QT_TR_NOOP("%1 is not a vaild SNBT long tag"),
+                               { literal.toString() }, start, literal.length());
+                    break;
+                }
+            }
+
+            case 's': {
+                advance();
+                const short int value = strWithExpToDec<short>(literal, ok);
+                if (ok) {
+                    return QSharedPointer<NbtShortNode>::create(
+                        spanText(start), value, true);
+                } else {
+                    throwError(QT_TR_NOOP("%1 is not a vaild SNBT short tag"),
+                               { literal.toString() }, start, literal.length());
+                    break;
+                }
+            }
+
+            default: {
+                if (literal.contains('.')) {
+                    const double value = literal.toDouble(&ok);
+                    if (ok || std::isinf(value)) {
+                        return QSharedPointer<NbtDoubleNode>::create(
+                            spanText(start), value, true);
+                    } else {
+                        throwError(QT_TR_NOOP(
+                                       "%1 is not a vaild SNBT double tag"),
+                                   { literal.toString() },
+                                   start,
+                                   literal.length());
+                        break;
+                    }
+                } else {
+//                    const int value = literal.toInt(&ok);
+                    const int value = strWithExpToDec<int>(literal, ok);
+                    if (ok) {
+                        return QSharedPointer<NbtIntNode>::create(
+                            spanText(start), value, true);
+                    } else {
+                        throwError(
+                            QT_TR_NOOP(
+                                "%1 is not a vaild SNBT integer tag"),
+                            { literal.toString() }, start, literal.length());
+                    }
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    QSharedPointer<NbtListNode> MinecraftParser::parseListTag() {
+        const int    start = pos() - 1;
+        const auto &&ret   = QSharedPointer<NbtListNode>::create(0);
+
+        Q_ASSERT(ret != nullptr);
+
+        ret->setLeftText(spanText(start));
+        bool first = true;
+
+        while (curChar() != ']') {
+            const QString &&trivia = skipWs(false);
+            const auto    &&elem   = parseTagValue();
+            if (!trivia.isEmpty()) {
+                elem->setLeadingTrivia(trivia);
+            }
+            if (first || (elem->tagType() == ret->prefix())) {
+                first = false;
+            } else {
+//                reportError(QT_TR_NOOP(
+//                                "Type of elements in this list tag must be the same"));
+            }
+            elem->setTrailingTrivia(eatListSep(',', ']'));
+            ret->append(elem);
+        }
+        ret->setRightText(eat(']'));
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<MapNode> MinecraftParser::
+    parseEntityAdvancements() {
+        return parseMap<MapNode, ParseNode>('{', '}', '=',
+                                            [this](const QString &) -> NodePtr {
+            if (curChar() == '{') {
+                return parseMap<MapNode, BoolNode>(
+                    '{', '}', '=', [this](const QString &) ->
+                    QSharedPointer<BoolNode> {
+                    return brigadier_bool();
+                }, false, R"(a-zA-z0-9-_:.+/)"_QL1);
+            } else {
+                return brigadier_bool();
+            }
+        }, false, R"(a-zA-z0-9-_:.+/)"_QL1);
+    }
+
+    QSharedPointer<MapNode> MinecraftParser::parseEntityArguments() {
+        return parseMap<MapNode, ParseNode>(
+            '[', ']', '=', [this](
+                const QString &key) -> QSharedPointer<ParseNode> {
+            uswitch (key) {
+                ucase ("x"_QL1):
+                ucase ("y"_QL1):
+                ucase ("z"_QL1):
+                ucase ("dx"_QL1):
+                ucase ("dy"_QL1):
+                ucase ("dz"_QL1): {
+                    return brigadier_double();
+                }
+                ucase ("distance"_QL1):
+                ucase ("x_rotation"_QL1):
+                ucase ("y_rotation"_QL1): {
+                    return minecraft_floatRange();
+                }
+
+                ucase ("level"_QL1): {
+                    return minecraft_intRange();
+                }
+                ucase ("limit"_QL1): {
+                    return brigadier_integer();
+                }
+                ucase ("predicate"_QL1): {
+                    const auto &&ret = parseNegEntityArg();
+                    ret->setNode(minecraft_resourceLocation());
+                    return ret;
+                }
+                ucase ("sort"_QL1): {
+                    const QString &&literal =
+                        oneOf({ "nearest"_QL1, "furthest"_QL1,
+                                "random"_QL1, "arbitrary"_QL1 });
+                    return QSharedPointer<StringNode>::create(
+                        spanText(literal), !literal.isEmpty());
+                }
+                ucase ("gamemode"_QL1): {
+                    const auto &&ret        = parseNegEntityArg();
+                    const QString &&literal =
+                        oneOf({ "adventure"_QL1, "creative"_QL1,
+                                "spectator"_QL1, "survival"_QL1 });
+                    ret->setNode(QSharedPointer<StringNode>::create(
+                                     spanText(literal), !literal.isEmpty()));
+                    return ret;
+                }
+                ucase ("name"_QL1): {
+                    const int start  = pos();
+                    const auto &&ret = parseNegEntityArg();
+                    QString literal;
+                    if (curChar() == '"' || curChar() == '\'') {
+                        literal = getQuotedString();
+                    } else {
+                        literal = getLiteralString().toString();
+                    }
+                    ret->setNode(QSharedPointer<StringNode>::create(
+                                     spanText(start), literal,
+                                     errorIfNot(
+                                         !literal.isEmpty(),
+                                         "Invalid empty name in target selector")));
+                    return ret;
+                }
+                ucase ("type"_QL1): {
+                    const auto &&ret    = parseNegEntityArg();
+                    const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(
+                        0);
+
+                    parseResourceLocation(resLoc.get(), true);
+                    ret->setNode(resLoc);
+                    return ret;
+                }
+                ucase ("nbt"_QL1): {
+                    const auto &&ret = parseNegEntityArg();
+                    ret->setNode(parseCompoundTag());
+                    return ret;
+                }
+                ucase ("tag"_QL1):
+                ucase ("team"_QL1): {
+                    const auto &&ret    = parseNegEntityArg();
+                    QStringView literal = getLiteralString();
+                    ret->setNode(QSharedPointer<StringNode>::create(
+                                     spanText(literal), true));
+                    return ret;
+                }
+                ucase ("scores"_QL1): {
+                    return parseMap<MapNode, IntRangeNode>(
+                        '{', '}', '=', [this](const QString &) {
+                        return minecraft_intRange();
+                    });
+                }
+                ucase ("advancements"): {
+                    return parseEntityAdvancements();
+                }
+                default: {
+                    throwError(QT_TR_NOOP(
+                                   "Unknown entity argument name: %1"),
+                               { key });
+                }
+            }
+            return nullptr;
+        });
+    }
+
+    QSharedPointer<TargetSelectorNode> MinecraftParser::
+    parseTargetSelector() {
+        const auto &&ret   = QSharedPointer<TargetSelectorNode>::create(0);
+        const int    start = pos();
+
+        eat('@');
+        using Variable = TargetSelectorNode::Variable;
+        switch (curChar().toLatin1()) {
+            case 'a': {
+                ret->setVariable(Variable::A);
+                break;
+            }
+
+            case 'e': {
+                ret->setVariable(Variable::E);
+                break;
+            }
+
+            case 'p': {
+                ret->setVariable(Variable::P);
+                break;
+            }
+
+            case 'r': {
+                ret->setVariable(Variable::R);
+                break;
+            }
+
+            case 's': {
+                ret->setVariable(Variable::S);
+                break;
+            }
+
+            default: {
+                reportError(QT_TR_NOOP("Invalid target selector variable: %1"),
+                            { QStringLiteral("@%1").arg(curChar()) });
+            }
+        }
+        advance();
+        ret->setLeftText(spanText(start));
+        if (curChar() == '[')
+            ret->setArgs(parseEntityArguments());
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<NbtPathStepNode> MinecraftParser::parseNbtPathStep() {
+        using StepType = NbtPathStepNode::Type;
+        const auto &&ret   = QSharedPointer<NbtPathStepNode>::create(0);
+        const int    start = pos();
+
+        switch (curChar().toLatin1()) {
+            case '"': {
+                ret->setName(QSharedPointer<StringNode>::create(
+                                 spanText(start), getQuotedString(), true));
+                if (curChar() == '{')
+                    ret->setFilter(parseCompoundTag());
+                break;
+            }
+
+            case '{': {
+                ret->setType(StepType::Root);
+                ret->setFilter(parseCompoundTag());
+                break;
+            }
+
+            case '[': {
+                ret->setType(StepType::Index);
+                ret->setIsValid(true);
+                const int leftPos = pos();
+                advance();
+                const QString &&trivia = skipWs(false);
+                if (curChar() == ']') {
+                    /* Selects all. Continues. */
+                    ret->setLeftText(spanText(leftPos));
+                } else {
+                    ret->setLeftText(spanText(QStringLiteral("[")));
+                    if (curChar() == '{') {
+                        ret->setFilter(parseCompoundTag());
+                        ret->filter()->setLeadingTrivia(trivia);
+                        ret->filter()->setTrailingTrivia(skipWs());
+                    } else {
+                        ret->setIndex(brigadier_integer());
+                        ret->index()->setLeadingTrivia(trivia);
+                        ret->index()->setTrailingTrivia(skipWs());
+                    }
+                }
+                ret->setRightText(eat(']'));
+                break;
+            }
+
+            default: {
+                const auto name = advanceView(re2c::nbtPathKey(peekRest()));
+                ret->setName(QSharedPointer<StringNode>::create(
+                                 spanText(name),
+                                 errorIfNot(!name.isEmpty(),
+                                            QT_TR_NOOP(
+                                                "Invalid empty NBT path key"))));
+                if (curChar() == '{')
+                    ret->setFilter(parseCompoundTag());
+            };
+        }
+        /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
+        if (curChar() == '.') {
+            advance();
+            ret->setTrailingTrivia(spanText(pos() - 1));
+        }
+        /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
+        ret->setLength(pos() - start);
+        /*qDebug() << ret->toString() << ret->index(); */
+        return ret;
+    }
+
+    QSharedPointer<ParticleColorNode> MinecraftParser::
+    parseParticleColor() {
+        const int start = pos();
+        auto    &&color = QSharedPointer<ParticleColorNode>::create(0);
+
+        color->setR(brigadier_float());
+        color->r()->setTrailingTrivia(eat(' '));
+        color->setG(brigadier_float());
+        color->g()->setTrailingTrivia(eat(' '));
+        color->setB(brigadier_float());
+        color->setLength(pos() - start);
+        return color;
+    }
+
+    QSharedPointer<EntityArgumentValueNode> MinecraftParser::parseNegEntityArg()
+    {
+        const bool   isNegative = curChar() == '!';
+        const auto &&ret        =
+            QSharedPointer<EntityArgumentValueNode>::create(isNegative);
+
+        if (isNegative) {
+            advance();
+            ret->setLeftText(spanText(pos() - 1));
+        }
+        return ret;
+    }
+
+    void MinecraftParser::parseResourceLocation(ResourceLocationNode *node,
+                                                bool acceptTag) {
+//        const static QRegularExpression charsetRegex{ QStringLiteral(
+//                                                          "[0-9a-z-_\\/.]*") };
+
+        bool      hasError = false;
+        const int start    = pos();
+        SpanPtr   nspace;
+        SpanPtr   id;
+
+        if (curChar() == '#') {
+            node->setIsTag(true);
+            if (!acceptTag) {
+                reportError(QT_TR_NOOP(
+                                "A resource location tag is not allowed here."));
+                hasError = true;
+            }
+            advance();
+            node->setLeftText(spanText(start));
+        }
+
+        const auto idStrView = advanceView(re2c::resLocPart(peekRest()));
+        id = SpanPtr::create(spanText(idStrView));
+        if (curChar() == ':') {
+            advance();
+            nspace = std::move(id);
+            id     = SpanPtr::create(
+                spanText(advanceView(re2c::resLocPart(peekRest()))));
+            id->setLeadingTrivia(spanText(QStringLiteral(":")));
+        }
+        if (nspace) {
+            if (nspace->text().contains('/')) {
+                reportError(
+                    QT_TR_NOOP(
+                        "The character '/' is not allowed in the namespace"),
+                    {}, start, nspace->length());
+            } else {
+                nspace->setIsValid(true);
+            }
+        }
+        Q_ASSERT(id != nullptr);
+        if (id->leftText().isNull() && id->text().isEmpty()) {
+            reportError(QT_TR_NOOP("Invalid empty namespaced ID"));
+            hasError = true;
+        } else {
+            id->setIsValid(true);
+        }
+
+        if (nspace) {
+            node->setNamespace(std::move(nspace));
+        }
+        node->setId(std::move(id));
+
+        node->setLength(pos() - start);
+        node->setIsValid(!hasError);
+    }
+
+    void MinecraftParser::parseBlock(BlockStateNode *node, bool acceptTag) {
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(resLoc.get(), acceptTag);
+        node->setResLoc(std::move(resLoc));
+
+        if (curChar() == '[') {
+            node->setStates(
+                parseMap<MapNode, ParseNode>('[', ']', '=',
+                                             [this](const QString &) {
+                const static QVariantMap props{ { "type", "word" } };
+                return brigadier_string(props);
+            }));
+        }
+        if (curChar() == '{')
+            node->setNbt(parseCompoundTag());
+    }
+
+    void Command::MinecraftParser::parseEntity(Command::EntityNode *node,
+                                               bool allowFakePlayer) {
+        const int curPos = pos();
+
+        switch (curChar().toLower().toLatin1()) {
+            case '@': {
+                node->setNode(parseTargetSelector());
+                break;
+            }
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f': {
+                auto &&uuid = minecraft_uuid();
+                if (uuid->isValid()) {
+                    node->setNode(std::move(uuid));
+                    break;
+                } else {
+                    setPos(curPos);
+                    m_errors.pop_back();
+                    [[fallthrough]];
+                }
+            }
+            default: {
+                const auto literal = allowFakePlayer
+                    ? getUntil(QChar::Space)
+                    : advanceView(re2c::realPlayerName(peekRest()));
+
+                node->setNode(QSharedPointer<StringNode>::create(
+                                  spanText(literal),
+                                  errorIfNot(!literal.isEmpty(),
+                                             QT_TR_NOOP(
+                                                 "Invalid empty player name"))));
+            }
         }
     }
-    this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                  "Only accept one of the following: %1"),
-                { strArr.join(QLatin1String(", ")) },
-                start,
-                peekLiteral().length());
-    return QString();
-}
 
-QSharedPointer<Command::AxisNode> Command::MinecraftParser::parseAxis(
-    AxisParseOptions options, bool &isLocal) {
-    using AxisType = Command::AxisNode::AxisType;
-    auto axis =
-        QSharedPointer<Command::AxisNode>::create(pos());
-    const bool           canBeLocal = options & AxisParseOption::CanBeLocal;
-    const bool           onlyInt    = options & AxisParseOption::OnlyInteger;
-    static const QString mixCoordErrMsg(QT_TRANSLATE_NOOP(
-                                            "Command::Parser::Error",
-                                            "Cannot mix world & local coordinates (everything must either use ^ or not)."));
-    const auto axisVal =
-        [this, onlyInt](const QSharedPointer<AxisNode> &axis) {
-            if (onlyInt) {
-                const auto intNode = brigadier_integer();
-                axis->setValue(intNode->value());
-            } else{
-                const auto floatNode = brigadier_float();
-                axis->setValue(floatNode->value());
+    NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
+                                          const QVariantMap &props) {
+        using ParserType = ArgumentNode::ParserType;
+        if (const auto &&ret = SchemaParser::invokeMethod(parserType, props)) {
+            return ret;
+        }
+        switch (parserType) {
+            case ParserType::Angle: { return minecraft_angle(); }
+            case ParserType::BlockState: { return minecraft_blockState(); }
+            case ParserType::BlockPos: { return minecraft_blockPos(); }
+            case ParserType::BlockPredicate: { return minecraft_blockPredicate();
             }
+            case ParserType::Color: { return minecraft_color(); }
+            case ParserType::ColumnPos: { return minecraft_columnPos(); }
+            case ParserType::Component: { return minecraft_component(); }
+            case ParserType::Dimension: { return minecraft_dimension(); }
+            case ParserType::Entity: { return minecraft_entity(props); }
+            case ParserType::EntityAnchor: { return minecraft_entityAnchor(); }
+            case ParserType::EntitySummon: { return minecraft_entitySummon(); }
+            case ParserType::FloatRange: { return minecraft_floatRange(props); }
+            case ParserType::Function: { return minecraft_function(); }
+            case ParserType::Gamemode: { return minecraft_gamemode(); }
+            case ParserType::GameProfile: { return minecraft_gameProfile(); }
+            case ParserType::Heightmap: { return minecraft_heightmap(); }
+            case ParserType::IntRange: { return minecraft_intRange(props); }
+            case ParserType::ItemEnchantment: { return minecraft_itemEnchantment();
+            }
+            case ParserType::ItemPredicate: { return minecraft_itemPredicate();
+            }
+            case ParserType::ItemSlot: { return minecraft_itemSlot(); }
+            case ParserType::ItemStack: { return minecraft_itemStack(); }
+            case ParserType::Message: { return minecraft_message(); }
+            case ParserType::MobEffect: { return minecraft_mobEffect(); }
+            case ParserType::NbtCompoundTag: { return minecraft_nbtCompoundTag();
+            }
+            case ParserType::NbtPath: { return minecraft_nbtPath(); }
+            case ParserType::NbtTag: { return minecraft_nbtTag(); }
+            case ParserType::Objective: { return minecraft_objective(); }
+            case ParserType::ObjectiveCriteria:  {
+                return minecraft_objectiveCriteria();
+            }
+            case ParserType::Operation: { return minecraft_operation(); }
+            case ParserType::Particle: { return minecraft_particle(); }
+            case ParserType::Resource: { return minecraft_resource(props); }
+            case ParserType::ResourceKey: { return minecraft_resourceKey(props);
+            }
+            case ParserType::ResourceOrTag: {
+                return minecraft_resourceOrTag(props);
+            }
+            case ParserType::ResourceOrTagKey: {
+                return minecraft_resourceOrTagKey(props);
+            }
+            case ParserType::ResourceLocation: {
+                return minecraft_resourceLocation();
+            }
+            case ParserType::Rotation: { return minecraft_rotation(); }
+            case ParserType::ScoreHolder: { return minecraft_scoreHolder(props);
+            }
+            case ParserType::ScoreboardSlot: {
+                return minecraft_scoreboardSlot();
+            }
+            case ParserType::Swizzle: { return minecraft_swizzle(); }
+            case ParserType::Team: { return minecraft_team(); }
+            case ParserType::TemplateMirror: { return minecraft_templateMirror();
+            }
+            case ParserType::TemplateRotation: { return
+                                                     minecraft_templateRotation();
+            }
+            case ParserType::Time: { return minecraft_time(); }
+            case ParserType::Uuid: { return minecraft_uuid(); }
+            case ParserType::Vec2: { return minecraft_vec2(); }
+            case ParserType::Vec3: { return minecraft_vec3(); }
+
+            default: {
+                Q_UNREACHABLE();
+                return nullptr;
+            }
+        }
+    }
+
+    QSharedPointer<AngleNode> MinecraftParser::minecraft_angle() {
+        bool _ = false;
+
+        return parseAxis(AxisParseOption::NoOption, _);
+    }
+
+    QSharedPointer<BlockPosNode> MinecraftParser::
+    minecraft_blockPos() {
+        const auto &&ret = QSharedPointer<BlockPosNode>::create(0);
+
+        parseAxes(ret.get(), AxisParseOption::CanBeLocal);
+        return ret;
+    }
+
+    QSharedPointer<BlockStateNode> MinecraftParser::
+    minecraft_blockState() {
+        const int    start = pos();
+        const auto &&ret   = QSharedPointer<BlockStateNode>::create(0);
+
+        parseBlock(ret.get(), false);
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<BlockPredicateNode> MinecraftParser::
+    minecraft_blockPredicate() {
+        const int    start = pos();
+        const auto &&ret   = QSharedPointer<BlockPredicateNode>::create(0);
+
+        parseBlock(ret.get(), true);
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<ColorNode> MinecraftParser::minecraft_color() {
+        const static QLatin1StringVector colors {
+            "aqua"_QL1, "black"_QL1, "blue"_QL1,
+            "dark_aqua"_QL1, "dark_blue"_QL1,
+            "dark_green"_QL1, "dark_gray"_QL1,
+            "dark_purple"_QL1, "dark_red"_QL1,
+            "gold"_QL1, "green"_QL1, "gray"_QL1,
+            "light_purple"_QL1, "red"_QL1,
+            "reset"_QL1, "white"_QL1, "yellow"_QL1,
         };
+        const QString &&literal = oneOf(colors);
 
-    axis->setPos(pos());
-    bool hasPrefix = false;
-    if (this->curChar() == '~') {
-        if (!isLocal) {
-            axis->setType(AxisType::Relative);
-            hasPrefix = true;
-            isLocal   = false;
-            this->advance();
-        } else {
-            this->error(mixCoordErrMsg);
-        }
-    } else if (this->curChar() == '^') {
-        if (isLocal == false)
-            isLocal = true;
-        if (canBeLocal && isLocal) {
-            axis->setType(AxisType::Local);
-            hasPrefix = true;
-            this->advance();
-        } else if (!isLocal) {
-            this->error(mixCoordErrMsg);
+        return QSharedPointer<ColorNode>::create(spanText(literal),
+                                                 !literal.isEmpty());
+    }
+
+    QSharedPointer<ColumnPosNode> MinecraftParser::
+    minecraft_columnPos() {
+        const auto &&ret = QSharedPointer<ColumnPosNode>::create(0);
+
+        parseAxes(ret.get(), AxisParseOption::OnlyInteger |
+                  AxisParseOption::CanBeLocal);
+        return ret;
+    }
+
+    QSharedPointer<ComponentNode> MinecraftParser::
+    minecraft_component() {
+        const int    curPos = pos();
+        const auto &&rest   = getRest();
+
+        try {
+            json       &&j   = json::parse(rest.toString().toStdString());
+            const auto &&ret =
+                QSharedPointer<ComponentNode>::create(spanText(rest));
+            ret->setValue(std::move(j));
+            return ret;
+        }  catch (const json::parse_error &err) {
+            /* TODO: Process JSON errors for localization */
+            reportError(err.what(), {}, curPos + err.byte - 1);
+            return QSharedPointer<ComponentNode>::create(spanText(rest));
         }
     }
-    if (hasPrefix) {
-        if ((!this->curChar().isNull()) && (this->curChar() != ' ')) {
-            axisVal(axis);
+
+    QSharedPointer<DimensionNode> MinecraftParser::
+    minecraft_dimension() {
+        const auto &&ret = QSharedPointer<DimensionNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<EntityNode> MinecraftParser::minecraft_entity(
+        const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<EntityNode>::create(0);
+
+        ret->setPlayerOnly(props[QStringLiteral(
+                                     "type")].toString() == "players"_QL1);
+        ret->setSingleOnly(props[QStringLiteral(
+                                     "amount")].toString() == "single"_QL1);
+
+        parseEntity(ret.get(), false);
+        return ret;
+    }
+
+    QSharedPointer<EntityAnchorNode> MinecraftParser::
+    minecraft_entityAnchor() {
+        const QString &&literal = oneOf({ "eyes"_QL1, "feet"_QL1, });
+
+        return QSharedPointer<EntityAnchorNode>::create(spanText(literal),
+                                                        !literal.isEmpty());
+    }
+
+    QSharedPointer<EntitySummonNode> MinecraftParser::
+    minecraft_entitySummon() {
+        const auto &&ret = QSharedPointer<EntitySummonNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<FloatRangeNode> MinecraftParser::
+    minecraft_floatRange(const QVariantMap &props) {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<FloatRangeNode>::create(0);
+        bool         hasMax = false;
+
+        if (peek(2) == QLatin1String("..")) {
+            hasMax = true;
+            advance(2);
         }
-    } else {
-        if (isLocal) {
-            if (this->curChar() != ' ') {
-                this->error(mixCoordErrMsg);
+
+        const auto &&num1 = brigadier_float();
+        if (!hasMax) {
+            bool hasDoubleDot = false;
+            if (peek(2) == ".."_QL1) {
+                advance(2);
+                hasDoubleDot = true;
+            } else if (!num1->text().isEmpty() && num1->text().back() == '.'_QL1
+                       && curChar() == '.'_QL1) {
+                advance();
+                num1->chopTrailingDot();
+                hasDoubleDot = true;
             }
-        } else {
-            axisVal(axis);
+            if (hasDoubleDot) {
+                if (curChar().isDigit() || curChar() == '.' ||
+                    curChar() == '-') { // "min..max"
+                    ret->setMaxValue(brigadier_float(), true);
+                }
+                num1->setTrailingTrivia(spanText(QStringLiteral("..")));
+                ret->setMinValue(std::move(num1), true); // "min.."
+            } else {
+                ret->setExactValue(std::move(num1));     // "value"
+            }
+        } else {                                         // "..max"
+            num1->setLeadingTrivia(spanText(QStringLiteral("..")));
+            ret->setMaxValue(std::move(num1), false);
         }
-    }
-    axis->setLength(pos() - axis->pos());
-    return axis;
-}
-
-QSharedPointer<Command::AxesNode> Command::MinecraftParser::parseAxes(
-    AxisParseOptions options) {
-    bool isLocal = false;
-    auto axes    = QSharedPointer<Command::AxesNode>::create(pos());
-
-    /*axes->setX(parseAxis(options, isLocal)); */
-    axes->setX(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
-                                       peekLiteral(), options, isLocal));
-    if (options & AxisParseOption::ParseY) {
-        this->eat(' ');
-        axes->setY(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
-                                           peekLiteral(), options, isLocal));
+        ret->setLength(pos() - start);
+        return ret;
     }
 
-    this->eat(' ');
-    axes->setZ(callWithCache<AxisNode>(&MinecraftParser::parseAxis, this,
-                                       peekLiteral(), options, isLocal));
-    axes->setLength(pos() - axes->pos());
-    return axes;
-}
+    QSharedPointer<FunctionNode> MinecraftParser::
+    minecraft_function() {
+        const auto &&ret = QSharedPointer<FunctionNode>::create(0);
 
-QSharedPointer<Command::NbtCompoundNode> Command::MinecraftParser::
-parseCompoundTag() {
-    return parseMap<NbtCompoundNode, NbtNode>('{', '}', ':',
-                                              [this](const QString &)
-                                              -> QSharedPointer<NbtNode> {
-        return parseTagValue();
-    }, true);
-}
+        parseResourceLocation(ret.get(), true);
+        return ret;
+    }
 
-QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseTagValue() {
-    const int startPos = pos();
+    QSharedPointer<GamemodeNode> MinecraftParser::minecraft_gamemode() {
+        const QString &&literal = oneOf({ "creative"_QL1, "survival"_QL1,
+                                          "adventure"_QL1, "spectator"_QL1 });
+        GamemodeNode::Mode mode = GamemodeNode::Mode::Unknown;
 
-    switch (curChar().toLatin1()) {
-    case '{': {
+        if (!literal.isEmpty()) {
+            uswitch (literal) {
+                ucase ("creative"): {
+                    mode = GamemodeNode::Mode::Creative;
+                    break;
+                }
+                ucase ("survival"): {
+                    mode = GamemodeNode::Mode::Survival;
+                    break;
+                }
+                ucase ("adventure"): {
+                    mode = GamemodeNode::Mode::Adventure;
+                    break;
+                }
+                ucase ("spectator"): {
+                    mode = GamemodeNode::Mode::Spectator;
+                    break;
+                }
+            }
+        }
+        return QSharedPointer<GamemodeNode>::create(spanText(literal), mode,
+                                                    !literal.isEmpty());
+    }
+
+    QSharedPointer<GameProfileNode> MinecraftParser::minecraft_gameProfile() {
+        const auto &&ret = QSharedPointer<GameProfileNode>::create(0);
+
+        ret->setPlayerOnly(true);
+
+        parseEntity(ret.get(), false);
+        return ret;
+    }
+
+    QSharedPointer<HeightmapNode> MinecraftParser::minecraft_heightmap() {
+        const QString &&literal = oneOf({
+            "motion_blocking_no_leaves"_QL1,
+            "motion_blocking"_QL1,
+            "ocean_floor"_QL1,
+            "world_surface"_QL1,
+        });
+
+        return QSharedPointer<HeightmapNode>::create(spanText(literal),
+                                                     !literal.isEmpty());
+    }
+
+    QSharedPointer<IntRangeNode> MinecraftParser::
+    minecraft_intRange(const QVariantMap &props) {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<IntRangeNode>::create(0);
+        bool         hasMax = false;
+
+        if (peek(2) == ".."_QL1) {
+            hasMax = true;
+            advance(2);
+        }
+        const auto &&num1 = brigadier_integer();
+        if (!hasMax) {
+            if (peek(2) == ".."_QL1) {
+                advance(2);
+                if (curChar().isDigit() || curChar() == '-') { // "min..max"
+                    ret->setMaxValue(brigadier_integer(), false);
+                }
+                num1->setTrailingTrivia(spanText(QStringLiteral("..")));
+                ret->setMinValue(std::move(num1), true); // "min.."
+            } else {
+                ret->setExactValue(std::move(num1));     // "value"
+            }
+        } else {                                         // "..max"
+            num1->setLeadingTrivia(spanText(QStringLiteral("..")));
+            ret->setMaxValue(std::move(num1), false);
+        }
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<ItemEnchantmentNode> MinecraftParser::
+    minecraft_itemEnchantment() {
+        const auto &&ret = QSharedPointer<ItemEnchantmentNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<ItemSlotNode> MinecraftParser::
+    minecraft_itemSlot() {
+        const auto slot = advanceView(re2c::itemSlot(peekRest()));
+
+        return QSharedPointer<ItemSlotNode>::create(
+            spanText(slot), errorIfNot(!slot.isEmpty(),
+                                       "Invalid empty item slot"));
+    }
+
+    QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ItemStackNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(resLoc.get());
+        ret->setResLoc(std::move(resLoc));
+
+        if (curChar() == '{') {
+            ret->setNbt(parseCompoundTag());
+        }
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<ItemPredicateNode> MinecraftParser::
+    minecraft_itemPredicate() {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ItemPredicateNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(resLoc.get(), true);
+        ret->setResLoc(std::move(resLoc));
+
+        if (curChar() == '{') {
+            ret->setNbt(parseCompoundTag());
+        }
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<MessageNode> MinecraftParser::minecraft_message() {
+        return QSharedPointer<MessageNode>::create(spanText(getRest()), true);
+    }
+
+    QSharedPointer<MobEffectNode> MinecraftParser::
+    minecraft_mobEffect() {
+        const auto &&ret = QSharedPointer<MobEffectNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<NbtCompoundNode> MinecraftParser::
+    minecraft_nbtCompoundTag() {
         return parseCompoundTag();
     }
 
-    case '[': {
-        advance();
-        switch (curChar().toLower().toLatin1()) {
-        case 'b': {
-            return parseArrayTag<NbtByteArrayNode, NbtByteNode>(
-                "Unvaild SNBT tag in a byte array tag");
-        }
+    QSharedPointer<NbtPathNode> MinecraftParser::
+    minecraft_nbtPath() {
+        const auto &&ret   = QSharedPointer<NbtPathNode>::create(0);
+        const int    start = pos();
 
-        case 'i': {
-            return parseArrayTag<NbtIntArrayNode, NbtIntNode>(
-                "Unvaild SNBT tag in an integer array tag");
-        }
+        ret->append(parseNbtPathStep());
+        auto last = ret->last();
+        // TODO: Allow single-quoted key in 1.20+
+        while (last->trailingTrivia() == '.' || curChar() == '[' ||
+               curChar() == '"') {
+            const auto &&step = parseNbtPathStep();
 
-        case 'l': {
-            return parseArrayTag<NbtLongArrayNode, NbtLongNode>(
-                "Unvaild SNBT tag in a long array tag");
-        }
-
-        default: {
-            return parseListTag();
-        }
-        }
-    }
-
-    case '"':
-    case '\'': {
-        return QSharedPointer<Command::NbtStringNode>::create(startPos,
-                                                              getQuotedString(),
-                                                              true);
-    }
-
-    default: {
-        if (curChar().isNumber() || curChar() == '-' || curChar() == '.') {
-            return parseNumericTag();
-        } else if (const auto &boolean = brigadier_bool(); boolean->isVaild()) {
-            return QSharedPointer<Command::NbtByteNode>::create(
-                startPos, boolean->length(), boolean->value());
-        } else {
-            const QString &&value =
-                getWithCharset(QStringLiteral("a-zA-Z0-9-_."));
-            if (value.isEmpty())
-                error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                        "Invaild empty tag value"));
-            return QSharedPointer<Command::NbtStringNode>::create(
-                startPos, value);
-        }
-    }
-    }
-    return nullptr;
-}
-
-QSharedPointer<Command::NbtNode> Command::MinecraftParser::parseNumericTag() {
-    const auto number = brigadier_double();
-
-    const QString &literal = text().mid(number->pos(),
-                                             number->length());
-    bool ok = false;
-
-    switch (curChar().toLower().toLatin1()) {
-    case 'b': {
-        advance();
-        float integer = literal.toFloat(&ok);
-        if (ok && integer <= 128 && integer >= -127) {
-            return QSharedPointer<Command::NbtByteNode>::create(number->pos(),
-                                                                number->length(),
-                                                                (int8_t)integer);
-        } else {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "%1 is not a vaild SNBT byte tag"),
-                  { literal }, number->pos(), number->length());
-            break;
-        }
-    }
-
-    case 'd': {
-        advance();
-        return QSharedPointer<Command::NbtDoubleNode>::create(
-            number->pos(), number->length(), number->value());
-    }
-
-    case 'f': {
-        advance();
-        float value = literal.toFloat(&ok);
-        if (ok) {
-            return QSharedPointer<Command::NbtFloatNode>::create(number->pos(),
-                                                                 number->length(),
-                                                                 value);
-        } else {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "%1 is not a vaild SNBT float tag"),
-                  { literal }, number->pos(), number->length());
-            break;
-        }
-    }
-
-    case 'l': {
-        advance();
-        int64_t value = literal.toLongLong(&ok);
-        if (ok) {
-            return QSharedPointer<Command::NbtLongNode>::create(number->pos(),
-                                                                number->length(),
-                                                                value);
-        } else {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "%1 is not a vaild SNBT long tag"),
-                  { literal }, number->pos(), number->length());
-            break;
-        }
-    }
-
-    case 's': {
-        advance();
-        short value = literal.toFloat(&ok);
-        if (ok) {
-            return QSharedPointer<Command::NbtShortNode>::create(number->pos(),
-                                                                 number->length(),
-                                                                 value);
-        } else {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "%1 is not a vaild SNBT short tag"),
-                  { literal }, number->pos(), number->length());
-            break;
-        }
-    }
-
-    default: {
-        if (literal.contains('.')) {
-            return QSharedPointer<Command::NbtDoubleNode>::create(number->pos(),
-                                                                  number->length(),
-                                                                  number->value());
-        } else {
-            int value = literal.toInt(&ok);
-            if (ok) {
-                return QSharedPointer<Command::NbtIntNode>::create(
-                    number->pos(),
-                    number->length(),
-                    value);
-            } else {
-                error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                        "%1 is not a vaild SNBT integer tag"),
-                      { literal }, number->pos(), number->length());
+            if ((step->type() == NbtPathStepNode::Type::Key)
+                && (!(last->trailingTrivia() == '.'))) {
+                reportError(QT_TR_NOOP(
+                                "Missing character '.' before a named tag"),
+                            {}, start + last->length() - 1);
             }
+            ret->append(step);
+            last = ret->last();
+            /*qDebug() << curChar() << curChar().isNull() << last->hasTrailingDot(); */
+            if (curChar().isNull())
+                break;
         }
-    }
-    }
-    return nullptr;
-}
-
-QSharedPointer<Command::NbtListNode> Command::MinecraftParser::parseListTag() {
-    auto ret   = QSharedPointer<Command::NbtListNode>::create(pos() - 1);
-    bool first = true;
-
-    while (curChar() != ']') {
-        skipWs(false);
-        auto elem = parseTagValue();
-        if (first || (elem->id() == ret->prefix())) {
-            ret->append(elem);
-            first = false;
-        } else {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "Type of elements in this list tag must be the same"));
-        }
-        skipWs(false);
-        if (this->curChar() != ']') {
-            this->eat(',');
-            skipWs(false);
-        }
-    }
-    eat(']');
-    return ret;
-}
-
-QSharedPointer<Command::MapNode> Command::MinecraftParser::
-parseEntityAdvancements() {
-    return this->parseMap<MapNode, ParseNode>(
-        '{', '}', '=', [this](const QString &) -> QSharedPointer<ParseNode> {
-        if (this->curChar() == '{') {
-            return parseMap<MapNode, BoolNode>(
-                '{', '}', '=', [this](const QString &) ->
-                QSharedPointer<Command::BoolNode> {
-                auto ret = brigadier_bool();
-                if (ret->isVaild())
-                    return ret;
-                else
-                    this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                                  "Argument value must be boolean"));
-                return nullptr;
-            }, false, R"(a-zA-z0-9-_:.+/)");
-        } else {
-            auto ret = brigadier_bool();
-            if (ret->isVaild())
-                return ret;
-            else
-                this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                              "Argument value must be a boolean"));
-            return nullptr;
-        }
-        return nullptr;
-    }, false, R"(a-zA-z0-9-_:.+/)");
-}
-
-QSharedPointer<Command::MultiMapNode> Command::MinecraftParser::
-parseEntityArguments() {
-    return this->parseMap<MultiMapNode, ParseNode>(
-        '[', ']', '=', [this](
-            const QString &key) -> QSharedPointer<ParseNode> {
-        static const QStringList doubleValKeys { "x", "y", "z", "dx", "dy", "dz" };
-        static const QStringList rangeValKeys { "distance", "x_rotation", "y_rotation" };
-        if (doubleValKeys.contains(key)) {
-            return brigadier_double();
-        } else if (rangeValKeys.contains(key)) {
-            return minecraft_floatRange();
-        } else if (key == QLatin1String("level")) {
-            return minecraft_intRange();
-        } else if (key == QLatin1String("limit")) {
-            return brigadier_integer();
-        } else if (key == QLatin1String("predicate")) {
-            bool isNegative = curChar() == '!';
-            if (isNegative)
-                advance();
-            return QSharedPointer<EntityArgumentValueNode>::create(
-                minecraft_resourceLocation(),
-                isNegative);
-        } else if (key == QLatin1String("sort")) {
-            int curPos        = pos();
-            QString &&literal = this->oneOf({ "nearest", "furthest",
-                                              "random", "arbitrary" });
-            return QSharedPointer<Command::StringNode>::create(curPos, literal);
-        } else if (key == QLatin1String("gamemode")) {
-            bool isNegative = curChar() == '!';
-            if (isNegative)
-                advance();
-            int curPos        = pos();
-            QString &&literal = this->oneOf({ "adventure", "creative",
-                                              "spectator", "survival" });
-            return QSharedPointer<EntityArgumentValueNode>::create(
-                QSharedPointer<Command::StringNode>::create(curPos, literal),
-                isNegative);
-        } else if (key == QLatin1String("name")) {
-            bool isNegative = curChar() == '!';
-            if (isNegative)
-                advance();
-            int curPos = pos();
-            QString literal;
-            bool isQuote = false;
-            if (curChar() == '"' || curChar() == '\'') {
-                literal = getQuotedString();
-                isQuote = true;
-            } else {
-                literal = this->getWithCharset("0-9a-zA-Z-_.+");
-            }
-            return QSharedPointer<EntityArgumentValueNode>::create(
-                QSharedPointer<Command::StringNode>::create(
-                    curPos, literal, isQuote), isNegative);
-        } else if (key == QLatin1String("type")) {
-            bool isNegative = curChar() == '!';
-            if (isNegative)
-                advance();
-            bool isTag = curChar() == '#';
-            if (isTag)
-                advance();
-            auto resLoc = minecraft_resourceLocation();
-            resLoc->setIsTag(isTag);
-            return QSharedPointer<EntityArgumentValueNode>::create(resLoc,
-                                                                   isNegative);
-        } else if (key == QLatin1String("nbt")) {
-            bool isNegative = curChar() == '!';
-            if (isNegative)
-                advance();
-            return QSharedPointer<EntityArgumentValueNode>::create(
-                parseCompoundTag(),
-                isNegative);
-        } else if (key == QLatin1String("tag") || key == QLatin1String(
-                       "team")) {
-            bool isNegative = curChar() == '!';
-            if (isNegative)
-                advance();
-            int curPos        = pos();
-            QString &&literal = getWithCharset("0-9a-zA-Z-_.+");
-            return QSharedPointer<EntityArgumentValueNode>::create(
-                QSharedPointer<Command::StringNode>::create(
-                    curPos, literal), isNegative);
-        } else if (key == QLatin1String("scores")) {
-            return parseMap<MapNode, IntRangeNode>(
-                '{', '}', '=', [this](const QString &) ->
-                QSharedPointer<IntRangeNode> {
-                return minecraft_intRange();
-            }, false, R"(0-9a-zA-Z-_.+)");
-        } else if (key == QLatin1String("advancements")) {
-            return parseEntityAdvancements();
-        } else{
-            this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                          "Unknown entity argument name: %1"),
-                        { key });
-        }
-        return nullptr;
-    });
-}
-
-QSharedPointer<Command::TargetSelectorNode> Command::MinecraftParser::
-parseTargetSelector() {
-    auto ret = QSharedPointer<Command::TargetSelectorNode>::create(pos());
-
-    eat('@');
-    using Variable = Command::TargetSelectorNode::Variable;
-    switch (curChar().toLatin1()) {
-    case 'a': {
-        ret->setVariable(Variable::A);
-        break;
-    }
-
-    case 'e': {
-        ret->setVariable(Variable::E);
-        break;
-    }
-
-    case 'p': {
-        ret->setVariable(Variable::P);
-        break;
-    }
-
-    case 'r': {
-        ret->setVariable(Variable::R);
-        break;
-    }
-
-    case 's': {
-        ret->setVariable(Variable::S);
-        break;
-    }
-
-    default: {
-        error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                "Invaild target selector variable: %1"),
-              { QStringLiteral("@%1").arg(curChar()) });
-    }
-    }
-    advance();
-    if (curChar() == '[')
-        ret->setArgs(parseEntityArguments());
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
-
-QSharedPointer<Command::NbtPathStepNode> Command::MinecraftParser::
-parseNbtPathStep() {
-    using StepType = Command::NbtPathStepNode::Type;
-    auto ret = QSharedPointer<Command::NbtPathStepNode>::create(pos());
-
-    switch (curChar().toLatin1()) {
-    case '"': {
-        ret->setName(QSharedPointer<StringNode>::create(ret->pos(),
-                                                        getQuotedString(),
-                                                        true));
-        if (curChar() == '{')
-            ret->setFilter(minecraft_nbtCompoundTag());
-        break;
-    }
-
-    case '{': {
-        ret->setType(StepType::Root);
-        ret->setFilter(minecraft_nbtCompoundTag());
-        break;
-    }
-
-    case '[': {
-        ret->setType(StepType::Index);
-        advance();
-        skipWs(false);
-        if (curChar() == ']') {
-            /* Selects all. Continues. */
-        } else if (curChar() == '{') {
-            ret->setFilter(minecraft_nbtCompoundTag());
-        } else {
-            ret->setIndex(brigadier_integer());
-            /*qDebug() << ret->index()->toString(); */
-        }
-        skipWs(false);
-        eat(']');
-        break;
-    }
-
-    default: {
-        ret->setName(QSharedPointer<Command::StringNode>::create(ret->pos(),
-                                                                 getWithCharset(
-                                                                     "a-zA-Z0-9-_+")));
-        /*qDebug() << "After key" << ret->name()->value(); */
-        if (ret->name()->value().isEmpty())
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "Invaild empty NBT path key"));
-        if (curChar() == '{')
-            ret->setFilter(minecraft_nbtCompoundTag());
-    };
-    }
-    /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
-    if (curChar() == '.') {
-        advance();
-        ret->setHasTrailingDot(true);
-    }
-    /*qDebug() << "After step:" << curChar() << ret->hasTrailingDot(); */
-    ret->setLength(pos() - ret->pos());
-    /*qDebug() << ret->toString() << ret->index(); */
-    return ret;
-}
-
-QSharedPointer<Command::ParticleColorNode> Command::MinecraftParser::parseParticleColor()
-{
-    auto color = QSharedPointer<ParticleColorNode>::create(pos());
-    color->setR(brigadier_float());
-    this->eat(' ');
-    color->setG(brigadier_float());
-    this->eat(' ');
-    color->setB(brigadier_float());
-    color->setLength(pos() - color->pos());
-    return color;
-}
-
-QSharedPointer<Command::AngleNode> Command::MinecraftParser::minecraft_angle() {
-    bool       _    = false;
-    const auto axis = parseAxis(AxisParseOption::NoOption, _);
-
-    return QSharedPointer<Command::AngleNode>::create(axis.get());
-}
-
-QSharedPointer<Command::BlockPosNode> Command::MinecraftParser::
-minecraft_blockPos() {
-    const auto axes = parseAxes(
-        AxisParseOption::ParseY | AxisParseOption::CanBeLocal);
-    auto ret = QSharedPointer<Command::BlockPosNode>::create(axes->pos(),
-                                                             axes->length());
-
-    ret->setX(axes->x());
-    ret->setY(axes->y());
-    ret->setZ(axes->z());
-    return ret;
-}
-
-QSharedPointer<Command::BlockStateNode> Command::MinecraftParser::
-minecraft_blockState() {
-    auto nspacedId = minecraft_resourceLocation();
-    auto ret       = QSharedPointer<Command::BlockStateNode>::create(
-        nspacedId->pos(),
-        nspacedId->nspace(),
-        nspacedId->id());
-
-    if (this->curChar() == '[') {
-        ret->setStates(
-            parseMap<MapNode, ParseNode>('[', ']', '=',
-                                         [this](const QString &) {
-            return brigadier_string({ { "type", "word" } });
-        }));
-    }
-    if (this->curChar() == '{') {
-        ret->setNbt(parseCompoundTag());
-    }
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
-
-QSharedPointer<Command::BlockPredicateNode> Command::MinecraftParser::
-minecraft_blockPredicate() {
-    bool isTag = false;
-
-    if (curChar() == '#') {
-        isTag = true;
-        advance();
-    }
-    const auto blockState = minecraft_blockState();
-    const auto ret        = QSharedPointer<BlockPredicateNode>::create(
-        blockState.get());
-    ret->setIsTag(isTag);
-    ret->setPos(ret->pos() - isTag);
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
-
-QSharedPointer<Command::ColorNode> Command::MinecraftParser::minecraft_color() {
-    const static QStringList colors {
-        "aqua", "black", "blue",
-        "dark_aqua", "dark_blue",
-        "dark_green", "dark_grey",
-        "dark_purple", "dark_red",
-        "gold", "green", "grey",
-        "light_purple", "red",
-        "reset", "white", "yellow",
-    };
-    const int       curPos  = pos();
-    const QString &&literal = oneOf(colors);
-
-    return QSharedPointer<Command::ColorNode>::create(curPos, literal);
-}
-
-QSharedPointer<Command::ColumnPosNode> Command::MinecraftParser::
-minecraft_columnPos() {
-    const auto axes = parseAxes(AxisParseOption::OnlyInteger |
-                                AxisParseOption::
-                                CanBeLocal);
-    auto ret = QSharedPointer<Command::ColumnPosNode>::create(axes->pos(),
-                                                              axes->length());
-
-    ret->setX(axes->x());
-    ret->setZ(axes->z());
-    return ret;
-}
-
-QSharedPointer<Command::ComponentNode> Command::MinecraftParser::
-minecraft_component() {
-    int curPos = pos();
-
-    try {
-        json &&j   = json::parse(getRest().toStdString());
-        auto   ret = QSharedPointer<Command::ComponentNode>::create(
-            curPos, pos() - curPos);
-        ret->setValue(j);
+        ret->setLength(pos() - start);
         return ret;
-    }  catch (const json::parse_error &err) {
-        /* TODO: Process JSON errors for localization */
-        error(err.what(), {}, curPos + err.byte - 1);
     }
-    return nullptr;
-}
 
-QSharedPointer<Command::DimensionNode> Command::MinecraftParser::
-minecraft_dimension() {
-    const auto node = minecraft_resourceLocation();
+    QSharedPointer<NbtNode> MinecraftParser::minecraft_nbtTag() {
+        return parseTagValue();
+    }
 
-    return QSharedPointer<Command::DimensionNode>::create(node->pos(),
-                                                          node->nspace(),
-                                                          node->id());
-}
+    QSharedPointer<ObjectiveNode> MinecraftParser::
+    minecraft_objective() {
+        const int   curPos  = pos();
+        QStringView objname = advanceView(re2c::objective(peekRest()));
+        bool        valid   = true;
 
-QSharedPointer<Command::EntityNode> Command::MinecraftParser::minecraft_entity(
-    const QVariantMap &props) {
-    QSharedPointer<EntityNode> ret    = nullptr;
-    int                        curPos = pos();
+        if (objname.isEmpty()) {
+            reportError("Invalid empty objective");
+            valid = false;
+        } else if ((objname.length() > 16) &&
+                   (gameVer < QVersionNumber(1, 18, 2))) {
+            reportError(QT_TR_NOOP(
+                            "Objective '%1' must be less than 16 characters"),
+                        { objname.toString() }, curPos, objname.length());
+            valid = false;
+        }
+        return QSharedPointer<ObjectiveNode>::create(spanText(objname), valid);
+    }
 
-    if (this->curChar() == '@') {
-        ret = QSharedPointer<Command::EntityNode>::create(
-            parseTargetSelector());
-    } else {
-        auto uuid = minecraft_uuid();
-        if (uuid->isVaild()) {
-            ret = QSharedPointer<Command::EntityNode>::create(uuid);
+    QSharedPointer<ObjectiveCriteriaNode> MinecraftParser::
+    minecraft_objectiveCriteria() {
+        const auto criteria = advanceView(re2c::objectiveCriteria(peekRest()));
+
+        return QSharedPointer<ObjectiveCriteriaNode>::create(
+            spanText(criteria), errorIfNot(!criteria.isEmpty(),
+                                           "Invalid empty objective criteria"));
+    }
+
+    QSharedPointer<OperationNode> MinecraftParser::
+    minecraft_operation() {
+        static const QLatin1StringVector operators {
+            "="_QL1, "<"_QL1, ">"_QL1, "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
+            "/="_QL1, "%="_QL1,
+        };
+        const QString &&literal = oneOf(operators);
+
+        return QSharedPointer<OperationNode>::create(spanText(literal),
+                                                     !literal.isEmpty());
+    }
+
+    QSharedPointer<ParticleNode> MinecraftParser::minecraft_particle() {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ParticleNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(resLoc.get());
+
+        QString fullId;
+        if (!resLoc->nspace()) {
+            fullId = resLoc->id()->text();
         } else {
-            setPos(curPos);
-            QString literal;
-            literal = getWithCharset("0-9a-zA-Z-_#$%.§");
-            if (literal.isEmpty()) {
-                this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                              "Invaild empty player name"));
+            const QString &&nspace = resLoc->nspace()->text();
+            if (nspace.isEmpty() || (nspace == "minecraft"_QL1)) {
+                fullId = resLoc->id()->text();
+            } else {
+                fullId = nspace + ":"_QL1 + resLoc->id()->text();
             }
-            auto playerName = QSharedPointer<Command::StringNode>::create(
-                curPos, literal);
-            ret = QSharedPointer<Command::EntityNode>::create(playerName);
         }
-    }
-    if (!ret)
-        error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                "Cannot parse entity"));
-    return ret;
-}
 
-QSharedPointer<Command::EntityAnchorNode> Command::MinecraftParser::
-minecraft_entityAnchor() {
-    const int       curPos  = pos();
-    const QString &&literal = oneOf({ "eyes", "feet", });
-
-    return QSharedPointer<Command::EntityAnchorNode>::create(curPos, literal);
-}
-
-QSharedPointer<Command::EntitySummonNode> Command::MinecraftParser::
-minecraft_entitySummon() {
-    const auto node = minecraft_resourceLocation();
-
-    return QSharedPointer<Command::EntitySummonNode>::create(node->pos(),
-                                                             node->nspace(),
-                                                             node->id());
-}
-
-QSharedPointer<Command::FloatRangeNode> Command::MinecraftParser::
-minecraft_floatRange(const QVariantMap &props) {
-    auto ret    = QSharedPointer<Command::FloatRangeNode>::create(pos(), -1);
-    bool hasMax = false;
-
-    if (this->peek(2) == QLatin1String("..")) {
-        hasMax = true;
-        this->advance(2);
-    }
-    auto num1 = this->brigadier_float();
-    if (!hasMax) {
-        bool hasDoubleDot = false;
-        if (this->peek(2) == QLatin1String("..")) {
-            this->advance(2);
-            hasDoubleDot = true;
-        } else if ((text().at(pos() - 1) == '.') && (curChar() == '.')) {
-            this->advance();
-            hasDoubleDot = true;
-        }
-        if (hasDoubleDot) {
-            if (curChar().isDigit() || curChar() == '.' || curChar() == '-') {
-                ret->setMaxValue(this->brigadier_float(), true);
+        uswitch (fullId) {
+            ucase ("block"_QL1):
+            ucase ("block_marker"_QL1):
+            ucase ("falling_dust"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                ret->setParams(minecraft_blockState());
+                break;
             }
-            ret->setMinValue(num1, true);
+            ucase ("dust"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                const auto &&color = parseParticleColor();
+                color->setTrailingTrivia(eat(' '));
+                ret->setParams(std::move(color), brigadier_float());
+                break;
+            }
+            ucase ("dust_color_transition"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                const auto &&startColor = parseParticleColor();
+                startColor->setTrailingTrivia(eat(' '));
+                const auto &&size = brigadier_float();
+                size->setTrailingTrivia(eat(' '));
+                const auto &&endColor = parseParticleColor();
+                ret->setParams(std::move(startColor), std::move(size),
+                               std::move(endColor));
+                break;
+            }
+            ucase ("item"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                ret->setParams(minecraft_itemStack());
+                break;
+            }
+            ucase ("sculk_charge"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                ret->setParams(brigadier_float());
+                break;
+            }
+            ucase ("shriek"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                ret->setParams(brigadier_integer());
+                break;
+            }
+            ucase ("vibration"_QL1): {
+                resLoc->setTrailingTrivia(eat(' '));
+                const auto &&pos = minecraft_vec3();
+                pos->setTrailingTrivia(eat(' '));
+                ret->setParams(std::move(pos), brigadier_integer());
+                break;
+            }
+        }
+        ret->setResLoc(std::move(resLoc));
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<ResourceNode> MinecraftParser::
+    minecraft_resource(const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<ResourceNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<ResourceKeyNode> MinecraftParser::minecraft_resourceKey(
+        const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<ResourceKeyNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<ResourceOrTagNode> MinecraftParser::
+    minecraft_resourceOrTag(const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<ResourceOrTagNode>::create(0);
+
+        parseResourceLocation(ret.get(), true);
+        return ret;
+    }
+
+    QSharedPointer<ResourceOrTagKeyNode> MinecraftParser::
+    minecraft_resourceOrTagKey(const QVariantMap &props) {
+        const auto &&ret = QSharedPointer<ResourceOrTagKeyNode>::create(0);
+
+        parseResourceLocation(ret.get(), true);
+        return ret;
+    }
+
+    QSharedPointer<ResourceLocationNode> MinecraftParser::
+    minecraft_resourceLocation() {
+        const auto &&ret = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<RotationNode> MinecraftParser::
+    minecraft_rotation() {
+        const auto &&ret = QSharedPointer<RotationNode>::create(0);
+
+        parseAxes(ret.get(), AxisParseOption::NoOption);
+        return ret;
+    }
+
+    QSharedPointer<ScoreHolderNode> MinecraftParser::
+    minecraft_scoreHolder(const QVariantMap &props) {
+        if (curChar() == '*') {
+            auto &&ret = QSharedPointer<ScoreHolderNode>::create(1);
+            ret->setSingleOnly(props[QStringLiteral(
+                                         "amount")].toString() == "single"_QL1);
+            ret->setAll(true);
+            advance();
+            return ret;
         } else {
-            ret->setExactValue(num1);
+            const auto &&ret = QSharedPointer<ScoreHolderNode>::create(0);
+            ret->setSingleOnly(props[QStringLiteral(
+                                         "amount")].toString() == "single"_QL1);
+            parseEntity(ret.get(), true);
+            return ret;
         }
-    } else {
-        ret->setMaxValue(num1, false);
-    }
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
-
-QSharedPointer<Command::FunctionNode> Command::MinecraftParser::
-minecraft_function() {
-    bool isTag = curChar() == '#';
-
-    if (isTag) {
-        advance();
     }
 
-    const auto node = minecraft_resourceLocation();
-    auto       ret  = QSharedPointer<Command::FunctionNode>::create(node->pos(),
-                                                                    node->nspace(),
-                                                                    node->id());
-    ret->setIsTag(isTag);
-    return ret;
-}
+    QSharedPointer<ScoreboardSlotNode> MinecraftParser::
+    minecraft_scoreboardSlot() {
+        const static QLatin1StringVector scoreboardSlots = {
+            "belowName"_QL1,
+            "sidebar.team.aqua"_QL1,
+            "sidebar.team.black"_QL1,
+            "sidebar.team.blue"_QL1,
+            "sidebar.team.dark_aqua"_QL1,
+            "sidebar.team.dark_blue"_QL1,
+            "sidebar.team.dark_green"_QL1,
+            "sidebar.team.dark_gray"_QL1,
+            "sidebar.team.dark_purple"_QL1,
+            "sidebar.team.dark_red"_QL1,
+            "sidebar.team.gold"_QL1,
+            "sidebar.team.green"_QL1,
+            "sidebar.team.gray"_QL1,
+            "sidebar.team.light_purple"_QL1,
+            "sidebar.team.red"_QL1,
+            "sidebar.team.reset"_QL1,
+            "sidebar.team.white"_QL1,
+            "sidebar.team.yellow"_QL1,
+            "sidebar"_QL1,
+            "list"_QL1,
+        };
 
-QSharedPointer<Command::GameProfileNode> Command::MinecraftParser::
-minecraft_gameProfile(const QVariantMap &props) {
-    const auto entity = minecraft_entity(props);
+        const QString &&slot = oneOf(scoreboardSlots);
 
-    return QSharedPointer<Command::GameProfileNode>::create(entity.get());
-}
-
-QSharedPointer<Command::IntRangeNode> Command::MinecraftParser::
-minecraft_intRange(const QVariantMap &props) {
-    auto ret    = QSharedPointer<Command::IntRangeNode>::create(pos(), -1);
-    bool hasMax = false;
-
-    if (this->peek(2) == QLatin1String("..")) {
-        hasMax = true;
-        this->advance(2);
+        return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),
+                                                          !slot.isEmpty());
     }
-    auto num1 = this->brigadier_integer();
-    if (!hasMax) {
-        if (this->peek(2) == QLatin1String("..")) {
-            this->advance(2);
-            if (curChar().isDigit() || curChar() == '-') {
-                ret->setMaxValue(brigadier_integer(), true);
+
+    QSharedPointer<SwizzleNode> MinecraftParser::
+    minecraft_swizzle() {
+        const int         start = pos();
+        SwizzleNode::Axes axes;
+        QString           acceptedChars = QStringLiteral("xyz");
+
+        while (acceptedChars.contains(curChar())) {
+            switch (curChar().toLatin1()) {
+                case 'x': {
+                    axes |= SwizzleNode::Axis::X;
+                    break;
+                }
+
+                case 'y': {
+                    axes |= SwizzleNode::Axis::Y;
+                    break;
+                }
+
+                case 'z': {
+                    axes |= SwizzleNode::Axis::Z;
+                    break;
+                }
             }
-            ret->setMinValue(num1, true);
-        } else {
-            ret->setExactValue(num1);
+            acceptedChars = acceptedChars.replace(curChar(), QString());
+            advance();
         }
-    } else {
-        ret->setMaxValue(num1, false);
+        return QSharedPointer<SwizzleNode>::create(spanText(start), axes);
     }
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
 
-QSharedPointer<Command::ItemEnchantmentNode> Command::MinecraftParser::
-minecraft_itemEnchantment() {
-    const auto node = minecraft_resourceLocation();
+    QSharedPointer<TeamNode> MinecraftParser::minecraft_team() {
+        const auto literal = getLiteralString();
 
-    return QSharedPointer<Command::ItemEnchantmentNode>::create(node->pos(),
-                                                                node->nspace(),
-                                                                node->id());
-}
-
-QSharedPointer<Command::ItemSlotNode> Command::MinecraftParser::
-minecraft_itemSlot() {
-    int           curPos  = pos();
-    const QString objname = this->getWithCharset("a-z0-9._");
-
-    return QSharedPointer<Command::ItemSlotNode>::create(curPos, objname);
-}
-
-QSharedPointer<Command::ItemStackNode> Command::MinecraftParser::
-minecraft_itemStack() {
-    const auto nspacedId = minecraft_resourceLocation();
-    auto       ret       = QSharedPointer<ItemStackNode>::create(
-        nspacedId->pos(), nspacedId->nspace(), nspacedId->id());
-
-    if (this->curChar() == '{') {
-        ret->setNbt(parseCompoundTag());
+        return QSharedPointer<TeamNode>::create(spanText(literal),
+                                                errorIfNot(!literal.isEmpty(),
+                                                           "Invalid empty team"));
     }
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
 
-QSharedPointer<Command::ItemPredicateNode> Command::MinecraftParser::
-minecraft_itemPredicate() {
-    bool isTag = false;
+    QSharedPointer<TimeNode> MinecraftParser::minecraft_time() {
+        const int curPos = pos();
+        auto      unit   = TimeNode::Unit::ImplicitTick;
+        bool      ok;
 
-    if (curChar() == '#') {
-        isTag = true;
-        advance();
-    }
-    auto itemStack = minecraft_itemStack();
-    auto ret       = QSharedPointer<ItemPredicateNode>::create(itemStack.get());
-    ret->setIsTag(isTag);
-    ret->setPos(ret->pos() - isTag);
-    return ret;
-}
-
-QSharedPointer<Command::MessageNode> Command::MinecraftParser::minecraft_message()
-{
-    const auto &str = brigadier_string({ { "type", "greedy" } });
-
-    return QSharedPointer<Command::MessageNode>::create(str->pos(),
-                                                        str->value());
-}
-
-QSharedPointer<Command::MobEffectNode> Command::MinecraftParser::
-minecraft_mobEffect() {
-    const auto node = minecraft_resourceLocation();
-
-    return QSharedPointer<Command::MobEffectNode>::create(node->pos(),
-                                                          node->nspace(),
-                                                          node->id());
-}
-
-QSharedPointer<Command::NbtCompoundNode> Command::MinecraftParser::
-minecraft_nbtCompoundTag() {
-    return parseCompoundTag();
-}
-
-QSharedPointer<Command::NbtPathNode> Command::MinecraftParser::minecraft_nbtPath()
-{
-    auto ret = QSharedPointer<Command::NbtPathNode>::create(pos());
-
-    ret->append(parseNbtPathStep());
-    auto last = ret->last();
-    while (last->hasTrailingDot() || curChar() == '[' || curChar() == '"') {
-        auto step = parseNbtPathStep();
-/*
-          qDebug() << QMetaEnum::fromType<NbtPathStepNode::Type>().valueToKey(
-              static_cast<int>(last->type())) << last->hasTrailingDot();
- */
-        if ((step->type() == Command::NbtPathStepNode::Type::Key)
-            && (!last->hasTrailingDot())) {
-            error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                    "Missing character '.' before a named tag"),
-                  {},
-                  last->pos() + last->length() - 1);
+        auto [raw, value] = parseFloat(ok);
+        if (!ok) {
+            reportError("Invalid time number", {}, curPos, raw.length());
         }
-        ret->append(step);
-        last = ret->last();
-        /*qDebug() << curChar() << curChar().isNull() << last->hasTrailingDot(); */
-        if (curChar().isNull())
-            break;
-    }
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
 
-QSharedPointer<Command::NbtNode> Command::MinecraftParser::minecraft_nbtTag() {
-    return parseTagValue();
-}
-
-QSharedPointer<Command::ObjectiveNode> Command::MinecraftParser::
-minecraft_objective() {
-    int       curPos  = pos();
-    QString &&objname = this->getWithCharset("0-9a-zA-Z-+_.#");
-
-    if (limitScoreboardObjectiveLength && (objname.length() > 16))
-        this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                      "Objective '%1' must be less than 16 characters"),
-                    { objname },
-                    curPos,
-                    objname.length());
-    return QSharedPointer<Command::ObjectiveNode>::create(curPos, objname);
-}
-
-QSharedPointer<Command::ObjectiveCriteriaNode> Command::MinecraftParser::
-minecraft_objectiveCriteria() {
-    int       curPos   = pos();
-    QString &&criteria = this->getWithCharset("-\\w.:");
-
-    return QSharedPointer<Command::ObjectiveCriteriaNode>::create(curPos,
-                                                                  criteria);
-}
-
-QSharedPointer<Command::OperationNode> Command::MinecraftParser::
-minecraft_operation() {
-    static const QStringList operators {
-        "=", "<", ">", "><", "+=", "-=", "*=", "/=", "%=",
-    };
-    const int       curPos  = pos();
-    const QString &&literal = oneOf(operators);
-
-    return QSharedPointer<Command::OperationNode>::create(curPos, literal);
-}
-
-QSharedPointer<Command::ParticleNode> Command::MinecraftParser::
-minecraft_particle() {
-    auto      nspacedId = minecraft_resourceLocation();
-    auto      ret       = QSharedPointer<ParticleNode>::create(nspacedId.get());
-    QString &&fullid    = ret->fullId();
-
-    if (fullid == QLatin1String("minecraft:block") ||
-        fullid == QLatin1String("minecraft:block_marker") ||
-        fullid == QLatin1String("minecraft:falling_dust")) {
-        eat(' ');
-        ret->setParams({minecraft_blockState()});
-    } else if (fullid == QLatin1String("minecraft:dust")) {
-        this->eat(' ');
-        const auto &color = parseParticleColor();
-        eat(' ');
-        ret->setParams({color, brigadier_float()});
-    } else if (fullid == "minecraft:dust_color_transition") {
-        eat(' ');
-        const auto &startColor = parseParticleColor();
-        eat(' ');
-        const auto &size = brigadier_float();
-        eat(' ');
-        const auto &endColor = parseParticleColor();
-        ret->setParams({startColor, size, endColor});
-    } else if (fullid == QLatin1String("minecraft:item")) {
-        eat(' ');
-        ret->setParams({minecraft_itemStack()});
-    }
-    ret->setLength(pos() - ret->pos());
-    return ret;
-}
-
-QSharedPointer<Command::ResourceLocationNode> Command::MinecraftParser::minecraft_resource(const QVariantMap &props) {
-    return minecraft_resourceLocation();
-}
-
-QSharedPointer<Command::ResourceLocationNode> Command::MinecraftParser::minecraft_resourceOrTag(const QVariantMap &props) {
-    const int curPos = pos();
-    bool isTag = false;
-    if (curChar() == '#') {
-        advance();
-        isTag = true;
-    }
-    const auto &node = minecraft_resourceLocation();
-    node->setPos(curPos);
-    node->setIsTag(isTag);
-    return node;
-}
-
-QSharedPointer<Command::ResourceLocationNode> Command::MinecraftParser::
-minecraft_resourceLocation() {
-    const int              curPos = pos();
-    QString                nspace;
-    QString                id;
-    static const QString &&charset = QStringLiteral("0-9a-z-_\\/.");
-
-    id = this->getWithCharset(charset);
-    if (this->curChar() == ':') {
-        this->advance();
-        nspace = id;
-        id     = this->getWithCharset(charset);
-    }
-    if (nspace.contains('/'))
-        this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                      "The character '/' is not allowed in the namespace"),
-                    {},
-                    curPos,
-                    nspace.length());
-    if (id.isEmpty())
-        this->error(QT_TRANSLATE_NOOP("Command::Parser::Error",
-                                      "Invaild empty namespaced ID"));
-
-    auto ret = QSharedPointer<ResourceLocationNode>::create(curPos, nspace, id);
-    return ret;
-}
-
-QSharedPointer<Command::RotationNode> Command::MinecraftParser::
-minecraft_rotation() {
-    const auto axes = parseAxes(AxisParseOption::NoOption);
-    auto       ret  = QSharedPointer<RotationNode>::create(axes->pos(),
-                                                           axes->length());
-
-    ret->setX(axes->x());
-    ret->setZ(axes->z());
-    return ret;
-}
-
-QSharedPointer<Command::ScoreHolderNode> Command::MinecraftParser::
-minecraft_scoreHolder(const QVariantMap &props) {
-    auto ret = QSharedPointer<Command::ScoreHolderNode>::create(pos());
-
-    if (curChar() == '*') {
-        ret->setAll(true);
-        advance();
-    } else {
-        auto entity = minecraft_entity(props);
-        ret = QSharedPointer<Command::ScoreHolderNode>::create(entity.get());
-    }
-    return ret;
-}
-
-QSharedPointer<Command::ScoreboardSlotNode> Command::MinecraftParser::
-minecraft_scoreboardSlot() {
-    const static QStringList scoreboardSlots = {
-        "list",                      "sidebar",
-        "belowName",
-        "sidebar.team.aqua",
-        "sidebar.team.black",
-        "sidebar.team.blue",
-        "sidebar.team.dark_aqua",
-        "sidebar.team.dark_blue",
-        "sidebar.team.dark_green",
-        "sidebar.team.dark_grey",
-        "sidebar.team.dark_purple",
-        "sidebar.team.dark_red",
-        "sidebar.team.gold",
-        "sidebar.team.green",
-        "sidebar.team.grey",
-        "sidebar.team.light_purple",
-        "sidebar.team.red",
-        "sidebar.team.reset",
-        "sidebar.team.white",
-        "sidebar.team.yellow",
-    };
-
-    int       curPos = pos();
-    QString &&slot   = this->oneOf(scoreboardSlots);
-
-    return QSharedPointer<Command::ScoreboardSlotNode>::create(curPos, slot);
-}
-
-QSharedPointer<Command::SwizzleNode> Command::MinecraftParser::minecraft_swizzle()
-{
-    auto ret = QSharedPointer<Command::SwizzleNode>::create(pos(), false, false,
-                                                            false);
-    QString acceptedChars("xyz");
-
-    while (acceptedChars.contains(this->curChar())) {
         switch (curChar().toLatin1()) {
-        case 'x': {
-            ret->setAxes(ret->axes() | Command::SwizzleNode::Axis::X);
-            break;
+            case 'd': {
+                unit = TimeNode::Unit::Day;
+                advance();
+                break;
+            }
+
+            case 's': {
+                unit = TimeNode::Unit::Second;
+                advance();
+                break;
+            }
+
+            case 't': {
+                unit = TimeNode::Unit::Tick;
+                advance();
+                break;
+            }
         }
 
-        case 'y': {
-            ret->setAxes(ret->axes() | Command::SwizzleNode::Axis::Y);
-            break;
+        auto &&ret = QSharedPointer<TimeNode>::create(spanText(curPos),
+                                                      value, unit);
+        ret->setIsValid(ok);
+        return ret;
+    }
+
+    QSharedPointer<TemplateMirrorNode> MinecraftParser::minecraft_templateMirror()
+    {
+        const QString &&literal = oneOf({ "none"_QL1, "front_back"_QL1,
+                                          "left_right"_QL1, });
+
+        return QSharedPointer<TemplateMirrorNode>::create(spanText(literal),
+                                                          !literal.isEmpty());
+    }
+
+    QSharedPointer<TemplateRotationNode> MinecraftParser::
+    minecraft_templateRotation() {
+        const QString &&literal = oneOf({ "none"_QL1, "clockwise_90"_QL1,
+                                          "counterclockwise_90"_QL1,
+                                          "180"_QL1 });
+
+        return QSharedPointer<TemplateRotationNode>::create(spanText(literal),
+                                                            !literal.isEmpty());
+    }
+
+    QSharedPointer<UuidNode> MinecraftParser::minecraft_uuid() {
+        QUuid uuid;
+        auto  raw = re2c::uuid(peekRest(), uuid);
+
+        if (!raw.isNull()) { // 0-0-0-0-0 is a null but valid UUID
+            advance(raw.length());
+            return QSharedPointer<UuidNode>::create(
+                spanText(raw), std::move(uuid), true);
+        } else {
+            reportError("Invalid UUID");
+            return QSharedPointer<UuidNode>::create(QString(), QUuid(), false);
         }
-
-        case 'z': {
-            ret->setAxes(ret->axes() | Command::SwizzleNode::Axis::Z);
-            break;
-        }
-        }
-        acceptedChars = acceptedChars.replace(this->curChar(), QString());
-        this->advance();
-    }
-    this->expect(' ', true);
-    return ret;
-}
-
-QSharedPointer<Command::TeamNode> Command::MinecraftParser::minecraft_team() {
-    int       curPos  = pos();
-    QString &&literal = this->getWithCharset(QStringLiteral("-+\\w.:"));
-
-    return QSharedPointer<Command::TeamNode>::create(curPos, literal);
-}
-
-QSharedPointer<Command::TimeNode> Command::MinecraftParser::minecraft_time() {
-    int  curPos = pos();
-    auto unit   = Command::TimeNode::Unit::Tick;
-    auto number = brigadier_float();
-
-    switch (this->curChar().toLatin1()) {
-    case 'd': {
-        unit = Command::TimeNode::Unit::Day;
-        advance();
-        break;
     }
 
-    case 's': {
-        unit = Command::TimeNode::Unit::Second;
-        advance();
-        break;
+    QSharedPointer<Vec2Node> MinecraftParser::minecraft_vec2() {
+        const auto &&ret = QSharedPointer<Vec2Node>::create(0);
+
+        parseAxes(ret.get(), AxisParseOption::CanBeLocal);
+        return ret;
     }
 
-    case 't': {
-        unit = Command::TimeNode::Unit::Tick;
-        advance();
-        break;
+    QSharedPointer<Vec3Node> MinecraftParser::minecraft_vec3() {
+        const auto &&ret = QSharedPointer<Vec3Node>::create(0);
+
+        parseAxes(ret.get(), AxisParseOption::CanBeLocal);
+        return ret;
     }
+
+    void MinecraftParser::setGameVer(const QVersionNumber &newGameVer) {
+        gameVer = newGameVer;
+        setSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
+                  QStringLiteral("/summary/commands/data.min.json"));
     }
-    return QSharedPointer<Command::TimeNode>::create(curPos, pos() - curPos,
-                                                     number->value(), unit);
-}
-
-QSharedPointer<Command::UuidNode> Command::MinecraftParser::minecraft_uuid() {
-    int                             curPos = pos();
-    static const QRegularExpression regex(
-        R"(([\da-fA-F]{1,8})-([\da-fA-F]{1,4})-([\da-fA-F]{1,4})-([\da-fA-F]{1,4})-([\da-fA-F]{1,12}))");
-    const auto &&match =
-        regex.match(text(), curPos, QRegularExpression::NormalMatch,
-                    QRegularExpression::AnchoredMatchOption);
-
-    if (match.hasMatch()) {
-        advance(match.capturedLength());
-        QStringList hexList;
-        hexList << match.captured(1).rightJustified(8, '0');
-        hexList << match.captured(2).rightJustified(4, '0');
-        hexList << match.captured(3).rightJustified(4, '0');
-        hexList << match.captured(4).rightJustified(4, '0');
-        hexList << match.captured(5).rightJustified(12, '0');
-        return QSharedPointer<Command::UuidNode>::create(curPos,
-                                                         match.capturedLength(),
-                                                         hexList.join('-'));
-    } else {
-        return QSharedPointer<Command::UuidNode>::create(curPos, 0, QString());
-    }
-}
-
-QSharedPointer<Command::Vec2Node> Command::MinecraftParser::minecraft_vec2() {
-    const auto axes = parseAxes(AxisParseOption::CanBeLocal);
-    auto       ret  = QSharedPointer<Command::Vec2Node>::create(axes->pos(),
-                                                                axes->length());
-
-    ret->setX(axes->x());
-    ret->setZ(axes->z());
-    return ret;
-}
-
-QSharedPointer<Command::Vec3Node> Command::MinecraftParser::minecraft_vec3() {
-    const auto axes = parseAxes(AxisParseOption::CanBeLocal
-                                | AxisParseOption::ParseY);
-    auto ret = QSharedPointer<Command::Vec3Node>::create(axes->pos(),
-                                                         axes->length());
-
-    ret->setX(axes->x());
-    ret->setY(axes->y());
-    ret->setZ(axes->z());
-    return ret;
 }

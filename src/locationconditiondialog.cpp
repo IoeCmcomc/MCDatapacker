@@ -3,6 +3,7 @@
 
 #include "globalhelpers.h"
 #include "inventoryitem.h"
+
 #include "game.h"
 
 #include <QVariant>
@@ -29,7 +30,8 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     initComboModelView("biome", biomesModel, ui->biomeCombo);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
     if (Game::version() >= Game::v1_18_2) {
-        initComboModelViewFromRegistry("worldgen/configured_structure_feature", featuresModel,
+        initComboModelViewFromRegistry("worldgen/configured_structure_feature",
+                                       featuresModel,
                                        ui->featureCombo);
     } else {
         initComboModelView("feature", featuresModel, ui->featureCombo);
@@ -74,9 +76,17 @@ QJsonObject LocationConditionDialog::toJson() const {
         root.insert(QStringLiteral("dimension"),
                     ui->dimensionCombo->currentData(
                         Qt::UserRole + 1).toString());
-    if (ui->featureCombo->currentIndex() != 0)
-        root.insert(QStringLiteral("feature"), ui->featureCombo->currentData(
-                        Qt::UserRole + 1).toString());
+    if (ui->featureCombo->currentText() != 0) {
+        if (Game::version() >= Game::v1_19) {
+            root.insert(QStringLiteral("structure"),
+                        ui->featureCombo->currentData(
+                            Qt::UserRole + 1).toString());
+        } else {
+            root.insert(QStringLiteral("feature"),
+                        ui->featureCombo->currentData(
+                            Qt::UserRole + 1).toString());
+        }
+    }
     if (!ui->lightInput->isCurrentlyUnset())
         root.insert(QStringLiteral("light"), { { "light",
                         ui->lightInput->toJson() } });
@@ -90,15 +100,19 @@ QJsonObject LocationConditionDialog::toJson() const {
             if (from_1_17) {
                 QJsonArray blocks;
                 for (int i = 0; i < ui->blocksList->count(); ++i) {
-                    blocks << ui->blocksList->item(i)->data(Qt::UserRole + 1).value<InventoryItem>().getNamespacedID();
+                    blocks <<
+                        ui->blocksList->item(i)->data(Qt::UserRole +
+                                                      1).value<InventoryItem>().
+                        getNamespacedID();
                 }
                 if (!blocks.isEmpty()) {
                     block.insert(QStringLiteral("blocks"), blocks);
                 }
             } else {
                 auto invItem = ui->blockCombo->currentData(Qt::UserRole + 1)
-                           .value<InventoryItem>();
-                block.insert(QStringLiteral("block"), invItem.getNamespacedID());
+                               .value<InventoryItem>();
+                block.insert(QStringLiteral("block"),
+                             invItem.getNamespacedID());
             }
         } else if (!ui->blockTagEdit->text().isEmpty()) {
             block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
@@ -118,7 +132,7 @@ QJsonObject LocationConditionDialog::toJson() const {
         } else if (!ui->fluidTagEdit->text().isEmpty()) {
             fluid.insert(QStringLiteral("tag"), ui->fluidTagEdit->text());
         }
-        QJsonObject fluidStates = jsonFromStateTable(ui->stateTable);;
+        QJsonObject fluidStates = jsonFromStateTable(ui->stateTable);
         if (!fluidStates.isEmpty() && ui->stateGroup->isChecked())
             fluid.insert(QStringLiteral("state"), fluidStates);
         root.insert(QStringLiteral("fluid"), fluid);
@@ -139,17 +153,25 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     }
 
     if (value.contains(QStringLiteral("biome")))
-        setupComboFrom(ui->biomeCombo, value[QStringLiteral("biome")]);
+        setComboValueFrom(ui->biomeCombo, value[QStringLiteral("biome")]);
     if (value.contains(QStringLiteral("dimension")))
-        setupComboFrom(ui->dimensionCombo, value[QStringLiteral("dimension")]);
-    if (value.contains(QStringLiteral("feature")))
-        setupComboFrom(ui->featureCombo, value[QStringLiteral("feature")]);
+        setComboValueFrom(ui->dimensionCombo,
+                          value[QStringLiteral("dimension")]);
+    if (value.contains(QStringLiteral("feature"))) {
+        if (Game::version() >= Game::v1_19) {
+            setComboValueFrom(ui->featureCombo,
+                              value[QStringLiteral("structure")]);
+        } else {
+            setComboValueFrom(ui->featureCombo,
+                              value[QStringLiteral("feature")]);
+        }
+    }
     if (value.contains(QStringLiteral("light"))) {
         auto light = value[QStringLiteral("light")].toObject();
         if (light.contains(QStringLiteral("light")))
             ui->lightInput->fromJson(light[QStringLiteral("light")]);
     }
-    if (Game::version() >= QVersionNumber(1, 16)) {
+    if (Game::version() >= Game::v1_16) {
         ui->smokeyCheck->setupFromJsonObject(value, "smokey");
     }
 
@@ -163,11 +185,16 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
                 auto &&blockId = block.toString();
                 if (!blockId.startsWith(QStringLiteral("minecraft:")))
                     blockId.prepend(QStringLiteral("minecraft:"));
-                const auto &vari = QVariant::fromValue(InventoryItem(blockId));
-                const auto &itemList = blocksModel.match(blocksModel.index(0, 0), Qt::UserRole + 1, vari, 1, Qt::MatchExactly);
+                const auto &vari = QVariant::fromValue(InventoryItem(
+                                                           blockId));
+                const auto &itemList = blocksModel.match(
+                    blocksModel.index(0, 0), Qt::UserRole + 1, vari,
+                    1, Qt::MatchExactly);
                 if (!itemList.isEmpty()) {
                     const auto &index = itemList.at(0);
-                    auto *item = new QListWidgetItem(index.data().toString(), ui->blocksList);
+                    auto       *item  = new QListWidgetItem(
+                        index.data().toString(),
+                        ui->blocksList);
                     item->setData(Qt::UserRole + 1, vari);
                     item->setIcon(index.data(Qt::DecorationRole).value<QIcon>());
                     ui->blocksList->addItem(item);
@@ -176,7 +203,7 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         } else if (block.contains(QStringLiteral("block"))) {
             InventoryItem invItem(block[QStringLiteral("block")].toString());
             /*qDebug() << invItem; */
-            setupComboFrom(ui->blockCombo, QVariant::fromValue(invItem));
+            setComboValueFrom(ui->blockCombo, QVariant::fromValue(invItem));
         } else if (block.contains(QStringLiteral("tag"))) {
             if (block.contains(QStringLiteral("tag")))
                 ui->blockTagEdit->setText(block[QStringLiteral(
@@ -194,8 +221,8 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         QJsonObject fluid = value[QStringLiteral("fluid")].toObject();
         ui->fluid_tagRadio->setChecked(fluid.contains(QStringLiteral("tag")));
         if (fluid.contains(QStringLiteral("fluid"))) {
-            InventoryItem invItem(fluid[QStringLiteral("fluid")].toString());
-            setupComboFrom(ui->fluidCombo, QVariant::fromValue(invItem));
+            setComboValueFrom(ui->fluidCombo,
+                              fluid[QStringLiteral("fluid")].toString());
         } else if (fluid.contains(QStringLiteral("tag"))) {
             ui->blockTagEdit->setText(fluid[QStringLiteral("tag")].toString());
         }
@@ -270,9 +297,13 @@ void LocationConditionDialog::initBlockGroup() {
         ui->blocksCombo->setModel(&blocksModel);
         ui->blocksList->installEventFilter(&viewFilter);
         connect(ui->addBlockBtn, &QToolButton::clicked, this, [this](){
-            auto *item = new QListWidgetItem(ui->blocksCombo->currentText(), ui->blocksList);
-            item->setData(Qt::UserRole + 1, ui->blocksCombo->currentData(Qt::UserRole + 1));
-            item->setIcon(ui->blocksCombo->itemIcon(ui->blocksCombo->currentIndex()));
+            auto *item =
+                new QListWidgetItem(ui->blocksCombo->currentText(),
+                                    ui->blocksList);
+            item->setData(Qt::UserRole + 1,
+                          ui->blocksCombo->currentData(Qt::UserRole + 1));
+            item->setIcon(ui->blocksCombo->itemIcon(ui->blocksCombo->
+                                                    currentIndex()));
             ui->blocksList->addItem(item);
         });
     }
@@ -283,7 +314,7 @@ void LocationConditionDialog::initBlockGroup() {
         ui->stateGroup->setEnabled(checked);
     });
     connect(ui->block_blockRadio, &QRadioButton::toggled,
-            ui->blockCombo, &QWidget::setEnabled);
+            ui->blockStackWidget, &QWidget::setEnabled);
     connect(ui->block_tagRadio, &QRadioButton::toggled,
             ui->blockTagEdit, &QWidget::setEnabled);
 }

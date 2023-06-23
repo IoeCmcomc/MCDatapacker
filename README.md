@@ -9,7 +9,7 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png">
   <p align="center">
-    <b>MCDatapacker is a Minecraft datapack editor which supports datapacks for Minecraft 1.15 – 1.18.2.</b>
+    <b>MCDatapacker is a Minecraft datapack editor which supports datapacks for Minecraft 1.15 – 1.20.</b>
   </p>
 </p>
 
@@ -25,14 +25,14 @@ This program can be used for making a new datapack, opening existing datapack, a
   - A *visual* recipe editor (idea from the [thedestruc7i0n's recipe generator](https://crafting.thedestruc7i0n.ca/ "thedestruc7i0n's recipe generator"));
   - Predicate, loot table and item modifier editors (idea from the [misode's generator](https://misode.github.io/ "misode's generator")).
 - View images (such as the pack.png) directly in the program.
-- Some useful tools, such as displaying datapack statistics and a raw JSON text editor.
+- Some useful tools, such as displaying datapack statistics and raw JSON text editors.
 - Lightweight (in term of storage and memory).
 
 ## Screenshots
 <img src="https://user-images.githubusercontent.com/53734763/120409406-0e1b5c80-c37b-11eb-901f-e74922dc6007.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409410-107db680-c37b-11eb-8c76-bd5c54470798.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409412-11164d00-c37b-11eb-9353-ae9ec47668ad.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409413-11aee380-c37b-11eb-8511-32fe4851955a.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409414-11aee380-c37b-11eb-9976-aa1ad04cf08e.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409415-12e01080-c37b-11eb-8fcb-8277ad220322.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409417-1378a700-c37b-11eb-8b8d-ad4743bcc302.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409420-14113d80-c37b-11eb-9450-0598951233cf.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409421-14a9d400-c37b-11eb-8961-061ea4737fa5.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409423-15426a80-c37b-11eb-9cf9-62e2b95bcb24.png" width="30%"></img> <img src="https://user-images.githubusercontent.com/53734763/120409424-15db0100-c37b-11eb-864a-f9c69e19db96.png" width="30%"></img>  
 
 ## Download
-The program currently supports 1.15 - 1.18.2 data packs, and it run on Windows (tested on Windows 7 and Windows 11) and Linux (tested on Ubuntu 20.04.5).
+The program currently supports 1.15 - 1.20 data packs, and it run on Windows (tested on Windows 7 and Windows 11) and Linux (tested on Ubuntu 20.04.5).
 
 Warning: This is currently an under-development program, and may contain errors. Use it with your own risk.
 

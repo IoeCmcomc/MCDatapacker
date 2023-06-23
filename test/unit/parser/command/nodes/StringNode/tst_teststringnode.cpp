@@ -32,12 +32,20 @@ void TestStringNode::cleanupTestCase() {
 }
 
 void TestStringNode::test_case1() {
-    StringNode node(51,
-                    "Although a long argument type is present in brigadier, it is not used by Minecraft.");
+    StringNode node(
+        "Although a \"long\" argument type is present in brigadier, it is not used by Minecraft.",
+        true);
 
+    QVERIFY(node.isValid());
+    QCOMPARE(node.kind(), ParseNode::Kind::Argument);
+    QCOMPARE(node.parserType(), ArgumentNode::ParserType::String);
+    QCOMPARE(node.length(), 85);
     QCOMPARE(
-        node.toString(),
-        "StringNode(\"Although a long argument type is present in brigadier, it is not used by Minecraft.\")");
+        node.text(),
+        "Although a \"long\" argument type is present in brigadier, it is not used by Minecraft.");
+    QCOMPARE(
+        node.value(),
+        "Although a \"long\" argument type is present in brigadier, it is not used by Minecraft.");
 }
 
 QTEST_MAIN(TestStringNode)

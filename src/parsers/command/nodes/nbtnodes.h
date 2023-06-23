@@ -3,49 +3,82 @@
 
 #include "argumentnode.h"
 #include "mapnode.h"
-#include "nbt.hpp"
-
-#include <iostream>
-#include <sstream>
+#include "singlevaluenode.h"
 
 namespace Command {
-    using namespace nbt;
     class NbtNode : public ArgumentNode {
 public:
-        NbtNode(int pos, int length,
-                const QString &parserId = "minecraft:nbt_tag");
-        virtual QString toString() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
-        virtual tag_id id() const noexcept {
-            return tag_id::tag_end;
+        enum class TagType {
+            Unknown,
+            Byte,
+            Double,
+            Float,
+            Int,
+            Long,
+            Short,
+            ByteArray,
+            IntArray,
+            LongArray,
+            String,
+            List,
+            Compound,
         };
+
+        virtual void accept(NodeVisitor *visitor, VisitOrder) override;
+
+        TagType tagType() const;
+
+protected:
+        TagType m_tagType = TagType::Unknown;
+
+        explicit NbtNode(TagType tagType, int length);
+        explicit NbtNode(ParserType parserType, int length);
+        explicit NbtNode(ParserType parserType, const QString &text);
+        explicit NbtNode(ParserType parserType, TagType tagType, int length);
     };
 
-#define DECLARE_PRIMITIVE_TAG_NBTNODE(Class, Tag, ValueType)      \
-    class Class : public NbtNode, public tags::Tag {              \
-public:                                                           \
-        explicit Class(int pos, int length, ValueType value);     \
-        QString toString() const override;                        \
-        void accept(NodeVisitor * visitor,                        \
-                    NodeVisitor::Order =                          \
-                        NodeVisitor::Order::Postorder) override { \
-            visitor->visit(this);                                 \
-        }                                                         \
-        nbt::tag_id id() const noexcept override;                 \
-    };
+    DECLARE_TYPE_ENUM_FULL(NbtNode, ArgumentNode::ParserType, NbtTag)
 
-    DECLARE_PRIMITIVE_TAG_NBTNODE(NbtByteNode, byte_tag, char)
-    DECLARE_PRIMITIVE_TAG_NBTNODE(NbtDoubleNode, double_tag, double)
-    DECLARE_PRIMITIVE_TAG_NBTNODE(NbtFloatNode, float_tag, float)
-    DECLARE_PRIMITIVE_TAG_NBTNODE(NbtIntNode, int_tag, int)
-    DECLARE_PRIMITIVE_TAG_NBTNODE(NbtLongNode, long_tag, int64_t)
-    DECLARE_PRIMITIVE_TAG_NBTNODE(NbtShortNode, short_tag, short)
+#define DECLARE_PRIMITIVE_TAG_NBTNODE(Name, T)                                               \
+        class Nbt ## Name ## Node : public SingleValueNode<NbtNode, T,                       \
+                                                           ArgumentNode::ParserType::NbtTag> \
+        {                                                                                    \
+public:                                                                                      \
+            Nbt ## Name ## Node(const QString &text, const T &value,                         \
+                                const bool isValid)                                          \
+                : SingleValueNode(text, value, isValid) {                                    \
+                m_tagType = TagType::Name;                                                   \
+            };                                                                               \
+            void accept(NodeVisitor * visitor, VisitOrder) final;                            \
+        };                                                                                   \
+
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Byte, int8_t)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Double, double)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Float, float)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Int, int)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Long, int64_t)
+    DECLARE_PRIMITIVE_TAG_NBTNODE(Short, short)
+    //DECLARE_PRIMITIVE_TAG_NBTNODE(String, QString)
 
 #undef DECLARE_PRIMITIVE_TAG_NBTNODE
 
-    template<typename T>
+    class NbtStringNode : public SingleValueNode<NbtNode, QString,
+                                                 ArgumentNode::ParserType::NbtTag>
+    {
+public:
+        NbtStringNode(const QString &text, const QString &value,
+                      const bool isValid)
+            : SingleValueNode(text, value, isValid) {
+            m_tagType = TagType::String;
+        };
+        explicit NbtStringNode(const QString &text, const bool isValid)
+            : SingleValueNode(text, text, isValid) {
+            m_tagType = TagType::String;
+        };
+        void accept(NodeVisitor *visitor, VisitOrder) final;
+    };
+
+    template<class T>
     class NbtListlikeNode {
 public:
         NbtListlikeNode() = default;
@@ -56,10 +89,10 @@ public:
             return m_vector.size();
         }
         virtual void append(QSharedPointer<T> node) {
-            m_vector.append(node);
+            m_vector.append(std::move(node));
         }
         void insert(int i, QSharedPointer<T> node) {
-            m_vector.insert(i, node);
+            m_vector.insert(i, std::move(node));
         }
         void remove(int i) {
             m_vector.remove(i);
@@ -73,107 +106,74 @@ public:
         const QSharedPointer<T> &operator[](int index) const {
             return m_vector[index];
         };
+        QVector<QSharedPointer<T> > children() const {
+            return m_vector;
+        }
+
 protected:
         QVector<QSharedPointer<T> > m_vector;
     };
 
-#define DECLARE_ARRAY_NBTNODE(Class, ValueType)                                 \
-    class Class : public NbtNode, public NbtListlikeNode<ValueType> {           \
-public:                                                                         \
-        explicit Class(int pos, int length = 0);                                \
-        QString toString() const override;                                      \
-        void accept(NodeVisitor * visitor, NodeVisitor::Order order) override { \
-            if (order == NodeVisitor::Order::Preorder) {                        \
-                visitor->visit(this);                                           \
-            }                                                                   \
-            for (const auto &elem: qAsConst(m_vector)) {                        \
-                elem->accept(visitor, order);                                   \
-            }                                                                   \
-            if (order == NodeVisitor::Order::Postorder) {                       \
-                visitor->visit(this);                                           \
-            }                                                                   \
-        }                                                                       \
-        nbt::tag_id id() const noexcept override;                               \
-    };
+#define DECLARE_ARRAY_NBTNODE(Name, ValueType)                          \
+        class Nbt ## Name ## Node : public NbtNode,                     \
+            public NbtListlikeNode<ValueType> {                         \
+public:                                                                 \
+            explicit Nbt ## Name ## Node(int length)                    \
+                : NbtNode(ParserType::NbtTag, TagType::Name, length) {  \
+                m_isValid = true;                                       \
+            };                                                          \
+            void accept(NodeVisitor * visitor, VisitOrder order) final; \
+        };                                                              \
 
-    DECLARE_ARRAY_NBTNODE(NbtByteArrayNode, NbtByteNode)
-    DECLARE_ARRAY_NBTNODE(NbtIntArrayNode, NbtIntNode)
-    DECLARE_ARRAY_NBTNODE(NbtLongArrayNode, NbtLongNode)
+    DECLARE_ARRAY_NBTNODE(ByteArray, NbtByteNode)
+    DECLARE_ARRAY_NBTNODE(IntArray, NbtIntNode)
+    DECLARE_ARRAY_NBTNODE(LongArray, NbtLongNode)
 
 #undef DECLARE_ARRAY_NBTNODE
 
-    class NbtStringNode : public NbtNode {
-public:
-        explicit NbtStringNode(int pos,
-                               const QString &value,
-                               bool isQuote = false);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
-        QString value() const;
-        void setValue(const QString &v);
-        nbt::tag_id id() const noexcept override;
-private:
-        QString m_value;
-    };
+    using NbtPtr = QSharedPointer<NbtNode>;
 
     class NbtListNode : public NbtNode, public NbtListlikeNode<NbtNode> {
 public:
-        explicit NbtListNode(int pos, int length = 0);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
-        void append(QSharedPointer<NbtNode> node) override;
-        nbt::tag_id id() const noexcept override;
-        nbt::tag_id prefix() const;
-        void setPrefix(const nbt::tag_id &prefix);
+        explicit NbtListNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
+        void append(NbtPtr node) final;
+
+        TagType prefix() const;
+        void setPrefix(TagType prefix);
+
 private:
-        nbt::tag_id m_prefix;
+        TagType m_prefix = TagType::Unknown;
     };
 
-    using NbtNodeMap = QMap<MapKey, QSharedPointer<NbtNode> >;
-
-    class NbtCompoundNode : public NbtNode
-    {
+    class NbtCompoundNode : public NbtNode {
 public:
-        NbtCompoundNode(int pos, int length = 0);
 
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order)
-        override;
+        using Pair  = QSharedPointer<PairNode<NbtPtr> >;
+        using Pairs = QVector<Pair>;
+
+        explicit NbtCompoundNode(int length = 0);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         int size() const;
+        bool isEmpty() const;
         bool contains(const QString &key) const;
-        bool contains(const MapKey &key) const;
-        NbtNodeMap::const_iterator find(const QString &key) const;
-        void insert(const MapKey &key, QSharedPointer<NbtNode> node);
-        int remove(const MapKey &key);
+        Pairs::const_iterator find(const QString &key) const;
+        void insert(KeyPtr key, NbtPtr node);
         void clear();
-        QSharedPointer<NbtNode> &operator[](const MapKey &key);
-        const QSharedPointer<NbtNode> operator[](const MapKey &key) const;
-        NbtNodeMap toMap() const;
+        PairNode<NbtPtr> inline * constLast() const {
+            return m_pairs.constLast().data();
+        }
+        Pairs pairs() const;
 
 private:
-        NbtNodeMap m_map;
+        Pairs m_pairs;
     };
+
+    DECLARE_TYPE_ENUM_FULL(NbtCompoundNode, ArgumentNode::ParserType,
+                           NbtCompoundTag)
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtByteNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtDoubleNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtFloatNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtIntNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtLongNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtShortNode>)
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtByteArrayNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtIntArrayNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtLongArrayNode>)
-
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtStringNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtListNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::NbtCompoundNode>)
 
 #endif /* NBTNODES_H */

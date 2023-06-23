@@ -1,26 +1,35 @@
 #include "globalhelpers.h"
 
-#include "mainwindow.h"
-#include "vieweventfilter.h"
-
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QRandomGenerator>
+#include <QStringMatcher>
 
 using namespace Glhp;
 
-QString Glhp::randStr(int length) {
-    static const QLatin1String charset("abcdefghijklmnopqrstuvwxyz0123456789");
-    QString                    r;
+QChar Glhp::randChr(QStringView charset) {
+    return charset.at(QRandomGenerator::global()->bounded((int)charset.size()));
+}
 
-    for (int i = 0; i < (length + 1); ++i) {
-        int index = QRandomGenerator::global()->bounded(charset.size());
-        r.append(charset.at(index));
+QString Glhp::randStr(QStringView charset, int length) {
+    QString result;
+
+    for (int i = 0; i < length; ++i) {
+        const int index = QRandomGenerator::global()->bounded(
+            (int)charset.size());
+        result.append(charset.at(index));
     }
-    return r;
+    return result;
+}
+
+QString Glhp::randStr(int length) {
+    static const QString charset = QStringLiteral(
+        "abcdefghijklmnopqrstuvwxyz0123456789");
+
+    return randStr(charset, length);
 }
 
 QString Glhp::relPath(const QString &dirpath, QString path) {
@@ -35,7 +44,7 @@ QString Glhp::relPath(const QString &dirpath, QString path) {
 QString Glhp::relNamespace(const QString &dirpath, QString path) {
     QString &&rp = relPath(dirpath, std::move(path));
 
-    if (removePrefix(rp, QStringLiteral("data/")))
+    if (removePrefix(rp, "data/"_QL1))
         rp = rp.section('/', 0, 0);
     else
         rp.clear();
@@ -47,9 +56,9 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    static const QStringList imageExts =
-    { QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
-      QStringLiteral("bmp") };
+    static const QStringList imageExts{
+        QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
+        QStringLiteral("bmp") };
 
     static const QVector<QPair<QString,
                                CodeFile::FileType> > catPathToFileType {
@@ -58,6 +67,12 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         { QStringLiteral("predicates"), CodeFile::Predicate },
         { QStringLiteral("item_modifiers"), CodeFile::ItemModifier },
         { QStringLiteral("recipes"), CodeFile::Recipe },
+        { QStringLiteral("dimension"), CodeFile::Dimension },
+        { QStringLiteral("dimension_type"), CodeFile::DimensionType },
+        { QStringLiteral("chat_type"), CodeFile::ChatType },
+        { QStringLiteral("damage_type"), CodeFile::DamageType },
+        { QStringLiteral("trim_material"), CodeFile::TrimMaterial },
+        { QStringLiteral("trim_pattern"), CodeFile::TrimPattern },
         { QStringLiteral("tags/blocks"), CodeFile::BlockTag },
         { QStringLiteral("tags/entity_types"), CodeFile::EntityTypeTag },
         { QStringLiteral("tags/fluids"), CodeFile::FluidTag },
@@ -74,6 +89,8 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
           CodeFile::StructureFeature },
         { QStringLiteral("worldgen/configured_surface_builder"),
           CodeFile::SurfaceBuilder },
+        { QStringLiteral("worldgen/flat_level_generator_preset"),
+          CodeFile::FlatLevelGenPreset },
         { QStringLiteral("worldgen/noise"), CodeFile::Noise },
         { QStringLiteral("worldgen/noise_settings"), CodeFile::NoiseSettings },
         { QStringLiteral("worldgen/placed_feature"), CodeFile::PlacedFeature },
@@ -83,7 +100,7 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         { QStringLiteral("worldgen"), CodeFile::WorldGen },
     };
 
-    QFileInfo       info(filepath);
+    const QFileInfo info(filepath);
     const QString &&fullSuffix = info.suffix();
 
     if (fullSuffix == QLatin1String("mcmeta")) {
@@ -108,81 +125,106 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
 
 QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
     switch (type) {
-    case CodeFile::Function:
-        return QIcon(QStringLiteral(":/file-mcfunction"));
+        case CodeFile::Function:
+            return QIcon(QStringLiteral(":/file-mcfunction"));
 
-    case CodeFile::Structure:
-        return QIcon(QStringLiteral(":/file-nbt"));
+        case CodeFile::Structure:
+            return QIcon(QStringLiteral(":/file-nbt"));
 
-    case CodeFile::Meta:
-        return QIcon(QStringLiteral(":/file-mcmeta"));
+        case CodeFile::Meta:
+            return QIcon(QStringLiteral(":/file-mcmeta"));
 
-    default: {
-        if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
-            return QIcon(QStringLiteral(":/file-json"));
+        default: {
+            if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
+                return QIcon(QStringLiteral(":/file-json"));
 
-        break;
-    }
+            break;
+        }
     }
     return QIcon();
 }
 
-bool Glhp::isPathRelativeTo(const QString &dirpath,
-                            const QString &path,
-                            const QString &catDir) {
-    const QString &&tmpDir = dirpath + QStringLiteral("/data/");
+bool Glhp::isPathRelativeTo(const QString &dirpath, QStringView path,
+                            QStringView category) {
+    static QString && dataDir{};
+    dataDir = dirpath + "/data/"_QL1;
 
-    if (!path.startsWith(tmpDir)) return false;
+    if (!path.startsWith(dataDir))
+        return false;
 
-    return path.mid(tmpDir.length()).section('/', 1).startsWith(catDir);
+    const int sepIndex = path.indexOf('/', dataDir.length() + 1);
+    if (sepIndex == -1)
+        return false;
+
+    return path.mid(sepIndex + 1).startsWith(category);
 }
 
-QString Glhp::toNamespacedID(const QString &dirpath,
-                             QString filepath,
+QString Glhp::toNamespacedID(const QString &dirpath, QStringView filepath,
                              bool noTagForm) {
-    const QString &&datapath = dirpath + QStringLiteral("/data/");
-    QString         r;
+    const QString &&dataDir = dirpath + QStringLiteral("/data/");
 
-    if (filepath.startsWith(datapath)) {
-        const auto &&finfo = QFileInfo(filepath);
-        filepath = finfo.dir().path() + '/' + finfo.completeBaseName();
-        filepath.remove(0, datapath.length());
-        if (!noTagForm && isPathRelativeTo(dirpath, finfo.filePath(),
-                                           QStringLiteral("tags"))) {
-            if (filepath.split('/').count() >= 4) {
-                r = QLatin1Char('#') + filepath.section('/', 0, 0)
-                    + QLatin1Char(':') + filepath.section('/', 3);
-            }
-        } else {
-            if (filepath.split('/').count() >= 3) {
-                r = filepath.section('/', 0, 0)
-                    + QLatin1Char(':') + filepath.section('/', 2);
-            }
-        }
+    if (!filepath.startsWith(dataDir))
+        return QString();
+
+    static QStringMatcher sepMatcher(u"/");
+
+    // Extract namespace part
+    int sepIndex = sepMatcher.indexIn(filepath, dataDir.length() + 1);
+    if (sepIndex == -1)
+        return QString();
+
+    const QString &&nameSpace = filepath.mid(dataDir.length(),
+                                             sepIndex -
+                                             dataDir.length()).toString();
+
+    // Extract ID part
+    bool isTag = false;
+    if (filepath.mid(sepIndex).startsWith("/tags/"_QL1)) {
+        isTag    = true;
+        sepIndex = sepMatcher.indexIn(filepath, sepIndex + 1);
+        if (sepIndex == -1)
+            return QString();
     }
-    return r;
+
+    if (filepath.mid(sepIndex).startsWith("/worldgen/"_QL1)) {
+        sepIndex = sepMatcher.indexIn(filepath, sepIndex + 1);
+        if (sepIndex == -1)
+            return QString();
+    }
+
+    sepIndex = sepMatcher.indexIn(filepath, sepIndex + 1);
+    if (sepIndex == -1)
+        return QString();
+
+    const int       lastDot = filepath.lastIndexOf('.');
+    const QString &&id      =
+        filepath.mid(sepIndex + 1, lastDot - sepIndex - 1).toString();
+
+    if (isTag && !noTagForm) {
+        return "#"_QL1 + nameSpace + ":"_QL1 + id;
+    } else {
+        return nameSpace + ":"_QL1 + id;
+    }
 }
 
-QVariant Glhp::strToVariant(const QString &str) {
+QVariant Glhp::strToVariant(QStringView str) {
     bool isInt;
     auto intValue = str.toInt(&isInt);
 
     if (isInt) {
         return intValue;
+    } else if (str == QLatin1String("true")) {
+        return true;
+    } else if (str == QLatin1String("false")) {
+        return false;
     } else {
-        if (str == QLatin1String("true") || str == QLatin1String("false")) {
-            return str == QLatin1String("true");
-        } else {
-            return str;
-        }
+        return str.toString();
     }
 }
 
 QString Glhp::variantToStr(const QVariant &vari) {
     if (vari.type() == QVariant::Bool)
         return vari.toBool() ? QStringLiteral("true") : QStringLiteral("false");
-    else if (vari.type() == QVariant::Int)
-        return vari.toString();
     else
         return vari.toString();
 }
@@ -220,6 +262,11 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
                 appendPerCategory(nspace, "predicates");
                 appendPerCategory(nspace, "item_modifiers");
                 appendPerCategory(nspace, "recipes");
+                appendPerCategory(nspace, "dimension");
+                appendPerCategory(nspace, "dimension_type");
+                appendPerCategory(nspace, "chat_type");
+                appendPerCategory(nspace, "trim_material");
+                appendPerCategory(nspace, "trim_pattern");
                 appendPerCategory(nspace, "tag");
                 appendPerCategory(nspace, "worldgen");
             }
@@ -227,8 +274,9 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
 
 
     if (nspace.isEmpty()) {
-        QDir   dir(dataPath);
-        auto &&nspaceDirs = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        QDir         dir(dataPath);
+        const auto &&nspaceDirs = dir.entryList(
+            QDir::Dirs | QDir::NoDotAndDotDot);
         for (const auto &nspaceDir : nspaceDirs) {
             appendIDToList(nspaceDir.section('.', 0, 0), catDir);
         }
@@ -238,7 +286,15 @@ QVector<QString> Glhp::fileIdList(const QString &dirpath, const QString &catDir,
     return idList;
 }
 
-bool Glhp::removePrefix(QString &str, const QString &prefix) {
+bool Glhp::removePrefix(QString &str, QLatin1String prefix) {
+    bool &&r = str.startsWith(prefix);
+
+    if (r)
+        str.remove(0, prefix.size());
+    return r;
+}
+
+bool Glhp::removePrefix(QString &str, QStringView prefix) {
     bool &&r = str.startsWith(prefix);
 
     if (r)
@@ -267,42 +323,50 @@ const QMap<QString, QString> Glhp::colorHexes = {
 
 
 QString Glhp::fileTypeToName(const CodeFile::FileType type) {
-    static QHash<CodeFile::FileType, const char*> const valueMap = {
-        { CodeFile::Binary,            QT_TR_NOOP("Binary")            },
-        { CodeFile::Structure,         QT_TR_NOOP("Structure")         },
-        { CodeFile::Image,             QT_TR_NOOP("Image")             },
-        { CodeFile::Text,              QT_TR_NOOP("Other")             },
-        { CodeFile::Function,          QT_TR_NOOP("Function")          },
-        { CodeFile::JsonText,          QT_TR_NOOP("JSON")              },
-        { CodeFile::Advancement,       QT_TR_NOOP("Advancement")       },
-        { CodeFile::LootTable,         QT_TR_NOOP("Loot table")        },
-        { CodeFile::Meta,              QT_TR_NOOP("Information")       },
-        { CodeFile::Predicate,         QT_TR_NOOP("Predicate")         },
-        { CodeFile::ItemModifier,      QT_TR_NOOP("Item modifier")     },
-        { CodeFile::Recipe,            QT_TR_NOOP("Recipe")            },
-        { CodeFile::BlockTag,          QT_TR_NOOP("Block tag")         },
-        { CodeFile::EntityTypeTag,     QT_TR_NOOP("Entity type tag")   },
-        { CodeFile::FluidTag,          QT_TR_NOOP("Fluid tag")         },
-        { CodeFile::FunctionTag,       QT_TR_NOOP("Function tag")      },
-        { CodeFile::ItemTag,           QT_TR_NOOP("Item tag")          },
-        { CodeFile::GameEventTag,      QT_TR_NOOP("Game event tag")    },
-        { CodeFile::Tag,               QT_TR_NOOP("Tag")               },
-        { CodeFile::WorldGen,          QT_TR_NOOP("World generation")  },
-        { CodeFile::Biome,             QT_TR_NOOP("Biome")             },
-        { CodeFile::ConfiguredCarver,  QT_TR_NOOP("Carver")            },
-        { CodeFile::ConfiguredFeature, QT_TR_NOOP("Feature")           },
-        { CodeFile::StructureFeature,  QT_TR_NOOP("Structure feature") },
-        { CodeFile::SurfaceBuilder,    QT_TR_NOOP("Surface builder")   },
-        { CodeFile::Noise,             QT_TR_NOOP("Noise")             },
-        { CodeFile::NoiseSettings,     QT_TR_NOOP("Noise settings")    },
-        { CodeFile::PlacedFeature,     QT_TR_NOOP("Placed feature")    },
-        { CodeFile::ProcessorList,     QT_TR_NOOP("Processor list")    },
-        { CodeFile::StructureSet,     QT_TR_NOOP("Structure set")      },
-        { CodeFile::TemplatePool,      QT_TR_NOOP("Jigsaw pool")       },
+    static QHash<CodeFile::FileType, const char *> const valueMap {
+        { CodeFile::Binary, QT_TR_NOOP("Binary") },
+        { CodeFile::Structure, QT_TR_NOOP("Structure") },
+        { CodeFile::Image, QT_TR_NOOP("Image") },
+        { CodeFile::Text, QT_TR_NOOP("Other") },
+        { CodeFile::Function, QT_TR_NOOP("Function") },
+        { CodeFile::JsonText, QT_TR_NOOP("JSON") },
+        { CodeFile::Advancement, QT_TR_NOOP("Advancement") },
+        { CodeFile::LootTable, QT_TR_NOOP("Loot table") },
+        { CodeFile::Meta, QT_TR_NOOP("Information") },
+        { CodeFile::Predicate, QT_TR_NOOP("Predicate") },
+        { CodeFile::ItemModifier, QT_TR_NOOP("Item modifier") },
+        { CodeFile::Recipe, QT_TR_NOOP("Recipe") },
+        { CodeFile::Dimension, QT_TR_NOOP("Dimension") },
+        { CodeFile::DimensionType, QT_TR_NOOP("Dimension type") },
+        { CodeFile::ChatType, QT_TR_NOOP("Chat type") },
+        { CodeFile::DamageType, QT_TR_NOOP("Damage type") },
+        { CodeFile::TrimMaterial, QT_TR_NOOP("Trim material") },
+        { CodeFile::TrimPattern, QT_TR_NOOP("Trim pattern") },
+        { CodeFile::BlockTag, QT_TR_NOOP("Block tag") },
+        { CodeFile::EntityTypeTag, QT_TR_NOOP("Entity type tag") },
+        { CodeFile::FluidTag, QT_TR_NOOP("Fluid tag") },
+        { CodeFile::FunctionTag, QT_TR_NOOP("Function tag") },
+        { CodeFile::ItemTag, QT_TR_NOOP("Item tag") },
+        { CodeFile::GameEventTag, QT_TR_NOOP("Game event tag") },
+        { CodeFile::Tag, QT_TR_NOOP("Tag") },
+        { CodeFile::WorldGen, QT_TR_NOOP("World generation") },
+        { CodeFile::Biome, QT_TR_NOOP("Biome") },
+        { CodeFile::ConfiguredCarver, QT_TR_NOOP("Carver") },
+        { CodeFile::ConfiguredFeature, QT_TR_NOOP("Feature") },
+        { CodeFile::StructureFeature, QT_TR_NOOP("Structure feature") },
+        { CodeFile::SurfaceBuilder, QT_TR_NOOP("Surface builder") },
+        { CodeFile::Noise, QT_TR_NOOP("Noise") },
+        { CodeFile::NoiseSettings, QT_TR_NOOP("Noise settings") },
+        { CodeFile::PlacedFeature, QT_TR_NOOP("Placed feature") },
+        { CodeFile::ProcessorList, QT_TR_NOOP("Processor list") },
+        { CodeFile::StructureSet, QT_TR_NOOP("Structure set") },
+        { CodeFile::TemplatePool, QT_TR_NOOP("Jigsaw pool") },
+        { CodeFile::FlatLevelGenPreset,
+          QT_TR_NOOP("Flat world generator preset") },
     };
 
     if (type < 0)
         return QString();
 
-    return QApplication::translate("Glhp", valueMap[type]);
+    return QCoreApplication::translate("Glhp", valueMap[type]);
 }

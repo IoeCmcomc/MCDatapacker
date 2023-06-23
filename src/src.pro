@@ -3,7 +3,7 @@ TEMPLATE = app
 
 TARGET = MCDatapacker
 
-QT += core gui uitools svg
+QT += core gui uitools svg widgets-private gui-private
 win32:QT += winextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -11,11 +11,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17 lrelease embed_translations conan_basic_setup
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
+win32:LIBS += -lDwmapi
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS MCFUNCTIONPARSER_USE_CACHE
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -31,11 +33,14 @@ SOURCES += \
     codeeditor.cpp \
     codefile.cpp \
     codegutter.cpp \
+    codepalette.cpp \
+    darkfusionstyle.cpp \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
     datawidgetinterface.cpp \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
+    entitynamestextobjectdialog.cpp \
     filenamedelegate.cpp \
     fileswitcher.cpp \
     game.cpp \
@@ -60,70 +65,85 @@ SOURCES += \
     mainwindow.cpp \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
+    nbttextobjectdialog.cpp \
     newdatapackdialog.cpp \
+    parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
+    parsers/command/nodes/gamemodenode.cpp \
+    parsers/command/re2c_generated_functions.cpp \
+    parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
     parsers/command/nodes/axesnode.cpp \
-    parsers/command/nodes/axisnode.cpp \
     parsers/command/nodes/blockstatenode.cpp \
-    parsers/command/nodes/boolnode.cpp \
     parsers/command/nodes/componentnode.cpp \
-    parsers/command/nodes/doublenode.cpp \
     parsers/command/nodes/entitynode.cpp \
-    parsers/command/nodes/floatnode.cpp \
+    parsers/command/nodes/filenode.cpp \
     parsers/command/nodes/floatrangenode.cpp \
-    parsers/command/nodes/integernode.cpp \
     parsers/command/nodes/intrangenode.cpp \
     parsers/command/nodes/itemstacknode.cpp \
     parsers/command/nodes/literalnode.cpp \
     parsers/command/nodes/mapnode.cpp \
-    parsers/command/nodes/multimapnode.cpp \
     parsers/command/nodes/nbtnodes.cpp \
     parsers/command/nodes/nbtpathnode.cpp \
     parsers/command/nodes/parsenode.cpp \
     parsers/command/nodes/particlenode.cpp \
     parsers/command/nodes/resourcelocationnode.cpp \
     parsers/command/nodes/rootnode.cpp \
-    parsers/command/nodes/similaraxesnodes.cpp \
-    parsers/command/nodes/similarresourcelocationnodes.cpp \
-    parsers/command/nodes/similarstringnodes.cpp \
+    parsers/command/nodes/singlevaluenode.cpp \
     parsers/command/nodes/stringnode.cpp \
     parsers/command/nodes/swizzlenode.cpp \
     parsers/command/nodes/targetselectornode.cpp \
     parsers/command/nodes/timenode.cpp \
-    parsers/command/nodes/uuidnode.cpp \
     parsers/command/parsenodecache.cpp \
-    parsers/command/parser.cpp \
+    parsers/command/schema/schemaargumentnode.cpp \
+    parsers/command/schema/schemaliteralnode.cpp \
+    parsers/command/schema/schemanode.cpp \
+    parsers/command/schema/schemarootnode.cpp \
+    parsers/command/schemaparser.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
+    parsers/command/visitors/nodevisitor.cpp \
     parsers/command/visitors/overloadnodevisitor.cpp \
-    platforms/windows.cpp \
+    parsers/command/visitors/reprprinter.cpp \
+    parsers/command/visitors/sourceprinter.cpp \
+    parsers/jsonparser.cpp \
+    parsers/parser.cpp \
+    platforms/windows_specific.cpp \
     predicatedock.cpp \
     problemarea.cpp \
     rawjsontextedit.cpp \
+    rawjsontexteditor.cpp \
+    rawjsontextobjectinterface.cpp \
+    scoreboardtextobjectdialog.cpp \
     settingsdialog.cpp \
     stackedwidget.cpp \
     statisticsdialog.cpp \
     statusbar.cpp \
     stripedscrollbar.cpp \
+#    stylesheetreapplier.cpp \
     tabbeddocumentinterface.cpp \
     tagselectordialog.cpp \
+    translatedtextobjectdialog.cpp \
     truefalsebox.cpp \
     vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
 HEADERS += \
     aboutdialog.h \
+    abstracttextobjectdialog.h \
     basecondition.h \
     blockitemselectordialog.h \
     codeeditor.h \
     codefile.h \
     codegutter.h \
+    codepalette.h \
+    darkfusionstyle.h \
     datapackfileiconprovider.h \
     datapacktreeview.h \
     datawidgetinterface.h \
     disclaimerdialog.h \
     entityconditiondialog.h \
+    entitynamestextobjectdialog.h \
     filenamedelegate.h \
     fileswitcher.h \
     game.h \
@@ -145,25 +165,25 @@ HEADERS += \
     loottablefunction.h \
     loottablepool.h \
     mainwindow.h \
+    mcdatapacker_pch.h \
     mcfunctionhighlighter.h \
     modelfunctions.h \
+    nbttextobjectdialog.h \
     newdatapackdialog.h \
+    parsers/command/mcfunctionparser.h \
+    parsers/command/nodes/anglenode.h \
     parsers/command/nodes/argumentnode.h \
     parsers/command/nodes/axesnode.h \
-    parsers/command/nodes/axisnode.h \
     parsers/command/nodes/blockstatenode.h \
-    parsers/command/nodes/boolnode.h \
     parsers/command/nodes/componentnode.h \
-    parsers/command/nodes/doublenode.h \
     parsers/command/nodes/entitynode.h \
-    parsers/command/nodes/floatnode.h \
+    parsers/command/nodes/filenode.h \
     parsers/command/nodes/floatrangenode.h \
-    parsers/command/nodes/integernode.h \
+    parsers/command/nodes/gamemodenode.h \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/mapnode.h \
-    parsers/command/nodes/multimapnode.h \
     parsers/command/nodes/nbtnodes.h \
     parsers/command/nodes/nbtpathnode.h \
     parsers/command/nodes/parsenode.h \
@@ -171,31 +191,43 @@ HEADERS += \
     parsers/command/nodes/rangenode.h \
     parsers/command/nodes/resourcelocationnode.h \
     parsers/command/nodes/rootnode.h \
-    parsers/command/nodes/similaraxesnodes.h \
-    parsers/command/nodes/similarresourcelocationnodes.h \
-    parsers/command/nodes/similarstringnodes.h \
+    parsers/command/nodes/singlevaluenode.h \
     parsers/command/nodes/stringnode.h \
     parsers/command/nodes/swizzlenode.h \
     parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \
-    parsers/command/nodes/uuidnode.h \
     parsers/command/parsenodecache.h \
-    parsers/command/parser.h \
     parsers/command/minecraftparser.h \
+    parsers/command/re2c_functions.re \
+    parsers/command/re2c_generated_functions.h \
+    parsers/command/schema/schemaargumentnode.h \
+    parsers/command/schema/schemaliteralnode.h \
+    parsers/command/schema/schemanode.h \
+    parsers/command/schema/schemarootnode.h \
+    parsers/command/schemaparser.h \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \
-    platforms/windows.h \
+    parsers/command/visitors/reprprinter.h \
+    parsers/command/visitors/sourceprinter.h \
+    parsers/jsonparser.h \
+    parsers/parser.h \
+    platforms/windows_specific.h \
     predicatedock.h \
     problemarea.h \
     rawjsontextedit.h \
+    rawjsontexteditor.h \
+    rawjsontextobjectinterface.h \
+    scoreboardtextobjectdialog.h \
     settingsdialog.h \
     stackedwidget.h \
     statisticsdialog.h \
     statusbar.h \
     stripedscrollbar.h \
+#    stylesheetreapplier.h \ # Already added in mcdatapackerwidgets.pri
     tabbeddocumentinterface.h \
     tagselectordialog.h \
+    translatedtextobjectdialog.h \
     truefalsebox.h \
     vieweventfilter.h \
     visualrecipeeditordock.h
@@ -206,6 +238,7 @@ FORMS += \
     datawidgetinterface.ui \
     disclaimerdialog.ui \
     entityconditiondialog.ui \
+    entitynamestextobjectdialog.ui \
     itemconditiondialog.ui \
     itemmodifierdock.ui \
     locationconditiondialog.ui \
@@ -216,13 +249,16 @@ FORMS += \
     loottablepool.ui \
     mainwindow.ui \
     inventorysloteditor.ui \
+    nbttextobjectdialog.ui \
     newdatapackdialog.ui \
     predicatedock.ui \
-    rawjsontextedit.ui \
+    rawjsontexteditor.ui \
+    scoreboardtextobjectdialog.ui \
     settingsdialog.ui \
     statisticsdialog.ui \
     tabbeddocumentinterface.ui \
     tagselectordialog.ui \
+    translatedtextobjectdialog.ui \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \
@@ -241,60 +277,50 @@ RESOURCES += \
     ../resource/minecraft/info/1.17/1.17.qrc \
     ../resource/minecraft/info/1.18/1.18.qrc \
     ../resource/minecraft/info/1.18.2/1.18.2.qrc \
+    ../resource/minecraft/info/1.19/1.19.qrc \
+    ../resource/minecraft/info/1.19.3/1.19.3.qrc \
+    ../resource/minecraft/info/1.19.4/1.19.4.qrc \
+    ../resource/minecraft/info/1.20/1.20.qrc \
     ../resource/minecraft/minecraft.qrc \
     ../resource/app/icons/default/default.qrc
 
 DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
-    ../resource/app/fonts/Monocraft/LICENSE
+    ../resource/app/fonts/LICENSE_Monocraft.txt
 
 RC_ICONS = ../resource/app/icon/favicon.ico
 
 include(widgets/mcdatapackerwidgets/mcdatapackerwidgets.pri)
 
-include ($$PWD/../lib/QSimpleUpdater/QSimpleUpdater.pri)
+include($$PWD/../lib/QSimpleUpdater/QSimpleUpdater.pri)
+include($$PWD/../lib/libqdark/libqdark.pri)
+include($$PWD/../lib/json/json.pri)
+include($$PWD/../lib/uberswitch/uberswitch.pri)
+include($$PWD/../lib/lru-cache/lru-cache.pri)
+include($$PWD/../lib/miniz/miniz.pri)
+
+#PRECOMPILED_HEADER = mcdatapacker_pch.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-VERSION = 0.6.0
+VERSION_MAJOR = 0
+VERSION_MINOR = 7
+VERSION_PATCH = 0
+
+VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 QMAKE_TARGET_COMPANY = IoeCmcomc
 QMAKE_TARGET = MCDatapacker
 QMAKE_TARGET_PRODUCT = MCDatapacker
 QMAKE_TARGET_DESCRIPTION = MCDatapacker - Minecraft datapack editor
-QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2022 IoeCmcomc
+QMAKE_TARGET_COPYRIGHT = \\251 2020 - 2023 IoeCmcomc
 
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/json/release/ -ljson
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/json/debug/ -ljson
-else:unix: LIBS += -L$$OUT_PWD/../lib/json/ -ljson
-
-INCLUDEPATH += $$PWD/../lib/json \
-    $$PWD/../lib/json/json/single_include
-DEPENDPATH += $$PWD/../lib/json
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/release/libjson.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/debug/libjson.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/release/json.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/json/debug/json.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/json/libjson.a
-
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/lru-cache/release/ -llru-cache
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/lru-cache/debug/ -llru-cache
-else:unix: LIBS += -L$$OUT_PWD/../lib/lru-cache/ -llru-cache
-
-INCLUDEPATH += $$PWD/../lib/lru-cache \
-    $$PWD/../lib/lru-cache/lru-cache/include
-DEPENDPATH += $$PWD/../lib/lru-cache
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/release/liblru-cache.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/debug/liblru-cache.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/release/lru-cache.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/debug/lru-cache.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/lru-cache/liblru-cache.a
+DEFINES += APP_VERSION=\\\"$$VERSION\\\" \
+    APP_VERSION_MAJOR=$$VERSION_MAJOR \
+    APP_VERSION_MINOR=$$VERSION_MINOR \
+    APP_VERSION_PATCH=$$VERSION_PATCH
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt
@@ -326,17 +352,8 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/libQFindDialogs.a
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/miniz/release/ -lminiz
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/miniz/debug/ -lminiz
-else:unix: LIBS += -L$$OUT_PWD/../lib/miniz/ -lminiz
-
-INCLUDEPATH += $$PWD/../lib/miniz
-DEPENDPATH += $$PWD/../lib/miniz
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/release/libminiz.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/libminiz.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/release/miniz.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/debug/miniz.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/miniz/libminiz.a
+msvc: {
+win32: LIBS += -lAdvAPI32
+}
 
 #message($$INCLUDEPATH)

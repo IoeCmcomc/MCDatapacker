@@ -1,35 +1,71 @@
 #ifndef AXESNODE_H
 #define AXESNODE_H
 
-#include "argumentnode.h"
-#include "axisnode.h"
+#include "anglenode.h"
 
 namespace Command {
-    class AxesNode : public ArgumentNode /* Axes, as the plural form of 'axis' */
+    using AnglePtr = QSharedPointer<AngleNode>;
+
+    class TwoAxesNode : public ArgumentNode
     {
 public:
-        explicit AxesNode(int pos = -1, int length = 0);
-        virtual QString toString() const override;
-        bool isVaild() const override;
-        virtual void accept(NodeVisitor *visitor,
-                            NodeVisitor::Order order) override;
+        AnglePtr firstAxis() const;
+        void setFirstAxis(AnglePtr axis);
 
-        QSharedPointer<AxisNode> y();
-        void setY(QSharedPointer<AxisNode> y);
+        AnglePtr secondAxis() const;
+        void setSecondAxis(AnglePtr axis);
 
-        QSharedPointer<AxisNode> x() const;
-        void setX(QSharedPointer<AxisNode> x);
+protected:
+        explicit TwoAxesNode(ParserType parserType, int length);
 
-        QSharedPointer<AxisNode> z() const;
-        void setZ(QSharedPointer<AxisNode> z);
+        void _accept(NodeVisitor *visitor, VisitOrder order);
 
 private:
-        QSharedPointer<AxisNode> m_x = nullptr;
-        QSharedPointer<AxisNode> m_z = nullptr;
-        QSharedPointer<AxisNode> m_y = nullptr;
+        AnglePtr m_first  = nullptr;
+        AnglePtr m_second = nullptr;
+    };
+
+    class XyzNode : public ArgumentNode
+    {
+public:
+        AnglePtr y();
+        void setY(AnglePtr y);
+
+        AnglePtr x() const;
+        void setX(AnglePtr x);
+
+        AnglePtr z() const;
+        void setZ(AnglePtr z);
+
+protected:
+        explicit XyzNode(ParserType parserType, int length);
+
+        void _accept(NodeVisitor *visitor, VisitOrder order);
+
+private:
+        AnglePtr m_x = nullptr;
+        AnglePtr m_y = nullptr;
+        AnglePtr m_z = nullptr;
     };
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::AxesNode>)
+#define DECLARE_NODE_CLASS(Name, Base)                                \
+        namespace Command {                                           \
+            class Name ## Node : public Base {                        \
+public:                                                               \
+                explicit Name ## Node(int length) : Base(             \
+                        ArgumentNode::ParserType::Name, length) {}    \
+                void accept(NodeVisitor * visitor, VisitOrder) final; \
+            };                                                        \
+            DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Name)         \
+        }                                                             \
+
+DECLARE_NODE_CLASS(BlockPos, XyzNode)
+DECLARE_NODE_CLASS(ColumnPos, TwoAxesNode)
+DECLARE_NODE_CLASS(Rotation, TwoAxesNode)
+DECLARE_NODE_CLASS(Vec2, TwoAxesNode)
+DECLARE_NODE_CLASS(Vec3, XyzNode)
+
+#undef DECLARE_NODE_CLASS
 
 #endif /* AXESNODE_H */

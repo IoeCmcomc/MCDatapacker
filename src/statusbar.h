@@ -11,6 +11,7 @@ class MainWindow;
 class TabbedDocumentInterface;
 class QLabel;
 class ImgViewer;
+class CodeEditor;
 
 class StatusBar : public QStatusBar
 {
@@ -23,8 +24,7 @@ public:
     void onCurFileChanged();
 
 public slots:
-    void updateCodeEditorStatus(CodeEditor *editor);
-    void updateImgViewerStatus(ImgViewer *viewer);
+    void updateStatusFrom(QWidget *widget);
 
 protected:
     void changeEvent(QEvent *e) override;
@@ -36,7 +36,10 @@ private:
     QLabel *m_packFmtLabel                     = nullptr;
     QLabel *m_tabsLabel                        = nullptr;
     QLabel *m_fileLabel                        = nullptr;
-    QVector<QLabel*> m_editorLabels;
+    QVector<QLabel *> m_editorLabels;
+
+    void updateCodeEditorStatus(CodeEditor *editor);
+    void updateImgViewerStatus(ImgViewer *viewer);
 };
 
 #endif /* STATUSBAR_H */

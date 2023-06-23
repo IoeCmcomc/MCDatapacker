@@ -8,17 +8,20 @@
 #include "disclaimerdialog.h"
 #include "tabbeddocumentinterface.h"
 #include "parsers/command/minecraftparser.h"
-#include "imgviewer.h"
 #include "visualrecipeeditordock.h"
 #include "loottableeditordock.h"
 #include "predicatedock.h"
 #include "itemmodifierdock.h"
 #include "statisticsdialog.h"
-#include "rawjsontextedit.h"
+#include "rawjsontexteditor.h"
+#include "darkfusionstyle.h"
+
 #include "game.h"
+#include "platforms/windows_specific.h"
 
 #include "QSimpleUpdater.h"
-#include "miniz-cpp/zip.hpp"
+#include "zip.hpp"
+#include "SystemThemeHelper.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -34,16 +37,20 @@
 #include <QClipboard>
 #include <QProgressDialog>
 #include <QSaveFile>
-
+#include <QDesktopServices>
 
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+    : QMainWindow(parent), ui(new Ui::MainWindow),
+    m_systemThemeHelper{new libqdark::SystemThemeHelper(this)} {
     ui->setupUi(this);
 
+    m_initialStyleId = style()->objectName();
+    moveOldSettings();
     readSettings();
+    loadLanguage(locale().name());
 
     /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
@@ -62,17 +69,12 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onCurFileChanged);
     connect(ui->datapackTreeView, &DatapackTreeView::openFileRequested,
             ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
-    connect(this, &MainWindow::gameVersionChanged, ui->tabbedInterface,
-            &TabbedDocumentInterface::onGameVersionChanged);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &CodeEditor::updateStatusBarRequest,
-            m_statusBar, &StatusBar::updateCodeEditorStatus);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &CodeEditor::showMessageRequest,
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::updateStatusBarRequest,
+            m_statusBar, &StatusBar::updateStatusFrom);
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::showMessageRequest,
             m_statusBar, &StatusBar::showMessage);
-    connect(ui->tabbedInterface->getImgViewer(),
-            &ImgViewer::updateStatusBarRequest,
-            m_statusBar, &StatusBar::updateImgViewerStatus);
 
     #ifndef QT_NO_SESSIONMANAGER
     QGuiApplication::setFallbackSessionManagementEnabled(false);
@@ -83,6 +85,9 @@ MainWindow::MainWindow(QWidget *parent)
     initDocks();
 
     auto *updater = QSimpleUpdater::getInstance();
+#ifdef Q_OS_WIN64
+    updater->setPlatformKey(updateDefUrl, "windows-x64");
+#endif
     updater->setModuleVersion(updateDefUrl,
                               QCoreApplication::applicationVersion());
     updater->setUseCustomInstallProcedures(updateDefUrl, true);
@@ -96,8 +101,22 @@ MainWindow::MainWindow(QWidget *parent)
     if (QFile::exists(oldProgramFile))
         QFile::remove(oldProgramFile);
 
-    updater->setNotifyOnFinish(updateDefUrl, false);
-    updater->checkForUpdates(updateDefUrl);
+//    updater->setNotifyOnFinish(updateDefUrl, false);
+//    updater->checkForUpdates(updateDefUrl);
+
+#ifdef Q_OS_WIN
+    QObject::connect(m_systemThemeHelper,
+                     &libqdark::SystemThemeHelper::signalLightTheme,
+                     this, [this]{
+        onColorModeChanged(false);
+    });
+    QObject::connect(m_systemThemeHelper,
+                     &libqdark::SystemThemeHelper::signalDarkTheme,
+                     this, [this]{
+        onColorModeChanged(true);
+    });
+    m_systemThemeHelper->setEnabled(true);
+#endif
 }
 
 void MainWindow::initDocks() {
@@ -163,27 +182,59 @@ void MainWindow::initMenu() {
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::pref_settings);
     /* Help menu */
+    initResourcesMenu();
     connect(ui->actionAboutApp, &QAction::triggered, this, &MainWindow::about);
     connect(ui->actionCheckForUpdates, &QAction::triggered,
             this, &MainWindow::checkForUpdates);
     connect(ui->actionDisclaimer, &QAction::triggered, this,
             &MainWindow::disclaimer);
-    connect(ui->actionAboutQt, &QAction::triggered, [this]() {
+    connect(ui->actionAboutQt, &QAction::triggered, this, [this]() {
         QMessageBox::aboutQt(this);
     });
 
     /* Menu items status update connections */
-    connect(ui->tabbedInterface->getStackedWidget(),
-            &QStackedWidget::currentChanged, this, &MainWindow::updateEditMenu);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &QPlainTextEdit::copyAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &QPlainTextEdit::undoAvailable, this, &MainWindow::updateEditMenu);
-    connect(ui->tabbedInterface->getCodeEditor(),
-            &QPlainTextEdit::redoAvailable, this, &MainWindow::updateEditMenu);
+    connect(ui->tabbedInterface,
+            &TabbedDocumentInterface::updateEditMenuRequest, this,
+            &MainWindow::updateEditMenu);
     connect(qApp->clipboard(), &QClipboard::changed, this,
             &MainWindow::updateEditMenu);
     ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+}
+
+void MainWindow::connectActionLink(QAction *action, const QString &&url) {
+    connect(action, &QAction::triggered, this, [url](){
+        QDesktopServices::openUrl(QUrl(url));
+    });
+}
+
+void MainWindow::initResourcesMenu() {
+    // Online tools
+    connectActionLink(ui->actionUuidConverter, QStringLiteral(
+                          R"(https://www.soltoder.com/mc-uuid-converter/)"));
+    connectActionLink(ui->actionSnowcapped, QStringLiteral(
+                          R"(https://snowcapped.jacobsjo.eu/)"));
+    connectActionLink(ui->actionGenerators, QStringLiteral(
+                          R"(https://misode.github.io/)"));
+    connectActionLink(ui->actionUpgrader, QStringLiteral(
+                          R"(https://misode.github.io/upgrader/)"));
+    connectActionLink(ui->actionMcstacker, QStringLiteral(
+                          R"(https://mcstacker.net/)"));
+    connectActionLink(ui->actionMinecraft_Tools, QStringLiteral(
+                          R"(https://minecraft.tools/en/)"));
+    // Offline tools
+    connectActionLink(ui->actionPackSquash, QStringLiteral(
+                          R"(https://github.com/ComunidadAylas/PackSquash/)"));
+    // Minecraft mods
+    connectActionLink(ui->actionBetterCommandBlockUi, QStringLiteral(
+                          R"(https://modrinth.com/mod/bettercommandblockui/)"));
+    connectActionLink(ui->actionDataReload, QStringLiteral(
+                          R"(https://modrinth.com/mod/data-reload/)"));
+    connectActionLink(ui->actionNbtAutocomplete, QStringLiteral(
+                          R"(https://modrinth.com/mod/nbt-autocomplete/)"));
+    connectActionLink(ui->actionCommandHelper, QStringLiteral(
+                          R"(https://github.com/SomeKitten/CommandHelper/)"));
+    connectActionLink(ui->actionNbtTooltips, QStringLiteral(
+                          R"(https://modrinth.com/mod/nbttooltips)"));
 }
 
 void MainWindow::open() {
@@ -211,7 +262,7 @@ bool MainWindow::save() {
         return false;
 
     if (auto *curFile = ui->tabbedInterface->getCurFile();
-        curFile->fileInfo.fileName().isEmpty()) {
+        curFile->name().isEmpty()) {
         QString filepath
             = QFileDialog::getSaveFileName(this, tr("Save File"), QString());
         if (!filepath.isEmpty())
@@ -237,13 +288,25 @@ void MainWindow::restart() {
 }
 
 void MainWindow::statistics() {
-    new StatisticsDialog(this);
+    auto *dialog = new StatisticsDialog(this);
+
+    connect(dialog, &StatisticsDialog::openFileWithLineRequested,
+            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFileWithLine);
 }
 
 void MainWindow::rawJsonTextEditor() {
-    auto *editor = new RawJsonTextEdit(this);
+    auto *editor = new RawJsonTextEditor(this);
 
-    editor->setWindowFlags(Qt::Tool);
+#ifdef Q_OS_LINUX
+    editor->setWindowFlags(
+        Qt::Window | Qt::FramelessWindowHint | Qt::CustomizeWindowHint | Qt::WindowTitleHint |
+        Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+#else
+    editor->setWindowFlags(
+        Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint |
+        Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint);
+#endif
+    editor->setWindowModality(Qt::NonModal);
     editor->setAttribute(Qt::WA_DeleteOnClose);
     editor->show();
     editor->activateWindow();
@@ -253,7 +316,7 @@ void MainWindow::pref_settings() {
     SettingsDialog dialog(this);
 
     if (dialog.exec() == QDialog::Accepted) {
-        QSettings settings{};
+        QSettings settings;
         readPrefSettings(settings, true);
     }
 }
@@ -294,8 +357,8 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
         }
     }
 
-    auto reloadExternChanges = QSettings().value("general/reloadExternChanges",
-                                                 0);
+    auto reloadExternChanges = QSettings().value(
+        "general/reloadExternChanges", 0);
     if (reloadExternChanges == 1) {
         if (uniqueMessageBox != nullptr) return;
 
@@ -335,6 +398,7 @@ void MainWindow::onCurFileChanged(const QString &path) {
     predicateDock->setVisible(curFileType == CodeFile::Predicate);
     if (itemModifierDock)
         itemModifierDock->setVisible(curFileType == CodeFile::ItemModifier);
+    updateEditMenu();
     m_statusBar->onCurFileChanged();
 }
 
@@ -381,20 +445,21 @@ void MainWindow::readSettings() {
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
-    const QString &style = settings.value(QStringLiteral("theme"),
-                                          qApp->style()->objectName()).toString();
+    settings.beginGroup(QStringLiteral("interface"));
 
-    if (style.toLower() != qApp->style()->objectName()) {
-        qApp->setStyle(style);
-    }
+    Windows::setDarkFrame(this, Windows::isDarkMode());
+    changeAppStyle(Windows::isDarkMode());
 
-    settings.beginGroup(QStringLiteral("general"));
-    loadLanguage(settings.value(QStringLiteral("locale"), QString()).toString(),
-                 true);
-    const QString &&gameVer = settings.value(QStringLiteral("gameVersion"),
-                                             Game::defaultVersionString).
-                              toString();
+    qInfo() << "The application style has been set to" << qApp->style();
 
+    const QString &localeCode =
+        settings.value(QStringLiteral("locale"), QString()).toString();
+    setLocale(localeCode.isEmpty() ? QLocale::system().name() : localeCode);
+    settings.endGroup();
+
+    settings.beginGroup(QStringLiteral("game"));
+    const QString &&gameVer = settings.value(
+        QStringLiteral("version"), Game::defaultVersionString).toString();
     if (gameVer != tempGameVerStr) {
         if (fromDialog) {
             QMessageBox msgBox(QMessageBox::Warning,
@@ -412,28 +477,24 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
             if (msgBox.clickedButton() == restartBtn) {
                 restart();
             } else {
-                settings.setValue("gameVersion", tempGameVerStr); // Set value explicitly
+                settings.setValue("version", tempGameVerStr); // Set value explicitly
             }
         } else {
-            settings.setValue(QStringLiteral("gameVersion"), gameVer); // Set value explicitly
+            settings.setValue(QStringLiteral("version"), gameVer); // Set value explicitly
             tempGameVerStr = gameVer;
-            Command::MinecraftParser::setSchema(
-                QStringLiteral(":/minecraft/") + gameVer +
-                QStringLiteral("/summary/commands/data.min.json"));
-            Command::MinecraftParser::limitScoreboardObjectiveLength
-                = Game::version() < Game::v1_18;
+            Command::MinecraftParser::setGameVer(Game::version());
 
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);
         }
     }
     settings.endGroup();
-    ui->tabbedInterface->getCodeEditor()->readPrefSettings();
+
+    emit ui->tabbedInterface->settingsChanged();
 }
 
 void MainWindow::writeSettings() {
-    QSettings settings(QCoreApplication::organizationName(),
-                       QCoreApplication::applicationName());
+    QSettings settings;
 
     settings.beginGroup("geometry");
     settings.setValue("isMaximized", isMaximized());
@@ -442,6 +503,25 @@ void MainWindow::writeSettings() {
         settings.setValue("pos", pos());
     }
     settings.endGroup();
+}
+
+void MainWindow::moveSetting(QSettings &settings, const QString &oldKey,
+                             const QString &newKey) {
+    if (settings.contains(oldKey)) {
+        settings.setValue(newKey, settings.value(oldKey));
+        settings.remove(oldKey);
+    }
+}
+
+void MainWindow::moveOldSettings() {
+    QSettings settings;
+
+    moveSetting(settings, QStringLiteral("theme"),
+                QStringLiteral("interface/style"));
+    moveSetting(settings, QStringLiteral("general/gameVersion"),
+                QStringLiteral("game/version"));
+    moveSetting(settings, QStringLiteral("general/locale"),
+                QStringLiteral("interface/locale"));
 }
 
 bool MainWindow::maybeSave() {
@@ -480,7 +560,7 @@ void MainWindow::openFolder(const QString &dirpath) {
             loadFolder(dirpath, metaInfo);
         } else {
             QMessageBox::critical(this,
-                                  tr("Invaild datapack"),
+                                  tr("Invalid datapack"),
                                   tr(
                                       "The pack format in the pack.memeta file must be greater than zero."));
         }
@@ -509,7 +589,7 @@ void MainWindow::loadFolder(const QString &dirPath,
     m_statusBar->onCurDirChanged();
     adjustForCurFolder(dirPath);
 
-    ui->menuTools->setEnabled(true);
+    ui->actionStatistics->setEnabled(true);
 
 #ifndef QT_NO_CURSOR
     QGuiApplication::restoreOverrideCursor();
@@ -599,21 +679,12 @@ PackMetaInfo MainWindow::readPackMcmeta(const QString &filepath,
     return ret;
 }
 
-QString MainWindow::getCurLocale() {
-    return this->curLocale.name();
-}
-
-void MainWindow::loadLanguage(const QString &rLanguage, bool atStartup) {
-    if ((curLocale.bcp47Name() != rLanguage) || atStartup) {
-        curLocale = (rLanguage.isEmpty()) ? QLocale::system() : QLocale(
-            rLanguage);
-        QLocale::setDefault(curLocale);
-        const QString &&langCode        = curLocale.bcp47Name();
-        QString       &&translationFile = QString("MCDatapacker_%1").arg(
-            langCode);
-        switchTranslator(m_translatorQt, QString("qt_%1").arg(langCode));
-        switchTranslator(m_translator, translationFile);
-    }
+void MainWindow::loadLanguage(const QString &langCode) {
+    QLocale::setDefault(locale());
+    QString &&translationFile = QString("MCDatapacker_%1").arg(
+        langCode);
+    switchTranslator(m_translatorQt, QString("qt_%1").arg(langCode));
+    switchTranslator(m_translator, translationFile);
 }
 
 void MainWindow::switchTranslator(QTranslator &translator,
@@ -683,18 +754,14 @@ void MainWindow::updateRecentFolders() {
 }
 
 void MainWindow::updateEditMenu() {
-    if (ui->tabbedInterface->getStackedWidget()->currentIndex() == 1) {
-        ui->actionUndo->setEnabled(
-            ui->tabbedInterface->getCodeEditor()->getCanUndo());
-        ui->actionRedo->setEnabled(
-            ui->tabbedInterface->getCodeEditor()->getCanRedo());
+    if (auto *editor = ui->tabbedInterface->getCodeEditor()) {
+        ui->actionUndo->setEnabled(editor->getCanUndo());
+        ui->actionRedo->setEnabled(editor->getCanRedo());
         ui->actionSelectAll->setEnabled(true);
-        const bool hasSelection =
-            ui->tabbedInterface->getCodeEditor()->textCursor().hasSelection();
+        const bool hasSelection = editor->textCursor().hasSelection();
         ui->actionCut->setEnabled(hasSelection);
         ui->actionCopy->setEnabled(hasSelection);
-        ui->actionPaste->setEnabled(
-            ui->tabbedInterface->getCodeEditor()->canPaste());
+        ui->actionPaste->setEnabled(editor->canPaste());
     } else {
         ui->actionUndo->setEnabled(false);
         ui->actionRedo->setEnabled(false);
@@ -705,21 +772,53 @@ void MainWindow::updateEditMenu() {
     }
 }
 
+void MainWindow::changeAppStyle(const bool darkMode) {
+    QSettings      settings;
+    const QString &styleId = settings.value(
+        QStringLiteral("interface/style"),
+        qApp->style()->objectName()).toString();
+
+    if (!darkMode) {
+        if (styleId.toCaseFolded() !=
+            qApp->style()->objectName().toCaseFolded()) {
+            if (styleId == QLatin1String("DarkFusion")) {
+                qApp->setStyle(new DarkFusionStyle);
+            } else {
+                qApp->setStyle(styleId);
+            }
+        }
+    } else {
+        const QString &darkStyleId = settings.value(
+            QStringLiteral("interface/darkStyle"), "DarkFusion").toString();
+        if (darkStyleId.toCaseFolded() !=
+            qApp->style()->objectName().toCaseFolded()) {
+            if (darkStyleId == QLatin1String("DarkFusion")) {
+                qApp->setStyle(new DarkFusionStyle);
+            } else {
+                qApp->setStyle(darkStyleId);
+            }
+        }
+    }
+    qApp->setPalette(style()->standardPalette());
+}
+
 void MainWindow::changeEvent(QEvent *event) {
     if (event != nullptr) {
         switch (event->type()) {
-            /* this event is send if a translator is loaded */
+            /* this event is sent if a translator is loaded */
             case QEvent::LanguageChange: {
                 /*qDebug() << "QEvent::LanguageChange"; */
                 ui->retranslateUi(this);
                 break;
             }
 
-            /* this event is send, if the system language changes */
+            /* this event is sent if the system locale changes (internal locale changes on Windows) */
             case QEvent::LocaleChange: {
-                /*qDebug() << "QEvent::LocaleChange"; */
-                QString locale = QLocale::system().name();
-                loadLanguage(locale);
+                qDebug() << "QEvent::LocaleChange" << locale();
+                const QString &locale = QSettings().value("interface/locale",
+                                                          QString()).toString();
+                loadLanguage(
+                    locale.isEmpty() ? QLocale::system().name() : locale);
                 break;
             }
 
@@ -806,6 +905,18 @@ void MainWindow::installUpdate(const QString &url, const QString &filepath) {
     restart();
 }
 
+void MainWindow::onColorModeChanged(const bool isDark) {
+    Windows::setDarkFrame(this, isDark);
+    for (auto *child: children()) {
+        auto *widget = qobject_cast<QWidget *>(child);
+        if (widget) {
+            Windows::setDarkFrame(widget, isDark);
+        }
+    }
+
+    changeAppStyle(isDark);
+}
+
 void MainWindow::newDatapack() {
     auto *dialog     = new NewDatapackDialog(this);
     int   dialogCode = dialog->exec();
@@ -854,13 +965,13 @@ void MainWindow::newDatapack() {
         dir.mkpath(dirPath + QStringLiteral("/data"));
         QString namesp = dialog->getName()
                          .toLower()
-                         .replace(" ", "_").replace("/", "_")
-                         .replace(".", "_").replace(":", "_");
+                         .replace(' ', '_').replace('/', '_')
+                         .replace('.', '_').replace(':', '_');
         dir.mkpath(dirPath + QStringLiteral("/data/") + namesp);
 
         loadFolder(dirPath,
                    PackMetaInfo{ dialog->getDesc(), dialog->getFormat() });
-        ui->tabbedInterface->openFile("pack.mcmeta");
+        ui->tabbedInterface->openFile(QStringLiteral("pack.mcmeta"));
     }
     delete dialog;
 }
@@ -890,6 +1001,9 @@ void MainWindow::setCodeEditorText(const QString &text) {
     if (ui->tabbedInterface->hasNoFile())
         return;
 
+    if (!ui->tabbedInterface->getCodeEditor())
+        return;
+
     /*ui->codeEditor->setPlainText(text); */
     QTextCursor cursor = ui->tabbedInterface->getCodeEditor()->textCursor();
 
@@ -902,7 +1016,7 @@ void MainWindow::setCodeEditorText(const QString &text) {
 
 QString MainWindow::getCodeEditorText() {
     if (auto *doc = ui->tabbedInterface->getCurDoc())
-        return ui->tabbedInterface->getCurDoc()->toPlainText();
+        return doc->toPlainText();
     else
         return QString();
 }

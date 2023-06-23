@@ -1,16 +1,14 @@
 #ifndef LINENUMBERAREA_H
 #define LINENUMBERAREA_H
 
-#include "codeeditor.h"
-
 #include <QWidget>
+#include <QTextCursor>
 
 class CodeGutter;
 
-class LineNumberArea : public QWidget
-{
+class LineNumberArea : public QWidget {
 public:
-    LineNumberArea(CodeGutter *parent);
+    explicit LineNumberArea(CodeGutter *parent);
 
     QSize sizeHint() const override;
 

@@ -17,7 +17,7 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void test_case1();
-    void isVaild();
+    void isValid();
     void length();
 };
 
@@ -34,26 +34,27 @@ void TestSwizzleNode::cleanupTestCase() {
 }
 
 void TestSwizzleNode::test_case1() {
-    SwizzleNode node(0, true, true, true);
+    SwizzleNode node("xyz", true, true, true);
 
-    QCOMPARE(node.toString(), "SwizzleNode(xyz)");
+    QVERIFY(node.isValid());
+    QCOMPARE(node.kind(), ParseNode::Kind::Argument);
+    QCOMPARE(node.parserType(), ArgumentNode::ParserType::Swizzle);
+    QCOMPARE(node.text(), "xyz");
+    QCOMPARE(node.length(), 3);
 }
 
-void TestSwizzleNode::isVaild() {
-    SwizzleNode node(0, false, false, false);
+void TestSwizzleNode::isValid() {
+    SwizzleNode node("xy", false, false, false);
 
-    QCOMPARE(node.isVaild(), false);
+    QCOMPARE(node.isValid(), false);
     node.setAxes(SwizzleNode::Axis::X | SwizzleNode::Axis::Y);
-    QCOMPARE(node.isVaild(), true);
+    QCOMPARE(node.isValid(), true);
 }
 
 void TestSwizzleNode::length() {
-    SwizzleNode node(0, false, false, true);
+    SwizzleNode node("zy", false, true, true);
 
-    QCOMPARE(node.length(), 1);
-    node.setAxes(SwizzleNode::Axis::X | SwizzleNode::Axis::Y);
     QCOMPARE(node.length(), 2);
-    qDebug() << node;
 }
 
 QTEST_MAIN(TestSwizzleNode)

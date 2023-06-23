@@ -15,8 +15,10 @@ QVersionNumber Game::version() {
 }
 
 QString Game::versionString() {
-    return QSettings().value(QStringLiteral("general/gameVersion"),
-                             defaultVersionString).toString();
+    static const QString &&value = QSettings().value(
+        QStringLiteral("game/version"), defaultVersionString).toString();
+
+    return value;
 }
 
 QStringList Game::getRegistry(const QString &type) {

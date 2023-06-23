@@ -1,11 +1,22 @@
 #include "floatrangenode.h"
+#include "../visitors/nodevisitor.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::FloatRangeNode> >();
+namespace Command {
+    FloatRangeNode::FloatRangeNode(int length)
+        : RangeNode(ParserType::FloatRange, length) {
+    }
 
-Command::FloatRangeNode::FloatRangeNode(int pos, int length)
-    : RangeNode(pos, length, "minecraft:float_range") {
-}
-
-QString Command::FloatRangeNode::toString() const {
-    return QString("FloatRangeNode(%1)").arg(format());
+    void FloatRangeNode::accept(NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        primary()->accept(visitor, order);
+        if (secondary())
+            secondary()->accept(visitor, order);
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
+    }
 }

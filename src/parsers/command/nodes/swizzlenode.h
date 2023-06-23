@@ -14,26 +14,21 @@ public:
         };
         Q_DECLARE_FLAGS(Axes, Axis);
 
-        SwizzleNode(int pos, bool hasX, bool hasY, bool hasZ);
-        SwizzleNode(int pos, Axes axes);
+        SwizzleNode(const QString &text, bool hasX, bool hasY, bool hasZ);
+        SwizzleNode(const QString &text, Axes axes);
 
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor,
-                    NodeVisitor::Order order = NodeVisitor::Order::Postorder)
-        override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         Axes axes() const;
         void setAxes(const Axes &axes);
 
 private:
         Axes m_axes;
-
-        void update();
     };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Swizzle)
 }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::SwizzleNode>)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Command::SwizzleNode::Axes)
 
 #endif /* SWIZZLENODE_H */

@@ -5,8 +5,7 @@
 
 class CodeGutter;
 
-class ProblemArea : public QWidget
-{
+class ProblemArea : public QWidget {
     Q_OBJECT
 public:
     explicit ProblemArea(CodeGutter *parent = nullptr);

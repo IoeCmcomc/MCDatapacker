@@ -7,23 +7,18 @@ namespace Command {
     class LiteralNode : public ParseNode
     {
 public:
-        explicit LiteralNode(int pos, const QString &txt);
+        explicit LiteralNode(const QString &txt);
 
-        QString toString() const override;
-        QString text() const;
-        void setText(const QString &text);
-
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        void accept(NodeVisitor *visitor, VisitOrder) final;
 
         bool isCommand() const;
         void setIsCommand(bool isCommand);
 
 private:
-        QString m_text;
         bool m_isCommand = false;
     };
-}
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::LiteralNode>);
+    DECLARE_TYPE_ENUM(ParseNode::Kind, Literal)
+}
 
 #endif /* LITERALNODE_H */

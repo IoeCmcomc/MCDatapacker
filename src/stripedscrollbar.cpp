@@ -4,10 +4,11 @@
 
 #include <QPainter>
 #include <QStyleOptionSlider>
+#include <QTextBlock>
 
 StripedScrollBar::StripedScrollBar(Qt::Orientation orientation, QWidget *parent)
     : QScrollBar(orientation, parent) {
-    if (auto *editor = qobject_cast<CodeEditor*>(parent)) {
+    if (auto *editor = qobject_cast<CodeEditor *>(parent)) {
         m_editor = editor;
     }
     Q_ASSERT(m_editor);
@@ -48,23 +49,31 @@ void StripedScrollBar::redrawStripes() {
     int x, y, w, h;
     r.getRect(&x, &y, &w, &h);
 
+    const auto &problems    = m_editor->m_problems;
+    auto       *prevProblem = problems.cbegin();
+    auto        block       = doc->firstBlock();
+
+    const auto predicate = [&block](const ProblemInfo &problem) {
+                               return block.contains(problem.pos);
+                           };
+
     if (orientation() == Qt::Vertical) {
-        for (auto it = doc->firstBlock(); it != doc->end(); it = it.next()) {
-            const int stripeY = y + (h * it.blockNumber() / lines);
-            if (const auto *data =
-                    dynamic_cast<TextBlockData *>(it.userData())) {
-                for (int i = 0; i < data->problems().size(); ++i) {
-                    const auto &problem = data->problems().at(i);
-                    if (problem.type != ProblemInfo::Type::Invaild) {
-                        p.setBrush((problem.type == ProblemInfo::Type::Error)
+        for (; block != doc->end(); block = block.next()) {
+            const int stripeY = y + (h * block.blockNumber() / lines);
+            int       i       = 0;
+            for (auto problem =
+                     std::find_if(prevProblem, problems.cend(), predicate);
+                 (problem != problems.cend()) && block.contains(problem->pos);
+                 ++problem) {
+                p.setBrush((problem->type == ProblemInfo::Type::Error)
                             ? errorColor : warningColor);
-                        const int stripeThickness = qMin(qMax((h / lines), 1),
-                                                         32);
-                        p.drawRect(x, stripeY, w, stripeThickness);
-                    }
-                    if (i >= 3)
-                        break;
-                }
+                const int stripeThickness = qBound(1, h / lines, 32);
+                p.drawRect(x, stripeY, w, stripeThickness);
+
+                prevProblem = problem;
+                ++i;
+                if (i >= 3)
+                    break;
             }
         }
     }

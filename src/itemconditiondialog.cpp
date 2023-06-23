@@ -1,9 +1,11 @@
 #include "itemconditiondialog.h"
 #include "ui_itemconditiondialog.h"
 
-#include "game.h"
 #include "numberproviderdelegate.h"
 #include "inventoryslot.h"
+
+#include "game.h"
+#include "platforms/windows_specific.h"
 
 #include <QJsonObject>
 
@@ -57,7 +59,6 @@ QJsonObject ItemConditionDialog::toJson() const {
                             ui->itemSlot->getItem().getNamespacedID());
             }
         }
-
     } else {
         if (!ui->itemTagEdit->text().isEmpty())
             root.insert(QStringLiteral("tag"), ui->itemTagEdit->text());
@@ -126,7 +127,7 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("nbt")))
         ui->NBTEdit->setText(value[QStringLiteral("nbt")].toString());
     if (value.contains(QStringLiteral("potion"))) {
-        setupComboFrom(ui->potionCombo, value[QStringLiteral("potion")]);
+        setComboValueFrom(ui->potionCombo, value[QStringLiteral("potion")]);
     }
 
     if (value.contains(QStringLiteral("enchantments"))) {

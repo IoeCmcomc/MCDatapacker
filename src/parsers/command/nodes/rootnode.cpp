@@ -1,68 +1,49 @@
 #include "rootnode.h"
+#include "../visitors/nodevisitor.h"
 
-static int _ = qRegisterMetaType<QSharedPointer<Command::RootNode> >();
-
-Command::RootNode::RootNode(int pos) : Command::ParseNode(pos) {
-}
-
-QString Command::RootNode::toString() const {
-    /*return QString("RootNode(%1)").arg(m_children.length()); */
-    QString ret = QString("RootNode[%1](").arg(m_children.length());
-
-    for (const auto &child: m_children) {
-        ret += child->toString();
-        if (child != m_children.last())
-            ret += ", ";
+namespace Command {
+    RootNode::RootNode(int length) : ParseNode(Kind::Root, length) {
     }
-    return ret + ')';
-}
 
-void Command::RootNode::accept(Command::NodeVisitor *visitor,
-                               NodeVisitor::Order order) {
-    if (order == NodeVisitor::Order::Preorder)
-        visitor->visit(this);
-    for (const auto &child: qAsConst(m_children)) {
-        child->accept(visitor, order);
+    void RootNode::accept(Command::NodeVisitor *visitor, VisitOrder order) {
+        if (order == VisitOrder::LetTheVisitorDecide) {
+            visitor->visit(this);
+            return;
+        }
+        if (order == VisitOrder::Preorder)
+            visitor->visit(this);
+        for (const auto &child: qAsConst(m_children)) {
+            child->accept(visitor, order);
+        }
+        if (order == VisitOrder::Postorder)
+            visitor->visit(this);
     }
-    if (order == NodeVisitor::Order::Postorder)
-        visitor->visit(this);
-}
 
-bool Command::RootNode::isEmpty() {
-    return m_children.isEmpty();
-}
+    bool RootNode::isEmpty() const {
+        return m_children.empty();
+    }
 
-int Command::RootNode::size() {
-    return m_children.size();
-}
+    int RootNode::size() const {
+        return m_children.size();
+    }
 
-void Command::RootNode::append(QSharedPointer<ParseNode> node) {
-    m_children.append(node);
-}
+    void RootNode::append(QSharedPointer<ParseNode> node) {
+        m_isValid = m_children.empty() ? node->isValid() : (m_isValid &&
+                                                            node->isValid());
+        m_children.emplace_back(node);
+    }
 
-void Command::RootNode::prepend(QSharedPointer<ParseNode> node) {
-    m_children.prepend(node);
-}
+    void RootNode::prepend(QSharedPointer<ParseNode> node) {
+        m_isValid = m_children.empty() ? node->isValid() : (m_isValid &&
+                                                            node->isValid());
+        m_children.emplace_front(node);
+    }
 
-void Command::RootNode::remove(int i) {
-    m_children.remove(i);
-}
+    void RootNode::clear() {
+        m_children.clear();
+    }
 
-void Command::RootNode::clear() {
-    m_children.clear();
+    RootNode::Nodes RootNode::children() const {
+        return m_children;
+    }
 }
-
-QSharedPointer<Command::ParseNode> &Command::RootNode::operator[](int index) {
-    return m_children[index];
-}
-
-const QSharedPointer<Command::ParseNode> Command::RootNode::operator[](
-    int index) const {
-    return m_children[index];
-}
-
-QVector<QSharedPointer<Command::ParseNode> > Command::RootNode::children() const
-{
-    return m_children;
-}
-

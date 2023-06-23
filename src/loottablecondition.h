@@ -43,19 +43,27 @@ private slots:
     void onCurDirChanged(const QDir &dir);
 
 private:
+    enum class NestedMode {
+        Invalid,
+        SingleInvert,
+        Alternative,
+        AnyOf,
+        AllOf,
+    };
+
     Ui::LootTableCondition *ui;
     int depth = 0;
     QStandardItemModel blocksModel;
     QStandardItemModel enchantmentsModel;
     QStandardItemModel condRefsModel;
     QStandardItemModel tableBonusModel;
-    const QStringList condTypes =
-    { "block_state_property", "damage_source_properties", "entity_properties",
-      "entity_scores",        "killed_by_player",
-      "location_check",       "alternative",              "match_tool",
-      "random_chance",        "reference",                "survives_explosion",
-      "table_bonus",          "time_check",               "tool_enchantment",
-      "weather_check",        "value_check" };
+    const QStringList condTypes = {
+        "block_state_property", "damage_source_properties", "entity_properties",
+        "entity_scores",        "killed_by_player",         "location_check",
+        "alternative",          "match_tool",               "random_chance",
+        "reference",            "survives_explosion",       "table_bonus",
+        "time_check",           "tool_enchantment",         "weather_check",
+        "value_check",          };
     const QStringList entityTargets = { "this", "killer", "killer_player" };
     QFileSystemWatcher predRefWatcher;
 
@@ -63,6 +71,7 @@ private:
     void clearModelExceptHeaders(QStandardItemModel &model);
 
     void initBlockStatesPage();
+    void initDamageSrcPage();
     void initEntityScoresPage();
     void initNestedCondPage();
     void initRandChancePage();

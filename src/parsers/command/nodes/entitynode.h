@@ -1,21 +1,19 @@
 #ifndef ENTITYNODE_H
 #define ENTITYNODE_H
 
-#include "stringnode.h"
-#include "targetselectornode.h"
-#include "uuidnode.h"
+//#include "stringnode.h"
+//#include "targetselectornode.h"
+//#include "singlevaluenode.h"
+
+#include "argumentnode.h"
 
 namespace Command {
     class EntityNode : public ArgumentNode
     {
 public:
-        EntityNode(int pos);
-        EntityNode(QSharedPointer<StringNode> other);
-        EntityNode(QSharedPointer<TargetSelectorNode> other);
-        EntityNode(QSharedPointer<UuidNode> other);
-        virtual QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit EntityNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) override;
 
         bool singleOnly() const;
         void setSingleOnly(bool singleOnly);
@@ -23,32 +21,38 @@ public:
         bool playerOnly() const;
         void setPlayerOnly(bool playerOnly);
 
-        QVariant ptrVari() const;
+        NodePtr getNode() const;
+        template <typename T>
+        typename std::enable_if_t<std::is_assignable_v<NodePtr, T> >
+        setNode(T &&node) {
+            setLength(node->length());
+            m_isValid = node->isValid();
+            m_ptr     = std::forward<T>(node);
+        }
 
 protected:
-        void setPtrVari(const QVariant &PtrVari);
-        QSharedPointer<ParseNode> castPtrVari() const;
+        NodePtr m_ptr;
 
-private:
-        QVariant m_ptrVari;
-        bool m_singleOnly = false;
-        bool m_playerOnly = false;
+        explicit EntityNode(ParserType parserType, int length,
+                            const NodePtr &ptr);
+
+        bool m_singleOnly = false; // Parser property
+        bool m_playerOnly = false; // Parser property
     };
 
     class GameProfileNode final : public EntityNode {
 public:
-        GameProfileNode(int pos);
-        GameProfileNode(EntityNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit GameProfileNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
     };
 
     class ScoreHolderNode final : public EntityNode {
 public:
-        ScoreHolderNode(int pos);
-        ScoreHolderNode(EntityNode *other);
-        QString toString() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        explicit ScoreHolderNode(int length);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
+
         bool isAll() const;
         void setAll(bool all);
 
@@ -58,26 +62,31 @@ private:
 
     class EntityArgumentValueNode final : public ParseNode {
 public:
-        EntityArgumentValueNode(QSharedPointer<ParseNode> valNode,
-                                bool negative = false);
-        QString toString() const override;
-        bool isVaild() const override;
-        void accept(NodeVisitor *visitor, NodeVisitor::Order order) override;
+        using ArgPtr = QSharedPointer<ArgumentNode>;
+
+        explicit EntityArgumentValueNode(bool negative = false);
+
+        void accept(NodeVisitor *visitor, VisitOrder order) final;
 
         bool isNegative() const;
         void setNegative(bool negative);
 
-        QSharedPointer<ParseNode> value() const;
-        void setValue(QSharedPointer<ParseNode> value);
-private:
-        bool m_negative                   = false;
-        QSharedPointer<ParseNode> m_value = nullptr;
-    };
-}
+        ArgPtr getNode() const;
+        template <typename T>
+        typename std::enable_if_t<std::is_assignable_v<ArgPtr, T> >
+        setNode(T &&node) {
+            m_isValid = node->isValid();
+            m_ptr     = std::forward<T>(node);
+        }
 
-Q_DECLARE_METATYPE(QSharedPointer<Command::EntityNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::GameProfileNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::ScoreHolderNode>)
-Q_DECLARE_METATYPE(QSharedPointer<Command::EntityArgumentValueNode>)
+private:
+        ArgPtr m_ptr;
+        bool m_negative = false;
+    };
+
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Entity)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, GameProfile)
+    DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ScoreHolder)
+}
 
 #endif /* ENTITYNODE_H */

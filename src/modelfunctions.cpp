@@ -3,6 +3,7 @@
 #include "game.h"
 #include "extendedtablewidget.h"
 
+#include <QListView>
 #include <QApplication>
 
 void initModelView(QStandardItemModel &model,
@@ -30,11 +31,11 @@ void initComboModelView(const QString &infoType,
                                               "(not set)")));
     const auto &&info = Game::getInfo(infoType);
     for (auto it = info.cbegin(); it != info.cend(); ++it) {
-        QString key = it.key();
+        QString        key  = it.key();
         QStandardItem *item = new QStandardItem();
         if (it.value().toMap().contains(QStringLiteral("name")))
             item->setText(it.value().toMap()[QStringLiteral(
-                                                      "name")].toString());
+                                                 "name")].toString());
         else if (it.value().canConvert(QVariant::String)
                  && !it.value().isNull())
             item->setText(it.value().toString());
@@ -62,16 +63,17 @@ void initComboModelView(const QString &infoType,
 }
 
 void initComboModelViewFromRegistry(const QString &registry,
-                        QStandardItemModel &model,
-                        QComboBox *combo, bool optional, bool append) {
+                                    QStandardItemModel &model,
+                                    QComboBox *combo, bool optional,
+                                    bool append) {
     if (optional)
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
                                               "(not set)")));
     const auto &&values = Game::getRegistry(registry);
     for (QString value : values) {
-        QStandardItem *item = new QStandardItem(value);
-        QString &&iconPath =
+        QStandardItem *item     = new QStandardItem(value);
+        QString      &&iconPath =
             QString(":minecraft/texture/%1/%2.png").arg(registry, value);
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
@@ -85,8 +87,8 @@ void initComboModelViewFromRegistry(const QString &registry,
     combo->setModel(&model);
 }
 
-void setupComboFrom(QComboBox *combo, const QVariant &vari, int role) {
-    const auto *model = qobject_cast<QStandardItemModel*>(combo->model());
+void setComboValueFrom(QComboBox *combo, const QVariant &vari, int role) {
+    const auto *model = qobject_cast<QStandardItemModel *>(combo->model());
 
     if (vari.canConvert<QString>()) {
         QString &&str = vari.toString();
@@ -126,5 +128,21 @@ void appendRowToTableWidget(QTableWidget *table,
     for (const auto &item : items) {
         table->setItem(row, i, item);
         ++i;
+    }
+}
+
+void appendRowToModel(QStandardItemModel &model, const QString &text,
+                      const QVariant &data, int role) {
+    QStandardItem *item = new QStandardItem(text);
+
+    item->setData(data, role);
+    model.appendRow(item);
+}
+
+void hideComboRow(QComboBox *comboBox, const int row) {
+    if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
+        auto *model = static_cast<QStandardItemModel *>(comboBox->model());
+        view->setRowHidden(row, true);
+        model->item(row, 0)->setEnabled(false);
     }
 }

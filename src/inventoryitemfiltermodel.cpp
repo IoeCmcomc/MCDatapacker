@@ -24,8 +24,8 @@ bool InventoryItemFilterModel::filterAcceptsRow(int sourceRow,
 const {
     const QModelIndex &index =
         sourceModel()->index(sourceRow, 0, sourceParent);
-    const auto &invItem = sourceModel()->data(index, Qt::UserRole +
-                                              1).value<InventoryItem>();
+    auto &&invItem = sourceModel()->data(index, Qt::UserRole +
+                                         1).value<InventoryItem>();
 
     if (invItem.isBlock()) {
         if (invItem.isItem()) {
@@ -42,7 +42,7 @@ const {
     }
 
     return invItem.getNamespacedID().contains(filterRegularExpression()) ||
-           invItem.getName().toLower().contains(filterRegularExpression());
+           invItem.getName().toCaseFolded().contains(filterRegularExpression());
 }
 
 InventoryItemFilterModel::Filters InventoryItemFilterModel::filters() const {

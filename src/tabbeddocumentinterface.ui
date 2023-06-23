@@ -33,9 +33,6 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTabBar" name="tabBar" native="true"/>
-   </item>
-   <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -46,7 +43,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="welcomeTab">
+     <widget class="QWidget" name="welcome">
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
         <widget class="QLabel" name="label">
@@ -63,7 +60,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="codeEditorTab">
+     <widget class="QWidget" name="tabs">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
         <number>0</number>
@@ -81,30 +78,20 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="CodeEditor" name="codeEditor">
-         <property name="lineWrapMode">
-          <enum>QPlainTextEdit::NoWrap</enum>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>-1</number>
+         </property>
+         <property name="documentMode">
+          <bool>true</bool>
+         </property>
+         <property name="tabsClosable">
+          <bool>true</bool>
+         </property>
+         <property name="movable">
+          <bool>true</bool>
          </property>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="imgViewerTab">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="ImgViewer" name="imgViewer"/>
        </item>
       </layout>
      </widget>
@@ -112,24 +99,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CodeEditor</class>
-   <extends>QPlainTextEdit</extends>
-   <header>codeeditor.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QTabBar</class>
-   <extends>QWidget</extends>
-   <header location="global">qtabbar.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ImgViewer</class>
-   <extends>QGraphicsView</extends>
-   <header>imgviewer.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -1,21 +1,20 @@
 #include "highlighter.h"
 
-#include "mainwindow.h"
 #include "globalhelpers.h"
 
 #include <QDebug>
 #include <QDir>
+#include <QTextDocument>
+
+TextBlockData::~TextBlockData() {
+    clear();
+}
 
 void TextBlockData::clear() {
     qDeleteAll(m_brackets);
     m_brackets.clear();
     qDeleteAll(m_namespaceIds);
     m_namespaceIds.clear();
-    m_problems.clear();
-}
-
-void TextBlockData::clearProblems() {
-    m_problems.clear();
 }
 
 QVector<BracketInfo *> TextBlockData::brackets() {
@@ -28,40 +27,20 @@ QVector<NamespacedIdInfo *> TextBlockData::namespacedIds() {
 
 
 void TextBlockData::insert(BracketInfo *info) {
-    int i = 0;
-
-    while (i < m_brackets.size() &&
-           info->pos > m_brackets.at(i)->pos)
-        ++i;
-
-    m_brackets.insert(i, info);
+    m_brackets << info;
 }
 
 void TextBlockData::insert(NamespacedIdInfo *info) {
-    int i = 0;
-
-    while (i < m_namespaceIds.size() &&
-           info->start > m_namespaceIds.at(i)->start)
-        ++i;
-
-    m_namespaceIds.insert(i, info);
+    m_namespaceIds << info;
 }
 
-QVector<ProblemInfo> TextBlockData::problems() const {
-    return m_problems;
-}
 
-void TextBlockData::setProblems(const QVector<ProblemInfo> &problems) {
-    m_problems = problems;
-}
+Highlighter::Highlighter(QTextDocument *parent)
+    : QSyntaxHighlighter(parent), m_palette{defaultCodePalette} {
+    connect(parent, &QTextDocument::contentsChanged,
+            this, &Highlighter::onDocChanged);
 
-Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
-    m_parentDoc = parent;
-    auto fmt = QTextCharFormat();
-
-    fmt.setForeground(QColor(QStringLiteral("#A31621")));
-
-    quoteHighlightRules.insert('"', fmt);
+    m_curDirExists = QDir::current().exists();
 
     bracketPairs.append({ '{', '}' });
     bracketPairs.append({ '[', ']' });
@@ -74,102 +53,39 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
  */
 }
 
-void Highlighter::highlightBlock(const QString &text) {
-    /*qDebug() << "Highlighter::highlightBlock" << text << currentBlockState(); */
-    if (m_highlightMunually) {
-    } else {
-        if (m_highlightingFirstBlock) {
-            m_changedBlocks.clear();
-            m_highlightingFirstBlock = false;
-        }
-        m_changedBlocks << currentBlock();
-    }
+void Highlighter::rehighlight() {
+    m_highlightManually = true;
+    QSyntaxHighlighter::rehighlight();
+    m_highlightManually = false;
+}
 
-    if (document()) {
-        TextBlockData *data                = nullptr;
-        bool           dataAlereadyExisted = false;
-        if (currentBlockUserData()) {
-            data =
-                dynamic_cast<TextBlockData*>(currentBlockUserData());
-            data->clear();
-            dataAlereadyExisted = true;
-        } else {
-            data = new TextBlockData();
-        }
+void Highlighter::rehighlightBlock(const QTextBlock &block) {
+    m_highlightManually = true;
+    QSyntaxHighlighter::rehighlightBlock(block);
+    m_highlightManually = false;
+}
 
-        if ((!text.isEmpty()) &&
-            singleCommentHighlightRules.contains(text[0])) {
-            setCurrentBlockState(Comment);
-            setFormat(0, text.length(), singleCommentHighlightRules[text[0]]);
-        } else {
-            QChar curQuoteChar = '\0';
-            int   quoteStart   = 0;
-            int   quoteLength  = 0;
-            bool  backslash    = false;
-            for (int i = 0; i < text.length(); i++) {
-                auto curChar = text[i];
-                if (quoteHighlightRules.contains(curChar)) {
-                    if (!backslash && (currentBlockState() == QuotedString)) {
-                        setCurrentBlockState(Normal);
-                        setFormat(quoteStart,
-                                  quoteLength + 1,
-                                  quoteHighlightRules[curQuoteChar]);
-                    } else {
-                        setCurrentBlockState(QuotedString);
-                        curQuoteChar = curChar;
-                        quoteStart   = i;
-                        quoteLength++;
-                    }
-                } else if (backslash) {
-                    quoteLength++;
-                    backslash = false;
-                } else if (curChar == QLatin1Char('\\')) {
-                    backslash = true;
-                    quoteLength++;
-                } else if (currentBlockState() == QuotedString) {
-                    quoteLength++;
-                } else if (currentBlockState() <= Normal) {
-                    for (const auto &bracketPair: qAsConst(bracketPairs)) {
-                        if (curChar == bracketPair.left ||
-                            curChar == bracketPair.right) {
-                            auto *info = new BracketInfo;
-                            info->character = curChar.toLatin1();
-                            info->pos       = i;
-                            data->insert(info);
-                        }
-                    }
-                }
-                if (curChar.isSpace() || curChar == '\t')
-                    setFormat(i, 1, m_invisSpaceFmt);
-            }
-        }
-        if (currentBlockState() == QuotedString
-            || currentBlockState() == Comment) {
-            setCurrentBlockState(-1);
-        }
+bool Highlighter::isManualHighlight() const {
+    return m_highlightManually;
+}
 
-        if (QDir::current().exists())
-            collectNamespacedIds(text, data);
-
-        if (!currentBlockUserData()) {
-            setCurrentBlockUserData(data);
-        } else if (!dataAlereadyExisted) {
-            delete data;
+void Highlighter::ensureDelayedRehighlightAll() {
+    if (m_changedBlocks.size() < document()->blockCount()) {
+        m_changedBlocks.clear();
+        m_changedBlocks.reserve(document()->blockCount());
+        for (auto &&block = document()->begin(); block != document()->end();
+             block = block.next()) {
+            m_changedBlocks << block;
         }
     }
 }
 
-void Highlighter::mergeFormat(int start, int count,
-                              const QTextCharFormat &fmt) {
-    for (int i = 0; i < count; ++i) {
-        QTextCharFormat newFmt = format(start + i);
-        newFmt.merge(fmt);
-        setFormat(start + i, 1, newFmt);
-    }
+void Highlighter::setPalette(const CodePalette &newPalette) {
+    m_palette = newPalette;
 }
 
 void Highlighter::onDocChanged() {
-    /*qDebug() << "onDocChanged"; */
+    //qDebug() << "Highlighter::onDocChanged";
     m_highlightingFirstBlock = true;
 }
 
@@ -177,20 +93,118 @@ QVector<QTextBlock> Highlighter::changedBlocks() const {
     return m_changedBlocks;
 }
 
-void Highlighter::rehighlightBlock(const QTextBlock &block) {
-    /*qDebug() << "reHighlightblock" << block.blockNumber(); */
-    m_highlightMunually = true;
-    QSyntaxHighlighter::rehighlightBlock(block);
-    m_highlightMunually = false;
+void Highlighter::highlightBlock(const QString &text) {
+//    qDebug() << "Highlighter::highlightBlock" << currentBlock().blockNumber();
+    Q_ASSERT(document() != nullptr);
+
+    TextBlockData *data = nullptr;
+
+    bool hasCurData = false;
+    if (!m_highlightManually) {
+        if (m_highlightingFirstBlock) {
+            m_changedBlocks.clear();
+            m_highlightingFirstBlock = false;
+        }
+        m_changedBlocks << currentBlock();
+
+        hasCurData = currentBlockUserData();
+        if (hasCurData) {
+            data = dynamic_cast<TextBlockData *>(currentBlockUserData());
+            Q_ASSERT(data != nullptr);
+            data->clear();
+        } else {
+            data = new TextBlockData();
+        }
+    }
+
+    const QStringView sv{ text };
+    const QStringView trimmed = sv.trimmed();
+    if ((!trimmed.isEmpty()) &&
+        m_singleCommentCharset.contains(trimmed[0])) {
+        setCurrentBlockState(Comment);
+        setFormat(0, sv.length(), m_palette[CodePalette::Comment]);
+    } else {
+        QChar curQuoteChar = '\0';
+        int   quoteStart   = 0;
+        int   quoteLength  = 0;
+        bool  backslash    = false;
+        for (int i = 0; i < sv.length(); i++) {
+            auto curChar = sv[i];
+            if (m_quoteDelimiters.contains(curChar)) {
+                if (!backslash) {
+                    if (curChar == curQuoteChar) {
+                        setCurrentBlockState(Normal);
+                        setFormat(quoteStart, quoteLength + 1,
+                                  m_palette[CodePalette::QuotedString]);
+                        curQuoteChar = '\0';
+                        quoteLength  = 0;
+                    } else if (currentBlockState() == Normal) {
+                        setCurrentBlockState(QuotedString);
+                        curQuoteChar = curChar;
+                        quoteStart   = i;
+                        quoteLength++;
+                    }
+                } else {
+                    quoteLength++;
+                    backslash = false;
+                }
+            } else if (backslash) {
+                quoteLength++;
+                backslash = false;
+            } else if (curChar == '\\') {
+                backslash = true;
+                quoteLength++;
+            } else if (currentBlockState() == QuotedString) {
+                quoteLength++;
+            } else if (currentBlockState() == Normal) {
+                collectBracket(i, curChar, data);
+            }
+            if (curChar.isSpace() || curChar == '\t')
+                setFormat(i, 1, m_invisSpaceFmt);
+        }
+    }
+    if (currentBlockState() == QuotedString
+        || currentBlockState() == Comment) {
+        setCurrentBlockState(Normal);
+    }
+
+    if (m_curDirExists)
+        collectNamespacedIds(sv, data);
+
+    if (data && !hasCurData) {
+        setCurrentBlockUserData(data);
+    }
 }
 
-QTextDocument *Highlighter::getParentDoc() const {
-    return m_parentDoc;
+void Highlighter::mergeFormat(int start, int count,
+                              const QTextCharFormat &fmt) {
+    for (int i = 0; i < count; ++i) {
+        QTextCharFormat &&newFmt = format(start + i);
+        newFmt.merge(fmt);
+        setFormat(start + i, 1, newFmt);
+    }
 }
 
-void Highlighter::collectNamespacedIds(const QString &text,
-                                       TextBlockData *data) {
-    auto &&matchIter = namespacedIdRegex.globalMatch(text);
+void Highlighter::collectBracket(int i, QChar ch, TextBlockData *data) {
+    if (!data)
+        return;
+
+    for (const auto &bracketPair: qAsConst(bracketPairs)) {
+        if (ch == bracketPair.left ||
+            ch == bracketPair.right) {
+            auto *info = new BracketInfo;
+            info->character = ch.toLatin1();
+            info->pos       = i;
+            data->insert(info);
+        }
+    }
+}
+
+void Highlighter::collectNamespacedIds(QStringView sv, TextBlockData *data) {
+    if (!data)
+        return;
+
+    auto &&matchIter = namespacedIdRegex.globalMatch(sv);
 
     while (matchIter.hasNext()) {
         auto            match    = matchIter.next();
@@ -209,19 +223,20 @@ void Highlighter::collectNamespacedIds(const QString &text,
 QString Highlighter::locateNamespacedId(QString id) {
     bool isTag = false;
 
-    if (Glhp::removePrefix(id, QStringLiteral("#")))
+    if (Glhp::removePrefix(id, "#"_QL1))
         isTag = true;
     auto dir = QDir::current();
     dir.cd(QStringLiteral("data/") + id.section(":", 0, 0));
     if (isTag)
         dir.cd(QStringLiteral("tags"));
 
-    if (!dir.exists()) return "";
+    if (!dir.exists()) return QString();
 
-    QStringList dirList =
+    const QStringList &&dirList =
         dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
     for (const auto &catDir: dirList) {
-        QString path = dir.path() + "/" + catDir + "/" + id.section(":", 1, 1);
+        const QString &&path = dir.path() + "/"_QL1 + catDir + "/"
+                               + id.section(":", 1, 1);
         if (catDir == QStringLiteral("functions")
             && QFile::exists(path + QStringLiteral(".mcfunction"))) {
             return path + QStringLiteral(".mcfunction");
@@ -229,5 +244,5 @@ QString Highlighter::locateNamespacedId(QString id) {
             return path + QStringLiteral(".json");
         }
     }
-    return "";
+    return QString();
 }

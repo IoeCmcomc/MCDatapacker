@@ -25,14 +25,12 @@ public:
     int getCurIndex() const;
     void setCurIndex(int i);
 
-    CodeFile *getCurFile();
+    CodeFile * getCurFile();
     QString getCurFilePath();
-    QTextDocument *getCurDoc();
-    QVector<CodeFile> *getFiles();
-    CodeEditor *getCodeEditor() const;
-    ImgViewer *getImgViewer() const;
-    QTabBar *getTabBar() const;
-    QStackedWidget *getStackedWidget();
+    QTextDocument * getCurDoc();
+    QVector<CodeFile> * getFiles();
+    CodeEditor * getCodeEditor() const;
+    ImgViewer * getImgViewer() const;
 
     int count() const;
     bool hasNoFile() const;
@@ -41,12 +39,12 @@ public:
 
 public /*slots*/ :
     void onOpenFile(const QString &filepath);
+    void onOpenFileWithLine(const QString &filepath, const int lineNo);
     bool saveCurFile();
     bool saveCurFile(const QString &path);
     bool saveAllFile();
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);
-    void onGameVersionChanged(const QString &ver);
     void undo();
     void redo();
     void selectAll();
@@ -57,38 +55,36 @@ public /*slots*/ :
 signals:
     void curFileChanged(const QString &path);
     void curModificationChanged(bool changed);
+    void updateStatusBarRequest(QWidget *widget);
+    void showMessageRequest(const QString &msg, int timeout);
+    void updateEditMenuRequest();
+    void settingsChanged();
 
 protected:
     void changeEvent(QEvent *event) override;
 
-private slots:
+private /*slots*/ :
     void onModificationChanged(bool changed);
     void onTabChanged(int index);
     void onTabMoved(int from, int to);
     void onCloseFile(int index);
     void onSwitchNextFile();
     void onSwitchPrevFile();
-    void onCurTextChanged();
-    void onCurTextChangingDone();
-    void onCurFileChanged(const QString &path);
 
 private:
     Ui::TabbedDocumentInterface *ui;
 
     QVector<CodeFile> files;
-    int prevIndex                 = -1;
-    QTextDocument *lastRemovedDoc = nullptr;
-    bool tabMovedOrRemoved        = false;
 
-    CodeFile readFile(const QString &path);
-    void addCodeFile(const CodeFile &file);
+    QString readTextFile(const QString &path, bool &ok);
+    void addFile(const QString &path);
     bool saveFile(int index, const QString &filepath);
     void updateTabTitle(int index, bool changed = false);
 
     bool maybeSave(int index);
     void retranslate();
-    QTextDocument *getDocAt(int index) const;
-    void saveFileData(int index);
+    QTextDocument * getDocAt(int index) const;
+    QTabBar * getTabBar() const;
 };
 
 #endif /* TABBEDCODEEDITORINTERFACE_H */

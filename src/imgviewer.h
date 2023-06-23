@@ -13,13 +13,8 @@
 #include <QImage>
 #include <QTimer>
 
-struct ImageFileData {
-    QTransform transform;
-    QImage     image;
-    int        offsetX = -1;
-    int        offsetY = -1;
-};
-Q_DECLARE_METATYPE(ImageFileData)
+
+//Q_DECLARE_METATYPE(QImage)
 
 class ImgViewer : public QGraphicsView
 {
@@ -27,9 +22,6 @@ class ImgViewer : public QGraphicsView
 
 public:
     explicit ImgViewer(QWidget *parent = 0);
-
-    static ImageFileData fromFile(const QString &strFilePath,
-                                  QString &strError);
 
     void resetView();
     void fitWindow();
@@ -43,24 +35,22 @@ public:
         return m_rotateAngle;
     }
 
+    bool setImage(const QString &path);
     bool setImage(const QImage &image);
     QImage getImage() const;
-
-    void loadData(const ImageFileData &data);
-    ImageFileData toData() const;
 
 signals:
     void updateStatusBarRequest(ImgViewer *viewer);
 
 protected:
-    void wheelEvent(QWheelEvent * event) override;
-    void resizeEvent(QResizeEvent * event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void paintEvent(QPaintEvent *e) override;
     void drawForeground(QPainter *painter, const QRectF &rect) override;
 
 private:
     QTimer m_timer;
-    mutable QImage m_image;
+    QImage m_image;
     QPixmap m_pixmap;
     QPixmap m_bg;
     QGraphicsPixmapItem *m_pixmapItem = nullptr;

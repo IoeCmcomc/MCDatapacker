@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
-    <height>394</height>
+    <width>475</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -47,19 +47,6 @@
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Language:</string>
-         </property>
-         <property name="buddy">
-          <cstring>languageCombo</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="languageCombo"/>
-       </item>
-       <item row="2" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Reload externally changed files:</string>
@@ -69,7 +56,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="0" column="1">
         <widget class="QComboBox" name="reloadExternChangesCombo">
          <property name="enabled">
           <bool>false</bool>
@@ -91,18 +78,25 @@
          </item>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_6">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="uiTab">
+      <attribute name="title">
+       <string>Interface</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Minecraft version:</string>
+          <string>Language:</string>
          </property>
          <property name="buddy">
-          <cstring>gameVersionCombo</cstring>
+          <cstring>languageCombo</cstring>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="gameVersionCombo"/>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="languageCombo"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_8">
@@ -115,7 +109,70 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="themeCombo"/>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="1">
+          <widget class="QLabel" name="darkThemeLabel">
+           <property name="text">
+            <string>Automatically switch to the below theme if system dark mode is detected:</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="buddy">
+            <cstring>darkThemeCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="darkThemeCombo">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QComboBox" name="themeCombo"/>
+         </item>
+         <item row="1" column="0" rowspan="2">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Maximum</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>18</width>
+             <height>58</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="gameTab">
+      <attribute name="title">
+       <string>Game</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_4">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Minecraft version:</string>
+         </property>
+         <property name="buddy">
+          <cstring>gameVersionCombo</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="gameVersionCombo"/>
        </item>
       </layout>
      </widget>
@@ -273,6 +330,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>reloadExternChangesCombo</tabstop>
+  <tabstop>languageCombo</tabstop>
+  <tabstop>themeCombo</tabstop>
+  <tabstop>gameVersionCombo</tabstop>
+  <tabstop>editorTextSizeSpin</tabstop>
+  <tabstop>editorTextFontCombo</tabstop>
+  <tabstop>editorWrapCheck</tabstop>
+  <tabstop>commentFillModeRadio</tabstop>
+  <tabstop>commentToggleModeRadio</tabstop>
+  <tabstop>editorTabSizeSpin</tabstop>
+  <tabstop>editorTabAsSpacesCheck</tabstop>
+  <tabstop>editorShowSpacesCheck</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -283,7 +355,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>252</x>
-     <y>389</y>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -299,7 +371,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>320</x>
-     <y>389</y>
+     <y>317</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

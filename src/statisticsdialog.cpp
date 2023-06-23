@@ -4,7 +4,8 @@
 #include "mainwindow.h"
 #include "globalhelpers.h"
 #include "parsers/command/minecraftparser.h"
-#include "platforms/windows.h"
+#include "parsers/command/visitors/sourceprinter.h"
+#include "platforms/windows_specific.h"
 
 #include <QDirIterator>
 #include <QProgressDialog>
@@ -18,25 +19,41 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     m_mainWin = parent;
     ui->setupUi(this);
 
-    extendFrameOnWindows(this, "StatisticsDialog");
+    Windows::extendFrame(this);
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
                                    QDir::current().dirName(),
                                    m_mainWin->getPackInfo().description));
 
-    m_parser = new Command::MinecraftParser(this);
+    m_parser = new Command::MinecraftParser();
 
     QElapsedTimer timer;
     timer.start();
     collectAndSetupData();
     ui->timeLabel->setText(tr("Total processing time: %Ln second(s)",
                               nullptr, timer.elapsed() / 1000.0));
+    connect(ui->syntaxErrorTable, &QTableWidget::cellDoubleClicked,
+            this, &StatisticsDialog::onErrorTableDoubleClicked);
     setAttribute(Qt::WA_DeleteOnClose, true);
 }
 
 StatisticsDialog::~StatisticsDialog() {
-    qDebug() << ui;
+    delete m_parser;
     delete ui;
+}
+
+void StatisticsDialog::onErrorTableDoubleClicked(int row,
+                                                 [[maybe_unused]] int column) {
+    const QString &&path = m_dirPath + '/' +
+                           ui->syntaxErrorTable->item(row, 0)->data(
+        Qt::DisplayRole).toString();
+
+    const int lineNo =
+        ui->syntaxErrorTable->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
+
+    emit openFileWithLineRequested(path, lineNo);
+
+    m_mainWin->activateWindow();
 }
 
 void StatisticsDialog::collectAndSetupData() {
@@ -197,19 +214,29 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
         int i = 0;
         while (!in.atEnd()) {
             ++i;
-            const QString &line = in.readLine();
-            if (line.startsWith('#'))
-                ++m_commentLines;
-
-            if (line.trimmed() == QString())
+            const QString &&line    = in.readLine();
+            const auto     &trimmed = line.trimmed();
+            if (trimmed.isEmpty()) {
                 continue;
+            } else if (trimmed[0] == '#') {
+                ++m_commentLines;
+                continue;
+            }
 
-            m_parser->setText(line);
-
+            m_parser->setText(QStringView(line));
             const auto &result = m_parser->parse();
-            if (result->isVaild()) {
+            if (result->isValid()) {
                 m_nodeCounter.startVisiting(result.get());
                 ++m_commandLines;
+
+                if (result->kind() == Command::ParseNode::Kind::Root) {
+                    Command::SourcePrinter printer;
+                    printer.startVisiting(result.get());
+                    if (printer.source() != line) {
+                        qDebug() << path << i;
+                        qDebug() << printer.source();
+                    }
+                }
             } else {
                 const int row = ui->syntaxErrorTable->rowCount();
                 ui->syntaxErrorTable->insertRow(row);
@@ -218,9 +245,15 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                     new QTableWidgetItem(Glhp::relPath(m_dirPath, path)));
                 ui->syntaxErrorTable->setItem(
                     row, 1, new QTableWidgetItem(QString::number(i)));
-                ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
-                                                  m_parser->lastError().
-                                                  toLocalizedMessage()));
+                if (m_parser->errors().isEmpty()) {
+                    ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
+                                                      "Invalid command"));
+                } else {
+                    ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
+                                                      m_parser->errors().last()
+                                                      .toLocalizedMessage()));
+                }
+
                 ++m_syntaxErrors;
             }
         }

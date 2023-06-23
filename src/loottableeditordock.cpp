@@ -4,8 +4,11 @@
 #include "mainwindow.h"
 #include "loottablepool.h"
 #include "loottablefunction.h"
+
+#include "modelfunctions.h"
 #include "globalhelpers.h"
 #include "game.h"
+#include "platforms/windows_specific.h"
 
 #include <QDebug>
 #include <QJsonArray>
@@ -14,21 +17,23 @@
 #include <QJsonDocument>
 #include <QListView>
 
+
 LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
 
     if (Game::version() < Game::v1_16) {
-        if (auto *view =
-                qobject_cast<QListView *>(ui->lootTableTypeCombo->view())) {
-            const auto &&model =
-                static_cast<QStandardItemModel*>(ui->lootTableTypeCombo->model());
-            for (int i = 8; i < view->model()->rowCount(); ++i) {
-                view->setRowHidden(i, true);
-                model->item(i, 0)->setEnabled(false);
-            }
-        }
+        hideComboRow(ui->lootTableTypeCombo, 8);
+        hideComboRow(ui->lootTableTypeCombo, 9);
+        hideComboRow(ui->lootTableTypeCombo, 10);
+        hideComboRow(ui->lootTableTypeCombo, 11);
+    }
+    if (Game::version() < Game::v1_20) {
+        ui->randomSeqEdit->hide();
+        ui->randomSeqLabel->hide();
+        hideComboRow(ui->lootTableTypeCombo, 12);
+        hideComboRow(ui->lootTableTypeCombo, 13);
     }
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
@@ -39,6 +44,14 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
             this, &LootTableEditorDock::updatePoolsTab);
     connect(ui->functionsInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTableEditorDock::updateFunctionsTab);
+
+    connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
+        adjustSize();
+        if (floating) {
+            Windows::setDarkFrameIfDarkMode(this);
+            resize(minimumWidth(), height());
+        }
+    });
 
     auto *pool = new LootTablePool();
     ui->poolsInterface->setupMainWidget(pool);
@@ -54,10 +67,19 @@ LootTableEditorDock::~LootTableEditorDock() {
 void LootTableEditorDock::writeJson() {
     QJsonObject root;
 
+    if (ui->lootTableTypeCombo->currentIndex() == 0) {
+        return;
+    }
     const QString &&type = QStringLiteral("minecraft:") +
                            types[ui->lootTableTypeCombo->currentIndex()];
 
     root.insert("type", type);
+
+    if (Game::version() >= Game::v1_20) {
+        if (auto &&sequence = ui->randomSeqEdit->text(); !sequence.isEmpty()) {
+            root["random_sequence"] = sequence;
+        }
+    }
 
     QJsonArray pools = ui->poolsInterface->json();
     if (!pools.isEmpty())
@@ -67,13 +89,13 @@ void LootTableEditorDock::writeJson() {
     if (!functions.isEmpty())
         root.insert("functions", functions);
 
-    qobject_cast<MainWindow*>(parent())->
+    qobject_cast<MainWindow *>(parent())->
     setCodeEditorText(QJsonDocument(root).toJson());
 }
 
 void LootTableEditorDock::readJson() {
     QString input =
-        qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+        qobject_cast<MainWindow *>(parent())->getCodeEditorText();
     QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
 
     if (json_doc.isNull() || (!json_doc.isObject()))
@@ -85,17 +107,21 @@ void LootTableEditorDock::readJson() {
     }
 
     QString type = root.value("type").toString();
-    Glhp::removePrefix(type, "minecraft:");
+    Glhp::removePrefix(type, "minecraft:"_QL1);
 
     const int index = types.indexOf(type);
     if (index > -1) {
         const auto &&model =
-            static_cast<QStandardItemModel*>(ui->lootTableTypeCombo->model());
+            static_cast<QStandardItemModel *>(ui->lootTableTypeCombo->model());
         const auto &&item = model->item(index, 0);
         if (!item->isEnabled())
             return;
 
         ui->lootTableTypeCombo->setCurrentIndex(index);
+    }
+
+    if (Game::version() >= Game::v1_20) {
+        ui->randomSeqEdit->setText(root.value("random_sequence").toString());
     }
 
     ui->poolsInterface->setJson(root.value("pools").toArray());

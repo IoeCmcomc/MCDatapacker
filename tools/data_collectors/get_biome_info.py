@@ -2,7 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Biome/ID?oldid=2130503') 
+req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Biome/ID') 
 ids_soup = BeautifulSoup(req.read(), "lxml")
 
 h1 = ids_soup.find("h1")

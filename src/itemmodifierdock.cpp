@@ -5,6 +5,7 @@
 #include "loottablefunction.h"
 
 #include "game.h"
+#include "platforms/windows_specific.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -21,6 +22,7 @@ ItemModifierDock::ItemModifierDock(QWidget *parent) :
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
         adjustSize();
         if (floating) {
+            Windows::setDarkFrameIfDarkMode(this);
             resize(minimumWidth(), height());
         }
     });
@@ -49,7 +51,7 @@ void ItemModifierDock::changeEvent(QEvent *event) {
 
 void ItemModifierDock::onReadBtn() {
     QString &&input =
-        qobject_cast<MainWindow*>(parent())->getCodeEditorText();
+        qobject_cast<MainWindow *>(parent())->getCodeEditorText();
     QJsonDocument &&json_doc = QJsonDocument::fromJson(input.toUtf8());
 
     if (json_doc.isNull() || json_doc.isEmpty())
@@ -77,5 +79,5 @@ void ItemModifierDock::onWriteBtn() {
         jsonDoc = QJsonDocument(ui->dataInterface->json()[0].toObject());
     }
 
-    qobject_cast<MainWindow*>(parent())->setCodeEditorText(jsonDoc.toJson());
+    qobject_cast<MainWindow *>(parent())->setCodeEditorText(jsonDoc.toJson());
 }

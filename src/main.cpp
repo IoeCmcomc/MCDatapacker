@@ -13,15 +13,21 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
-    QCoreApplication::setApplicationVersion("0.6.0");
+    QCoreApplication::setApplicationVersion(APP_VERSION);
 
     /*Q_INIT_RESOURCE(application); */
+
+#ifdef Q_OS_WIN
+    qputenv("QT_QPA_PLATFORM", "windows:darkmode=1");
+#endif
 
     QApplication a(argc, argv);
     qInfo() << "Appication started.";
 
     QFontDatabase::addApplicationFont(QStringLiteral(
-                                          ":/fonts/Monocraft/Monocraft.otf"));
+                                          ":/fonts/Monocraft.otf"));
+    QFontDatabase::addApplicationFont(QStringLiteral(
+                                          ":/fonts/MCDatapacker-Icons.ttf"));
 
     QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << QStringLiteral(
                                       ":/icon"));
@@ -42,6 +48,7 @@ int main(int argc, char *argv[]) {
 
     MainWindow w;
     w.show();
+
     qInfo() << "Appication startup completed.";
 
     return QApplication::exec();
