@@ -9,7 +9,7 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png">
   <p align="center">
-    <b>MCDatapacker is a Minecraft datapack editor which supports datapacks for Minecraft 1.15 – 1.18.2.</b>
+    <b>MCDatapacker is a Minecraft datapack editor which supports datapacks for Minecraft 1.15 – 1.20.</b>
   </p>
 </p>
 
@@ -25,7 +25,7 @@ This program can be used for making a new datapack, opening existing datapack, a
   - A *visual* recipe editor (idea from the [thedestruc7i0n's recipe generator](https://crafting.thedestruc7i0n.ca/ "thedestruc7i0n's recipe generator"));
   - Predicate, loot table and item modifier editors (idea from the [misode's generator](https://misode.github.io/ "misode's generator")).
 - View images (such as the pack.png) directly in the program.
-- Some useful tools, such as displaying datapack statistics and a raw JSON text editor.
+- Some useful tools, such as displaying datapack statistics and raw JSON text editors.
 - Lightweight (in term of storage and memory).
 
 ## Screenshots
