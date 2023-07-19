@@ -119,6 +119,7 @@ SOURCES += \
     stackedwidget.cpp \
     statisticsdialog.cpp \
     statusbar.cpp \
+    stringvectormodel.cpp \
     stripedscrollbar.cpp \
 #    stylesheetreapplier.cpp \
     tabbeddocumentinterface.cpp \
@@ -223,6 +224,7 @@ HEADERS += \
     stackedwidget.h \
     statisticsdialog.h \
     statusbar.h \
+    stringvectormodel.h \
     stripedscrollbar.h \
 #    stylesheetreapplier.h \ # Already added in mcdatapackerwidgets.pri
     tabbeddocumentinterface.h \

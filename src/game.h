@@ -25,9 +25,9 @@ namespace Game {
                         const int depth = 0);
     QVariantMap loadInfo(const QString &type, const QString &version,
                          const int depth = 0);
-    QStringList getRegistry(const QString &type);
-    QStringList getRegistry(const QString &type, const QString &version);
-    QStringList loadRegistry(const QString &type, const QString &version);
+    QVector<QString> getRegistry(const QString &type);
+    QVector<QString> getRegistry(const QString &type, const QString &version);
+    QVector<QString> loadRegistry(const QString &type, const QString &version);
 }
 
 #endif // GAME_H

@@ -4,7 +4,6 @@
 #include <QPlainTextEdit>
 #include <QPointer>
 #include <QSettings>
-#include <QStringList>
 
 #include "codefile.h"
 #include "parsers/parser.h"
@@ -94,7 +93,7 @@ private /*slots*/ :
     void onTextChanged();
 
 private:
-    static QStringList minecraftCompletionInfo;
+    static QVector<QString> minecraftCompletionInfo;
 
     QTextCharFormat bracketSeclectFmt;
     QTextCharFormat errorHighlightRule;

@@ -21,12 +21,14 @@ QString Game::versionString() {
     return value;
 }
 
-QStringList Game::getRegistry(const QString &type) {
+QVector<QString> Game::getRegistry(const QString &type) {
     return getRegistry(type, Game::versionString());
 }
 
-QStringList Game::getRegistry(const QString &type, const QString &version) {
-    static LRU::Cache<std::tuple<QString, QString>, QStringList> cache{ 20 };
+QVector<QString> Game::getRegistry(const QString &type,
+                                   const QString &version) {
+    static LRU::Cache<std::tuple<QString, QString>,
+                      QVector<QString> > cache{ 20 };
 
     const std::tuple inputPair{ type, version };
 
@@ -40,7 +42,8 @@ QStringList Game::getRegistry(const QString &type, const QString &version) {
     return result;
 }
 
-QStringList Game::loadRegistry(const QString &type, const QString &version) {
+QVector<QString> Game::loadRegistry(const QString &type,
+                                    const QString &version) {
     QFileInfo finfo(":minecraft/" + version + "/registries/" + type +
                     "/data.min.json");
 
@@ -60,8 +63,8 @@ QStringList Game::loadRegistry(const QString &type, const QString &version) {
         return {};
     }
 
-    QStringList  values;
-    const auto &&array = doc.array();
+    QVector<QString> values;
+    const auto     &&array = doc.array();
     for (const auto &value : array) {
         values << value.toString();
     }
