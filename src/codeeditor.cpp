@@ -9,6 +9,7 @@
 #include "parsers/command/minecraftparser.h"
 #include "parsers/command/schema/schemaliteralnode.h"
 #include "parsers/command/schema/schemaargumentnode.h"
+#include "stringvectormodel.h"
 #include "game.h"
 
 #include <QPainter>
@@ -24,13 +25,12 @@
 #include <QScroller>
 #include <QScrollBar>
 #include <QCompleter>
-#include <QStringListModel>
 #include <QElapsedTimer>
 #include <QAbstractItemView>
 #include <QMenu>
 
 
-QStringList getMinecraftInfoKeys(const QString &key) {
+QVector<QString> getMinecraftInfoKeys(const QString &key) {
 //    QElapsedTimer timer;
 //    timer.start();
 
@@ -40,17 +40,17 @@ QStringList getMinecraftInfoKeys(const QString &key) {
 //    qDebug() << "getMinecraftInfoKeys() exec time:" <<
 //        timer.nsecsElapsed() / 1e6;
 
-    return infoMap.keys();
+    return infoMap.keys().toVector();
 }
 
-QStringList loadMinecraftCommandLiterals(
+QVector<QString> loadMinecraftCommandLiterals(
     const Command::Schema::Node * const node, ushort depth = 0) {
     QElapsedTimer timer;
 
     if (depth == 0)
         timer.start();
 
-    QStringList ret;
+    QVector<QString> ret;
 
     const auto &&literalChidrens = node->literalChildren();
     for (auto it = literalChidrens.cbegin();
@@ -76,8 +76,8 @@ QStringList loadMinecraftCommandLiterals(
     return ret;
 }
 
-QStringList loadMinecraftCompletionInfo() {
-    QStringList &&ret = loadMinecraftCommandLiterals(
+QVector<QString> loadMinecraftCompletionInfo() {
+    QVector<QString> &&ret = loadMinecraftCommandLiterals(
         Command::MinecraftParser::schema());
 
     ret += getMinecraftInfoKeys(QStringLiteral("attribute"));
@@ -100,8 +100,8 @@ QStringList loadMinecraftCompletionInfo() {
     ret += Game::getRegistry(QStringLiteral("particle_type"));
     ret += Game::getRegistry(QStringLiteral("sound_event"));
 
-    ret.sort(Qt::CaseInsensitive);
-    ret.removeDuplicates();
+    std::sort(ret.begin(), ret.end());
+    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
     return ret;
 }
 
@@ -130,7 +130,7 @@ qreal perceivedLightness(const QColor &color) {
     }
 }
 
-QStringList CodeEditor::minecraftCompletionInfo = {};
+QVector<QString> CodeEditor::minecraftCompletionInfo = {};
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     m_gutter = new CodeGutter(this);
@@ -193,7 +193,7 @@ void CodeEditor::initCompleter() {
                 minecraftCompletionInfo.size() << "items)";
         }
     }
-    completer->setModel(new QStringListModel(minecraftCompletionInfo, this));
+    completer->setModel(new StringVectorModel(minecraftCompletionInfo, this));
     completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
@@ -489,7 +489,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (completionPrefix != m_completer->completionPrefix()) {
         if (m_completer->popup()->isHidden()) {
             qDebug() << "Combining final completions";
-            QStringList completionInfo = minecraftCompletionInfo;
+            QVector<QString> completionInfo = minecraftCompletionInfo;
 
             const QVector<QString> &&idList = Glhp::fileIdList(
                 QDir::currentPath(), QString(), QString(), false);
@@ -497,12 +497,14 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
                 completionInfo << item;
             }
 
-            completionInfo.sort(Qt::CaseInsensitive);
-            completionInfo.removeDuplicates();
+            std::sort(completionInfo.begin(), completionInfo.end());
+            completionInfo.erase(std::unique(completionInfo.begin(),
+                                             completionInfo.end()),
+                                 completionInfo.end());
 
             if (auto *model =
-                    qobject_cast<QStringListModel *>(m_completer->model())) {
-                model->setStringList(completionInfo);
+                    qobject_cast<StringVectorModel *>(m_completer->model())) {
+                model->setVector(completionInfo);
             }
 //            qDebug() << minecraftCompletionInfo.size() <<
 //                m_completer->model()->rowCount() <<
