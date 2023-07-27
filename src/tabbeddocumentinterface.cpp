@@ -99,6 +99,10 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
 
     QSaveFile file(filepath);
     if (curFile.fileType >= CodeFile::Text) {
+        auto *doc =
+            qobject_cast<CodeEditor *>(ui->tabWidget->widget(index))->document();
+        Q_ASSERT(doc != nullptr);
+
 #ifndef QT_NO_CURSOR
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
@@ -106,7 +110,8 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
         if (file.open(QFile::WriteOnly | QFile::Text)) {
             QTextStream out(&file);
             out.setCodec("UTF-8");
-            out << getCurDoc()->toPlainText().toUtf8();
+
+            out << doc->toPlainText().toUtf8();
             if (!file.commit()) {
                 errorMessage = tr("Cannot write file %1:\n%2.")
                                .arg(QDir::toNativeSeparators(filepath),
@@ -131,9 +136,8 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
 
         if (ok) {
             curFile.changePath(filepath);
-            getCurDoc()->setModified(false);
-            if (index != getCurIndex())
-                updateTabTitle(index, false);
+            doc->setModified(false);
+            updateTabTitle(index, false);
             files[index].isModified = false;
         }
 
@@ -143,7 +147,7 @@ bool TabbedDocumentInterface::saveFile(int index, const QString &filepath) {
 }
 
 void TabbedDocumentInterface::updateTabTitle(int index, bool changed) {
-    auto &&newTitle = getCurFile()->name();
+    auto &&newTitle = files[index].name();
 
     if (changed)
         newTitle += '*';
@@ -366,8 +370,11 @@ bool TabbedDocumentInterface::saveAllFile() {
 
     if (!hasNoFile()) {
         for (int i = 0; i < count(); i++) {
-            /* AND operation */
-            r &= saveFile(i, files[i].path());
+            const auto &codeFile = files.at(i);
+            if (codeFile.isModified) {
+                /* AND operation */
+                r &= saveFile(i, codeFile.path());
+            }
         }
     }
     return r;
