@@ -336,7 +336,10 @@ void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
         //debugTextCursor(tc);
         // This fixes garbage characters in debug mode
         const QString &&selectedText = tc.selectedText();
-        const QChar    &curChar      = selectedText.front();
+        if (selectedText.isEmpty()) {
+            return;
+        }
+        const QChar &curChar = selectedText.front();
 
         if (extendedAcceptedCharsset.contains(curChar)) {
             tc.movePosition(QTextCursor::PreviousCharacter);
