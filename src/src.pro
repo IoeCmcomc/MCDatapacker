@@ -97,6 +97,7 @@ SOURCES += \
     parsers/command/parsenodecache.cpp \
     parsers/command/schema/schemaargumentnode.cpp \
     parsers/command/schema/schemaliteralnode.cpp \
+    parsers/command/schema/schemaloader.cpp \
     parsers/command/schema/schemanode.cpp \
     parsers/command/schema/schemarootnode.cpp \
     parsers/command/schemaparser.cpp \
@@ -203,6 +204,7 @@ HEADERS += \
     parsers/command/re2c_generated_functions.h \
     parsers/command/schema/schemaargumentnode.h \
     parsers/command/schema/schemaliteralnode.h \
+    parsers/command/schema/schemaloader.h \
     parsers/command/schema/schemanode.h \
     parsers/command/schema/schemarootnode.h \
     parsers/command/schemaparser.h \

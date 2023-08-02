@@ -3,16 +3,14 @@
 //#include "visitors/sourceprinter.h"
 #include "schema/schemaargumentnode.h"
 #include "schema/schemaliteralnode.h"
+#include "schema/schemaloader.h"
 
 #include "re2c_generated_functions.h"
 
 #include "uberswitch.hpp"
 
-#include <QCoreApplication>
-#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QMetaMethod>
 #include <QElapsedTimer>
 
 /* These classes are for benchmarking deserialization methods.
@@ -395,81 +393,26 @@ namespace Command {
         }
     }
 
+    void SchemaParser::setSchema(Schema::RootNode *schema) {
+        m_schemaGraph = schema;
+    }
+
 /*!
  * \brief Opens a JSON file and loads it into the static schema.
  */
-    void SchemaParser::setSchema(const QString &filepath) {
+    void SchemaParser::loadSchema(const QString &filepath) {
         QElapsedTimer timer;
 
         timer.start();
-        loadSchema(filepath);
-        qDebug() << "Schema loaded in" << timer.elapsed() << "ms (path:" <<
-            filepath << ")";
-    }
 
-    void resolveRedirects(const json &j, Schema::Node *node,
-                          Schema::RootNode *root = nullptr) {
-        if (node->kind() == Schema::Node::Kind::Root) {
-            root = static_cast<Schema::RootNode *>(node);
-        }
+        setSchema(Schema::SchemaLoader(filepath).tree());
 
-        if (j.contains("redirect")) {
-            Q_ASSERT(root != nullptr);
-            // Example: "execute as >@e< at @s ..."
-            node->setRedirect(
-                root->literalChildren()[j["redirect"][0].get<QString>()]);
-        }
-
-        if (j.contains("children")) {
-            const auto &children        = j["children"];
-            const auto &literalChildren = node->literalChildren();
-            for (auto it = literalChildren.cbegin();
-                 it != literalChildren.cend(); ++it) {
-                resolveRedirects(children[it.key().toStdString()], it.value(),
-                                 root);
-            }
-            const auto &argChildren = node->argumentChildren();
-            for (const auto &child: argChildren) {
-                resolveRedirects(children[child->name().toStdString()], child,
-                                 root);
-            }
-        } else if (!(node->redirect() || node->isExecutable())) {
-            // Example: "execute >run< say ..."
-            node->setRedirect(root);
-        }
-    }
-
-    void SchemaParser::loadSchema(const QString &filepath) {
-        QFileInfo finfo(filepath);
-
-        if (!(finfo.exists() && finfo.isFile())) {
-            qWarning() << "File not exists:" << finfo.filePath();
-            return;
-        }
-
-        QFile      f(finfo.filePath());
-        const bool isJson      = finfo.suffix() == "json"_QL1;
-        const auto openOptions = (isJson)
-                ? (QIODevice::ReadOnly | QIODevice::Text) : QIODevice::ReadOnly;
-        f.open(openOptions);
-        QByteArray &&data = f.readAll();
-        f.close();
-
-        json j;
-
-        if (isJson) {
-            j = json::parse(data);
-        } else if (finfo.suffix() == "msgpack"_QL1) {
-            j = json::from_msgpack(data);
-        }
-
-        m_schemaGraph = j.get<Schema::RootNode>();
-        resolveRedirects(j, &m_schemaGraph);
-        // TODO: Merge duplicated sub-trees
+        qInfo() << "Command schema loaded in" << timer.elapsed() <<
+            "ms (path:" << filepath << ")";
     }
 
     Schema::RootNode * SchemaParser::schema() {
-        return &m_schemaGraph;
+        return m_schemaGraph;
     }
 
 /*!
@@ -727,7 +670,7 @@ namespace Command {
     QSharedPointer<ParseNode> SchemaParser::parse() {
         m_tree = QSharedPointer<RootNode>::create();
         m_errors.clear();
-        if (m_schemaGraph.isEmpty()) {
+        if (!m_schemaGraph || m_schemaGraph->isEmpty()) {
             qWarning() << "The parser schema hasn't been initialized yet.";
             return m_tree;
         }
@@ -735,7 +678,7 @@ namespace Command {
         setPos(0);
         try {
             m_tree->setLeadingTrivia(skipWs(false));
-            parseBySchema(&m_schemaGraph);
+            parseBySchema(m_schemaGraph);
 
             m_tree->setLength(pos() - 1);
             m_tree->setTrailingTrivia(skipWs(false));

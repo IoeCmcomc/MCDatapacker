@@ -9,10 +9,10 @@ public:
         RootNode();
 
 protected:
-        friend void from_json(const json& j, RootNode &n);
+        friend void from_json(const json& j, RootNode *&n);
     };
 
-    void from_json(const json& j, RootNode &n);
+    void from_json(const json& j, RootNode *&n);
 }
 
 #endif // SCHEMA_ROOTNODE_H

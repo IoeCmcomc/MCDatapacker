@@ -1543,7 +1543,7 @@ namespace Command {
 
     void MinecraftParser::setGameVer(const QVersionNumber &newGameVer) {
         gameVer = newGameVer;
-        setSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
-                  QStringLiteral("/summary/commands/data.min.json"));
+        loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
+                   QStringLiteral("/summary/commands/data.min.json"));
     }
 }

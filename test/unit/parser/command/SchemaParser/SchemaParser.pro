@@ -14,6 +14,7 @@ SOURCES +=  tst_testschemaparser.cpp \
     ../../../../../src/parsers/command/nodes/rootnode.cpp \
     ../../../../../src/parsers/command/nodes/stringnode.cpp \
     ../../../../../src/parsers/command/parsenodecache.cpp \
+    ../../../../../src/parsers/command/schema/schemaloader.cpp \
     ../../../../../src/parsers/command/schemaparser.cpp \
     ../../../../../src/parsers/command/schema/schemaargumentnode.cpp \
     ../../../../../src/parsers/command/schema/schemaliteralnode.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/rootnode.h \
     ../../../../../src/parsers/command/nodes/stringnode.h \
     ../../../../../src/parsers/command/parsenodecache.h \
+    ../../../../../src/parsers/command/schema/schemaloader.h \
     ../../../../../src/parsers/command/schemaparser.h \
     ../../../../../src/parsers/command/schema/schemaargumentnode.h \
     ../../../../../src/parsers/command/schema/schemaliteralnode.h \

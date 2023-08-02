@@ -39,7 +39,7 @@ TestSchemaParser::~TestSchemaParser() {
 }
 
 void TestSchemaParser::initTestCase() {
-    SchemaParser::setSchema(":/minecraft/1.15/summary/commands/data.min.json");
+    SchemaParser::loadSchema(":/minecraft/1.15/summary/commands/data.min.json");
     Command::SchemaParser::setTestMode(true);
 }
 

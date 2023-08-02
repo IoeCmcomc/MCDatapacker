@@ -83,7 +83,7 @@ public:
         SchemaParser();
         using Parser::Parser;
 
-        static void setSchema(const QString &filepath);
+        static void setSchema(Schema::RootNode *schema);
         static void loadSchema(const QString &filepath);
         static Schema::RootNode * schema();
 
@@ -195,7 +195,7 @@ private:
         QSharedPointer<Command::RootNode> m_tree;
 //        static inline const QRegularExpression m_decimalNumRegex{
 //            QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
-        static inline Schema::RootNode m_schemaGraph;
+        static inline Schema::RootNode *m_schemaGraph = nullptr;
 
         const QString commandGuideStr(const Schema::Node *schemaNode);
     };
