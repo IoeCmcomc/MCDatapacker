@@ -132,7 +132,8 @@ public:
         MinecraftParser();
         using SchemaParser::SchemaParser;
 
-        static void setGameVer(const QVersionNumber &newGameVer);
+        static void setGameVer(const QVersionNumber &newGameVer,
+                               const bool autoLoadSchema = true);
 
 private:
         friend class McfunctionParser;

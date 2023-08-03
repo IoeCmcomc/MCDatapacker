@@ -19,6 +19,10 @@ public:
 protected slots:
     void onAccepted();
 
+private slots:
+    void onCustomCmdBrowse();
+    void checkCustomCmd();
+
 private:
     Ui::SettingsDialog *ui;
     QSettings m_settings;

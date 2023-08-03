@@ -79,7 +79,8 @@ namespace Command {
 //                 << ". Total miss:" << m_cache.stats().total_misses()
 //                 << ". Hit rate:" << m_cache.stats().hit_rate()
 //                 << ". Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
-        qDebug() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
+
+        //        qDebug() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
 
         m_tree  = tree;
         m_spans = m_commandParser.spans();

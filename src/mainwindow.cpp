@@ -8,6 +8,7 @@
 #include "disclaimerdialog.h"
 #include "tabbeddocumentinterface.h"
 #include "parsers/command/minecraftparser.h"
+#include "parsers/command/schema/schemaloader.h"
 #include "visualrecipeeditordock.h"
 #include "loottableeditordock.h"
 #include "predicatedock.h"
@@ -482,11 +483,24 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
         } else {
             settings.setValue(QStringLiteral("version"), gameVer); // Set value explicitly
             tempGameVerStr = gameVer;
-            Command::MinecraftParser::setGameVer(Game::version());
-
             qInfo() << "The game version has been set to" << gameVer;
             emit gameVersionChanged(gameVer);
         }
+    }
+    const auto &&syntaxPath =
+        settings.value("customCommandSyntaxFilePath").toString();
+    if (!syntaxPath.isEmpty()) {
+        Command::Schema::SchemaLoader loader{ syntaxPath };
+        if (loader.lastError().isEmpty()) {
+            Command::MinecraftParser::setGameVer(Game::version(), false);
+            Command::MinecraftParser::setSchema(loader.tree());
+            qInfo() << "Command syntax tree has been overriden by" <<
+                syntaxPath;
+        } else {
+            Command::MinecraftParser::setGameVer(Game::version());
+        }
+    } else {
+        Command::MinecraftParser::setGameVer(Game::version());
     }
     settings.endGroup();
 

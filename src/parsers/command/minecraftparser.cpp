@@ -1541,9 +1541,12 @@ namespace Command {
         return ret;
     }
 
-    void MinecraftParser::setGameVer(const QVersionNumber &newGameVer) {
+    void MinecraftParser::setGameVer(const QVersionNumber &newGameVer,
+                                     const bool autoLoadSchema) {
         gameVer = newGameVer;
-        loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
-                   QStringLiteral("/summary/commands/data.min.json"));
+        if (autoLoadSchema) {
+            loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
+                       QStringLiteral("/summary/commands/data.min.json"));
+        }
     }
 }

@@ -394,6 +394,10 @@ namespace Command {
     }
 
     void SchemaParser::setSchema(Schema::RootNode *schema) {
+        Q_ASSERT(schema != nullptr);
+        if (m_schemaGraph) {
+            delete m_schemaGraph;
+        }
         m_schemaGraph = schema;
     }
 

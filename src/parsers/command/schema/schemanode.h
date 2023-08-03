@@ -32,6 +32,7 @@ public:
         using LiteralChildrenType = QMap<QString, LiteralNode *>;
 
         Node();
+        ~Node();
 
         Kind kind() const;
 
