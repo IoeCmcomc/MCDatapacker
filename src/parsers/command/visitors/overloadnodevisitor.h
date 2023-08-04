@@ -54,6 +54,9 @@ public:
         void visit(IntegerNode *node) override {
             _visit(node);
         }
+        void visit(LongNode *node) override {
+            _visit(node);
+        }
         void visit(StringNode *node) override {
             _visit(node);
         }

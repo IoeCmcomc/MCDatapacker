@@ -378,8 +378,7 @@ namespace Command {
                 return brigadier_literal();
             }
             case ParserType::Long: {
-                throwError(
-                    "The 'brigadier:long' parser hasn't been implemented yet.");
+                return brigadier_long(props);
             }
             case ParserType::String: {
                 return brigadier_string(props);
@@ -507,19 +506,22 @@ namespace Command {
         }
     }
 
-    QPair<QStringView, int> SchemaParser::parseInteger(bool &ok) {
+    QStringView SchemaParser::getDigits() {
         const int start = pos();
 
         if (curChar() == '-' || curChar() == '+') {
             advance();
         }
-
         while (curChar().isDigit()) {
             advance();
         }
+        return textView().mid(start, pos() - start);
+    }
 
-        const QStringView raw   = textView().mid(start, pos() - start);
+    QPair<QStringView, int> SchemaParser::parseInteger(bool &ok) {
+        const QStringView raw   = getDigits();
         const int         value = strToDec<int>(raw, ok);
+
         return { raw, value };
     }
 
@@ -625,6 +627,28 @@ namespace Command {
             checkMax(value, vari.toInt());
         }
         return QSharedPointer<IntegerNode>::create(spanText(raw), value, true);
+    }
+
+    QSharedPointer<LongNode> SchemaParser::brigadier_long(
+        const QVariantMap &props) {
+        bool              ok;
+        const QStringView raw   = getDigits();
+        const long long   value = strToDec<long long>(raw, ok);
+
+        if (!ok) {
+            reportError(QT_TR_NOOP("%1 is not a vaild long number"),
+                        { raw.toString() });
+            return QSharedPointer<LongNode>::create(spanText(raw), false);
+        }
+        if (const QVariant &vari = props.value(QStringLiteral(
+                                                   "min")); vari.isValid()) {
+            checkMin(value, vari.toLongLong());
+        }
+        if (const QVariant &vari = props.value(QStringLiteral(
+                                                   "max")); vari.isValid()) {
+            checkMax(value, vari.toLongLong());
+        }
+        return QSharedPointer<LongNode>::create(spanText(raw), value, true);
     }
 
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {

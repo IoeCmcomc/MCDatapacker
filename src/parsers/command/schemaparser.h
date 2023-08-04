@@ -95,6 +95,8 @@ public:
         QSharedPointer<Command::IntegerNode> brigadier_integer(
             const QVariantMap &props = {});
         QSharedPointer<Command::LiteralNode> brigadier_literal();
+        QSharedPointer<Command::LongNode> brigadier_long(
+            const QVariantMap &props = {});
         QSharedPointer<Command::StringNode> brigadier_string(
             const QVariantMap &props = {});
 
@@ -120,6 +122,7 @@ protected:
 
         QString peekLiteral() const;
         QStringView getLiteralString();
+        QStringView getDigits();
 
         QPair<QStringView, int> parseInteger(bool &ok);
         QPair<QStringView, float> parseFloat(bool &ok);

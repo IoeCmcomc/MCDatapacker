@@ -21,6 +21,7 @@ private slots:
     void parseDouble();
     void parseFloat();
     void parseInteger();
+    void parseLong();
     void parseString();
     void useRegexToParseStringLiteral();
     void useRegexToParseStringLiteral2();
@@ -108,6 +109,18 @@ void TestSchemaParser::parseInteger() {
     QCOMPARE(result->parserType(), ArgumentNode::ParserType::Integer);
     QCOMPARE(result->text(), "66771508");
     QCOMPARE(result->value(), 66771508);
+}
+
+void TestSchemaParser::parseLong() {
+    SchemaParser             parser("-9223372036854775807");
+    QSharedPointer<LongNode> result(
+        parser.brigadier_long({ { "max", 1000000 } }));
+
+    QVERIFY(result->isValid());
+    QCOMPARE(result->kind(), ParseNode::Kind::Argument);
+    QCOMPARE(result->parserType(), ArgumentNode::ParserType::Long);
+    QCOMPARE(result->text(), "-9223372036854775807");
+    QCOMPARE(result->value(), -9223372036854775807);
 }
 
 void TestSchemaParser::parseString() {

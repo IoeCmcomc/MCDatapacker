@@ -60,6 +60,9 @@ public:
         void visit(IntegerNode *node) final {
             m_repr += QString("IntegerNode(%1)").arg(node->value());
         };
+        void visit(LongNode *node) final {
+            m_repr += QString("LongNode(%1)").arg(node->value());
+        };
         void visit(StringNode *node) final {
             m_repr += QString("StringNode(\"%1\")").arg(node->value());
         };

@@ -10,6 +10,7 @@ namespace Command {
     class DoubleNode;
     class FloatNode;
     class IntegerNode;
+    class LongNode;
     class StringNode;
     class LiteralNode;
     class AngleNode;
@@ -95,6 +96,7 @@ public:
         virtual void visit(DoubleNode *node)              = 0;
         virtual void visit(FloatNode *node)               = 0;
         virtual void visit(IntegerNode *node)             = 0;
+        virtual void visit(LongNode *node)                = 0;
         virtual void visit(StringNode *node)              = 0;
         virtual void visit(LiteralNode *node)             = 0;
         virtual void visit(AngleNode *node)               = 0;
