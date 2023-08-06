@@ -63,6 +63,13 @@ public:
             Uuid,
             Vec2,
             Vec3,
+            Vanilla_end = 0xff,
+            /*
+             * Internal arguments are meant to use in custom syntax tree files
+             * which are provided to the program by users.
+             */
+            InternalGreedyString,
+            InternalRegexPattern,
         };
 
         void accept(NodeVisitor *visitor, VisitOrder) override;

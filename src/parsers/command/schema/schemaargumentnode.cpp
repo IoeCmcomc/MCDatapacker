@@ -83,6 +83,8 @@ namespace Command::Schema {
             { QStringLiteral("minecraft:uuid"), PT::Uuid },
             { QStringLiteral("minecraft:vec2"), PT::Vec2 },
             { QStringLiteral("minecraft:vec3"), PT::Vec3 },
+            { QStringLiteral("___:greedy_string"), PT::InternalGreedyString },
+            { QStringLiteral("___:regex_pattern"), PT::InternalRegexPattern },
         };
 
         n = new ArgumentNode();

@@ -386,8 +386,6 @@ namespace Command {
 
             default: {
                 return nullptr;
-
-                break;
             }
         }
     }
@@ -683,9 +681,8 @@ namespace Command {
                 const auto literal = getLiteralString();
                 return QSharedPointer<StringNode>::create(
                     spanText(literal),
-                    errorIfNot(
-                        !literal.isEmpty(),
-                        "Expected a single word without spaces."));
+                    errorIfNot(!literal.isEmpty(),
+                               QT_TR_NOOP("Invalid empty word.")));
             }
         }
         return QSharedPointer<StringNode>::create(QString(), false);

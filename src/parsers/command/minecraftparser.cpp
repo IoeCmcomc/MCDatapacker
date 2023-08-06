@@ -794,8 +794,8 @@ namespace Command {
     NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
                                           const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;
-        if (const auto &&ret = SchemaParser::invokeMethod(parserType, props)) {
-            return ret;
+        if ((int)parserType < (int)ParserType::Angle) {
+            return SchemaParser::invokeMethod(parserType, props);
         }
         switch (parserType) {
             case ParserType::Angle: { return minecraft_angle(); }
@@ -863,6 +863,12 @@ namespace Command {
             case ParserType::Uuid: { return minecraft_uuid(); }
             case ParserType::Vec2: { return minecraft_vec2(); }
             case ParserType::Vec3: { return minecraft_vec3(); }
+            case ParserType::InternalGreedyString: {
+                return parseGreedyString();
+            }
+            case ParserType::InternalRegexPattern: {
+                return parseRegexPattern();
+            }
 
             default: {
                 Q_UNREACHABLE();
@@ -1541,9 +1547,43 @@ namespace Command {
         return ret;
     }
 
+    QSharedPointer<InternalGreedyStringNode> MinecraftParser::parseGreedyString()
+    {
+        const int    curPos = pos();
+        const auto &&raw    = getWithRegex(QStringLiteral(R"([^\s\\'"]+)"));
+
+        if (!raw.isEmpty()) {
+            return QSharedPointer<InternalGreedyStringNode>::create(
+                spanText(raw), true);
+        } else {
+            reportError("Invalid empty greedy string", {}, curPos,
+                        raw.length());
+            return QSharedPointer<InternalGreedyStringNode>::create(QString(),
+                                                                    false);
+        }
+    }
+
+    QSharedPointer<InternalRegexPatternNode> MinecraftParser::parseRegexPattern()
+    {
+        const int                curPos = pos();
+        const auto             &&rest   = getRest();
+        const QRegularExpression pattern(rest.toString());
+
+        if (pattern.isValid()) {
+            return QSharedPointer<InternalRegexPatternNode>::create(
+                spanText(rest), std::move(pattern), true);
+        } else {
+            reportError(pattern.errorString().toStdString().c_str(),
+                        {}, curPos + pattern.patternErrorOffset(), 1);
+            return QSharedPointer<InternalRegexPatternNode>::create(
+                QString(), QRegularExpression(), false);
+        }
+    }
+
     void MinecraftParser::setGameVer(const QVersionNumber &newGameVer,
                                      const bool autoLoadSchema) {
         gameVer = newGameVer;
+
         if (autoLoadSchema) {
             loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
                        QStringLiteral("/summary/commands/data.min.json"));

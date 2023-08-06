@@ -60,7 +60,7 @@ namespace Command::Schema {
         if (j.contains("redirect")) {
             // Example: "execute as >@e< at @s ..."
             node->setRedirect(
-                m_tree->literalChildren()[j["redirect"][0].get<QString>()]);
+                m_tree->literalChildren().value(j["redirect"][0].get<QString>()));
         }
 
         if (j.contains("children")) {

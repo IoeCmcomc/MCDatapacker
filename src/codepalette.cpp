@@ -82,6 +82,8 @@ const CodePalette defaultCodePalette{
     { CP::TargetSelector_Arguments, CharFormatBuilder().bg("#aafaf0f5")->ok() },
     { CP::Key, CharFormatBuilder().fg("#B89C3D")->ok() },
     { CP::Gamemode, CharFormatBuilder().fg("#152769")->bold(true)->ok() },
+    { CP::RegexPattern, CharFormatBuilder().fg("#444444")->ok() },
+    { CP::GreedyString, CharFormatBuilder().fg("#A31621")->ok() },
 };
 
 const CodePalette defaultDarkCodePalette{
@@ -154,4 +156,6 @@ const CodePalette defaultDarkCodePalette{
     { CP::TargetSelector_Arguments, CharFormatBuilder().bg("#aa341123")->ok() },
     { CP::Key, CharFormatBuilder().fg("#B89C3D")->ok() },
     { CP::Gamemode, CharFormatBuilder().fg("#BBC6F1")->bold(true)->ok() },
+    { CP::RegexPattern, CharFormatBuilder().fg("#b4b4b4")->ok() },
+    { CP::GreedyString, CharFormatBuilder().fg("#B72E3A")->ok() },
 };

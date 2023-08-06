@@ -163,7 +163,7 @@ private:
                     (curChar() == '"' || curChar() == '\'')) {
                     try {
                         name = getQuotedString();
-                    } catch (const SchemaParser::Error &err) {
+                    } catch (const SchemaParser::Error &) {
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
@@ -299,6 +299,10 @@ private:
         QSharedPointer<UuidNode> minecraft_uuid();
         QSharedPointer<Vec2Node> minecraft_vec2();
         QSharedPointer<Vec3Node> minecraft_vec3();
+
+        // MCDatapacker-specific parser methods
+        QSharedPointer<InternalGreedyStringNode> parseGreedyString();
+        QSharedPointer<InternalRegexPatternNode> parseRegexPattern();
     };
 }
 

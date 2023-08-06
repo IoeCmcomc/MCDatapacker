@@ -28,4 +28,7 @@ namespace Command {
     DEFINE_ACCEPT_METHOD(TemplateRotationNode)
 
     DEFINE_ACCEPT_METHOD(UuidNode)
+
+    DEFINE_ACCEPT_METHOD(InternalGreedyStringNode)
+    DEFINE_ACCEPT_METHOD(InternalRegexPatternNode)
 }

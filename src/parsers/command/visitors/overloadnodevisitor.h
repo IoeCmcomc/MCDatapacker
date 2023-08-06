@@ -262,6 +262,14 @@ public:
             _visit(node);
         }
 
+        void visit(InternalGreedyStringNode *node) override {
+            _visit(node);
+        }
+
+        void visit(InternalRegexPatternNode *node) override {
+            _visit(node);
+        }
+
 private:
         template <class U>
         void _visit(U *node) {
