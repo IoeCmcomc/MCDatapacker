@@ -555,14 +555,12 @@ namespace Command {
 
     QSharedPointer<DoubleNode> SchemaParser::brigadier_double(
         const QVariantMap &props) {
-//        const auto raw   = getWithRegex(m_decimalNumRegex);
         const QStringView raw   = re2c::decimal(peekRest());
         bool              ok    = false;
         double            value = raw.toDouble(&ok);
 
         if (!ok) {
-            reportError(QT_TR_NOOP(
-                            "%1 is not a vaild double number"),
+            reportError(QT_TR_NOOP("%1 is not a vaild double number"),
                         { raw.toString() });
             return QSharedPointer<DoubleNode>::create(spanText(raw), false);
         } else {
@@ -581,14 +579,12 @@ namespace Command {
 
     QSharedPointer<FloatNode> SchemaParser::brigadier_float(
         const QVariantMap &props) {
-        //const auto raw   = getWithRegex(m_decimalNumRegex);
         const QStringView raw   = re2c::decimal(peekRest());
         bool              ok    = false;
         float             value = raw.toFloat(&ok);
 
         if (!ok) {
-            reportError(QT_TR_NOOP(
-                            "%1 is not a vaild float number"),
+            reportError(QT_TR_NOOP("%1 is not a vaild float number"),
                         { raw.toString() });
             return QSharedPointer<FloatNode>::create(spanText(raw), false);
         } else {
@@ -721,7 +717,7 @@ namespace Command {
             qDebug() << "Command::Parser::parse: errors detected";
             qDebug() << textView();
             m_errors << err;
-            for (const auto &error: m_errors) {
+            for (const auto &error: qAsConst(m_errors)) {
                 qDebug() << error.toLocalizedMessage();
             }
         }
@@ -802,7 +798,7 @@ namespace Command {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
                 } catch (SchemaParser::Error &err) {
-                    err.length = pos() - start + 1;
+//                    err.length = pos() - start + 1;
                     m_errors << err;
                 }
                 if (!ret || (!ret->isValid() && canBacktrack)) {
@@ -827,7 +823,7 @@ namespace Command {
                         m_tree->append(ret);
                     }
                 } catch (SchemaParser::Error &err) {
-                    err.length = pos() - start + 1;
+//                    err.length = pos() - start + 1;
                     m_errors << err;
                     if (!canBacktrack) {
                         m_tree->append(ret);
@@ -889,7 +885,9 @@ namespace Command {
             reportInvalidCommand = true;
             auto &&node =
                 QSharedPointer<ErrorNode>::create(spanText(getRest()));
-            node->setLeadingTrivia(" ");
+            if (depth > 0) {
+                node->setLeadingTrivia(" ");
+            }
             m_tree->append(std::move(node));
         } else if (depth > 0) {
             ret->setLeadingTrivia(QStringLiteral(" "));

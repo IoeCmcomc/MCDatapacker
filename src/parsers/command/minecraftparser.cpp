@@ -1002,7 +1002,7 @@ namespace Command {
             advance(2);
         }
 
-        const auto &&num1 = brigadier_float();
+        const auto &&num1 = brigadier_float(props);
         if (!hasMax) {
             bool hasDoubleDot = false;
             if (peek(2) == ".."_QL1) {
@@ -1017,7 +1017,7 @@ namespace Command {
             if (hasDoubleDot) {
                 if (curChar().isDigit() || curChar() == '.' ||
                     curChar() == '-') { // "min..max"
-                    ret->setMaxValue(brigadier_float(), true);
+                    ret->setMaxValue(brigadier_float(props), true);
                 }
                 num1->setTrailingTrivia(spanText(QStringLiteral("..")));
                 ret->setMinValue(std::move(num1), true); // "min.."
@@ -1100,12 +1100,12 @@ namespace Command {
             hasMax = true;
             advance(2);
         }
-        const auto &&num1 = brigadier_integer();
+        const auto &&num1 = brigadier_integer(props);
         if (!hasMax) {
             if (peek(2) == ".."_QL1) {
                 advance(2);
                 if (curChar().isDigit() || curChar() == '-') { // "min..max"
-                    ret->setMaxValue(brigadier_integer(), false);
+                    ret->setMaxValue(brigadier_integer(props), false);
                 }
                 num1->setTrailingTrivia(spanText(QStringLiteral("..")));
                 ret->setMinValue(std::move(num1), true); // "min.."

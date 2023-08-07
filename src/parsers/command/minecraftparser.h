@@ -20,6 +20,8 @@
 
 template<typename T>
 T strWithExpToDec(QStringView v, bool &ok) {
+    constexpr std::make_unsigned_t<T> maxLimit = std::numeric_limits<T>::max();
+
     if (v.isEmpty()) {
         ok = false;
         return 0;
@@ -43,7 +45,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
 
     ok = false;
     for (int i = 0; i < v.length(); ++i) {
-        if (value > std::numeric_limits<T>::max() / 10) {
+        if (value > maxLimit / 10) {
             ok = false;
             return 0;
         }
@@ -81,7 +83,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
                         break;
                     } else if (exp > 0) {
                         for (int j = 0; j < abs(exp); ++j) {
-                            if (value > std::numeric_limits<T>::max() / 10) {
+                            if (value > maxLimit / 10) {
                                 ok = false;
                                 return 0;
                             }
@@ -107,7 +109,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
                 return 0;
             }
         }
-        if (((sign == 1) && (value > std::numeric_limits<T>::max()))
+        if (((sign == 1) && (value > maxLimit))
             || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
             ok = false;
             return 0;
