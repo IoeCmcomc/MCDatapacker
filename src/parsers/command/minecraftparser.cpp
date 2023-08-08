@@ -52,7 +52,8 @@ namespace Command {
             advance();
         }
         if (curChar() != endChr) {
-            expect(sepChr);
+            expect(sepChr,
+                   "Unexpected %1, expecting separator %2 or closing character");
             advance();
             while (curChar().isSpace()) {
                 advance();
@@ -144,7 +145,8 @@ namespace Command {
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
                 axes->setFirstAxis(parseAxis(options, isLocal));
-                axes->firstAxis()->setTrailingTrivia(eat(' '));
+                axes->firstAxis()->setTrailingTrivia(eat(' ',
+                                                         "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setSecondAxis(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
@@ -159,12 +161,14 @@ namespace Command {
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
                 axes->setX(parseAxis(options, isLocal));
-                axes->x()->setTrailingTrivia(eat(' '));
+                axes->x()->setTrailingTrivia(eat(' ',
+                                                 "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setY(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
                 axes->setY(parseAxis(options, isLocal));
-                axes->y()->setTrailingTrivia(eat(' '));
+                axes->y()->setTrailingTrivia(eat(' ',
+                                                 "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setZ(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
@@ -646,9 +650,11 @@ namespace Command {
         auto    &&color = QSharedPointer<ParticleColorNode>::create(0);
 
         color->setR(brigadier_float());
-        color->r()->setTrailingTrivia(eat(' '));
+        color->r()->setTrailingTrivia(eat(' ',
+                                          "Unexpected %1, expecting %2 to separate between color values"));
         color->setG(brigadier_float());
-        color->g()->setTrailingTrivia(eat(' '));
+        color->g()->setTrailingTrivia(eat(' ',
+                                          "Unexpected %1, expecting %2 to separate between color values"));
         color->setB(brigadier_float());
         color->setLength(pos() - start);
         return color;
@@ -703,6 +709,7 @@ namespace Command {
                     QT_TR_NOOP(
                         "The character '/' is not allowed in the namespace"),
                     {}, start, nspace->length());
+                hasError = true;
             } else {
                 nspace->setIsValid(true);
             }
@@ -1275,24 +1282,28 @@ namespace Command {
                 fullId = nspace + ":"_QL1 + resLoc->id()->text();
             }
         }
+        ret->setResLoc(std::move(resLoc));
 
         uswitch (fullId) {
             ucase ("block"_QL1):
             ucase ("block_marker"_QL1):
             ucase ("falling_dust"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(minecraft_blockState());
                 break;
             }
             ucase ("dust"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 const auto &&color = parseParticleColor();
                 color->setTrailingTrivia(eat(' '));
                 ret->setParams(std::move(color), brigadier_float());
                 break;
             }
             ucase ("dust_color_transition"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 const auto &&startColor = parseParticleColor();
                 startColor->setTrailingTrivia(eat(' '));
                 const auto &&size = brigadier_float();
@@ -1303,29 +1314,33 @@ namespace Command {
                 break;
             }
             ucase ("item"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(minecraft_itemStack());
                 break;
             }
             ucase ("sculk_charge"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(brigadier_float());
                 break;
             }
             ucase ("shriek"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(brigadier_integer());
                 break;
             }
             ucase ("vibration"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 const auto &&pos = minecraft_vec3();
                 pos->setTrailingTrivia(eat(' '));
                 ret->setParams(std::move(pos), brigadier_integer());
                 break;
             }
         }
-        ret->setResLoc(std::move(resLoc));
+
         ret->setLength(pos() - start);
         return ret;
     }

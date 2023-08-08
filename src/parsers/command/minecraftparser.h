@@ -182,7 +182,9 @@ private:
                 const auto &&key = KeyPtr::create(spanText(keyPos), name,
                                                   !name.isEmpty());
                 key->setLeadingTrivia(trivia);
-                key->setTrailingTrivia(spanText(eat(sepChar, SkipLeftWs)));
+                key->setTrailingTrivia(spanText(eat(sepChar,
+                                                    "Unexpected %1, expecting %2 separator between a key and a value",
+                                                    SkipLeftWs)));
                 const auto &&valueTrivia = skipWs(false);
                 //const int    valueStart  = pos();
                 const auto &&value = func(name);
@@ -191,7 +193,8 @@ private:
                 value->setTrailingTrivia(this->skipWs(false));
                 obj->insert(key, value);
                 if (this->curChar() != endChar) {
-                    obj->constLast()->setTrailingTrivia(eat(',', SkipRightWs));
+                    obj->constLast()->setTrailingTrivia(eat(',', nullptr,
+                                                            SkipRightWs));
                 }
             }
             obj->setRightText(this->eat(endChar));

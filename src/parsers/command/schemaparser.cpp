@@ -753,7 +753,8 @@ namespace Command {
         if (curChar().isNull()) {
             throwError(QT_TR_NOOP("Incompleted command"));
         }
-        eat(QChar::Space);
+        eat(QChar::Space,
+            "Unexpected %1, expecting %2 to separate between commands and arguments");
 
         return true;
     }

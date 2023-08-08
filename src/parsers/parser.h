@@ -45,21 +45,13 @@ public:
     using Errors = QVector<Error>;
 
     Parser();
-    explicit Parser(const QString &text) : m_srcText(text) {
-        m_text = m_srcText;
-        setPos(0);
-    };
-    explicit Parser(QString &&text) : m_srcText(text) {
-        m_text = m_srcText;
-        setPos(0);
-    };
+    explicit Parser(const QString &text);;
+    explicit Parser(QString &&text);;
 
     int pos() const;
     void setPos(int newPos);
 
-    QChar inline curChar() const {
-        return m_curChar;
-    }
+    QChar curChar() const;
 
     QString text() const;
     QStringView textView() const;
@@ -101,8 +93,9 @@ protected:
     void advance(int n = 1);
     QStringView advanceView(QStringView sv);
 
-    bool expect(QChar chr);
-    QString eat(QChar chr, EatOptions options = NoOption);
+    bool expect(QChar chr, const char *errMsg = nullptr);
+    QString eat(QChar chr, const char *errMsg = nullptr,
+                EatOptions options            = NoOption);
     QStringView getUntil(QChar chr);
     QStringView getRest();
     QStringView getWithCharset(const QString &charset);
