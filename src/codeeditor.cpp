@@ -593,31 +593,49 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     delete menu;
 }
 
+QPoint translatedMargins(const QPoint &p, const QMargins &margins) {
+    return QPoint{ p.x() - margins.left(), p.y() - margins.right() };
+}
+
 bool CodeEditor::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
-        auto *helpEvent = static_cast<QHelpEvent *>(event);
-        auto  globalPos = mapToGlobal(helpEvent->pos());
-        auto  pos       = helpEvent->pos();
-        bool  done      = false;
+        const auto    *helpEvent = static_cast<QHelpEvent *>(event);
+        const QPoint  &globalPos = helpEvent->globalPos();
+        const QPoint &&pos       = translatedMargins(helpEvent->pos(),
+                                                     viewportMargins());
+        bool done = false;
 
-        pos.rx() -= viewportMargins().left();
-        pos.ry() -= viewportMargins().top();
-        auto &&cursor    = cursorForPosition(pos);
-        auto &&block     = cursor.block();
-        int    cursorPos = cursor.positionInBlock();
+        const auto &&cursor = cursorForPosition(pos);
+        if (pos.x() < 0
+            || abs(cursorRect(cursor).center().y() - pos.y()) > m_fontSize) {
+            QToolTip::hideText();
+            event->ignore();
+            return false;
+        }
+
+        const auto &&block        = cursor.block();
+        const int    cursorPos    = cursor.positionInBlock();
+        const int    cursorAbsPos = cursor.position();
 
         for (const auto &selection: qAsConst(problemExtraSelections)) {
-            if (selection.cursor.block().contains(cursor.position())) {
-                QToolTip::showText(globalPos,
-                                   selection.format.toolTip());
+            auto selCursor = selection.cursor;
+            if ((cursorAbsPos >= selCursor.selectionStart())
+                && (cursorAbsPos <= selCursor.selectionEnd())) {
+                QRect &&selRect = cursorRect(selCursor);
+                selCursor.setPosition(selCursor.selectionEnd());
+                selRect |= cursorRect(selCursor);
+                QToolTip::showText(globalPos, selection.format.toolTip(),
+                                   this, selRect);
                 done = true;
                 break;
             }
         }
-        if (done)
+        if (done) {
+            event->accept();
             return true;
+        }
 
-        const auto formats = block.layout()->formats();
+        const auto &formats = block.layout()->formats();
         for (const auto &format: qAsConst(formats)) {
             int formatStart = format.start;
             if ((formatStart <= cursorPos)
@@ -628,24 +646,14 @@ bool CodeEditor::event(QEvent *event) {
                 break;
             }
         }
-        if (done)
+        if (done) {
+            event->accept();
             return true;
-
-        cursor.select(QTextCursor::WordUnderCursor);
-        if (!cursor.selectedText().isEmpty()) {
-/*
-              QToolTip::showText(globalPos,
-                                 QString("%1 %2").arg(cursor.selectedText(),
-                                                      QString::number(cursor.
-                                                                      selectedText()
-                                                                      .length())));
- */
-        } else {
-            QToolTip::hideText();
         }
-        /*qDebug() << QToolTip::text() << QToolTip::isVisible(); */
 
-        return true;
+        QToolTip::hideText();
+        event->ignore();
+        return false;
     } else {
         return QPlainTextEdit::event(event);
     }
