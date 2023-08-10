@@ -760,6 +760,7 @@ namespace Command {
     }
     void SchemaParser::parseBySchema(const Schema::Node *schemaNode,
                                      int depth) {
+        Q_ASSERT(schemaNode != nullptr);
         NodePtr ret;
 
         const bool isRoot = schemaNode->kind() == Schema::Node::Kind::Root;
@@ -798,7 +799,7 @@ namespace Command {
                 try {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
-                } catch (SchemaParser::Error &err) {
+                } catch (const SchemaParser::Error &err) {
 //                    err.length = pos() - start + 1;
                     m_errors << err;
                 }
@@ -834,6 +835,7 @@ namespace Command {
                         setPos(start);
                     }
                 }
+                ret->setSchemaNode(argNode);
                 break;
             }
         } else {
@@ -884,14 +886,18 @@ namespace Command {
 
         if (!ret) {
             reportInvalidCommand = true;
-            auto &&node =
-                QSharedPointer<ErrorNode>::create(spanText(getRest()));
+
+            ret = QSharedPointer<ErrorNode>::create(spanText(getRest()));
             if (depth > 0) {
-                node->setLeadingTrivia(" ");
+                ret->setLeadingTrivia(" ");
             }
-            m_tree->append(std::move(node));
+            m_tree->append(ret);
         } else if (depth > 0) {
             ret->setLeadingTrivia(QStringLiteral(" "));
+        }
+
+        if (litNode && ret) {
+            ret->setSchemaNode(litNode);
         }
 
         if (reportInvalidCommand) {

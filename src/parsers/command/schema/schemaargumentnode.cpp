@@ -1,7 +1,8 @@
 #include "schemaargumentnode.h"
 
 namespace Command::Schema {
-    ArgumentNode::ArgumentNode() : Node(Node::Kind::Argument) {
+ArgumentNode::ArgumentNode() : Node(Node::Kind::Argument),
+    m_parserType{ParserType::Unknown} {
     }
 
     void ArgumentNode::setName(const QString &newName) {

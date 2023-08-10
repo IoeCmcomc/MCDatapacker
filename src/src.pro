@@ -101,6 +101,7 @@ SOURCES += \
     parsers/command/schema/schemanode.cpp \
     parsers/command/schema/schemarootnode.cpp \
     parsers/command/schemaparser.cpp \
+    parsers/command/visitors/completionprovider.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/nodevisitor.cpp \
@@ -208,6 +209,7 @@ HEADERS += \
     parsers/command/schema/schemanode.h \
     parsers/command/schema/schemarootnode.h \
     parsers/command/schemaparser.h \
+    parsers/command/visitors/completionprovider.h \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \

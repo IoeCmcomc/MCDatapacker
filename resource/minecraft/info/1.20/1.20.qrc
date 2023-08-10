@@ -34,5 +34,6 @@
         <file>registries/recipe/data.min.json</file>
         <file>registries/sound_event/data.min.json</file>
         <file>tag/damage_type.json</file>
+        <file>registries/entity_type/data.min.json</file>
     </qresource>
 </RCC>

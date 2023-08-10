@@ -6,9 +6,10 @@
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
 #include "stripedscrollbar.h"
-#include "parsers/command/minecraftparser.h"
+#include "parsers/command/mcfunctionparser.h"
 #include "parsers/command/schema/schemaliteralnode.h"
 #include "parsers/command/schema/schemaargumentnode.h"
+#include "parsers/command/visitors/completionprovider.h"
 #include "stringvectormodel.h"
 #include "game.h"
 
@@ -31,54 +32,14 @@
 
 
 QVector<QString> getMinecraftInfoKeys(const QString &key) {
-//    QElapsedTimer timer;
-//    timer.start();
-
     const QVariantMap &&infoMap = Game::getInfo(key);
+    const auto &&keys = infoMap.keys();
 
-//    qDebug() << key << infoMap.size();
-//    qDebug() << "getMinecraftInfoKeys() exec time:" <<
-//        timer.nsecsElapsed() / 1e6;
-
-    return infoMap.keys().toVector();
-}
-
-QVector<QString> loadMinecraftCommandLiterals(
-    const Command::Schema::Node * const node, ushort depth = 0) {
-    QElapsedTimer timer;
-
-    if (depth == 0)
-        timer.start();
-
-    QVector<QString> ret;
-
-    const auto &&literalChidrens = node->literalChildren();
-    for (auto it = literalChidrens.cbegin();
-         it != literalChidrens.cend(); ++it) {
-        ret << it.key();
-        ret += loadMinecraftCommandLiterals(it.value(), depth + 1);
-    }
-
-    // cppcheck-suppress iterators3
-    const auto &&argumentChildren = node->literalChildren();
-    for (auto it = argumentChildren.cbegin();
-         it != argumentChildren.cend(); ++it) {
-        // cppcheck-suppress danglingTemporaryLifetime
-        ret += loadMinecraftCommandLiterals(*it, depth + 1);
-    }
-
-//    if (depth == 0) {
-//        qDebug() << "function literals" << ret.size();
-//        qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
-//            timer.nsecsElapsed() / 1e6;
-//    }
-
-    return ret;
+    return keys.toVector();
 }
 
 QVector<QString> loadMinecraftCompletionInfo() {
-    QVector<QString> &&ret = loadMinecraftCommandLiterals(
-        Command::MinecraftParser::schema());
+    QVector<QString> ret;
 
     ret += getMinecraftInfoKeys(QStringLiteral("attribute"));
     ret += getMinecraftInfoKeys(QStringLiteral("block"));
@@ -492,18 +453,32 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (completionPrefix != m_completer->completionPrefix()) {
         if (m_completer->popup()->isHidden()) {
             qDebug() << "Combining final completions";
-            QVector<QString> completionInfo = minecraftCompletionInfo;
+//            QVector<QString> completionInfo = minecraftCompletionInfo;
 
-            const QVector<QString> &&idList = Glhp::fileIdList(
-                QDir::currentPath(), QString(), QString(), false);
-            for (const auto &item: idList) {
-                completionInfo << item;
+//            const QVector<QString> &&idList = Glhp::fileIdList(
+//                QDir::currentPath(), QString(), QString(), false);
+//            for (const auto &item: idList) {
+//                completionInfo << item;
+//            }
+
+//            std::sort(completionInfo.begin(), completionInfo.end());
+//            completionInfo.erase(std::unique(completionInfo.begin(),
+//                                             completionInfo.end()),
+//                                 completionInfo.end());
+
+            QVector<QString> completionInfo;
+            if (const auto *parser =
+                    dynamic_cast<Command::McfunctionParser *>(m_parser.get())) {
+                const int curLine   = textCursor().blockNumber();
+                const int posInLine = textCursor().positionInBlock();
+
+                if (auto *line = parser->syntaxTree()->at(curLine).get();
+                    line->kind() == Command::ParseNode::Kind::Root) {
+                    Command::CompletionProvider suggester{ posInLine };
+                    suggester.startVisiting(line);
+                    completionInfo = suggester.suggestions();
+                }
             }
-
-            std::sort(completionInfo.begin(), completionInfo.end());
-            completionInfo.erase(std::unique(completionInfo.begin(),
-                                             completionInfo.end()),
-                                 completionInfo.end());
 
             if (auto *model =
                     qobject_cast<StringVectorModel *>(m_completer->model())) {

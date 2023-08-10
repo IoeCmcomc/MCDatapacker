@@ -23,8 +23,8 @@ public:
             m_lines.push_back(std::forward<T>(node));
         }
 
-        NodePtr const operator[](const int i) const {
-            return m_lines[i];
+        NodePtr const at(const int i) const {
+            return m_lines.at(i);
         }
 
         Lines lines() const;

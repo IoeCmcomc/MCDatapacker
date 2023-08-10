@@ -28,7 +28,7 @@ QVector<QString> Game::getRegistry(const QString &type) {
 QVector<QString> Game::getRegistry(const QString &type,
                                    const QString &version) {
     static LRU::Cache<std::tuple<QString, QString>,
-                      QVector<QString> > cache{ 20 };
+                      QVector<QString> > cache{ 32 };
 
     const std::tuple inputPair{ type, version };
 

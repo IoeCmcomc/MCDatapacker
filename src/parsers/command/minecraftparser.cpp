@@ -929,9 +929,11 @@ namespace Command {
             "reset"_QL1, "white"_QL1, "yellow"_QL1,
         };
         const QString &&literal = oneOf(colors);
-
-        return QSharedPointer<ColorNode>::create(spanText(literal),
-                                                 !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<ColorNode>::create(spanText(literal), true);
+        } else {
+            return QSharedPointer<ColorNode>::create(spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<ColumnPosNode> MinecraftParser::
@@ -1048,32 +1050,36 @@ namespace Command {
     }
 
     QSharedPointer<GamemodeNode> MinecraftParser::minecraft_gamemode() {
+        using GameMode = GamemodeNode::Mode;
         const QString &&literal = oneOf({ "creative"_QL1, "survival"_QL1,
                                           "adventure"_QL1, "spectator"_QL1 });
-        GamemodeNode::Mode mode = GamemodeNode::Mode::Unknown;
+        GameMode mode = GamemodeNode::Mode::Unknown;
 
         if (!literal.isEmpty()) {
             uswitch (literal) {
                 ucase ("creative"): {
-                    mode = GamemodeNode::Mode::Creative;
+                    mode = GameMode::Creative;
                     break;
                 }
                 ucase ("survival"): {
-                    mode = GamemodeNode::Mode::Survival;
+                    mode = GameMode::Survival;
                     break;
                 }
                 ucase ("adventure"): {
-                    mode = GamemodeNode::Mode::Adventure;
+                    mode = GameMode::Adventure;
                     break;
                 }
                 ucase ("spectator"): {
-                    mode = GamemodeNode::Mode::Spectator;
+                    mode = GameMode::Spectator;
                     break;
                 }
             }
+
+            return QSharedPointer<GamemodeNode>::create(spanText(literal), mode, true);
+        } else {
+            return QSharedPointer<GamemodeNode>::create(
+                spanText(getUntil(QChar::Space)), mode, false);
         }
-        return QSharedPointer<GamemodeNode>::create(spanText(literal), mode,
-                                                    !literal.isEmpty());
     }
 
     QSharedPointer<GameProfileNode> MinecraftParser::minecraft_gameProfile() {
@@ -1438,8 +1444,11 @@ namespace Command {
 
         const QString &&slot = oneOf(scoreboardSlots);
 
-        return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),
-                                                          !slot.isEmpty());
+        if (!slot.isEmpty()) {
+            return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot), true);
+        } else {
+            return QSharedPointer<ScoreboardSlotNode>::create(spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<SwizzleNode> MinecraftParser::
@@ -1520,8 +1529,11 @@ namespace Command {
         const QString &&literal = oneOf({ "none"_QL1, "front_back"_QL1,
                                           "left_right"_QL1, });
 
-        return QSharedPointer<TemplateMirrorNode>::create(spanText(literal),
-                                                          !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<TemplateMirrorNode>::create(spanText(literal), true);
+        } else {
+            return QSharedPointer<TemplateMirrorNode>::create(spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<TemplateRotationNode> MinecraftParser::
@@ -1530,8 +1542,11 @@ namespace Command {
                                           "counterclockwise_90"_QL1,
                                           "180"_QL1 });
 
-        return QSharedPointer<TemplateRotationNode>::create(spanText(literal),
-                                                            !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<TemplateRotationNode>::create(spanText(literal), true);
+        } else {
+            return QSharedPointer<TemplateRotationNode>::create(spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<UuidNode> MinecraftParser::minecraft_uuid() {
