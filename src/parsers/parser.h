@@ -11,13 +11,6 @@ using StringHash = QHash<QStringView, QString>;
 
 //using StringHash = QSet<QString>;
 
-#ifndef QLATIN1STRING_OPERATOR
-QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
-    return QLatin1String(literal, size);
-}
-#define QLATIN1STRING_OPERATOR
-#endif
-
 QLatin1Char constexpr operator ""_QL1(const char chr) {
     return QLatin1Char(chr);
 }

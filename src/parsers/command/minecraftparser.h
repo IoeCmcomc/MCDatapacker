@@ -129,8 +129,6 @@ public:
         };
         Q_DECLARE_FLAGS(AxisParseOptions, AxisParseOption);
 
-        using QLatin1StringVector = QVector<QLatin1String>;
-
         MinecraftParser();
         using SchemaParser::SchemaParser;
 

@@ -16,7 +16,7 @@ namespace Command {
          */
     }
 
-    QString join(const MinecraftParser::QLatin1StringVector &vector) {
+    QString join(const QLatin1StringVector &vector) {
         QString ret;
 
         for (auto it = vector.cbegin(); it != vector.cend();) {
@@ -468,8 +468,7 @@ namespace Command {
                 ucase ("gamemode"_QL1): {
                     const auto &&ret        = parseNegEntityArg();
                     const QString &&literal =
-                        oneOf({ "adventure"_QL1, "creative"_QL1,
-                                "spectator"_QL1, "survival"_QL1 });
+                        oneOf(staticSuggestions<GamemodeNode>);
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(literal), !literal.isEmpty()));
                     return ret;
@@ -919,20 +918,13 @@ namespace Command {
     }
 
     QSharedPointer<ColorNode> MinecraftParser::minecraft_color() {
-        const static QLatin1StringVector colors {
-            "aqua"_QL1, "black"_QL1, "blue"_QL1,
-            "dark_aqua"_QL1, "dark_blue"_QL1,
-            "dark_green"_QL1, "dark_gray"_QL1,
-            "dark_purple"_QL1, "dark_red"_QL1,
-            "gold"_QL1, "green"_QL1, "gray"_QL1,
-            "light_purple"_QL1, "red"_QL1,
-            "reset"_QL1, "white"_QL1, "yellow"_QL1,
-        };
-        const QString &&literal = oneOf(colors);
+        const QString &&literal = oneOf(staticSuggestions<ColorNode>);
+
         if (!literal.isEmpty()) {
             return QSharedPointer<ColorNode>::create(spanText(literal), true);
         } else {
-            return QSharedPointer<ColorNode>::create(spanText(getUntil(QChar::Space)), false);
+            return QSharedPointer<ColorNode>::create(
+                spanText(getUntil(QChar::Space)), false);
         }
     }
 
@@ -986,10 +978,15 @@ namespace Command {
 
     QSharedPointer<EntityAnchorNode> MinecraftParser::
     minecraft_entityAnchor() {
-        const QString &&literal = oneOf({ "eyes"_QL1, "feet"_QL1, });
+        const QString &&literal = oneOf(staticSuggestions<EntityAnchorNode>);
 
-        return QSharedPointer<EntityAnchorNode>::create(spanText(literal),
-                                                        !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<EntityAnchorNode>::create(spanText(literal),
+                                                            true);
+        } else {
+            return QSharedPointer<EntityAnchorNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<EntitySummonNode> MinecraftParser::
@@ -1051,9 +1048,8 @@ namespace Command {
 
     QSharedPointer<GamemodeNode> MinecraftParser::minecraft_gamemode() {
         using GameMode = GamemodeNode::Mode;
-        const QString &&literal = oneOf({ "creative"_QL1, "survival"_QL1,
-                                          "adventure"_QL1, "spectator"_QL1 });
-        GameMode mode = GamemodeNode::Mode::Unknown;
+        const QString &&literal = oneOf(staticSuggestions<GamemodeNode>);
+        GameMode        mode    = GamemodeNode::Mode::Unknown;
 
         if (!literal.isEmpty()) {
             uswitch (literal) {
@@ -1075,7 +1071,8 @@ namespace Command {
                 }
             }
 
-            return QSharedPointer<GamemodeNode>::create(spanText(literal), mode, true);
+            return QSharedPointer<GamemodeNode>::create(spanText(literal),
+                                                        mode, true);
         } else {
             return QSharedPointer<GamemodeNode>::create(
                 spanText(getUntil(QChar::Space)), mode, false);
@@ -1092,15 +1089,15 @@ namespace Command {
     }
 
     QSharedPointer<HeightmapNode> MinecraftParser::minecraft_heightmap() {
-        const QString &&literal = oneOf({
-            "motion_blocking_no_leaves"_QL1,
-            "motion_blocking"_QL1,
-            "ocean_floor"_QL1,
-            "world_surface"_QL1,
-        });
+        const QString &&literal = oneOf(staticSuggestions<HeightmapNode>);
 
-        return QSharedPointer<HeightmapNode>::create(spanText(literal),
-                                                     !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<HeightmapNode>::create(spanText(literal),
+                                                         true);
+        } else {
+            return QSharedPointer<HeightmapNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<IntRangeNode> MinecraftParser::
@@ -1260,14 +1257,15 @@ namespace Command {
 
     QSharedPointer<OperationNode> MinecraftParser::
     minecraft_operation() {
-        static const QLatin1StringVector operators {
-            "="_QL1, "<"_QL1, ">"_QL1, "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
-            "/="_QL1, "%="_QL1,
-        };
-        const QString &&literal = oneOf(operators);
+        const QString &&literal = oneOf(staticSuggestions<OperationNode>);
 
-        return QSharedPointer<OperationNode>::create(spanText(literal),
-                                                     !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<OperationNode>::create(spanText(literal),
+                                                         true);
+        } else {
+            return QSharedPointer<OperationNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<ParticleNode> MinecraftParser::minecraft_particle() {
@@ -1419,35 +1417,14 @@ namespace Command {
 
     QSharedPointer<ScoreboardSlotNode> MinecraftParser::
     minecraft_scoreboardSlot() {
-        const static QLatin1StringVector scoreboardSlots = {
-            "belowName"_QL1,
-            "sidebar.team.aqua"_QL1,
-            "sidebar.team.black"_QL1,
-            "sidebar.team.blue"_QL1,
-            "sidebar.team.dark_aqua"_QL1,
-            "sidebar.team.dark_blue"_QL1,
-            "sidebar.team.dark_green"_QL1,
-            "sidebar.team.dark_gray"_QL1,
-            "sidebar.team.dark_purple"_QL1,
-            "sidebar.team.dark_red"_QL1,
-            "sidebar.team.gold"_QL1,
-            "sidebar.team.green"_QL1,
-            "sidebar.team.gray"_QL1,
-            "sidebar.team.light_purple"_QL1,
-            "sidebar.team.red"_QL1,
-            "sidebar.team.reset"_QL1,
-            "sidebar.team.white"_QL1,
-            "sidebar.team.yellow"_QL1,
-            "sidebar"_QL1,
-            "list"_QL1,
-        };
-
-        const QString &&slot = oneOf(scoreboardSlots);
+        const QString &&slot = oneOf(staticSuggestions<ScoreboardSlotNode>);
 
         if (!slot.isEmpty()) {
-            return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot), true);
+            return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),
+                                                              true);
         } else {
-            return QSharedPointer<ScoreboardSlotNode>::create(spanText(getUntil(QChar::Space)), false);
+            return QSharedPointer<ScoreboardSlotNode>::create(
+                spanText(getUntil(QChar::Space)), false);
         }
     }
 
@@ -1526,26 +1503,28 @@ namespace Command {
 
     QSharedPointer<TemplateMirrorNode> MinecraftParser::minecraft_templateMirror()
     {
-        const QString &&literal = oneOf({ "none"_QL1, "front_back"_QL1,
-                                          "left_right"_QL1, });
+        const QString &&literal = oneOf(staticSuggestions<TemplateMirrorNode>);
 
         if (!literal.isEmpty()) {
-            return QSharedPointer<TemplateMirrorNode>::create(spanText(literal), true);
+            return QSharedPointer<TemplateMirrorNode>::create(spanText(literal),
+                                                              true);
         } else {
-            return QSharedPointer<TemplateMirrorNode>::create(spanText(getUntil(QChar::Space)), false);
+            return QSharedPointer<TemplateMirrorNode>::create(
+                spanText(getUntil(QChar::Space)), false);
         }
     }
 
     QSharedPointer<TemplateRotationNode> MinecraftParser::
     minecraft_templateRotation() {
-        const QString &&literal = oneOf({ "none"_QL1, "clockwise_90"_QL1,
-                                          "counterclockwise_90"_QL1,
-                                          "180"_QL1 });
+        const QString &&literal =
+            oneOf(staticSuggestions<TemplateRotationNode>);
 
         if (!literal.isEmpty()) {
-            return QSharedPointer<TemplateRotationNode>::create(spanText(literal), true);
+            return QSharedPointer<TemplateRotationNode>::create(
+                spanText(literal), true);
         } else {
-            return QSharedPointer<TemplateRotationNode>::create(spanText(getUntil(QChar::Space)), false);
+            return QSharedPointer<TemplateRotationNode>::create(
+                spanText(getUntil(QChar::Space)), false);
         }
     }
 

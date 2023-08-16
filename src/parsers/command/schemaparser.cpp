@@ -549,7 +549,8 @@ namespace Command {
         } else {
             reportError(QT_TR_NOOP(
                             "A boolean value can only be either 'true' or 'false'"));
-            return QSharedPointer<BoolNode>::create(QString(), false);
+            return QSharedPointer<BoolNode>::create(
+                spanText(getUntil(QChar::Space)), false);
         }
     }
 

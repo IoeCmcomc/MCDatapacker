@@ -3,6 +3,15 @@
 
 #include "parsenode.h"
 
+#ifndef QLATIN1STRING_OPERATOR
+QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
+    return QLatin1String(literal, size);
+}
+#define QLATIN1STRING_OPERATOR
+#endif
+
+using QLatin1StringVector = QVector<QLatin1String>;
+
 namespace Command {
     class ArgumentNode : public ParseNode {
 public:
@@ -94,6 +103,11 @@ protected:
     constexpr ArgumentNode::ParserType nodeTypeEnum<T,
                                                     ArgumentNode::ParserType> =
         ArgumentNode::ParserType::Unknown;
+
+    template <class T>
+    const QLatin1StringVector staticSuggestions;
+
+    QVector<QString> toStringVec(const QLatin1StringVector &vector);
 }
 
 #endif /* ARGUMENTNODE_H */

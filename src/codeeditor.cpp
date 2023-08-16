@@ -33,7 +33,7 @@
 
 QVector<QString> getMinecraftInfoKeys(const QString &key) {
     const QVariantMap &&infoMap = Game::getInfo(key);
-    const auto &&keys = infoMap.keys();
+    const auto        &&keys    = infoMap.keys();
 
     return keys.toVector();
 }
@@ -41,25 +41,11 @@ QVector<QString> getMinecraftInfoKeys(const QString &key) {
 QVector<QString> loadMinecraftCompletionInfo() {
     QVector<QString> ret;
 
-    ret += getMinecraftInfoKeys(QStringLiteral("attribute"));
-    ret += getMinecraftInfoKeys(QStringLiteral("block"));
-    ret += getMinecraftInfoKeys(QStringLiteral("dimension"));
-    ret += getMinecraftInfoKeys(QStringLiteral("enchantment"));
     ret += getMinecraftInfoKeys(QStringLiteral("fluid"));
-    ret += getMinecraftInfoKeys(QStringLiteral("feature"));
-    ret += getMinecraftInfoKeys(QStringLiteral("entity"));
-    ret += getMinecraftInfoKeys(QStringLiteral("item"));
-    ret += getMinecraftInfoKeys(QStringLiteral("tag/block"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/entity_type"));
     if (Game::version() >= Game::v1_17)
         ret += getMinecraftInfoKeys(QStringLiteral("tag/game_event"));
     ret += getMinecraftInfoKeys(QStringLiteral("tag/fluid"));
-    ret += getMinecraftInfoKeys(QStringLiteral("tag/item"));
-    ret += Game::getRegistry(QStringLiteral("advancement"));
-    ret += Game::getRegistry(QStringLiteral("recipe"));
-    ret += Game::getRegistry(QStringLiteral("loot_table"));
-    ret += Game::getRegistry(QStringLiteral("particle_type"));
-    ret += Game::getRegistry(QStringLiteral("sound_event"));
 
     std::sort(ret.begin(), ret.end());
     ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
@@ -148,14 +134,15 @@ void CodeEditor::initCompleter() {
     auto *completer = new QCompleter(this);
 
     if (m_fileType == CodeFile::Function) {
-        if (minecraftCompletionInfo.isEmpty()) {
-            minecraftCompletionInfo = loadMinecraftCompletionInfo();
-            qDebug() << "Minecraft completions loaded (" <<
-                minecraftCompletionInfo.size() << "items)";
-        }
+//        if (minecraftCompletionInfo.isEmpty()) {
+//            minecraftCompletionInfo = loadMinecraftCompletionInfo();
+//            qDebug() << "Minecraft completions loaded (" <<
+//                minecraftCompletionInfo.size() << "items)";
+//        }
     }
     completer->setModel(new StringVectorModel(minecraftCompletionInfo, this));
     completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+//    completer->setModelSorting(QCompleter::UnsortedModel);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
     setCompleter(completer);
@@ -444,7 +431,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     const QString &&completionPrefix = textUnderCursor();
 
     if (!isShortcut &&
-        (hasModifier || e->text().isEmpty() || completionPrefix.length() < 3
+        (hasModifier || e->text().isEmpty() || completionPrefix.length() < 2
          || eow.contains(e->text().right(1)))) {
         m_completer->popup()->hide();
         return;
@@ -477,11 +464,16 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
                     Command::CompletionProvider suggester{ posInLine };
                     suggester.startVisiting(line);
                     completionInfo = suggester.suggestions();
+                    std::sort(completionInfo.begin(), completionInfo.end());
+                    completionInfo.erase(std::unique(completionInfo.begin(),
+                                                     completionInfo.end()),
+                                         completionInfo.end());
                 }
             }
 
             if (auto *model =
                     qobject_cast<StringVectorModel *>(m_completer->model())) {
+                m_completer->setCompletionPrefix(QString());
                 model->setVector(completionInfo);
             }
 //            qDebug() << minecraftCompletionInfo.size() <<
@@ -492,6 +484,9 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
         m_completer->setCompletionPrefix(completionPrefix);
         m_completer->popup()->setCurrentIndex(
             m_completer->completionModel()->index(0, 0));
+
+        qDebug() << m_completer->completionCount() << m_completer->model() <<
+            completionPrefix;
     }
 
     QRect     cr = cursorRect();

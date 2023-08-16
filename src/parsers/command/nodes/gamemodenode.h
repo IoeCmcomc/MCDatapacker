@@ -33,5 +33,10 @@ protected:
     };
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Gamemode)
+
+    template<>
+    const QVector<QLatin1String> staticSuggestions<GamemodeNode> = {
+        "adventure"_QL1, "creative"_QL1, "spectator"_QL1, "survival"_QL1,
+    };
 }
 #endif // GAMEMODENODE_H

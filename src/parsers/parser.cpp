@@ -232,11 +232,11 @@ QStringView Parser::getRest() {
  * \brief Returns the substring from the current character with the given (regex) \a charset.
  */
 QStringView Parser::getWithCharset(const QString &charset) {
-    return getWithRegex("["_QL1 + charset + "]+"_QL1);
+    return getWithRegex(QLatin1String("[") + charset + QLatin1String("]+"));
 }
 
 QStringView Parser::getWithCharset(const QLatin1String &charset) {
-    return getWithRegex("["_QL1 + charset + "]+"_QL1);
+    return getWithRegex(QLatin1String("[") + charset + QLatin1String("]+"));
 }
 
 /*!
