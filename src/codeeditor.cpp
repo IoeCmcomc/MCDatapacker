@@ -357,7 +357,7 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
 
         auto cursor = textCursor();
         if (e->key() == Qt::Key_Tab) {
-            cursor.insertText(QString(' ').repeated(m_tabSize));
+            cursor.insertText(QStringLiteral(" ").repeated(m_tabSize));
             setTextCursor(cursor);
             e->accept();
             return;
@@ -390,6 +390,69 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
 
         QPlainTextEdit::keyPressEvent(e);
     }
+}
+
+void CodeEditor::startCompletion(const QString &completionPrefix) {
+    if (m_completer->popup()->isHidden()) {
+        qDebug() << "Combining final completions";
+        //            QVector<QString> completionInfo = minecraftCompletionInfo;
+
+        //            const QVector<QString> &&idList = Glhp::fileIdList(
+        //                QDir::currentPath(), QString(), QString(), false);
+        //            for (const auto &item: idList) {
+        //                completionInfo << item;
+        //            }
+
+        //            std::sort(completionInfo.begin(), completionInfo.end());
+        //            completionInfo.erase(std::unique(completionInfo.begin(),
+        //                                             completionInfo.end()),
+        //                                 completionInfo.end());
+
+        QVector<QString> completionInfo;
+        if (const auto *parser =
+                dynamic_cast<Command::McfunctionParser *>(m_parser.get())) {
+            const int curLine   = textCursor().blockNumber();
+            const int posInLine = textCursor().positionInBlock();
+
+            if (auto *line = parser->syntaxTree()->at(curLine).get();
+                line->kind() == Command::ParseNode::Kind::Root) {
+                Command::CompletionProvider suggester{ posInLine };
+                suggester.startVisiting(line);
+                completionInfo = suggester.suggestions();
+                std::sort(completionInfo.begin(), completionInfo.end());
+                completionInfo.erase(std::unique(completionInfo.begin(),
+                                                 completionInfo.end()),
+                                     completionInfo.end());
+            }
+        }
+
+        if (auto *model =
+                qobject_cast<StringVectorModel *>(m_completer->model())) {
+            m_completer->setCompletionPrefix(QString());
+            model->setVector(completionInfo);
+        }
+        //            qDebug() << minecraftCompletionInfo.size() <<
+        //                m_completer->model()->rowCount() <<
+        //                m_completer->completionModel()->rowCount();
+    }
+
+    m_completer->setCompletionPrefix(completionPrefix);
+    m_completer->popup()->setCurrentIndex(
+        m_completer->completionModel()->index(0, 0));
+
+    qDebug() << m_completer->completionCount() << m_completer->model() <<
+        completionPrefix;
+
+    QRect     cr = cursorRect();
+    const int prefixOffset
+        = fontMetrics().horizontalAdvance(completionPrefix,
+                                          completionPrefix.size());
+    cr.translate(-prefixOffset + cr.width() + viewportMargins().left(), 2);
+    cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
+                + m_completer->popup()->verticalScrollBar()->sizeHint().width());
+
+    m_needCompleting = false;
+    m_completer->complete(cr);       // popup it up!
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
@@ -435,69 +498,11 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
          || eow.contains(e->text().right(1)))) {
         m_completer->popup()->hide();
         return;
+    } else if (isShortcut) {
+        startCompletion(completionPrefix);
+    } else {
+        m_needCompleting = true;
     }
-
-    if (completionPrefix != m_completer->completionPrefix()) {
-        if (m_completer->popup()->isHidden()) {
-            qDebug() << "Combining final completions";
-//            QVector<QString> completionInfo = minecraftCompletionInfo;
-
-//            const QVector<QString> &&idList = Glhp::fileIdList(
-//                QDir::currentPath(), QString(), QString(), false);
-//            for (const auto &item: idList) {
-//                completionInfo << item;
-//            }
-
-//            std::sort(completionInfo.begin(), completionInfo.end());
-//            completionInfo.erase(std::unique(completionInfo.begin(),
-//                                             completionInfo.end()),
-//                                 completionInfo.end());
-
-            QVector<QString> completionInfo;
-            if (const auto *parser =
-                    dynamic_cast<Command::McfunctionParser *>(m_parser.get())) {
-                const int curLine   = textCursor().blockNumber();
-                const int posInLine = textCursor().positionInBlock();
-
-                if (auto *line = parser->syntaxTree()->at(curLine).get();
-                    line->kind() == Command::ParseNode::Kind::Root) {
-                    Command::CompletionProvider suggester{ posInLine };
-                    suggester.startVisiting(line);
-                    completionInfo = suggester.suggestions();
-                    std::sort(completionInfo.begin(), completionInfo.end());
-                    completionInfo.erase(std::unique(completionInfo.begin(),
-                                                     completionInfo.end()),
-                                         completionInfo.end());
-                }
-            }
-
-            if (auto *model =
-                    qobject_cast<StringVectorModel *>(m_completer->model())) {
-                m_completer->setCompletionPrefix(QString());
-                model->setVector(completionInfo);
-            }
-//            qDebug() << minecraftCompletionInfo.size() <<
-//                m_completer->model()->rowCount() <<
-//                m_completer->completionModel()->rowCount();
-        }
-
-        m_completer->setCompletionPrefix(completionPrefix);
-        m_completer->popup()->setCurrentIndex(
-            m_completer->completionModel()->index(0, 0));
-
-        qDebug() << m_completer->completionCount() << m_completer->model() <<
-            completionPrefix;
-    }
-
-    QRect     cr = cursorRect();
-    const int prefixOffset
-        = fontMetrics().horizontalAdvance(completionPrefix,
-                                          completionPrefix.size());
-    cr.translate(-prefixOffset + cr.width() + viewportMargins().left(), 2);
-    cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
-                + m_completer->popup()->verticalScrollBar()->sizeHint().width());
-
-    m_completer->complete(cr);      /* popup it up! */
 }
 
 void CodeEditor::dropEvent(QDropEvent *e) {
@@ -811,10 +816,13 @@ void CodeEditor::insertCompletion(const QString &completion) {
     if (m_completer->widget() != this)
         return;
 
+    m_needCompleting = false;
+
     QTextCursor tc     = textCursor();
     const int   oldPos = tc.position();
     startOfWordExtended(tc);
     tc.setPosition(oldPos, QTextCursor::KeepAnchor);
+    tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
     tc.insertText(completion);
     setTextCursor(tc);
 }
@@ -835,6 +843,10 @@ void CodeEditor::onTextChanged() {
         }
         if (m_highlighter) {
             m_highlighter->rehighlightDelayed();
+        }
+        if (m_needCompleting && m_completer
+            && m_completer->popup()->isHidden()) {
+            startCompletion(textUnderCursor());
         }
         updateErrorSelections();
     }

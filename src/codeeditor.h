@@ -111,6 +111,7 @@ private:
     bool canUndo                  = false;
     bool canRedo                  = false;
     bool m_insertTabAsSpaces      = true;
+    bool m_needCompleting         = false;
 
     void highlightCurrentLine();
     void matchParentheses();
@@ -129,6 +130,7 @@ private:
     void initCompleter();
     void startOfWordExtended(QTextCursor &tc) const;
     QString textUnderCursorExtended(QTextCursor tc) const;
+    void startCompletion(const QString &completionPrefix);
 };
 
 

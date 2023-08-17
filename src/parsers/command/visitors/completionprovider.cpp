@@ -15,6 +15,7 @@ namespace Command {
         const auto &children = node->children();
         if (!children.empty()) {
             auto *prevChild = children.at(0).get();
+            bool  isFirst   = true;
             for (const auto &child: children) {
                 m_pos += child->leadingTrivia().length();
                 qDebug() << m_pos << child << child->length() <<
@@ -22,7 +23,7 @@ namespace Command {
                 if ((m_cursorRow >= m_pos) &&
                     (m_cursorRow <= (m_pos + child->length()))) {
                     qDebug() << "I choose you" << child;
-                    if (children.size() > 1) {
+                    if (!isFirst) {
                         Q_ASSERT(prevChild->schemaNode() != nullptr);
                         m_suggestions +=
                             prevChild->schemaNode()->literalChildren().
@@ -41,6 +42,7 @@ namespace Command {
                 m_pos += child->rightText().length() +
                          child->trailingTrivia().length();
                 prevChild = child.get();
+                isFirst   = false;
             }
         }
     }
