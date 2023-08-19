@@ -475,13 +475,15 @@ void TestSchemaParser::qStringViewToDec() {
     QVERIFY(!ok);
 
     QBENCHMARK {
-        QStringView(u"127").toShort(&ok);
-        QStringView(u"1234").toShort(&ok);
-        QStringView(u"-2147483648").toInt(&ok);
-        QStringView(u"78187493520").toLongLong(&ok);
-        QStringView(u"0").toInt(&ok);
-        QStringView(u"4g").toInt(&ok);
-        QStringView(u"142857").toShort(&ok);
+        [[maybe_unused]] const auto ret1 = QStringView(u"127").toShort(&ok);
+        [[maybe_unused]] const auto ret2 = QStringView(u"1234").toShort(&ok);
+        [[maybe_unused]] const auto ret3 =
+            QStringView(u"78187493520").toLongLong(&ok);
+        [[maybe_unused]] const auto ret4 =
+            QStringView(u"-2147483648").toInt(&ok);
+        [[maybe_unused]] const auto ret5 = QStringView(u"0").toInt(&ok);
+        [[maybe_unused]] const auto ret6 = QStringView(u"4g").toInt(&ok);
+        [[maybe_unused]] const auto ret7 = QStringView(u"142857").toShort(&ok);
     }
 }
 
