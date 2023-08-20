@@ -74,7 +74,7 @@ DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Long, long long)
 
 namespace Command {
     template<>
-    const QVector<QLatin1String> staticSuggestions<BoolNode> = {
+    constexpr std::array staticSuggestions<BoolNode> = {
         "false"_QL1, "true"_QL1,
     };
 }
@@ -96,7 +96,7 @@ DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Uuid, QUuid)
 
 namespace Command {
     template<>
-    const QVector<QLatin1String> staticSuggestions<ColorNode> = {
+    constexpr std::array staticSuggestions<ColorNode> = {
         "aqua"_QL1,         "black"_QL1,       "blue"_QL1,
         "dark_aqua"_QL1,    "dark_blue"_QL1,   "dark_green"_QL1,
         "dark_gray"_QL1,    "dark_purple"_QL1, "dark_red"_QL1,
@@ -106,23 +106,23 @@ namespace Command {
     };
 
     template<>
-    const QVector<QLatin1String> staticSuggestions<EntityAnchorNode> =
+    constexpr std::array staticSuggestions<EntityAnchorNode> =
     { "eyes"_QL1, "feet"_QL1, };
 
     template<>
-    const QVector<QLatin1String> staticSuggestions<HeightmapNode> = {
+    constexpr std::array staticSuggestions<HeightmapNode> = {
         "motion_blocking_no_leaves"_QL1, "motion_blocking"_QL1,
         "ocean_floor"_QL1,               "world_surface"_QL1,
     };
 
     template<>
-    const QVector<QLatin1String> staticSuggestions<OperationNode> = {
+    constexpr std::array staticSuggestions<OperationNode> = {
         "="_QL1,  "<"_QL1,  ">"_QL1, "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
         "/="_QL1, "%="_QL1,
     };
 
     template<>
-    const QVector<QLatin1String> staticSuggestions<ScoreboardSlotNode> = {
+    constexpr std::array staticSuggestions<ScoreboardSlotNode> = {
         "belowName"_QL1, // Will be renamed to below_name in 1.20.2
         "sidebar.team.aqua"_QL1,
         "sidebar.team.black"_QL1,
@@ -146,12 +146,12 @@ namespace Command {
     };
 
     template<>
-    const QVector<QLatin1String> staticSuggestions<TemplateMirrorNode> = {
+    constexpr std::array staticSuggestions<TemplateMirrorNode> = {
         "none"_QL1, "front_back"_QL1, "left_right"_QL1,
     };
 
     template<>
-    const QVector<QLatin1String> staticSuggestions<TemplateRotationNode> = {
+    constexpr std::array staticSuggestions<TemplateRotationNode> = {
         "none"_QL1, "clockwise_90"_QL1, "counterclockwise_90"_QL1, "180"_QL1
     };
 }

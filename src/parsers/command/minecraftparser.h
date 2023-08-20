@@ -140,7 +140,37 @@ private:
 
         static inline QVersionNumber gameVer = QVersionNumber();
 
-        QString oneOf(const QLatin1StringVector &strArr);
+        template<typename T, size_t N>
+        QString oneOf(const std::array<T, N> &strArr) {
+            const int         start   = pos();
+            const QStringView curText = peekRest();
+
+            for (const auto &str: strArr) {
+                if (curText.startsWith(str)) {
+                    advance(str.size());
+                    return str;
+                }
+            }
+            reportError(QT_TR_NOOP("Only accept one of the following: %1"),
+                        { join(strArr) }, start,
+                        peekLiteral().length());
+            return QString();
+        }
+
+        template<typename T, size_t N>
+        QString join(const std::array<T, N> &array) {
+            QString ret;
+
+            for (auto it = array.cbegin(); it != array.cend();) {
+                ret += *it;
+                ++it;
+                if (it != array.cend()) {
+                    ret += ", "_QL1;
+                }
+            }
+            return ret;
+        }
+
         QString eatListSep(QChar sepChr, QChar endChr);
 
         template<class Container, class Type>

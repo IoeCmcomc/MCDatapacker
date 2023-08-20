@@ -16,35 +16,6 @@ namespace Command {
          */
     }
 
-    QString join(const QLatin1StringVector &vector) {
-        QString ret;
-
-        for (auto it = vector.cbegin(); it != vector.cend();) {
-            ret += *it;
-            ++it;
-            if (it != vector.cend()) {
-                ret += ", "_QL1;
-            }
-        }
-        return ret;
-    }
-
-    QString MinecraftParser::oneOf(const QLatin1StringVector &strArr) {
-        const int         start   = pos();
-        const QStringView curText = peekRest();
-
-        for (const auto &str: qAsConst(strArr)) {
-            if (curText.startsWith(str)) {
-                advance(str.size());
-                return str;
-            }
-        }
-        reportError(QT_TR_NOOP("Only accept one of the following: %1"),
-                    { join(strArr) }, start,
-                    peekLiteral().length());
-        return QString();
-    }
-
     QString MinecraftParser::eatListSep(QChar sepChr, QChar endChr) {
         const int start = pos();
 
@@ -459,9 +430,10 @@ namespace Command {
                     return ret;
                 }
                 ucase ("sort"_QL1): {
-                    const QString &&literal =
-                        oneOf({ "nearest"_QL1, "furthest"_QL1,
-                                "random"_QL1, "arbitrary"_QL1 });
+                    constexpr static std::array options {
+                        "nearest"_QL1, "furthest"_QL1, "random"_QL1,
+                        "arbitrary"_QL1 };
+                    const QString &&literal = oneOf(options);
                     return QSharedPointer<StringNode>::create(
                         spanText(literal), !literal.isEmpty());
                 }

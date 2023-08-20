@@ -3,14 +3,14 @@
 
 #include "parsenode.h"
 
+#include <array>
+
 #ifndef QLATIN1STRING_OPERATOR
 QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
     return QLatin1String(literal, size);
 }
 #define QLATIN1STRING_OPERATOR
 #endif
-
-using QLatin1StringVector = QVector<QLatin1String>;
 
 namespace Command {
     class ArgumentNode : public ParseNode {
@@ -104,10 +104,24 @@ protected:
                                                     ArgumentNode::ParserType> =
         ArgumentNode::ParserType::Unknown;
 
+    /*
+     * Declaring staticSuggestions as QVector<QLatin1String> causes the program
+     * to crash when exiting. The crash doesn't happen in debug mode.
+     * Conclusion: QVector<QLatin1String> shouldn't be used with global variables.
+     */
     template <class T>
-    const QLatin1StringVector staticSuggestions;
+    constexpr std::array<QLatin1String, 0> staticSuggestions;
 
-    QVector<QString> toStringVec(const QLatin1StringVector &vector);
+    template<typename T, size_t N>
+    QVector<QString> toStringVec(const std::array<T, N> &array) {
+        QVector<QString> newVec{ (int)N };
+
+        std::transform(array.cbegin(), array.cend(), newVec.begin(),
+                       [](const auto &str) {
+            return str;
+        });
+        return newVec;
+    }
 }
 
 #endif /* ARGUMENTNODE_H */
