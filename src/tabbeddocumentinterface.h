@@ -12,8 +12,7 @@ namespace Ui {
     class TabbedDocumentInterface;
 }
 
-class TabbedDocumentInterface : public QFrame
-{
+class TabbedDocumentInterface : public QFrame {
     Q_OBJECT
 
 public:
@@ -67,7 +66,7 @@ private /*slots*/ :
     void onModificationChanged(bool changed);
     void onTabChanged(int index);
     void onTabMoved(int from, int to);
-    void onCloseFile(int index);
+    void onCloseFile(int index, const bool force = false);
     void onSwitchNextFile();
     void onSwitchPrevFile();
 
