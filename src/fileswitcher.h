@@ -5,16 +5,16 @@
 
 #include <QListWidget>
 
-class FileSwitcher : public QListWidget
-{
+class FileSwitcher : public QListWidget {
 public:
-    FileSwitcher(TabbedDocumentInterface *parent = nullptr,
-                 bool backward                     = false);
+    explicit FileSwitcher(TabbedDocumentInterface *parent = nullptr,
+                          bool backward                   = false);
     ~FileSwitcher();
 
 protected:
-    void focusOutEvent(QFocusEvent* event);
-    void keyReleaseEvent(QKeyEvent *event);
+    QSize sizeHint() const final;
+    void focusOutEvent(QFocusEvent *event) final;
+    void keyReleaseEvent(QKeyEvent *event) final;
 
 private slots:
     void onSelectNextItem();

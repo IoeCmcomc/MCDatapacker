@@ -11,10 +11,6 @@ FileSwitcher::FileSwitcher(TabbedDocumentInterface *parent, bool backward)
     this->parent = parent;
     setWindowFlag(Qt::Popup, true);
     setSelectionMode(QAbstractItemView::SingleSelection);
-    setSizeAdjustPolicy(QListWidget::AdjustToContents);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    initFileList();
 
     connect(this, &QListWidget::itemClicked, this, &QObject::deleteLater);
     connect(this, &QListWidget::itemActivated, this, &QObject::deleteLater);
@@ -24,8 +20,10 @@ FileSwitcher::FileSwitcher(TabbedDocumentInterface *parent, bool backward)
                           this),
             &QShortcut::activated, this, &FileSwitcher::onSelectPrevItem);
 
-    QRect parentRect(parentWidget()->mapToGlobal(QPoint(0, 0)),
-                     parentWidget()->size());
+    initFileList();
+
+    const QRect parentRect(parent->mapToGlobal({ 0, 0 }),
+                           parent->size());
     move(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(),
                              parentRect).topLeft());
 
@@ -45,14 +43,17 @@ FileSwitcher::~FileSwitcher() {
     }
 }
 
+QSize FileSwitcher::sizeHint() const {
+    const int width  = sizeHintForColumn(0) + 2 * frameWidth();
+    const int height = sizeHintForRow(0) * count() + 2 * frameWidth();
+
+    return QSize(width, height).boundedTo(qApp->screens().at(0)->size());
+}
+
 void FileSwitcher::show() {
-    setMinimumWidth(sizeHintForColumn(0) + 2 * frameWidth());
-    setMinimumHeight(sizeHintForRow(0) * count() + 2 * frameWidth());
-    setMaximumWidth(700);
-    setMaximumHeight(500);
     adjustSize();
 
-    const auto scrSize  = qApp->screens()[0]->size();
+    const auto scrSize  = qApp->screens().at(0)->size();
     QPoint     newPoint = pos();
 
     if ((newPoint.x() + width()) > scrSize.width())
@@ -63,13 +64,8 @@ void FileSwitcher::show() {
     newPoint.rx() = qMax(newPoint.x(), 0);
     newPoint.ry() = qMax(newPoint.y(), 0);
 
-    if ((newPoint.x() + width()) > scrSize.width())
-        sizeHint().rwidth() = scrSize.width();
-    if ((newPoint.y() + height()) > scrSize.height())
-        sizeHint().rheight() = scrSize.height();
-
-
     move(newPoint);
+    adjustSize();
 
     QListWidget::show();
 }
