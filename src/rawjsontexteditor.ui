@@ -312,6 +312,16 @@
            <string>Single-line JSON</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Formatting codes ('§' prefix)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Formatting codes ('&amp;' prefix)</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">

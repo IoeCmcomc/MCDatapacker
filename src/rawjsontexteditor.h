@@ -37,6 +37,10 @@ public:
     QJsonArray toJsonObjects() const;
     void fromJsonObjects(const QJsonArray &arr);
 
+    QString toFormattingCodes(const QChar prefix = u'§')
+    const;
+    void fromFormattingCodes(const QString &codes, const QChar prefix = u'§');
+
 public /*slots*/ :
     void setBold(bool bold);
     void setItalic(bool italic);
@@ -57,6 +61,8 @@ private /*slots*/ :
         JSON,
         HTML,
         InlineJSON,
+        FormattingCodes,    // '§' prefix
+        AmpFormattingCodes, // '&' prefix
     };
 
     using Property   = RawJsonTextEdit::FormatProperty;

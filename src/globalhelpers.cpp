@@ -309,7 +309,7 @@ const QMap<QString, QString> Glhp::colorHexes = {
     { "dark_aqua",    "#00aaaa" },
     { "dark_red",     "#aa0000" },
     { "dark_purple",  "#aa00aa" },
-    { "gold",         "#ffAA00" },
+    { "gold",         "#ffaa00" },
     { "gray",         "#aaaaaa" },
     { "dark_gray",    "#555555" },
     { "blue",         "#5555ff" },
@@ -319,6 +319,25 @@ const QMap<QString, QString> Glhp::colorHexes = {
     { "light_purple", "#ff55ff" },
     { "yellow",       "#ffff55" },
     { "white",        "#ffffff" }
+};
+
+const QMap<char, QString> Glhp::colorCodes = {
+    { '0', "#000000" },
+    { '1', "#0000aa" },
+    { '2', "#00aa00" },
+    { '3', "#00aaaa" },
+    { '4', "#aa0000" },
+    { '5', "#aa00aa" },
+    { '6', "#ffaa00" },
+    { '7', "#aaaaaa" },
+    { '8', "#555555" },
+    { '9', "#5555ff" },
+    { 'a', "#55ff55" },
+    { 'b', "#55ffff" },
+    { 'c', "#ff5555" },
+    { 'd', "#ff55ff" },
+    { 'e', "#ffff55" },
+    { 'f', "#ffffff" }
 };
 
 
