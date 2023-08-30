@@ -83,7 +83,9 @@ public:
 
     class SpanNode : public ParseNode {
 public:
-        explicit SpanNode(const QString &text) : ParseNode(Kind::Span, text) {
+        explicit SpanNode(const QString &text, const bool valid = false)
+            : ParseNode(Kind::Span, text) {
+            m_isValid = valid;
         };
     };
 

@@ -1,5 +1,7 @@
 #include "mcfunctionparser.h"
 
+#include "game.h"
+
 #include <QElapsedTimer>
 
 namespace Command {
@@ -27,10 +29,12 @@ namespace Command {
         for (const auto line: lines) {
             const int  linePos = pos();
             const auto trimmed = line.trimmed();
-            if (trimmed.isEmpty() || trimmed[0] == '#') {
-                const auto &&span = SpanPtr::create(spanText(line));
-                span->setIsValid(true);
-                tree->append(std::move(span));
+            if (trimmed.isEmpty() || trimmed[0] == u'#') {
+                tree->append(SpanPtr::create(spanText(line), true));
+                validLineCount++;
+            } else if (trimmed[0] == u'$'
+                       && m_commandParser.gameVer >= Game::v1_20_2) {
+                tree->append(SpanPtr::create(spanText(line), true));
                 validLineCount++;
             } else {
                 NodePtr command;
