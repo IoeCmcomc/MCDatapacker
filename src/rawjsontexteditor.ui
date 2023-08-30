@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>397</width>
+    <width>404</width>
     <height>252</height>
    </rect>
   </property>
@@ -73,6 +73,9 @@
          </property>
          <item>
           <widget class="QToolButton" name="boldBtn">
+           <property name="toolTip">
+            <string>Bold</string>
+           </property>
            <property name="icon">
             <iconset theme="format-text-bold">
              <normaloff>.</normaloff>.</iconset>
@@ -87,6 +90,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="italicBtn">
+           <property name="toolTip">
+            <string>Italic</string>
+           </property>
            <property name="icon">
             <iconset theme="format-text-italic">
              <normaloff>.</normaloff>.</iconset>
@@ -101,6 +107,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="underlineBtn">
+           <property name="toolTip">
+            <string>Underline</string>
+           </property>
            <property name="icon">
             <iconset theme="format-text-underline">
              <normaloff>.</normaloff>.</iconset>
@@ -115,6 +124,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="strikeBtn">
+           <property name="toolTip">
+            <string>Strikethrough</string>
+           </property>
            <property name="icon">
             <iconset theme="format-text-strikethrough">
              <normaloff>.</normaloff>.</iconset>
@@ -129,6 +141,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="obfuscatedBtn">
+           <property name="toolTip">
+            <string>Obfuscated</string>
+           </property>
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/format-text-obfuscated.png</normaloff>:/icon/format-text-obfuscated.png</iconset>
@@ -143,6 +158,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="colorBtn">
+           <property name="toolTip">
+            <string>Text color</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -166,6 +184,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="translatedTextBtn">
+           <property name="toolTip">
+            <string>Translated text</string>
+           </property>
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-translate.png</normaloff>:/icon/object-text-translate.png</iconset>
@@ -177,6 +198,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="scoreboardBtn">
+           <property name="toolTip">
+            <string>Scoreboard value</string>
+           </property>
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-scoreboard.png</normaloff>:/icon/object-text-scoreboard.png</iconset>
@@ -188,6 +212,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="entityNamesBtn">
+           <property name="toolTip">
+            <string>Entity names</string>
+           </property>
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-entity.png</normaloff>:/icon/object-text-entity.png</iconset>
@@ -199,6 +226,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="keyBindBtn">
+           <property name="toolTip">
+            <string>Keybind</string>
+           </property>
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-keybind.png</normaloff>:/icon/object-text-keybind.png</iconset>
@@ -210,6 +240,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="snbtBtn">
+           <property name="toolTip">
+            <string>NBT values</string>
+           </property>
            <property name="icon">
             <iconset resource="../resource/app/app.qrc">
              <normaloff>:/icon/object-text-snbt.png</normaloff>:/icon/object-text-snbt.png</iconset>
