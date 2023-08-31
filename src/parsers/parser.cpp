@@ -15,15 +15,14 @@ Parser::Error::Error(const char *whatArg, int pos, int length,
 }
 
 QString Parser::Error::toLocalizedMessage() const {
-    QString &&errMsg = QCoreApplication::translate("Parser", what());
+    QString &&errMsg = tr(what());
 
     for (int i = 0; i < args.size(); ++i) {
         errMsg = errMsg.arg(args.at(i).toString());
     }
 
-    const QString &&ret =
-        QCoreApplication::translate("Parser", "Syntax error at position %1: %2")
-        .arg(pos).arg(errMsg);
+    const QString &&ret = tr("Syntax error at position %1: %2")
+                          .arg(pos).arg(errMsg);
     return std::move(ret);
 }
 

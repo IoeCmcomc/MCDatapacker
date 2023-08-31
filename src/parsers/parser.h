@@ -3,6 +3,7 @@
 
 #include <QVariantList>
 #include <QDebug>
+#include <QCoreApplication>
 
 #include <stdexcept>
 
@@ -16,9 +17,10 @@ QLatin1Char constexpr operator ""_QL1(const char chr) {
 }
 
 class Parser {
-    Q_GADGET
+    Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
     class Error : public std::runtime_error {
+        Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
         int pos           = 0;
         int length        = 1;

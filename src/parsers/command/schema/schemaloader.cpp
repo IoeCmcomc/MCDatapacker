@@ -14,7 +14,7 @@ namespace Command::Schema {
 
         if (!(finfo.exists() && finfo.isFile())) {
             qWarning() << "File not exists:" << finfo.filePath();
-            m_error = QT_TR_NOOP("File not exists");
+            m_error = QT_TRANSLATE_NOOP("SchemaLoader", "File not exists");
             return;
         }
 

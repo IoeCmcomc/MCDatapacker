@@ -77,7 +77,7 @@ T strToDec(QStringView v, bool &ok) {
 
 namespace Command {
     class SchemaParser : public Parser {
-        Q_GADGET
+        Q_DECLARE_TR_FUNCTIONS(Parser)
 
 public:
         SchemaParser();

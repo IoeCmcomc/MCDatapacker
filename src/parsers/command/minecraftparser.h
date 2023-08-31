@@ -120,7 +120,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
 
 namespace Command {
     class MinecraftParser final : public SchemaParser  {
-        Q_GADGET;
+        Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
         enum class AxisParseOption : unsigned char {
             NoOption    = 0,

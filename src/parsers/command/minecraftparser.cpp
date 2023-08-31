@@ -95,7 +95,8 @@ namespace Command {
         axis->setText(spanText(start));
         axis->setIsValid(isValid);
         if (!isValid) {
-            reportError("Invalid axis value", {}, start, axis->length());
+            reportError(QT_TR_NOOP("Invalid axis value"),
+                        {}, start, axis->length());
         }
         return axis;
     }
@@ -454,11 +455,12 @@ namespace Command {
                     } else {
                         literal = getLiteralString().toString();
                     }
-                    ret->setNode(QSharedPointer<StringNode>::create(
-                                     spanText(start), literal,
-                                     errorIfNot(
-                                         !literal.isEmpty(),
-                                         "Invalid empty name in target selector")));
+                    ret->setNode(
+                        QSharedPointer<StringNode>::create(
+                            spanText(start), literal, errorIfNot(
+                                !literal.isEmpty(),
+                                QT_TR_NOOP(
+                                    "Invalid empty name in target selector"))));
                     return ret;
                 }
                 ucase ("type"_QL1): {
@@ -592,9 +594,9 @@ namespace Command {
                 const auto name = advanceView(re2c::nbtPathKey(peekRest()));
                 ret->setName(QSharedPointer<StringNode>::create(
                                  spanText(name),
-                                 errorIfNot(!name.isEmpty(),
-                                            QT_TR_NOOP(
-                                                "Invalid empty NBT path key"))));
+                                 (!name.isEmpty(),
+                                  QT_TR_NOOP(
+                                      "Invalid empty NBT path key"))));
                 if (curChar() == '{')
                     ret->setFilter(parseCompoundTag());
             };
@@ -755,11 +757,11 @@ namespace Command {
                     ? getUntil(QChar::Space)
                     : advanceView(re2c::realPlayerName(peekRest()));
 
-                node->setNode(QSharedPointer<StringNode>::create(
-                                  spanText(literal),
-                                  errorIfNot(!literal.isEmpty(),
-                                             QT_TR_NOOP(
-                                                 "Invalid empty player name"))));
+                node->setNode(
+                    QSharedPointer<StringNode>::create(
+                        spanText(literal),
+                        errorIfNot(!literal.isEmpty(),
+                                   QT_TR_NOOP("Invalid empty player name"))));
             }
         }
     }
@@ -1111,7 +1113,7 @@ namespace Command {
 
         return QSharedPointer<ItemSlotNode>::create(
             spanText(slot), errorIfNot(!slot.isEmpty(),
-                                       "Invalid empty item slot"));
+                                       QT_TR_NOOP("Invalid empty item slot")));
     }
 
     QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
@@ -1201,7 +1203,7 @@ namespace Command {
         bool        valid   = true;
 
         if (objname.isEmpty()) {
-            reportError("Invalid empty objective");
+            reportError(QT_TR_NOOP("Invalid empty objective"));
             valid = false;
         } else if ((objname.length() > 16) &&
                    (gameVer < QVersionNumber(1, 18, 2))) {
@@ -1218,8 +1220,9 @@ namespace Command {
         const auto criteria = advanceView(re2c::objectiveCriteria(peekRest()));
 
         return QSharedPointer<ObjectiveCriteriaNode>::create(
-            spanText(criteria), errorIfNot(!criteria.isEmpty(),
-                                           "Invalid empty objective criteria"));
+            spanText(criteria),
+            errorIfNot(!criteria.isEmpty(),
+                       QT_TR_NOOP("Invalid empty objective criteria")));
     }
 
     QSharedPointer<OperationNode> MinecraftParser::
@@ -1427,9 +1430,9 @@ namespace Command {
     QSharedPointer<TeamNode> MinecraftParser::minecraft_team() {
         const auto literal = getLiteralString();
 
-        return QSharedPointer<TeamNode>::create(spanText(literal),
-                                                errorIfNot(!literal.isEmpty(),
-                                                           "Invalid empty team"));
+        return QSharedPointer<TeamNode>::create(
+            spanText(literal),
+            errorIfNot(!literal.isEmpty(), QT_TR_NOOP("Invalid empty team")));
     }
 
     QSharedPointer<TimeNode> MinecraftParser::minecraft_time() {
@@ -1439,7 +1442,7 @@ namespace Command {
 
         auto [raw, value] = parseFloat(ok);
         if (!ok) {
-            reportError("Invalid time number", {}, curPos, raw.length());
+            reportError(QT_TR_NOOP("Invalid time"), {}, curPos, raw.length());
         }
 
         switch (curChar().toLatin1()) {
@@ -1504,7 +1507,7 @@ namespace Command {
             return QSharedPointer<UuidNode>::create(
                 spanText(raw), std::move(uuid), true);
         } else {
-            reportError("Invalid UUID");
+            reportError(QT_TR_NOOP("Invalid UUID"));
             return QSharedPointer<UuidNode>::create(QString(), QUuid(), false);
         }
     }
@@ -1532,7 +1535,7 @@ namespace Command {
             return QSharedPointer<InternalGreedyStringNode>::create(
                 spanText(raw), true);
         } else {
-            reportError("Invalid empty greedy string", {}, curPos,
+            reportError(QT_TR_NOOP("Invalid empty greedy string"), {}, curPos,
                         raw.length());
             return QSharedPointer<InternalGreedyStringNode>::create(QString(),
                                                                     false);

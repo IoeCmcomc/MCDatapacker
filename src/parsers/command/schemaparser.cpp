@@ -655,7 +655,7 @@ namespace Command {
         const QVariantMap &props) {
         if (!props.contains(QStringLiteral("type")))
             throwError(QT_TR_NOOP(
-                           "The required paramenter 'type' of the 'brigadier_string' argument parser is missing."));
+                           "The required paramenter 'type' of the 'brigadier:string' argument parser is missing."));
 
         const QString &&type = props[QStringLiteral("type")].toString();
         uswitch (type) {
