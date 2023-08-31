@@ -22,5 +22,9 @@
         <file>registries/particle_type/data.min.json</file>
         <file>registries/recipe/data.min.json</file>
         <file>registries/sound_event/data.min.json</file>
+        <file>registries/entity_type/data.min.json</file>
+        <file>registries/mob_effect/data.min.json</file>
+        <file>registries/enchantment/data.min.json</file>
+        <file>registries/point_of_interest_type/data.min.json</file>
     </qresource>
 </RCC>
