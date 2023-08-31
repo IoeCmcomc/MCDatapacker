@@ -269,7 +269,7 @@ void debugTextCursor(const QTextCursor &tc) {
 }
 
 void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
-    static const QString extendedAcceptedCharsset("#.:/");
+    static const QString extendedAcceptedCharsset("#.:/-");
 
     //debugTextCursor(tc);
 
@@ -844,8 +844,7 @@ void CodeEditor::onTextChanged() {
         if (m_highlighter) {
             m_highlighter->rehighlightDelayed();
         }
-        if (m_needCompleting && m_completer
-            && m_completer->popup()->isHidden()) {
+        if (m_needCompleting && m_completer) {
             startCompletion(textUnderCursor());
         }
         updateErrorSelections();
