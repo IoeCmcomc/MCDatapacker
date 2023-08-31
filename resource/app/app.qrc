@@ -19,5 +19,9 @@
         <file>icon/object-text-entity.png</file>
         <file>icon/object-text-keybind.png</file>
         <file>icon/object-text-snbt.png</file>
+        <file alias="file-jmc">icon/datapack/file-jmc-16x16.png</file>
+        <file alias="file-mc">icon/datapack/file-mc-16x16.png</file>
+        <file alias="file-mcm">icon/datapack/file-mcm-16x16.png</file>
+        <file alias="file-tdn">icon/datapack/file-tdn-16x16.png</file>
     </qresource>
 </RCC>

@@ -492,13 +492,8 @@ namespace Command {
                 ucase ("advancements"): {
                     return parseEntityAdvancements();
                 }
-                default: {
-                    throwError(QT_TR_NOOP(
-                                   "Unknown entity argument name: %1"),
-                               { key });
-                }
             }
-            return nullptr;
+            throwError(QT_TR_NOOP("Unknown entity argument name: %1"), { key });
         });
     }
 

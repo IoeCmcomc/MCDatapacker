@@ -670,6 +670,10 @@ namespace Command {
                     return QSharedPointer<StringNode>::create(
                         spanText(start), str, true);
                 } else {
+                    /*
+                     * Using goto here make the code clearer than
+                     * using fall through.
+                     */
                     goto SINGLE_WORD;
                 }
             }

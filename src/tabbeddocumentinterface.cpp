@@ -220,7 +220,8 @@ void TabbedDocumentInterface::addFile(const QString &path) {
                 new McfunctionHighlighter(codeEditor->document(),
                                           parser.get()));
             codeEditor->setParser(std::move(parser));
-        } else if (newFile.fileType >= CodeFile::JsonText) {
+        } else if (newFile.fileType >= CodeFile::JsonText
+                   && newFile.fileType < CodeFile::JsonText_end) {
             codeEditor->setHighlighter(new JsonHighlighter(codeEditor->
                                                            document()));
             codeEditor->setParser(std::make_unique<JsonParser>());

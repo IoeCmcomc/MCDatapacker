@@ -1,5 +1,7 @@
 #include "globalhelpers.h"
 
+#include "uberswitch.hpp"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -56,10 +58,6 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    static const QStringList imageExts{
-        QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
-        QStringLiteral("bmp") };
-
     static const QVector<QPair<QString,
                                CodeFile::FileType> > catPathToFileType {
         { QStringLiteral("advancements"), CodeFile::Advancement },
@@ -103,24 +101,44 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     const QFileInfo info(filepath);
     const QString &&fullSuffix = info.suffix();
 
-    if (fullSuffix == QLatin1String("mcmeta")) {
-        return CodeFile::Meta;
-    } else if (fullSuffix == QLatin1String("mcfunction")) {
-        return CodeFile::Function;
-    } else if (fullSuffix == QLatin1String("nbt")) {
-        return CodeFile::Structure;
-    } else if (imageExts.contains(fullSuffix)) {
-        return CodeFile::Image;
-    } else if (fullSuffix == QLatin1String("json")) {
-        for (const auto &pair: catPathToFileType) {
-            if (isPathRelativeTo(dirpath, filepath, pair.first)) {
-                return pair.second;
+    uswitch (fullSuffix) {
+        ucase (QLatin1String("mcmeta")):
+            return CodeFile::Meta;
+
+        ucase (QLatin1String("mcfunction")):
+            return CodeFile::Function;
+
+        ucase (QLatin1String("nbt")):
+            return CodeFile::Structure;
+
+        ucase (QLatin1String("png")):
+        ucase (QLatin1String("jpg")):
+        ucase (QLatin1String("jpeg")):
+        ucase (QLatin1String("bmp")):
+            return CodeFile::Image;
+
+        ucase (QLatin1String("mc")):
+            return CodeFile::McBuild;
+
+        ucase (QLatin1String("mcm")):
+            return CodeFile::McBuildMacro;
+
+        ucase (QLatin1String("jmc")):
+            return CodeFile::Jmc;
+
+        ucase (QLatin1String("tdn")):
+            return CodeFile::TridentCode;
+
+        ucase (QLatin1String("json")): {
+            for (const auto &pair: catPathToFileType) {
+                if (isPathRelativeTo(dirpath, filepath, pair.first)) {
+                    return pair.second;
+                }
             }
+            return CodeFile::JsonText;
         }
-        return CodeFile::JsonText;
-    } else {
-        return CodeFile::Text;
     }
+    return CodeFile::Text;
 }
 
 QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
@@ -133,6 +151,18 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
 
         case CodeFile::Meta:
             return QIcon(QStringLiteral(":/file-mcmeta"));
+
+        case CodeFile::McBuild:
+            return QIcon(QStringLiteral(":/file-mc"));
+
+        case CodeFile::McBuildMacro:
+            return QIcon(QStringLiteral(":/file-mcm"));
+
+        case CodeFile::Jmc:
+            return QIcon(QStringLiteral(":/file-jmc"));
+
+        case CodeFile::TridentCode:
+            return QIcon(QStringLiteral(":/file-tdn"));
 
         default: {
             if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
@@ -382,6 +412,12 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
         { CodeFile::TemplatePool, QT_TR_NOOP("Jigsaw pool") },
         { CodeFile::FlatLevelGenPreset,
           QT_TR_NOOP("Flat world generator preset") },
+        { CodeFile::Jmc,
+          QT_TR_NOOP("JavaScript-like Minecraft function") },
+        { CodeFile::McBuild, QT_TR_NOOP("mc-build code") },
+        { CodeFile::McBuildMacro, QT_TR_NOOP("mc-build macro") },
+        // Do not translate "Trident"
+        { CodeFile::TridentCode, QT_TR_NOOP("Trident code") },
     };
 
     if (type < 0)
