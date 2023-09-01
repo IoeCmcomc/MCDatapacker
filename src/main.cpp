@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
     QCoreApplication::setApplicationVersion(APP_VERSION);
+    qInfo() << "MCDatapacker" << ("v" APP_VERSION);
 
     /*Q_INIT_RESOURCE(application); */
 
@@ -22,7 +23,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     QApplication a(argc, argv);
-    qInfo() << "Appication started.";
+    qInfo() << "Appication is starting...";
 
     QFontDatabase::addApplicationFont(QStringLiteral(
                                           ":/fonts/Monocraft.otf"));

@@ -316,8 +316,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 7
-VERSION_PATCH = 1
+VERSION_MINOR = 8
+VERSION_PATCH = 0
 
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 QMAKE_TARGET_COMPANY = IoeCmcomc
