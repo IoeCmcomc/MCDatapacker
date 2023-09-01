@@ -32,6 +32,7 @@ public:
         using LiteralChildrenType = QMap<QString, LiteralNode *>;
 
         Node();
+        ~Node();
 
         Kind kind() const;
 
@@ -44,10 +45,12 @@ public:
         bool isExecutable() const;
         Node * redirect() const;
         void setRedirect(Node *newRedirect);
+        Node *parent() const;
 
-protected:
+    protected:
         LiteralChildrenType m_literalChildren;
         QVector<ArgumentNode *> m_argumentChildren;
+        Node *m_parent = nullptr;
         Node *m_redirect  = nullptr;
         Kind m_kind       = Kind::Unknown;
         bool m_executable = false;

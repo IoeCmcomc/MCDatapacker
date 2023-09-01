@@ -12,6 +12,7 @@ namespace Command {
     DEFINE_ACCEPT_METHOD(DoubleNode)
     DEFINE_ACCEPT_METHOD(FloatNode)
     DEFINE_ACCEPT_METHOD(IntegerNode)
+    DEFINE_ACCEPT_METHOD(LongNode)
 
     DEFINE_ACCEPT_METHOD(ColorNode)
     DEFINE_ACCEPT_METHOD(EntityAnchorNode)
@@ -27,4 +28,7 @@ namespace Command {
     DEFINE_ACCEPT_METHOD(TemplateRotationNode)
 
     DEFINE_ACCEPT_METHOD(UuidNode)
+
+    DEFINE_ACCEPT_METHOD(InternalGreedyStringNode)
+    DEFINE_ACCEPT_METHOD(InternalRegexPatternNode)
 }

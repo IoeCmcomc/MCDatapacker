@@ -87,17 +87,17 @@
 <context>
     <name>CodeEditor</name>
     <message>
-        <location filename="../src/codeeditor.cpp" line="253"/>
+        <location filename="../src/codeeditor.cpp" line="201"/>
         <source>Zoom: %1%</source>
         <translation>Thu phóng: %1%</translation>
     </message>
     <message>
-        <location filename="../src/codeeditor.cpp" line="562"/>
+        <location filename="../src/codeeditor.cpp" line="542"/>
         <source>More</source>
         <translation>Thêm</translation>
     </message>
     <message>
-        <location filename="../src/codeeditor.cpp" line="567"/>
+        <location filename="../src/codeeditor.cpp" line="547"/>
         <source>Format</source>
         <translation>Định dạng</translation>
     </message>
@@ -105,95 +105,77 @@
 <context>
     <name>Command::MinecraftParser</name>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="42"/>
         <source>Only accept one of the following: %1</source>
-        <translation>Chỉ chấp nhận một trong số những thứ sau: %1</translation>
+        <translation type="vanished">Chỉ chấp nhận một trong số những thứ sau: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="67"/>
         <source>Cannot mix world &amp; local coordinates (everything must either use ^ or not).</source>
-        <translation>Không thể kết hợp toạ độ thế giới &amp; cục bộ (mọi thứ phải dùng ^ hoặc để trống).</translation>
+        <translation type="vanished">Không thể kết hợp toạ độ thế giới &amp; cục bộ (mọi thứ phải dùng ^ hoặc để trống).</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="267"/>
         <source>Invalid empty tag value</source>
-        <translation>Giá trị nhãn rỗng không hợp lệ</translation>
+        <translation type="vanished">Giá trị nhãn rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="292"/>
         <source>%1 is not a vaild SNBT byte tag</source>
-        <translation>%1 không phải là một nhãn byte SNBT hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một nhãn byte SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="305"/>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="357"/>
         <source>%1 is not a vaild SNBT double tag</source>
-        <translation>%1 không phải là một nhãn phẩy động đôi SNBThợp lệ</translation>
+        <translation type="vanished">%1 không phải là một nhãn phẩy động đôi SNBThợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="318"/>
         <source>%1 is not a vaild SNBT float tag</source>
-        <translation>%1 không phải là một nhãn phẩy động đơn SNBT hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một nhãn phẩy động đơn SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="331"/>
         <source>%1 is not a vaild SNBT long tag</source>
-        <translation>%1 không phải là một nhãn số nguyên dài SNBT hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một nhãn số nguyên dài SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="344"/>
         <source>%1 is not a vaild SNBT short tag</source>
-        <translation>%1 không phải là một nhãn số nguyên ngắn SNBT hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một nhãn số nguyên ngắn SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="372"/>
         <source>%1 is not a vaild SNBT integer tag</source>
-        <translation>%1 không phải là một nhãn số nguyên SNBT hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một nhãn số nguyên SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="521"/>
         <source>Unknown entity argument name: %1</source>
-        <translation>Tên đối số thực thể không hợp lệ: %1</translation>
+        <translation type="vanished">Tên đối số thực thể không hợp lệ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="564"/>
         <source>Invalid target selector variable: %1</source>
-        <translation>Biến chọn mục tiêu không hợp lệ: %1</translation>
+        <translation type="vanished">Biến chọn mục tiêu không hợp lệ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="626"/>
         <source>Invalid empty NBT path key</source>
-        <translation>Khoá đường dẫn NBT rỗng không hợp lệ</translation>
+        <translation type="vanished">Khoá đường dẫn NBT rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="683"/>
         <source>A resource location tag is not allowed here.</source>
-        <translation>Không được để nhãn vị trí tài nguyên ở đây.</translation>
+        <translation type="vanished">Không được để nhãn vị trí tài nguyên ở đây.</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="703"/>
         <source>The character &apos;/&apos; is not allowed in the namespace</source>
-        <translation>Kí tự &apos;/&apos; không được cho phép trong không gian tên</translation>
+        <translation type="vanished">Kí tự &apos;/&apos; không được cho phép trong không gian tên</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="712"/>
         <source>Invalid empty namespaced ID</source>
-        <translation>ID không gian tên rỗng không hợp lệ</translation>
+        <translation type="vanished">ID không gian tên rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="788"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="764"/>
         <source>Invalid empty player name</source>
         <translation>Tên người chơi rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1196"/>
         <source>Missing character &apos;.&apos; before a named tag</source>
-        <translation>Thiếu kí tự &apos;.&apos; trước một nhãn có tên</translation>
+        <translation type="vanished">Thiếu kí tự &apos;.&apos; trước một nhãn có tên</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1225"/>
         <source>Objective &apos;%1&apos; must be less than 16 characters</source>
-        <translation>Mục tiêu &apos;%1&apos; phải ngắn hơn 16 kí tự</translation>
+        <translation type="vanished">Mục tiêu &apos;%1&apos; phải ngắn hơn 16 kí tự</translation>
     </message>
 </context>
 <context>
@@ -333,12 +315,12 @@
         <translation type="vanished">Ô bảng điểm không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.h" line="133"/>
+        <location filename="../src/parsers/command/schemaparser.h" line="136"/>
         <source>The value must be greater than or equal to %1</source>
         <translation>Giá trị phải lớn hơn hoặc bằng %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.h" line="141"/>
+        <location filename="../src/parsers/command/schemaparser.h" line="144"/>
         <source>The value must be lesser than or equal to %1</source>
         <translation>Giá trị phải nhỏ hơn hoặc bằng %1</translation>
     </message>
@@ -346,74 +328,60 @@
 <context>
     <name>Command::SchemaParser</name>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="603"/>
         <source>A boolean value can only be either &apos;true&apos; or &apos;false&apos;</source>
-        <translation>Một giá trị boolean chỉ có thể là &apos;true&apos; hoặc &apos;false&apos;</translation>
+        <translation type="vanished">Một giá trị boolean chỉ có thể là &apos;true&apos; hoặc &apos;false&apos;</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="617"/>
         <source>%1 is not a vaild double number</source>
-        <translation>%1 không phải là một số phẩy động đôi hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một số phẩy động đôi hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="643"/>
         <source>%1 is not a vaild float number</source>
-        <translation>%1 không phải là một số phẩy động đơn hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một số phẩy động đơn hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="668"/>
         <source>%1 is not a vaild integer number</source>
-        <translation>%1 không phải là một số nguyên hợp lệ</translation>
+        <translation type="vanished">%1 không phải là một số nguyên hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="691"/>
         <source>The required paramenter &apos;type&apos; of the &apos;brigadier_string&apos; argument parser is missing.</source>
-        <translation>Tham số bắt buộc &apos;type&apos; của trình phân tích đối số &apos;brigadier_string&apos; bị thiết.</translation>
+        <translation type="vanished">Tham số bắt buộc &apos;type&apos; của trình phân tích đối số &apos;brigadier_string&apos; bị thiết.</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="790"/>
         <source>Incompleted command</source>
-        <translation>Lệnh chưa được hoàn thiện</translation>
+        <translation type="vanished">Lệnh chưa được hoàn thiện</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="823"/>
         <source>Cannot parse unsupported argument type</source>
-        <translation>Không thể phân tích kiểu đối số không được hỗ trợ</translation>
+        <translation type="vanished">Không thể phân tích kiểu đối số không được hỗ trợ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="934"/>
         <source>Available commands: %1</source>
-        <translation>Các lệnh hiện có: %1</translation>
+        <translation type="vanished">Các lệnh hiện có: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="939"/>
         <source>Available sub-commands: %1</source>
-        <translation>Các lệnh phụ hiện có: %1</translation>
+        <translation type="vanished">Các lệnh phụ hiện có: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="943"/>
         <source>Invalid empty sub-command</source>
-        <translation>Lệnh phụ rỗng không hợp lệ</translation>
+        <translation type="vanished">Lệnh phụ rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="951"/>
         <source>Unknown command &apos;%1&apos;. Available commands: %2</source>
-        <translation>Lệnh không rõ &apos;%1&apos;. Các lệnh hiện có: %2</translation>
+        <translation type="vanished">Lệnh không rõ &apos;%1&apos;. Các lệnh hiện có: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="957"/>
         <source>Unknown command &apos;%1&apos;</source>
-        <translation>Lệnh không rõ: %1</translation>
+        <translation type="vanished">Lệnh không rõ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="964"/>
         <source>Unknown sub-command &apos;%1&apos;. Available sub-commands: %2</source>
-        <translation>Lệnh phụ không rõ &apos;%1&apos;. Các lệnh phụ hiện có: %2</translation>
+        <translation type="vanished">Lệnh phụ không rõ &apos;%1&apos;. Các lệnh phụ hiện có: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="970"/>
         <source>Unknown sub-command &apos;%1&apos;</source>
-        <translation>Lệnh phụ không rõ: &apos;%1&apos;</translation>
+        <translation type="vanished">Lệnh phụ không rõ: &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -1436,194 +1404,214 @@ li.checked::marker { content: &quot;\2612&quot;; }
 <context>
     <name>Glhp</name>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="327"/>
+        <location filename="../src/globalhelpers.cpp" line="376"/>
         <source>Binary</source>
         <translation>Nhị phân</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="328"/>
+        <location filename="../src/globalhelpers.cpp" line="377"/>
         <source>Structure</source>
         <translation>Cấu trúc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="329"/>
+        <location filename="../src/globalhelpers.cpp" line="378"/>
         <source>Image</source>
         <translation>Ảnh</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="330"/>
+        <location filename="../src/globalhelpers.cpp" line="379"/>
         <source>Other</source>
         <translation>Khác</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="331"/>
+        <location filename="../src/globalhelpers.cpp" line="380"/>
         <source>Function</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="332"/>
+        <location filename="../src/globalhelpers.cpp" line="381"/>
         <source>JSON</source>
         <translation>JSON</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="333"/>
+        <location filename="../src/globalhelpers.cpp" line="382"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="334"/>
+        <location filename="../src/globalhelpers.cpp" line="383"/>
         <source>Loot table</source>
         <translation>Bảng lợi phẩm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="335"/>
+        <location filename="../src/globalhelpers.cpp" line="384"/>
         <source>Information</source>
         <translation>Thông tin</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="336"/>
+        <location filename="../src/globalhelpers.cpp" line="385"/>
         <source>Predicate</source>
         <translation>Xác lập</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="337"/>
+        <location filename="../src/globalhelpers.cpp" line="386"/>
         <source>Item modifier</source>
         <translation>Bộ sửa đổi vật phẩm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="338"/>
+        <location filename="../src/globalhelpers.cpp" line="387"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="339"/>
+        <location filename="../src/globalhelpers.cpp" line="388"/>
         <source>Dimension</source>
         <translation>Chiều không gian</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="340"/>
+        <location filename="../src/globalhelpers.cpp" line="390"/>
         <source>Dimension type</source>
         <translation>Loại chiều không gian</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="341"/>
+        <location filename="../src/globalhelpers.cpp" line="391"/>
         <source>Chat type</source>
         <translation>Loại  trò chuyện</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="342"/>
+        <location filename="../src/globalhelpers.cpp" line="392"/>
         <source>Damage type</source>
         <translation>Loại sát thương</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="343"/>
+        <location filename="../src/globalhelpers.cpp" line="393"/>
         <source>Trim material</source>
         <translation>Vật liệu trang trí</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="344"/>
+        <location filename="../src/globalhelpers.cpp" line="394"/>
         <source>Trim pattern</source>
         <translation>Hoa văn trang trí</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="345"/>
+        <location filename="../src/globalhelpers.cpp" line="395"/>
         <source>Block tag</source>
         <translation>Nhãn khối</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="346"/>
+        <location filename="../src/globalhelpers.cpp" line="397"/>
         <source>Entity type tag</source>
         <translation>Nhãn loại thực thể</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="347"/>
+        <location filename="../src/globalhelpers.cpp" line="398"/>
         <source>Fluid tag</source>
         <translation>Nhãn chất lỏng</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="348"/>
+        <location filename="../src/globalhelpers.cpp" line="399"/>
         <source>Function tag</source>
         <translation>Nhãn hàm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="349"/>
+        <location filename="../src/globalhelpers.cpp" line="400"/>
         <source>Item tag</source>
         <translation>Nhãn vật phẩm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="350"/>
+        <location filename="../src/globalhelpers.cpp" line="401"/>
         <source>Game event tag</source>
         <translation>Nhãn sự kiện trò chơi</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="351"/>
+        <location filename="../src/globalhelpers.cpp" line="402"/>
         <source>Tag</source>
         <translation>Nhãn</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="352"/>
+        <location filename="../src/globalhelpers.cpp" line="403"/>
         <source>World generation</source>
         <translation>Sinh thế giới</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="353"/>
+        <location filename="../src/globalhelpers.cpp" line="404"/>
         <source>Biome</source>
         <translation>Khu sinh học</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="354"/>
+        <location filename="../src/globalhelpers.cpp" line="405"/>
         <source>Carver</source>
         <translation>Bộ khắc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="355"/>
+        <location filename="../src/globalhelpers.cpp" line="406"/>
         <source>Feature</source>
         <translation>Đặc điểm địa hình</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="356"/>
+        <location filename="../src/globalhelpers.cpp" line="407"/>
         <source>Structure feature</source>
         <translation>Đối tượng cấu trúc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="357"/>
+        <location filename="../src/globalhelpers.cpp" line="410"/>
         <source>Surface builder</source>
         <translation>Bộ tạo bề mặt</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="358"/>
+        <location filename="../src/globalhelpers.cpp" line="411"/>
         <source>Noise</source>
         <translation>Nhiễu</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="359"/>
+        <location filename="../src/globalhelpers.cpp" line="413"/>
         <source>Noise settings</source>
         <translation>Thiết đặt nhiễu</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="360"/>
+        <location filename="../src/globalhelpers.cpp" line="415"/>
         <source>Placed feature</source>
         <translation>Đặc điểm được đặt</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="361"/>
+        <location filename="../src/globalhelpers.cpp" line="417"/>
         <source>Processor list</source>
         <translation>Danh sách bộ xử lí</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="362"/>
+        <location filename="../src/globalhelpers.cpp" line="418"/>
         <source>Structure set</source>
         <translation>Tập hợp cấu trúc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="363"/>
+        <location filename="../src/globalhelpers.cpp" line="419"/>
         <source>Jigsaw pool</source>
         <translation>Nhóm mảnh ghép</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="365"/>
+        <location filename="../src/globalhelpers.cpp" line="421"/>
         <source>Flat world generator preset</source>
         <translation>Cài đặt có sẵn bộ sinh thế giới phẳng</translation>
+    </message>
+    <message>
+        <location filename="../src/globalhelpers.cpp" line="423"/>
+        <source>JavaScript-like Minecraft function</source>
+        <translation>Hàm Minecraft giống JavaScript</translation>
+    </message>
+    <message>
+        <location filename="../src/globalhelpers.cpp" line="424"/>
+        <source>mc-build code</source>
+        <translation>Mã mc-build</translation>
+    </message>
+    <message>
+        <location filename="../src/globalhelpers.cpp" line="425"/>
+        <source>mc-build macro</source>
+        <translation>Vĩ lệnh mc-build</translation>
+    </message>
+    <message>
+        <location filename="../src/globalhelpers.cpp" line="427"/>
+        <source>Trident code</source>
+        <translation>Mã Trident</translation>
     </message>
 </context>
 <context>
@@ -3655,32 +3643,32 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Về Qt...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="238"/>
+        <location filename="../src/mainwindow.cpp" line="244"/>
         <source>Open file</source>
         <translation>Mở tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="262"/>
+        <location filename="../src/mainwindow.cpp" line="268"/>
         <source>Save File</source>
         <translation>Lưu tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="353"/>
+        <location filename="../src/mainwindow.cpp" line="368"/>
         <source>Reload file</source>
         <translation>Tải lại tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="369"/>
         <source>The file %1 has been changed exernally.</source>
         <translation>Tệp %1 đã được thay đổi từ bên ngoài.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="356"/>
+        <location filename="../src/mainwindow.cpp" line="371"/>
         <source>Do you want to reload this file?</source>
         <translation>Bạn có muốn tải lại tệp này không?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="519"/>
+        <location filename="../src/mainwindow.cpp" line="547"/>
         <source>Unsaved changes</source>
         <translation>Thay đổi chưa lưu</translation>
     </message>
@@ -3709,7 +3697,7 @@ Bạn có muốn lưu các thay đổi không?</translation>
 %2.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="968"/>
+        <location filename="../src/mainwindow.cpp" line="996"/>
         <source>Open datapack folder</source>
         <translation>Mở thư mục gói dữ liệu</translation>
     </message>
@@ -3722,29 +3710,29 @@ Bạn có muốn lưu các thay đổi không?</translation>
         <translation type="vanished">Lỗi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="452"/>
+        <location filename="../src/mainwindow.cpp" line="467"/>
         <source>Changing game version</source>
         <translation>Thay đổi phiên bản trò chơi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="453"/>
+        <location filename="../src/mainwindow.cpp" line="468"/>
         <source>The game version has been changed from %1 to %2
 The program need to restart to apply the changes.</source>
         <translation>Phiên bản trò chơi đã được thay đổi từ %1 sang %2
 Chương trình cần phải khởi động lại để áp dụng các thay đổi.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="457"/>
+        <location filename="../src/mainwindow.cpp" line="472"/>
         <source>Restart</source>
         <translation>Khởi động lại</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="460"/>
+        <location filename="../src/mainwindow.cpp" line="475"/>
         <source>Keep</source>
         <translation>Giữ lại</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="520"/>
+        <location filename="../src/mainwindow.cpp" line="548"/>
         <source>Some document(s) has been modified.
 Do you want to save your changes?</source>
         <translation>Một vài tài liệu đã được thay đổi.
@@ -3755,78 +3743,78 @@ Bạn có muốn lưu các thay đổi của bạn không?</translation>
         <translation type="vanished">Gói dữ liệu không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="549"/>
+        <location filename="../src/mainwindow.cpp" line="577"/>
         <source>Invalid datapack</source>
         <translation>Gói dữ liệu không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="550"/>
+        <location filename="../src/mainwindow.cpp" line="578"/>
         <source>The pack format in the pack.memeta file must be greater than zero.</source>
         <translation>Định dạng gói trong tệp pack.memeta phải lớn hơn không.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="594"/>
-        <location filename="../src/mainwindow.cpp" line="599"/>
+        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="627"/>
         <source>Can&apos;t load datapack</source>
         <translation>Không thể nạp gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="595"/>
+        <location filename="../src/mainwindow.cpp" line="623"/>
         <source>The specified datapack must have a pack.mcmeta file.</source>
         <translation>Gói dữ liệu được chỉ định phải có một tệp pack.mcmeta.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="600"/>
+        <location filename="../src/mainwindow.cpp" line="628"/>
         <source>The specified datapack must contain a /data folder.</source>
         <translation>Gói dữ liệu được chỉ định phải có một thư mục /data.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="650"/>
         <source>The file is not a vaild JSON file.</source>
         <translation>Tệp này không phải là một tệp JSON hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="626"/>
+        <location filename="../src/mainwindow.cpp" line="654"/>
         <source>The file must contain a JSON object.</source>
         <translation>Tệp phải chứa một đối tượng JSON.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="633"/>
+        <location filename="../src/mainwindow.cpp" line="661"/>
         <source>The file contents is empty.</source>
         <translation>Nội dung tệp bị rỗng.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="650"/>
+        <location filename="../src/mainwindow.cpp" line="678"/>
         <source>The pack format number must be greater than 0.</source>
         <translation>Số định dạng gói phải lớn hơn 0.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="654"/>
+        <location filename="../src/mainwindow.cpp" line="682"/>
         <source>The %1 object must have the %2 and %3 keys</source>
         <translation>Đối tượng %1 phải có khoá %2 và %3</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="661"/>
+        <location filename="../src/mainwindow.cpp" line="689"/>
         <source>The root object must have the %1 section.</source>
         <translation>Đối tượng gốc phải có phần %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="860"/>
+        <location filename="../src/mainwindow.cpp" line="888"/>
         <source>Extracting files</source>
         <translation>Đang giải nén các tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="868"/>
+        <location filename="../src/mainwindow.cpp" line="896"/>
         <source>Extracting: %1</source>
         <translation>Đang giải nén: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="922"/>
+        <location filename="../src/mainwindow.cpp" line="950"/>
         <source>Folder not empty</source>
         <translation>Thư mục không rỗng</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="923"/>
+        <location filename="../src/mainwindow.cpp" line="951"/>
         <source>The folder is not empty.
 Do you want to recreate this folder?</source>
         <translation>Thư mục này không trống.
@@ -3847,6 +3835,81 @@ Bạn có muốn tạo lại thư mục này không?</translation>
     <message>
         <source>Invaild datapack folder</source>
         <translation type="vanished">Thư mục gói dữ liệu không hợp lệ</translation>
+    </message>
+</context>
+<context>
+    <name>MinecraftParser</name>
+    <message>
+        <source>Cannot mix world &amp; local coordinates (everything must either use ^ or not).</source>
+        <translation type="vanished">Không thể kết hợp toạ độ thế giới &amp; cục bộ (mọi thứ phải dùng ^ hoặc để trống).</translation>
+    </message>
+    <message>
+        <source>Invalid empty tag value</source>
+        <translation type="vanished">Giá trị nhãn rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild SNBT byte tag</source>
+        <translation type="vanished">%1 không phải là một nhãn byte SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild SNBT double tag</source>
+        <translation type="vanished">%1 không phải là một nhãn phẩy động đôi SNBThợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild SNBT float tag</source>
+        <translation type="vanished">%1 không phải là một nhãn số phẩy động đơn SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild SNBT long tag</source>
+        <translation type="vanished">%1 không phải là một nhãn số nguyên dài SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild SNBT short tag</source>
+        <translation type="vanished">%1 không phải là một nhãn số nguyên ngắn SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild SNBT integer tag</source>
+        <translation type="vanished">%1 không phải là một nhãn số nguyên SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <source>Unknown entity argument name: %1</source>
+        <translation type="vanished">Tên đối số thực thể không hợp lệ: %1</translation>
+    </message>
+    <message>
+        <source>Invalid target selector variable: %1</source>
+        <translation type="vanished">Biến chọn mục tiêu không hợp lệ: %1</translation>
+    </message>
+    <message>
+        <source>Invalid empty NBT path key</source>
+        <translation type="vanished">Khoá đường dẫn NBT rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <source>A resource location tag is not allowed here.</source>
+        <translation type="vanished">Không được để nhãn vị trí tài nguyên ở đây.</translation>
+    </message>
+    <message>
+        <source>The character &apos;/&apos; is not allowed in the namespace</source>
+        <translation type="vanished">Kí tự &apos;/&apos; không được cho phép trong không gian tên</translation>
+    </message>
+    <message>
+        <source>Invalid empty namespaced ID</source>
+        <translation type="vanished">ID không gian tên rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Invalid empty player name</source>
+        <translation type="vanished">Tên người chơi rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Missing character &apos;.&apos; before a named tag</source>
+        <translation type="vanished">Thiếu kí tự &apos;.&apos; trước một nhãn có tên</translation>
+    </message>
+    <message>
+        <source>Objective &apos;%1&apos; must be less than 16 characters</source>
+        <translation type="vanished">Mục tiêu &apos;%1&apos; phải ngắn hơn 16 kí tự</translation>
+    </message>
+    <message>
+        <source>Only accept one of the following: %1</source>
+        <translation type="vanished">Chỉ chấp nhận một trong số những thứ sau: %1</translation>
     </message>
 </context>
 <context>
@@ -3908,57 +3971,89 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <translation>Gói dữ liệu mới</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="35"/>
         <source>Options</source>
-        <translation>Tuỳ chọn</translation>
+        <translation type="vanished">Tuỳ chọn</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="41"/>
-        <location filename="../src/newdatapackdialog.ui" line="51"/>
+        <location filename="../src/newdatapackdialog.ui" line="37"/>
         <source>Name of the datapack</source>
         <translation>Tên của gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="44"/>
+        <location filename="../src/newdatapackdialog.ui" line="43"/>
         <source>Name:</source>
         <translation>Tên:</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="58"/>
         <source>Description:</source>
-        <translation>Mô tả:</translation>
+        <translation type="vanished">Mô tả:</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="65"/>
+        <location filename="../src/newdatapackdialog.ui" line="156"/>
         <source>A Minecraft datapack.</source>
         <translation>Một gói dữ liệu Minecraft</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="75"/>
+        <location filename="../src/newdatapackdialog.ui" line="62"/>
         <source>Pack format:</source>
         <translation>Định dạng gói:</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="92"/>
+        <location filename="../src/newdatapackdialog.ui" line="40"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Name of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This is also used in order to name the default namespace of this datapack.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Tên của gói dữ liệu.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Cũng được dùng để đặt tên cho không gian tên mặc định của gói dữ liệu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="56"/>
+        <source>Pack format number of the datapack</source>
+        <translation>Số định dạng gói của gói dữ liệu</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="59"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Pack format number of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This number indicates what Minecraft version the datapack is designed for.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Số định dạng gói của dữ liệu.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Con số này biểu chị phiên bản Minecraft mà gói dữ liệu này dành cho.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="93"/>
+        <source>Where to create the datapack</source>
+        <translation>Nơi tạo gói dữ liệu</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="96"/>
         <source>Location:</source>
         <translation>Địa điểm:</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.ui" line="104"/>
+        <location filename="../src/newdatapackdialog.ui" line="111"/>
         <source>Browse</source>
         <translation>Duyệt</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="141"/>
+        <source>Description of the datapack</source>
+        <translation>Mô tả của gói dữ liệu</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="144"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Description of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Shown in places where datapacks are listed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Mô tả của gói dữ liệu.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Hiển thị ở những nơi mà các gói dữ liệu được liệt kê.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/newdatapackdialog.ui" line="147"/>
+        <source>Description</source>
+        <translation>Mô tả</translation>
     </message>
     <message>
         <source>Open folder</source>
         <translation type="vanished">Mở thư mục</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.cpp" line="48"/>
+        <location filename="../src/newdatapackdialog.cpp" line="52"/>
         <source>Create</source>
         <translation>Tạo</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.cpp" line="62"/>
+        <location filename="../src/newdatapackdialog.cpp" line="67"/>
         <source>Choose folder to create new datapack</source>
         <translation>Chọn thư mục để tạo gói dữ liệu mới</translation>
     </message>
@@ -4009,24 +4104,242 @@ Bạn có muốn tạo lại thư mục này không?</translation>
 <context>
     <name>Parser</name>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="29"/>
+        <location filename="../src/parsers/parser.cpp" line="24"/>
         <source>Syntax error at position %1: %2</source>
         <translation>Lỗi cú pháp tại vị trí %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="166"/>
+        <location filename="../src/parsers/parser.cpp" line="179"/>
         <source>Unexpected %1, expecting %2</source>
         <translation>Không mong đợi %1, đang mong đợi %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="313"/>
+        <location filename="../src/parsers/parser.cpp" line="328"/>
         <source>Incomplete quoted string</source>
         <translation>Xâu trích dẫn chưa được hoàn thành</translation>
     </message>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="353"/>
+        <location filename="../src/parsers/parser.cpp" line="368"/>
         <source>Invalid Unicode code point</source>
         <translation>Điểm mã Unicode không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="39"/>
+        <source>Cannot mix world &amp; local coordinates (everything must either use ^ or not).</source>
+        <translation>Không thể kết hợp toạ độ thế giới &amp; cục bộ (mọi thứ phải dùng ^ hoặc để trống).</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="98"/>
+        <source>Invalid axis value</source>
+        <translation>Giá trị trục không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="243"/>
+        <source>Invalid empty tag value</source>
+        <translation>Giá trị nhãn rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="268"/>
+        <source>%1 is not a vaild SNBT byte tag</source>
+        <translation>%1 không phải là một nhãn byte SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="281"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="333"/>
+        <source>%1 is not a vaild SNBT double tag</source>
+        <translation>%1 không phải là một nhãn phẩy động đôi SNBThợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="294"/>
+        <source>%1 is not a vaild SNBT float tag</source>
+        <translation>%1 không phải là một nhãn phẩy động đơn SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="307"/>
+        <source>%1 is not a vaild SNBT long tag</source>
+        <translation>%1 không phải là một nhãn số nguyên dài SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="320"/>
+        <source>%1 is not a vaild SNBT short tag</source>
+        <translation>%1 không phải là một nhãn số nguyên ngắn SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="348"/>
+        <source>%1 is not a vaild SNBT integer tag</source>
+        <translation>%1 không phải là một nhãn số nguyên SNBT hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="462"/>
+        <source>Invalid empty name in target selector</source>
+        <translation>Tên rỗng không hợp lệ trong bộ chọn mục tiêu</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="498"/>
+        <source>Unknown entity argument name: %1</source>
+        <translation>Tên đối số thực thể không hợp lệ: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="536"/>
+        <source>Invalid target selector variable: %1</source>
+        <translation>Biến chọn mục tiêu không hợp lệ: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="598"/>
+        <source>Invalid empty NBT path key</source>
+        <translation>Khoá đường dẫn NBT rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="657"/>
+        <source>A resource location tag is not allowed here.</source>
+        <translation>Không được để nhãn vị trí tài nguyên ở đây.</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="677"/>
+        <source>The character &apos;/&apos; is not allowed in the namespace</source>
+        <translation>Kí tự &apos;/&apos; không được cho phép trong không gian tên</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="687"/>
+        <source>Invalid empty namespaced ID</source>
+        <translation>ID không gian tên rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1116"/>
+        <source>Invalid empty item slot</source>
+        <translation>Ô vật phẩm rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1181"/>
+        <source>Missing character &apos;.&apos; before a named tag</source>
+        <translation>Thiếu kí tự &apos;.&apos; trước một nhãn có tên</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1206"/>
+        <source>Invalid empty objective</source>
+        <translation>Mục tiêu rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1210"/>
+        <source>Objective &apos;%1&apos; must be less than 16 characters</source>
+        <translation>Mục tiêu &apos;%1&apos; phải ngắn hơn 16 kí tự</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1225"/>
+        <source>Invalid empty objective criteria</source>
+        <translation>Tiêu chí mục tiêu rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1435"/>
+        <source>Invalid empty team</source>
+        <translation>Đội rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1445"/>
+        <source>Invalid time</source>
+        <translation>Thời gian không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1510"/>
+        <source>Invalid UUID</source>
+        <translation>UUID không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1538"/>
+        <source>Invalid empty greedy string</source>
+        <translation>Xâu lấn chiếm rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.h" line="154"/>
+        <source>Only accept one of the following: %1</source>
+        <translation>Chỉ chấp nhận một trong số những thứ sau: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="550"/>
+        <source>A boolean value can only be either &apos;true&apos; or &apos;false&apos;</source>
+        <translation>Một giá trị boolean chỉ có thể là &apos;true&apos; hoặc &apos;false&apos;</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="564"/>
+        <source>%1 is not a vaild double number</source>
+        <translation>%1 không phải là một số phẩy động đôi hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="588"/>
+        <source>%1 is not a vaild float number</source>
+        <translation>%1 không phải là một số phẩy động đơn hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="612"/>
+        <source>%1 is not a vaild integer number</source>
+        <translation>%1 không phải là một số nguyên hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="634"/>
+        <source>%1 is not a vaild long number</source>
+        <translation>%1 không phải là một số nguyên dài hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="657"/>
+        <source>The required paramenter &apos;type&apos; of the &apos;brigadier:string&apos; argument parser is missing.</source>
+        <translation>Tham số bắt buộc &apos;type&apos; của trình phân tích đối số &apos;brigadier:string&apos; bị thiếu.</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="686"/>
+        <source>Invalid empty word.</source>
+        <translation>Từ rỗng không hợp lệ.</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="759"/>
+        <source>Incompleted command</source>
+        <translation>Lệnh chưa được hoàn thiện</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="794"/>
+        <source>Cannot parse unsupported argument type</source>
+        <translation>Không thể phân tích kiểu đối số không được hỗ trợ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="912"/>
+        <source>Available commands: %1</source>
+        <translation>Các lệnh hiện có: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="917"/>
+        <source>Available sub-commands: %1</source>
+        <translation>Các lệnh phụ hiện có: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="921"/>
+        <source>Invalid empty sub-command</source>
+        <translation>Lệnh phụ rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="929"/>
+        <source>Unknown command &apos;%1&apos;. Available commands: %2</source>
+        <translation>Lệnh không rõ &apos;%1&apos;. Các lệnh hiện có: %2</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="935"/>
+        <source>Unknown command &apos;%1&apos;</source>
+        <translation>Lệnh không rõ: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="942"/>
+        <source>Unknown sub-command &apos;%1&apos;. Available sub-commands: %2</source>
+        <translation>Lệnh phụ không rõ &apos;%1&apos;. Các lệnh phụ hiện có: %2</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="948"/>
+        <source>Unknown sub-command &apos;%1&apos;</source>
+        <translation>Lệnh phụ không rõ: &apos;%1&apos;</translation>
+    </message>
+</context>
+<context>
+    <name>Parser::Error</name>
+    <message>
+        <source>Syntax error at position %1: %2</source>
+        <translation type="vanished">Lỗi cú pháp tại vị trí %1: %2</translation>
     </message>
 </context>
 <context>
@@ -4045,6 +4358,16 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <location filename="../src/predicatedock.ui" line="37"/>
         <source>Write</source>
         <translation>Viết</translation>
+    </message>
+</context>
+<context>
+    <name>ProblemArea</name>
+    <message numerus="yes">
+        <location filename="../src/problemarea.cpp" line="30"/>
+        <source>&lt;b&gt;There be %n problem(s) in line %1:&lt;/b&gt;&lt;ol&gt;</source>
+        <translation>
+            <numerusform>&lt;b&gt;Có %n vấn đề ở dòng %1:&lt;/b&gt;&lt;ol&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4116,34 +4439,178 @@ hr { height: 1px; border-width: 0; }
         <translation>Sửa</translation>
     </message>
     <message>
-        <location filename="../src/rawjsontexteditor.ui" line="273"/>
+        <location filename="../src/rawjsontexteditor.ui" line="77"/>
+        <source>Bold</source>
+        <translation>Đậm</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="94"/>
+        <source>Italic</source>
+        <translation>Nghiêng</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="111"/>
+        <source>Underline</source>
+        <translation>Gạch chân</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="128"/>
+        <source>Strikethrough</source>
+        <translation>Gạch ngang</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="145"/>
+        <source>Obfuscated</source>
+        <translation>Làm rối</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="162"/>
+        <source>Text color</source>
+        <translation>Màu chữ</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="188"/>
+        <source>Translated text</source>
+        <translation>Văn bản được dịch</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="202"/>
+        <source>Scoreboard value</source>
+        <translation>Giá trị bảng điểm</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="216"/>
+        <source>Entity names</source>
+        <translation>Tên thực thể</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="230"/>
+        <source>Keybind</source>
+        <translation>Phím gán</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="244"/>
+        <source>NBT values</source>
+        <translation>Giá trị NBT</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="306"/>
         <source>Source</source>
         <translation>Nguồn</translation>
     </message>
     <message>
-        <location filename="../src/rawjsontexteditor.ui" line="291"/>
+        <location filename="../src/rawjsontexteditor.ui" line="324"/>
         <source>Source code format:</source>
         <translation>Định dạng mã nguồn:</translation>
     </message>
     <message>
-        <location filename="../src/rawjsontexteditor.ui" line="302"/>
+        <location filename="../src/rawjsontexteditor.ui" line="335"/>
         <source>JSON</source>
         <translation>JSON</translation>
     </message>
     <message>
-        <location filename="../src/rawjsontexteditor.ui" line="307"/>
+        <location filename="../src/rawjsontexteditor.ui" line="340"/>
         <source>HTML</source>
         <translation>HTML</translation>
     </message>
     <message>
-        <location filename="../src/rawjsontexteditor.ui" line="312"/>
+        <location filename="../src/rawjsontexteditor.ui" line="345"/>
         <source>Single-line JSON</source>
         <translation>JSON một dòng</translation>
     </message>
     <message>
-        <location filename="../src/rawjsontexteditor.cpp" line="685"/>
+        <location filename="../src/rawjsontexteditor.ui" line="350"/>
+        <source>Formatting codes (&apos;§&apos; prefix)</source>
+        <translation>Mã định dạng (tiền tố &apos;§&apos;)</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.ui" line="355"/>
+        <source>Formatting codes (&apos;&amp;&apos; prefix)</source>
+        <translation>Mã định dạng (tiền tố &apos;&amp;&apos;)</translation>
+    </message>
+    <message>
+        <location filename="../src/rawjsontexteditor.cpp" line="872"/>
         <source>Select color...</source>
         <translation>Chọn màu...</translation>
+    </message>
+</context>
+<context>
+    <name>SchemaLoader</name>
+    <message>
+        <location filename="../src/parsers/command/schema/schemaloader.cpp" line="17"/>
+        <source>File not exists</source>
+        <translation>Tệp không tồn tại</translation>
+    </message>
+</context>
+<context>
+    <name>SchemaParser</name>
+    <message>
+        <source>A boolean value can only be either &apos;true&apos; or &apos;false&apos;</source>
+        <translation type="vanished">Một giá trị boolean chỉ có thể là &apos;true&apos; hoặc &apos;false&apos;</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild double number</source>
+        <translation type="vanished">%1 không phải là một số phẩy động đôi hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild float number</source>
+        <translation type="vanished">%1 không phải là một số phẩy động đơn hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild integer number</source>
+        <translation type="vanished">%1 không phải là một số nguyên hợp lệ</translation>
+    </message>
+    <message>
+        <source>%1 is not a vaild long number</source>
+        <translation type="vanished">%1 không phải là một số nguyên dài hợp lệ</translation>
+    </message>
+    <message>
+        <source>The required paramenter &apos;type&apos; of the &apos;brigadier_string&apos; argument parser is missing.</source>
+        <translation type="obsolete">Tham số bắt buộc &apos;type&apos; của trình phân tích đối số &apos;brigadier_string&apos; bị thiếu.</translation>
+    </message>
+    <message>
+        <source>The required paramenter &apos;type&apos; of the &apos;brigadier:string&apos; argument parser is missing.</source>
+        <translation type="vanished">Tham số bắt buộc &apos;type&apos; của trình phân tích đối số &apos;brigadier:string&apos; bị thiếu.</translation>
+    </message>
+    <message>
+        <source>Invalid empty word.</source>
+        <translation type="vanished">Từ rỗng không hợp lệ.</translation>
+    </message>
+    <message>
+        <source>Incompleted command</source>
+        <translation type="vanished">Lệnh chưa được hoàn thiện</translation>
+    </message>
+    <message>
+        <source>Cannot parse unsupported argument type</source>
+        <translation type="vanished">Không thể phân tích kiểu đối số không được hỗ trợ</translation>
+    </message>
+    <message>
+        <source>Available commands: %1</source>
+        <translation type="vanished">Các lệnh hiện có: %1</translation>
+    </message>
+    <message>
+        <source>Available sub-commands: %1</source>
+        <translation type="vanished">Các lệnh phụ hiện có: %1</translation>
+    </message>
+    <message>
+        <source>Invalid empty sub-command</source>
+        <translation type="vanished">Lệnh phụ rỗng không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Unknown command &apos;%1&apos;. Available commands: %2</source>
+        <translation type="vanished">Lệnh không rõ &apos;%1&apos;. Các lệnh hiện có: %2</translation>
+    </message>
+    <message>
+        <source>Unknown command &apos;%1&apos;</source>
+        <translation type="vanished">Lệnh không rõ: %1</translation>
+    </message>
+    <message>
+        <source>Unknown sub-command &apos;%1&apos;. Available sub-commands: %2</source>
+        <translation type="vanished">Lệnh phụ không rõ &apos;%1&apos;. Các lệnh phụ hiện có: %2</translation>
+    </message>
+    <message>
+        <source>Unknown sub-command &apos;%1&apos;</source>
+        <translation type="vanished">Lệnh phụ không rõ: &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -4232,58 +4699,68 @@ hr { height: 1px; border-width: 0; }
         <translation>Trò chơi</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="181"/>
+        <location filename="../src/settingsdialog.ui" line="180"/>
+        <source>Custom command tree file:</source>
+        <translation>Tệp cây lệnh tuỳ chỉnh:</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="192"/>
+        <source>...</source>
+        <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="218"/>
         <source>Code editor</source>
         <oldsource>Editor</oldsource>
         <translation>Trình chỉnh sửa</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="187"/>
+        <location filename="../src/settingsdialog.ui" line="224"/>
         <source>Text size:</source>
         <translation>Cỡ chữ</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="207"/>
+        <location filename="../src/settingsdialog.ui" line="244"/>
         <source>Text font family:</source>
         <translation>Họ phông chữ:</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="230"/>
+        <location filename="../src/settingsdialog.ui" line="267"/>
         <source>Wrap text</source>
         <translation>Bọc văn bản</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="237"/>
+        <location filename="../src/settingsdialog.ui" line="274"/>
         <source>Block commenting mode:</source>
         <translation>Chế độ chú thích theo khối:</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="249"/>
+        <location filename="../src/settingsdialog.ui" line="286"/>
         <source>Fill</source>
         <translation>Đổ đầy</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="262"/>
+        <location filename="../src/settingsdialog.ui" line="299"/>
         <source>Toggle</source>
         <translation>Bật tắt</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="274"/>
+        <location filename="../src/settingsdialog.ui" line="311"/>
         <source>Tab size:</source>
         <translation>Cỡ Tab:</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="284"/>
+        <location filename="../src/settingsdialog.ui" line="321"/>
         <source> spaces</source>
         <translation> dấu cách</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="300"/>
+        <location filename="../src/settingsdialog.ui" line="337"/>
         <source>Insert Tab characters as spaces</source>
         <translation>Chèn các dấu cách thay cho kí tự Tab</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="310"/>
+        <location filename="../src/settingsdialog.ui" line="347"/>
         <source>Show spaces and tab characters</source>
         <translation>Hiện các kí tự tab và dấu cách</translation>
     </message>
@@ -4292,9 +4769,31 @@ hr { height: 1px; border-width: 0; }
         <translation type="vanished">&lt;Mặc định&gt;</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="25"/>
+        <location filename="../src/settingsdialog.cpp" line="38"/>
         <source>(System locale)</source>
         <translation>(khu vực hệ thống)</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.cpp" line="113"/>
+        <source>Open command syntax file</source>
+        <translation>Mở tệp cú pháp lệnh</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.cpp" line="114"/>
+        <source>Command syntax tree files (*.json *.msgpack)</source>
+        <translation>Tệp cây cú pháp lệnh (*.json *.msgpack)</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/settingsdialog.cpp" line="132"/>
+        <source>&lt;b style=&quot;color:green&quot;&gt;Valid&lt;/b&gt;. %n command(s) detected.</source>
+        <translation>
+            <numerusform>&lt;b style=&quot;color:green&quot;&gt;Hợp lệ&lt;/b&gt;. %n lệnh được phát hiện.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.cpp" line="137"/>
+        <source>&lt;b style=&quot;color:red&quot;&gt;Error&lt;/b&gt;: %1.</source>
+        <translation>&lt;b style=&quot;color:red&quot;&gt;Lỗi&lt;/b&gt;: %1.</translation>
     </message>
 </context>
 <context>
@@ -4422,7 +4921,7 @@ Số lỗi cú pháp: %3</translation>
     </message>
     <message>
         <location filename="../src/statisticsdialog.ui" line="321"/>
-        <location filename="../src/statisticsdialog.cpp" line="33"/>
+        <location filename="../src/statisticsdialog.cpp" line="34"/>
         <source>Total processing time: %Ln second(s)</source>
         <translation>Tổng thời gian xử lí: %Ln giây</translation>
     </message>
@@ -4432,27 +4931,29 @@ Số lỗi cú pháp: %3</translation>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="84"/>
+        <location filename="../src/statisticsdialog.cpp" line="85"/>
         <source>Scanning datapack...</source>
         <translation>Đang quét gói dữ liệu...</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="82"/>
+        <location filename="../src/statisticsdialog.cpp" line="83"/>
         <source>Abort</source>
         <translation>Huỷ bỏ</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="98"/>
+        <location filename="../src/statisticsdialog.cpp" line="99"/>
         <source>Currently scanning: %1</source>
         <translation>Đang quét: %1</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="130"/>
+        <location filename="../src/statisticsdialog.cpp" line="131"/>
+        <location filename="../src/statisticsdialog.cpp" line="134"/>
         <source>Yes</source>
         <translation>Có</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="130"/>
+        <location filename="../src/statisticsdialog.cpp" line="131"/>
+        <location filename="../src/statisticsdialog.cpp" line="134"/>
         <source>No</source>
         <translation>Không</translation>
     </message>
@@ -4571,14 +5072,14 @@ Số lỗi cú pháp: %3</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chưa có tệp nào được mở.&lt;/p&gt;&lt;p&gt;Đầu tiên, mở một gói dữ liệu; sau đó mở một tệp từ khung nhìn cây phía bên trái.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="111"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="118"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="117"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="124"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
@@ -4589,29 +5090,29 @@ Số lỗi cú pháp: %3</translation>
         <translation type="vanished">Lỗi</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="128"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="135"/>
         <source>Save file error</source>
         <translation>Lỗi lưu tệp</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="159"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="165"/>
         <source>Unsaved file</source>
         <translation>Tệp chưa được lưu</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="160"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="166"/>
         <source>This document has been modified.
 Do you want to save it?</source>
         <translation>Tài liệu này đã được chỉnh sửa.
 Bạn có muốn lưu nó không?</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="506"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="516"/>
         <source>Loading text file error</source>
         <translation>Lỗi nạp tệp văn bản</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="507"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="517"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>Không thể đọc tệp %1:

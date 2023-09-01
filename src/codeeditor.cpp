@@ -6,11 +6,9 @@
 #include "QFindDialogs/src/finddialog.h"
 #include "QFindDialogs/src/findreplacedialog.h"
 #include "stripedscrollbar.h"
-#include "parsers/command/minecraftparser.h"
-#include "parsers/command/schema/schemaliteralnode.h"
-#include "parsers/command/schema/schemaargumentnode.h"
+#include "parsers/command/mcfunctionparser.h"
+#include "parsers/command/visitors/completionprovider.h"
 #include "stringvectormodel.h"
-#include "game.h"
 
 #include <QPainter>
 #include <QMimeData>
@@ -29,81 +27,6 @@
 #include <QAbstractItemView>
 #include <QMenu>
 
-
-QVector<QString> getMinecraftInfoKeys(const QString &key) {
-//    QElapsedTimer timer;
-//    timer.start();
-
-    const QVariantMap &&infoMap = Game::getInfo(key);
-
-//    qDebug() << key << infoMap.size();
-//    qDebug() << "getMinecraftInfoKeys() exec time:" <<
-//        timer.nsecsElapsed() / 1e6;
-
-    return infoMap.keys().toVector();
-}
-
-QVector<QString> loadMinecraftCommandLiterals(
-    const Command::Schema::Node * const node, ushort depth = 0) {
-    QElapsedTimer timer;
-
-    if (depth == 0)
-        timer.start();
-
-    QVector<QString> ret;
-
-    const auto &&literalChidrens = node->literalChildren();
-    for (auto it = literalChidrens.cbegin();
-         it != literalChidrens.cend(); ++it) {
-        ret << it.key();
-        ret += loadMinecraftCommandLiterals(it.value(), depth + 1);
-    }
-
-    // cppcheck-suppress iterators3
-    const auto &&argumentChildren = node->literalChildren();
-    for (auto it = argumentChildren.cbegin();
-         it != argumentChildren.cend(); ++it) {
-        // cppcheck-suppress danglingTemporaryLifetime
-        ret += loadMinecraftCommandLiterals(*it, depth + 1);
-    }
-
-//    if (depth == 0) {
-//        qDebug() << "function literals" << ret.size();
-//        qDebug() << "loadMinecraftCommandLiterals() exec time:" <<
-//            timer.nsecsElapsed() / 1e6;
-//    }
-
-    return ret;
-}
-
-QVector<QString> loadMinecraftCompletionInfo() {
-    QVector<QString> &&ret = loadMinecraftCommandLiterals(
-        Command::MinecraftParser::schema());
-
-    ret += getMinecraftInfoKeys(QStringLiteral("attribute"));
-    ret += getMinecraftInfoKeys(QStringLiteral("block"));
-    ret += getMinecraftInfoKeys(QStringLiteral("dimension"));
-    ret += getMinecraftInfoKeys(QStringLiteral("enchantment"));
-    ret += getMinecraftInfoKeys(QStringLiteral("fluid"));
-    ret += getMinecraftInfoKeys(QStringLiteral("feature"));
-    ret += getMinecraftInfoKeys(QStringLiteral("entity"));
-    ret += getMinecraftInfoKeys(QStringLiteral("item"));
-    ret += getMinecraftInfoKeys(QStringLiteral("tag/block"));
-    ret += getMinecraftInfoKeys(QStringLiteral("tag/entity_type"));
-    if (Game::version() >= Game::v1_17)
-        ret += getMinecraftInfoKeys(QStringLiteral("tag/game_event"));
-    ret += getMinecraftInfoKeys(QStringLiteral("tag/fluid"));
-    ret += getMinecraftInfoKeys(QStringLiteral("tag/item"));
-    ret += Game::getRegistry(QStringLiteral("advancement"));
-    ret += Game::getRegistry(QStringLiteral("recipe"));
-    ret += Game::getRegistry(QStringLiteral("loot_table"));
-    ret += Game::getRegistry(QStringLiteral("particle_type"));
-    ret += Game::getRegistry(QStringLiteral("sound_event"));
-
-    std::sort(ret.begin(), ret.end());
-    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
-    return ret;
-}
 
 // Adapted from: https://stackoverflow.com/a/56678483/12682038
 qreal perceivedLightness(const QColor &color) {
@@ -129,8 +52,6 @@ qreal perceivedLightness(const QColor &color) {
         return pow(Y, (1. / 3)) * 116 - 16;
     }
 }
-
-QVector<QString> CodeEditor::minecraftCompletionInfo = {};
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     m_gutter = new CodeGutter(this);
@@ -187,13 +108,13 @@ void CodeEditor::initCompleter() {
     auto *completer = new QCompleter(this);
 
     if (m_fileType == CodeFile::Function) {
-        if (minecraftCompletionInfo.isEmpty()) {
-            minecraftCompletionInfo = loadMinecraftCompletionInfo();
-            qDebug() << "Minecraft completions loaded (" <<
-                minecraftCompletionInfo.size() << "items)";
-        }
+//        if (minecraftCompletionInfo.isEmpty()) {
+//            minecraftCompletionInfo = loadMinecraftCompletionInfo();
+//            qDebug() << "Minecraft completions loaded (" <<
+//                minecraftCompletionInfo.size() << "items)";
+//        }
     }
-    completer->setModel(new StringVectorModel(minecraftCompletionInfo, this));
+    completer->setModel(new StringVectorModel(this));
     completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
@@ -321,7 +242,7 @@ void debugTextCursor(const QTextCursor &tc) {
 }
 
 void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
-    static const QString extendedAcceptedCharsset("#.:/");
+    static const QString extendedAcceptedCharsset("#.:/-");
 
     //debugTextCursor(tc);
 
@@ -409,7 +330,7 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
 
         auto cursor = textCursor();
         if (e->key() == Qt::Key_Tab) {
-            cursor.insertText(QString(' ').repeated(m_tabSize));
+            cursor.insertText(QStringLiteral(" ").repeated(m_tabSize));
             setTextCursor(cursor);
             e->accept();
             return;
@@ -442,6 +363,69 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
 
         QPlainTextEdit::keyPressEvent(e);
     }
+}
+
+void CodeEditor::startCompletion(const QString &completionPrefix) {
+    if (m_completer->popup()->isHidden()) {
+        qDebug() << "Combining final completions";
+        //            QVector<QString> completionInfo = minecraftCompletionInfo;
+
+        //            const QVector<QString> &&idList = Glhp::fileIdList(
+        //                QDir::currentPath(), QString(), QString(), false);
+        //            for (const auto &item: idList) {
+        //                completionInfo << item;
+        //            }
+
+        //            std::sort(completionInfo.begin(), completionInfo.end());
+        //            completionInfo.erase(std::unique(completionInfo.begin(),
+        //                                             completionInfo.end()),
+        //                                 completionInfo.end());
+
+        QVector<QString> completionInfo;
+        if (const auto *parser =
+                dynamic_cast<Command::McfunctionParser *>(m_parser.get())) {
+            const int curLine   = textCursor().blockNumber();
+            const int posInLine = textCursor().positionInBlock();
+
+            if (auto *line = parser->syntaxTree()->at(curLine).get();
+                line->kind() == Command::ParseNode::Kind::Root) {
+                Command::CompletionProvider suggester{ posInLine };
+                suggester.startVisiting(line);
+                completionInfo = suggester.suggestions();
+                std::sort(completionInfo.begin(), completionInfo.end());
+                completionInfo.erase(std::unique(completionInfo.begin(),
+                                                 completionInfo.end()),
+                                     completionInfo.end());
+            }
+        }
+
+        if (auto *model =
+                qobject_cast<StringVectorModel *>(m_completer->model())) {
+            m_completer->setCompletionPrefix(QString());
+            model->setVector(completionInfo);
+        }
+        //            qDebug() << minecraftCompletionInfo.size() <<
+        //                m_completer->model()->rowCount() <<
+        //                m_completer->completionModel()->rowCount();
+    }
+
+    m_completer->setCompletionPrefix(completionPrefix);
+    m_completer->popup()->setCurrentIndex(
+        m_completer->completionModel()->index(0, 0));
+
+    qDebug() << m_completer->completionCount() << m_completer->model() <<
+        completionPrefix;
+
+    QRect     cr = cursorRect();
+    const int prefixOffset
+        = fontMetrics().horizontalAdvance(completionPrefix,
+                                          completionPrefix.size());
+    cr.translate(-prefixOffset + cr.width() + viewportMargins().left(), 2);
+    cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
+                + m_completer->popup()->verticalScrollBar()->sizeHint().width());
+
+    m_needCompleting = false;
+    m_completer->complete(cr);       // popup it up!
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
@@ -483,51 +467,15 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     const QString &&completionPrefix = textUnderCursor();
 
     if (!isShortcut &&
-        (hasModifier || e->text().isEmpty() || completionPrefix.length() < 3
+        (hasModifier || e->text().isEmpty() || completionPrefix.length() < 2
          || eow.contains(e->text().right(1)))) {
         m_completer->popup()->hide();
         return;
+    } else if (isShortcut) {
+        startCompletion(completionPrefix);
+    } else {
+        m_needCompleting = true;
     }
-
-    if (completionPrefix != m_completer->completionPrefix()) {
-        if (m_completer->popup()->isHidden()) {
-            qDebug() << "Combining final completions";
-            QVector<QString> completionInfo = minecraftCompletionInfo;
-
-            const QVector<QString> &&idList = Glhp::fileIdList(
-                QDir::currentPath(), QString(), QString(), false);
-            for (const auto &item: idList) {
-                completionInfo << item;
-            }
-
-            std::sort(completionInfo.begin(), completionInfo.end());
-            completionInfo.erase(std::unique(completionInfo.begin(),
-                                             completionInfo.end()),
-                                 completionInfo.end());
-
-            if (auto *model =
-                    qobject_cast<StringVectorModel *>(m_completer->model())) {
-                model->setVector(completionInfo);
-            }
-//            qDebug() << minecraftCompletionInfo.size() <<
-//                m_completer->model()->rowCount() <<
-//                m_completer->completionModel()->rowCount();
-        }
-
-        m_completer->setCompletionPrefix(completionPrefix);
-        m_completer->popup()->setCurrentIndex(
-            m_completer->completionModel()->index(0, 0));
-    }
-
-    QRect     cr = cursorRect();
-    const int prefixOffset
-        = fontMetrics().horizontalAdvance(completionPrefix,
-                                          completionPrefix.size());
-    cr.translate(-prefixOffset + cr.width() + viewportMargins().left(), 2);
-    cr.setWidth(m_completer->popup()->sizeHintForColumn(0)
-                + m_completer->popup()->verticalScrollBar()->sizeHint().width());
-
-    m_completer->complete(cr);      /* popup it up! */
 }
 
 void CodeEditor::dropEvent(QDropEvent *e) {
@@ -593,31 +541,49 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     delete menu;
 }
 
+QPoint translatedMargins(const QPoint &p, const QMargins &margins) {
+    return QPoint{ p.x() - margins.left(), p.y() - margins.right() };
+}
+
 bool CodeEditor::event(QEvent *event) {
     if (event->type() == QEvent::ToolTip) {
-        auto *helpEvent = static_cast<QHelpEvent *>(event);
-        auto  globalPos = mapToGlobal(helpEvent->pos());
-        auto  pos       = helpEvent->pos();
-        bool  done      = false;
+        const auto    *helpEvent = static_cast<QHelpEvent *>(event);
+        const QPoint  &globalPos = helpEvent->globalPos();
+        const QPoint &&pos       = translatedMargins(helpEvent->pos(),
+                                                     viewportMargins());
+        bool done = false;
 
-        pos.rx() -= viewportMargins().left();
-        pos.ry() -= viewportMargins().top();
-        auto &&cursor    = cursorForPosition(pos);
-        auto &&block     = cursor.block();
-        int    cursorPos = cursor.positionInBlock();
+        const auto &&cursor = cursorForPosition(pos);
+        if (pos.x() < 0
+            || abs(cursorRect(cursor).center().y() - pos.y()) > m_fontSize) {
+            QToolTip::hideText();
+            event->ignore();
+            return false;
+        }
+
+        const auto &&block        = cursor.block();
+        const int    cursorPos    = cursor.positionInBlock();
+        const int    cursorAbsPos = cursor.position();
 
         for (const auto &selection: qAsConst(problemExtraSelections)) {
-            if (selection.cursor.block().contains(cursor.position())) {
-                QToolTip::showText(globalPos,
-                                   selection.format.toolTip());
+            auto selCursor = selection.cursor;
+            if ((cursorAbsPos >= selCursor.selectionStart())
+                && (cursorAbsPos <= selCursor.selectionEnd())) {
+                QRect &&selRect = cursorRect(selCursor);
+                selCursor.setPosition(selCursor.selectionEnd());
+                selRect |= cursorRect(selCursor);
+                QToolTip::showText(globalPos, selection.format.toolTip(),
+                                   this, selRect);
                 done = true;
                 break;
             }
         }
-        if (done)
+        if (done) {
+            event->accept();
             return true;
+        }
 
-        const auto formats = block.layout()->formats();
+        const auto &formats = block.layout()->formats();
         for (const auto &format: qAsConst(formats)) {
             int formatStart = format.start;
             if ((formatStart <= cursorPos)
@@ -628,24 +594,14 @@ bool CodeEditor::event(QEvent *event) {
                 break;
             }
         }
-        if (done)
+        if (done) {
+            event->accept();
             return true;
-
-        cursor.select(QTextCursor::WordUnderCursor);
-        if (!cursor.selectedText().isEmpty()) {
-/*
-              QToolTip::showText(globalPos,
-                                 QString("%1 %2").arg(cursor.selectedText(),
-                                                      QString::number(cursor.
-                                                                      selectedText()
-                                                                      .length())));
- */
-        } else {
-            QToolTip::hideText();
         }
-        /*qDebug() << QToolTip::text() << QToolTip::isVisible(); */
 
-        return true;
+        QToolTip::hideText();
+        event->ignore();
+        return false;
     } else {
         return QPlainTextEdit::event(event);
     }
@@ -833,10 +789,13 @@ void CodeEditor::insertCompletion(const QString &completion) {
     if (m_completer->widget() != this)
         return;
 
+    m_needCompleting = false;
+
     QTextCursor tc     = textCursor();
     const int   oldPos = tc.position();
     startOfWordExtended(tc);
     tc.setPosition(oldPos, QTextCursor::KeepAnchor);
+    tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
     tc.insertText(completion);
     setTextCursor(tc);
 }
@@ -857,6 +816,9 @@ void CodeEditor::onTextChanged() {
         }
         if (m_highlighter) {
             m_highlighter->rehighlightDelayed();
+        }
+        if (m_needCompleting && m_completer) {
+            startCompletion(textUnderCursor());
         }
         updateErrorSelections();
     }

@@ -20,6 +20,8 @@
 
 template<typename T>
 T strWithExpToDec(QStringView v, bool &ok) {
+    constexpr std::make_unsigned_t<T> maxLimit = std::numeric_limits<T>::max();
+
     if (v.isEmpty()) {
         ok = false;
         return 0;
@@ -43,7 +45,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
 
     ok = false;
     for (int i = 0; i < v.length(); ++i) {
-        if (value > std::numeric_limits<T>::max() / 10) {
+        if (value > maxLimit / 10) {
             ok = false;
             return 0;
         }
@@ -81,7 +83,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
                         break;
                     } else if (exp > 0) {
                         for (int j = 0; j < abs(exp); ++j) {
-                            if (value > std::numeric_limits<T>::max() / 10) {
+                            if (value > maxLimit / 10) {
                                 ok = false;
                                 return 0;
                             }
@@ -107,7 +109,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
                 return 0;
             }
         }
-        if (((sign == 1) && (value > std::numeric_limits<T>::max()))
+        if (((sign == 1) && (value > maxLimit))
             || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
             ok = false;
             return 0;
@@ -118,7 +120,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
 
 namespace Command {
     class MinecraftParser final : public SchemaParser  {
-        Q_GADGET;
+        Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
         enum class AxisParseOption : unsigned char {
             NoOption    = 0,
@@ -127,19 +129,48 @@ public:
         };
         Q_DECLARE_FLAGS(AxisParseOptions, AxisParseOption);
 
-        using QLatin1StringVector = QVector<QLatin1String>;
-
         MinecraftParser();
         using SchemaParser::SchemaParser;
 
-        static void setGameVer(const QVersionNumber &newGameVer);
+        static void setGameVer(const QVersionNumber &newGameVer,
+                               const bool autoLoadSchema = true);
 
 private:
         friend class McfunctionParser;
 
         static inline QVersionNumber gameVer = QVersionNumber();
 
-        QString oneOf(const QLatin1StringVector &strArr);
+        template<typename T, size_t N>
+        QString oneOf(const std::array<T, N> &strArr) {
+            const int         start   = pos();
+            const QStringView curText = peekRest();
+
+            for (const auto &str: strArr) {
+                if (curText.startsWith(str)) {
+                    advance(str.size());
+                    return str;
+                }
+            }
+            reportError(QT_TR_NOOP("Only accept one of the following: %1"),
+                        { join(strArr) }, start,
+                        peekLiteral().length());
+            return QString();
+        }
+
+        template<typename T, size_t N>
+        QString join(const std::array<T, N> &array) {
+            QString ret;
+
+            for (auto it = array.cbegin(); it != array.cend();) {
+                ret += *it;
+                ++it;
+                if (it != array.cend()) {
+                    ret += ", "_QL1;
+                }
+            }
+            return ret;
+        }
+
         QString eatListSep(QChar sepChr, QChar endChr);
 
         template<class Container, class Type>
@@ -162,7 +193,7 @@ private:
                     (curChar() == '"' || curChar() == '\'')) {
                     try {
                         name = getQuotedString();
-                    } catch (const SchemaParser::Error &err) {
+                    } catch (const SchemaParser::Error &) {
                         qDebug() << "No quotation have been found. Continue.";
                     }
                 }
@@ -179,7 +210,9 @@ private:
                 const auto &&key = KeyPtr::create(spanText(keyPos), name,
                                                   !name.isEmpty());
                 key->setLeadingTrivia(trivia);
-                key->setTrailingTrivia(spanText(eat(sepChar, SkipLeftWs)));
+                key->setTrailingTrivia(spanText(eat(sepChar,
+                                                    "Unexpected %1, expecting %2 separator between a key and a value",
+                                                    SkipLeftWs)));
                 const auto &&valueTrivia = skipWs(false);
                 //const int    valueStart  = pos();
                 const auto &&value = func(name);
@@ -188,7 +221,8 @@ private:
                 value->setTrailingTrivia(this->skipWs(false));
                 obj->insert(key, value);
                 if (this->curChar() != endChar) {
-                    obj->constLast()->setTrailingTrivia(eat(',', SkipRightWs));
+                    obj->constLast()->setTrailingTrivia(eat(',', nullptr,
+                                                            SkipRightWs));
                 }
             }
             obj->setRightText(this->eat(endChar));
@@ -298,6 +332,10 @@ private:
         QSharedPointer<UuidNode> minecraft_uuid();
         QSharedPointer<Vec2Node> minecraft_vec2();
         QSharedPointer<Vec3Node> minecraft_vec3();
+
+        // MCDatapacker-specific parser methods
+        QSharedPointer<InternalGreedyStringNode> parseGreedyString();
+        QSharedPointer<InternalRegexPatternNode> parseRegexPattern();
     };
 }
 

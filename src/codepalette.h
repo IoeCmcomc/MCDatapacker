@@ -147,6 +147,8 @@ public:
         Key,
         Operator       = Operation,
         CommandLiteral = Keyword,
+        GreedyString   = (int)ArgType::InternalGreedyString,
+        RegexPattern,
     };
 
     using RoleToFormat = QMap<Role, QTextCharFormat>;

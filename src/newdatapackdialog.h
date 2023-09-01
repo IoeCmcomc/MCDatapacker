@@ -25,6 +25,9 @@ public:
 public slots:
     void checkOK();
 
+private slots:
+    void onFormatSpinChanged(const int format);
+
 private:
     Ui::NewDatapackDialog *ui;
     QPushButton *createButton = nullptr;

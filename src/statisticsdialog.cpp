@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "globalhelpers.h"
+#include "game.h"
 #include "parsers/command/minecraftparser.h"
 #include "parsers/command/visitors/sourceprinter.h"
 #include "platforms/windows_specific.h"
@@ -127,10 +128,10 @@ void StatisticsDialog::collectAndSetupData() {
                                            namespaces.size()));
     const QString hasTickJson = (QFileInfo::exists(dirPath +
                                                    "/data/minecraft/tags/functions/tick.json"))
-        ? QT_TR_NOOP("Yes") : QT_TR_NOOP("No");
+        ? tr("Yes") : tr("No");
     const QString hasLoadJson = (QFileInfo::exists(dirPath +
                                                    "/data/minecraft/tags/functions/load.json"))
-                                        ? "Yes" : "No";
+                                        ? tr("Yes") : tr("No");
     ui->rightFilesGeneralLabel->setText(
         ui->rightFilesGeneralLabel->text().arg(hasTickJson, hasLoadJson));
 
@@ -218,8 +219,10 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
             const auto     &trimmed = line.trimmed();
             if (trimmed.isEmpty()) {
                 continue;
-            } else if (trimmed[0] == '#') {
+            } else if (trimmed[0] == u'#') {
                 ++m_commentLines;
+                continue;
+            } else if (trimmed[0] == u'$' && Game::version() >= Game::v1_20) {
                 continue;
             }
 
@@ -249,9 +252,9 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                     ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
                                                       "Invalid command"));
                 } else {
-                    ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
-                                                      m_parser->errors().last()
-                                                      .toLocalizedMessage()));
+                    ui->syntaxErrorTable->setItem(
+                        row, 2, new QTableWidgetItem(
+                            m_parser->errors().constLast().toLocalizedMessage()));
                 }
 
                 ++m_syntaxErrors;

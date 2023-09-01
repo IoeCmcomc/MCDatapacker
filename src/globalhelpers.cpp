@@ -1,5 +1,7 @@
 #include "globalhelpers.h"
 
+#include "uberswitch.hpp"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -56,10 +58,6 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     if (filepath.isEmpty())
         return CodeFile::Text;
 
-    static const QStringList imageExts{
-        QStringLiteral("png"), QStringLiteral("jpg"), QStringLiteral("jpeg"),
-        QStringLiteral("bmp") };
-
     static const QVector<QPair<QString,
                                CodeFile::FileType> > catPathToFileType {
         { QStringLiteral("advancements"), CodeFile::Advancement },
@@ -103,24 +101,44 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
     const QFileInfo info(filepath);
     const QString &&fullSuffix = info.suffix();
 
-    if (fullSuffix == QLatin1String("mcmeta")) {
-        return CodeFile::Meta;
-    } else if (fullSuffix == QLatin1String("mcfunction")) {
-        return CodeFile::Function;
-    } else if (fullSuffix == QLatin1String("nbt")) {
-        return CodeFile::Structure;
-    } else if (imageExts.contains(fullSuffix)) {
-        return CodeFile::Image;
-    } else if (fullSuffix == QLatin1String("json")) {
-        for (const auto &pair: catPathToFileType) {
-            if (isPathRelativeTo(dirpath, filepath, pair.first)) {
-                return pair.second;
+    uswitch (fullSuffix) {
+        ucase (QLatin1String("mcmeta")):
+            return CodeFile::Meta;
+
+        ucase (QLatin1String("mcfunction")):
+            return CodeFile::Function;
+
+        ucase (QLatin1String("nbt")):
+            return CodeFile::Structure;
+
+        ucase (QLatin1String("png")):
+        ucase (QLatin1String("jpg")):
+        ucase (QLatin1String("jpeg")):
+        ucase (QLatin1String("bmp")):
+            return CodeFile::Image;
+
+        ucase (QLatin1String("mc")):
+            return CodeFile::McBuild;
+
+        ucase (QLatin1String("mcm")):
+            return CodeFile::McBuildMacro;
+
+        ucase (QLatin1String("jmc")):
+            return CodeFile::Jmc;
+
+        ucase (QLatin1String("tdn")):
+            return CodeFile::TridentCode;
+
+        ucase (QLatin1String("json")): {
+            for (const auto &pair: catPathToFileType) {
+                if (isPathRelativeTo(dirpath, filepath, pair.first)) {
+                    return pair.second;
+                }
             }
+            return CodeFile::JsonText;
         }
-        return CodeFile::JsonText;
-    } else {
-        return CodeFile::Text;
     }
+    return CodeFile::Text;
 }
 
 QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
@@ -133,6 +151,18 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
 
         case CodeFile::Meta:
             return QIcon(QStringLiteral(":/file-mcmeta"));
+
+        case CodeFile::McBuild:
+            return QIcon(QStringLiteral(":/file-mc"));
+
+        case CodeFile::McBuildMacro:
+            return QIcon(QStringLiteral(":/file-mcm"));
+
+        case CodeFile::Jmc:
+            return QIcon(QStringLiteral(":/file-jmc"));
+
+        case CodeFile::TridentCode:
+            return QIcon(QStringLiteral(":/file-tdn"));
 
         default: {
             if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
@@ -309,7 +339,7 @@ const QMap<QString, QString> Glhp::colorHexes = {
     { "dark_aqua",    "#00aaaa" },
     { "dark_red",     "#aa0000" },
     { "dark_purple",  "#aa00aa" },
-    { "gold",         "#ffAA00" },
+    { "gold",         "#ffaa00" },
     { "gray",         "#aaaaaa" },
     { "dark_gray",    "#555555" },
     { "blue",         "#5555ff" },
@@ -321,48 +351,80 @@ const QMap<QString, QString> Glhp::colorHexes = {
     { "white",        "#ffffff" }
 };
 
+const QMap<char, QString> Glhp::colorCodes = {
+    { '0', "#000000" },
+    { '1', "#0000aa" },
+    { '2', "#00aa00" },
+    { '3', "#00aaaa" },
+    { '4', "#aa0000" },
+    { '5', "#aa00aa" },
+    { '6', "#ffaa00" },
+    { '7', "#aaaaaa" },
+    { '8', "#555555" },
+    { '9', "#5555ff" },
+    { 'a', "#55ff55" },
+    { 'b', "#55ffff" },
+    { 'c', "#ff5555" },
+    { 'd', "#ff55ff" },
+    { 'e', "#ffff55" },
+    { 'f', "#ffffff" }
+};
+
 
 QString Glhp::fileTypeToName(const CodeFile::FileType type) {
     static QHash<CodeFile::FileType, const char *> const valueMap {
-        { CodeFile::Binary, QT_TR_NOOP("Binary") },
-        { CodeFile::Structure, QT_TR_NOOP("Structure") },
-        { CodeFile::Image, QT_TR_NOOP("Image") },
-        { CodeFile::Text, QT_TR_NOOP("Other") },
-        { CodeFile::Function, QT_TR_NOOP("Function") },
-        { CodeFile::JsonText, QT_TR_NOOP("JSON") },
-        { CodeFile::Advancement, QT_TR_NOOP("Advancement") },
-        { CodeFile::LootTable, QT_TR_NOOP("Loot table") },
-        { CodeFile::Meta, QT_TR_NOOP("Information") },
-        { CodeFile::Predicate, QT_TR_NOOP("Predicate") },
-        { CodeFile::ItemModifier, QT_TR_NOOP("Item modifier") },
-        { CodeFile::Recipe, QT_TR_NOOP("Recipe") },
-        { CodeFile::Dimension, QT_TR_NOOP("Dimension") },
-        { CodeFile::DimensionType, QT_TR_NOOP("Dimension type") },
-        { CodeFile::ChatType, QT_TR_NOOP("Chat type") },
-        { CodeFile::DamageType, QT_TR_NOOP("Damage type") },
-        { CodeFile::TrimMaterial, QT_TR_NOOP("Trim material") },
-        { CodeFile::TrimPattern, QT_TR_NOOP("Trim pattern") },
-        { CodeFile::BlockTag, QT_TR_NOOP("Block tag") },
-        { CodeFile::EntityTypeTag, QT_TR_NOOP("Entity type tag") },
-        { CodeFile::FluidTag, QT_TR_NOOP("Fluid tag") },
-        { CodeFile::FunctionTag, QT_TR_NOOP("Function tag") },
-        { CodeFile::ItemTag, QT_TR_NOOP("Item tag") },
-        { CodeFile::GameEventTag, QT_TR_NOOP("Game event tag") },
-        { CodeFile::Tag, QT_TR_NOOP("Tag") },
-        { CodeFile::WorldGen, QT_TR_NOOP("World generation") },
-        { CodeFile::Biome, QT_TR_NOOP("Biome") },
-        { CodeFile::ConfiguredCarver, QT_TR_NOOP("Carver") },
-        { CodeFile::ConfiguredFeature, QT_TR_NOOP("Feature") },
-        { CodeFile::StructureFeature, QT_TR_NOOP("Structure feature") },
-        { CodeFile::SurfaceBuilder, QT_TR_NOOP("Surface builder") },
-        { CodeFile::Noise, QT_TR_NOOP("Noise") },
-        { CodeFile::NoiseSettings, QT_TR_NOOP("Noise settings") },
-        { CodeFile::PlacedFeature, QT_TR_NOOP("Placed feature") },
-        { CodeFile::ProcessorList, QT_TR_NOOP("Processor list") },
-        { CodeFile::StructureSet, QT_TR_NOOP("Structure set") },
-        { CodeFile::TemplatePool, QT_TR_NOOP("Jigsaw pool") },
+        { CodeFile::Binary, QT_TRANSLATE_NOOP("Glhp", "Binary") },
+        { CodeFile::Structure, QT_TRANSLATE_NOOP("Glhp", "Structure") },
+        { CodeFile::Image, QT_TRANSLATE_NOOP("Glhp", "Image") },
+        { CodeFile::Text, QT_TRANSLATE_NOOP("Glhp", "Other") },
+        { CodeFile::Function, QT_TRANSLATE_NOOP("Glhp", "Function") },
+        { CodeFile::JsonText, QT_TRANSLATE_NOOP("Glhp", "JSON") },
+        { CodeFile::Advancement, QT_TRANSLATE_NOOP("Glhp", "Advancement") },
+        { CodeFile::LootTable, QT_TRANSLATE_NOOP("Glhp", "Loot table") },
+        { CodeFile::Meta, QT_TRANSLATE_NOOP("Glhp", "Information") },
+        { CodeFile::Predicate, QT_TRANSLATE_NOOP("Glhp", "Predicate") },
+        { CodeFile::ItemModifier, QT_TRANSLATE_NOOP("Glhp", "Item modifier") },
+        { CodeFile::Recipe, QT_TRANSLATE_NOOP("Glhp", "Recipe") },
+        { CodeFile::Dimension, QT_TRANSLATE_NOOP("Glhp", "Dimension") },
+        { CodeFile::DimensionType,
+          QT_TRANSLATE_NOOP("Glhp", "Dimension type") },
+        { CodeFile::ChatType, QT_TRANSLATE_NOOP("Glhp", "Chat type") },
+        { CodeFile::DamageType, QT_TRANSLATE_NOOP("Glhp", "Damage type") },
+        { CodeFile::TrimMaterial, QT_TRANSLATE_NOOP("Glhp", "Trim material") },
+        { CodeFile::TrimPattern, QT_TRANSLATE_NOOP("Glhp", "Trim pattern") },
+        { CodeFile::BlockTag, QT_TRANSLATE_NOOP("Glhp", "Block tag") },
+        { CodeFile::EntityTypeTag,
+          QT_TRANSLATE_NOOP("Glhp", "Entity type tag") },
+        { CodeFile::FluidTag, QT_TRANSLATE_NOOP("Glhp", "Fluid tag") },
+        { CodeFile::FunctionTag, QT_TRANSLATE_NOOP("Glhp", "Function tag") },
+        { CodeFile::ItemTag, QT_TRANSLATE_NOOP("Glhp", "Item tag") },
+        { CodeFile::GameEventTag, QT_TRANSLATE_NOOP("Glhp", "Game event tag") },
+        { CodeFile::Tag, QT_TRANSLATE_NOOP("Glhp", "Tag") },
+        { CodeFile::WorldGen, QT_TRANSLATE_NOOP("Glhp", "World generation") },
+        { CodeFile::Biome, QT_TRANSLATE_NOOP("Glhp", "Biome") },
+        { CodeFile::ConfiguredCarver, QT_TRANSLATE_NOOP("Glhp", "Carver") },
+        { CodeFile::ConfiguredFeature, QT_TRANSLATE_NOOP("Glhp", "Feature") },
+        { CodeFile::StructureFeature, QT_TRANSLATE_NOOP("Glhp",
+                                                        "Structure feature") },
+        { CodeFile::SurfaceBuilder,
+          QT_TRANSLATE_NOOP("Glhp", "Surface builder") },
+        { CodeFile::Noise, QT_TRANSLATE_NOOP("Glhp", "Noise") },
+        { CodeFile::NoiseSettings,
+          QT_TRANSLATE_NOOP("Glhp", "Noise settings") },
+        { CodeFile::PlacedFeature,
+          QT_TRANSLATE_NOOP("Glhp", "Placed feature") },
+        { CodeFile::ProcessorList,
+          QT_TRANSLATE_NOOP("Glhp", "Processor list") },
+        { CodeFile::StructureSet, QT_TRANSLATE_NOOP("Glhp", "Structure set") },
+        { CodeFile::TemplatePool, QT_TRANSLATE_NOOP("Glhp", "Jigsaw pool") },
         { CodeFile::FlatLevelGenPreset,
-          QT_TR_NOOP("Flat world generator preset") },
+          QT_TRANSLATE_NOOP("Glhp", "Flat world generator preset") },
+        { CodeFile::Jmc,
+          QT_TRANSLATE_NOOP("Glhp", "JavaScript-like Minecraft function") },
+        { CodeFile::McBuild, QT_TRANSLATE_NOOP("Glhp", "mc-build code") },
+        { CodeFile::McBuildMacro, QT_TRANSLATE_NOOP("Glhp", "mc-build macro") },
+        // Do not translate "Trident"
+        { CodeFile::TridentCode, QT_TRANSLATE_NOOP("Glhp", "Trident code") },
     };
 
     if (type < 0)

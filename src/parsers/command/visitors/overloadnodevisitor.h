@@ -54,6 +54,9 @@ public:
         void visit(IntegerNode *node) override {
             _visit(node);
         }
+        void visit(LongNode *node) override {
+            _visit(node);
+        }
         void visit(StringNode *node) override {
             _visit(node);
         }
@@ -246,16 +249,19 @@ public:
         void visit(KeyNode *node) override {
             _visit(node);
         }
-
         void visit(TwoAxesNode *node) override {
             _visit(node);
         }
-
         void visit(XyzNode *node) override {
             _visit(node);
         }
-
         void visit(GamemodeNode *node) override {
+            _visit(node);
+        }
+        void visit(InternalGreedyStringNode *node) override {
+            _visit(node);
+        }
+        void visit(InternalRegexPatternNode *node) override {
             _visit(node);
         }
 

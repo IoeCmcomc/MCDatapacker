@@ -7,6 +7,11 @@ namespace Command::Schema {
     Node::Node() {
     }
 
+    Node::~Node() {
+        qDeleteAll(m_literalChildren);
+        qDeleteAll(m_argumentChildren);
+    }
+
     Node::Kind Node::kind() const {
         return m_kind;
     }
@@ -31,6 +36,11 @@ namespace Command::Schema {
         m_redirect = newRedirect;
     }
 
+    Node *Node::parent() const
+    {
+        return m_parent;
+    }
+
     Node::Node(Kind kind) : m_kind(kind) {
     }
 
@@ -45,10 +55,12 @@ namespace Command::Schema {
 
         for (auto& [key, val] : j.at("children").items()) {
             if (val["type"] == "literal") {
-                m_literalChildren[QString::fromStdString(key)] =
-                    val.get<LiteralNode *>();
-            } else if (val["type"] == "argument") {
+                LiteralNode *child = val.get<LiteralNode *>();
+                child->m_parent = this;
+                m_literalChildren[QString::fromStdString(key)] = child;
+            } else if (val.at("type") == "argument") {
                 ArgumentNode *child = val.get<ArgumentNode *>();
+                child->m_parent = this;
                 child->setName(QString::fromStdString(key));
                 m_argumentChildren << child;
             }

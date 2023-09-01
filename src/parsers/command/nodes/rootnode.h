@@ -3,11 +3,13 @@
 
 #include "parsenode.h"
 
+#include <deque>
+
 namespace Command {
     class RootNode : public ParseNode
     {
 public:
-        using Nodes = std::list<NodePtr>;
+        using Nodes = std::deque<NodePtr>;
 
         explicit RootNode(int nodeLength = 0);
 

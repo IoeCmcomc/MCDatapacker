@@ -1,5 +1,7 @@
 #include "mcfunctionparser.h"
 
+#include "game.h"
+
 #include <QElapsedTimer>
 
 namespace Command {
@@ -14,9 +16,10 @@ namespace Command {
         constexpr static int typeId =
             MinecraftParser::getTypeEnumId<RootNode>();
 
-        const auto &&tree  = QSharedPointer<FileNode>::create();
-        const auto &&txt   = text(); // This prevent crash in release build
-        const auto &&lines = QStringView(txt).split(QChar::LineFeed);
+        const auto &&tree           = QSharedPointer<FileNode>::create();
+        const auto &&txt            = text(); // This prevent crash in release build
+        const auto &&lines          = QStringView(txt).split(QChar::LineFeed);
+        int          validLineCount = 0;
 
         m_commandParser.m_spans = std::move(m_spans);
 
@@ -26,10 +29,13 @@ namespace Command {
         for (const auto line: lines) {
             const int  linePos = pos();
             const auto trimmed = line.trimmed();
-            if (trimmed.isEmpty() || trimmed[0] == '#') {
-                const auto &&span = SpanPtr::create(spanText(line));
-                span->setIsValid(true);
-                tree->append(std::move(span));
+            if (trimmed.isEmpty() || trimmed[0] == u'#') {
+                tree->append(SpanPtr::create(spanText(line), true));
+                validLineCount++;
+            } else if (trimmed[0] == u'$'
+                       && m_commandParser.gameVer >= Game::v1_20) {
+                tree->append(SpanPtr::create(spanText(line), true));
+                validLineCount++;
             } else {
                 NodePtr command;
 #ifdef MCFUNCTIONPARSER_USE_CACHE
@@ -44,6 +50,7 @@ namespace Command {
                 if (command->isValid()) {
                     m_cache.emplace(typeId, std::move(lineText),
                                     WeakNodePtr(command));
+                    validLineCount++;
                 }
             }
 #endif
@@ -75,15 +82,16 @@ namespace Command {
 
 //        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
 //                 << "Total access:" << m_cache.stats().total_accesses()
-//                 << ". Total hit:" << m_cache.stats().total_hits()
-//                 << ". Total miss:" << m_cache.stats().total_misses()
-//                 << ". Hit rate:" << m_cache.stats().hit_rate()
+//                 << "(hit:" << m_cache.stats().total_hits()
+//                 << ", miss:" << m_cache.stats().total_misses()
+//                 << "). Hit rate:" << m_cache.stats().hit_rate()
 //                 << ". Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
-        qDebug() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
+
+        //        qDebug() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
 
         m_tree  = tree;
         m_spans = m_commandParser.spans();
-        m_cache.setCapacity(lines.length() + 1);
+        m_cache.setCapacity(validLineCount + 1);
         return m_tree->isValid();
     }
 }

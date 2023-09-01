@@ -17,7 +17,10 @@ win32:LIBS += -lDwmapi
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS MCFUNCTIONPARSER_USE_CACHE
+DEFINES += QT_DEPRECATED_WARNINGS
+
+# Application-specific defines
+DEFINES += MCFUNCTIONPARSER_USE_CACHE
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -97,9 +100,11 @@ SOURCES += \
     parsers/command/parsenodecache.cpp \
     parsers/command/schema/schemaargumentnode.cpp \
     parsers/command/schema/schemaliteralnode.cpp \
+    parsers/command/schema/schemaloader.cpp \
     parsers/command/schema/schemanode.cpp \
     parsers/command/schema/schemarootnode.cpp \
     parsers/command/schemaparser.cpp \
+    parsers/command/visitors/completionprovider.cpp \
     parsers/command/visitors/nodecounter.cpp \
     parsers/command/visitors/nodeformatter.cpp \
     parsers/command/visitors/nodevisitor.cpp \
@@ -203,9 +208,11 @@ HEADERS += \
     parsers/command/re2c_generated_functions.h \
     parsers/command/schema/schemaargumentnode.h \
     parsers/command/schema/schemaliteralnode.h \
+    parsers/command/schema/schemaloader.h \
     parsers/command/schema/schemanode.h \
     parsers/command/schema/schemarootnode.h \
     parsers/command/schemaparser.h \
+    parsers/command/visitors/completionprovider.h \
     parsers/command/visitors/nodecounter.h \
     parsers/command/visitors/nodeformatter.h \
     parsers/command/visitors/overloadnodevisitor.h \

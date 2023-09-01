@@ -2,7 +2,9 @@
 #define SINGLEVALUENODE_H
 
 #include "argumentnode.h"
+
 #include <QUuid>
+#include <QRegularExpression>
 
 namespace Command {
     template <class Base, typename T, ArgumentNode::ParserType PT>
@@ -68,6 +70,14 @@ DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Bool, bool)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Double, double)
 //DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Float, float)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Integer, int)
+DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Long, long long)
+
+namespace Command {
+    template<>
+    constexpr std::array staticSuggestions<BoolNode> = {
+        "false"_QL1, "true"_QL1,
+    };
+}
 
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Color, QString)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(EntityAnchor, QString)
@@ -83,6 +93,83 @@ DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(TemplateMirror, QString)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(TemplateRotation, QString)
 
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Uuid, QUuid)
+
+namespace Command {
+    template<>
+    constexpr std::array staticSuggestions<ColorNode> = {
+        "aqua"_QL1,         "black"_QL1,       "blue"_QL1,
+        "dark_aqua"_QL1,    "dark_blue"_QL1,   "dark_green"_QL1,
+        "dark_gray"_QL1,    "dark_purple"_QL1, "dark_red"_QL1,
+        "gold"_QL1,         "green"_QL1,       "gray"_QL1,
+        "light_purple"_QL1, "red"_QL1,         "reset"_QL1,
+        "white"_QL1,        "yellow"_QL1,
+    };
+
+    template<>
+    constexpr std::array staticSuggestions<EntityAnchorNode> =
+    { "eyes"_QL1, "feet"_QL1, };
+
+    template<>
+    constexpr std::array staticSuggestions<HeightmapNode> = {
+        "motion_blocking_no_leaves"_QL1, "motion_blocking"_QL1,
+        "ocean_floor"_QL1,               "world_surface"_QL1,
+    };
+
+    template<>
+    constexpr std::array staticSuggestions<OperationNode> = {
+        "="_QL1,  "<"_QL1,  ">"_QL1, "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
+        "/="_QL1, "%="_QL1,
+    };
+
+    template<>
+    constexpr std::array staticSuggestions<ScoreboardSlotNode> = {
+        "belowName"_QL1, // Will be renamed to below_name in 1.20.2
+        "sidebar.team.aqua"_QL1,
+        "sidebar.team.black"_QL1,
+        "sidebar.team.blue"_QL1,
+        "sidebar.team.dark_aqua"_QL1,
+        "sidebar.team.dark_blue"_QL1,
+        "sidebar.team.dark_green"_QL1,
+        "sidebar.team.dark_gray"_QL1,
+        "sidebar.team.dark_purple"_QL1,
+        "sidebar.team.dark_red"_QL1,
+        "sidebar.team.gold"_QL1,
+        "sidebar.team.green"_QL1,
+        "sidebar.team.gray"_QL1,
+        "sidebar.team.light_purple"_QL1,
+        "sidebar.team.red"_QL1,
+        "sidebar.team.reset"_QL1,
+        "sidebar.team.white"_QL1,
+        "sidebar.team.yellow"_QL1,
+        "sidebar"_QL1,
+        "list"_QL1,
+    };
+
+    template<>
+    constexpr std::array staticSuggestions<TemplateMirrorNode> = {
+        "none"_QL1, "front_back"_QL1, "left_right"_QL1,
+    };
+
+    template<>
+    constexpr std::array staticSuggestions<TemplateRotationNode> = {
+        "none"_QL1, "clockwise_90"_QL1, "counterclockwise_90"_QL1, "180"_QL1
+    };
+}
+
+/*
+ * InternalGreedyStringNode represent a unquoted string contains characters
+ * except whitespaces, quote punctiations and backslashes.
+ *
+ * Namespaced ID: ___:greedy_string
+ */
+DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(InternalGreedyString, QString)
+/*
+ * InternalRegexPatternNode represent a regular expression pattern.
+ * Agument nodes of this type must be put at the end of a command branch.
+ *
+ * Namespaced ID: ___:regex_pattern
+ */
+DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(InternalRegexPattern, QRegularExpression)
 
 #undef DECLARE_SINGLE_VALUE_ARGUMENT_CLASS
 

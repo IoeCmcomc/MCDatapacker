@@ -28,12 +28,12 @@ CodeGutter::CodeGutter(CodeEditor *parent) : QWidget(parent),
     adjustSize();
 }
 
-CodeEditor *CodeGutter::editor() const {
+CodeEditor * CodeGutter::editor() const {
     return m_editor;
 }
 
 void CodeGutter::updateChildrenGeometries() {
-    for (auto *child: findChildren<QWidget*>()) {
+    for (auto *child: findChildren<QWidget *>()) {
         child->adjustSize();
         child->updateGeometry();
     }

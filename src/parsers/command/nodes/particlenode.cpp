@@ -46,8 +46,8 @@ namespace Command {
     }
 
     void ParticleColorNode::setR(QSharedPointer<FloatNode> r) {
-        m_isValid &= r->isValid();
-        m_r        = std::move(r);
+        m_isValid = r->isValid();
+        m_r       = std::move(r);
     }
 
     ParticleNode::ParticleNode(int length)

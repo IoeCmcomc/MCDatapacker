@@ -15,27 +15,32 @@ Parser::Error::Error(const char *whatArg, int pos, int length,
 }
 
 QString Parser::Error::toLocalizedMessage() const {
-    QString &&errMsg =
-        QCoreApplication::translate("Parser::Error", what());
-
-    if (errMsg == QString::fromUtf8(what()))
-        errMsg = QCoreApplication::translate("Parser", what());
+    QString &&errMsg = tr(what());
 
     for (int i = 0; i < args.size(); ++i) {
         errMsg = errMsg.arg(args.at(i).toString());
     }
 
-    const QString &&ret =
-        QCoreApplication::translate("Parser", "Syntax error at position %1: %2")
-        .arg(pos).arg(errMsg);
+    const QString &&ret = tr("Syntax error at position %1: %2")
+                          .arg(pos).arg(errMsg);
     return std::move(ret);
 }
 
 bool Parser::Error::operator==(const Error &o) const {
-    return std::make_tuple(pos, length) == std::make_tuple(o.pos, o.length);
+    return std::tie(pos, length) == std::tie(o.pos, o.length);
 }
 
 Parser::Parser() {
+}
+
+Parser::Parser(const QString &text) : m_srcText(text) {
+    m_text = m_srcText;
+    setPos(0);
+}
+
+Parser::Parser(QString &&text) : m_srcText(text) {
+    m_text = m_srcText;
+    setPos(0);
 }
 
 int Parser::pos() const {
@@ -54,6 +59,10 @@ void Parser::setPos(int pos) {
         m_curChar = QChar();
     else
         m_curChar = m_text.at(pos);
+}
+
+QChar Parser::curChar() const {
+    return m_curChar;
 }
 
 /*!
@@ -152,8 +161,12 @@ QStringView Parser::advanceView(QStringView sv) {
 
 /*!
  * \brief Throws a \c error if the char \a chr isn't equal to the current character.
+ * If \c errMsg is not specified, the error message will have the form
+ * "Unexpected %1, expecting %2".
+ *
+ * \sa eat()
  */
-bool Parser::expect(QChar chr) {
+bool Parser::expect(QChar chr, const char *errMsg) {
     if (m_curChar == chr) {
         return true;
     } else {
@@ -163,7 +176,8 @@ bool Parser::expect(QChar chr) {
         const QString &&charTxt =
             (chr.isNull()) ? QStringLiteral("EOL") : '\''_QL1 +
             chr + '\''_QL1;
-        throwError(QT_TR_NOOP("Unexpected %1, expecting %2"),
+        throwError((errMsg) ? errMsg : QT_TR_NOOP(
+                       "Unexpected %1, expecting %2"),
                    { curCharTxt, charTxt }, m_pos, 1);
         return false;
     }
@@ -171,9 +185,10 @@ bool Parser::expect(QChar chr) {
 
 /*!
  * \brief Consumes the character \a chr and optionaly skips whitespaces.
- * \sa eat()
+ *
+ * \sa expect()
  */
-QString Parser::eat(QChar chr, EatOptions options) {
+QString Parser::eat(QChar chr, const char *errMsg, EatOptions options) {
     const int start = m_pos;
 
     if (options.testFlag(SkipLeftWs)) {
@@ -181,7 +196,7 @@ QString Parser::eat(QChar chr, EatOptions options) {
             advance();
     }
 
-    expect(chr);
+    expect(chr, errMsg);
     advance();
 
     if (options.testFlag(SkipRightWs)) {
@@ -216,11 +231,11 @@ QStringView Parser::getRest() {
  * \brief Returns the substring from the current character with the given (regex) \a charset.
  */
 QStringView Parser::getWithCharset(const QString &charset) {
-    return getWithRegex("["_QL1 + charset + "]+"_QL1);
+    return getWithRegex(QLatin1String("[") + charset + QLatin1String("]+"));
 }
 
 QStringView Parser::getWithCharset(const QLatin1String &charset) {
-    return getWithRegex("["_QL1 + charset + "]+"_QL1);
+    return getWithRegex(QLatin1String("[") + charset + QLatin1String("]+"));
 }
 
 /*!

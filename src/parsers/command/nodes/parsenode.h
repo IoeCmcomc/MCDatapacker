@@ -6,6 +6,9 @@
 namespace Command {
     class NodeVisitor;
     enum VisitOrder: int;
+    namespace Schema {
+        class Node;
+    }
 
     class ParseNode {
 public:
@@ -46,6 +49,9 @@ public:
         QString rightText() const;
         void setRightText(const QString &newRight);
 
+        const Schema::Node * schemaNode() const;
+        void setSchemaNode(const Schema::Node *newSchemaNode);
+
 protected:
         QString m_left;
         QString m_right;
@@ -61,7 +67,8 @@ protected:
         void setText(const QString &text);
 
 private:
-        Span m_span = 0;
+        Span m_span                      = 0;
+        const Schema::Node *m_schemaNode = nullptr;
     };
 
     using NodePtr = QSharedPointer<ParseNode>;
@@ -76,7 +83,9 @@ public:
 
     class SpanNode : public ParseNode {
 public:
-        explicit SpanNode(const QString &text) : ParseNode(Kind::Span, text) {
+        explicit SpanNode(const QString &text, const bool valid = false)
+            : ParseNode(Kind::Span, text) {
+            m_isValid = valid;
         };
     };
 

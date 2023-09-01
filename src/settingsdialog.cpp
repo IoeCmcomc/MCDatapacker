@@ -1,6 +1,9 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
+#include "parsers/command/schema/schemarootnode.h"
+#include "parsers/command/schema/schemaloader.h"
+
 //#include "mainwindow.h"
 #include "platforms/windows_specific.h"
 #include "game.h"
@@ -9,6 +12,7 @@
 #include <QFontDatabase>
 #include <QStyleFactory>
 #include <QDir>
+#include <QFileDialog>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::SettingsDialog) {
@@ -24,6 +28,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     initSettings();
 
     connect(this, &QDialog::accepted, this, &SettingsDialog::onAccepted);
+    connect(ui->customCmdBtn, &QToolButton::clicked,
+            this, &SettingsDialog::onCustomCmdBrowse);
+    connect(ui->customCmdEdit, &QLineEdit::editingFinished,
+            this, &SettingsDialog::checkCustomCmd);
 }
 
 void SettingsDialog::setupLanguageSetting() {
@@ -79,6 +87,8 @@ void SettingsDialog::onAccepted() {
 
     m_settings.beginGroup("game");
     m_settings.setValue("version", ui->gameVersionCombo->currentText());
+    m_settings.setValue("customCommandSyntaxFilePath",
+                        ui->customCmdEdit->text());
     m_settings.endGroup();
 
     m_settings.beginGroup("editor");
@@ -95,6 +105,39 @@ void SettingsDialog::onAccepted() {
     m_settings.endGroup();
 
     m_settings.sync();
+}
+
+void SettingsDialog::onCustomCmdBrowse() {
+    ui->customCmdEdit->setText(
+        QFileDialog::getOpenFileName(
+            this, tr("Open command syntax file"), "",
+            tr("Command syntax tree files (*.json *.msgpack)")
+            )
+        );
+    checkCustomCmd();
+}
+
+void SettingsDialog::checkCustomCmd() {
+    const auto &&filepath = ui->customCmdEdit->text();
+
+    if (filepath.isEmpty()) {
+        ui->customCmdStatus->clear();
+        return;
+    }
+
+    Command::Schema::SchemaLoader loader(ui->customCmdEdit->text());
+
+    if (const QString && error = loader.lastError(); error.isEmpty()) {
+        ui->customCmdStatus->setText(
+            tr(
+                R"(<b style="color:green">Valid</b>. %n command(s) detected.)",
+                nullptr, loader.tree()->literalChildren().size()));
+    } else {
+        ui->customCmdStatus->setText(
+            tr(R"(<b style="color:red">Error</b>: %1.)").arg(error));
+    }
+
+    delete loader.tree();
 }
 
 void SettingsDialog::initSettings() {
@@ -126,6 +169,9 @@ void SettingsDialog::initSettings() {
     ui->gameVersionCombo->setCurrentText(
         m_settings.value(QStringLiteral("version"),
                          Game::defaultVersionString).toString());
+    ui->customCmdEdit->setText(m_settings.value(QStringLiteral(
+                                                    "customCommandSyntaxFilePath")).toString());
+    checkCustomCmd();
     m_settings.endGroup();
 
     m_settings.beginGroup(QStringLiteral("editor"));

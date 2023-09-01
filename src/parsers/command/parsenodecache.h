@@ -62,14 +62,14 @@ namespace Command {
     class ParseNodeCache
     {
 public:
-        explicit ParseNodeCache(int capacity = 500);
+        explicit ParseNodeCache(int capacity = 64);
 
         using Cache = LRU::Cache<CacheKey, WeakNodePtr>;
 
         bool isEmpty() const;
         int size() const;
         int capacity() const;
-        void setCapacity(const size_t capacity);;
+        void setCapacity(const size_t capacity);
         void clear();
         bool contains(const CacheKey &key) const;
         const WeakNodePtr &lookup(const CacheKey &key) const;

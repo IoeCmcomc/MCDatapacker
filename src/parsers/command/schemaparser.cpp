@@ -3,16 +3,14 @@
 //#include "visitors/sourceprinter.h"
 #include "schema/schemaargumentnode.h"
 #include "schema/schemaliteralnode.h"
+#include "schema/schemaloader.h"
 
 #include "re2c_generated_functions.h"
 
 #include "uberswitch.hpp"
 
-#include <QCoreApplication>
-#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QMetaMethod>
 #include <QElapsedTimer>
 
 /* These classes are for benchmarking deserialization methods.
@@ -380,8 +378,7 @@ namespace Command {
                 return brigadier_literal();
             }
             case ParserType::Long: {
-                throwError(
-                    "The 'brigadier:long' parser hasn't been implemented yet.");
+                return brigadier_long(props);
             }
             case ParserType::String: {
                 return brigadier_string(props);
@@ -389,87 +386,34 @@ namespace Command {
 
             default: {
                 return nullptr;
-
-                break;
             }
         }
+    }
+
+    void SchemaParser::setSchema(Schema::RootNode *schema) {
+        Q_ASSERT(schema != nullptr);
+        if (m_schemaGraph) {
+            delete m_schemaGraph;
+        }
+        m_schemaGraph = schema;
     }
 
 /*!
  * \brief Opens a JSON file and loads it into the static schema.
  */
-    void SchemaParser::setSchema(const QString &filepath) {
+    void SchemaParser::loadSchema(const QString &filepath) {
         QElapsedTimer timer;
 
         timer.start();
-        loadSchema(filepath);
-        qDebug() << "Schema loaded in" << timer.elapsed() << "ms (path:" <<
-            filepath << ")";
-    }
 
-    void resolveRedirects(const json &j, Schema::Node *node,
-                          Schema::RootNode *root = nullptr) {
-        if (node->kind() == Schema::Node::Kind::Root) {
-            root = static_cast<Schema::RootNode *>(node);
-        }
+        setSchema(Schema::SchemaLoader(filepath).tree());
 
-        if (j.contains("redirect")) {
-            Q_ASSERT(root != nullptr);
-            // Example: "execute as >@e< at @s ..."
-            node->setRedirect(
-                root->literalChildren()[j["redirect"][0].get<QString>()]);
-        }
-
-        if (j.contains("children")) {
-            const auto &children        = j["children"];
-            const auto &literalChildren = node->literalChildren();
-            for (auto it = literalChildren.cbegin();
-                 it != literalChildren.cend(); ++it) {
-                resolveRedirects(children[it.key().toStdString()], it.value(),
-                                 root);
-            }
-            const auto &argChildren = node->argumentChildren();
-            for (const auto &child: argChildren) {
-                resolveRedirects(children[child->name().toStdString()], child,
-                                 root);
-            }
-        } else if (!(node->redirect() || node->isExecutable())) {
-            // Example: "execute >run< say ..."
-            node->setRedirect(root);
-        }
-    }
-
-    void SchemaParser::loadSchema(const QString &filepath) {
-        QFileInfo finfo(filepath);
-
-        if (!(finfo.exists() && finfo.isFile())) {
-            qWarning() << "File not exists:" << finfo.filePath();
-            return;
-        }
-
-        QFile      f(finfo.filePath());
-        const bool isJson      = finfo.suffix() == "json"_QL1;
-        const auto openOptions = (isJson)
-                ? (QIODevice::ReadOnly | QIODevice::Text) : QIODevice::ReadOnly;
-        f.open(openOptions);
-        QByteArray &&data = f.readAll();
-        f.close();
-
-        json j;
-
-        if (isJson) {
-            j = json::parse(data);
-        } else if (finfo.suffix() == "msgpack"_QL1) {
-            j = json::from_msgpack(data);
-        }
-
-        m_schemaGraph = j.get<Schema::RootNode>();
-        resolveRedirects(j, &m_schemaGraph);
-        // TODO: Merge duplicated sub-trees
+        qInfo() << "Command schema loaded in" << timer.elapsed() <<
+            "ms (path:" << filepath << ")";
     }
 
     Schema::RootNode * SchemaParser::schema() {
-        return &m_schemaGraph;
+        return m_schemaGraph;
     }
 
 /*!
@@ -560,19 +504,22 @@ namespace Command {
         }
     }
 
-    QPair<QStringView, int> SchemaParser::parseInteger(bool &ok) {
+    QStringView SchemaParser::getDigits() {
         const int start = pos();
 
         if (curChar() == '-' || curChar() == '+') {
             advance();
         }
-
         while (curChar().isDigit()) {
             advance();
         }
+        return textView().mid(start, pos() - start);
+    }
 
-        const QStringView raw   = textView().mid(start, pos() - start);
+    QPair<QStringView, int> SchemaParser::parseInteger(bool &ok) {
+        const QStringView raw   = getDigits();
         const int         value = strToDec<int>(raw, ok);
+
         return { raw, value };
     }
 
@@ -602,20 +549,19 @@ namespace Command {
         } else {
             reportError(QT_TR_NOOP(
                             "A boolean value can only be either 'true' or 'false'"));
-            return QSharedPointer<BoolNode>::create(QString(), false);
+            return QSharedPointer<BoolNode>::create(
+                spanText(getUntil(QChar::Space)), false);
         }
     }
 
     QSharedPointer<DoubleNode> SchemaParser::brigadier_double(
         const QVariantMap &props) {
-//        const auto raw   = getWithRegex(m_decimalNumRegex);
         const QStringView raw   = re2c::decimal(peekRest());
         bool              ok    = false;
         double            value = raw.toDouble(&ok);
 
         if (!ok) {
-            reportError(QT_TR_NOOP(
-                            "%1 is not a vaild double number"),
+            reportError(QT_TR_NOOP("%1 is not a vaild double number"),
                         { raw.toString() });
             return QSharedPointer<DoubleNode>::create(spanText(raw), false);
         } else {
@@ -634,14 +580,12 @@ namespace Command {
 
     QSharedPointer<FloatNode> SchemaParser::brigadier_float(
         const QVariantMap &props) {
-        //const auto raw   = getWithRegex(m_decimalNumRegex);
         const QStringView raw   = re2c::decimal(peekRest());
         bool              ok    = false;
         float             value = raw.toFloat(&ok);
 
         if (!ok) {
-            reportError(QT_TR_NOOP(
-                            "%1 is not a vaild float number"),
+            reportError(QT_TR_NOOP("%1 is not a vaild float number"),
                         { raw.toString() });
             return QSharedPointer<FloatNode>::create(spanText(raw), false);
         } else {
@@ -680,6 +624,28 @@ namespace Command {
         return QSharedPointer<IntegerNode>::create(spanText(raw), value, true);
     }
 
+    QSharedPointer<LongNode> SchemaParser::brigadier_long(
+        const QVariantMap &props) {
+        bool              ok;
+        const QStringView raw   = getDigits();
+        const long long   value = strToDec<long long>(raw, ok);
+
+        if (!ok) {
+            reportError(QT_TR_NOOP("%1 is not a vaild long number"),
+                        { raw.toString() });
+            return QSharedPointer<LongNode>::create(spanText(raw), false);
+        }
+        if (const QVariant &vari = props.value(QStringLiteral(
+                                                   "min")); vari.isValid()) {
+            checkMin(value, vari.toLongLong());
+        }
+        if (const QVariant &vari = props.value(QStringLiteral(
+                                                   "max")); vari.isValid()) {
+            checkMax(value, vari.toLongLong());
+        }
+        return QSharedPointer<LongNode>::create(spanText(raw), value, true);
+    }
+
     QSharedPointer<LiteralNode> SchemaParser::brigadier_literal() {
         return QSharedPointer<LiteralNode>::create(
             spanText(getUntil(QChar::Space)));
@@ -689,7 +655,7 @@ namespace Command {
         const QVariantMap &props) {
         if (!props.contains(QStringLiteral("type")))
             throwError(QT_TR_NOOP(
-                           "The required paramenter 'type' of the 'brigadier_string' argument parser is missing."));
+                           "The required paramenter 'type' of the 'brigadier:string' argument parser is missing."));
 
         const QString &&type = props[QStringLiteral("type")].toString();
         uswitch (type) {
@@ -704,6 +670,10 @@ namespace Command {
                     return QSharedPointer<StringNode>::create(
                         spanText(start), str, true);
                 } else {
+                    /*
+                     * Using goto here make the code clearer than
+                     * using fall through.
+                     */
                     goto SINGLE_WORD;
                 }
             }
@@ -712,9 +682,8 @@ namespace Command {
                 const auto literal = getLiteralString();
                 return QSharedPointer<StringNode>::create(
                     spanText(literal),
-                    errorIfNot(
-                        !literal.isEmpty(),
-                        "Expected a single word without spaces."));
+                    errorIfNot(!literal.isEmpty(),
+                               QT_TR_NOOP("Invalid empty word.")));
             }
         }
         return QSharedPointer<StringNode>::create(QString(), false);
@@ -727,7 +696,7 @@ namespace Command {
     QSharedPointer<ParseNode> SchemaParser::parse() {
         m_tree = QSharedPointer<RootNode>::create();
         m_errors.clear();
-        if (m_schemaGraph.isEmpty()) {
+        if (!m_schemaGraph || m_schemaGraph->isEmpty()) {
             qWarning() << "The parser schema hasn't been initialized yet.";
             return m_tree;
         }
@@ -735,7 +704,7 @@ namespace Command {
         setPos(0);
         try {
             m_tree->setLeadingTrivia(skipWs(false));
-            parseBySchema(&m_schemaGraph);
+            parseBySchema(m_schemaGraph);
 
             m_tree->setLength(pos() - 1);
             m_tree->setTrailingTrivia(skipWs(false));
@@ -753,7 +722,7 @@ namespace Command {
             qDebug() << "Command::Parser::parse: errors detected";
             qDebug() << textView();
             m_errors << err;
-            for (const auto &error: m_errors) {
+            for (const auto &error: qAsConst(m_errors)) {
                 qDebug() << error.toLocalizedMessage();
             }
         }
@@ -789,12 +758,14 @@ namespace Command {
         if (curChar().isNull()) {
             throwError(QT_TR_NOOP("Incompleted command"));
         }
-        eat(QChar::Space);
+        eat(QChar::Space,
+            "Unexpected %1, expecting %2 to separate between commands and arguments");
 
         return true;
     }
     void SchemaParser::parseBySchema(const Schema::Node *schemaNode,
                                      int depth) {
+        Q_ASSERT(schemaNode != nullptr);
         NodePtr ret;
 
         const bool isRoot = schemaNode->kind() == Schema::Node::Kind::Root;
@@ -833,8 +804,8 @@ namespace Command {
                 try {
                     ret = invokeMethod(parserType, props);
                     Q_ASSERT(ret != nullptr);
-                } catch (SchemaParser::Error &err) {
-                    err.length = pos() - start + 1;
+                } catch (const SchemaParser::Error &err) {
+//                    err.length = pos() - start + 1;
                     m_errors << err;
                 }
                 if (!ret || (!ret->isValid() && canBacktrack)) {
@@ -859,7 +830,7 @@ namespace Command {
                         m_tree->append(ret);
                     }
                 } catch (SchemaParser::Error &err) {
-                    err.length = pos() - start + 1;
+//                    err.length = pos() - start + 1;
                     m_errors << err;
                     if (!canBacktrack) {
                         m_tree->append(ret);
@@ -869,6 +840,7 @@ namespace Command {
                         setPos(start);
                     }
                 }
+                ret->setSchemaNode(argNode);
                 break;
             }
         } else {
@@ -919,12 +891,18 @@ namespace Command {
 
         if (!ret) {
             reportInvalidCommand = true;
-            auto &&node =
-                QSharedPointer<ErrorNode>::create(spanText(getRest()));
-            node->setLeadingTrivia(" ");
-            m_tree->append(std::move(node));
+
+            ret = QSharedPointer<ErrorNode>::create(spanText(getRest()));
+            if (depth > 0) {
+                ret->setLeadingTrivia(" ");
+            }
+            m_tree->append(ret);
         } else if (depth > 0) {
             ret->setLeadingTrivia(QStringLiteral(" "));
+        }
+
+        if (litNode && ret) {
+            ret->setSchemaNode(litNode);
         }
 
         if (reportInvalidCommand) {

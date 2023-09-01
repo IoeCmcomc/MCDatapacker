@@ -60,6 +60,9 @@ public:
         void visit(IntegerNode *node) final {
             m_repr += QString("IntegerNode(%1)").arg(node->value());
         };
+        void visit(LongNode *node) final {
+            m_repr += QString("LongNode(%1)").arg(node->value());
+        };
         void visit(StringNode *node) final {
             m_repr += QString("StringNode(\"%1\")").arg(node->value());
         };
@@ -424,18 +427,24 @@ public:
         void visit(KeyNode *node) final {
             m_repr += QString("KeyNode(\"%1\")").arg(node->value());
         };
-
         void visit(TwoAxesNode *node) final {
             m_repr += "TwoAxesNode";
             reprAxes(node, "first", "second");
         }
-
         void visit(XyzNode *node) final {
             m_repr += "XyzNode";
             reprAxes(node);
         }
         void visit(GamemodeNode *node) final {
             m_repr += QString("GamemodeNode(\"%1\")").arg(node->text());
+        };
+        void visit(InternalGreedyStringNode *node) final {
+            m_repr += QString("InternalGreedyStringNode(\"%1\")").arg(
+                node->text());
+        };
+        void visit(InternalRegexPatternNode *node) final {
+            m_repr += QString("InternalRegexPatternNode(%1)").arg(
+                node->value().pattern());
         };
 
         QString repr() const;

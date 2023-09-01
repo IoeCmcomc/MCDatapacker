@@ -16,35 +16,6 @@ namespace Command {
          */
     }
 
-    QString join(const MinecraftParser::QLatin1StringVector &vector) {
-        QString ret;
-
-        for (auto it = vector.cbegin(); it != vector.cend();) {
-            ret += *it;
-            ++it;
-            if (it != vector.cend()) {
-                ret += ", "_QL1;
-            }
-        }
-        return ret;
-    }
-
-    QString MinecraftParser::oneOf(const QLatin1StringVector &strArr) {
-        const int         start   = pos();
-        const QStringView curText = peekRest();
-
-        for (const auto &str: qAsConst(strArr)) {
-            if (curText.startsWith(str)) {
-                advance(str.size());
-                return str;
-            }
-        }
-        reportError(QT_TR_NOOP("Only accept one of the following: %1"),
-                    { join(strArr) }, start,
-                    peekLiteral().length());
-        return QString();
-    }
-
     QString MinecraftParser::eatListSep(QChar sepChr, QChar endChr) {
         const int start = pos();
 
@@ -52,7 +23,8 @@ namespace Command {
             advance();
         }
         if (curChar() != endChr) {
-            expect(sepChr);
+            expect(sepChr,
+                   "Unexpected %1, expecting separator %2 or closing character");
             advance();
             while (curChar().isSpace()) {
                 advance();
@@ -123,7 +95,8 @@ namespace Command {
         axis->setText(spanText(start));
         axis->setIsValid(isValid);
         if (!isValid) {
-            reportError("Invalid axis value", {}, start, axis->length());
+            reportError(QT_TR_NOOP("Invalid axis value"),
+                        {}, start, axis->length());
         }
         return axis;
     }
@@ -144,7 +117,8 @@ namespace Command {
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
                 axes->setFirstAxis(parseAxis(options, isLocal));
-                axes->firstAxis()->setTrailingTrivia(eat(' '));
+                axes->firstAxis()->setTrailingTrivia(eat(' ',
+                                                         "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setSecondAxis(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
@@ -159,12 +133,14 @@ namespace Command {
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
                 axes->setX(parseAxis(options, isLocal));
-                axes->x()->setTrailingTrivia(eat(' '));
+                axes->x()->setTrailingTrivia(eat(' ',
+                                                 "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setY(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
                 axes->setY(parseAxis(options, isLocal));
-                axes->y()->setTrailingTrivia(eat(' '));
+                axes->y()->setTrailingTrivia(eat(' ',
+                                                 "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setZ(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
@@ -455,17 +431,17 @@ namespace Command {
                     return ret;
                 }
                 ucase ("sort"_QL1): {
-                    const QString &&literal =
-                        oneOf({ "nearest"_QL1, "furthest"_QL1,
-                                "random"_QL1, "arbitrary"_QL1 });
+                    constexpr static std::array options {
+                        "nearest"_QL1, "furthest"_QL1, "random"_QL1,
+                        "arbitrary"_QL1 };
+                    const QString &&literal = oneOf(options);
                     return QSharedPointer<StringNode>::create(
                         spanText(literal), !literal.isEmpty());
                 }
                 ucase ("gamemode"_QL1): {
                     const auto &&ret        = parseNegEntityArg();
                     const QString &&literal =
-                        oneOf({ "adventure"_QL1, "creative"_QL1,
-                                "spectator"_QL1, "survival"_QL1 });
+                        oneOf(staticSuggestions<GamemodeNode>);
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(literal), !literal.isEmpty()));
                     return ret;
@@ -479,11 +455,12 @@ namespace Command {
                     } else {
                         literal = getLiteralString().toString();
                     }
-                    ret->setNode(QSharedPointer<StringNode>::create(
-                                     spanText(start), literal,
-                                     errorIfNot(
-                                         !literal.isEmpty(),
-                                         "Invalid empty name in target selector")));
+                    ret->setNode(
+                        QSharedPointer<StringNode>::create(
+                            spanText(start), literal, errorIfNot(
+                                !literal.isEmpty(),
+                                QT_TR_NOOP(
+                                    "Invalid empty name in target selector"))));
                     return ret;
                 }
                 ucase ("type"_QL1): {
@@ -517,13 +494,8 @@ namespace Command {
                 ucase ("advancements"): {
                     return parseEntityAdvancements();
                 }
-                default: {
-                    throwError(QT_TR_NOOP(
-                                   "Unknown entity argument name: %1"),
-                               { key });
-                }
             }
-            return nullptr;
+            throwError(QT_TR_NOOP("Unknown entity argument name: %1"), { key });
         });
     }
 
@@ -622,9 +594,9 @@ namespace Command {
                 const auto name = advanceView(re2c::nbtPathKey(peekRest()));
                 ret->setName(QSharedPointer<StringNode>::create(
                                  spanText(name),
-                                 errorIfNot(!name.isEmpty(),
-                                            QT_TR_NOOP(
-                                                "Invalid empty NBT path key"))));
+                                 (!name.isEmpty(),
+                                  QT_TR_NOOP(
+                                      "Invalid empty NBT path key"))));
                 if (curChar() == '{')
                     ret->setFilter(parseCompoundTag());
             };
@@ -646,9 +618,11 @@ namespace Command {
         auto    &&color = QSharedPointer<ParticleColorNode>::create(0);
 
         color->setR(brigadier_float());
-        color->r()->setTrailingTrivia(eat(' '));
+        color->r()->setTrailingTrivia(eat(' ',
+                                          "Unexpected %1, expecting %2 to separate between color values"));
         color->setG(brigadier_float());
-        color->g()->setTrailingTrivia(eat(' '));
+        color->g()->setTrailingTrivia(eat(' ',
+                                          "Unexpected %1, expecting %2 to separate between color values"));
         color->setB(brigadier_float());
         color->setLength(pos() - start);
         return color;
@@ -703,6 +677,7 @@ namespace Command {
                     QT_TR_NOOP(
                         "The character '/' is not allowed in the namespace"),
                     {}, start, nspace->length());
+                hasError = true;
             } else {
                 nspace->setIsValid(true);
             }
@@ -782,11 +757,11 @@ namespace Command {
                     ? getUntil(QChar::Space)
                     : advanceView(re2c::realPlayerName(peekRest()));
 
-                node->setNode(QSharedPointer<StringNode>::create(
-                                  spanText(literal),
-                                  errorIfNot(!literal.isEmpty(),
-                                             QT_TR_NOOP(
-                                                 "Invalid empty player name"))));
+                node->setNode(
+                    QSharedPointer<StringNode>::create(
+                        spanText(literal),
+                        errorIfNot(!literal.isEmpty(),
+                                   QT_TR_NOOP("Invalid empty player name"))));
             }
         }
     }
@@ -794,8 +769,8 @@ namespace Command {
     NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
                                           const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;
-        if (const auto &&ret = SchemaParser::invokeMethod(parserType, props)) {
-            return ret;
+        if ((int)parserType < (int)ParserType::Angle) {
+            return SchemaParser::invokeMethod(parserType, props);
         }
         switch (parserType) {
             case ParserType::Angle: { return minecraft_angle(); }
@@ -863,6 +838,12 @@ namespace Command {
             case ParserType::Uuid: { return minecraft_uuid(); }
             case ParserType::Vec2: { return minecraft_vec2(); }
             case ParserType::Vec3: { return minecraft_vec3(); }
+            case ParserType::InternalGreedyString: {
+                return parseGreedyString();
+            }
+            case ParserType::InternalRegexPattern: {
+                return parseRegexPattern();
+            }
 
             default: {
                 Q_UNREACHABLE();
@@ -906,19 +887,14 @@ namespace Command {
     }
 
     QSharedPointer<ColorNode> MinecraftParser::minecraft_color() {
-        const static QLatin1StringVector colors {
-            "aqua"_QL1, "black"_QL1, "blue"_QL1,
-            "dark_aqua"_QL1, "dark_blue"_QL1,
-            "dark_green"_QL1, "dark_gray"_QL1,
-            "dark_purple"_QL1, "dark_red"_QL1,
-            "gold"_QL1, "green"_QL1, "gray"_QL1,
-            "light_purple"_QL1, "red"_QL1,
-            "reset"_QL1, "white"_QL1, "yellow"_QL1,
-        };
-        const QString &&literal = oneOf(colors);
+        const QString &&literal = oneOf(staticSuggestions<ColorNode>);
 
-        return QSharedPointer<ColorNode>::create(spanText(literal),
-                                                 !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<ColorNode>::create(spanText(literal), true);
+        } else {
+            return QSharedPointer<ColorNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<ColumnPosNode> MinecraftParser::
@@ -971,10 +947,15 @@ namespace Command {
 
     QSharedPointer<EntityAnchorNode> MinecraftParser::
     minecraft_entityAnchor() {
-        const QString &&literal = oneOf({ "eyes"_QL1, "feet"_QL1, });
+        const QString &&literal = oneOf(staticSuggestions<EntityAnchorNode>);
 
-        return QSharedPointer<EntityAnchorNode>::create(spanText(literal),
-                                                        !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<EntityAnchorNode>::create(spanText(literal),
+                                                            true);
+        } else {
+            return QSharedPointer<EntityAnchorNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<EntitySummonNode> MinecraftParser::
@@ -996,7 +977,7 @@ namespace Command {
             advance(2);
         }
 
-        const auto &&num1 = brigadier_float();
+        const auto &&num1 = brigadier_float(props);
         if (!hasMax) {
             bool hasDoubleDot = false;
             if (peek(2) == ".."_QL1) {
@@ -1011,7 +992,7 @@ namespace Command {
             if (hasDoubleDot) {
                 if (curChar().isDigit() || curChar() == '.' ||
                     curChar() == '-') { // "min..max"
-                    ret->setMaxValue(brigadier_float(), true);
+                    ret->setMaxValue(brigadier_float(props), true);
                 }
                 num1->setTrailingTrivia(spanText(QStringLiteral("..")));
                 ret->setMinValue(std::move(num1), true); // "min.."
@@ -1035,32 +1016,36 @@ namespace Command {
     }
 
     QSharedPointer<GamemodeNode> MinecraftParser::minecraft_gamemode() {
-        const QString &&literal = oneOf({ "creative"_QL1, "survival"_QL1,
-                                          "adventure"_QL1, "spectator"_QL1 });
-        GamemodeNode::Mode mode = GamemodeNode::Mode::Unknown;
+        using GameMode = GamemodeNode::Mode;
+        const QString &&literal = oneOf(staticSuggestions<GamemodeNode>);
+        GameMode        mode    = GamemodeNode::Mode::Unknown;
 
         if (!literal.isEmpty()) {
             uswitch (literal) {
                 ucase ("creative"): {
-                    mode = GamemodeNode::Mode::Creative;
+                    mode = GameMode::Creative;
                     break;
                 }
                 ucase ("survival"): {
-                    mode = GamemodeNode::Mode::Survival;
+                    mode = GameMode::Survival;
                     break;
                 }
                 ucase ("adventure"): {
-                    mode = GamemodeNode::Mode::Adventure;
+                    mode = GameMode::Adventure;
                     break;
                 }
                 ucase ("spectator"): {
-                    mode = GamemodeNode::Mode::Spectator;
+                    mode = GameMode::Spectator;
                     break;
                 }
             }
+
+            return QSharedPointer<GamemodeNode>::create(spanText(literal),
+                                                        mode, true);
+        } else {
+            return QSharedPointer<GamemodeNode>::create(
+                spanText(getUntil(QChar::Space)), mode, false);
         }
-        return QSharedPointer<GamemodeNode>::create(spanText(literal), mode,
-                                                    !literal.isEmpty());
     }
 
     QSharedPointer<GameProfileNode> MinecraftParser::minecraft_gameProfile() {
@@ -1073,15 +1058,15 @@ namespace Command {
     }
 
     QSharedPointer<HeightmapNode> MinecraftParser::minecraft_heightmap() {
-        const QString &&literal = oneOf({
-            "motion_blocking_no_leaves"_QL1,
-            "motion_blocking"_QL1,
-            "ocean_floor"_QL1,
-            "world_surface"_QL1,
-        });
+        const QString &&literal = oneOf(staticSuggestions<HeightmapNode>);
 
-        return QSharedPointer<HeightmapNode>::create(spanText(literal),
-                                                     !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<HeightmapNode>::create(spanText(literal),
+                                                         true);
+        } else {
+            return QSharedPointer<HeightmapNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<IntRangeNode> MinecraftParser::
@@ -1094,12 +1079,12 @@ namespace Command {
             hasMax = true;
             advance(2);
         }
-        const auto &&num1 = brigadier_integer();
+        const auto &&num1 = brigadier_integer(props);
         if (!hasMax) {
             if (peek(2) == ".."_QL1) {
                 advance(2);
                 if (curChar().isDigit() || curChar() == '-') { // "min..max"
-                    ret->setMaxValue(brigadier_integer(), false);
+                    ret->setMaxValue(brigadier_integer(props), false);
                 }
                 num1->setTrailingTrivia(spanText(QStringLiteral("..")));
                 ret->setMinValue(std::move(num1), true); // "min.."
@@ -1128,7 +1113,7 @@ namespace Command {
 
         return QSharedPointer<ItemSlotNode>::create(
             spanText(slot), errorIfNot(!slot.isEmpty(),
-                                       "Invalid empty item slot"));
+                                       QT_TR_NOOP("Invalid empty item slot")));
     }
 
     QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
@@ -1218,7 +1203,7 @@ namespace Command {
         bool        valid   = true;
 
         if (objname.isEmpty()) {
-            reportError("Invalid empty objective");
+            reportError(QT_TR_NOOP("Invalid empty objective"));
             valid = false;
         } else if ((objname.length() > 16) &&
                    (gameVer < QVersionNumber(1, 18, 2))) {
@@ -1235,20 +1220,22 @@ namespace Command {
         const auto criteria = advanceView(re2c::objectiveCriteria(peekRest()));
 
         return QSharedPointer<ObjectiveCriteriaNode>::create(
-            spanText(criteria), errorIfNot(!criteria.isEmpty(),
-                                           "Invalid empty objective criteria"));
+            spanText(criteria),
+            errorIfNot(!criteria.isEmpty(),
+                       QT_TR_NOOP("Invalid empty objective criteria")));
     }
 
     QSharedPointer<OperationNode> MinecraftParser::
     minecraft_operation() {
-        static const QLatin1StringVector operators {
-            "="_QL1, "<"_QL1, ">"_QL1, "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
-            "/="_QL1, "%="_QL1,
-        };
-        const QString &&literal = oneOf(operators);
+        const QString &&literal = oneOf(staticSuggestions<OperationNode>);
 
-        return QSharedPointer<OperationNode>::create(spanText(literal),
-                                                     !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<OperationNode>::create(spanText(literal),
+                                                         true);
+        } else {
+            return QSharedPointer<OperationNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<ParticleNode> MinecraftParser::minecraft_particle() {
@@ -1269,24 +1256,28 @@ namespace Command {
                 fullId = nspace + ":"_QL1 + resLoc->id()->text();
             }
         }
+        ret->setResLoc(std::move(resLoc));
 
         uswitch (fullId) {
             ucase ("block"_QL1):
             ucase ("block_marker"_QL1):
             ucase ("falling_dust"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(minecraft_blockState());
                 break;
             }
             ucase ("dust"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 const auto &&color = parseParticleColor();
                 color->setTrailingTrivia(eat(' '));
                 ret->setParams(std::move(color), brigadier_float());
                 break;
             }
             ucase ("dust_color_transition"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 const auto &&startColor = parseParticleColor();
                 startColor->setTrailingTrivia(eat(' '));
                 const auto &&size = brigadier_float();
@@ -1297,29 +1288,33 @@ namespace Command {
                 break;
             }
             ucase ("item"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(minecraft_itemStack());
                 break;
             }
             ucase ("sculk_charge"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(brigadier_float());
                 break;
             }
             ucase ("shriek"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 ret->setParams(brigadier_integer());
                 break;
             }
             ucase ("vibration"_QL1): {
-                resLoc->setTrailingTrivia(eat(' '));
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
                 const auto &&pos = minecraft_vec3();
                 pos->setTrailingTrivia(eat(' '));
                 ret->setParams(std::move(pos), brigadier_integer());
                 break;
             }
         }
-        ret->setResLoc(std::move(resLoc));
+
         ret->setLength(pos() - start);
         return ret;
     }
@@ -1392,33 +1387,15 @@ namespace Command {
 
     QSharedPointer<ScoreboardSlotNode> MinecraftParser::
     minecraft_scoreboardSlot() {
-        const static QLatin1StringVector scoreboardSlots = {
-            "belowName"_QL1,
-            "sidebar.team.aqua"_QL1,
-            "sidebar.team.black"_QL1,
-            "sidebar.team.blue"_QL1,
-            "sidebar.team.dark_aqua"_QL1,
-            "sidebar.team.dark_blue"_QL1,
-            "sidebar.team.dark_green"_QL1,
-            "sidebar.team.dark_gray"_QL1,
-            "sidebar.team.dark_purple"_QL1,
-            "sidebar.team.dark_red"_QL1,
-            "sidebar.team.gold"_QL1,
-            "sidebar.team.green"_QL1,
-            "sidebar.team.gray"_QL1,
-            "sidebar.team.light_purple"_QL1,
-            "sidebar.team.red"_QL1,
-            "sidebar.team.reset"_QL1,
-            "sidebar.team.white"_QL1,
-            "sidebar.team.yellow"_QL1,
-            "sidebar"_QL1,
-            "list"_QL1,
-        };
+        const QString &&slot = oneOf(staticSuggestions<ScoreboardSlotNode>);
 
-        const QString &&slot = oneOf(scoreboardSlots);
-
-        return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),
-                                                          !slot.isEmpty());
+        if (!slot.isEmpty()) {
+            return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),
+                                                              true);
+        } else {
+            return QSharedPointer<ScoreboardSlotNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<SwizzleNode> MinecraftParser::
@@ -1453,9 +1430,9 @@ namespace Command {
     QSharedPointer<TeamNode> MinecraftParser::minecraft_team() {
         const auto literal = getLiteralString();
 
-        return QSharedPointer<TeamNode>::create(spanText(literal),
-                                                errorIfNot(!literal.isEmpty(),
-                                                           "Invalid empty team"));
+        return QSharedPointer<TeamNode>::create(
+            spanText(literal),
+            errorIfNot(!literal.isEmpty(), QT_TR_NOOP("Invalid empty team")));
     }
 
     QSharedPointer<TimeNode> MinecraftParser::minecraft_time() {
@@ -1465,7 +1442,7 @@ namespace Command {
 
         auto [raw, value] = parseFloat(ok);
         if (!ok) {
-            reportError("Invalid time number", {}, curPos, raw.length());
+            reportError(QT_TR_NOOP("Invalid time"), {}, curPos, raw.length());
         }
 
         switch (curChar().toLatin1()) {
@@ -1496,21 +1473,29 @@ namespace Command {
 
     QSharedPointer<TemplateMirrorNode> MinecraftParser::minecraft_templateMirror()
     {
-        const QString &&literal = oneOf({ "none"_QL1, "front_back"_QL1,
-                                          "left_right"_QL1, });
+        const QString &&literal = oneOf(staticSuggestions<TemplateMirrorNode>);
 
-        return QSharedPointer<TemplateMirrorNode>::create(spanText(literal),
-                                                          !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<TemplateMirrorNode>::create(spanText(literal),
+                                                              true);
+        } else {
+            return QSharedPointer<TemplateMirrorNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<TemplateRotationNode> MinecraftParser::
     minecraft_templateRotation() {
-        const QString &&literal = oneOf({ "none"_QL1, "clockwise_90"_QL1,
-                                          "counterclockwise_90"_QL1,
-                                          "180"_QL1 });
+        const QString &&literal =
+            oneOf(staticSuggestions<TemplateRotationNode>);
 
-        return QSharedPointer<TemplateRotationNode>::create(spanText(literal),
-                                                            !literal.isEmpty());
+        if (!literal.isEmpty()) {
+            return QSharedPointer<TemplateRotationNode>::create(
+                spanText(literal), true);
+        } else {
+            return QSharedPointer<TemplateRotationNode>::create(
+                spanText(getUntil(QChar::Space)), false);
+        }
     }
 
     QSharedPointer<UuidNode> MinecraftParser::minecraft_uuid() {
@@ -1522,7 +1507,7 @@ namespace Command {
             return QSharedPointer<UuidNode>::create(
                 spanText(raw), std::move(uuid), true);
         } else {
-            reportError("Invalid UUID");
+            reportError(QT_TR_NOOP("Invalid UUID"));
             return QSharedPointer<UuidNode>::create(QString(), QUuid(), false);
         }
     }
@@ -1541,9 +1526,46 @@ namespace Command {
         return ret;
     }
 
-    void MinecraftParser::setGameVer(const QVersionNumber &newGameVer) {
+    QSharedPointer<InternalGreedyStringNode> MinecraftParser::parseGreedyString()
+    {
+        const int    curPos = pos();
+        const auto &&raw    = getWithRegex(QStringLiteral(R"([^\s\\'"]+)"));
+
+        if (!raw.isEmpty()) {
+            return QSharedPointer<InternalGreedyStringNode>::create(
+                spanText(raw), true);
+        } else {
+            reportError(QT_TR_NOOP("Invalid empty greedy string"), {}, curPos,
+                        raw.length());
+            return QSharedPointer<InternalGreedyStringNode>::create(QString(),
+                                                                    false);
+        }
+    }
+
+    QSharedPointer<InternalRegexPatternNode> MinecraftParser::parseRegexPattern()
+    {
+        const int                curPos = pos();
+        const auto             &&rest   = getRest();
+        const QRegularExpression pattern(rest.toString());
+
+        if (pattern.isValid()) {
+            return QSharedPointer<InternalRegexPatternNode>::create(
+                spanText(rest), std::move(pattern), true);
+        } else {
+            reportError(pattern.errorString().toStdString().c_str(),
+                        {}, curPos + pattern.patternErrorOffset(), 1);
+            return QSharedPointer<InternalRegexPatternNode>::create(
+                QString(), QRegularExpression(), false);
+        }
+    }
+
+    void MinecraftParser::setGameVer(const QVersionNumber &newGameVer,
+                                     const bool autoLoadSchema) {
         gameVer = newGameVer;
-        setSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
-                  QStringLiteral("/summary/commands/data.min.json"));
+
+        if (autoLoadSchema) {
+            loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +
+                       QStringLiteral("/summary/commands/data.min.json"));
+        }
     }
 }

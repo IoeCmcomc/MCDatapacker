@@ -45,6 +45,7 @@ namespace Glhp {
     bool removePrefix(QString &str, QStringView prefix);
 
     extern const QMap<QString, QString> colorHexes;
+    extern const QMap<char, QString>    colorCodes;
 }
 
 #endif /* GLOBALHELPERS_H */

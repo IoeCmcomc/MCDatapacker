@@ -11,3 +11,5 @@ SOURCES +=  tst_testglobalhelpers.cpp \
 HEADERS += \
     ../../../src/codefile.h \
     ../../../src/globalhelpers.h
+
+include($$PWD/../../../lib/uberswitch/uberswitch.pri)

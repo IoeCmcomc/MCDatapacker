@@ -142,7 +142,7 @@ namespace re2c {
         const QChar *YYMARKER = nullptr;
 
         /*!local:re2c
-            key = [^ "[\].{}\x00]+;
+            key = [^ "[\].{}\x00-\x1f\x7f]+;
 
             key { return QStringView(input.cbegin(), YYCURSOR); }
          *       { return QStringView(); }

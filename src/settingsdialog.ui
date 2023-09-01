@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>475</width>
-    <height>322</height>
+    <width>578</width>
+    <height>341</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -174,6 +174,43 @@
        <item row="0" column="1">
         <widget class="QComboBox" name="gameVersionCombo"/>
        </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Custom command tree file:</string>
+         </property>
+         <property name="buddy">
+          <cstring>customCmdEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="1">
+          <widget class="QToolButton" name="customCmdBtn">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLineEdit" name="customCmdEdit"/>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="customCmdStatus">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="codeEditorTab">
@@ -335,7 +372,10 @@
   <tabstop>reloadExternChangesCombo</tabstop>
   <tabstop>languageCombo</tabstop>
   <tabstop>themeCombo</tabstop>
+  <tabstop>darkThemeCombo</tabstop>
   <tabstop>gameVersionCombo</tabstop>
+  <tabstop>customCmdEdit</tabstop>
+  <tabstop>customCmdBtn</tabstop>
   <tabstop>editorTextSizeSpin</tabstop>
   <tabstop>editorTextFontCombo</tabstop>
   <tabstop>editorWrapCheck</tabstop>

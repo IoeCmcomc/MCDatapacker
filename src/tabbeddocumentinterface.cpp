@@ -49,7 +49,9 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
     connect(ui->tabWidget, &QTabWidget::currentChanged,
             this, &TabbedDocumentInterface::onTabChanged);
     connect(ui->tabWidget, &QTabWidget::tabCloseRequested,
-            this, &TabbedDocumentInterface::onCloseFile);
+            this, [this](int index) {
+        this->onCloseFile(index, false);
+    });
     connect(getTabBar(), &QTabBar::tabMoved,
             this, &TabbedDocumentInterface::onTabMoved);
 
@@ -218,7 +220,8 @@ void TabbedDocumentInterface::addFile(const QString &path) {
                 new McfunctionHighlighter(codeEditor->document(),
                                           parser.get()));
             codeEditor->setParser(std::move(parser));
-        } else if (newFile.fileType >= CodeFile::JsonText) {
+        } else if (newFile.fileType >= CodeFile::JsonText
+                   && newFile.fileType < CodeFile::JsonText_end) {
             codeEditor->setHighlighter(new JsonHighlighter(codeEditor->
                                                            document()));
             codeEditor->setParser(std::make_unique<JsonParser>());
@@ -321,7 +324,7 @@ bool TabbedDocumentInterface::hasNoFile() const {
 void TabbedDocumentInterface::clear() {
     if (!hasNoFile()) {
         for (int i = count() - 1; i >= 0; --i) {
-            onCloseFile(i);
+            onCloseFile(i, true);
         }
     }
 
@@ -483,12 +486,12 @@ void TabbedDocumentInterface::onTabMoved(int from, int to) {
     std::swap(files[from], files[to]);
 }
 
-void TabbedDocumentInterface::onCloseFile(int index) {
+void TabbedDocumentInterface::onCloseFile(int index, const bool force) {
     if (index == -1)
         return;
 
     Q_ASSERT(count() > 0);
-    if (maybeSave(index)) {
+    if (force || maybeSave(index)) {
         files.remove(index);
         /*qDebug() << "Close tab" << index; */
         ui->tabWidget->removeTab(index);

@@ -16,7 +16,9 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
 
     const auto &&gameVer = Game::version();
 
-    if (gameVer >= Game::v1_19_4)
+    if (gameVer >= Game::v1_20)
+        ui->formatInput->setValue(15);
+    else if (gameVer >= Game::v1_19_4)
         ui->formatInput->setValue(12);
     else if (gameVer >= Game::v1_19)
         ui->formatInput->setValue(10);
@@ -40,16 +42,19 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
             this, &NewDatapackDialog::checkOK);
     connect(ui->nameInput, &QLineEdit::textChanged,
             this, &NewDatapackDialog::checkOK);
-    connect(ui->descInput, &QLineEdit::textChanged,
+    connect(ui->descInput, &QPlainTextEdit::textChanged,
             this, &NewDatapackDialog::checkOK);
     connect(ui->locationInput, &QLineEdit::textChanged,
             this, &NewDatapackDialog::checkOK);
+    connect(ui->formatInput, qOverload<int>(&QSpinBox::valueChanged),
+            this, &NewDatapackDialog::onFormatSpinChanged);
 
     createButton = new QPushButton(tr("Create"), this);
     ui->dialogBox->addButton(createButton, QDialogButtonBox::ActionRole);
     connect(createButton, &QAbstractButton::clicked, this, &QDialog::accept);
 
     checkOK();
+    onFormatSpinChanged(ui->formatInput->value());
 }
 
 NewDatapackDialog::~NewDatapackDialog() {
@@ -73,8 +78,35 @@ void NewDatapackDialog::checkOK() {
     createButton->setDisabled(getName().isEmpty() || getDirPath().isEmpty());
 }
 
+void NewDatapackDialog::onFormatSpinChanged(const int format) {
+    constexpr int        maxFormat                     = 15;
+    const static QString formatReleases[maxFormat + 1] = {
+        {},
+        {},
+        {},
+        {},
+        QStringLiteral("1.13–1.14.4"),
+        QStringLiteral("1.15–1.16.1"),
+        QStringLiteral("1.16.2–1.16.5"),
+        QStringLiteral("1.17–1.17.1"),
+        QStringLiteral("1.18–1.18.1"),
+        QStringLiteral("1.18.2"),
+        QStringLiteral("1.19–1.19.3"),
+        {},
+        QStringLiteral("1.19.4"),
+        {},
+        {},
+        QStringLiteral("1.20–1.20.1")
+    };
+
+    Q_ASSERT(format >= 0);
+
+    ui->formatDisplay->setText(
+        (format <= maxFormat) ? formatReleases[format] : QString());
+}
+
 QString NewDatapackDialog::getDesc() {
-    return ui->descInput->text();
+    return ui->descInput->toPlainText();
 }
 
 QString NewDatapackDialog::getName() {

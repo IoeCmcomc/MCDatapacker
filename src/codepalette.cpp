@@ -22,6 +22,7 @@ const CodePalette defaultCodePalette{
     { CP::Double, CharFormatBuilder().fg("#2F97C1")->ok() },
     { CP::Float, CharFormatBuilder().fg("#2F97C1")->ok() },
     { CP::Integer, CharFormatBuilder().fg("#2F97C1")->ok() },
+    { CP::Long, CharFormatBuilder().fg("#2F97C1")->ok() },
     { CP::String, CharFormatBuilder().fg("#A31621")->ok() },
     { CP::Angle, CharFormatBuilder().fg("#7404cf")->ok() },
     { CP::BlockPos, CharFormatBuilder().fg("#8c54ba")->ok() },
@@ -81,6 +82,8 @@ const CodePalette defaultCodePalette{
     { CP::TargetSelector_Arguments, CharFormatBuilder().bg("#aafaf0f5")->ok() },
     { CP::Key, CharFormatBuilder().fg("#B89C3D")->ok() },
     { CP::Gamemode, CharFormatBuilder().fg("#152769")->bold(true)->ok() },
+    { CP::RegexPattern, CharFormatBuilder().fg("#444444")->ok() },
+    { CP::GreedyString, CharFormatBuilder().fg("#A31621")->ok() },
 };
 
 const CodePalette defaultDarkCodePalette{
@@ -92,6 +95,7 @@ const CodePalette defaultDarkCodePalette{
     { CP::Double, CharFormatBuilder().fg("#A2D4E8")->ok() },
     { CP::Float, CharFormatBuilder().fg("#A2D4E8")->ok() },
     { CP::Integer, CharFormatBuilder().fg("#A2D4E8")->ok() },
+    { CP::Long, CharFormatBuilder().fg("#A2D4E8")->ok() },
     { CP::String, CharFormatBuilder().fg("#B72E3A")->ok() },
     { CP::Angle, CharFormatBuilder().fg("#7404cf")->ok() },
     { CP::BlockPos, CharFormatBuilder().fg("#8c54ba")->ok() },
@@ -152,4 +156,6 @@ const CodePalette defaultDarkCodePalette{
     { CP::TargetSelector_Arguments, CharFormatBuilder().bg("#aa341123")->ok() },
     { CP::Key, CharFormatBuilder().fg("#B89C3D")->ok() },
     { CP::Gamemode, CharFormatBuilder().fg("#BBC6F1")->bold(true)->ok() },
+    { CP::RegexPattern, CharFormatBuilder().fg("#b4b4b4")->ok() },
+    { CP::GreedyString, CharFormatBuilder().fg("#B72E3A")->ok() },
 };

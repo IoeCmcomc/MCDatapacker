@@ -274,10 +274,182 @@ void RawJsonTextEditor::fromJsonObjects(const QJsonArray &arr) {
         if (isFirst) {
             isFirst = !isFirst;
         } else {
-            appendJsonObject({ { "text", "\n" } });
+            appendJsonObject({ { QStringLiteral("text"), QStringLiteral(
+                                     "\n") } });
         }
         appendJsonObject(JsonToComponent(line));
     }
+}
+
+QString RawJsonTextEditor::toFormattingCodes(const QChar prefix) const {
+    QString              codes;
+    const QTextDocument *doc = ui->textEdit->document();
+
+    for (QTextBlock block = doc->begin(); block != doc->end();
+         block = block.next()) {
+        if (block != doc->begin())
+            codes += '\n';
+
+        QTextBlock::iterator it;
+
+        for (it = block.begin(); !(it.atEnd()); ++it) {
+            QTextFragment currFragment = it.fragment();
+            if (currFragment.isValid()) {
+                const QString txt = currFragment.text();
+                const auto    fmt = currFragment.charFormat();
+                QString       formatCodes;
+                QString       colorCode;
+
+                if (fmt.fontWeight() >= 75)
+                    formatCodes += prefix + 'l';
+                if (fmt.fontItalic())
+                    formatCodes += prefix + 'o';
+                if (fmt.fontUnderline())
+                    formatCodes += prefix + 'n';
+                if (fmt.boolProperty(RawJsonProperty::TextObfuscated))
+                    formatCodes += prefix + 'k';
+                if (fmt.fontStrikeOut())
+                    formatCodes += prefix + 'm';
+                if (fmt.foreground().style() == Qt::SolidPattern) {
+                    const char key = Glhp::colorCodes.key(
+                        fmt.foreground().color().name(), '\0');
+                    if (key != '\0') {
+                        colorCode = prefix + key;
+                    }
+                } else {
+                    colorCode = prefix + 'r';
+                }
+
+                if (txt != QChar::ObjectReplacementCharacter) {
+                    codes += colorCode;
+                    codes += formatCodes;
+                    codes += txt;
+                }
+            }
+        }
+    }
+    return codes;
+}
+
+void RawJsonTextEditor::fromFormattingCodes(const QString &codes,
+                                            const QChar prefix) {
+    enum class TokenType {
+        Char,
+        Sign,
+        Code,
+    };
+
+    m_json = QJsonValue{};
+    ui->textEdit->clear();
+    bool            isFirst = true;
+    QTextCharFormat prevFmt;
+    const auto    &&lines = codes.splitRef('\n');
+
+    auto cursor = ui->textEdit->textCursor();
+    cursor.beginEditBlock();
+    for (const auto &line: lines) {
+        if (isFirst) {
+            isFirst = !isFirst;
+        } else {
+            cursor.insertText(QStringLiteral("\n"));
+        }
+
+        QTextCharFormat fmt;
+
+        TokenType tokenType = TokenType::Char;
+        for (const auto &ch: line) {
+            if (tokenType == TokenType::Sign) {
+                switch (ch.toLower().toLatin1()) {
+                    case 'l': {
+                        fmt.setFontWeight(QFont::Bold);
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                    case 'o': {
+                        fmt.setFontItalic(true);
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                    case 'n': {
+                        fmt.setFontUnderline(true);
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                    case 'k': {
+                        fmt.setProperty(RawJsonProperty::TextObfuscated, true);
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                    case 'm': {
+                        fmt.setFontStrikeOut(true);
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                    case 'r': {
+                        fmt       = QTextCharFormat{};
+                        prevFmt   = QTextCharFormat{};
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                    case 'a':
+                    case 'b':
+                    case 'c':
+                    case 'd':
+                    case 'e':
+                    case 'f': {
+                        fmt     = QTextCharFormat{};
+                        prevFmt = QTextCharFormat{};
+                        fmt.setForeground(
+                            QBrush(QColor(Glhp::colorCodes.value(
+                                              ch.toLower().toLatin1()))));
+                        tokenType = TokenType::Code;
+                        break;
+                    }
+                }
+            }
+
+            switch (tokenType) {
+                case TokenType::Sign: {
+                    if (ch == prefix) {
+                        cursor.setCharFormat(fmt);
+                        cursor.insertText(prefix);
+                        cursor.insertText(ch);
+                        tokenType = TokenType::Char;
+                    }
+                    break;
+                }
+                case TokenType::Code: {
+                    fmt.merge(prevFmt);
+                    cursor.setCharFormat(fmt);
+                    prevFmt   = fmt;
+                    tokenType = TokenType::Char;
+                    break;
+                }
+                case TokenType::Char: {
+                    if (ch == prefix) {
+                        tokenType = TokenType::Sign;
+                    } else {
+                        cursor.insertText(ch);
+                        tokenType = TokenType::Char;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    cursor.endEditBlock();
+    ui->textEdit->setTextCursor(cursor);
 }
 
 QJsonObject RawJsonTextEditor::JsonToComponent(const QJsonValue &root) {
@@ -626,9 +798,16 @@ void RawJsonTextEditor::readSourceEditor(int format) {
 
             break;
         }
-
         case HTML: {
             ui->textEdit->setHtml(ui->sourceEdit->toPlainText());
+            break;
+        }
+        case FormattingCodes: {
+            fromFormattingCodes(ui->sourceEdit->toPlainText());
+            break;
+        }
+        case AmpFormattingCodes: {
+            fromFormattingCodes(ui->sourceEdit->toPlainText(), u'&');
             break;
         }
     }
@@ -665,6 +844,14 @@ void RawJsonTextEditor::writeSourceEditor(int format) {
 
         case HTML: {
             ui->sourceEdit->setPlainText(ui->textEdit->toHtml());
+            break;
+        }
+        case FormattingCodes: {
+            ui->sourceEdit->setPlainText(toFormattingCodes());
+            break;
+        }
+        case AmpFormattingCodes: {
+            ui->sourceEdit->setPlainText(toFormattingCodes(u'&'));
             break;
         }
     }

@@ -29,6 +29,14 @@ namespace Command {
         m_span = text;
     }
 
+    const Schema::Node *ParseNode::schemaNode() const {
+        return m_schemaNode;
+    }
+
+    void ParseNode::setSchemaNode(const Schema::Node *newSchemaNode) {
+        m_schemaNode = newSchemaNode;
+    }
+
     void ParseNode::setLength(int length) {
         m_span = length;
     }

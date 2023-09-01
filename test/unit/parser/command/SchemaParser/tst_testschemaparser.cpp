@@ -21,6 +21,7 @@ private slots:
     void parseDouble();
     void parseFloat();
     void parseInteger();
+    void parseLong();
     void parseString();
     void useRegexToParseStringLiteral();
     void useRegexToParseStringLiteral2();
@@ -39,7 +40,7 @@ TestSchemaParser::~TestSchemaParser() {
 }
 
 void TestSchemaParser::initTestCase() {
-    SchemaParser::setSchema(":/minecraft/1.15/summary/commands/data.min.json");
+    SchemaParser::loadSchema(":/minecraft/1.15/summary/commands/data.min.json");
     Command::SchemaParser::setTestMode(true);
 }
 
@@ -108,6 +109,18 @@ void TestSchemaParser::parseInteger() {
     QCOMPARE(result->parserType(), ArgumentNode::ParserType::Integer);
     QCOMPARE(result->text(), "66771508");
     QCOMPARE(result->value(), 66771508);
+}
+
+void TestSchemaParser::parseLong() {
+    SchemaParser             parser("-9223372036854775807");
+    QSharedPointer<LongNode> result(
+        parser.brigadier_long({ { "max", 1000000 } }));
+
+    QVERIFY(result->isValid());
+    QCOMPARE(result->kind(), ParseNode::Kind::Argument);
+    QCOMPARE(result->parserType(), ArgumentNode::ParserType::Long);
+    QCOMPARE(result->text(), "-9223372036854775807");
+    QCOMPARE(result->value(), -9223372036854775807);
 }
 
 void TestSchemaParser::parseString() {
@@ -462,13 +475,15 @@ void TestSchemaParser::qStringViewToDec() {
     QVERIFY(!ok);
 
     QBENCHMARK {
-        QStringView(u"127").toShort(&ok);
-        QStringView(u"1234").toShort(&ok);
-        QStringView(u"-2147483648").toInt(&ok);
-        QStringView(u"78187493520").toLongLong(&ok);
-        QStringView(u"0").toInt(&ok);
-        QStringView(u"4g").toInt(&ok);
-        QStringView(u"142857").toShort(&ok);
+        [[maybe_unused]] const auto ret1 = QStringView(u"127").toShort(&ok);
+        [[maybe_unused]] const auto ret2 = QStringView(u"1234").toShort(&ok);
+        [[maybe_unused]] const auto ret3 =
+            QStringView(u"78187493520").toLongLong(&ok);
+        [[maybe_unused]] const auto ret4 =
+            QStringView(u"-2147483648").toInt(&ok);
+        [[maybe_unused]] const auto ret5 = QStringView(u"0").toInt(&ok);
+        [[maybe_unused]] const auto ret6 = QStringView(u"4g").toInt(&ok);
+        [[maybe_unused]] const auto ret7 = QStringView(u"142857").toShort(&ok);
     }
 }
 

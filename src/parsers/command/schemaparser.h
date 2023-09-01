@@ -77,13 +77,13 @@ T strToDec(QStringView v, bool &ok) {
 
 namespace Command {
     class SchemaParser : public Parser {
-        Q_GADGET
+        Q_DECLARE_TR_FUNCTIONS(Parser)
 
 public:
         SchemaParser();
         using Parser::Parser;
 
-        static void setSchema(const QString &filepath);
+        static void setSchema(Schema::RootNode *schema);
         static void loadSchema(const QString &filepath);
         static Schema::RootNode * schema();
 
@@ -95,6 +95,8 @@ public:
         QSharedPointer<Command::IntegerNode> brigadier_integer(
             const QVariantMap &props = {});
         QSharedPointer<Command::LiteralNode> brigadier_literal();
+        QSharedPointer<Command::LongNode> brigadier_long(
+            const QVariantMap &props = {});
         QSharedPointer<Command::StringNode> brigadier_string(
             const QVariantMap &props = {});
 
@@ -120,6 +122,7 @@ protected:
 
         QString peekLiteral() const;
         QStringView getLiteralString();
+        QStringView getDigits();
 
         QPair<QStringView, int> parseInteger(bool &ok);
         QPair<QStringView, float> parseFloat(bool &ok);
@@ -195,7 +198,7 @@ private:
         QSharedPointer<Command::RootNode> m_tree;
 //        static inline const QRegularExpression m_decimalNumRegex{
 //            QStringLiteral(R"([+-]?(?:\d+\.\d+|\.\d+|\d+\.|\d+))") };
-        static inline Schema::RootNode m_schemaGraph;
+        static inline Schema::RootNode *m_schemaGraph = nullptr;
 
         const QString commandGuideStr(const Schema::Node *schemaNode);
     };

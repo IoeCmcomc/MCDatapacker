@@ -3,6 +3,7 @@
 
 #include <QVariantList>
 #include <QDebug>
+#include <QCoreApplication>
 
 #include <stdexcept>
 
@@ -11,21 +12,15 @@ using StringHash = QHash<QStringView, QString>;
 
 //using StringHash = QSet<QString>;
 
-#ifndef QLATIN1STRING_OPERATOR
-QLatin1String constexpr operator ""_QL1(const char *literal, size_t size) {
-    return QLatin1String(literal, size);
-}
-#define QLATIN1STRING_OPERATOR
-#endif
-
 QLatin1Char constexpr operator ""_QL1(const char chr) {
     return QLatin1Char(chr);
 }
 
 class Parser {
-    Q_GADGET
+    Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
     class Error : public std::runtime_error {
+        Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
         int pos           = 0;
         int length        = 1;
@@ -45,21 +40,13 @@ public:
     using Errors = QVector<Error>;
 
     Parser();
-    explicit Parser(const QString &text) : m_srcText(text) {
-        m_text = m_srcText;
-        setPos(0);
-    };
-    explicit Parser(QString &&text) : m_srcText(text) {
-        m_text = m_srcText;
-        setPos(0);
-    };
+    explicit Parser(const QString &text);;
+    explicit Parser(QString &&text);;
 
     int pos() const;
     void setPos(int newPos);
 
-    QChar inline curChar() const {
-        return m_curChar;
-    }
+    QChar curChar() const;
 
     QString text() const;
     QStringView textView() const;
@@ -101,8 +88,9 @@ protected:
     void advance(int n = 1);
     QStringView advanceView(QStringView sv);
 
-    bool expect(QChar chr);
-    QString eat(QChar chr, EatOptions options = NoOption);
+    bool expect(QChar chr, const char *errMsg = nullptr);
+    QString eat(QChar chr, const char *errMsg = nullptr,
+                EatOptions options            = NoOption);
     QStringView getUntil(QChar chr);
     QStringView getRest();
     QStringView getWithCharset(const QString &charset);
