@@ -222,7 +222,7 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
             } else if (trimmed[0] == u'#') {
                 ++m_commentLines;
                 continue;
-            } else if (trimmed[0] == u'$' && Game::version() >= Game::v1_20_2) {
+            } else if (trimmed[0] == u'$' && Game::version() >= Game::v1_20) {
                 continue;
             }
 

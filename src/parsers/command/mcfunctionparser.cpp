@@ -33,7 +33,7 @@ namespace Command {
                 tree->append(SpanPtr::create(spanText(line), true));
                 validLineCount++;
             } else if (trimmed[0] == u'$'
-                       && m_commandParser.gameVer >= Game::v1_20_2) {
+                       && m_commandParser.gameVer >= Game::v1_20) {
                 tree->append(SpanPtr::create(spanText(line), true));
                 validLineCount++;
             } else {
