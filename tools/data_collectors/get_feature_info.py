@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Commands/locate')
+req = urllib.request.urlopen('https://minecraft.wiki/w/Commands/locate')
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 table = ids_soup.find("table", class_="wikitable")
