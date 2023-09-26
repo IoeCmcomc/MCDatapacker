@@ -11,9 +11,9 @@ def find_tr_tags(tag):
     return (tag.name == "tr") and (tag.th is None) \
            and (("upcoming" not in tag.find("td").text) or ("only" in tag.find("td").text))
 
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Java_Edition_data_values/Blocks') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Java_Edition_data_values/Blocks') 
 ids_soup = BeautifulSoup(req.read(), "lxml")
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Template:InvSprite') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Template:InvSprite') 
 icons_soup = BeautifulSoup(req.read(), "lxml")
 
 regex = re.compile(r"-(\d+)px -(\d+)px")

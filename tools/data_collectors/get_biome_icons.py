@@ -5,7 +5,7 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Biome/ID') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Biome/ID') 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 h1 = ids_soup.find("h1")
