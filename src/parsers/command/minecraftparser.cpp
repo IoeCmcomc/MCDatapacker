@@ -1387,7 +1387,13 @@ namespace Command {
 
     QSharedPointer<ScoreboardSlotNode> MinecraftParser::
     minecraft_scoreboardSlot() {
-        const QString &&slot = oneOf(staticSuggestions<ScoreboardSlotNode>);
+        QString slot;
+
+        if (gameVer >= QVersionNumber(1, 20, 2)) {
+            slot = oneOf(staticSuggestions_ScoreboardSlotNode_v1_20_2);
+        } else {
+            slot = oneOf(staticSuggestions<ScoreboardSlotNode>);
+        }
 
         if (!slot.isEmpty()) {
             return QSharedPointer<ScoreboardSlotNode>::create(spanText(slot),

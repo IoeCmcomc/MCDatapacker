@@ -72,7 +72,12 @@ namespace Command {
     }
 
     void CompletionProvider::visit(ScoreboardSlotNode *) {
-        m_suggestions += toStringVec(staticSuggestions<ScoreboardSlotNode>);
+        if (Game::version() >= Game::v1_20_2) {
+            m_suggestions += toStringVec(
+                staticSuggestions_ScoreboardSlotNode_v1_20_2);
+        } else {
+            m_suggestions += toStringVec(staticSuggestions<ScoreboardSlotNode>);
+        }
     }
 
     void CompletionProvider::visit(TemplateMirrorNode *) {

@@ -145,6 +145,17 @@ namespace Command {
         "list"_QL1,
     };
 
+    template<uint N>
+    constexpr auto changeArrayValue(std::array<QLatin1String, N> arr,
+                                    const int i, QLatin1String str) {
+        arr[i] = str;
+        return arr;
+    }
+
+    constexpr std::array staticSuggestions_ScoreboardSlotNode_v1_20_2 =
+        changeArrayValue(staticSuggestions<ScoreboardSlotNode>, 0,
+                         "below_name"_QL1);
+
     template<>
     constexpr std::array staticSuggestions<TemplateMirrorNode> = {
         "none"_QL1, "front_back"_QL1, "left_right"_QL1,
