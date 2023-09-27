@@ -2,8 +2,11 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 
-req = urllib.request.urlopen('https://minecraft.wiki/w/Attribute')
-ids_soup = BeautifulSoup(req.read(), "html.parser")
+req = urllib.request.Request(
+    url='https://minecraft.wiki/w/Attribute',
+    headers={'User-Agent': 'Mozilla/5.0'}
+)
+ids_soup = BeautifulSoup(urllib.request.urlopen(req).read(), "lxml")
 
 info = dict()
 

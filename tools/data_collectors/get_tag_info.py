@@ -3,8 +3,11 @@ from bs4 import BeautifulSoup
 import json
 from pathlib import Path
 
-req = urllib.request.urlopen('https://minecraft.wiki/w/Tag') 
-soup = BeautifulSoup(req.read(), "html.parser")
+req = urllib.request.Request(
+    url='https://minecraft.wiki/w/Tag',
+    headers={'User-Agent': 'Mozilla/5.0'}
+)
+soup = BeautifulSoup(urllib.request.urlopen(req).read(), "lxml")
 
 h3 = soup.find("span", id="Java_Edition_2").parent
 print(h3.name)
