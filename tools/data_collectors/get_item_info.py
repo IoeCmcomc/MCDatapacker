@@ -1,16 +1,9 @@
-import urllib.request
-from bs4 import BeautifulSoup
 import re
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
-from types import GeneratorType
 import json
-
-def find_tr_tags(tag):
-    return (tag.name == "tr") and (tag.th is None) \
-           and (("upcoming" not in tag.find("td").text) or ("only" in tag.find("td").text))
-
+from commons import get_soup, find_tr_tags, Request, urlopen
 
 def get_icon_info(id: str, alt_name: str = None, name: str = None):
     global icons
@@ -24,10 +17,8 @@ def get_icon_info(id: str, alt_name: str = None, name: str = None):
         icons.append((alt_name if alt_name else id, pos,))
 
 
-req = urllib.request.urlopen("https://minecraft.wiki/w/Java_Edition_data_values/Items")
-ids_soup = BeautifulSoup(req.read(), "lxml")
-req = urllib.request.urlopen('https://minecraft.wiki/w/Template:ItemSprite') 
-icons_soup = BeautifulSoup(req.read(), "lxml")
+ids_soup = get_soup("https://minecraft.wiki/w/Java_Edition_data_values/Items")
+icons_soup = get_soup('https://minecraft.wiki/w/Template:ItemSprite')
 
 regex = re.compile(r"-(\d+)px -(\d+)px")
 
@@ -52,8 +43,9 @@ get_icon_info("uncraftable-potion", "potion")
 get_icon_info("uncraftable-splash-potion", "splash_potion")
 get_icon_info("uncraftable-lingering-potion", "lingering_potion")
 
-sheet_url = "https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f5/ItemCSS.png/revision/latest?cb=20230607112659"
-with urllib.request.urlopen(sheet_url) as url:
+sheet_url = "https://minecraft.wiki/images/ItemCSS.png"
+req = Request(sheet_url, headers={'User-Agent': 'Mozilla/5.0'})
+with urlopen(req) as url:
     f = BytesIO(url.read())
 sheet_img = Image.open(f)
 

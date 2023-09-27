@@ -1560,5 +1560,9 @@
         <file>texture/item/ward_armor_trim_smithing_template.png</file>
         <file>texture/item/wayfinder_armor_trim_smithing_template.png</file>
         <file>texture/item/wild_armor_trim_smithing_template.png</file>
+        <file>texture/item/bamboo_chest_raft.png</file>
+        <file>texture/item/bamboo_raft.png</file>
+        <file>texture/item/cherry_boat.png</file>
+        <file>texture/item/cherry_chest_boat.png</file>
     </qresource>
 </RCC>
