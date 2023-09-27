@@ -2,7 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Attribute')
+req = urllib.request.urlopen('https://minecraft.wiki/w/Attribute')
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 info = dict()

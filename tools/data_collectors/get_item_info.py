@@ -24,9 +24,9 @@ def get_icon_info(id: str, alt_name: str = None, name: str = None):
         icons.append((alt_name if alt_name else id, pos,))
 
 
-req = urllib.request.urlopen("https://minecraft.fandom.com/wiki/Java_Edition_data_values/Items")
+req = urllib.request.urlopen("https://minecraft.wiki/w/Java_Edition_data_values/Items")
 ids_soup = BeautifulSoup(req.read(), "lxml")
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Template:ItemSprite') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Template:ItemSprite') 
 icons_soup = BeautifulSoup(req.read(), "lxml")
 
 regex = re.compile(r"-(\d+)px -(\d+)px")

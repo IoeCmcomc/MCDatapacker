@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Java_Edition_data_values/Effects') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Java_Edition_data_values/Effects') 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 h1 = ids_soup.find("h1")

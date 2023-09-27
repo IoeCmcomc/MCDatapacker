@@ -68,4 +68,4 @@ This program is not affiliated with [Mojang Studios](www.minecraft.net).
 
 All Minecraft textures and other materials are copyrighted by Mojang Studios.
 
-Some content in the program is from [Minecraft Wiki](https://minecraft.fandom.com/wiki/Minecraft_Wiki), whose content (except Mojang-owned images, art, and lore) is licensed under the CC BY-NC-SA 3.0 license.
+Some content in the program is from [Minecraft Wiki](https://minecraft.wiki/w/Minecraft_Wiki), whose content (except Mojang-owned images, art, and lore) is licensed under the CC BY-NC-SA 3.0 license.

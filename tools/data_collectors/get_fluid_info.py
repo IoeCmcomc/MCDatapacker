@@ -2,7 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 
-req = urllib.request.urlopen('https://minecraft.gamepedia.com/Java_Edition_data_values') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Java_Edition_data_values') 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 h3 = ids_soup.find("span", id="Fluids").parent

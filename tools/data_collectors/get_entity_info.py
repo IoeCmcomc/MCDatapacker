@@ -2,7 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 
-req = urllib.request.urlopen("https://minecraft.gamepedia.com/Java_Edition_data_values/Entities") 
+req = urllib.request.urlopen("https://minecraft.wiki/w/Java_Edition_data_values/Entities") 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 def find_tr_tags(tag):

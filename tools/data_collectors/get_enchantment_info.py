@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import re
 
-req = urllib.request.urlopen('https://minecraft.fandom.com/wiki/Java_Edition_data_values') 
+req = urllib.request.urlopen('https://minecraft.wiki/w/Java_Edition_data_values') 
 ids_soup = BeautifulSoup(req.read(), "html.parser")
 
 h3 = ids_soup.find("span", id="Enchantments").parent
