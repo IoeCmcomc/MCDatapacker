@@ -21,6 +21,7 @@ class VisualRecipeEditorDock;
 class LootTableEditorDock;
 class PredicateDock;
 class ItemModifierDock;
+class AdvancementTabDock;
 class StatusBar;
 
 namespace libqdark {
@@ -100,6 +101,7 @@ private:
     LootTableEditorDock *lootTableEditorDock         = nullptr;
     PredicateDock *predicateDock                     = nullptr;
     ItemModifierDock *itemModifierDock               = nullptr;
+    AdvancementTabDock *advancementsDock             = nullptr;
     libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;

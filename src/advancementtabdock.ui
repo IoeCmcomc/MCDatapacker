@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdvancementTabDock</class>
+ <widget class="QDockWidget" name="AdvancementTabDock">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>513</width>
+    <height>363</height>
+   </rect>
+  </property>
+  <property name="allowedAreas">
+   <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::TopDockWidgetArea</set>
+  </property>
+  <property name="windowTitle">
+   <string>Advancements viewer</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>6</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>6</number>
+    </property>
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <item row="0" column="0" rowspan="3">
+     <widget class="QTabWidget" name="tabWidget"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="QToolButton" name="addTabBtn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>+</string>
+      </property>
+      <property name="icon">
+       <iconset theme="list-add">
+        <normaloff>.</normaloff>.</iconset>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>258</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="1">
+     <widget class="QToolButton" name="reloadBtn">
+      <property name="toolTip">
+       <string>Reload advancements</string>
+      </property>
+      <property name="text">
+       <string>⟳</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

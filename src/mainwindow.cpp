@@ -13,6 +13,7 @@
 #include "loottableeditordock.h"
 #include "predicatedock.h"
 #include "itemmodifierdock.h"
+#include "advancementtabdock.h"
 #include "statisticsdialog.h"
 #include "rawjsontexteditor.h"
 #include "darkfusionstyle.h"
@@ -132,6 +133,12 @@ void MainWindow::initDocks() {
     predicateDock = new PredicateDock(this);
     addDockWidget(Qt::RightDockWidgetArea, predicateDock);
     predicateDock->hide();
+
+    advancementsDock = new AdvancementTabDock(this);
+    addDockWidget(Qt::BottomDockWidgetArea, advancementsDock);
+    advancementsDock->hide();
+    connect(advancementsDock, &AdvancementTabDock::openFileRequested,
+            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
 
     if (Game::version() >= Game::v1_17) {
         itemModifierDock = new ItemModifierDock(this);
@@ -596,7 +603,6 @@ void MainWindow::loadFolder(const QString &dirPath,
         this->fileWatcher.removePath(curDir.path());
         this->fileWatcher.addPath(curDir.path());
     }
-    emit curDirChanged(dirPath);
     ui->tabbedInterface->clear();
     updateWindowTitle(false);
     m_packInfo = packInfo;
@@ -608,6 +614,10 @@ void MainWindow::loadFolder(const QString &dirPath,
 #ifndef QT_NO_CURSOR
     QGuiApplication::restoreOverrideCursor();
 #endif
+
+    emit curDirChanged(dirPath);
+
+    advancementsDock->loadAdvancements();
 }
 
 bool MainWindow::folderIsVaild(const QDir &dir, bool reportError) {

@@ -31,6 +31,9 @@ win32:DEFINES *= QT_USE_QSTRINGBUILDER
 
 SOURCES += \
     aboutdialog.cpp \
+    advancementitem.cpp \
+    advancementtab.cpp \
+    advancementtabdock.cpp \
     basecondition.cpp \
     blockitemselectordialog.cpp \
     codeeditor.cpp \
@@ -57,6 +60,7 @@ SOURCES += \
     itemconditiondialog.cpp \
     itemmodifierdock.cpp \
     jsonhighlighter.cpp \
+    layouttreenode.cpp \
     linenumberarea.cpp \
     locationconditiondialog.cpp \
     loottablecondition.cpp \
@@ -137,6 +141,9 @@ SOURCES += \
 HEADERS += \
     aboutdialog.h \
     abstracttextobjectdialog.h \
+    advancementitem.h \
+    advancementtab.h \
+    advancementtabdock.h \
     basecondition.h \
     blockitemselectordialog.h \
     codeeditor.h \
@@ -163,6 +170,7 @@ HEADERS += \
     itemconditiondialog.h \
     itemmodifierdock.h \
     jsonhighlighter.h \
+    layouttreenode.h \
     linenumberarea.h \
     locationconditiondialog.h \
     loottablecondition.h \
@@ -243,6 +251,7 @@ HEADERS += \
 
 FORMS += \
     aboutdialog.ui \
+    advancementtabdock.ui \
     blockitemselectordialog.ui \
     datawidgetinterface.ui \
     disclaimerdialog.ui \

@@ -1564,5 +1564,8 @@
         <file>texture/item/bamboo_raft.png</file>
         <file>texture/item/cherry_boat.png</file>
         <file>texture/item/cherry_chest_boat.png</file>
+        <file>texture/advancement/regular_challenge.png</file>
+        <file>texture/advancement/regular_goal.png</file>
+        <file>texture/advancement/regular_task.png</file>
     </qresource>
 </RCC>
