@@ -1567,5 +1567,12 @@
         <file>texture/advancement/regular_challenge.png</file>
         <file>texture/advancement/regular_goal.png</file>
         <file>texture/advancement/regular_task.png</file>
+        <file>texture/block/pitcher_crop.png</file>
+        <file>texture/inv_item/cherry_log.png</file>
+        <file>texture/inv_item/cherry_wood.png</file>
+        <file>texture/inv_item/decorated_pot.png</file>
+        <file>texture/inv_item/Sculk.png</file>
+        <file>texture/inv_item/stripped_cherry_log.png</file>
+        <file>texture/inv_item/stripped_cherry_wood.png</file>
     </qresource>
 </RCC>

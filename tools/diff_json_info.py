@@ -63,7 +63,7 @@ def getInfoDiff(filename: str, firstVer: str):
 
 pp(getInfoDiff('attribute', '1.20'))
 # pp(getInfoDiff('biome', '1.20'))
-# pp(getInfoDiff('block', '1.20'))
+pp(getInfoDiff('block', '1.19'))
 #pp(getInfoDiff('dimension', '1.17'))
 #pp(getInfoDiff('effect', '1.18.2'))
 #pp(getInfoDiff('enchantment', '1.18.2'))

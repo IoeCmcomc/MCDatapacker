@@ -1,9 +1,16 @@
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup, Tag
+from PIL import Image
+from io import BytesIO
 
 def get_soup(url: str) -> BeautifulSoup:
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     return BeautifulSoup(urlopen(req).read(), "lxml")
+
+def get_image_online(url: str) -> Image:
+    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urlopen(req) as url:
+        return Image.open(BytesIO(url.read()))
 
 def find_tr_tags(tag):
     return (tag.name == "tr") and (tag.find('th', recursive=False) is None) \
@@ -14,3 +21,4 @@ def get_html(tag: Tag) -> str:
     for child in tag.children:
         html += str(child)
     return html
+    
