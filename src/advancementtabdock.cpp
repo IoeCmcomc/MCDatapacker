@@ -22,6 +22,8 @@ AdvancementTabDock::AdvancementTabDock(QWidget *parent) :
             loadAdvancements();
         }
     });
+    connect(ui->reloadBtn, &QToolButton::clicked, this,
+            &AdvancementTabDock::loadAdvancements);
 }
 
 AdvancementTabDock::~AdvancementTabDock() {
@@ -41,7 +43,9 @@ void AdvancementTabDock::loadAdvancements() {
         return;
     }
 
-    for (int i = ui->tabWidget->count(); i >= 0; --i) {
+    qApp->setOverrideCursor(Qt::WaitCursor);
+
+    for (int i = ui->tabWidget->count() - 1; i >= 0; --i) {
         ui->tabWidget->widget(i)->deleteLater();
         ui->tabWidget->removeTab(i);
     }
@@ -155,6 +159,8 @@ void AdvancementTabDock::loadAdvancements() {
                 this, &AdvancementTabDock::openFileRequested);
         ui->tabWidget->addTab(tab, id);
     }
+
+    qApp->restoreOverrideCursor();
 }
 
 void AdvancementTabDock::changeEvent(QEvent *e) {
