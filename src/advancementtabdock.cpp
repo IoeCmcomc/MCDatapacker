@@ -13,6 +13,15 @@
 AdvancementTabDock::AdvancementTabDock(QWidget *parent) :
     QDockWidget(parent), ui(new Ui::AdvancementTabDock) {
     ui->setupUi(this);
+    hide();
+
+    connect(this, &QDockWidget::visibilityChanged, this,
+            [this](const bool visible) {
+        if (visible && m_pendingLoad) {
+            m_pendingLoad = false;
+            loadAdvancements();
+        }
+    });
 }
 
 AdvancementTabDock::~AdvancementTabDock() {
@@ -26,6 +35,11 @@ void AdvancementTabDock::loadAdvancements() {
         { "goal",      AdvancemDisplayInfo::FrameType::Goal      },
         { "challenge", AdvancemDisplayInfo::FrameType::Challenge },
     };
+
+    if (isHidden()) {
+        m_pendingLoad = true;
+        return;
+    }
 
     for (int i = ui->tabWidget->count(); i >= 0; --i) {
         ui->tabWidget->widget(i)->deleteLater();

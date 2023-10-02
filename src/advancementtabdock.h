@@ -43,6 +43,8 @@ protected:
 
 private:
     Ui::AdvancementTabDock *ui;
+
+    bool m_pendingLoad = false;
 };
 
 #endif // ADVANCEMENTTABDOCK_H

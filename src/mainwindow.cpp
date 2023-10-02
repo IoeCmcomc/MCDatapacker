@@ -136,7 +136,6 @@ void MainWindow::initDocks() {
 
     advancementsDock = new AdvancementTabDock(this);
     addDockWidget(Qt::BottomDockWidgetArea, advancementsDock);
-    advancementsDock->hide();
     connect(advancementsDock, &AdvancementTabDock::openFileRequested,
             ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
 
