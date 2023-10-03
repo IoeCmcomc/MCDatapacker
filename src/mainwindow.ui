@@ -130,7 +130,7 @@
      <x>0</x>
      <y>0</y>
      <width>700</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -193,10 +193,20 @@
       <addaction name="actionNbtAutocomplete"/>
       <addaction name="actionCommandHelper"/>
       <addaction name="actionNbtTooltips"/>
+      <addaction name="actionCommand_Extractor"/>
+     </widget>
+     <widget class="QMenu" name="menuDistributionPlatforms">
+      <property name="title">
+       <string>&amp;Distribution platforms</string>
+      </property>
+      <addaction name="actionPlanetMinecraft"/>
+      <addaction name="actionModrinth"/>
+      <addaction name="actionSmithed"/>
      </widget>
      <addaction name="menuOnlineTools"/>
      <addaction name="menu_Offline_tools"/>
      <addaction name="menuMinecraft_mods"/>
+     <addaction name="menuDistributionPlatforms"/>
     </widget>
     <addaction name="menuExtResources"/>
     <addaction name="separator"/>
@@ -477,6 +487,26 @@
   <action name="actionMinecraft_Tools">
    <property name="text">
     <string>Minecraft Tools</string>
+   </property>
+  </action>
+  <action name="actionCommand_Extractor">
+   <property name="text">
+    <string>Command Extractor</string>
+   </property>
+  </action>
+  <action name="actionPlanetMinecraft">
+   <property name="text">
+    <string>Planet Minecraft</string>
+   </property>
+  </action>
+  <action name="actionModrinth">
+   <property name="text">
+    <string>Modrinth</string>
+   </property>
+  </action>
+  <action name="actionSmithed">
+   <property name="text">
+    <string>Smithed</string>
    </property>
   </action>
  </widget>

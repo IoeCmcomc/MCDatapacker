@@ -242,6 +242,15 @@ void MainWindow::initResourcesMenu() {
                           R"(https://github.com/SomeKitten/CommandHelper/)"));
     connectActionLink(ui->actionNbtTooltips, QStringLiteral(
                           R"(https://modrinth.com/mod/nbttooltips)"));
+    connectActionLink(ui->actionCommand_Extractor, QStringLiteral(
+                          R"(https://modrinth.com/mod/command_extractor)"));
+    // Datapack distribution platforms
+    connectActionLink(ui->actionPlanetMinecraft, QStringLiteral(
+                          R"(https://www.planetminecraft.com)"));
+    connectActionLink(ui->actionModrinth, QStringLiteral(
+                          R"(https://modrinth.com)"));
+    connectActionLink(ui->actionSmithed, QStringLiteral(
+                          R"(https://smithed.dev)"));
 }
 
 void MainWindow::open() {

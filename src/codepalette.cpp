@@ -146,7 +146,7 @@ const CodePalette defaultDarkCodePalette{
     { CP::Uuid, CharFormatBuilder().fg("#9c442f")->ok() },
     { CP::Comment, CharFormatBuilder().fg("#577D45")->ok() },
     { CP::Number, CharFormatBuilder().fg("#A2D4E8")->ok() },
-    { CP::QuotedString, CharFormatBuilder().fg("#B72E3A")->ok() },
+    { CP::QuotedString, CharFormatBuilder().fg("#b84f58")->ok() },
     { CP::CommandLiteral,
       CharFormatBuilder().fg(59, 120, 255)->bold(true)->ok() },
     { CP::BlockState_States, CharFormatBuilder().bg("#aa341123")->ok() },
