@@ -2,6 +2,8 @@
 
 #include <QGraphicsPixmapItem>
 
+#include <cmath>
+
 LayoutTreeNode::LayoutTreeNode(QGraphicsPixmapItem *newItem) : m_item{newItem} {
 }
 
@@ -89,11 +91,11 @@ QGraphicsPixmapItem * LayoutTreeNode::item() const {
     return m_item;
 }
 
-const int LayoutTreeNode::getCenterX() {
+int LayoutTreeNode::getCenterX() const {
     return item()->x() + item()->pixmap().width() / 2;
 }
 
-const int LayoutTreeNode::getCenterY() {
+int LayoutTreeNode::getCenterY() const {
     return item()->y() + item()->pixmap().height() / 2;
 }
 

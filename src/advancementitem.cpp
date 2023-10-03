@@ -13,19 +13,26 @@ AdvancementItem::AdvancementItem(const AdvancemDisplayInfo &advancem,
     QPixmap frame;
     switch (advancem.frameType) {
         case FrameType::Task: {
-            frame.load(":/minecraft/texture/advancement/regular_task.png");
+            static const QPixmap task{
+                QLatin1String(":/minecraft/texture/advancement/regular_task.png") };
+            frame = task;
             break;
         }
         case FrameType::Goal: {
-            frame.load(":/minecraft/texture/advancement/regular_goal.png");
+            static const QPixmap goal{
+                QLatin1String(":/minecraft/texture/advancement/regular_goal.png") };
+            frame = goal;
             break;
         }
         case FrameType::Challenge: {
-            frame.load(
-                ":/minecraft/texture/advancement/regular_challenge.png");
+            static const QPixmap challenge{
+                QLatin1String(
+                    ":/minecraft/texture/advancement/regular_challenge.png") };
+            frame = challenge;
             break;
         }
     }
+
     {
         QPainter painter{ &frame };
         painter.drawPixmap(10, 10, advancem.displayIcon);
@@ -39,7 +46,7 @@ AdvancementItem::AdvancementItem(const AdvancemDisplayInfo &advancem,
 }
 
 int AdvancementItem::type() const {
-    return QGraphicsItem::UserType + 1;
+    return AdvancementItem::Type;
 }
 
 void AdvancementItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {

@@ -1,7 +1,6 @@
 #include "advancementtabdock.h"
 #include "ui_advancementtabdock.h"
 
-#include "advancementtab.h"
 #include "inventoryitem.h"
 
 #include "globalhelpers.h"
@@ -44,11 +43,6 @@ void AdvancementTabDock::loadAdvancements() {
     }
 
     qApp->setOverrideCursor(Qt::WaitCursor);
-
-    for (int i = ui->tabWidget->count() - 1; i >= 0; --i) {
-        ui->tabWidget->widget(i)->deleteLater();
-        ui->tabWidget->removeTab(i);
-    }
 
     // Read all showable advancements
 
@@ -151,13 +145,27 @@ void AdvancementTabDock::loadAdvancements() {
     }
 
     // Populate advancement tabs
-
     for (const auto &id: qAsConst(rootAdvancements)) {
-        auto *tab = new AdvancementTab();
-        tab->setRootAdvancement(std::move(advancements.at(id)), id);
-        connect(tab, &AdvancementTab::openFileRequested,
-                this, &AdvancementTabDock::openFileRequested);
-        ui->tabWidget->addTab(tab, id);
+        if (m_tabs.contains(id)) {
+            m_tabs.value(id)->setRootAdvancement(std::move(advancements.at(id)),
+                                                 id);
+        } else {
+            auto *tab = new AdvancementTab();
+            tab->setRootAdvancement(std::move(advancements.at(id)), id);
+            connect(tab, &AdvancementTab::openFileRequested,
+                    this, &AdvancementTabDock::openFileRequested);
+            ui->tabWidget->addTab(tab, id);
+            m_tabs[id] = tab;
+        }
+    }
+    for (auto it = m_tabs.begin(); it != m_tabs.end();) {
+        if (!rootAdvancements.contains(it.key())) {
+            ui->tabWidget->removeTab(ui->tabWidget->indexOf(it.value()));
+            it.value()->deleteLater();
+            it = m_tabs.erase(it);
+        } else {
+            ++it;
+        }
     }
 
     qApp->restoreOverrideCursor();

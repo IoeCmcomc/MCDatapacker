@@ -1,26 +1,10 @@
 #ifndef ADVANCEMENTTABDOCK_H
 #define ADVANCEMENTTABDOCK_H
 
+#include "advancementtab.h"
+
 #include <QDockWidget>
 #include <QJsonValue>
-
-struct AdvancemDisplayInfo {
-    enum class FrameType: char {
-        Task,
-        Goal,
-        Challenge,
-    };
-
-    QPixmap                                displayIcon;
-    std::map<QString, AdvancemDisplayInfo> children;
-    QJsonValue                             title;
-    QJsonValue                             description;
-    QString                                backgroundPath;
-    QString                                parent;
-    FrameType                              frameType = FrameType::Task;
-    bool                                   missing   = false;
-    bool                                   hidden    = false;
-};
 
 namespace Ui {
     class AdvancementTabDock;
@@ -44,6 +28,7 @@ protected:
 private:
     Ui::AdvancementTabDock *ui;
 
+    QMap<QString, AdvancementTab *> m_tabs;
     bool m_pendingLoad = false;
 };
 

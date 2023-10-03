@@ -1,12 +1,31 @@
 #ifndef ADVANCEMENTTAB_H
 #define ADVANCEMENTTAB_H
 
-#include "advancementtabdock.h"
+#include "layouttreenode.h"
 
 #include <QGraphicsView>
+#include <QJsonValue>
 
 class LayoutTreeNode;
 class AdvancementItem;
+
+struct AdvancemDisplayInfo {
+    enum class FrameType: char {
+        Task,
+        Goal,
+        Challenge,
+    };
+
+    QPixmap                                displayIcon;
+    std::map<QString, AdvancemDisplayInfo> children;
+    QJsonValue                             title;
+    QJsonValue                             description;
+    QString                                backgroundPath;
+    QString                                parent;
+    FrameType                              frameType = FrameType::Task;
+    bool                                   missing   = false;
+    bool                                   hidden    = false;
+};
 
 class AdvancementTab : public QGraphicsView {
     Q_OBJECT
@@ -18,12 +37,15 @@ public:
 signals:
     void openFileRequested(const QString &filePath);
 
+protected:
+    void showEvent(QShowEvent *event) final;
+
 private:
     AdvancemDisplayInfo m_rootAdvancement;
     QGraphicsScene m_scene;
-    QVector<AdvancementItem *> m_items;
-    std::unique_ptr<LayoutTreeNode> m_layoutTree = nullptr;
+    std::unique_ptr<LayoutTreeNode> m_layoutTree;
     QString m_rootAdvancemId;
+    bool m_pendingLoad = false;
 
     LayoutTreeNode * addAdvancement(
         const AdvancemDisplayInfo &advancem, const QString &id);

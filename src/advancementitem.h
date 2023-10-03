@@ -1,7 +1,7 @@
 #ifndef ADVANCEMENTITEM_H
 #define ADVANCEMENTITEM_H
 
-#include "advancementtabdock.h"
+#include "advancementtab.h"
 
 #include <QGraphicsPixmapItem>
 
@@ -10,6 +10,8 @@ public:
     AdvancementItem(const AdvancemDisplayInfo &advancem, const QString &id);
 
     int type() const final;
+
+    static constexpr int Type = QGraphicsItem::UserType + 1;
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) final;

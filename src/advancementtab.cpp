@@ -9,6 +9,7 @@
 AdvancementTab::AdvancementTab(QWidget *parent) : QGraphicsView(parent) {
     setScene(&m_scene);
     setDragMode(QGraphicsView::ScrollHandDrag);
+    setCacheMode(QGraphicsView::CacheBackground);
 }
 
 void AdvancementTab::setRootAdvancement(AdvancemDisplayInfo &&advancem,
@@ -16,9 +17,20 @@ void AdvancementTab::setRootAdvancement(AdvancemDisplayInfo &&advancem,
     m_rootAdvancement = advancem;
     m_rootAdvancemId  = id;
 
-    m_layoutTree =
-        std::unique_ptr<LayoutTreeNode>(addAdvancement(advancem, id));
+    if (isHidden()) {
+        m_pendingLoad = true;
+        return;
+    }
+
     arrangeItems();
+}
+
+void AdvancementTab::showEvent(QShowEvent *event) {
+    QGraphicsView::showEvent(event);
+    if (m_pendingLoad) {
+        m_pendingLoad = false;
+        arrangeItems();
+    }
 }
 
 LayoutTreeNode * AdvancementTab::addAdvancement(
@@ -26,7 +38,6 @@ LayoutTreeNode * AdvancementTab::addAdvancement(
     auto *item = new AdvancementItem(advancem, id);
 
     m_scene.addItem(item);
-    m_items += item;
 
     auto *layoutNode = new LayoutTreeNode(item);
 
@@ -38,15 +49,15 @@ LayoutTreeNode * AdvancementTab::addAdvancement(
 }
 
 void AdvancementTab::arrangeItems() {
-//    constexpr int xSpacing = 4;
-//    int           x        = 0;
+    m_scene.clear();
 
-//    for (auto *item: qAsConst(m_items)) {
-//        item->setPos(x, 0);
-//        x += item->pixmap().width() + xSpacing;
-//    }
+    m_layoutTree =
+        std::unique_ptr<LayoutTreeNode>(addAdvancement(m_rootAdvancement,
+                                                       m_rootAdvancemId));
+
     m_layoutTree->update();
     drawConnections(m_layoutTree.get());
+    m_scene.setSceneRect(m_scene.itemsBoundingRect());
 }
 
 void AdvancementTab::drawConnections(LayoutTreeNode *node) {

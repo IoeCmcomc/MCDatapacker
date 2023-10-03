@@ -17,9 +17,6 @@ class LayoutTreeNode {
  * https://github.com/llimllib/pymag-trees/blob/master/buchheim.py
  */
 public:
-    static constexpr int xSpacing = 8;
-    static constexpr int ySpacing = 8;
-
     LayoutTreeNode(QGraphicsPixmapItem *newItem);
 
     LayoutTreeNode * get(int i);
@@ -45,10 +42,13 @@ public:
     void update();
 
     QGraphicsPixmapItem * item() const;
-    const int getCenterX();
-    const int getCenterY();
+    int getCenterX() const;
+    int getCenterY() const;
 
     std::vector<std::unique_ptr<LayoutTreeNode> > &children();
+
+    static constexpr int xSpacing = 8;
+    static constexpr int ySpacing = 8;
 
 private:
     std::vector<std::unique_ptr<LayoutTreeNode> > m_children;
