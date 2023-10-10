@@ -11,7 +11,7 @@ namespace Command {
 
 class McfunctionHighlighter : public Highlighter {
 public:
-    using FormatRanges = QVector<QVector<QTextLayout::FormatRange> >;
+    using FormatRanges = QVector<QTextLayout::FormatRange>;
 
     explicit McfunctionHighlighter(QTextDocument *parent,
                                    Command::McfunctionParser *parser = nullptr);
@@ -23,13 +23,16 @@ protected slots:
     void rehighlightDelayed() final;
 
 private:
-    void setupRules();
-
     QVector<HighlightingRule> highlightingRules;
-    FormatRanges m_formats;
+    QVector<FormatRanges> m_formats;
 
     Command::McfunctionParser *m_parser = nullptr;
     int m_curChangedBlockIndex          = 0;
+
+    void setupRules();
+    static QVector<FormatRanges> splitRangesToLines(
+        const FormatRanges &ranges, QVector<int> &breakPositions,
+        const int offset = 0);
 };
 
 #endif /* MCFUNCTIONHIGHLIGHTER_H */

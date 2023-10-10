@@ -8,6 +8,15 @@
 #include <QAbstractTextDocumentLayout>
 #include <QDebug>
 
+
+QDebug operator<<(QDebug debug, const QTextLayout::FormatRange &value) {
+    QDebugStateSaver saver(debug);
+
+    debug.nospace() << "FormatRange(" << value.start << ", " << value.length <<
+        ')';
+    return debug;
+}
+
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
                                              Command::McfunctionParser *parser)
     : Highlighter(parent), m_parser(parser) {
@@ -70,7 +79,7 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
 }
 
 void McfunctionHighlighter::rehighlightChangedBlocks() {
-    const auto &&blocks = changedBlocks();
+    const auto &blocks = changedBlocks();
 
     if (blocks.isEmpty()) {
         return;
@@ -88,30 +97,149 @@ void McfunctionHighlighter::rehighlightChangedBlocks() {
     m_curChangedBlockIndex = 0;
 }
 
+QVector<Command::FormatRanges> McfunctionHighlighter::splitRangesToLines(
+    const FormatRanges &ranges, QVector<int> &breakPositions,
+    const int offset) {
+    QVector<Command::FormatRanges> lines;
+    Command::FormatRanges          currentLine;
+
+    for (const auto& range : ranges) {
+        int       rangeStart  = range.start;
+        int       rangeLength = range.length;
+        const int rangeEnd    = rangeStart + rangeLength - 1;
+
+        while (!breakPositions.isEmpty()
+               && breakPositions.first() + offset <= rangeEnd) {
+            int nextBreak = breakPositions.takeFirst() + offset;
+            if (nextBreak < 0) {
+                continue;
+            }
+            if (nextBreak > rangeStart) {
+                currentLine.append({ rangeStart, nextBreak - rangeStart,
+                                     range.format });
+                rangeLength -= nextBreak - rangeStart;
+                rangeStart   = nextBreak;
+            }
+            Q_ASSERT(!currentLine.isEmpty());
+            lines << currentLine;
+            currentLine.clear();
+        }
+        currentLine.append({ rangeStart, rangeLength, range.format });
+    }
+
+    if (!currentLine.isEmpty()) {
+        lines << currentLine;
+    }
+
+    return lines;
+}
+
 void McfunctionHighlighter::rehighlightDelayed() {
     Q_ASSERT(m_parser != nullptr);
 
     const auto &&result      = m_parser->syntaxTree();
     const auto &&resultLines = result->lines();
-    const auto &&blocks      = changedBlocks();
+    auto        &blocks      = changedBlocks();
+    Q_ASSERT(!blocks.isEmpty());
+
+    auto block = blocks.front();
+    while (block.isValid() &&
+           (result->sourceMapper().logicalLines.indexOf(block.blockNumber()) ==
+            -1)) {
+        block = block.previous();
+        blocks.prepend(std::move(block));
+    }
+    block = blocks.back();
+    while (block.isValid() && block.text().trimmed().endsWith('\\')) {
+        block = block.next();
+        blocks << std::move(block);
+    }
+
     m_formats.resize(blocks.size());
     Command::NodeFormatter formatter(m_palette);
 
-    int i = -1;
+    int    i              = -1;
+    auto &&breakPositions =
+        result->sourceMapper().backslashMap.keys().toVector();
     for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
+        const int lineNumber = result->sourceMapper().logicalLines.indexOf(
+            iter->blockNumber());
+        if (lineNumber == -1) {
+            continue;
+        }
         ++i;
         const QString &&lineText   = iter->text();
-        auto           *lineResult = resultLines[iter->blockNumber()].get();
+        auto           *lineResult = resultLines[lineNumber].get();
         if (lineResult->kind() == Command::ParseNode::Kind::Root) {
             Command::SourcePrinter printer;
             printer.startVisiting(lineResult);
             if (printer.source() != lineText) {
                 // qDebug() << lineText;
-                qDebug() << printer.source();
+//                qDebug() << printer.source();
             }
 
             formatter.startVisiting(lineResult);
-            m_formats[i] = formatter.formatRanges();
+            const auto &backslashMap =
+                result->sourceMapper().backslashMap;
+            const auto &ranges = formatter.formatRanges();
+            if (!backslashMap.empty()) {
+                const auto &posMapping =
+                    result->sourceMapper().logicalPositions;
+
+                int blockPos = iter->position();
+                if (!posMapping.isEmpty()
+                    && blockPos >= posMapping.cbegin().key()) {
+                    auto &&nearest = posMapping.upperBound(iter->position());
+                    if (nearest != posMapping.begin()) {
+                        nearest--;
+                    }
+                    blockPos += nearest.value() - nearest.key();
+                }
+
+                auto &&splitedRanges = splitRangesToLines(
+                    ranges, breakPositions, -blockPos);
+
+                const bool hasSingleLine = splitedRanges.size() == 1;
+                if (hasSingleLine) {
+                    m_formats[i] = ranges;
+                } else {
+                    bool isFirstLine = true;
+
+                    int wsOffset = 0;
+                    for (auto &line: splitedRanges) {
+                        if (!isFirstLine && (iter != blocks.cend())) {
+                            ++iter;
+
+                            auto it = backslashMap.find(
+                                result->sourceMapper().logicalPositions.value(
+                                    iter->position()));
+                            if (it != backslashMap.end()) {
+                                wsOffset = it->trivia.length() - 2;
+                            }
+                        }
+                        int firstPos = line.first().start;
+
+                        for (auto &range: line) {
+                            if (!isFirstLine) {
+                                range.start -= firstPos;
+                                range.start += wsOffset;
+                            }
+                            if (range != line.last()) {
+                                range.length += 1;
+                            }
+                        }
+                        if (isFirstLine) {
+                            isFirstLine = false;
+                        }
+                    }
+                    for (int j = 0; j < splitedRanges.size(); ++j) {
+                        m_formats[i + j] = splitedRanges.at(j);
+                    }
+                    i += splitedRanges.size() - 1;
+                }
+            } else {
+                m_formats[i] = ranges;
+            }
             formatter.reset();
         }
     }

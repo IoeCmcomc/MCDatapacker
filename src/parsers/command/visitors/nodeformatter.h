@@ -19,9 +19,10 @@
 #include <QTextLayout>
 
 namespace Command {
-    class NodeFormatter : public OverloadNodeVisitor {
-        using FormatRange = QTextLayout::FormatRange;
+    using FormatRange  = QTextLayout::FormatRange;
+    using FormatRanges = QVector<FormatRange>;
 
+    class NodeFormatter : public OverloadNodeVisitor {
 public:
         explicit NodeFormatter(const CodePalette &palette);
 
@@ -390,11 +391,11 @@ public:
             m_pos += node->length() + node->trailingTrivia().length();
         }
 
-        QVector<FormatRange> formatRanges() const;
+        FormatRanges formatRanges() const;
         void reset();
 
 private:
-        QVector<FormatRange> m_formatRanges;
+        FormatRanges m_formatRanges;
         CodePalette m_palette;
         int m_pos = 0;
 

@@ -29,7 +29,7 @@ namespace Command {
         m_span = text;
     }
 
-    const Schema::Node *ParseNode::schemaNode() const {
+    const Schema::Node * ParseNode::schemaNode() const {
         return m_schemaNode;
     }
 

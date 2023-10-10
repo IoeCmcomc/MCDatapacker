@@ -90,6 +90,9 @@ protected:
 
     void highlightBlock(const QString &text) override;
     void mergeFormat(int start, int count, const QTextCharFormat &fmt);
+    QVector<QTextBlock> &changedBlocks() {
+        return m_changedBlocks;
+    }
     virtual void rehighlightDelayed() {
     };
 

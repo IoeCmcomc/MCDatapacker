@@ -368,34 +368,27 @@ void CodeEditor::handleKeyPressEvent(QKeyEvent *e) {
 void CodeEditor::startCompletion(const QString &completionPrefix) {
     if (m_completer->popup()->isHidden()) {
         qDebug() << "Combining final completions";
-        //            QVector<QString> completionInfo = minecraftCompletionInfo;
-
-        //            const QVector<QString> &&idList = Glhp::fileIdList(
-        //                QDir::currentPath(), QString(), QString(), false);
-        //            for (const auto &item: idList) {
-        //                completionInfo << item;
-        //            }
-
-        //            std::sort(completionInfo.begin(), completionInfo.end());
-        //            completionInfo.erase(std::unique(completionInfo.begin(),
-        //                                             completionInfo.end()),
-        //                                 completionInfo.end());
 
         QVector<QString> completionInfo;
         if (const auto *parser =
                 dynamic_cast<Command::McfunctionParser *>(m_parser.get())) {
-            const int curLine   = textCursor().blockNumber();
-            const int posInLine = textCursor().positionInBlock();
+            const auto &logicalLines =
+                parser->syntaxTree()->sourceMapper().logicalLines;
+            if (logicalLines.contains(textCursor().blockNumber())) {
+                const int curLine = logicalLines.indexOf(
+                    textCursor().blockNumber());
+                const int posInLine = textCursor().positionInBlock();
 
-            if (auto *line = parser->syntaxTree()->at(curLine).get();
-                line->kind() == Command::ParseNode::Kind::Root) {
-                Command::CompletionProvider suggester{ posInLine };
-                suggester.startVisiting(line);
-                completionInfo = suggester.suggestions();
-                std::sort(completionInfo.begin(), completionInfo.end());
-                completionInfo.erase(std::unique(completionInfo.begin(),
-                                                 completionInfo.end()),
-                                     completionInfo.end());
+                if (auto *line = parser->syntaxTree()->at(curLine).get();
+                    line->kind() == Command::ParseNode::Kind::Root) {
+                    Command::CompletionProvider suggester{ posInLine };
+                    suggester.startVisiting(line);
+                    completionInfo = suggester.suggestions();
+                    std::sort(completionInfo.begin(), completionInfo.end());
+                    completionInfo.erase(std::unique(completionInfo.begin(),
+                                                     completionInfo.end()),
+                                         completionInfo.end());
+                }
             }
         }
 

@@ -4,6 +4,18 @@
 #include "parsenode.h"
 
 namespace Command {
+    struct SourceMapper {
+        struct Info {
+            int     pos;
+            QString trivia;
+        };
+
+        QMap<int, Info> backslashMap;      // Map logical positions to physical backslash positions
+        QMap<int, int>  physicalPositions; // Map logical positions to physical positions
+        QMap<int, int>  logicalPositions;  // Map physical positions to logical positions
+        QVector<int>    logicalLines;      // Indexes are logical line numbers, values are their physical line numbers
+    };
+
     class FileNode : public ParseNode {
 public:
         using Lines = QVector<NodePtr>;
@@ -29,9 +41,15 @@ public:
 
         Lines lines() const;
 
+        SourceMapper &sourceMapper();
+        void setSourceMapper(SourceMapper &&newSrcMapper);
+
 private:
+        SourceMapper m_srcMapper;
         Lines m_lines;
     };
 }
+
+QDebug operator<<(QDebug debug, const Command::SourceMapper::Info &value);
 
 #endif // FILENODE_H

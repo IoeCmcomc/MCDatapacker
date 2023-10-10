@@ -7,7 +7,7 @@ namespace Command {
         OverloadNodeVisitor(LetTheVisitorDecide), m_palette{palette} {
     }
 
-    QVector<QTextLayout::FormatRange> NodeFormatter::formatRanges() const {
+    FormatRanges NodeFormatter::formatRanges() const {
         return m_formatRanges;
     }
 
