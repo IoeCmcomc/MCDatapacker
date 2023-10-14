@@ -150,7 +150,7 @@ namespace Command {
                 state =
                     trimmed.endsWith(u'\\') ? State::Comment : State::Command;
             } else if ((trimmed[0] == u'$'
-                        && m_commandParser.gameVer >= Game::v1_20)
+                        && m_commandParser.gameVer >= Game::v1_20_2)
                        || state == State::Macro) {
                 tree->append(SpanPtr::create(spanText(splitter.getCurrLine()),
                                              true));
@@ -161,7 +161,10 @@ namespace Command {
             } else {
                 Q_ASSERT(state == State::Command);
                 NodePtr     command;
-                const auto &logicalLine = splitter.nextLogicalLine();
+                const auto &logicalLine =
+                    (m_commandParser.gameVer >= Game::v1_20_2)
+                    ? splitter.nextLogicalLine()
+                    : splitter.getCurrLine();
 //                qDebug() << "logicalLine" << logicalLine;
 #ifdef MCFUNCTIONPARSER_USE_CACHE
                 CacheKey key{ typeId, logicalLine };

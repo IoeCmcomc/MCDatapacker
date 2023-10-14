@@ -16,7 +16,9 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
 
     const auto &&gameVer = Game::version();
 
-    if (gameVer >= Game::v1_20)
+    if (gameVer >= Game::v1_20_2)
+        ui->formatInput->setValue(18);
+    else if (gameVer >= Game::v1_20)
         ui->formatInput->setValue(15);
     else if (gameVer >= Game::v1_19_4)
         ui->formatInput->setValue(12);
@@ -63,12 +65,10 @@ NewDatapackDialog::~NewDatapackDialog() {
 
 void NewDatapackDialog::browse() {
     QString &&dir =
-        QFileDialog::getExistingDirectory(this,
-                                          tr(
-                                              "Choose folder to create new datapack"),
-                                          QString(),
-                                          QFileDialog::ShowDirsOnly |
-                                          QFileDialog::DontResolveSymlinks);
+        QFileDialog::getExistingDirectory(
+            this, tr("Choose folder to create new datapack"),
+            QString(),
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     if (!dir.isEmpty())
         ui->locationInput->setText(dir);
@@ -79,7 +79,7 @@ void NewDatapackDialog::checkOK() {
 }
 
 void NewDatapackDialog::onFormatSpinChanged(const int format) {
-    constexpr int        maxFormat                     = 15;
+    constexpr int        maxFormat                     = 18;
     const static QString formatReleases[maxFormat + 1] = {
         {},
         {},
@@ -96,7 +96,10 @@ void NewDatapackDialog::onFormatSpinChanged(const int format) {
         QStringLiteral("1.19.4"),
         {},
         {},
-        QStringLiteral("1.20–1.20.1")
+        QStringLiteral("1.20–1.20.1"),
+        {},
+        {},
+        QStringLiteral("1.20.2"),
     };
 
     Q_ASSERT(format >= 0);
