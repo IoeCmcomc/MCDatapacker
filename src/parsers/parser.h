@@ -40,8 +40,10 @@ public:
     using Errors = QVector<Error>;
 
     Parser();
-    explicit Parser(const QString &text);;
-    explicit Parser(QString &&text);;
+    explicit Parser(const QString &text);
+    explicit Parser(QString &&text);
+    virtual ~Parser() {
+    };
 
     int pos() const;
     void setPos(int newPos);

@@ -3,9 +3,7 @@
 
 #include "mainwindow.h"
 #include "globalhelpers.h"
-#include "game.h"
-#include "parsers/command/minecraftparser.h"
-#include "parsers/command/visitors/sourceprinter.h"
+#include "parsers/command/mcfunctionparser.h"
 #include "platforms/windows_specific.h"
 
 #include <QDirIterator>
@@ -13,6 +11,8 @@
 #include <QTableWidgetItem>
 #include <QOperatingSystemVersion>
 #include <QElapsedTimer>
+#include <QTextDocument>
+#include <QTextBlock>
 
 
 StatisticsDialog::StatisticsDialog(MainWindow *parent) :
@@ -26,7 +26,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
                                    QDir::current().dirName(),
                                    m_mainWin->getPackInfo().description));
 
-    m_parser = new Command::MinecraftParser();
+    m_parser = new Command::McfunctionParser();
 
     QElapsedTimer timer;
     timer.start();
@@ -206,38 +206,45 @@ void StatisticsDialog::collectAndSetupData() {
 }
 
 void StatisticsDialog::collectFunctionData(const QString &path) {
-    QFile file(path);
+    QString text;
 
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
+    if (QFile file(path); file.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream in(&file);
         in.setCodec("UTF-8");
 
-        int i = 0;
-        while (!in.atEnd()) {
-            ++i;
-            const QString &&line    = in.readLine();
-            const auto     &trimmed = line.trimmed();
-            if (trimmed.isEmpty()) {
-                continue;
-            } else if (trimmed[0] == u'#') {
-                ++m_commentLines;
-                continue;
-            } else if (trimmed[0] == u'$' && Game::version() >= Game::v1_20) {
-                continue;
-            }
+        text = in.readAll();
+    }
 
-            m_parser->setText(QStringView(line));
-            const auto &result = m_parser->parse();
-            if (result->isValid()) {
-                m_nodeCounter.startVisiting(result.get());
-                ++m_commandLines;
-
-                if (result->kind() == Command::ParseNode::Kind::Root) {
-                    Command::SourcePrinter printer;
-                    printer.startVisiting(result.get());
-                    if (printer.source() != line) {
-                        qDebug() << path << i;
-                        qDebug() << printer.source();
+    if (!text.isNull()) {
+        Q_ASSERT(m_parser != nullptr);
+        m_parser->parse(text);
+        if (m_parser->errors().isEmpty()) {
+            if (m_parser->syntaxTree()->isValid()) {
+                for (const auto &logiLine: m_parser->syntaxTree()->lines()) {
+                    switch (logiLine->kind()) {
+                        case Command::ParseNode::Kind::Span: {
+                            const auto span =
+                                static_cast<Command::SpanNode *>(logiLine.get());
+                            const auto &trimmed = span->text().trimmed();
+                            if (trimmed.isEmpty()) {
+                                continue;
+                            } else if (trimmed.front() == '#'_QL1) {
+                                ++m_commentLines;
+                                continue;
+                            } else if (trimmed.front() == '$'_QL1) {
+                                continue;
+                            }
+                        }
+                        case Command::ParseNode::Kind::Root: {
+                            const auto root =
+                                static_cast<Command::RootNode *>(logiLine.get());
+                            if (root->isValid()) {
+                                m_nodeCounter.startVisiting(root);
+                                ++m_commandLines;
+                            }
+                        }
+                        default: {
+                        }
                     }
                 }
             } else {
@@ -247,19 +254,28 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                     row, 0,
                     new QTableWidgetItem(Glhp::relPath(m_dirPath, path)));
                 ui->syntaxErrorTable->setItem(
-                    row, 1, new QTableWidgetItem(QString::number(i)));
-                if (m_parser->errors().isEmpty()) {
-                    ui->syntaxErrorTable->setItem(row, 2, new QTableWidgetItem(
-                                                      "Invalid command"));
-                } else {
-                    ui->syntaxErrorTable->setItem(
-                        row, 2, new QTableWidgetItem(
-                            m_parser->errors().constLast().toLocalizedMessage()));
-                }
-
+                    row, 1, new QTableWidgetItem("1"));
+                ui->syntaxErrorTable->setItem(0, 2, new QTableWidgetItem(
+                                                  tr("Invalid command")));
+                ++m_syntaxErrors;
+            }
+        } else {
+            const auto  doc    = std::make_unique<QTextDocument>(text);
+            const auto &errors = m_parser->errors();
+            for (const auto &error: errors) {
+                const int row = ui->syntaxErrorTable->rowCount();
+                ui->syntaxErrorTable->insertRow(row);
+                const int line = doc->findBlock(error.pos).blockNumber() + 1;
+                ui->syntaxErrorTable->setItem(
+                    row, 0,
+                    new QTableWidgetItem(Glhp::relPath(m_dirPath, path)));
+                ui->syntaxErrorTable->setItem(
+                    row, 1, new QTableWidgetItem(QString::number(line)));
+                ui->syntaxErrorTable->setItem(
+                    row, 2, new QTableWidgetItem(
+                        error.toLocalizedMessage()));
                 ++m_syntaxErrors;
             }
         }
     }
-    file.close();
 }

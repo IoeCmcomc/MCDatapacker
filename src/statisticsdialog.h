@@ -11,7 +11,7 @@ namespace Ui {
 }
 
 namespace Command {
-    class MinecraftParser;
+    class McfunctionParser;
 };
 
 class MainWindow;
@@ -40,8 +40,8 @@ private:
     QVector<SyntaxErrorInfo> m_syntaxErrorsInfo;
     QString m_dirPath;
     Ui::StatisticsDialog *ui;
-    MainWindow *m_mainWin              = nullptr;
-    Command::MinecraftParser *m_parser = nullptr;
+    MainWindow *m_mainWin               = nullptr;
+    Command::McfunctionParser *m_parser = nullptr;
     Command::NodeCounter m_nodeCounter;
     uint m_commandLines = 0;
     uint m_commentLines = 0;

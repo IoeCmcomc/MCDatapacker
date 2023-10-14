@@ -5,7 +5,7 @@
 #include "nodes/filenode.h"
 
 namespace Command {
-    class McfunctionParser : public Parser {
+    class McfunctionParser final : public Parser {
 public:
         enum class State {
             Command,
@@ -14,6 +14,8 @@ public:
         };
 
         McfunctionParser();
+        ~McfunctionParser() {
+        };
 
         QSharedPointer<FileNode> syntaxTree() const;
 
