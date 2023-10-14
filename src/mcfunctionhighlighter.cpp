@@ -142,18 +142,24 @@ void McfunctionHighlighter::rehighlightDelayed() {
     auto        &blocks      = changedBlocks();
     Q_ASSERT(!blocks.isEmpty());
 
+//    qDebug() << "Initial range:" << blocks.first().blockNumber() << '-' <<
+//        blocks.last().blockNumber();
+
     auto block = blocks.front();
-    while (block.isValid() &&
-           (result->sourceMapper().logicalLines.indexOf(block.blockNumber()) ==
-            -1)) {
+    while (block.isValid()
+           && (result->sourceMapper().logicalLinesIndexOf(block.blockNumber())
+               == -1)) {
         block = block.previous();
         blocks.prepend(std::move(block));
     }
     block = blocks.back();
-    while (block.isValid() && block.text().trimmed().endsWith('\\')) {
+    while (block.isValid() && canConcatenate(block.text().trimmed())) {
         block = block.next();
         blocks << std::move(block);
     }
+
+//    qDebug() << "Final range:" << blocks.first().blockNumber() << '-' <<
+//        blocks.last().blockNumber();
 
     m_formats.resize(blocks.size());
     Command::NodeFormatter formatter(m_palette);
@@ -162,7 +168,9 @@ void McfunctionHighlighter::rehighlightDelayed() {
     auto &&breakPositions =
         result->sourceMapper().backslashMap.keys().toVector();
     for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
-        const int lineNumber = result->sourceMapper().logicalLines.indexOf(
+//        qDebug() << "Block" << iter->blockNumber() << "at pos" <<
+//            iter->position() << "text:" << iter->text();
+        const int lineNumber = result->sourceMapper().logicalLinesIndexOf(
             iter->blockNumber());
         if (lineNumber == -1) {
             continue;
@@ -174,7 +182,7 @@ void McfunctionHighlighter::rehighlightDelayed() {
             Command::SourcePrinter printer;
             printer.startVisiting(lineResult);
             if (printer.source() != lineText) {
-                // qDebug() << lineText;
+//                qDebug() << lineText;
 //                qDebug() << printer.source();
             }
 

@@ -7,6 +7,12 @@
 namespace Command {
     class McfunctionParser : public Parser {
 public:
+        enum class State {
+            Command,
+            Comment,
+            Macro,
+        };
+
         McfunctionParser();
 
         QSharedPointer<FileNode> syntaxTree() const;

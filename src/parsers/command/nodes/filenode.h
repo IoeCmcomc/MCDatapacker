@@ -14,6 +14,21 @@ namespace Command {
         QMap<int, int>  physicalPositions; // Map logical positions to physical positions
         QMap<int, int>  logicalPositions;  // Map physical positions to logical positions
         QVector<int>    logicalLines;      // Indexes are logical line numbers, values are their physical line numbers
+
+        static int binarySearchIndexOf(const QVector<int> &container,
+                                       const int value) {
+            const auto &&it =
+                std::lower_bound(container.cbegin(), container.cend(), value);
+
+            if (it != container.cend() && *it == value) {
+                return it - container.cbegin();
+            }
+            return -1;
+        }
+
+        int logicalLinesIndexOf(const int pos) const {
+            return binarySearchIndexOf(logicalLines, pos);
+        }
     };
 
     class FileNode : public ParseNode {

@@ -372,11 +372,10 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
         QVector<QString> completionInfo;
         if (const auto *parser =
                 dynamic_cast<Command::McfunctionParser *>(m_parser.get())) {
-            const auto &logicalLines =
-                parser->syntaxTree()->sourceMapper().logicalLines;
-            if (logicalLines.contains(textCursor().blockNumber())) {
-                const int curLine = logicalLines.indexOf(
+            const int curLine =
+                parser->syntaxTree()->sourceMapper().logicalLinesIndexOf(
                     textCursor().blockNumber());
+            if (curLine != -1) {
                 const int posInLine = textCursor().positionInBlock();
 
                 if (auto *line = parser->syntaxTree()->at(curLine).get();
@@ -406,8 +405,8 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
     m_completer->popup()->setCurrentIndex(
         m_completer->completionModel()->index(0, 0));
 
-    qDebug() << m_completer->completionCount() << m_completer->model() <<
-        completionPrefix;
+//    qDebug() << m_completer->completionCount() << m_completer->model() <<
+//        completionPrefix;
 
     QRect     cr = cursorRect();
     const int prefixOffset

@@ -30,6 +30,9 @@ private:
     int m_curChangedBlockIndex          = 0;
 
     void setupRules();
+    static bool canConcatenate(const QString &line) {
+        return !line.isEmpty() && line.back() == QLatin1Char('\\');
+    };
     static QVector<FormatRanges> splitRangesToLines(
         const FormatRanges &ranges, QVector<int> &breakPositions,
         const int offset = 0);

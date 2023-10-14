@@ -9,13 +9,13 @@ public:
     LineSplitter(const QString &text) : m_text{text} {
     };
 
-    QStringView nextLineView() {
+    QStringView getCurrLineView() {
         const int pos = m_physPos;
 
         if (pos == m_text.length()) {
             m_physPos++;
             m_lineNo++;
-            return QString();
+            return QStringView();
         }
         const int   index = m_text.indexOf('\n', pos);
         QStringView view{ m_text };
@@ -31,6 +31,28 @@ public:
         }
     };
 
+    QString getCurrLine() {
+        const auto line = getCurrLineView();
+
+        m_srcMapper.logicalLines += m_lineNo;
+        m_logiPos                += line.length() + 1;
+        return line.toString();
+    }
+
+    QStringView peekCurrLineView() const {
+        if (m_physPos == m_text.length()) {
+            return QStringView();
+        }
+        const int   index = m_text.indexOf('\n', m_physPos);
+        QStringView view{ m_text };
+
+        if (index != -1) {
+            return view.mid(m_physPos, index - m_physPos);
+        } else {
+            return view.mid(m_physPos);
+        }
+    };
+
     bool hasNextLine() const {
         return m_physPos <= m_text.length();
     };
@@ -42,7 +64,7 @@ public:
                 m_srcMapper.logicalPositions[m_physPos]  = m_logiPos;
                 m_lastLineIsContinuation                 = false;
             }
-            QStringView line = nextLineView();
+            QStringView line = getCurrLineView();
             m_srcMapper.logicalLines += m_lineNo;
             QString logicalLine;
             if (canConcatenate(line)) {
@@ -58,7 +80,7 @@ public:
 
                     m_srcMapper.logicalPositions[m_physPos] = m_logiPos;
 
-                    line = nextLineView().trimmed();
+                    line = getCurrLineView().trimmed();
 
                     m_srcMapper.backslashMap[m_logiPos] = {
                         lastPhysPos,
@@ -75,7 +97,7 @@ public:
     };
 
     bool canConcatenate(QStringView line) {
-        return !line.isEmpty() && line.endsWith('\\');
+        return !line.isEmpty() && line.back() == QLatin1Char('\\');
     };
 
     Command::SourceMapper sourceMapper() const {
@@ -105,41 +127,52 @@ namespace Command {
 
         const auto &&tree           = QSharedPointer<FileNode>::create();
         const auto &&txt            = text(); // This prevent crash in release build
-        const auto &&lines          = QStringView(txt).split(QChar::LineFeed);
         int          validLineCount = 0;
 
         m_commandParser.m_spans = std::move(m_spans);
 
-        QElapsedTimer timer;
-        timer.start();
+//        QElapsedTimer timer;
+//        timer.start();
 
+        State        state = State::Command;
         LineSplitter splitter{ txt };
         while (splitter.hasNextLine()) {
             const int linePos = pos();
-//            const auto line    = splitter.nextLineView();
-            const auto line    = splitter.nextLogicalLine();
+//            qDebug() << "linePos" << linePos << splitter.peekCurrLineView();
+            const auto line    = splitter.peekCurrLineView();
             const auto trimmed = line.trimmed();
-            if (trimmed.isEmpty() || trimmed[0] == u'#') {
-                tree->append(SpanPtr::create(spanText(line), true));
+            if (trimmed.isEmpty() || trimmed[0] == u'#' ||
+                state == State::Comment) {
+                tree->append(SpanPtr::create(spanText(splitter.getCurrLine()),
+                                             true));
                 validLineCount++;
-            } else if (trimmed[0] == u'$'
-                       && m_commandParser.gameVer >= Game::v1_20) {
-                tree->append(SpanPtr::create(spanText(line), true));
+                advance(line.length() + 1);
+                state =
+                    trimmed.endsWith(u'\\') ? State::Comment : State::Command;
+            } else if ((trimmed[0] == u'$'
+                        && m_commandParser.gameVer >= Game::v1_20)
+                       || state == State::Macro) {
+                tree->append(SpanPtr::create(spanText(splitter.getCurrLine()),
+                                             true));
                 validLineCount++;
+                advance(line.length() + 1);
+                state =
+                    trimmed.endsWith(u'\\') ? State::Macro : State::Command;
             } else {
-                NodePtr command;
+                Q_ASSERT(state == State::Command);
+                NodePtr     command;
+                const auto &logicalLine = splitter.nextLogicalLine();
+//                qDebug() << "logicalLine" << logicalLine;
 #ifdef MCFUNCTIONPARSER_USE_CACHE
-//                QString &&lineText = line.toString();
-                const auto &lineText = line;
-                CacheKey    key{ typeId, lineText };
+                CacheKey key{ typeId, logicalLine };
                 if (!m_cache.contains(key)
                     || !(command = m_cache[key].lock())) {
 #endif
-                m_commandParser.setText(line);
+                m_commandParser.setText(logicalLine);
                 command = m_commandParser.parse();
 #ifdef MCFUNCTIONPARSER_USE_CACHE
                 if (command->isValid()) {
-                    m_cache.emplace(typeId, std::move(lineText),
+                    m_cache.emplace(typeId, std::move(logicalLine),
                                     WeakNodePtr(command));
                     validLineCount++;
                 }
@@ -157,26 +190,32 @@ namespace Command {
                     }
                 }
                 tree->append(std::move(command));
+                advance(logicalLine.length() + 1);
             }
-            advance(line.length() + 1);
         }
 
         const auto &&posMapping = splitter.sourceMapper().physicalPositions;
+//        qDebug() << posMapping << splitter.sourceMapper().backslashMap;
 
         if (!posMapping.empty()) {
             for (auto &error: m_errors) {
                 const int pos = error.pos;
+//                qDebug() << pos << posMapping.cbegin().key();
                 if (pos >= posMapping.cbegin().key()) {
                     auto &&nearest = posMapping.upperBound(pos);
                     if (nearest != posMapping.cbegin()) {
                         nearest--;
                     }
+//                    qDebug() << "nearest" << nearest.key() << nearest.value();
                     error.pos += nearest.value() - nearest.key();
+//                    qDebug() << "error.pos =" << pos << '+' <<
+//                        (nearest.value() - nearest.key()) << '=' << error.pos;
                 }
                 const int   endPos       = pos + error.length - 1;
                 const auto &backslashMap = splitter.sourceMapper().backslashMap;
                 for (auto it = backslashMap.lowerBound(pos);
                      it != backslashMap.upperBound(endPos); ++it) {
+//                    qDebug() << "backslash" << it.key() << it.value();
                     error.length += it.value().trivia.length();
                 }
             }
