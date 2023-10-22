@@ -120,11 +120,13 @@ void VisualRecipeEditorDock::retranslate() {
     if (Game::version() >= Game::v1_16)
         ui->customTabBar->setTabText(3, tr("Smithing"));
 
-    if (Game::version() >= Game::v1_19) {
+    if (Game::version() >= Game::v1_19_3) {
+        Q_ASSERT(m_craftCategories.rowCount() > 0);
         m_craftCategories.item(0)->setText(tr("Miscellaneous"));
         m_craftCategories.item(1)->setText(tr("Building"));
         m_craftCategories.item(2)->setText(tr("Equipment"));
         m_craftCategories.item(3)->setText(tr("Redstone"));
+        Q_ASSERT(m_smeltCategories.rowCount() > 0);
         m_smeltCategories.item(0)->setText(tr("Miscellaneous"));
         m_smeltCategories.item(1)->setText(tr("Blocks"));
         m_smeltCategories.item(2)->setText(tr("Food"));
