@@ -45,6 +45,7 @@ private:
     Command::NodeCounter m_nodeCounter;
     uint m_commandLines = 0;
     uint m_commentLines = 0;
+    uint m_macroLines   = 0;
     uint m_syntaxErrors = 0;
 
     void collectAndSetupData();

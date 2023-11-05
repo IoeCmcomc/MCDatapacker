@@ -172,7 +172,8 @@ Has load.json file: %2</string>
             <property name="text">
              <string>Number of commands: %1
 Number of comment lines: %2
-Number of syntax errors: %3</string>
+Number of macros: %3
+Number of syntax errors: %4</string>
             </property>
            </widget>
           </item>

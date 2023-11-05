@@ -2,9 +2,11 @@
 #include "ui_statisticsdialog.h"
 
 #include "mainwindow.h"
-#include "globalhelpers.h"
 #include "parsers/command/mcfunctionparser.h"
+#include "parsers/command/nodes/macronode.h"
+#include "globalhelpers.h"
 #include "platforms/windows_specific.h"
+#include "game.h"
 
 #include <QDirIterator>
 #include <QProgressDialog>
@@ -160,10 +162,12 @@ void StatisticsDialog::collectAndSetupData() {
     ui->fileTypesTable->setSortingEnabled(true);
 
     /* "Functions" tab */
-
-    ui->functionLabel->setText(ui->functionLabel->text().arg(
-                                   m_commandLines).arg(m_commentLines).arg(
-                                   m_syntaxErrors));
+    const QString &&macroStr = (Game::version() >= Game::v1_20_2)
+                                   ? QString::number(m_macroLines)
+                                   : tr("(not in this version)");
+    ui->functionLabel->setText(
+        ui->functionLabel->text().arg(m_commandLines).arg(m_commentLines).arg(
+            macroStr).arg(m_syntaxErrors));
 
     const auto &&selectorCounts = m_nodeCounter.targetSelectorCounts();
     using At = Command::TargetSelectorNode::Variable;
@@ -220,7 +224,8 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
         m_parser->parse(text);
         if (m_parser->errors().isEmpty()) {
             if (m_parser->syntaxTree()->isValid()) {
-                for (const auto &logiLine: m_parser->syntaxTree()->lines()) {
+                const auto &lines = m_parser->syntaxTree()->lines();
+                for (const auto &logiLine: lines) {
                     switch (logiLine->kind()) {
                         case Command::ParseNode::Kind::Span: {
                             const auto span =
@@ -230,10 +235,16 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                                 continue;
                             } else if (trimmed.front() == '#'_QL1) {
                                 ++m_commentLines;
-                                continue;
-                            } else if (trimmed.front() == '$'_QL1) {
-                                continue;
+                                break;
                             }
+                        }
+                        case Command::ParseNode::Kind::Macro: {
+                            const auto macro =
+                                static_cast<Command::MacroNode *>(logiLine.get());
+                            if (macro->isValid()) {
+                                ++m_macroLines;
+                            }
+                            break;
                         }
                         case Command::ParseNode::Kind::Root: {
                             const auto root =
