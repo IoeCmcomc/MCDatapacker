@@ -85,6 +85,12 @@ public:
             return m_cache.stats();
         }
 
+        void print() {
+            for (const auto entry: m_cache) {
+                qDebug() << entry.key().literalStr << entry.value();
+            }
+        }
+
 private:
         Cache m_cache;
     };

@@ -8,8 +8,7 @@
 
 namespace Command {
     template <class Base, typename T, ArgumentNode::ParserType PT>
-    class SingleValueNode : public Base
-    {
+    class SingleValueNode : public Base {
 public:
         SingleValueNode(const QString &text, const T &value,
                         const bool isValid = false)

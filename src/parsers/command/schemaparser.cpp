@@ -342,22 +342,6 @@ namespace Command {
     SchemaParser::SchemaParser() {
     }
 
-    /*!
-     * \brief Adds a \c Command::Parser::ParsingError with a formatted message
-     * to the error list and continue.
-     */
-    void SchemaParser::reportError(const char *msg, const QVariantList &args) {
-        reportError(msg, args, pos());
-    }
-
-    /*!
-     * \brief Add or throw an error based on current parser states.
-     */
-    void SchemaParser::reportError(const char *msg, const QVariantList &args,
-                                   int pos, int length) {
-        m_errors << Parser::Error(msg, pos, length, args);
-    }
-
     NodePtr SchemaParser::invokeMethod(ArgumentNode::ParserType parserType,
                                        const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;

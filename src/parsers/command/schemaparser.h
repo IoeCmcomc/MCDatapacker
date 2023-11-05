@@ -109,10 +109,6 @@ public:
 protected:
         static inline bool m_testMode = false;
 
-        void reportError(const char *msg, const QVariantList &args = {});
-        void reportError(const char *msg, const QVariantList &args,
-                         int pos, int length = 0);
-
         bool errorIfNot(const bool condition, const char *msg) {
             if (!condition) {
                 reportError(msg);

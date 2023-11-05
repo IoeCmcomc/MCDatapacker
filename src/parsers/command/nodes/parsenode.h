@@ -17,6 +17,8 @@ public:
             Error,
             Span, // Act as a token, not visitable
             File,
+            Macro,
+            MacroVariable,
             Root,
             Literal,
             Container, // Contains two or more nodes

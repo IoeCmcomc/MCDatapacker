@@ -16,6 +16,10 @@ QLatin1Char constexpr operator ""_QL1(const char chr) {
     return QLatin1Char(chr);
 }
 
+namespace Command {
+    class McfunctionParser;
+}
+
 class Parser {
     Q_DECLARE_TR_FUNCTIONS(Parser);
 public:
@@ -65,6 +69,7 @@ public:
 
     StringHash spans() const;
 
+    friend Command::McfunctionParser;
 
 protected:
     enum EatOption { // For use in eat() method
@@ -86,6 +91,10 @@ protected:
                                  int pos, int length = 0);
     void throwError [[noreturn]](const char *msg, const QVariantList &args,
                                  int pos, int length = 0);
+
+    void reportError(const char *msg, const QVariantList &args = {});
+    void reportError(const char *msg, const QVariantList &args,
+                     int pos, int length = 0);
 
     void advance(int n = 1);
     QStringView advanceView(QStringView sv);

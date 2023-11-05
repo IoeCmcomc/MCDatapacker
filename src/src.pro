@@ -77,6 +77,7 @@ SOURCES += \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/gamemodenode.cpp \
+    parsers/command/nodes/macronode.cpp \
     parsers/command/re2c_generated_functions.cpp \
     parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
@@ -197,6 +198,7 @@ HEADERS += \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
+    parsers/command/nodes/macronode.h \
     parsers/command/nodes/mapnode.h \
     parsers/command/nodes/nbtnodes.h \
     parsers/command/nodes/nbtpathnode.h \

@@ -142,6 +142,23 @@ void Parser::throwError(const char *msg, const QVariantList &args,
 }
 
 /*!
+ * \brief Adds a \c Command::Parser::ParsingError with a formatted message
+ * to the error list and continue.
+ */
+void Parser::reportError(const char *msg, const QVariantList &args) {
+    reportError(msg, args, pos());
+}
+
+/*!
+ * \brief Adds a \c Command::Parser::ParsingError with a formatted message
+ * to the error list and continue.
+ */
+void Parser::reportError(const char *msg, const QVariantList &args,
+                         int pos, int length) {
+    m_errors << Parser::Error(msg, pos, length, args);
+}
+
+/*!
  * \brief Advances \a n characters, then updates the current character.
  */
 void Parser::advance(int n) {

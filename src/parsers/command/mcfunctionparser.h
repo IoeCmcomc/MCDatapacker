@@ -5,6 +5,8 @@
 #include "nodes/filenode.h"
 
 namespace Command {
+    class MacroNode;
+
     class McfunctionParser final : public Parser {
 public:
         enum class State {
@@ -26,6 +28,9 @@ private:
         MinecraftParser m_commandParser;
         ParseNodeCache m_cache;
         QSharedPointer<FileNode> m_tree;
+
+        QSharedPointer<MacroNode> parseMacroLine(const QString &line,
+                                                 const int linePos);
     };
 }
 
