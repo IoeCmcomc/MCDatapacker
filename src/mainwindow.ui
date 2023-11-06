@@ -130,7 +130,7 @@
      <x>0</x>
      <y>0</y>
      <width>700</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -194,6 +194,7 @@
       <addaction name="actionCommandHelper"/>
       <addaction name="actionNbtTooltips"/>
       <addaction name="actionCommand_Extractor"/>
+      <addaction name="actionDatamancer"/>
      </widget>
      <widget class="QMenu" name="menuDistributionPlatforms">
       <property name="title">
@@ -507,6 +508,11 @@
   <action name="actionSmithed">
    <property name="text">
     <string>Smithed</string>
+   </property>
+  </action>
+  <action name="actionDatamancer">
+   <property name="text">
+    <string>Datamancer</string>
    </property>
   </action>
  </widget>

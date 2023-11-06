@@ -244,13 +244,15 @@ void MainWindow::initResourcesMenu() {
                           R"(https://modrinth.com/mod/nbttooltips)"));
     connectActionLink(ui->actionCommand_Extractor, QStringLiteral(
                           R"(https://modrinth.com/mod/command_extractor)"));
+    connectActionLink(ui->actionDatamancer, QStringLiteral(
+                          R"(https://modrinth.com/mod/datamancer)"));
     // Datapack distribution platforms
     connectActionLink(ui->actionPlanetMinecraft, QStringLiteral(
                           R"(https://www.planetminecraft.com)"));
     connectActionLink(ui->actionModrinth, QStringLiteral(
                           R"(https://modrinth.com)"));
     connectActionLink(ui->actionSmithed, QStringLiteral(
-                          R"(https://smithed.dev)"));
+                          R"(https://smithed.net)"));
 }
 
 void MainWindow::open() {
