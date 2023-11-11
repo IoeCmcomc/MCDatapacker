@@ -42,6 +42,12 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     if (Game::version() < Game::v1_19) {
         hideComboRow(ui->functionTypeCombo, SetInstrument);
     }
+    if (Game::version() < Game::v1_20) {
+        hideComboRow(ui->functionTypeCombo, Reference);
+    }
+    if (Game::version() < Game::v1_20_2) {
+        hideComboRow(ui->functionTypeCombo, Sequence);
+    }
 
     connect(ui->functionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
@@ -267,6 +273,16 @@ QJsonObject LootTableFunction::toJson() const {
                     root["name"] = name;
                 }
             }
+        }
+
+        case Sequence: { /* Set contents */
+            if (Game::version() >= Game::v1_20_2) {
+                const auto functions = ui->funcInterface->json();
+                if (!functions.isEmpty()) {
+                    root.insert("functions", functions);
+                }
+            }
+            break;
         }
 
         case SetAttributes: { /* Set attributes */
@@ -625,6 +641,17 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             }
         }
 
+        case Sequence: { /* Set contents */
+            if (Game::version() >= Game::v1_20_2) {
+                if (root.contains("functions")) {
+                    if (!ui->funcInterface->mainWidget())
+                        initFuncInterface();
+                    ui->funcInterface->setJson(root["functions"].toArray());
+                }
+            }
+            break;
+        }
+
         case SetAttributes: { /* Set attributes */
             if (!root.contains("modifiers"))
                 return;
@@ -909,6 +936,8 @@ void LootTableFunction::onTypeChanged(int index) {
         ui->stackedWidget->setCurrentIndex(index);
     if ((index == SetContents) && !ui->entryInterface->mainWidget())
         initEntryInterface();
+    else if ((index == Sequence) && !ui->funcInterface->mainWidget())
+        initFuncInterface();
 }
 
 void LootTableFunction::onTabChanged(int index) {
@@ -1054,6 +1083,16 @@ void LootTableFunction::initCondInterface() {
     ui->conditionsInterface->mapToSetter(
         cond, qOverload<const QJsonObject &>(&LootTableCondition::fromJson));
     ui->conditionsInterface->mapToGetter(&LootTableCondition::toJson, cond);
+}
+
+void LootTableFunction::initFuncInterface() {
+    auto *func = new LootTableFunction();
+
+    ui->funcInterface->setMainWidget(func);
+
+    ui->funcInterface->mapToSetter(
+        func, qOverload<const QJsonObject &>(&LootTableFunction::fromJson));
+    ui->funcInterface->mapToGetter(&LootTableFunction::toJson, func);
 }
 
 void LootTableFunction::initEntryInterface() {
