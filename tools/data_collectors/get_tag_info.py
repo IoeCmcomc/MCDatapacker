@@ -1,13 +1,13 @@
-import urllib.request
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
+from selenium import webdriver
 
-req = urllib.request.Request(
-    url='https://minecraft.wiki/w/Tag',
-    headers={'User-Agent': 'Mozilla/5.0'}
-)
-soup = BeautifulSoup(urllib.request.urlopen(req).read(), "lxml")
+driver = webdriver.ChromiumEdge()
+driver.get("https://minecraft.wiki/wiki/Tag")
+html = driver.page_source
+driver.quit()
+soup = BeautifulSoup(html, "lxml")
 
 h3 = soup.find("span", id="Java_Edition_2").parent
 print(h3.name)

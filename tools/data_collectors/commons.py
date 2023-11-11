@@ -2,10 +2,18 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup, Tag
 from PIL import Image
 from io import BytesIO
+from selenium import webdriver
 
 def get_soup(url: str) -> BeautifulSoup:
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     return BeautifulSoup(urlopen(req).read(), "lxml")
+
+def get_selenium_soup(url: str) -> BeautifulSoup:
+    driver = webdriver.ChromiumEdge()
+    driver.get(str)
+    soup = BeautifulSoup(driver.page_source, "lxml")
+    driver.quit()
+    return soup
 
 def get_image_online(url: str) -> Image:
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
