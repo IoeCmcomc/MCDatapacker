@@ -59,6 +59,7 @@ SOURCES += \
     inventorysloteditor.cpp \
     itemconditiondialog.cpp \
     itemmodifierdock.cpp \
+    jmchighlighter.cpp \
     jsonhighlighter.cpp \
     layouttreenode.cpp \
     linenumberarea.cpp \
@@ -170,6 +171,7 @@ HEADERS += \
     inventorysloteditor.h \
     itemconditiondialog.h \
     itemmodifierdock.h \
+    jmchighlighter.h \
     jsonhighlighter.h \
     layouttreenode.h \
     linenumberarea.h \

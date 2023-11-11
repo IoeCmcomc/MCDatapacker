@@ -3,8 +3,6 @@
 
 #include "highlighter.h"
 
-#include <QRegularExpression>
-
 class JsonHighlighter : public Highlighter {
 public:
     explicit JsonHighlighter(QTextDocument *parent);
@@ -13,7 +11,7 @@ protected:
     void highlightBlock(const QString &text) final;
 
 private:
-    QVector<HighlightingRule> highlightingRules;
+    HighlightingRules highlightingRules;
 
     void setupRules();
 };

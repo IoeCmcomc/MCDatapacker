@@ -136,6 +136,7 @@ public:
         Number,
         Separator,
         Identifier,
+        Directive,
         Macro,
         QuotedString,
         Bool_True,

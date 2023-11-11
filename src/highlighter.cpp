@@ -176,6 +176,26 @@ void Highlighter::highlightBlock(const QString &text) {
     }
 }
 
+void Highlighter::highlightUsingRules(const QString &text,
+                                      const HighlightingRules &rules) {
+    for (const HighlightingRule &rule : rules) {
+        QRegularExpressionMatchIterator matchIterator =
+            rule.pattern.globalMatch(text);
+        while (matchIterator.hasNext()) {
+            QRegularExpressionMatch match = matchIterator.next();
+            if (const int start = match.capturedStart(1); start != -1) {
+                // Only highlight the range of the first capturing group
+                setFormat(start, match.capturedLength(1),
+                          m_palette[rule.formatRole]);
+            } else {
+                // Highlight the whole match
+                setFormat(match.capturedStart(), match.capturedLength(),
+                          m_palette[rule.formatRole]);
+            }
+        }
+    }
+}
+
 void Highlighter::mergeFormat(int start, int count,
                               const QTextCharFormat &fmt) {
     for (int i = 0; i < count; ++i) {

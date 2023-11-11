@@ -4,8 +4,9 @@
 #include "globalhelpers.h"
 #include "fileswitcher.h"
 #include "mcfunctionhighlighter.h"
+#include "jmchighlighter.h"
 #include "jsonhighlighter.h"
-#include "game.h"
+//#include "game.h"
 #include "parsers/command/mcfunctionparser.h"
 #include "parsers/jsonparser.h"
 
@@ -214,17 +215,29 @@ void TabbedDocumentInterface::addFile(const QString &path) {
         auto *codeEditor = new CodeEditor(this);
         codeEditor->setPlainText(text);
 
-        if (newFile.fileType == CodeFile::Function) {
-            auto &&parser = std::make_unique<Command::McfunctionParser>();
-            codeEditor->setHighlighter(
-                new McfunctionHighlighter(codeEditor->document(),
-                                          parser.get()));
-            codeEditor->setParser(std::move(parser));
-        } else if (newFile.fileType >= CodeFile::JsonText
-                   && newFile.fileType < CodeFile::JsonText_end) {
+        if (newFile.fileType >= CodeFile::JsonText
+            && newFile.fileType < CodeFile::JsonText_end) {
             codeEditor->setHighlighter(new JsonHighlighter(codeEditor->
                                                            document()));
             codeEditor->setParser(std::make_unique<JsonParser>());
+        } else {
+            switch (newFile.fileType) {
+                case CodeFile::Function: {
+                    auto &&parser =
+                        std::make_unique<Command::McfunctionParser>();
+                    codeEditor->setHighlighter(
+                        new McfunctionHighlighter(codeEditor->document(),
+                                                  parser.get()));
+                    codeEditor->setParser(std::move(parser));
+                    break;
+                }
+                case CodeFile::Jmc: {
+                    codeEditor->setHighlighter(
+                        new JmcHighlighter(codeEditor->document()));
+                }
+                default: {
+                }
+            }
         }
 
         codeEditor->setFileType(newFile.fileType);

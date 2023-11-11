@@ -54,6 +54,7 @@ public:
     enum BlockState {
         Normal = -1,
         QuotedString,
+        MultilineString,
         Comment,
         MultilineComment,
     };
@@ -62,6 +63,8 @@ public:
         QRegularExpression pattern;
         CodePalette::Role  formatRole;
     };
+
+    using HighlightingRules = QVector<HighlightingRule>;
 
     explicit Highlighter(QTextDocument *parent);
 
@@ -89,6 +92,8 @@ protected:
     friend class CodeEditor;
 
     void highlightBlock(const QString &text) override;
+    void highlightUsingRules(const QString &text,
+                             const HighlightingRules &rules);
     void mergeFormat(int start, int count, const QTextCharFormat &fmt);
     QVector<QTextBlock> &changedBlocks() {
         return m_changedBlocks;

@@ -1,6 +1,6 @@
 #include "jsonhighlighter.h"
 
-#include <QDebug>
+#include <QRegularExpression>
 
 JsonHighlighter::JsonHighlighter(QTextDocument *parent)
     : Highlighter(parent) {
@@ -8,10 +8,9 @@ JsonHighlighter::JsonHighlighter(QTextDocument *parent)
 }
 
 void JsonHighlighter::setupRules() {
-    const QRegularExpression keywordPatterns("\\b(?:true|false|null)\\b");
-
-    highlightingRules.append({ keywordPatterns, CodePalette::Keyword });
-
+    highlightingRules.append({
+        QRegularExpression("\\b(?:true|false|null)\\b"),
+        CodePalette::Keyword });
     highlightingRules.append({
         QRegularExpression(
             R"(\b-?(?:[1-9]\d*|0)(?:\.\d+)?(:?[eE][+-]?\d+)?\b)"),
@@ -21,15 +20,6 @@ void JsonHighlighter::setupRules() {
 void JsonHighlighter::highlightBlock(const QString &text) {
     Highlighter::highlightBlock(text);
     if (this->document()) {
-        for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
-            QRegularExpressionMatchIterator matchIterator =
-                rule.pattern.globalMatch(text);
-            while (matchIterator.hasNext()) {
-                QRegularExpressionMatch match = matchIterator.next();
-                setFormat(match.capturedStart(),
-                          match.capturedLength(),
-                          m_palette[rule.formatRole]);
-            }
-        }
+        highlightUsingRules(text, highlightingRules);
     }
 }
