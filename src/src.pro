@@ -71,6 +71,7 @@ SOURCES += \
     loottablepool.cpp \
     main.cpp \
     mainwindow.cpp \
+    mcbuildhighlighter.cpp \
     mcfunctionhighlighter.cpp \
     modelfunctions.cpp \
     nbttextobjectdialog.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     loottablefunction.h \
     loottablepool.h \
     mainwindow.h \
+    mcbuildhighlighter.h \
     mcdatapacker_pch.h \
     mcfunctionhighlighter.h \
     modelfunctions.h \

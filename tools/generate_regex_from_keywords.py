@@ -3,13 +3,20 @@ from re import escape as re_escape
 end = '\0'
 
 strings = [
-    "+=", "-=", "*=", "/=", "%=", "++", "--", "><", "->", ">", "<", "=", "??=",
-    "=", "?=", ">=", "<=", "||", "&&", "!",
+    "dir",
+    "function",
+    "block",
+    "clock",
+    "while",
+    "async",
+    "finally",
+    "until",
+    "else",
+    "macro",
+    "import",
+    "!IF",
+    "LOOP",
 ]
-
-# strings = [
-#     "aaa", "aab", "bab", "bba", "abb", "aba", "bba",
-# ]
 
 def escape(s: str) -> str:
     return re_escape(s.replace('/', r"\/"))

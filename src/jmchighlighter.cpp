@@ -65,13 +65,14 @@ void JmcHighlighter::highlightBlock(const QString &text) {
 
     setCurrentBlockState(Normal);
 
-    int startIndex = 0;
+    int startIndex = -2;
     if (previousBlockState() != MultilineString)
         startIndex = text.indexOf(multilineStringDelimiter);
 
-    while (startIndex >= 0) {
+    while (startIndex != -1) {
+        startIndex = (startIndex == -2) ? 0 : startIndex + 1;
         const int endIndex = text.indexOf(multilineStringDelimiter,
-                                          startIndex + 1);
+                                          startIndex);
         int stringLength = 0;
         if (endIndex == -1) {
             setCurrentBlockState(MultilineString);

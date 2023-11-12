@@ -138,6 +138,7 @@ public:
         Identifier,
         Directive,
         Macro,
+        Script,
         QuotedString,
         Bool_True,
         Bool_False,

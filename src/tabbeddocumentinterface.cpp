@@ -5,6 +5,7 @@
 #include "fileswitcher.h"
 #include "mcfunctionhighlighter.h"
 #include "jmchighlighter.h"
+#include "mcbuildhighlighter.h"
 #include "jsonhighlighter.h"
 //#include "game.h"
 #include "parsers/command/mcfunctionparser.h"
@@ -238,10 +239,22 @@ void TabbedDocumentInterface::addFile(const QString &path) {
                 case CodeFile::Jmc: {
                     codeEditor->setHighlighter(
                         new JmcHighlighter(codeEditor->document(), false));
+                    break;
                 }
                 case CodeFile::JmcHeader: {
                     codeEditor->setHighlighter(
                         new JmcHighlighter(codeEditor->document(), true));
+                    break;
+                }
+                case CodeFile::McBuild: {
+                    codeEditor->setHighlighter(
+                        new McbuildHighlighter(codeEditor->document(), false));
+                    break;
+                }
+                case CodeFile::McBuildMacro: {
+                    codeEditor->setHighlighter(
+                        new McbuildHighlighter(codeEditor->document(), true));
+                    break;
                 }
                 default: {
                 }

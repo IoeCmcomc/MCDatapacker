@@ -57,6 +57,7 @@ public:
         MultilineString,
         Comment,
         MultilineComment,
+        _end_BlockState,
     };
 
     struct HighlightingRule {

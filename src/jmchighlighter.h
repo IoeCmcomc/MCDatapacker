@@ -8,6 +8,8 @@ class JmcHighlighter : public Highlighter {
 public:
     JmcHighlighter(QTextDocument *parent, const bool isHeaderFile);
 
+    const static int MultilineScriptState = _end_BlockState + 1;
+
 protected:
     void highlightBlock(const QString &text) final;
 

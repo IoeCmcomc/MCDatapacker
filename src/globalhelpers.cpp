@@ -118,9 +118,11 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
             return CodeFile::Image;
 
         ucase (QLatin1String("mc")):
+        ucase (QLatin1String("mcb")):
             return CodeFile::McBuild;
 
         ucase (QLatin1String("mcm")):
+        ucase (QLatin1String("mcbm")):
             return CodeFile::McBuildMacro;
 
         ucase (QLatin1String("jmc")):
