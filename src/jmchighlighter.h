@@ -6,7 +6,7 @@
 class JmcHighlighter : public Highlighter {
     Q_OBJECT
 public:
-    JmcHighlighter(QTextDocument *parent);
+    JmcHighlighter(QTextDocument *parent, const bool isHeaderFile);
 
 protected:
     void highlightBlock(const QString &text) final;

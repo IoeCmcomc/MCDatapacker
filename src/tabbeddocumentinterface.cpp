@@ -231,9 +231,17 @@ void TabbedDocumentInterface::addFile(const QString &path) {
                     codeEditor->setParser(std::move(parser));
                     break;
                 }
+                /*
+                 * TODO: Change the CodeFile, highlighter and parser of a file
+                         everytime its file extension changed
+                 */
                 case CodeFile::Jmc: {
                     codeEditor->setHighlighter(
-                        new JmcHighlighter(codeEditor->document()));
+                        new JmcHighlighter(codeEditor->document(), false));
+                }
+                case CodeFile::JmcHeader: {
+                    codeEditor->setHighlighter(
+                        new JmcHighlighter(codeEditor->document(), true));
                 }
                 default: {
                 }

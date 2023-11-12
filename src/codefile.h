@@ -44,7 +44,9 @@ struct CodeFile {
         FunctionTag, ItemTag, GameEventTag,
         Tag_end,
         JsonText_end,
-        Jmc, // TODO: Add .hjmc file format
+        Jmc,
+        JmcHeader,
+        JmcCert,
         McBuild,
         McBuildMacro,
         TridentCode,

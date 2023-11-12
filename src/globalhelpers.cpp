@@ -126,6 +126,9 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         ucase (QLatin1String("jmc")):
             return CodeFile::Jmc;
 
+        ucase (QLatin1String("hjmc")):
+            return CodeFile::JmcHeader;
+
         ucase (QLatin1String("tdn")):
             return CodeFile::TridentCode;
 
@@ -137,6 +140,10 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
             }
             return CodeFile::JsonText;
         }
+
+        ucase (QLatin1String("txt")):
+            return isPathRelativeTo(dirpath, filepath, u"jmc.txt")
+                ? CodeFile::JmcCert : CodeFile::Text;
     }
     return CodeFile::Text;
 }
@@ -160,6 +167,12 @@ QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
 
         case CodeFile::Jmc:
             return QIcon(QStringLiteral(":/file-jmc"));
+
+        case CodeFile::JmcHeader:
+            return QIcon(QStringLiteral(":/file-hjmc"));
+
+        case CodeFile::JmcCert:
+            return QIcon(QStringLiteral(":/file-jmc.txt"));
 
         case CodeFile::TridentCode:
             return QIcon(QStringLiteral(":/file-tdn"));
@@ -421,6 +434,8 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
           QT_TRANSLATE_NOOP("Glhp", "Flat world generator preset") },
         { CodeFile::Jmc,
           QT_TRANSLATE_NOOP("Glhp", "JavaScript-like Minecraft function") },
+        { CodeFile::JmcHeader, QT_TRANSLATE_NOOP("Glhp", "JMC header") },
+        { CodeFile::JmcCert, QT_TRANSLATE_NOOP("Glhp", "JMC certificate") },
         { CodeFile::McBuild, QT_TRANSLATE_NOOP("Glhp", "mc-build code") },
         { CodeFile::McBuildMacro, QT_TRANSLATE_NOOP("Glhp", "mc-build macro") },
         // Do not translate "Trident"

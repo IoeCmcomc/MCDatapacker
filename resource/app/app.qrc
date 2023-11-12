@@ -23,5 +23,7 @@
         <file alias="file-mc">icon/datapack/file-mc-16x16.png</file>
         <file alias="file-mcm">icon/datapack/file-mcm-16x16.png</file>
         <file alias="file-tdn">icon/datapack/file-tdn-16x16.png</file>
+        <file alias="file-hjmc">icon/datapack/file-hjmc-16x16.png</file>
+        <file alias="file-jmc.txt">icon/datapack/file-jmc_txt-16x16.png</file>
     </qresource>
 </RCC>

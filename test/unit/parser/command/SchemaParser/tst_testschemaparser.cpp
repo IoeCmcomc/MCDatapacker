@@ -434,15 +434,31 @@ void TestSchemaParser::stringViewToDec() {
     QVERIFY(ok);
     QCOMPARE(strToDec<short>(u"1234", ok), 1234);
     QVERIFY(ok);
-    QCOMPARE(strToDec<int>(u"-2147483648", ok), -2147483648);
+    QCOMPARE(strToDec<int>(u"-2147483648", ok), -2147483647 - 1);
     QVERIFY(ok);
     QCOMPARE(strToDec<long long>(u"78187493520", ok), 78187493520);
     QVERIFY(ok);
+    QCOMPARE(strToDec<int>(u"2147483647", ok), 2147483647);
+    QVERIFY(ok);
     QCOMPARE(strToDec<int>(u"0", ok), 0);
     QVERIFY(ok);
+    QCOMPARE(strToDec<long long>(u"9223372036854775807", ok),
+             9223372036854775807);
+    QVERIFY(ok);
+
     QCOMPARE(strToDec<int>(u"4g", ok), 0);
     QVERIFY(!ok);
     QCOMPARE(strToDec<short>(u"142857", ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(strToDec<int>(u"abc", ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(strToDec<int>(u"", ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(strToDec<int>(u"2147483648", ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(strToDec<int>(u"-2147483649", ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(strToDec<long long>(u"-9223372036854775809", ok), 0);
     QVERIFY(!ok);
 
     QBENCHMARK {
@@ -453,6 +469,7 @@ void TestSchemaParser::stringViewToDec() {
         strToDec<int>(u"0", ok);
         strToDec<int>(u"4g", ok);
         strToDec<short>(u"142857", ok);
+        strToDec<long long>(u"9223372036854775807", ok);
     }
 }
 
@@ -463,15 +480,30 @@ void TestSchemaParser::qStringViewToDec() {
     QVERIFY(ok);
     QCOMPARE(QStringView(u"1234").toShort(&ok), 1234);
     QVERIFY(ok);
-    QCOMPARE(QStringView(u"-2147483648").toInt(&ok), -2147483648);
+    QCOMPARE(QStringView(u"-2147483648").toInt(&ok), -2147483647 - 1);
     QVERIFY(ok);
     QCOMPARE(QStringView(u"78187493520").toLongLong(&ok), 78187493520);
     QVERIFY(ok);
     QCOMPARE(QStringView(u"0").toInt(&ok), 0);
     QVERIFY(ok);
+    QCOMPARE(QStringView(u"2147483647").toInt(&ok), 2147483647);
+    QVERIFY(ok);
+    QCOMPARE(QStringView(u"9223372036854775807").toLongLong(&ok),
+             9223372036854775807);
+    QVERIFY(ok);
     QCOMPARE(QStringView(u"4g").toInt(&ok), 0);
     QVERIFY(!ok);
     QCOMPARE(QStringView(u"142857").toShort(&ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(QStringView(u"abc").toInt(&ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(QStringView(u"").toInt(&ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(QStringView(u"2147483648").toInt(&ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(QStringView(u"-2147483649").toInt(&ok), 0);
+    QVERIFY(!ok);
+    QCOMPARE(QStringView(u"-9223372036854775809").toLongLong(&ok), 0);
     QVERIFY(!ok);
 
     QBENCHMARK {
@@ -483,7 +515,10 @@ void TestSchemaParser::qStringViewToDec() {
             QStringView(u"-2147483648").toInt(&ok);
         [[maybe_unused]] const auto ret5 = QStringView(u"0").toInt(&ok);
         [[maybe_unused]] const auto ret6 = QStringView(u"4g").toInt(&ok);
-        [[maybe_unused]] const auto ret7 = QStringView(u"142857").toShort(&ok);
+        [[maybe_unused]] const auto ret7 = QStringView(u"142857").toShort(
+            &ok);
+        [[maybe_unused]] const long long man =
+            QStringView(u"9223372036854775807").toLongLong(&ok);
     }
 }
 

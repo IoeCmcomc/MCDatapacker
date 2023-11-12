@@ -1,21 +1,26 @@
 #include "jmchighlighter.h"
 
 
-JmcHighlighter::JmcHighlighter(QTextDocument *parent) : Highlighter{parent} {
-    m_singleCommentCharset += QStringLiteral("#");
-    m_quoteDelimiters      += QStringLiteral("'");
+JmcHighlighter::JmcHighlighter(QTextDocument *parent,
+                               const bool isHeaderFile) : Highlighter{parent} {
+    m_quoteDelimiters += QStringLiteral("'");
     bracketPairs.append({ '(', ')' });
+    if (!isHeaderFile) {
+        m_singleCommentCharset += QStringLiteral("#");
+    }
 
     const QRegularExpression commandRegex{
         QStringLiteral(
             R"((?<=^| )(?>(?>a)(?>dvancement|ttribute)|b(?>an(?>-ip|list|)|ossbar)|cl(?>ear|one)|d(?>ata(?:pack)?|e(?>bug|faultgamemode|op)|ifficulty)|e(?>chant|ffect|x(?>ecute|perience))|f(?>ill|orceload|unction)|g(?>ame(?>mode|rule)|ive)|help|item|jfr|ki(?>ck|ll)|l(?>ist|o(?>cate(?:biome)?|ot))|m(?>e|sg)|op|p(?>ar(?>don(?:-ip)?|ticle)|erf|laysound|ublish)|re(?>cipe|load|placeitem)|s(?>a(?>ve-(?>all|o(?>ff|n))|y)|c(?>hedule|oreboard)|e(?>ed|t(?>block|idletimeout|worldspawn))|p(?>awnpoint|ectate|readplayer)|top(?:sound)?|ummon)|t(?>ag|e(?>am(?:msg)?|l(?>eport|l(?:raw)?))|i(?>me|tle)|m|p|rigger)|w(?>eather|hitelist|orldborder|)|xp)(?= |$|;))") };
     m_rules.append({ commandRegex, CodePalette::CmdLiteral });
 
-    const QRegularExpression directiveRegex{
-        QStringLiteral(
-            R"(^#(?>bind|c(?>ommand|redit)|de(?>fine|l)|include|nometa|override|static|uninstall)\b)")
-    };
-    m_rules.append({ directiveRegex, CodePalette::Directive });
+    if (isHeaderFile) {
+        const QRegularExpression directiveRegex{
+            QStringLiteral(
+                R"(^#(?>bind|c(?>ommand|redit)|de(?>fine|l)|include|nometa|override|static|uninstall)\b)")
+        };
+        m_rules.append({ directiveRegex, CodePalette::Directive });
+    }
 
     const QRegularExpression operatorRegex{
         QStringLiteral(
