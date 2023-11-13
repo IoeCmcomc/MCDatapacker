@@ -5,6 +5,10 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QFileInfo>
+#include <QMenu>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QApplication>
+#include <QClipboard>
 
 AdvancementItem::AdvancementItem(const AdvancemDisplayInfo &advancem,
                                  const QString &id) : m_id{id} {
@@ -61,4 +65,19 @@ void AdvancementItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
         emit qobject_cast<AdvancementTab *>(scene()->views().front())
         ->openFileRequested(finfo.absoluteFilePath());
     }
+}
+
+void AdvancementItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+    QMenu    menu;
+    QAction *copyIdAction = menu.addAction(
+        QCoreApplication::translate("AdvancementItem",
+                                    "Copy resouce location"));
+
+    scene()->connect(copyIdAction, &QAction::triggered,
+                     copyIdAction, [ this ](){
+        qApp->clipboard()->setText(m_id);
+    });
+
+    event->accept();
+    menu.exec(event->screenPos());
 }

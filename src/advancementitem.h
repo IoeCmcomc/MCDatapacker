@@ -15,6 +15,8 @@ public:
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) final;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) final;
+
 
 private:
     const QString m_id;
