@@ -590,13 +590,25 @@ namespace Command {
                 break;
             }
 
+            case '\'': {
+                if (gameVer >= QVersionNumber(1, 20)) {
+                    ret->setName(QSharedPointer<StringNode>::create(
+                                     spanText(start), getQuotedString(), true));
+                    if (curChar() == '{')
+                        ret->setFilter(parseCompoundTag());
+                    break;
+                } else {
+                    [[fallthrough]];
+                }
+            }
+
             default: {
                 const auto name = advanceView(re2c::nbtPathKey(peekRest()));
-                ret->setName(QSharedPointer<StringNode>::create(
-                                 spanText(name),
-                                 (!name.isEmpty(),
-                                  QT_TR_NOOP(
-                                      "Invalid empty NBT path key"))));
+                ret->setName(
+                    QSharedPointer<StringNode>::create(
+                        spanText(name),
+                        errorIfNot(!name.isEmpty(),
+                                   QT_TR_NOOP("Invalid empty NBT path key"))));
                 if (curChar() == '{')
                     ret->setFilter(parseCompoundTag());
             };
@@ -1173,7 +1185,8 @@ namespace Command {
         auto last = ret->last();
         // TODO: Allow single-quoted key in 1.20+
         while (last->trailingTrivia() == '.' || curChar() == '[' ||
-               curChar() == '"') {
+               curChar() == '"' ||
+               ((gameVer >= QVersionNumber(1, 20)) && (curChar() == '\''))) {
             const auto &&step = parseNbtPathStep();
 
             if ((step->type() == NbtPathStepNode::Type::Key)

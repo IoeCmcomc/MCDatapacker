@@ -252,11 +252,11 @@ namespace Command {
 //                << ". Total miss:" << cache.stats().total_misses()
 //                << ". Hit rate:" << cache.stats().hit_rate();
 
-        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
-                 << "Total access:" << m_cache.stats().total_accesses()
-                 << "(hit:" << m_cache.stats().total_hits()
-                 << ", miss:" << m_cache.stats().total_misses()
-                 << "). Hit rate:" << m_cache.stats().hit_rate();
+//        qDebug() << "Size:" << m_cache.size() << '/' << m_cache.capacity()
+//                 << "Total access:" << m_cache.stats().total_accesses()
+//                 << "(hit:" << m_cache.stats().total_hits()
+//                 << ", miss:" << m_cache.stats().total_misses()
+//                 << "). Hit rate:" << m_cache.stats().hit_rate();
 //                 << ". Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
 
         //        qDebug() << "Time elapsed:" << timer.nsecsElapsed() / 1e6 << "ms.";
