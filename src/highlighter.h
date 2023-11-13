@@ -78,9 +78,12 @@ public:
     void onDocChanged();
 
     bool isManualHighlight() const;
+    bool hasAdvancedHighlighting() const;
     void ensureDelayedRehighlightAll();
 
     void setPalette(const CodePalette &newPalette);
+
+    friend class CodeEditor;
 
 protected:
     QString m_quoteDelimiters = QStringLiteral("\"");
@@ -90,24 +93,22 @@ protected:
                                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };
     CodePalette m_palette;
 
-    friend class CodeEditor;
-
     void highlightBlock(const QString &text) override;
     void highlightUsingRules(const QString &text,
                              const HighlightingRules &rules);
     void mergeFormat(int start, int count, const QTextCharFormat &fmt);
-    QVector<QTextBlock> &changedBlocks() {
-        return m_changedBlocks;
-    }
+    void setHasAdvancedHighlighting(bool newHasAdvancedHighlighting);
+    QVector<QTextBlock> &changedBlocks();
     virtual void rehighlightDelayed() {
     };
 
 private:
     QVector<QTextBlock> m_changedBlocks;
     QTextCharFormat m_invisSpaceFmt;
-    bool m_highlightManually      = false;
-    bool m_highlightingFirstBlock = false;
-    bool m_curDirExists           = false;
+    bool m_highlightManually       = false;
+    bool m_highlightingFirstBlock  = false;
+    bool m_curDirExists            = false;
+    bool m_hasAdvancedHighlighting = false;
 
     void collectBracket(int i, QChar ch, TextBlockData *data);
     void collectNamespacedIds(QStringView sv, TextBlockData *data);

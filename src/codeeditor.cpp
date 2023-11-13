@@ -614,8 +614,12 @@ void CodeEditor::changeEvent(QEvent *e) {
                 m_highlighter->setPalette(defaultCodePalette);
             }
             onCursorPositionChanged();
-            m_highlighter->ensureDelayedRehighlightAll();
-            m_highlighter->rehighlightDelayed();
+            if (m_highlighter->hasAdvancedHighlighting()) {
+                m_highlighter->ensureDelayedRehighlightAll();
+                m_highlighter->rehighlightDelayed();
+            } else {
+                m_highlighter->rehighlight();
+            }
         }
     }
     QPlainTextEdit::changeEvent(e);

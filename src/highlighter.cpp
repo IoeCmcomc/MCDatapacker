@@ -69,6 +69,10 @@ bool Highlighter::isManualHighlight() const {
     return m_highlightManually;
 }
 
+bool Highlighter::hasAdvancedHighlighting() const {
+    return m_hasAdvancedHighlighting;
+}
+
 void Highlighter::ensureDelayedRehighlightAll() {
     if (m_changedBlocks.size() < document()->blockCount()) {
         m_changedBlocks.clear();
@@ -203,6 +207,14 @@ void Highlighter::mergeFormat(int start, int count,
         newFmt.merge(fmt);
         setFormat(start + i, 1, newFmt);
     }
+}
+
+QVector<QTextBlock> &Highlighter::changedBlocks() {
+    return m_changedBlocks;
+}
+
+void Highlighter::setHasAdvancedHighlighting(bool newHasAdvancedHighlighting) {
+    m_hasAdvancedHighlighting = newHasAdvancedHighlighting;
 }
 
 void Highlighter::collectBracket(int i, QChar ch, TextBlockData *data) {

@@ -30,7 +30,7 @@ McbuildHighlighter::McbuildHighlighter(QTextDocument *parent,
             CodePalette::String });
     }
     m_rules.append({
-        QRegularExpression(QStringLiteral(R"(function +(\w+)\()")),
+        QRegularExpression(QStringLiteral(R"(function +(\w+) +{)")),
         CodePalette::Function });
     m_rules.append({ QRegularExpression(QStringLiteral(R"(<%.+?%>)")),
                      CodePalette::Script });

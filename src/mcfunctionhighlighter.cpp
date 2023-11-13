@@ -20,6 +20,7 @@ QDebug operator<<(QDebug debug, const QTextLayout::FormatRange &value) {
 McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
                                              Command::McfunctionParser *parser)
     : Highlighter(parent), m_parser(parser) {
+    setHasAdvancedHighlighting(true);
     setupRules();
 }
 
