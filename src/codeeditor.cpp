@@ -78,6 +78,21 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
             &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Slash), this),
             &QShortcut::activated, this, &CodeEditor::toggleComment);
+    connect(new QShortcut(QKeySequence(
+                              Qt::SHIFT + Qt::ALT + Qt::Key_Down), this),
+            &QShortcut::activated, this, &CodeEditor::copyLineDown);
+    connect(new QShortcut(QKeySequence(
+                              Qt::SHIFT + Qt::ALT + Qt::Key_Up), this),
+            &QShortcut::activated, this, &CodeEditor::copyLineUp);
+    connect(new QShortcut(QKeySequence(
+                              Qt::CTRL + Qt::SHIFT + Qt::Key_Down), this),
+            &QShortcut::activated, this, &CodeEditor::moveLineDown);
+    connect(new QShortcut(QKeySequence(
+                              Qt::CTRL + Qt::SHIFT + Qt::Key_Up), this),
+            &QShortcut::activated, this, &CodeEditor::moveLineUp);
+    connect(new QShortcut(QKeySequence(
+                              Qt::CTRL + Qt::Key_L), this),
+            &QShortcut::activated, this, &CodeEditor::selectCurrentLine);
 
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
@@ -437,12 +452,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
         }
     }
 
-    const bool isShortcut =
+    const bool isCompletionShortcut =
         (e->modifiers().testFlag(Qt::ControlModifier) &&
          e->key() == Qt::Key_Space);  /* CTRL+Space */
 
     /* Do not process the shortcut when we have a completer */
-    if (!m_completer || !isShortcut) {
+    if (!m_completer || !isCompletionShortcut) {
         handleKeyPressEvent(e);
     }
 
@@ -458,12 +473,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
         (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
     const QString &&completionPrefix = textUnderCursor();
 
-    if (!isShortcut &&
+    if (!isCompletionShortcut &&
         (hasModifier || e->text().isEmpty() || completionPrefix.length() < 2
          || eow.contains(e->text().right(1)))) {
         m_completer->popup()->hide();
         return;
-    } else if (isShortcut) {
+    } else if (isCompletionShortcut) {
         startCompletion(completionPrefix);
     } else {
         m_needCompleting = true;
@@ -709,7 +724,7 @@ void CodeEditor::toggleComment() {
     const int  anchorPosInBlock = anchorCursor.positionInBlock();
 
     txtCursor.beginEditBlock();
-    const bool fromTopDown = txtCursor.position() > txtCursor.anchor();;
+    const bool fromTopDown = txtCursor.position() > txtCursor.anchor();
     int        count       = abs(
         posBlock.blockNumber() - anchorBlock.blockNumber()) +
                              1;
@@ -771,6 +786,101 @@ void CodeEditor::toggleComment() {
                           QTextCursor::KeepAnchor);
     txtCursor.endEditBlock();
     setTextCursor(txtCursor);
+}
+
+void CodeEditor::copyLineUp() {
+    QTextCursor &&cursor = textCursor();
+
+    selectEnclosingLines(cursor);
+    if (cursor.hasSelection()) {
+        const int       anchor = cursor.anchor();
+        const QString &&text   = cursor.selectedText();
+        cursor.setPosition(anchor);
+
+        cursor.beginEditBlock();
+        cursor.insertText(text);
+        const int pos = cursor.position();
+        cursor.insertBlock();
+        cursor.setPosition(anchor);
+        cursor.setPosition(pos, QTextCursor::KeepAnchor);
+        cursor.endEditBlock();
+
+        setTextCursor(cursor);
+    }
+}
+
+void CodeEditor::copyLineDown() {
+    QTextCursor &&cursor = textCursor();
+
+    selectEnclosingLines(cursor);
+    if (cursor.hasSelection()) {
+        const QString &&text = cursor.selectedText();
+        cursor.movePosition(QTextCursor::EndOfBlock);
+
+        cursor.beginEditBlock();
+        cursor.insertBlock();
+        const int anchor = cursor.position();
+        cursor.insertText(text);
+        const int pos = cursor.position();
+        cursor.setPosition(anchor);
+        cursor.setPosition(pos, QTextCursor::KeepAnchor);
+        cursor.endEditBlock();
+
+        setTextCursor(cursor);
+    }
+}
+
+void CodeEditor::moveLineUp() {
+    QTextCursor &&cursor = textCursor();
+
+    selectEnclosingLines(cursor);
+    if (cursor.hasSelection() && !cursor.atStart()) {
+        const QString &&text = cursor.selectedText();
+        cursor.beginEditBlock();
+        cursor.removeSelectedText();
+        cursor.deletePreviousChar();
+        cursor.movePosition(QTextCursor::StartOfBlock);
+
+        const int anchor = cursor.position();
+        cursor.insertText(text);
+        const int pos = cursor.position();
+        cursor.insertBlock();
+        cursor.setPosition(anchor);
+        cursor.setPosition(pos, QTextCursor::KeepAnchor);
+
+        cursor.endEditBlock();
+        setTextCursor(cursor);
+    }
+}
+
+void CodeEditor::moveLineDown() {
+    QTextCursor &&cursor = textCursor();
+
+    selectEnclosingLines(cursor);
+    if (cursor.hasSelection()) {
+        const QString &&text = cursor.selectedText();
+        cursor.beginEditBlock();
+        cursor.removeSelectedText();
+        cursor.deleteChar();
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        cursor.insertBlock();
+
+        const int anchor = cursor.position();
+        cursor.insertText(text);
+        const int pos = cursor.position();
+        cursor.setPosition(anchor);
+        cursor.setPosition(pos, QTextCursor::KeepAnchor);
+
+        cursor.endEditBlock();
+        setTextCursor(cursor);
+    }
+}
+
+void CodeEditor::selectCurrentLine() {
+    QTextCursor &&cursor = textCursor();
+
+    cursor.select(QTextCursor::LineUnderCursor);
+    setTextCursor(cursor);
 }
 
 void CodeEditor::onUndoAvailable(bool value) {
@@ -1109,6 +1219,25 @@ QString CodeEditor::textUnderCursorExtended(QTextCursor tc) const {
 
     //qDebug() << "textUnderCursorExtended" << tc.selectedText();
     return tc.selectedText();
+}
+
+void CodeEditor::selectEnclosingLines(QTextCursor &cursor) const {
+    if (cursor.hasSelection()) {
+        int selStart = cursor.selectionStart();
+        int selEnd   = cursor.selectionEnd();
+        cursor.setPosition(selStart);
+        cursor.movePosition(QTextCursor::StartOfBlock);
+        selStart = cursor.position();
+        cursor.setPosition(selEnd);
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        selEnd = cursor.position();
+        cursor.setPosition(selStart);
+        cursor.setPosition(selEnd, QTextCursor::KeepAnchor);
+    } else {
+        // cursor.select(QTextCursor::BlockUnderCursor) will move the cursor to
+        // the first position of the next block.
+        cursor.select(QTextCursor::LineUnderCursor);
+    }
 }
 
 QString CodeEditor::textUnderCursor() const {

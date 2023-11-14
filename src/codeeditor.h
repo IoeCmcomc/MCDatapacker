@@ -87,6 +87,11 @@ private /*slots*/ :
     void openFindDialog();
     void openReplaceDialog();
     void toggleComment();
+    void copyLineUp();
+    void copyLineDown();
+    void moveLineUp();
+    void moveLineDown();
+    void selectCurrentLine();
     void onUndoAvailable(bool value);
     void onRedoAvailable(bool value);
     void insertCompletion(const QString &completion);
@@ -128,6 +133,7 @@ private:
     void initCompleter();
     void startOfWordExtended(QTextCursor &tc) const;
     QString textUnderCursorExtended(QTextCursor tc) const;
+    void selectEnclosingLines(QTextCursor &cursor) const;
     void startCompletion(const QString &completionPrefix);
 };
 
