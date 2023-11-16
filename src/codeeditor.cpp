@@ -256,8 +256,8 @@ void debugTextCursor(const QTextCursor &tc) {
     }
 }
 
-void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
-    static const QString extendedAcceptedCharsset("#.:/-");
+void CodeEditor::startOfWordExtended(QTextCursor &tc) {
+    static const QString extendedAcceptedCharset("#.:/-");
 
     //debugTextCursor(tc);
 
@@ -277,7 +277,7 @@ void CodeEditor::startOfWordExtended(QTextCursor &tc) const {
         }
         const QChar &curChar = selectedText.front();
 
-        if (extendedAcceptedCharsset.contains(curChar)) {
+        if (extendedAcceptedCharset.contains(curChar)) {
             tc.movePosition(QTextCursor::PreviousCharacter);
             //debugTextCursor(tc);
             if (!tc.atBlockStart()) {
@@ -1211,7 +1211,7 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
     }
 }
 
-QString CodeEditor::textUnderCursorExtended(QTextCursor tc) const {
+QString CodeEditor::textUnderCursorExtended(QTextCursor tc) {
     const int oldPos = tc.position();
 
     startOfWordExtended(tc);
@@ -1221,7 +1221,7 @@ QString CodeEditor::textUnderCursorExtended(QTextCursor tc) const {
     return tc.selectedText();
 }
 
-void CodeEditor::selectEnclosingLines(QTextCursor &cursor) const {
+void CodeEditor::selectEnclosingLines(QTextCursor &cursor) {
     if (cursor.hasSelection()) {
         int selStart = cursor.selectionStart();
         int selEnd   = cursor.selectionEnd();

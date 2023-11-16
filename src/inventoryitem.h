@@ -26,7 +26,7 @@ public:
     InventoryItem(const QString &id);
 
     InventoryItem &operator=(const InventoryItem &other) = default;
-    InventoryItem &operator=(InventoryItem &&other);;
+    InventoryItem &operator=(InventoryItem &&other);
 
     bool operator==(const InventoryItem &other);
     bool operator==(const InventoryItem &other) const;

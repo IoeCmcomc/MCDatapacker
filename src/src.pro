@@ -8,7 +8,7 @@ win32:QT += winextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17 lrelease embed_translations conan_basic_setup
+CONFIG += c++17 lrelease embed_translations
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 win32:LIBS += -lDwmapi
@@ -119,6 +119,7 @@ SOURCES += \
     parsers/command/visitors/reprprinter.cpp \
     parsers/command/visitors/sourceprinter.cpp \
     parsers/jsonparser.cpp \
+    parsers/linesplitter.cpp \
     parsers/parser.cpp \
     platforms/windows_specific.cpp \
     predicatedock.cpp \
@@ -233,6 +234,7 @@ HEADERS += \
     parsers/command/visitors/reprprinter.h \
     parsers/command/visitors/sourceprinter.h \
     parsers/jsonparser.h \
+    parsers/linesplitter.h \
     parsers/parser.h \
     platforms/windows_specific.h \
     predicatedock.h \
@@ -377,8 +379,12 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/libQFindDialogs.a
 
 
-msvc: {
-win32: LIBS += -lAdvAPI32
+win32-msvc*: {
+    LIBS += -lAdvAPI32
+    CONFIG(force_debug_info) {
+        DEFINES += _DISABLE_VECTOR_ANNOTATION=1 _DISABLE_STRING_ANNOTATION=1
+        QMAKE_CXXFLAGS += -fsanitize=address
+    }
 }
 
 #message($$INCLUDEPATH)

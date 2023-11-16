@@ -98,8 +98,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(updater, &QSimpleUpdater::downloadFinished,
             this, &MainWindow::installUpdate);
 
-    const auto &oldProgramFile = qApp->applicationDirPath() +
-                                 QLatin1String("/MCDatapacker_old");
+    const QString &oldProgramFile = qApp->applicationDirPath() +
+                                    QLatin1String("/MCDatapacker_old");
     if (QFile::exists(oldProgramFile))
         QFile::remove(oldProgramFile);
 
