@@ -41,63 +41,75 @@ namespace Command {
 
         const bool canBeLocal = options & AxisParseOption::CanBeLocal;
         const bool onlyInt    = options & AxisParseOption::OnlyInteger;
+        const bool isFirst    = options & AxisParseOption::FirstAxis;
         bool       isValid    = true;
-
-        const auto axisVal =
-            [this](AngleNode *axis, bool onlyInt, bool &valid) {
-                if (onlyInt) {
-                    auto [_, value] = parseInteger(valid);
-                    axis->setValue(value);
-                } else {
-                    auto [_, value] = parseFloat(valid);
-                    axis->setValue(value);
-                }
-            };
 
         const int start     = pos();
         bool      hasPrefix = false;
-        AnglePtr  axis;
+
+        const auto axisVal =
+            [&](AngleNode *axis) {
+                bool        ok;
+                QStringView literal;
+                if (onlyInt) {
+                    auto [raw, value] = parseInteger(ok);
+                    literal           = raw;
+                    axis->setValue(value);
+                } else {
+                    auto [raw, value] = parseFloat(ok);
+                    literal           = raw;
+                    axis->setValue(value);
+                }
+                if (isValid) {
+                    isValid |= ok;
+                }
+                if (!ok) {
+                    reportError(QT_TR_NOOP("Invalid axis value"),
+                                {}, start, literal.length());
+                }
+            };
+
+        AnglePtr axis;
         if (curChar() == '~') {
-            if (!isLocal) {
-                axis      = AnglePtr::create(AxisType::Relative);
-                hasPrefix = true;
-                isLocal   = false;
-                advance();
+            axis      = AnglePtr::create(AxisType::Relative);
+            hasPrefix = true;
+            if (isFirst || !isLocal) {
+                isLocal = false;
             } else {
-                throwError(mixCoordErrMsg);
+                isValid = false;
+                reportError(mixCoordErrMsg);
             }
+            advance();
         } else if (curChar() == '^') {
-            if (isLocal == false)
+            axis      = AnglePtr::create(AxisType::Local);
+            hasPrefix = true;
+            if (!canBeLocal) {
+                isValid = false;
+                reportError(QT_TR_NOOP(
+                                "Local coordinates can't be used here"));
+            } else if (isFirst) {
                 isLocal = true;
-            if (canBeLocal && isLocal) {
-                axis      = AnglePtr::create(AxisType::Local);
-                hasPrefix = true;
-                advance();
             } else if (!isLocal) {
-                throwError(mixCoordErrMsg);
+                isValid = false;
+                reportError(mixCoordErrMsg);
             }
+            advance();
         } else {
             axis = AnglePtr::create(AxisType::Absolute);
         }
         if (hasPrefix) {
             if ((!curChar().isNull()) && (curChar() != ' ')) {
-                axisVal(axis.get(), onlyInt, isValid);
+                axisVal(axis.get());
             }
+        } else if (curChar() == ' ') {
+            isValid = false;
+            reportError(QT_TR_NOOP("Missing an axis here"), {}, start, 1);
         } else {
-            if (isLocal) {
-                if (curChar() != ' ') {
-                    throwError(mixCoordErrMsg);
-                }
-            } else {
-                axisVal(axis.get(), onlyInt, isValid);
-            }
+            axisVal(axis.get());
         }
+
         axis->setText(spanText(start));
         axis->setIsValid(isValid);
-        if (!isValid) {
-            reportError(QT_TR_NOOP("Invalid axis value"),
-                        {}, start, axis->length());
-        }
         return axis;
     }
 
@@ -116,7 +128,8 @@ namespace Command {
 //                axes->setFirstAxis(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
-                axes->setFirstAxis(parseAxis(options, isLocal));
+                axes->setFirstAxis(
+                    parseAxis(options | AxisParseOption::FirstAxis, isLocal));
                 axes->firstAxis()->setTrailingTrivia(eat(' ',
                                                          "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setSecondAxis(
@@ -132,7 +145,8 @@ namespace Command {
 //                axes->setX(
 //                    callWithCache<AngleNode>(&MinecraftParser::parseAxis, this,
 //                                             peekLiteral(), options, isLocal));
-                axes->setX(parseAxis(options, isLocal));
+                axes->setX(parseAxis(options | AxisParseOption::FirstAxis,
+                                     isLocal));
                 axes->x()->setTrailingTrivia(eat(' ',
                                                  "Unexpected %1, expecting %2 to separate between axes"));
 //                axes->setY(

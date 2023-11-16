@@ -126,6 +126,7 @@ public:
             NoOption    = 0,
             OnlyInteger = 1,
             CanBeLocal  = 2,
+            FirstAxis   = 4,
         };
         Q_DECLARE_FLAGS(AxisParseOptions, AxisParseOption);
 
