@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += unit/parser/command/nodes/DoubleNode \
     unit/GlobalHelpers \
+    unit/parser/LineSplitter \
     unit/parser/command/nodes/IntRangeNode \
     unit/parser/command/nodes/LiteralNode \
     unit/parser/command/nodes/MapNode \
