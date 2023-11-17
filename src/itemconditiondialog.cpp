@@ -50,7 +50,7 @@ QJsonObject ItemConditionDialog::toJson() const {
         if (!ui->itemSlot->isEmpty()) {
             if (from_1_17) {
                 QJsonArray ids;
-                for (const auto &item: ui->itemSlot->getItems()) {
+                for (const auto &item: qAsConst(ui->itemSlot->getItems())) {
                     ids << item.getNamespacedID();
                 }
                 root.insert(QStringLiteral("items"), ids);
@@ -109,7 +109,8 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
         return;
 
     if (from_1_17 && value.contains(QStringLiteral("items"))) {
-        for (const auto &item: value[QStringLiteral("items")].toArray()) {
+        const auto &&items = value[QStringLiteral("items")].toArray();
+        for (const auto &item: items) {
             ui->itemSlot->appendItem(item.toString());
         }
     } else if (value.contains(QStringLiteral("item"))) {

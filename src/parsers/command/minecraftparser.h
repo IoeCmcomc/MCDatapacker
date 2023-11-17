@@ -312,14 +312,10 @@ private:
         QSharedPointer<ObjectiveCriteriaNode> minecraft_objectiveCriteria();
         QSharedPointer<OperationNode> minecraft_operation();
         QSharedPointer<ParticleNode> minecraft_particle();
-        QSharedPointer<ResourceNode> minecraft_resource(
-            const QVariantMap &props);
-        QSharedPointer<ResourceKeyNode> minecraft_resourceKey(
-            const QVariantMap &props);
-        QSharedPointer<ResourceOrTagNode> minecraft_resourceOrTag(
-            const QVariantMap &props);
-        QSharedPointer<ResourceOrTagKeyNode> minecraft_resourceOrTagKey(
-            const QVariantMap &props);
+        QSharedPointer<ResourceNode> minecraft_resource();
+        QSharedPointer<ResourceKeyNode> minecraft_resourceKey();
+        QSharedPointer<ResourceOrTagNode> minecraft_resourceOrTag();
+        QSharedPointer<ResourceOrTagKeyNode> minecraft_resourceOrTagKey();
         QSharedPointer<ResourceLocationNode> minecraft_resourceLocation();
         QSharedPointer<RotationNode> minecraft_rotation();
         QSharedPointer<ScoreHolderNode> minecraft_scoreHolder(

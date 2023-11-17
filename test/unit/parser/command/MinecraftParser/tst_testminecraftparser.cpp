@@ -586,7 +586,7 @@ void TestMinecraftParser::benchmarkCommandBoxes() {
         result = parser.parse();
     }
     Q_ASSERT(result);
-    for (const auto &error: parser.errors()) {
+    for (const auto &error: qAsConst(parser.errors())) {
         qDebug() << error.toLocalizedMessage();
     }
     QVERIFY(result->isValid());

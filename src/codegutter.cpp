@@ -33,7 +33,9 @@ CodeEditor * CodeGutter::editor() const {
 }
 
 void CodeGutter::updateChildrenGeometries() {
-    for (auto *child: findChildren<QWidget *>()) {
+    const auto &&children = findChildren<QWidget *>();
+
+    for (auto *child: children) {
         child->adjustSize();
         child->updateGeometry();
     }

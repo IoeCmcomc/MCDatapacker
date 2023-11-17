@@ -835,14 +835,13 @@ namespace Command {
             }
             case ParserType::Operation: { return minecraft_operation(); }
             case ParserType::Particle: { return minecraft_particle(); }
-            case ParserType::Resource: { return minecraft_resource(props); }
-            case ParserType::ResourceKey: { return minecraft_resourceKey(props);
-            }
+            case ParserType::Resource: { return minecraft_resource(); }
+            case ParserType::ResourceKey: { return minecraft_resourceKey(); }
             case ParserType::ResourceOrTag: {
-                return minecraft_resourceOrTag(props);
+                return minecraft_resourceOrTag();
             }
             case ParserType::ResourceOrTagKey: {
-                return minecraft_resourceOrTagKey(props);
+                return minecraft_resourceOrTagKey();
             }
             case ParserType::ResourceLocation: {
                 return minecraft_resourceLocation();
@@ -1347,15 +1346,14 @@ namespace Command {
     }
 
     QSharedPointer<ResourceNode> MinecraftParser::
-    minecraft_resource(const QVariantMap &props) {
+    minecraft_resource() {
         const auto &&ret = QSharedPointer<ResourceNode>::create(0);
 
         parseResourceLocation(ret.get());
         return ret;
     }
 
-    QSharedPointer<ResourceKeyNode> MinecraftParser::minecraft_resourceKey(
-        const QVariantMap &props) {
+    QSharedPointer<ResourceKeyNode> MinecraftParser::minecraft_resourceKey() {
         const auto &&ret = QSharedPointer<ResourceKeyNode>::create(0);
 
         parseResourceLocation(ret.get());
@@ -1363,7 +1361,7 @@ namespace Command {
     }
 
     QSharedPointer<ResourceOrTagNode> MinecraftParser::
-    minecraft_resourceOrTag(const QVariantMap &props) {
+    minecraft_resourceOrTag() {
         const auto &&ret = QSharedPointer<ResourceOrTagNode>::create(0);
 
         parseResourceLocation(ret.get(), true);
@@ -1371,7 +1369,7 @@ namespace Command {
     }
 
     QSharedPointer<ResourceOrTagKeyNode> MinecraftParser::
-    minecraft_resourceOrTagKey(const QVariantMap &props) {
+    minecraft_resourceOrTagKey() {
         const auto &&ret = QSharedPointer<ResourceOrTagKeyNode>::create(0);
 
         parseResourceLocation(ret.get(), true);

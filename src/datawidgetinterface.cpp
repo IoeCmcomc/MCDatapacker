@@ -53,9 +53,9 @@ DataWidgetInterface::~DataWidgetInterface() {
 void DataWidgetInterface::setMainWidget(QWidget *widget) {
     widget->setParent(this);
     widget->setMouseTracking(true);
-    for (auto *child :
-         widget->findChildren<QWidget *>(QString(),
-                                         Qt::FindDirectChildrenOnly)) {
+    const auto &&children = widget->findChildren<QWidget *>(
+        QString(), Qt::FindDirectChildrenOnly);
+    for (auto *child : children) {
         child->setMouseTracking(true);
     }
 

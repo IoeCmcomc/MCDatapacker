@@ -85,7 +85,6 @@ void BlockItemSelectorDialog::setupListView() {
     auto blockIter = MCRBlockInfo.constBegin();
     auto itemIter  = (m_category == SelectCategory::Blocks)
                         ? MCRItemInfo.constEnd() : MCRItemInfo.constBegin();
-    int c = 0;
     while ((blockIter != MCRBlockInfo.constEnd())
            || (itemIter != MCRItemInfo.constEnd())) {
         const auto &blockIterVal = blockIter.value();
@@ -106,7 +105,6 @@ void BlockItemSelectorDialog::setupListView() {
         }
         const QString &key = (blockIter != MCRBlockInfo.constEnd())
                        ? blockIter.key() : itemIter.key();
-        /*qDebug() << key << c; */
         InventoryItem invItem(key);
         auto         *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
@@ -116,8 +114,6 @@ void BlockItemSelectorDialog::setupListView() {
         item->setToolTip(invItem.toolTip());
         /*qDebug() << item << vari; */
         model.appendRow(item);
-        /*qDebug() << "appended" << c; */
-        ++c;
         if (blockIter != MCRBlockInfo.constEnd())
             ++blockIter;
         else
@@ -169,13 +165,13 @@ void BlockItemSelectorDialog::setCategory(const SelectCategory &category) {
     using Filter = InventoryItemFilterModel::Filter;
     switch (m_category) {
         case SelectCategory::Blocks: {
-            filterModel.setFilters(Filter::ObtainableBlocks
-                                   | Filter::ObtainableBlocks);
+            filterModel.setFilters(Filter::ObtainableBlocks);
             break;
         }
 
         case SelectCategory::ObtainableItems: {
             filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
+            break;
         }
     }
     ui->stackedWidget->setCurrentIndex((int)m_category);

@@ -47,6 +47,7 @@ void TestGlobalHelpers::strToVariant() {
         result = Glhp::strToVariant(u"727");
         result = Glhp::strToVariant(u"true");
     }
+    Q_UNUSED(result)
 }
 
 void TestGlobalHelpers::variantToStr() {
@@ -63,6 +64,7 @@ void TestGlobalHelpers::variantToStr() {
         result = Glhp::variantToStr(727);
         result = Glhp::variantToStr(true);
     }
+    Q_UNUSED(result)
 }
 
 void TestGlobalHelpers::removePrefix() {
@@ -109,6 +111,7 @@ void TestGlobalHelpers::isPathRelativeTo() {
     QBENCHMARK {
         result = Glhp::isPathRelativeTo(dirpath, path, category);
     }
+    Q_UNUSED(result)
 }
 
 void TestGlobalHelpers::toNamespacedId() {
@@ -136,6 +139,7 @@ void TestGlobalHelpers::toNamespacedId() {
     QBENCHMARK {
         result = Glhp::toNamespacedID(dirpath, path);
     }
+    Q_UNUSED(result)
 }
 
 QTEST_MAIN(TestGlobalHelpers)

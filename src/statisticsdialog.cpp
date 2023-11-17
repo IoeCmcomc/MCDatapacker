@@ -271,9 +271,8 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
                 ++m_syntaxErrors;
             }
         } else {
-            const auto  doc    = std::make_unique<QTextDocument>(text);
-            const auto &errors = m_parser->errors();
-            for (const auto &error: errors) {
+            const auto doc = std::make_unique<QTextDocument>(text);
+            for (const auto &error: qAsConst(m_parser->errors())) {
                 const int row = ui->syntaxErrorTable->rowCount();
                 ui->syntaxErrorTable->insertRow(row);
                 const int line = doc->findBlock(error.pos).blockNumber() + 1;

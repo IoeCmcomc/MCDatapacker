@@ -189,7 +189,7 @@ public:
                                            m_palette[CodePalette::NbtByteArray] };
             m_pos += node->leftText().length();
 
-            for (const auto &elem: node->children()) {
+            for (const auto &elem: qAsConst(node->children())) {
                 elem->accept(this, m_order);
             }
 
@@ -221,7 +221,7 @@ public:
                                            m_palette[CodePalette::NbtIntArray] };
             m_pos += node->leftText().length();
 
-            for (const auto &elem: node->children()) {
+            for (const auto &elem: qAsConst(node->children())) {
                 elem->accept(this, m_order);
             }
 
@@ -236,7 +236,7 @@ public:
 
             m_pos += node->leftText().length();
 
-            for (const auto &elem: node->children()) {
+            for (const auto &elem: qAsConst(node->children())) {
                 elem->accept(this, m_order);
             }
 
@@ -251,7 +251,7 @@ public:
 
             m_pos += node->leftText().length();
 
-            for (const auto &elem: node->children()) {
+            for (const auto &elem: qAsConst(node->children())) {
                 elem->accept(this, m_order);
             }
 
@@ -262,7 +262,8 @@ public:
         void visit(NbtPathNode *node) final {
             m_pos += node->leadingTrivia().length();
 
-            for (const auto &child: node->steps()) {
+            const auto &&steps = node->steps();
+            for (const auto &child: steps) {
                 child->accept(this, m_order);
             }
 
@@ -352,8 +353,9 @@ public:
 
             m_pos += node->resLoc()->length();
             m_pos += node->resLoc()->trailingTrivia().length();
-            if (!node->params().isEmpty()) {
-                for (const auto &child: node->params()) {
+            const auto &&params = node->params();
+            if (!params.isEmpty()) {
+                for (const auto &child: params) {
                     child->accept(this, m_order);
                 }
             }

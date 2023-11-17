@@ -529,7 +529,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     formatAction->setDisabled(!((CodeFile::JsonText <= m_fileType) &&
                                 (m_fileType <= CodeFile::JsonText_end)));
     if (formatAction->isEnabled()) {
-        connect(formatAction, &QAction::triggered, [ = ]() {
+        connect(formatAction, &QAction::triggered, this, [ = ]() {
             QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
             if (doc.isNull()) return;
 
@@ -913,7 +913,7 @@ void CodeEditor::onTextChanged() {
         m_problems.clear();
         if (!ok) {
             m_problems.reserve(m_parser->errors().size());
-            for (const auto &error: m_parser->errors()) {
+            for (const auto &error: qAsConst(m_parser->errors())) {
                 ProblemInfo problem{ ProblemInfo::Type::Error,
                                      error.pos, error.length,
                                      error.toLocalizedMessage() };
@@ -1023,7 +1023,7 @@ void CodeEditor::updateErrorSelections() {
         tc.movePosition(QTextCursor::End);
         const int endPos = tc.position();
 
-        for (const auto &problem: m_problems) {
+        for (const auto &problem: qAsConst(m_problems)) {
             QTextEdit::ExtraSelection selection;
             QTextCursor               selCursor = textCursor();
             selCursor.setPosition(qBound(0, problem.pos, endPos));

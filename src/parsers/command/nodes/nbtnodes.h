@@ -109,6 +109,9 @@ public:
         QVector<QSharedPointer<T> > children() const {
             return m_vector;
         }
+        QVector<QSharedPointer<T> > &children() {
+            return m_vector;
+        }
 
 protected:
         QVector<QSharedPointer<T> > m_vector;

@@ -273,6 +273,7 @@ QJsonObject LootTableFunction::toJson() const {
                     root["name"] = name;
                 }
             }
+            break;
         }
 
         case Sequence: { /* Set contents */
@@ -639,6 +640,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     ui->ref_nameEdit->setText(root.value("name").toString());
                 }
             }
+            break;
         }
 
         case Sequence: { /* Set contents */
@@ -713,8 +715,9 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     if (slotTypes.contains(slot))
                         slotsList << slot;
                 } else if (slotsVal.isArray()) {
-                    for (auto slotRef: slotsVal.toArray()) {
-                        QString slot = slotRef.toString();
+                    const auto &&slotArr = slotsVal.toArray();
+                    for (const auto &slotRef: slotArr) {
+                        const QString &&slot = slotRef.toString();
                         if (slotTypes.contains(slot)) {
                             slotsList << slot;
                         }

@@ -82,8 +82,8 @@ void TagSelectorDialog::setupTagTreeView(
 
     auto tagStrSplited = tagStr.split('/');
     std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
-                   tagStrSplited.begin(), [](const QString &str){
-        return str + "s";
+                   tagStrSplited.begin(), [](const QString &str) -> QString {
+        return str + 's';
     });
     auto tagDir = tagStrSplited.join('/');
 

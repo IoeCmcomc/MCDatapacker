@@ -107,6 +107,8 @@ bool RawJsonTextObjectInterface::execEditorDialog(QTextFormat &format,
     QScopedPointer<AbstractTextObjectDialog,
                    QScopedPointerDeleteLater> pointer{ dialog };
 
+    Q_UNUSED(pointer)
+
     dialog->fromTextFormat(format);
 
     if (dialog->exec() == QDialog::Accepted) {

@@ -722,7 +722,9 @@ void EntityConditionDialog::initPlayerStat() {
 void EntityConditionDialog::setupGrantedTableFromJson(const QJsonObject &json,
                                                       QStandardItemModel &model)
 {
-    for (const auto &name : json.keys()) {
+    const auto &&keys = json.keys();
+
+    for (const auto &name : keys) {
         auto *nameItem = new QStandardItem(name);
         auto *boolItem = new QStandardItem();
         boolItem->setData(json[name].toBool());

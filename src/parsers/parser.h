@@ -66,6 +66,8 @@ public:
     bool parse(QStringView text);
 
     Errors errors() const;
+    // The below method is added to avoid clazy-range-loop-detach warning
+    Errors &errors();
 
     StringHash spans() const;
 

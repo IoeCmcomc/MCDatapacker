@@ -102,6 +102,9 @@ void Parser::setText(QStringView text) {
 Parser::Errors Parser::errors() const {
     return m_errors;
 }
+Parser::Errors &Parser::errors() {
+    return m_errors;
+}
 
 StringHash Parser::spans() const {
     return m_spans;

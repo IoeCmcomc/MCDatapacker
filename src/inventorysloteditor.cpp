@@ -34,7 +34,7 @@ InventorySlotEditor::InventorySlotEditor(InventorySlot *parent) :
                                   &InventorySlotEditor::onNewItem);
     }
 
-    for (const auto &invItem : slot->getItems()) {
+    for (const auto &invItem : qAsConst(slot->getItems())) {
         appendItem(invItem);
     }
     ui->listView->setModel(&model);

@@ -165,9 +165,10 @@ void McfunctionHighlighter::rehighlightDelayed() {
     m_formats.resize(blocks.size());
     Command::NodeFormatter formatter(m_palette);
 
-    int    i              = -1;
-    auto &&breakPositions =
-        result->sourceMapper().backslashMap.keys().toVector();
+    int          i              = -1;
+    const auto  &backslashMap   = result->sourceMapper().backslashMap;
+    const auto &&breakPosList   = backslashMap.keys();
+    auto       &&breakPositions = breakPosList.toVector();
     for (auto iter = blocks.cbegin(); iter != blocks.cend(); ++iter) {
 //        qDebug() << "Block" << iter->blockNumber() << "at pos" <<
 //            iter->position() << "text:" << iter->text();
@@ -188,8 +189,6 @@ void McfunctionHighlighter::rehighlightDelayed() {
             }
 
             formatter.startVisiting(lineResult);
-            const auto &backslashMap =
-                result->sourceMapper().backslashMap;
             const auto &ranges = formatter.formatRanges();
             if (!backslashMap.empty()) {
                 const auto &posMapping =

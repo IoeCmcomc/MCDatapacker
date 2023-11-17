@@ -28,8 +28,9 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &LootTableCondition::onTypeChanged);
-    MainWindow *mainWin = nullptr;
-    for (auto *wid : qApp->topLevelWidgets()) {
+    MainWindow  *mainWin = nullptr;
+    const auto &&widgets = qApp->topLevelWidgets();
+    for (auto *wid : widgets) {
         if (wid->objectName() == QStringLiteral("MainWindow")) {
             mainWin = qobject_cast<MainWindow *>(wid);
             break;
@@ -159,7 +160,8 @@ QJsonObject LootTableCondition::toJson() const {
             int        childCount = ui->nested_dataInterface->entriesCount();
             if (childCount != 0) {
                 if (Game::version() < Game::v1_20) {
-                    for (const auto child : ui->nested_dataInterface->json()) {
+                    const auto &&children = ui->nested_dataInterface->json();
+                    for (const auto &child : children) {
                         auto &&cond = child.toObject();
                         if (ui->nested_andRadio->isChecked())
                             addInvertCondition(cond);
@@ -387,8 +389,9 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                 ui->entityScores_typeCombo->setCurrentIndex
                     (entityTargets.indexOf(value["entity"].toString()));
             if (value.contains("scores")) {
-                QJsonObject scores = value["scores"].toObject();
-                for (const auto &objective : scores.keys()) {
+                const QJsonObject &scores     = value["scores"].toObject();
+                const auto       &&objectives = scores.keys();
+                for (const auto &objective : objectives) {
                     auto *objectiveItem =
                         new QTableWidgetItem(objective);
                     auto *valueItem = new QTableWidgetItem();
@@ -806,12 +809,14 @@ void LootTableCondition::initBlockStatesPage() {
     const auto &&blocksInfo = Game::getInfo("block");
 
     blocksModel.appendRow(new QStandardItem(tr("(not set)")));
-    for (const auto &key : blocksInfo.keys()) {
+    const auto &&keys = blocksInfo.keys();
+    for (const auto &key : keys) {
         InventoryItem  invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {
-            auto name = blocksInfo.value(key).toMap().value("name").toString();
+            QString &&name =
+                blocksInfo.value(key).toMap().value("name").toString();
             item->setText(name);
         } else {
             item->setText(invItem.getName());

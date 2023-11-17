@@ -77,9 +77,9 @@ QString LineSplitter::nextLogicalLine() {
                 line = getCurrLineView().trimmed();
 
                 m_srcMapper.backslashMap[m_logiPos] = {
-                                                       lastPhysPos,
-                                                       m_text.mid(lastPhysPos,
-                                                                  line.cbegin() - lastLine.cend()) };
+                    lastPhysPos,
+                    m_text.mid(lastPhysPos,
+                               line.cbegin() - lastLine.cend()) };
             } while (canConcatenate(line));
             m_lastLineIsContinuation = true;
         }

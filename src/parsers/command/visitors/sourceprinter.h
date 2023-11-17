@@ -154,11 +154,6 @@ public:
         };
         void visit(NbtPathStepNode *node) override {
             using Type = NbtPathStepNode::Type;
-            static const QMap<Type, QString> type2Name {
-                { Type::Index, "Index" },
-                { Type::Key, "Key" },
-                { Type::Root, "Root" },
-            };
 
             m_text += node->leadingTrivia();
             m_text += node->leftText();

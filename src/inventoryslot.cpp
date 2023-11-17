@@ -394,7 +394,9 @@ void InventorySlot::paintEvent(QPaintEvent *event) {
                 if (!isEnabled()) {
                     auto &&image = pixmap.toImage();
 
-                    QRgb         *st         = (QRgb *)image.bits(); // Detach the image
+                    // Detach the image
+                    QRgb *st =
+                        reinterpret_cast<QRgb *>(image.bits());
                     const quint64 pixelCount = image.width() * image.height();
 
                     for (quint64 p = 0; p < pixelCount; ++p) {

@@ -221,10 +221,10 @@ void ImgViewer::resizeEvent(QResizeEvent *event) {
 }
 
 void ImgViewer::paintEvent(QPaintEvent *e) {
-    static int progress = 0;
     {
         QPainter painter(viewport());
 
+        static int progress = 0;
         if (progress >= cellSize)
             progress = 0;
         else

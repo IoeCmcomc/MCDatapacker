@@ -58,7 +58,7 @@ QIcon DarkFusionStyle::standardIcon(StandardPixmap standardIcon,
         auto &&pixmap = icon.pixmap(option->rect.size());
         auto &&image  = pixmap.toImage();
 
-        QRgb         *st         = (QRgb *)image.bits(); // Detach the image
+        QRgb         *st         = reinterpret_cast<QRgb *>(image.bits()); // Detach the image
         const quint64 pixelCount = image.width() * image.height();
 
         for (quint64 p = 0; p < pixelCount; ++p) {

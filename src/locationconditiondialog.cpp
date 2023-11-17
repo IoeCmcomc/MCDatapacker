@@ -181,7 +181,8 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
         QJsonObject block = value[QStringLiteral("block")].toObject();
         ui->block_tagRadio->setChecked(block.contains(QStringLiteral("tag")));
         if (from_1_17 && block.contains(QStringLiteral("blocks"))) {
-            for (const auto &block: block["blocks"].toArray()) {
+            const auto &&blocks = block["blocks"].toArray();
+            for (const auto &block: blocks) {
                 auto &&blockId = block.toString();
                 if (!blockId.startsWith(QStringLiteral("minecraft:")))
                     blockId.prepend(QStringLiteral("minecraft:"));
@@ -236,7 +237,9 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
 
 void LocationConditionDialog::setupStateTableFromJson(QTableWidget *table,
                                                       const QJsonObject &json) {
-    for (const auto &key : json.keys()) {
+    const auto &&keys = json.keys();
+
+    for (const auto &key : keys) {
         auto *stateItem = new QTableWidgetItem();
         stateItem->setText(key);
         auto *valueItem = new QTableWidgetItem();
@@ -276,13 +279,15 @@ void LocationConditionDialog::onAddedState() {
 void LocationConditionDialog::initBlockGroup() {
     ui->blockGroup->setChecked(false);
 
-    auto blocksInfo = Game::getInfo(QStringLiteral("block"));
-    for (const auto &key : blocksInfo.keys()) {
+    const auto &&blocksInfo = Game::getInfo(QStringLiteral("block"));
+    const auto &&keys       = blocksInfo.keys();
+    for (const auto &key : keys) {
         InventoryItem  invItem(key);
         QStandardItem *item = new QStandardItem();
         item->setIcon(QIcon(invItem.getPixmap()));
         if (invItem.getName().isEmpty()) {
-            auto name = blocksInfo.value(key).toMap().value("name").toString();
+            auto &&name =
+                blocksInfo.value(key).toMap().value("name").toString();
             item->setText(name);
         } else {
             item->setText(invItem.getName());
