@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Development;Qt;
+Comment=Minecraft datapack editor
+Exec=usr/bin/MCDatapacker
+GenericName=MCDatapacker
+Icon=mcdatapacker
+Name=MCDatapacker
+StartupNotify=true
+Terminal=false
+Type=Application
