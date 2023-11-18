@@ -181,11 +181,12 @@ QJsonObject EntityConditionDialog::toJson() const {
     if (!effects.isEmpty())
         root.insert(QStringLiteral("effects"), effects);
 
-    const QString &entityId = ui->entityTypeCombo->currentData(
+    QString &&entityId = ui->entityTypeCombo->currentData(
         Qt::UserRole + 1).toString();
+    Glhp::removePrefix(entityId, "minecraft:"_QL1);
     const bool isNotSelected = ui->entityTypeCombo->currentIndex() == 0;
 
-    if (isNotSelected || (entityId == QStringLiteral("minecraft:player"))) {
+    if (isNotSelected || (entityId == QStringLiteral("player"))) {
         QJsonObject player;
         if (ui->gameModeCombo->currentIndex() != 0)
             player.insert(QStringLiteral("gamemode"),
@@ -246,7 +247,7 @@ QJsonObject EntityConditionDialog::toJson() const {
         }
     }
 
-    if ((isNotSelected || (entityId == QStringLiteral("minecraft:cat")))
+    if ((isNotSelected || (entityId == QStringLiteral("cat")))
         && (ui->catVariantCombo->currentIndex() > 0)) {
         const auto &variant = catVariants[ui->catVariantCombo->currentIndex()];
         if (Game::version() >= Game::v1_19) {
@@ -261,7 +262,7 @@ QJsonObject EntityConditionDialog::toJson() const {
     }
 
     if ((isNotSelected ||
-         (entityId == QStringLiteral("minecraft:fishing_bobber")))
+         (entityId == QStringLiteral("fishing_bobber")))
         && (Game::version() >= Game::v1_16)) {
         QJsonObject fishingHook;
         ui->inOpenWaterCheck->insertToJsonObject(fishingHook,
@@ -277,7 +278,7 @@ QJsonObject EntityConditionDialog::toJson() const {
     }
 
     if ((isNotSelected ||
-         (entityId == QStringLiteral("minecraft:lightning_bolt")))
+         (entityId == QStringLiteral("lightning_bolt")))
         && (Game::version() >= Game::v1_17)) {
         QJsonObject lightningBolt;
         if (!ui->blocksOnFireInput->isCurrentlyUnset()) {
@@ -297,7 +298,7 @@ QJsonObject EntityConditionDialog::toJson() const {
         }
     }
 
-    if ((isNotSelected || (entityId == QStringLiteral("minecraft:frog")))
+    if ((isNotSelected || (entityId == QStringLiteral("frog")))
         && (Game::version() >= Game::v1_19)
         && (ui->frogVariantCombo->currentIndex() != 0)) {
         QJsonObject frog{ { "type", "frog" } };
@@ -308,9 +309,10 @@ QJsonObject EntityConditionDialog::toJson() const {
     }
 
     if ((isNotSelected ||
-         (entityId == QStringLiteral("minecraft:slime") ||
-          entityId == QStringLiteral("minecraft:magma_cube")))
-        && (Game::version() >= Game::v1_19)) {
+         (entityId == QStringLiteral("slime") ||
+          entityId == QStringLiteral("magma_cube")))
+        && (Game::version() >= Game::v1_19)
+        && !ui->slimeSizeInput->isCurrentlyUnset()) {
         QJsonObject slime{ { "type", "slime" } };
         slime["size"]         = ui->slimeSizeInput->toJson();
         root["type_specific"] = slime;
