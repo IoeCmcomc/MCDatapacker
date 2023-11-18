@@ -23,6 +23,37 @@
     </message>
 </context>
 <context>
+    <name>AdvancementItem</name>
+    <message>
+        <location filename="../src/advancementitem.cpp" line="73"/>
+        <source>Copy resouce location</source>
+        <translation>Sao chép vị trí tài nguyên</translation>
+    </message>
+</context>
+<context>
+    <name>AdvancementTabDock</name>
+    <message>
+        <location filename="../src/advancementtabdock.ui" line="17"/>
+        <source>Advancements viewer</source>
+        <translation>Trình xem tiến trình</translation>
+    </message>
+    <message>
+        <location filename="../src/advancementtabdock.ui" line="45"/>
+        <source>+</source>
+        <translation>+</translation>
+    </message>
+    <message>
+        <location filename="../src/advancementtabdock.ui" line="69"/>
+        <source>Reload advancements</source>
+        <translation>Tải lại các tiến trình</translation>
+    </message>
+    <message>
+        <location filename="../src/advancementtabdock.ui" line="72"/>
+        <source>⟳</source>
+        <translation>⟳</translation>
+    </message>
+</context>
+<context>
     <name>BaseCondition</name>
     <message>
         <location filename="../src/modelfunctions.cpp" line="29"/>
@@ -87,19 +118,37 @@
 <context>
     <name>CodeEditor</name>
     <message>
-        <location filename="../src/codeeditor.cpp" line="201"/>
+        <location filename="../src/codeeditor.cpp" line="189"/>
         <source>Zoom: %1%</source>
         <translation>Thu phóng: %1%</translation>
     </message>
     <message>
-        <location filename="../src/codeeditor.cpp" line="542"/>
+        <location filename="../src/codeeditor.cpp" line="522"/>
         <source>More</source>
         <translation>Thêm</translation>
     </message>
     <message>
-        <location filename="../src/codeeditor.cpp" line="547"/>
+        <location filename="../src/codeeditor.cpp" line="527"/>
         <source>Format</source>
         <translation>Định dạng</translation>
+    </message>
+</context>
+<context>
+    <name>Command::McfunctionParser</name>
+    <message>
+        <location filename="../src/parsers/command/mcfunctionparser.cpp" line="200"/>
+        <source>Invalid macro variable name &apos;%1&apos;</source>
+        <translation>Tên biến vĩ lệnh không hợp lệ &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/mcfunctionparser.cpp" line="215"/>
+        <source>Unterminated macro variable</source>
+        <translation>Biến vĩ lệnh chưa được đóng lại</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/mcfunctionparser.cpp" line="227"/>
+        <source>A macro requires at least one variable.</source>
+        <translation>Một vĩ lệnh cần ít nhất một biến.</translation>
     </message>
 </context>
 <context>
@@ -165,7 +214,7 @@
         <translation type="vanished">ID không gian tên rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="764"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="790"/>
         <source>Invalid empty player name</source>
         <translation>Tên người chơi rỗng không hợp lệ</translation>
     </message>
@@ -315,12 +364,12 @@
         <translation type="vanished">Ô bảng điểm không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.h" line="136"/>
+        <location filename="../src/parsers/command/schemaparser.h" line="132"/>
         <source>The value must be greater than or equal to %1</source>
         <translation>Giá trị phải lớn hơn hoặc bằng %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.h" line="144"/>
+        <location filename="../src/parsers/command/schemaparser.h" line="140"/>
         <source>The value must be lesser than or equal to %1</source>
         <translation>Giá trị phải nhỏ hơn hoặc bằng %1</translation>
     </message>
@@ -985,7 +1034,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <message>
         <location filename="../src/entityconditiondialog.ui" line="404"/>
         <source>Feet...</source>
-        <translation>Bàn chên...</translation>
+        <translation>Bàn chân...</translation>
     </message>
     <message>
         <location filename="../src/entityconditiondialog.ui" line="277"/>
@@ -1055,7 +1104,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/entityconditiondialog.ui" line="471"/>
-        <location filename="../src/entityconditiondialog.cpp" line="664"/>
+        <location filename="../src/entityconditiondialog.cpp" line="666"/>
         <source>Ambient</source>
         <translation>Bầu không khí</translation>
     </message>
@@ -1087,7 +1136,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/entityconditiondialog.ui" line="537"/>
-        <location filename="../src/entityconditiondialog.cpp" line="665"/>
+        <location filename="../src/entityconditiondialog.cpp" line="667"/>
         <source>Visible</source>
         <translation>Thấy được</translation>
     </message>
@@ -1281,8 +1330,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <message>
         <location filename="../src/entityconditiondialog.ui" line="737"/>
         <location filename="../src/entityconditiondialog.ui" line="778"/>
-        <location filename="../src/entityconditiondialog.cpp" line="685"/>
-        <location filename="../src/entityconditiondialog.cpp" line="696"/>
+        <location filename="../src/entityconditiondialog.cpp" line="687"/>
+        <location filename="../src/entityconditiondialog.cpp" line="698"/>
         <source>Granted</source>
         <translation>Đã nhận được</translation>
     </message>
@@ -1312,22 +1361,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>Giá trị:</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="661"/>
+        <location filename="../src/entityconditiondialog.cpp" line="663"/>
         <source>Effect</source>
         <translation>Hiệu ứng</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="662"/>
+        <location filename="../src/entityconditiondialog.cpp" line="664"/>
         <source>Amplifier</source>
         <translation>Độ mạnh</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="663"/>
+        <location filename="../src/entityconditiondialog.cpp" line="665"/>
         <source>Duration</source>
         <translation>Độ lâu</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="684"/>
+        <location filename="../src/entityconditiondialog.cpp" line="686"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
@@ -1336,22 +1385,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Đã nhận được</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="695"/>
+        <location filename="../src/entityconditiondialog.cpp" line="697"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="706"/>
+        <location filename="../src/entityconditiondialog.cpp" line="708"/>
         <source>Type</source>
         <translation>Loại</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="707"/>
+        <location filename="../src/entityconditiondialog.cpp" line="709"/>
         <source>Stat</source>
         <translation>Thống kê</translation>
     </message>
     <message>
-        <location filename="../src/entityconditiondialog.cpp" line="708"/>
+        <location filename="../src/entityconditiondialog.cpp" line="710"/>
         <source>Value</source>
         <translation>Giá trị</translation>
     </message>
@@ -1404,212 +1453,222 @@ li.checked::marker { content: &quot;\2612&quot;; }
 <context>
     <name>Glhp</name>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="376"/>
+        <location filename="../src/globalhelpers.cpp" line="391"/>
         <source>Binary</source>
         <translation>Nhị phân</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="377"/>
+        <location filename="../src/globalhelpers.cpp" line="392"/>
         <source>Structure</source>
         <translation>Cấu trúc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="378"/>
+        <location filename="../src/globalhelpers.cpp" line="393"/>
         <source>Image</source>
         <translation>Ảnh</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="379"/>
+        <location filename="../src/globalhelpers.cpp" line="394"/>
         <source>Other</source>
         <translation>Khác</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="380"/>
+        <location filename="../src/globalhelpers.cpp" line="395"/>
         <source>Function</source>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="381"/>
+        <location filename="../src/globalhelpers.cpp" line="396"/>
         <source>JSON</source>
         <translation>JSON</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="382"/>
+        <location filename="../src/globalhelpers.cpp" line="397"/>
         <source>Advancement</source>
         <translation>Tiến trình</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="383"/>
+        <location filename="../src/globalhelpers.cpp" line="398"/>
         <source>Loot table</source>
         <translation>Bảng lợi phẩm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="384"/>
+        <location filename="../src/globalhelpers.cpp" line="399"/>
         <source>Information</source>
         <translation>Thông tin</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="385"/>
+        <location filename="../src/globalhelpers.cpp" line="400"/>
         <source>Predicate</source>
         <translation>Xác lập</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="386"/>
+        <location filename="../src/globalhelpers.cpp" line="401"/>
         <source>Item modifier</source>
         <translation>Bộ sửa đổi vật phẩm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="387"/>
+        <location filename="../src/globalhelpers.cpp" line="402"/>
         <source>Recipe</source>
         <translation>Công thức</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="388"/>
+        <location filename="../src/globalhelpers.cpp" line="403"/>
         <source>Dimension</source>
         <translation>Chiều không gian</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="390"/>
+        <location filename="../src/globalhelpers.cpp" line="405"/>
         <source>Dimension type</source>
         <translation>Loại chiều không gian</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="391"/>
+        <location filename="../src/globalhelpers.cpp" line="406"/>
         <source>Chat type</source>
         <translation>Loại  trò chuyện</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="392"/>
+        <location filename="../src/globalhelpers.cpp" line="407"/>
         <source>Damage type</source>
         <translation>Loại sát thương</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="393"/>
+        <location filename="../src/globalhelpers.cpp" line="408"/>
         <source>Trim material</source>
         <translation>Vật liệu trang trí</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="394"/>
+        <location filename="../src/globalhelpers.cpp" line="409"/>
         <source>Trim pattern</source>
         <translation>Hoa văn trang trí</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="395"/>
+        <location filename="../src/globalhelpers.cpp" line="410"/>
         <source>Block tag</source>
         <translation>Nhãn khối</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="397"/>
+        <location filename="../src/globalhelpers.cpp" line="412"/>
         <source>Entity type tag</source>
         <translation>Nhãn loại thực thể</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="398"/>
+        <location filename="../src/globalhelpers.cpp" line="413"/>
         <source>Fluid tag</source>
         <translation>Nhãn chất lỏng</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="399"/>
+        <location filename="../src/globalhelpers.cpp" line="414"/>
         <source>Function tag</source>
         <translation>Nhãn hàm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="400"/>
+        <location filename="../src/globalhelpers.cpp" line="415"/>
         <source>Item tag</source>
         <translation>Nhãn vật phẩm</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="401"/>
+        <location filename="../src/globalhelpers.cpp" line="416"/>
         <source>Game event tag</source>
         <translation>Nhãn sự kiện trò chơi</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="402"/>
+        <location filename="../src/globalhelpers.cpp" line="417"/>
         <source>Tag</source>
         <translation>Nhãn</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="403"/>
+        <location filename="../src/globalhelpers.cpp" line="418"/>
         <source>World generation</source>
         <translation>Sinh thế giới</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="404"/>
+        <location filename="../src/globalhelpers.cpp" line="419"/>
         <source>Biome</source>
         <translation>Khu sinh học</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="405"/>
+        <location filename="../src/globalhelpers.cpp" line="420"/>
         <source>Carver</source>
         <translation>Bộ khắc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="406"/>
+        <location filename="../src/globalhelpers.cpp" line="421"/>
         <source>Feature</source>
         <translation>Đặc điểm địa hình</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="407"/>
+        <location filename="../src/globalhelpers.cpp" line="422"/>
         <source>Structure feature</source>
         <translation>Đối tượng cấu trúc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="410"/>
+        <location filename="../src/globalhelpers.cpp" line="425"/>
         <source>Surface builder</source>
         <translation>Bộ tạo bề mặt</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="411"/>
+        <location filename="../src/globalhelpers.cpp" line="426"/>
         <source>Noise</source>
         <translation>Nhiễu</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="413"/>
+        <location filename="../src/globalhelpers.cpp" line="428"/>
         <source>Noise settings</source>
         <translation>Thiết đặt nhiễu</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="415"/>
+        <location filename="../src/globalhelpers.cpp" line="430"/>
         <source>Placed feature</source>
         <translation>Đặc điểm được đặt</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="417"/>
+        <location filename="../src/globalhelpers.cpp" line="432"/>
         <source>Processor list</source>
         <translation>Danh sách bộ xử lí</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="418"/>
+        <location filename="../src/globalhelpers.cpp" line="433"/>
         <source>Structure set</source>
         <translation>Tập hợp cấu trúc</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="419"/>
+        <location filename="../src/globalhelpers.cpp" line="434"/>
         <source>Jigsaw pool</source>
         <translation>Nhóm mảnh ghép</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="421"/>
+        <location filename="../src/globalhelpers.cpp" line="436"/>
         <source>Flat world generator preset</source>
         <translation>Cài đặt có sẵn bộ sinh thế giới phẳng</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="423"/>
+        <location filename="../src/globalhelpers.cpp" line="438"/>
         <source>JavaScript-like Minecraft function</source>
         <translation>Hàm Minecraft giống JavaScript</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="424"/>
+        <location filename="../src/globalhelpers.cpp" line="439"/>
+        <source>JMC header</source>
+        <translation>Tệp đầu JMC</translation>
+    </message>
+    <message>
+        <location filename="../src/globalhelpers.cpp" line="440"/>
+        <source>JMC certificate</source>
+        <translation>Chứng nhận JMC</translation>
+    </message>
+    <message>
+        <location filename="../src/globalhelpers.cpp" line="441"/>
         <source>mc-build code</source>
         <translation>Mã mc-build</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="425"/>
+        <location filename="../src/globalhelpers.cpp" line="442"/>
         <source>mc-build macro</source>
         <translation>Vĩ lệnh mc-build</translation>
     </message>
     <message>
-        <location filename="../src/globalhelpers.cpp" line="427"/>
+        <location filename="../src/globalhelpers.cpp" line="444"/>
         <source>Trident code</source>
         <translation>Mã Trident</translation>
     </message>
@@ -2045,7 +2104,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/loottablecondition.ui" line="76"/>
-        <location filename="../src/loottablecondition.cpp" line="808"/>
+        <location filename="../src/loottablecondition.cpp" line="811"/>
         <source>(not set)</source>
         <translation>(không đặt)</translation>
     </message>
@@ -2664,119 +2723,119 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>Chung</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1256"/>
+        <location filename="../src/loottablefunction.ui" line="1282"/>
         <source>Function:</source>
         <translation>Hàm:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1280"/>
+        <location filename="../src/loottablefunction.ui" line="1306"/>
         <source>Apply bonus</source>
         <translation>Áp dụng thưởng thêm</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1285"/>
+        <location filename="../src/loottablefunction.ui" line="1311"/>
         <source>Copy NBT</source>
         <translation>Sao chép NBT</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1290"/>
+        <location filename="../src/loottablefunction.ui" line="1316"/>
         <source>Copy state</source>
         <translation>Sao chép trạng thái</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1295"/>
+        <location filename="../src/loottablefunction.ui" line="1321"/>
         <source>Enchant randomly </source>
         <translation>Phù phép ngẫu nhiêm</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1300"/>
+        <location filename="../src/loottablefunction.ui" line="1326"/>
         <source>Enchant with levels</source>
         <translation>Phù phép với cấp độ</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1305"/>
+        <location filename="../src/loottablefunction.ui" line="1331"/>
         <source>Exploration map</source>
         <translation>Bản đồ khám phá</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1310"/>
+        <location filename="../src/loottablefunction.ui" line="1336"/>
         <source>Fill player head</source>
         <translation>Điền bằng đầu người chơi</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1315"/>
+        <location filename="../src/loottablefunction.ui" line="1341"/>
         <source>Limit count</source>
         <translation>Giới hạn số lượng</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1320"/>
+        <location filename="../src/loottablefunction.ui" line="1346"/>
         <source>Looting enchant</source>
         <translation>Phù phép nhặt</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1330"/>
+        <location filename="../src/loottablefunction.ui" line="1361"/>
         <source>Set attributes</source>
         <translation>Đặt thuộc tính</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1340"/>
+        <location filename="../src/loottablefunction.ui" line="1371"/>
         <source>Set contents</source>
         <translation>Đặt nội dung</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1345"/>
+        <location filename="../src/loottablefunction.ui" line="1376"/>
         <source>Set count</source>
         <translation>Đặt số lượng</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1350"/>
+        <location filename="../src/loottablefunction.ui" line="1381"/>
         <source>Set damage</source>
         <translation>Đặt độ bền</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1365"/>
+        <location filename="../src/loottablefunction.ui" line="1396"/>
         <source>Set loot table</source>
         <translation>Đặt bảng lợi phẩm</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1370"/>
+        <location filename="../src/loottablefunction.ui" line="1401"/>
         <source>Set lore</source>
         <translation>Đặt thông tin</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1375"/>
+        <location filename="../src/loottablefunction.ui" line="1406"/>
         <source>Set name</source>
         <translation>Đặt tên</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1380"/>
+        <location filename="../src/loottablefunction.ui" line="1411"/>
         <source>Set NBT</source>
         <translation>Đặt NBT</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1390"/>
+        <location filename="../src/loottablefunction.ui" line="1421"/>
         <source>Set stew effect</source>
         <translation>Đặt hiệu ứng súp</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1395"/>
+        <location filename="../src/loottablefunction.ui" line="1426"/>
         <source>Copy name</source>
         <translation>Sao chép tên</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1400"/>
+        <location filename="../src/loottablefunction.ui" line="1431"/>
         <source>Explosion decay</source>
         <translation>Vụ nổ phân rã</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1405"/>
+        <location filename="../src/loottablefunction.ui" line="1436"/>
         <source>Furnace smelt</source>
         <translation>Nung như lò nung</translation>
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="49"/>
         <location filename="../src/loottablefunction.ui" line="322"/>
-        <location filename="../src/loottablefunction.ui" line="941"/>
+        <location filename="../src/loottablefunction.ui" line="967"/>
         <source>Enchantment:</source>
         <translation>Phù phép:</translation>
     </message>
@@ -2822,7 +2881,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="142"/>
-        <location filename="../src/loottablefunction.ui" line="817"/>
+        <location filename="../src/loottablefunction.ui" line="843"/>
         <source>Append</source>
         <translation>Nối thêm</translation>
     </message>
@@ -2833,7 +2892,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="152"/>
-        <location filename="../src/loottablefunction.ui" line="1060"/>
+        <location filename="../src/loottablefunction.ui" line="1086"/>
         <source>Replace</source>
         <translation>Thay thế</translation>
     </message>
@@ -2851,8 +2910,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <location filename="../src/loottablefunction.ui" line="134"/>
         <location filename="../src/loottablefunction.ui" line="311"/>
         <location filename="../src/loottablefunction.ui" line="342"/>
-        <location filename="../src/loottablefunction.ui" line="660"/>
-        <location filename="../src/loottablefunction.ui" line="1191"/>
+        <location filename="../src/loottablefunction.ui" line="686"/>
+        <location filename="../src/loottablefunction.ui" line="1217"/>
         <source>Add</source>
         <translation>Thêm</translation>
     </message>
@@ -2863,7 +2922,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="211"/>
-        <location filename="../src/loottablefunction.ui" line="614"/>
+        <location filename="../src/loottablefunction.ui" line="640"/>
         <source>Operation</source>
         <translation>Thao tác</translation>
     </message>
@@ -2880,16 +2939,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <message>
         <location filename="../src/loottablefunction.ui" line="173"/>
         <location filename="../src/loottablefunction.ui" line="487"/>
-        <location filename="../src/loottablefunction.ui" line="1086"/>
-        <location filename="../src/loottablefunction.ui" line="1126"/>
+        <location filename="../src/loottablefunction.ui" line="1112"/>
+        <location filename="../src/loottablefunction.ui" line="1152"/>
         <source>Killer</source>
         <translation>Vật giết</translation>
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="178"/>
         <location filename="../src/loottablefunction.ui" line="492"/>
-        <location filename="../src/loottablefunction.ui" line="1091"/>
-        <location filename="../src/loottablefunction.ui" line="1131"/>
+        <location filename="../src/loottablefunction.ui" line="1117"/>
+        <location filename="../src/loottablefunction.ui" line="1157"/>
         <source>Killer player</source>
         <translation>Người giết</translation>
     </message>
@@ -2916,8 +2975,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <message>
         <location filename="../src/loottablefunction.ui" line="294"/>
         <location filename="../src/loottablefunction.ui" line="349"/>
-        <location filename="../src/loottablefunction.ui" line="588"/>
-        <location filename="../src/loottablefunction.ui" line="1218"/>
+        <location filename="../src/loottablefunction.ui" line="614"/>
+        <location filename="../src/loottablefunction.ui" line="1244"/>
         <source>Right click a row to delete it.</source>
         <translation>Nháy chuột phải vào một hàng để xoá.</translation>
     </message>
@@ -2975,8 +3034,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="482"/>
-        <location filename="../src/loottablefunction.ui" line="1081"/>
-        <location filename="../src/loottablefunction.ui" line="1121"/>
+        <location filename="../src/loottablefunction.ui" line="1107"/>
+        <location filename="../src/loottablefunction.ui" line="1147"/>
         <source>This (self)</source>
         <translation>Chính nó</translation>
     </message>
@@ -2988,251 +3047,256 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="521"/>
-        <location filename="../src/loottablefunction.ui" line="879"/>
+        <location filename="../src/loottablefunction.ui" line="905"/>
         <source>Count:</source>
         <translation>Số lượng:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="578"/>
+        <location filename="../src/loottablefunction.ui" line="604"/>
         <source>Attribute:</source>
         <translation>Thuộc tính:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="604"/>
+        <location filename="../src/loottablefunction.ui" line="630"/>
         <source>Name</source>
         <translation>Tên</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="609"/>
+        <location filename="../src/loottablefunction.ui" line="635"/>
         <source>Attribute</source>
         <translation>Thuộc tính</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="619"/>
+        <location filename="../src/loottablefunction.ui" line="645"/>
         <source>Amount</source>
         <oldsource>Ammount</oldsource>
         <translation>Số lượng</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="624"/>
+        <location filename="../src/loottablefunction.ui" line="650"/>
         <source>Slot</source>
         <translation>Ô</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="629"/>
+        <location filename="../src/loottablefunction.ui" line="655"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="637"/>
+        <location filename="../src/loottablefunction.ui" line="663"/>
         <source>Amount:</source>
         <oldsource>Ammount:</oldsource>
         <translation>Số lượng:</translation>
     </message>
     <message>
         <location filename="../src/loottablefunction.ui" line="561"/>
-        <location filename="../src/loottablefunction.ui" line="647"/>
-        <location filename="../src/loottablefunction.ui" line="999"/>
-        <location filename="../src/loottablefunction.ui" line="1139"/>
+        <location filename="../src/loottablefunction.ui" line="673"/>
+        <location filename="../src/loottablefunction.ui" line="1025"/>
+        <location filename="../src/loottablefunction.ui" line="1165"/>
         <source>Name:</source>
         <translation>Tên:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="670"/>
+        <location filename="../src/loottablefunction.ui" line="696"/>
         <source>ID:</source>
         <translation>ID:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="690"/>
+        <location filename="../src/loottablefunction.ui" line="716"/>
         <source>Operation:</source>
         <translation>Thao tác:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="700"/>
+        <location filename="../src/loottablefunction.ui" line="726"/>
         <source>Slots</source>
         <translation>Các ô</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="706"/>
+        <location filename="../src/loottablefunction.ui" line="732"/>
         <source>Head</source>
         <translation>Đầu</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="713"/>
+        <location filename="../src/loottablefunction.ui" line="739"/>
         <source>Offhand</source>
         <translation>Tay phụ</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="720"/>
+        <location filename="../src/loottablefunction.ui" line="746"/>
         <source>Mainhand</source>
         <translation>Tay chính</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="727"/>
+        <location filename="../src/loottablefunction.ui" line="753"/>
         <source>Legs</source>
         <translation>Cánh chân</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="734"/>
+        <location filename="../src/loottablefunction.ui" line="760"/>
         <source>Feet</source>
         <translation>Bàn chân</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="741"/>
+        <location filename="../src/loottablefunction.ui" line="767"/>
         <source>Chest</source>
         <translation>Ngực</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="752"/>
+        <location filename="../src/loottablefunction.ui" line="778"/>
         <source>Addition</source>
         <translation>Thêm</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="757"/>
+        <location filename="../src/loottablefunction.ui" line="783"/>
         <source>Multiply base</source>
         <translation>Nhân cơ số</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="762"/>
+        <location filename="../src/loottablefunction.ui" line="788"/>
         <source>Multiply total</source>
         <translation>Nhân tống số</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="777"/>
+        <location filename="../src/loottablefunction.ui" line="803"/>
         <source>Pattern</source>
         <translation>Hoa văn</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="777"/>
+        <location filename="../src/loottablefunction.ui" line="803"/>
         <source>Color</source>
         <translation>Màu</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="787"/>
+        <location filename="../src/loottablefunction.ui" line="813"/>
         <source>Pattern:</source>
         <translation>Hoa văn:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="800"/>
+        <location filename="../src/loottablefunction.ui" line="826"/>
         <source>Color:</source>
         <translation>Màu:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="846"/>
-        <location filename="../src/loottablefunction.ui" line="1036"/>
+        <location filename="../src/loottablefunction.ui" line="872"/>
+        <location filename="../src/loottablefunction.ui" line="1062"/>
         <source>Type:</source>
         <translation>Loại:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="896"/>
-        <location filename="../src/loottablefunction.ui" line="920"/>
+        <location filename="../src/loottablefunction.ui" line="922"/>
+        <location filename="../src/loottablefunction.ui" line="946"/>
         <source>Add (change is relative to the current value)</source>
         <translation>Thêm (thay đổi tương đối so với giá trị hiện tại)</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="907"/>
+        <location filename="../src/loottablefunction.ui" line="933"/>
         <source>Damage:</source>
         <translation>Độ bền:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="931"/>
+        <location filename="../src/loottablefunction.ui" line="957"/>
         <source>Enchantment</source>
         <translation>Phù phép</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="931"/>
+        <location filename="../src/loottablefunction.ui" line="957"/>
         <source>Level</source>
         <translation>Cấp độ</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="954"/>
+        <location filename="../src/loottablefunction.ui" line="980"/>
         <source>Level:</source>
         <translation>Cấp độ:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="971"/>
+        <location filename="../src/loottablefunction.ui" line="997"/>
         <source>Add (change is relative to the current level)</source>
         <translation>Thêm (thay đổi tương đối so với cấp độ hiện tại)</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="982"/>
+        <location filename="../src/loottablefunction.ui" line="1008"/>
         <source>Instrument:</source>
         <translation>Nhạc cụ:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1009"/>
+        <location filename="../src/loottablefunction.ui" line="1035"/>
         <source>namespace:id</source>
         <translation>namespace:id</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1016"/>
+        <location filename="../src/loottablefunction.ui" line="1042"/>
         <source>Seed:</source>
         <translation>Số nguồn:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1067"/>
-        <location filename="../src/loottablefunction.ui" line="1113"/>
+        <location filename="../src/loottablefunction.ui" line="1093"/>
+        <location filename="../src/loottablefunction.ui" line="1139"/>
         <source>Entity</source>
         <translation>Thực thể:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1157"/>
+        <location filename="../src/loottablefunction.ui" line="1183"/>
         <source>NBT:</source>
         <translation>NBT:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1174"/>
+        <location filename="../src/loottablefunction.ui" line="1200"/>
         <source>Potion:</source>
         <translation>Thuốc:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1198"/>
+        <location filename="../src/loottablefunction.ui" line="1224"/>
         <source>Duration:</source>
         <translation>Độ lâu:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1208"/>
+        <location filename="../src/loottablefunction.ui" line="1234"/>
         <source>Effect:</source>
         <translation>Hiệu ứng:</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1228"/>
+        <location filename="../src/loottablefunction.ui" line="1254"/>
         <source>Effect</source>
         <translation>Hiệu ứng</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1233"/>
+        <location filename="../src/loottablefunction.ui" line="1259"/>
         <source>Duration</source>
         <translation>Độ lâu</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1325"/>
+        <location filename="../src/loottablefunction.ui" line="1351"/>
         <source>Reference</source>
         <translation>Tham chiếu</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1335"/>
+        <location filename="../src/loottablefunction.ui" line="1356"/>
+        <source>Sequence</source>
+        <translation>Chuỗi</translation>
+    </message>
+    <message>
+        <location filename="../src/loottablefunction.ui" line="1366"/>
         <source>Set banner pattern</source>
         <translation>Đặt hoa văn cờ hiệu</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1355"/>
+        <location filename="../src/loottablefunction.ui" line="1386"/>
         <source>Set enchantments</source>
         <translation>Đặt phù phép</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1360"/>
+        <location filename="../src/loottablefunction.ui" line="1391"/>
         <source>Set instrument</source>
         <translation>Đặt nhạc cụ</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1385"/>
+        <location filename="../src/loottablefunction.ui" line="1416"/>
         <source>Set potion</source>
         <translation>Đặt thuốc</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.ui" line="1414"/>
-        <location filename="../src/loottablefunction.cpp" line="1024"/>
+        <location filename="../src/loottablefunction.ui" line="1445"/>
+        <location filename="../src/loottablefunction.cpp" line="1057"/>
         <source>Conditions (%1)</source>
         <translation>Các điều kiện (%1)</translation>
     </message>
@@ -3241,7 +3305,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Các điều kiện</translation>
     </message>
     <message>
-        <location filename="../src/loottablefunction.cpp" line="1030"/>
+        <location filename="../src/loottablefunction.cpp" line="1063"/>
         <source>(not set)</source>
         <translation>(không đặt)</translation>
     </message>
@@ -3311,7 +3375,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Mở</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="240"/>
+        <location filename="../src/mainwindow.ui" line="251"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
@@ -3360,237 +3424,267 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>Mod &amp;Minecraft</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="211"/>
+        <location filename="../src/mainwindow.ui" line="201"/>
+        <source>&amp;Distribution platforms</source>
+        <translation>&amp;Nền tảng phân phối</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="222"/>
         <source>&amp;Edit</source>
         <translation>&amp;Chỉnh sửa</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="223"/>
+        <location filename="../src/mainwindow.ui" line="234"/>
         <source>&amp;Tools</source>
         <translation>Cô&amp;ng cụ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="237"/>
+        <location filename="../src/mainwindow.ui" line="248"/>
         <source>Open &amp;file</source>
         <translation>Mở &amp;tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="245"/>
+        <location filename="../src/mainwindow.ui" line="256"/>
         <source>&amp;Open datapack</source>
         <translation>&amp;Mở gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="248"/>
+        <location filename="../src/mainwindow.ui" line="259"/>
         <source>Open a datapack for editing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="251"/>
+        <location filename="../src/mainwindow.ui" line="262"/>
         <source>Ctrl+Shift+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="256"/>
+        <location filename="../src/mainwindow.ui" line="267"/>
         <source>&amp;Save</source>
         <translation>&amp;Lưu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="267"/>
+        <location filename="../src/mainwindow.ui" line="278"/>
         <source>E&amp;xit</source>
         <translation>&amp;Thoát</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="275"/>
+        <location filename="../src/mainwindow.ui" line="286"/>
         <source>&amp;New datapack</source>
         <translation>Gói dữ liệu &amp;mới</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="281"/>
+        <location filename="../src/mainwindow.ui" line="292"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="286"/>
+        <location filename="../src/mainwindow.ui" line="297"/>
         <source>&amp;Options...</source>
         <translation>&amp;Tuỳ chọn...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="289"/>
+        <location filename="../src/mainwindow.ui" line="300"/>
         <source>Open the settings dialog</source>
         <translation>Mở hộp thoại thiết đặt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="297"/>
+        <location filename="../src/mainwindow.ui" line="308"/>
         <source>Save &amp;all</source>
         <translation>Lưu &amp;hết</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="308"/>
+        <location filename="../src/mainwindow.ui" line="319"/>
         <source>&amp;About MCDatapacker</source>
         <translation>&amp;Về MCDatapacker</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="316"/>
+        <location filename="../src/mainwindow.ui" line="327"/>
         <source>About &amp;Qt</source>
         <translation>Về &amp;Qt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="324"/>
+        <location filename="../src/mainwindow.ui" line="335"/>
         <source>&amp;Disclaimer</source>
         <translation>&amp;Lời từ chối</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="332"/>
+        <location filename="../src/mainwindow.ui" line="343"/>
         <source>&amp;Undo</source>
         <translation>&amp;Hoàn tác</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="335"/>
+        <location filename="../src/mainwindow.ui" line="346"/>
         <source>Ctrl+Z</source>
         <translation>Ctrl+Z</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="343"/>
+        <location filename="../src/mainwindow.ui" line="354"/>
         <source>&amp;Redo</source>
         <translation>&amp;Làm lại</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="346"/>
+        <location filename="../src/mainwindow.ui" line="357"/>
         <source>Ctrl+Y</source>
         <translation>Ctrl+Y</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="354"/>
+        <location filename="../src/mainwindow.ui" line="365"/>
         <source>Select &amp;all</source>
         <translation>C&amp;họn tất cả</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="357"/>
+        <location filename="../src/mainwindow.ui" line="368"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="365"/>
+        <location filename="../src/mainwindow.ui" line="376"/>
         <source>Cut</source>
         <translation>&amp;Cắt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="368"/>
+        <location filename="../src/mainwindow.ui" line="379"/>
         <source>Ctrl+X</source>
         <translation>Ctrl+X</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="376"/>
+        <location filename="../src/mainwindow.ui" line="387"/>
         <source>&amp;Copy</source>
         <translation>&amp;Sao chép</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="379"/>
+        <location filename="../src/mainwindow.ui" line="390"/>
         <source>Ctrl+C</source>
         <translation>Ctrl+C</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="387"/>
+        <location filename="../src/mainwindow.ui" line="398"/>
         <source>&amp;Paste</source>
         <translation>&amp;Dán</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="390"/>
+        <location filename="../src/mainwindow.ui" line="401"/>
         <source>Ctrl+V</source>
         <translation>Ctrl+V</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="395"/>
+        <location filename="../src/mainwindow.ui" line="406"/>
         <source>R&amp;estart</source>
         <translation>&amp;Khởi động lại</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="406"/>
+        <location filename="../src/mainwindow.ui" line="417"/>
         <source>&amp;Statistics</source>
         <translation>&amp;Thống kê</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="411"/>
+        <location filename="../src/mainwindow.ui" line="422"/>
         <source>&amp;Raw JSON text editor</source>
         <translation>Trình sửa &amp;JSON thô</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="416"/>
+        <location filename="../src/mainwindow.ui" line="427"/>
         <source>&amp;Check for updates</source>
         <translation>&amp;Kiểm tra cập nhật</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="421"/>
+        <location filename="../src/mainwindow.ui" line="432"/>
         <source>UUID converter</source>
         <translation>Bộ chuyển đổi UUID</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="426"/>
+        <location filename="../src/mainwindow.ui" line="437"/>
         <source>Snowcapped – Dimension layout editor</source>
         <translation>Snowcapped – Trình sửa bố cục không gian tên</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="431"/>
+        <location filename="../src/mainwindow.ui" line="442"/>
         <source>Generators for datapack</source>
         <translation>Bộ sinh cho gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="436"/>
+        <location filename="../src/mainwindow.ui" line="447"/>
         <source>Datapack upgrader</source>
         <translation>Trình nâng cấp gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="441"/>
+        <location filename="../src/mainwindow.ui" line="452"/>
         <source>MCStacker – Command generators</source>
         <translation>MCStacker – Bộ sinh cậu lệnh</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="446"/>
+        <location filename="../src/mainwindow.ui" line="457"/>
         <source>PackSquash – datapack optimizer</source>
         <translation>PackSquash – tối ưu hoá gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="451"/>
-        <location filename="../src/mainwindow.ui" line="454"/>
+        <location filename="../src/mainwindow.ui" line="462"/>
+        <location filename="../src/mainwindow.ui" line="465"/>
         <source>Better Command Block UI</source>
         <translation>Better Command Block UI</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="459"/>
+        <location filename="../src/mainwindow.ui" line="470"/>
         <source>Data Reload</source>
         <translation>Data Reload</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="464"/>
+        <location filename="../src/mainwindow.ui" line="475"/>
         <source>NBT Autocomplete</source>
         <translation>NBT Autocomplete</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="469"/>
+        <location filename="../src/mainwindow.ui" line="480"/>
         <source>CommandHelper</source>
         <translation>CommandHelper</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="474"/>
+        <location filename="../src/mainwindow.ui" line="485"/>
         <source>NBTtooltips</source>
         <translation>NBTtooltips</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="479"/>
+        <location filename="../src/mainwindow.ui" line="490"/>
         <source>Minecraft Tools</source>
         <translation>Minecraft Tools</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="495"/>
+        <source>Command Extractor</source>
+        <translation>Command Extractor</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="500"/>
+        <source>Planet Minecraft</source>
+        <translation>Planet Minecraft</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="505"/>
+        <source>Modrinth</source>
+        <translation>Modrinth</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="510"/>
+        <source>Smithed</source>
+        <translation>Smithed</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="515"/>
+        <source>Datamancer</source>
+        <translation>Datamancer</translation>
     </message>
     <message>
         <source>Save</source>
         <translation type="vanished">Lưu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="259"/>
+        <location filename="../src/mainwindow.ui" line="270"/>
         <source>Save the currently editing file</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="262"/>
+        <location filename="../src/mainwindow.ui" line="273"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
@@ -3599,7 +3693,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Thoát</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="398"/>
+        <location filename="../src/mainwindow.ui" line="409"/>
         <source>Shift+Esc</source>
         <translation></translation>
     </message>
@@ -3608,7 +3702,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Gói dữ liệu mới</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="278"/>
+        <location filename="../src/mainwindow.ui" line="289"/>
         <source>Create a new datapack</source>
         <translation></translation>
     </message>
@@ -3617,7 +3711,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Thiết đặt...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="300"/>
+        <location filename="../src/mainwindow.ui" line="311"/>
         <source>Save all unsaved files</source>
         <translation>Lưu tất cả các tệp chưa được lưu</translation>
     </message>
@@ -3630,7 +3724,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Lưu tất cả</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="303"/>
+        <location filename="../src/mainwindow.ui" line="314"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
@@ -3643,32 +3737,32 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Về Qt...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="244"/>
+        <location filename="../src/mainwindow.cpp" line="261"/>
         <source>Open file</source>
         <translation>Mở tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="268"/>
+        <location filename="../src/mainwindow.cpp" line="285"/>
         <source>Save File</source>
         <translation>Lưu tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="368"/>
+        <location filename="../src/mainwindow.cpp" line="385"/>
         <source>Reload file</source>
         <translation>Tải lại tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="369"/>
+        <location filename="../src/mainwindow.cpp" line="386"/>
         <source>The file %1 has been changed exernally.</source>
         <translation>Tệp %1 đã được thay đổi từ bên ngoài.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="371"/>
+        <location filename="../src/mainwindow.cpp" line="388"/>
         <source>Do you want to reload this file?</source>
         <translation>Bạn có muốn tải lại tệp này không?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="547"/>
+        <location filename="../src/mainwindow.cpp" line="564"/>
         <source>Unsaved changes</source>
         <translation>Thay đổi chưa lưu</translation>
     </message>
@@ -3697,7 +3791,7 @@ Bạn có muốn lưu các thay đổi không?</translation>
 %2.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="996"/>
+        <location filename="../src/mainwindow.cpp" line="1016"/>
         <source>Open datapack folder</source>
         <translation>Mở thư mục gói dữ liệu</translation>
     </message>
@@ -3710,29 +3804,29 @@ Bạn có muốn lưu các thay đổi không?</translation>
         <translation type="vanished">Lỗi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="467"/>
+        <location filename="../src/mainwindow.cpp" line="484"/>
         <source>Changing game version</source>
         <translation>Thay đổi phiên bản trò chơi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="468"/>
+        <location filename="../src/mainwindow.cpp" line="485"/>
         <source>The game version has been changed from %1 to %2
 The program need to restart to apply the changes.</source>
         <translation>Phiên bản trò chơi đã được thay đổi từ %1 sang %2
 Chương trình cần phải khởi động lại để áp dụng các thay đổi.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="472"/>
+        <location filename="../src/mainwindow.cpp" line="489"/>
         <source>Restart</source>
         <translation>Khởi động lại</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="475"/>
+        <location filename="../src/mainwindow.cpp" line="492"/>
         <source>Keep</source>
         <translation>Giữ lại</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="548"/>
+        <location filename="../src/mainwindow.cpp" line="565"/>
         <source>Some document(s) has been modified.
 Do you want to save your changes?</source>
         <translation>Một vài tài liệu đã được thay đổi.
@@ -3743,78 +3837,78 @@ Bạn có muốn lưu các thay đổi của bạn không?</translation>
         <translation type="vanished">Gói dữ liệu không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="577"/>
+        <location filename="../src/mainwindow.cpp" line="594"/>
         <source>Invalid datapack</source>
         <translation>Gói dữ liệu không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="578"/>
+        <location filename="../src/mainwindow.cpp" line="595"/>
         <source>The pack format in the pack.memeta file must be greater than zero.</source>
         <translation>Định dạng gói trong tệp pack.memeta phải lớn hơn không.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="622"/>
-        <location filename="../src/mainwindow.cpp" line="627"/>
+        <location filename="../src/mainwindow.cpp" line="642"/>
+        <location filename="../src/mainwindow.cpp" line="647"/>
         <source>Can&apos;t load datapack</source>
         <translation>Không thể nạp gói dữ liệu</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="623"/>
+        <location filename="../src/mainwindow.cpp" line="643"/>
         <source>The specified datapack must have a pack.mcmeta file.</source>
         <translation>Gói dữ liệu được chỉ định phải có một tệp pack.mcmeta.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
+        <location filename="../src/mainwindow.cpp" line="648"/>
         <source>The specified datapack must contain a /data folder.</source>
         <translation>Gói dữ liệu được chỉ định phải có một thư mục /data.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="650"/>
+        <location filename="../src/mainwindow.cpp" line="670"/>
         <source>The file is not a vaild JSON file.</source>
         <translation>Tệp này không phải là một tệp JSON hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="654"/>
+        <location filename="../src/mainwindow.cpp" line="674"/>
         <source>The file must contain a JSON object.</source>
         <translation>Tệp phải chứa một đối tượng JSON.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="661"/>
+        <location filename="../src/mainwindow.cpp" line="681"/>
         <source>The file contents is empty.</source>
         <translation>Nội dung tệp bị rỗng.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="678"/>
+        <location filename="../src/mainwindow.cpp" line="698"/>
         <source>The pack format number must be greater than 0.</source>
         <translation>Số định dạng gói phải lớn hơn 0.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="682"/>
+        <location filename="../src/mainwindow.cpp" line="702"/>
         <source>The %1 object must have the %2 and %3 keys</source>
         <translation>Đối tượng %1 phải có khoá %2 và %3</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="689"/>
+        <location filename="../src/mainwindow.cpp" line="709"/>
         <source>The root object must have the %1 section.</source>
         <translation>Đối tượng gốc phải có phần %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="888"/>
+        <location filename="../src/mainwindow.cpp" line="908"/>
         <source>Extracting files</source>
         <translation>Đang giải nén các tệp</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="896"/>
+        <location filename="../src/mainwindow.cpp" line="916"/>
         <source>Extracting: %1</source>
         <translation>Đang giải nén: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="950"/>
+        <location filename="../src/mainwindow.cpp" line="970"/>
         <source>Folder not empty</source>
         <translation>Thư mục không rỗng</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="951"/>
+        <location filename="../src/mainwindow.cpp" line="971"/>
         <source>The folder is not empty.
 Do you want to recreate this folder?</source>
         <translation>Thư mục này không trống.
@@ -4048,12 +4142,12 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <translation type="vanished">Mở thư mục</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.cpp" line="52"/>
+        <location filename="../src/newdatapackdialog.cpp" line="54"/>
         <source>Create</source>
         <translation>Tạo</translation>
     </message>
     <message>
-        <location filename="../src/newdatapackdialog.cpp" line="67"/>
+        <location filename="../src/newdatapackdialog.cpp" line="69"/>
         <source>Choose folder to create new datapack</source>
         <translation>Chọn thư mục để tạo gói dữ liệu mới</translation>
     </message>
@@ -4109,17 +4203,17 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <translation>Lỗi cú pháp tại vị trí %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="179"/>
+        <location filename="../src/parsers/parser.cpp" line="199"/>
         <source>Unexpected %1, expecting %2</source>
         <translation>Không mong đợi %1, đang mong đợi %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="328"/>
+        <location filename="../src/parsers/parser.cpp" line="348"/>
         <source>Incomplete quoted string</source>
         <translation>Xâu trích dẫn chưa được hoàn thành</translation>
     </message>
     <message>
-        <location filename="../src/parsers/parser.cpp" line="368"/>
+        <location filename="../src/parsers/parser.cpp" line="388"/>
         <source>Invalid Unicode code point</source>
         <translation>Điểm mã Unicode không hợp lệ</translation>
     </message>
@@ -4129,208 +4223,218 @@ Bạn có muốn tạo lại thư mục này không?</translation>
         <translation>Không thể kết hợp toạ độ thế giới &amp; cục bộ (mọi thứ phải dùng ^ hoặc để trống).</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="98"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="67"/>
         <source>Invalid axis value</source>
         <translation>Giá trị trục không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="243"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="88"/>
+        <source>Local coordinates can&apos;t be used here</source>
+        <translation>Toạ độ cục bộ không thể được dùng ở đây</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="106"/>
+        <source>Missing an axis here</source>
+        <translation>Bị thiếu một trục ở đây</translation>
+    </message>
+    <message>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="257"/>
         <source>Invalid empty tag value</source>
         <translation>Giá trị nhãn rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="268"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="282"/>
         <source>%1 is not a vaild SNBT byte tag</source>
         <translation>%1 không phải là một nhãn byte SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="281"/>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="333"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="295"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="347"/>
         <source>%1 is not a vaild SNBT double tag</source>
         <translation>%1 không phải là một nhãn phẩy động đôi SNBThợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="294"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="308"/>
         <source>%1 is not a vaild SNBT float tag</source>
         <translation>%1 không phải là một nhãn phẩy động đơn SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="307"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="321"/>
         <source>%1 is not a vaild SNBT long tag</source>
         <translation>%1 không phải là một nhãn số nguyên dài SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="320"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="334"/>
         <source>%1 is not a vaild SNBT short tag</source>
         <translation>%1 không phải là một nhãn số nguyên ngắn SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="348"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="362"/>
         <source>%1 is not a vaild SNBT integer tag</source>
         <translation>%1 không phải là một nhãn số nguyên SNBT hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="462"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="476"/>
         <source>Invalid empty name in target selector</source>
         <translation>Tên rỗng không hợp lệ trong bộ chọn mục tiêu</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="498"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="512"/>
         <source>Unknown entity argument name: %1</source>
         <translation>Tên đối số thực thể không hợp lệ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="536"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="550"/>
         <source>Invalid target selector variable: %1</source>
         <translation>Biến chọn mục tiêu không hợp lệ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="598"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="625"/>
         <source>Invalid empty NBT path key</source>
         <translation>Khoá đường dẫn NBT rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="657"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="683"/>
         <source>A resource location tag is not allowed here.</source>
         <translation>Không được để nhãn vị trí tài nguyên ở đây.</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="677"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="703"/>
         <source>The character &apos;/&apos; is not allowed in the namespace</source>
         <translation>Kí tự &apos;/&apos; không được cho phép trong không gian tên</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="687"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="713"/>
         <source>Invalid empty namespaced ID</source>
         <translation>ID không gian tên rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1116"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1141"/>
         <source>Invalid empty item slot</source>
         <translation>Ô vật phẩm rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1181"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1207"/>
         <source>Missing character &apos;.&apos; before a named tag</source>
         <translation>Thiếu kí tự &apos;.&apos; trước một nhãn có tên</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1206"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1232"/>
         <source>Invalid empty objective</source>
         <translation>Mục tiêu rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1210"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1236"/>
         <source>Objective &apos;%1&apos; must be less than 16 characters</source>
         <translation>Mục tiêu &apos;%1&apos; phải ngắn hơn 16 kí tự</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1225"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1251"/>
         <source>Invalid empty objective criteria</source>
         <translation>Tiêu chí mục tiêu rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1435"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1466"/>
         <source>Invalid empty team</source>
         <translation>Đội rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1445"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1476"/>
         <source>Invalid time</source>
         <translation>Thời gian không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1510"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1541"/>
         <source>Invalid UUID</source>
         <translation>UUID không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.cpp" line="1538"/>
+        <location filename="../src/parsers/command/minecraftparser.cpp" line="1569"/>
         <source>Invalid empty greedy string</source>
         <translation>Xâu lấn chiếm rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/minecraftparser.h" line="154"/>
+        <location filename="../src/parsers/command/minecraftparser.h" line="155"/>
         <source>Only accept one of the following: %1</source>
         <translation>Chỉ chấp nhận một trong số những thứ sau: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="550"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="534"/>
         <source>A boolean value can only be either &apos;true&apos; or &apos;false&apos;</source>
         <translation>Một giá trị boolean chỉ có thể là &apos;true&apos; hoặc &apos;false&apos;</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="564"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="548"/>
         <source>%1 is not a vaild double number</source>
         <translation>%1 không phải là một số phẩy động đôi hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="588"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="572"/>
         <source>%1 is not a vaild float number</source>
         <translation>%1 không phải là một số phẩy động đơn hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="612"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="596"/>
         <source>%1 is not a vaild integer number</source>
         <translation>%1 không phải là một số nguyên hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="634"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="618"/>
         <source>%1 is not a vaild long number</source>
         <translation>%1 không phải là một số nguyên dài hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="657"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="641"/>
         <source>The required paramenter &apos;type&apos; of the &apos;brigadier:string&apos; argument parser is missing.</source>
         <translation>Tham số bắt buộc &apos;type&apos; của trình phân tích đối số &apos;brigadier:string&apos; bị thiếu.</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="686"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="670"/>
         <source>Invalid empty word.</source>
         <translation>Từ rỗng không hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="759"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="743"/>
         <source>Incompleted command</source>
         <translation>Lệnh chưa được hoàn thiện</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="794"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="778"/>
         <source>Cannot parse unsupported argument type</source>
         <translation>Không thể phân tích kiểu đối số không được hỗ trợ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="912"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="896"/>
         <source>Available commands: %1</source>
         <translation>Các lệnh hiện có: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="917"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="901"/>
         <source>Available sub-commands: %1</source>
         <translation>Các lệnh phụ hiện có: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="921"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="905"/>
         <source>Invalid empty sub-command</source>
         <translation>Lệnh phụ rỗng không hợp lệ</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="929"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="913"/>
         <source>Unknown command &apos;%1&apos;. Available commands: %2</source>
         <translation>Lệnh không rõ &apos;%1&apos;. Các lệnh hiện có: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="935"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="919"/>
         <source>Unknown command &apos;%1&apos;</source>
         <translation>Lệnh không rõ: %1</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="942"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="926"/>
         <source>Unknown sub-command &apos;%1&apos;. Available sub-commands: %2</source>
         <translation>Lệnh phụ không rõ &apos;%1&apos;. Các lệnh phụ hiện có: %2</translation>
     </message>
     <message>
-        <location filename="../src/parsers/command/schemaparser.cpp" line="948"/>
+        <location filename="../src/parsers/command/schemaparser.cpp" line="932"/>
         <source>Unknown sub-command &apos;%1&apos;</source>
         <translation>Lệnh phụ không rõ: &apos;%1&apos;</translation>
     </message>
@@ -4842,32 +4946,42 @@ Có tệp load.json: %2</translation>
     </message>
     <message>
         <location filename="../src/statisticsdialog.ui" line="144"/>
-        <location filename="../src/statisticsdialog.ui" line="248"/>
+        <location filename="../src/statisticsdialog.ui" line="249"/>
         <source>Count</source>
         <translation>Số lượng</translation>
     </message>
     <message>
         <location filename="../src/statisticsdialog.ui" line="149"/>
-        <location filename="../src/statisticsdialog.ui" line="253"/>
+        <location filename="../src/statisticsdialog.ui" line="254"/>
         <source>Count %</source>
         <translation>% số lượng</translation>
+    </message>
+    <message>
+        <source>Number of commands: %1
+Number of comment lines: %2
+Number of syntax errors: %3</source>
+        <translation type="vanished">Số lượng lệnh: %1
+Số chú thích: %2
+Số lỗi cú pháp: %3</translation>
     </message>
     <message>
         <location filename="../src/statisticsdialog.ui" line="173"/>
         <source>Number of commands: %1
 Number of comment lines: %2
-Number of syntax errors: %3</source>
+Number of macros: %3
+Number of syntax errors: %4</source>
         <translation>Số lượng lệnh: %1
 Số chú thích: %2
-Số lỗi cú pháp: %3</translation>
+Số vĩ lệnh: %3
+Số lỗi cú pháp: %4</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="185"/>
+        <location filename="../src/statisticsdialog.ui" line="186"/>
         <source>Target selectors</source>
         <translation>Bộ chọn mục tiêu</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="191"/>
+        <location filename="../src/statisticsdialog.ui" line="192"/>
         <source>@a: %1
 @e: %2
 @p: %3
@@ -4880,48 +4994,48 @@ Số lỗi cú pháp: %3</translation>
 @s: %5</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="205"/>
+        <location filename="../src/statisticsdialog.ui" line="206"/>
         <source>Other</source>
         <translation>Khác</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="211"/>
+        <location filename="../src/statisticsdialog.ui" line="212"/>
         <source>Number of NBT accesses: %1</source>
         <translation>Số lượt truy cập NBT: %1</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="221"/>
+        <location filename="../src/statisticsdialog.ui" line="222"/>
         <source>Commands</source>
         <translation>Lệnh</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="243"/>
+        <location filename="../src/statisticsdialog.ui" line="244"/>
         <source>Command</source>
         <translation>Lệnh</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="265"/>
+        <location filename="../src/statisticsdialog.ui" line="266"/>
         <source>Syntax errors</source>
         <translation>Lỗi cú pháp</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="299"/>
+        <location filename="../src/statisticsdialog.ui" line="300"/>
         <source>Path</source>
         <translation>Đường dẫn</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="304"/>
+        <location filename="../src/statisticsdialog.ui" line="305"/>
         <source>Line</source>
         <translation>Dòng</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="309"/>
+        <location filename="../src/statisticsdialog.ui" line="310"/>
         <source>Error</source>
         <translation>Lỗi</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.ui" line="321"/>
-        <location filename="../src/statisticsdialog.cpp" line="34"/>
+        <location filename="../src/statisticsdialog.ui" line="322"/>
+        <location filename="../src/statisticsdialog.cpp" line="36"/>
         <source>Total processing time: %Ln second(s)</source>
         <translation>Tổng thời gian xử lí: %Ln giây</translation>
     </message>
@@ -4931,31 +5045,41 @@ Số lỗi cú pháp: %3</translation>
         <translation>Hàm</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="85"/>
+        <location filename="../src/statisticsdialog.cpp" line="87"/>
         <source>Scanning datapack...</source>
         <translation>Đang quét gói dữ liệu...</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="83"/>
+        <location filename="../src/statisticsdialog.cpp" line="85"/>
         <source>Abort</source>
         <translation>Huỷ bỏ</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="99"/>
+        <location filename="../src/statisticsdialog.cpp" line="101"/>
         <source>Currently scanning: %1</source>
         <translation>Đang quét: %1</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="131"/>
-        <location filename="../src/statisticsdialog.cpp" line="134"/>
+        <location filename="../src/statisticsdialog.cpp" line="133"/>
+        <location filename="../src/statisticsdialog.cpp" line="136"/>
         <source>Yes</source>
         <translation>Có</translation>
     </message>
     <message>
-        <location filename="../src/statisticsdialog.cpp" line="131"/>
-        <location filename="../src/statisticsdialog.cpp" line="134"/>
+        <location filename="../src/statisticsdialog.cpp" line="133"/>
+        <location filename="../src/statisticsdialog.cpp" line="136"/>
         <source>No</source>
         <translation>Không</translation>
+    </message>
+    <message>
+        <location filename="../src/statisticsdialog.cpp" line="167"/>
+        <source>(not in this version)</source>
+        <translation>(không ở phiên bản này)</translation>
+    </message>
+    <message>
+        <location filename="../src/statisticsdialog.cpp" line="270"/>
+        <source>Invalid command</source>
+        <translation>Lệnh không hợp lệ</translation>
     </message>
 </context>
 <context>
@@ -5072,14 +5196,14 @@ Số lỗi cú pháp: %3</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chưa có tệp nào được mở.&lt;/p&gt;&lt;p&gt;Đầu tiên, mở một gói dữ liệu; sau đó mở một tệp từ khung nhìn cây phía bên trái.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="118"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="120"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Không thể ghi tệp %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="124"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="126"/>
         <source>Cannot open file %1 for writing:
 %2.</source>
         <translation>Không thể mở tệp %1 để ghi:
@@ -5090,29 +5214,29 @@ Số lỗi cú pháp: %3</translation>
         <translation type="vanished">Lỗi</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="135"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="137"/>
         <source>Save file error</source>
         <translation>Lỗi lưu tệp</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="165"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="167"/>
         <source>Unsaved file</source>
         <translation>Tệp chưa được lưu</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="166"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="168"/>
         <source>This document has been modified.
 Do you want to save it?</source>
         <translation>Tài liệu này đã được chỉnh sửa.
 Bạn có muốn lưu nó không?</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="516"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="550"/>
         <source>Loading text file error</source>
         <translation>Lỗi nạp tệp văn bản</translation>
     </message>
     <message>
-        <location filename="../src/tabbeddocumentinterface.cpp" line="517"/>
+        <location filename="../src/tabbeddocumentinterface.cpp" line="551"/>
         <source>Cannot read file %1:
 %2.</source>
         <translation>Không thể đọc tệp %1:
@@ -5342,38 +5466,38 @@ Bạn có muốn lưu nó không?</translation>
     <message>
         <location filename="../src/visualrecipeeditordock.cpp" line="100"/>
         <location filename="../src/visualrecipeeditordock.cpp" line="104"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="124"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="128"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="125"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="130"/>
         <source>Miscellaneous</source>
         <translation>Khác</translation>
     </message>
     <message>
         <location filename="../src/visualrecipeeditordock.cpp" line="101"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="125"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="126"/>
         <source>Building</source>
         <translation>Xây dựng</translation>
     </message>
     <message>
         <location filename="../src/visualrecipeeditordock.cpp" line="102"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="126"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="127"/>
         <source>Equipment</source>
         <translation>Trang bị</translation>
     </message>
     <message>
         <location filename="../src/visualrecipeeditordock.cpp" line="103"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="127"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="128"/>
         <source>Redstone</source>
         <translation>Redstone</translation>
     </message>
     <message>
         <location filename="../src/visualrecipeeditordock.cpp" line="105"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="129"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="131"/>
         <source>Blocks</source>
         <translation>Khối</translation>
     </message>
     <message>
         <location filename="../src/visualrecipeeditordock.cpp" line="106"/>
-        <location filename="../src/visualrecipeeditordock.cpp" line="130"/>
+        <location filename="../src/visualrecipeeditordock.cpp" line="132"/>
         <source>Food</source>
         <translation>Thức ăn</translation>
     </message>
