@@ -729,7 +729,7 @@ void EntityConditionDialog::setupGrantedTableFromJson(const QJsonObject &json,
     for (const auto &name : keys) {
         auto *nameItem = new QStandardItem(name);
         auto *boolItem = new QStandardItem();
-        boolItem->setData(json[name].toBool());
+        boolItem->setData(json[name].toBool(), Qt::DisplayRole);
 
         model.appendRow({ nameItem, boolItem });
     }

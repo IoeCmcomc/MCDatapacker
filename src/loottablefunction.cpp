@@ -776,6 +776,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             if (!root.contains("damage"))
                 return;
 
+            // TODO: Change setDamage_damageInput to allow decimal values
             ui->setDamage_damageInput->fromJson(root.value(QLatin1String(
                                                                "damage")));
             if (root.contains("add") && (Game::version() >= Game::v1_17)) {
