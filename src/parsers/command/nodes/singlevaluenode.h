@@ -144,7 +144,7 @@ namespace Command {
         "list"_QL1,
     };
 
-    template<uint N>
+    template<std::size_t N>
     constexpr auto changeArrayValue(std::array<QLatin1String, N> arr,
                                     const int i, QLatin1String str) {
         arr[i] = str;
