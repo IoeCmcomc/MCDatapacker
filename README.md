@@ -35,6 +35,7 @@ MCDatapacker provides a unified interface for making and editing datapacks. It a
 - Lightweight in terms of storage and memory.
 
 ## Screenshots
+<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Advancement%20viewer.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Loot%20table%20editor.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/New%20file%20menus.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Predicate%20location%20dialog%20in%20the%20predicate%20editor.png" width="30%"></img>
@@ -66,9 +67,9 @@ Sometimes, when you run the executable, a SmartScreen warning saying that "Windo
 Download the .AppImage file, make it executable and run it.
 
 ## Contributing
-To report issues and suggest features or enhancements, please go to [Issues](https://github.com/IoeCmcomc/MCDatapacker/issues) page. For questions and suggestions, the [Discussion](https://github.com/IoeCmcomc/MCDatapacker/discussions) page is the right place. If you prefer to ask anonymously, you can fill in [this form](https://forms.gle/RbWePVvVNtYLhpvx8) instead.
+To report issues and suggest features or enhancements, please go to [Issues](https://github.com/IoeCmcomc/MCDatapacker/issues) page. For questions and suggestions, the [Discussion](https://github.com/IoeCmcomc/MCDatapacker/discussions) page is the right place. If you don't have a Github account, you can also reply on [this Planet Minecraft page](https://www.planetminecraft.com/mod/program-mcdatapacker-a-datapack-editor/).
 
-If you don't have a Github account, you can also reply on [this Planet Minecraft page](https://www.planetminecraft.com/mod/program-mcdatapacker-a-datapack-editor/).
+If you prefer to ask anonymously, you can fill in [this form](https://forms.gle/RbWePVvVNtYLhpvx8) instead.
 
 ## To-do
 - [ ] Fully implement side editors (predicate, loot table and item modifier editors);
