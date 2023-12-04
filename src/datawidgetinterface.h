@@ -92,14 +92,15 @@ protected:
     void leaveEvent(QEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;
     void changeEvent(QEvent *e) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     void onSliderMoved(int value);
     void onScrollAreaScrolled(int value);
-    void moveToPrevStep();
-    void moveToNextStep();
-    void moveToPrevPage();
-    void moveToNextPage();
+    void goToPrevStep();
+    void goToNextStep();
+    void goToPrevPage();
+    void goToNextPage();
     void sidebarAnimFinished();
 
 private:

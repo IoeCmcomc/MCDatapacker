@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>125</width>
-    <height>206</height>
+    <height>252</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -61,7 +61,7 @@
         <x>0</x>
         <y>0</y>
         <width>85</width>
-        <height>204</height>
+        <height>250</height>
        </rect>
       </property>
      </widget>
@@ -92,20 +92,6 @@
        <number>2</number>
       </property>
       <item>
-       <widget class="QToolButton" name="moveUpBtn">
-        <property name="text">
-         <string>⇈</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="moveDownBtn">
-        <property name="text">
-         <string>⇊</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QScrollBar" name="scrollBar">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -115,6 +101,32 @@
         </property>
         <property name="maximum">
          <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="prevBtn">
+        <property name="toolTip">
+         <string>Previous entry</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::UpArrow</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="nextBtn">
+        <property name="toolTip">
+         <string>Next entry</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::DownArrow</enum>
         </property>
        </widget>
       </item>
@@ -130,15 +142,23 @@
       </item>
       <item>
        <widget class="QToolButton" name="addBtn">
+        <property name="toolTip">
+         <string>Add new entry after current</string>
+        </property>
         <property name="icon">
-         <iconset theme="list-add"/>
+         <iconset theme="list-add">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="removeBtn">
+        <property name="toolTip">
+         <string>Remove current entry</string>
+        </property>
         <property name="icon">
-         <iconset theme="list-remove"/>
+         <iconset theme="list-remove">
+          <normaloff>.</normaloff>.</iconset>
         </property>
        </widget>
       </item>

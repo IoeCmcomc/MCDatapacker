@@ -7,14 +7,17 @@
 #include <QMouseEvent>
 #include <QShortcut>
 #include <QPropertyAnimation>
+#include <QToolTip>
 
 DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
     QFrame(parent), ui(new Ui::DataWidgetInterface) {
     ui->setupUi(this);
     ui->scrollAreaWidgetContents->setLayout(&m_layout);
-    ui->moveUpBtn->hide();
-    ui->moveDownBtn->hide();
 
+    connect(ui->prevBtn, &QToolButton::clicked,
+            this, &DataWidgetInterface::goToPrevPage);
+    connect(ui->nextBtn, &QToolButton::clicked,
+            this, &DataWidgetInterface::goToNextPage);
     connect(ui->addBtn, &QToolButton::clicked,
             this, &DataWidgetInterface::addAfterCurrent);
     connect(ui->removeBtn, &QToolButton::clicked,
@@ -25,18 +28,20 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
             this, &DataWidgetInterface::onSliderMoved);
 
     connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Up), this),
-            &QShortcut::activated, this, &DataWidgetInterface::moveToPrevStep);
+            &QShortcut::activated, this, &DataWidgetInterface::goToPrevStep);
     connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Down), this),
-            &QShortcut::activated, this, &DataWidgetInterface::moveToNextStep);
+            &QShortcut::activated, this, &DataWidgetInterface::goToNextStep);
     connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_PageUp), this),
-            &QShortcut::activated, this, &DataWidgetInterface::moveToPrevPage);
+            &QShortcut::activated, this, &DataWidgetInterface::goToPrevPage);
     connect(new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_PageDown), this),
-            &QShortcut::activated, this, &DataWidgetInterface::moveToNextPage);
+            &QShortcut::activated, this, &DataWidgetInterface::goToNextPage);
 
     ui->scrollArea->verticalScrollBar()->hide();
     ui->scrollArea->verticalScrollBar()->setStyleSheet(QStringLiteral(
                                                            "QScrollBar{width:0px;}"));
     ui->scrollArea->verticalScrollBar()->installEventFilter(styleSheetReapplier);
+
+    ui->scrollBar->installEventFilter(this);
 
     m_sidebarRect = QRect(ui->sidebar->pos(), ui->sidebar->size());
     m_animation   = new QPropertyAnimation(ui->sidebar, "maximumWidth");
@@ -160,6 +165,19 @@ void DataWidgetInterface::changeEvent(QEvent *e) {
     }
 }
 
+bool DataWidgetInterface::eventFilter(QObject *obj, QEvent *event) {
+    if (obj == ui->scrollBar) {
+        if (event->type() == QEvent::MouseMove) {
+            QToolTip::showText(ui->scrollBar->mapToGlobal(
+                                   ui->scrollBar->rect().center()),
+                               tr("Entry %1 of %2").arg(m_currentIndex + 1)
+                               .arg(m_json.size()),
+                               ui->scrollBar, ui->scrollBar->rect());
+        }
+    }
+    return QFrame::eventFilter(obj, event);
+}
+
 void DataWidgetInterface::onSliderMoved(int value) {
     auto *areaScrollbar = ui->scrollArea->verticalScrollBar();
 
@@ -185,7 +203,7 @@ void DataWidgetInterface::onSliderMoved(int value) {
 }
 
 void DataWidgetInterface::onScrollAreaScrolled(int value) {
-    const auto areaScrollbar = ui->scrollArea->verticalScrollBar();
+    const auto *areaScrollbar = ui->scrollArea->verticalScrollBar();
 
     if (areaScrollbar->maximum() <= 0)
         return;
@@ -203,19 +221,19 @@ void DataWidgetInterface::onScrollAreaScrolled(int value) {
     }
 }
 
-void DataWidgetInterface::moveToPrevStep() {
+void DataWidgetInterface::goToPrevStep() {
     ui->scrollBar->triggerAction(QScrollBar::SliderSingleStepSub);
 }
 
-void DataWidgetInterface::moveToNextStep() {
+void DataWidgetInterface::goToNextStep() {
     ui->scrollBar->triggerAction(QScrollBar::SliderSingleStepAdd);
 }
 
-void DataWidgetInterface::moveToPrevPage() {
+void DataWidgetInterface::goToPrevPage() {
     ui->scrollBar->triggerAction(QScrollBar::SliderPageStepSub);
 }
 
-void DataWidgetInterface::moveToNextPage() {
+void DataWidgetInterface::goToNextPage() {
     ui->scrollBar->triggerAction(QScrollBar::SliderPageStepAdd);
 }
 
@@ -244,6 +262,8 @@ void DataWidgetInterface::updateStates() {
     const bool arrEmpty = m_json.isEmpty();
 
     ui->removeBtn->setDisabled(arrEmpty);
+    ui->prevBtn->setDisabled(m_currentIndex <= 0);
+    ui->nextBtn->setDisabled(m_currentIndex >= m_json.size() - 1);
     ui->scrollBar->setDisabled(arrEmpty);
     if (m_mainWidget) {
         setEnabled(true);
@@ -271,6 +291,11 @@ void DataWidgetInterface::showSidebar() {
 
 void DataWidgetInterface::hideSidebar() {
     /*qDebug() << "DataWidgetInterface::hideSidebar"; */
+    constexpr int maxWidthToHideSidebar = 450;
+
+    if (width() > maxWidthToHideSidebar)
+        return;
+
     m_animation->stop();
     m_animation->setDuration(m_sidebarSlideTime);
     m_animation->setStartValue(ui->sidebar->width());

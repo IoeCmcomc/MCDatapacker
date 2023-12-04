@@ -1196,7 +1196,6 @@ namespace Command {
 
         ret->append(parseNbtPathStep());
         auto last = ret->last();
-        // TODO: Allow single-quoted key in 1.20+
         while (last->trailingTrivia() == '.' || curChar() == '[' ||
                curChar() == '"' ||
                ((gameVer >= QVersionNumber(1, 20)) && (curChar() == '\''))) {
