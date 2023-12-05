@@ -44,11 +44,26 @@ QVector<QString> Game::getRegistry(const QString &type,
 
 QVector<QString> Game::loadRegistry(const QString &type,
                                     const QString &version) {
-    QFileInfo finfo(":minecraft/" + version + "/registries/" + type +
-                    "/data.min.json");
+    const static QString &&filePathTemplate = QStringLiteral(
+        ":minecraft/%1/registries/%2/data.min.json");
+
+    QFileInfo finfo(filePathTemplate.arg(version, type));
+
+    if (!finfo.exists() && (version != Game::defaultVersionString)) {
+        qWarning() << "Game registry file not exists:" << finfo.filePath()
+                   << "; falling back to" << Game::defaultVersionString;
+        finfo.setFile(filePathTemplate.arg(Game::defaultVersionString, type));
+    }
+
+    if (!finfo.exists()) {
+        qWarning() << "Game registry file not exists:" << finfo.filePath()
+                   << "; falling back to" << Game::minimumVersionString;
+        finfo.setFile(filePathTemplate.arg(Game::minimumVersionString, type));
+    }
 
     if (!(finfo.exists() && finfo.isFile())) {
-        qWarning() << "File not exists:" << finfo.path() << "Return empty.";
+        qWarning() << "Game registry not exists:" << finfo.filePath()
+                   << "; return empty.";
         return {};
     }
     QFile inFile(finfo.filePath());
@@ -92,20 +107,30 @@ QVariantMap Game::getInfo(const QString &type,
     return result;
 }
 
-QVariantMap Game::loadInfo(const QString &type,
-                           const QString &version,
+QVariantMap Game::loadInfo(const QString &type, const QString &version,
                            const int depth) {
     QVariantMap retMap;
 
-    QFileInfo finfo(":minecraft/" + version + "/" + type + ".json");
+    const static QString &&filePathTemplate = QStringLiteral(
+        ":minecraft/%1/%2.json");
 
-    //qDebug() << type << version << finfo << finfo.exists() << depth;
+    QFileInfo finfo(filePathTemplate.arg(version, type));
 
-    if (!finfo.exists())
-        finfo.setFile(QStringLiteral(":minecraft/1.15/") + type + ".json");
+    if (!finfo.exists() && (version != Game::defaultVersionString)) {
+        qWarning() << "Game info file not exists:" << finfo.filePath()
+                   << "; falling back to" << Game::defaultVersionString;
+        finfo.setFile(filePathTemplate.arg(Game::defaultVersionString, type));
+    }
+
+    if (!finfo.exists()) {
+        qWarning() << "Game info file not exists:" << finfo.filePath()
+                   << "; falling back to" << Game::minimumVersionString;
+        finfo.setFile(filePathTemplate.arg(Game::minimumVersionString, type));
+    }
 
     if (!(finfo.exists() && finfo.isFile())) {
-        qWarning() << "File not exists:" << finfo.path() << "Return empty.";
+        qWarning() << "Game file not exists:" << finfo.filePath()
+                   << "; return empty.";
         return {};
     }
     /*qDebug() << finfo; */

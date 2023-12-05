@@ -127,6 +127,10 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
                 insertNonEmptyProp<QString>(component, "fallback", fmt,
                                             Property::TranslateFallback);
             }
+            if (Game::version() >= Game::v1_20_3) {
+                component.insert(QStringLiteral("type"),
+                                 QStringLiteral("translatable"));
+            }
             break;
         }
         case RawJsonTextEdit::Scoreboard: {
@@ -137,6 +141,10 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
             };
             insertNonEmptyProp<QString>(score, "value", fmt, ScoreboardValue);
             component.insert("score", score);
+            if (Game::version() >= Game::v1_20_3) {
+                component.insert(QStringLiteral("type"),
+                                 QStringLiteral("score"));
+            }
             break;
         }
         case RawJsonTextEdit::EntityNames: {
@@ -146,10 +154,18 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
                 insertNonEmptyProp<QJsonValue>(component, "separator",
                                                fmt, Property::Separator);
             }
+            if (Game::version() >= Game::v1_20_3) {
+                component.insert(QStringLiteral("type"),
+                                 QStringLiteral("selector"));
+            }
             break;
         }
         case RawJsonTextEdit::Keybind: {
             component.insert("keybind", fmt.stringProperty(Property::Keybind));
+            if (Game::version() >= Game::v1_20_3) {
+                component.insert(QStringLiteral("type"),
+                                 QStringLiteral("keybind"));
+            }
             break;
         }
         case RawJsonTextEdit::Nbt: {
@@ -161,6 +177,9 @@ void RawJsonTextEditor::mergeObjectComponent(QJsonObject &component,
             if (Game::version() >= Game::v1_17) {
                 insertNonEmptyProp<QJsonValue>(component, "separator",
                                                fmt, Property::Separator);
+            }
+            if (Game::version() >= Game::v1_20_3) {
+                component.insert(QStringLiteral("type"), QStringLiteral("nbt"));
             }
             break;
         }
@@ -183,6 +202,10 @@ void RawJsonTextEditor::appendBlockToArray(QJsonArray &arr,
                 mergeObjectComponent(component, fmt);
             } else {
                 component.insert(QLatin1String("text"), txt);
+                if (Game::version() >= Game::v1_20_3) {
+                    component.insert(QStringLiteral("type"),
+                                     QStringLiteral("text"));
+                }
             }
             if (fmt.fontWeight() >= 75)
                 component.insert(QLatin1String("bold"), true);
