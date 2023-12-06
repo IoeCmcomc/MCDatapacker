@@ -1574,5 +1574,6 @@
         <file>texture/inv_item/Sculk.png</file>
         <file>texture/inv_item/stripped_cherry_log.png</file>
         <file>texture/inv_item/stripped_cherry_wood.png</file>
+        <file>texture/inv_item/short_grass.png</file>
     </qresource>
 </RCC>

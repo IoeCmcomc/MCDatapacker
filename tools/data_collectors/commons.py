@@ -10,7 +10,7 @@ def get_soup(url: str) -> BeautifulSoup:
 
 def get_selenium_soup(url: str) -> BeautifulSoup:
     driver = webdriver.ChromiumEdge()
-    driver.get(str)
+    driver.get(url)
     soup = BeautifulSoup(driver.page_source, "lxml")
     driver.quit()
     return soup

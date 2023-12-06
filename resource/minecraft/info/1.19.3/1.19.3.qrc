@@ -27,7 +27,6 @@
         <file>tag/world_preset.json</file>
         <file>summary/commands/data.min.json</file>
         <file>registries/block_entity_type/data.min.json</file>
-        <file>registries/worldgen/configured_structure_feature/data.min.json</file>
         <file>registries/advancement/data.min.json</file>
         <file>registries/particle_type/data.min.json</file>
         <file>registries/loot_table/data.min.json</file>

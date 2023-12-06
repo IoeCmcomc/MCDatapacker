@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/minecraft/1.19">
+    <qresource prefix="/minecraft/1.20.3">
         <file>attribute.json</file>
         <file>biome.json</file>
         <file>block.json</file>
@@ -32,9 +32,11 @@
         <file>registries/loot_table/data.min.json</file>
         <file>registries/recipe/data.min.json</file>
         <file>registries/sound_event/data.min.json</file>
+        <file>tag/damage_type.json</file>
         <file>registries/entity_type/data.min.json</file>
         <file>registries/attribute/data.min.json</file>
         <file>registries/mob_effect/data.min.json</file>
+        <file>registries/damage_type/data.min.json</file>
         <file>registries/enchantment/data.min.json</file>
         <file>registries/worldgen/biome/data.min.json</file>
         <file>registries/point_of_interest_type/data.min.json</file>

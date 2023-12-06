@@ -18,7 +18,7 @@ namespace Game {
     inline const QVersionNumber v1_21{ 1, 21 };
 
     inline const auto *minimumVersionString = "1.15";
-    inline const auto *defaultVersionString = "1.20.2";
+    inline const auto *defaultVersionString = "1.20.3";
 
     QVersionNumber version();
     QString versionString();
