@@ -16,7 +16,9 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
 
     const auto &&gameVer = Game::version();
 
-    if (gameVer >= Game::v1_20_2)
+    if (gameVer >= Game::v1_20_3)
+        ui->formatInput->setValue(26);
+    else if (gameVer >= Game::v1_20_2)
         ui->formatInput->setValue(18);
     else if (gameVer >= Game::v1_20)
         ui->formatInput->setValue(15);
@@ -79,33 +81,23 @@ void NewDatapackDialog::checkOK() {
 }
 
 void NewDatapackDialog::onFormatSpinChanged(const int format) {
-    constexpr int        maxFormat                     = 18;
-    const static QString formatReleases[maxFormat + 1] = {
-        {},
-        {},
-        {},
-        {},
-        QStringLiteral("1.13–1.14.4"),
-        QStringLiteral("1.15–1.16.1"),
-        QStringLiteral("1.16.2–1.16.5"),
-        QStringLiteral("1.17–1.17.1"),
-        QStringLiteral("1.18–1.18.1"),
-        QStringLiteral("1.18.2"),
-        QStringLiteral("1.19–1.19.3"),
-        {},
-        QStringLiteral("1.19.4"),
-        {},
-        {},
-        QStringLiteral("1.20–1.20.1"),
-        {},
-        {},
-        QStringLiteral("1.20.2"),
+    const static QMap<int, QString> formatReleases = {
+        {  4, QStringLiteral("1.13–1.14.4")   },
+        {  5, QStringLiteral("1.15–1.16.1")   },
+        {  6, QStringLiteral("1.16.2–1.16.5") },
+        {  7, QStringLiteral("1.17–1.17.1")   },
+        {  8, QStringLiteral("1.18–1.18.1")   },
+        {  9, QStringLiteral("1.18.2")        },
+        { 10, QStringLiteral("1.19–1.19.3")   },
+        { 12, QStringLiteral("1.19.4")        },
+        { 15, QStringLiteral("1.20–1.20.1")   },
+        { 18, QStringLiteral("1.20.2")        },
+        { 26, QStringLiteral("1.20.3")        },
     };
 
     Q_ASSERT(format >= 0);
 
-    ui->formatDisplay->setText(
-        (format <= maxFormat) ? formatReleases[format] : QString());
+    ui->formatDisplay->setText(formatReleases.value(format, {}));
 }
 
 QString NewDatapackDialog::getDesc() {

@@ -9,6 +9,7 @@
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
+#include "../nodes/stylenode.h"
 #include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
@@ -89,6 +90,10 @@ public:
         };
         void visit(ComponentNode *node) final {
             m_repr += QString("ComponentNode(%1)").arg(
+                node->value().dump().c_str());
+        };
+        void visit(StyleNode *node) final {
+            m_repr += QString("StyleNode(%1)").arg(
                 node->value().dump().c_str());
         };
         void visit(EntityNode *node) final {

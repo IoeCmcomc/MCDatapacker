@@ -852,6 +852,7 @@ namespace Command {
             case ParserType::ScoreboardSlot: {
                 return minecraft_scoreboardSlot();
             }
+            case ParserType::Style: { return minecraft_style(); }
             case ParserType::Swizzle: { return minecraft_swizzle(); }
             case ParserType::Team: { return minecraft_team(); }
             case ParserType::TemplateMirror: { return minecraft_templateMirror();
@@ -1425,6 +1426,22 @@ namespace Command {
         } else {
             return QSharedPointer<ScoreboardSlotNode>::create(
                 spanText(getUntil(QChar::Space)), false);
+        }
+    }
+
+    QSharedPointer<StyleNode> MinecraftParser::minecraft_style() {
+        const int    curPos = pos();
+        const auto &&rest   = getRest();
+
+        try {
+            json       &&j   = json::parse(rest.toString().toStdString());
+            const auto &&ret =
+                QSharedPointer<StyleNode>::create(spanText(rest));
+            ret->setValue(std::move(j));
+            return ret;
+        }  catch (const json::parse_error &err) {
+            reportError(err.what(), {}, curPos + err.byte - 1);
+            return QSharedPointer<StyleNode>::create(spanText(rest));
         }
     }
 

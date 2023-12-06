@@ -1,8 +1,8 @@
 #include "schemaargumentnode.h"
 
 namespace Command::Schema {
-ArgumentNode::ArgumentNode() : Node(Node::Kind::Argument),
-    m_parserType{ParserType::Unknown} {
+    ArgumentNode::ArgumentNode() : Node(Node::Kind::Argument),
+        m_parserType{ParserType::Unknown} {
     }
 
     void ArgumentNode::setName(const QString &newName) {
@@ -75,6 +75,7 @@ ArgumentNode::ArgumentNode() : Node(Node::Kind::Argument),
             { QStringLiteral("minecraft:rotation"), PT::Rotation },
             { QStringLiteral("minecraft:score_holder"), PT::ScoreHolder },
             { QStringLiteral("minecraft:scoreboard_slot"), PT::ScoreboardSlot },
+            { QStringLiteral("minecraft:style"), PT::Style },
             { QStringLiteral("minecraft:swizzle"), PT::Swizzle },
             { QStringLiteral("minecraft:template_mirror"), PT::TemplateMirror },
             { QStringLiteral("minecraft:template_rotation"),

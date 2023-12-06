@@ -5,6 +5,7 @@
 #include "nodes/axesnode.h"
 #include "nodes/blockstatenode.h"
 #include "nodes/componentnode.h"
+#include "nodes/stylenode.h"
 #include "nodes/gamemodenode.h"
 #include "nodes/entitynode.h"
 #include "nodes/floatrangenode.h"
@@ -321,6 +322,7 @@ private:
         QSharedPointer<ScoreHolderNode> minecraft_scoreHolder(
             const QVariantMap &props = {});
         QSharedPointer<ScoreboardSlotNode> minecraft_scoreboardSlot();
+        QSharedPointer<StyleNode> minecraft_style();
         QSharedPointer<SwizzleNode> minecraft_swizzle();
         QSharedPointer<TeamNode> minecraft_team();
         QSharedPointer<TimeNode> minecraft_time();

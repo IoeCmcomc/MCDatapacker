@@ -123,6 +123,7 @@ public:
         Rotation,
         ScoreHolder,
         ScoreboardSlot,
+        Style,
         Swizzle,
         Team,
         TemplateMirror,

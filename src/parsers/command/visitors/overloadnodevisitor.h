@@ -9,6 +9,7 @@
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
+#include "../nodes/stylenode.h"
 #include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
@@ -70,6 +71,9 @@ public:
             _visit(node);
         }
         void visit(ComponentNode *node) override {
+            _visit(node);
+        }
+        void visit(StyleNode *node) override {
             _visit(node);
         }
         void visit(EntityNode *node) override {

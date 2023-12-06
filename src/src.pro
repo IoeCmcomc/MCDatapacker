@@ -80,6 +80,7 @@ SOURCES += \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/gamemodenode.cpp \
     parsers/command/nodes/macronode.cpp \
+    parsers/command/nodes/stylenode.cpp \
     parsers/command/re2c_generated_functions.cpp \
     parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
@@ -214,6 +215,7 @@ HEADERS += \
     parsers/command/nodes/rootnode.h \
     parsers/command/nodes/singlevaluenode.h \
     parsers/command/nodes/stringnode.h \
+    parsers/command/nodes/stylenode.h \
     parsers/command/nodes/swizzlenode.h \
     parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \

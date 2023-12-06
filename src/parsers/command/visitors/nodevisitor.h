@@ -16,6 +16,7 @@ namespace Command {
     class AngleNode;
     class BlockStateNode;
     class ComponentNode;
+    class StyleNode;
     class EntityNode;
     class GameProfileNode;
     class ScoreHolderNode;
@@ -104,6 +105,7 @@ public:
         virtual void visit(AngleNode *node)                = 0;
         virtual void visit(BlockStateNode *node)           = 0;
         virtual void visit(ComponentNode *node)            = 0;
+        virtual void visit(StyleNode *node)                = 0;
         virtual void visit(EntityNode *node)               = 0;
         virtual void visit(GameProfileNode *node)          = 0;
         virtual void visit(ScoreHolderNode *node)          = 0;
