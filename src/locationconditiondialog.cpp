@@ -29,10 +29,12 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
 
     initComboModelView("biome", biomesModel, ui->biomeCombo);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
-    if (Game::version() >= Game::v1_18_2) {
-        initComboModelViewFromRegistry("worldgen/configured_structure_feature",
-                                       featuresModel,
+    if (Game::version() >= Game::v1_19) {
+        initComboModelViewFromRegistry("worldgen/structure", featuresModel,
                                        ui->featureCombo);
+    } else if (Game::version() == Game::v1_18_2) {
+        initComboModelViewFromRegistry("worldgen/configured_structure_feature",
+                                       featuresModel, ui->featureCombo);
     } else {
         initComboModelView("feature", featuresModel, ui->featureCombo);
     }

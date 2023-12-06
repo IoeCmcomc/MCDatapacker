@@ -14,8 +14,8 @@ void initModelView(QStandardItemModel &model, QTableView *tableView,
                    QAbstractItemDelegate *delegate = nullptr);
 void initComboModelView(const QString &infoType,
                         QStandardItemModel &model, QComboBox *combo,
-                        bool optional = true, bool append = true,
-                        bool asTag    = false);
+                        bool optional = true, bool append        = true,
+                        bool asTag    = false, bool forceKeyName = false);
 
 void initComboModelViewFromRegistry(const QString &registry,
                                     QStandardItemModel &model, QComboBox *combo,

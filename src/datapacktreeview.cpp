@@ -226,10 +226,14 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                                      tr("Flat world generator preset"), jsonExt,
                                      QLatin1String(
                                          "worldgen/flat_level_generator_preset"));
+                    addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
+                                     QLatin1String("worldgen/structure"));
+                } else if (Game::version() >= Game::v1_17) {
+                    addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
+                                     QLatin1String(
+                                         "worldgen/configured_structure_feature"));
                 }
-                addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
-                                 QLatin1String(
-                                     "worldgen/configured_structure_feature"));
+
                 if (Game::version() <= Game::v1_17) {
                     addNewFileAction(worldMenu, tr("Surface builder"), jsonExt,
                                      QLatin1String(

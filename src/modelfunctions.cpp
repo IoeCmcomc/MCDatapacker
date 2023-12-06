@@ -22,9 +22,9 @@ void initModelView(QStandardItemModel &model,
         tableView->setItemDelegate(delegate);
 }
 
-void initComboModelView(const QString &infoType,
-                        QStandardItemModel &model, QComboBox *combo,
-                        bool optional, bool append, bool asTag) {
+void initComboModelView(const QString &infoType, QStandardItemModel &model,
+                        QComboBox *combo, bool optional, bool append,
+                        bool asTag, bool forceKeyName) {
     if (optional)
         model.appendRow(new QStandardItem(QCoreApplication::translate(
                                               "BaseCondition",
@@ -37,7 +37,7 @@ void initComboModelView(const QString &infoType,
             item->setText(it.value().toMap()[QStringLiteral(
                                                  "name")].toString());
         else if (it.value().canConvert(QVariant::String)
-                 && !it.value().isNull())
+                 && !it.value().isNull() && !forceKeyName)
             item->setText(it.value().toString());
         else if (asTag)
             item->setText("#" + key);

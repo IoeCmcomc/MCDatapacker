@@ -92,15 +92,18 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     connect(ui->enchantRand_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::enchantRand_onAdded);
 
-    if (Game::version() >= Game::v1_18_2) {
-        initComboModelView(QStringLiteral("tag/configured_structure_feature"),
+    if (Game::version() >= Game::v1_19) {
+        initComboModelView(QStringLiteral("tag/structure"),
                            featuresModel, ui->map_destCombo,
-                           true, true, true);
-        initComboModelViewFromRegistry(QStringLiteral(
-                                           "worldgen/configured_structure_feature"),
-                                       featuresModel,
-                                       ui->map_destCombo,
-                                       false);
+                           true, true, true, true);
+        initComboModelViewFromRegistry(QStringLiteral("worldgen/structure"),
+                                       featuresModel, ui->map_destCombo, false);
+    } else if (Game::version() == Game::v1_18_2) {
+        initComboModelView(QStringLiteral("tag/configured_structure_feature"),
+                           featuresModel, ui->map_destCombo, true, true, true);
+        initComboModelViewFromRegistry(
+            QStringLiteral("worldgen/configured_structure_feature"),
+            featuresModel, ui->map_destCombo, false);
     } else {
         initComboModelView(QStringLiteral("feature"), featuresModel,
                            ui->map_destCombo);

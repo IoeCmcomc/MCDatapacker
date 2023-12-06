@@ -95,6 +95,7 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
         { QStringLiteral("worldgen/processor_list"), CodeFile::ProcessorList },
         { QStringLiteral("worldgen/structure_set"), CodeFile::StructureSet },
         { QStringLiteral("worldgen/template_pool"), CodeFile::TemplatePool },
+        { QStringLiteral("worldgen/structure"), CodeFile::StructureFeature },
         { QStringLiteral("worldgen"), CodeFile::WorldGen },
     };
 
