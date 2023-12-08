@@ -19,7 +19,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
 
 #ifdef Q_OS_WIN
-    Windows::extendFrame(this);
+    Windows::applyGlassEffectToFrame(this, true);
 #else
     ui->darkThemeLabel->hide();
     ui->darkThemeCombo->hide();

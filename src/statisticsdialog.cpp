@@ -22,7 +22,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     m_mainWin = parent;
     ui->setupUi(this);
 
-    Windows::extendFrame(this);
+    Windows::applyGlassEffectToFrame(this);
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
                                    QDir::current().dirName(),

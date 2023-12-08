@@ -11,7 +11,8 @@ namespace Windows {
     bool isWindows11();
     bool isDarkMode();
     void extendFrame(QWidget *w);
-    void setDarkFrame(QWidget *w, const bool dark = true);
+    void applyGlassEffectToFrame(QWidget *w, const bool useMicaAlt = false);
+    void setDarkFrame(QWidget *w, const bool dark                  = true);
     void setDarkFrameIfDarkMode(QWidget *w);
 }
 

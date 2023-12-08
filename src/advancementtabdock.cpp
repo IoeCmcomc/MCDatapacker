@@ -4,6 +4,7 @@
 #include "inventoryitem.h"
 
 #include "globalhelpers.h"
+#include "platforms/windows_specific.h"
 
 #include <QDirIterator>
 #include <QJsonDocument>
@@ -23,6 +24,11 @@ AdvancementTabDock::AdvancementTabDock(QWidget *parent) :
     });
     connect(ui->reloadBtn, &QToolButton::clicked, this,
             &AdvancementTabDock::loadAdvancements);
+    connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
+        if (floating) {
+            Windows::setDarkFrameIfDarkMode(this);
+        }
+    });
 }
 
 AdvancementTabDock::~AdvancementTabDock() {

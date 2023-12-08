@@ -15,7 +15,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui->mainInfoLabel->setText(ui->mainInfoLabel->text().arg(qApp->
                                                              applicationVersion()));
 
-    Windows::extendFrame(this);
+    Windows::applyGlassEffectToFrame(this);
 
     auto *effect = new QGraphicsOpacityEffect(ui->logoLabel);
     ui->logoLabel->setGraphicsEffect(effect);
