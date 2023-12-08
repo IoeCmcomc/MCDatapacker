@@ -92,7 +92,7 @@ void NewDatapackDialog::onFormatSpinChanged(const int format) {
         { 12, QStringLiteral("1.19.4")        },
         { 15, QStringLiteral("1.20–1.20.1")   },
         { 18, QStringLiteral("1.20.2")        },
-        { 26, QStringLiteral("1.20.3")        },
+        { 26, QStringLiteral("1.20.3–1.20.4") },
     };
 
     Q_ASSERT(format >= 0);

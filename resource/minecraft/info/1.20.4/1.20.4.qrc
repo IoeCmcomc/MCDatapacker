@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/minecraft/1.20.3">
+    <qresource prefix="/minecraft/1.20.4">
         <file>attribute.json</file>
         <file>biome.json</file>
         <file>block.json</file>

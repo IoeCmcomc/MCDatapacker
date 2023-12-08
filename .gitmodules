@@ -85,9 +85,9 @@
 [submodule "resource/minecraft/info/1.20.2/registries"]
 	path = resource/minecraft/info/1.20.2/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.3/summary"]
-	path = resource/minecraft/info/1.20.3/summary
+[submodule "resource/minecraft/info/1.20.4/summary"]
+	path = resource/minecraft/info/1.20.4/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.3/registries"]
-	path = resource/minecraft/info/1.20.3/registries
+[submodule "resource/minecraft/info/1.20.4/registries"]
+	path = resource/minecraft/info/1.20.4/registries
 	url = https://github.com/misode/mcmeta.git
