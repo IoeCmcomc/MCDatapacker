@@ -53,6 +53,8 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     setupRefCombo();
     initTableBonusPage();
     ui->time_valueInput->setModes(NumberProvider::ExactAndRange);
+    m_timeCtrl.addMapping("value", ui->time_valueInput);
+    m_timeCtrl.addMapping("period", ui->time_periodSpinBox);
     initToolEnchantPage();
 }
 
@@ -238,9 +240,7 @@ QJsonObject LootTableCondition::toJson() const {
         }
 
         case 12: {/*Time */
-            root.insert("value", ui->time_valueInput->toJson());
-            if (ui->time_periodSpinBox->value() > 0)
-                root.insert("period", ui->time_periodSpinBox->value());
+            m_timeCtrl.putValueTo(root, {});
             break;
         }
 
@@ -525,10 +525,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
         }
 
         case 12: {/*Time */
-            if (value.contains("value"))
-                ui->time_valueInput->fromJson(value["value"]);
-            if (value.contains("period") && value["period"].toInt() > 0)
-                ui->time_periodSpinBox->setValue(value["period"].toInt());
+            m_timeCtrl.setValueFrom(root, {});
             break;
         }
 

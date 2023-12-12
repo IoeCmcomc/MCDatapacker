@@ -43,6 +43,7 @@ SOURCES += \
     darkfusionstyle.cpp \
     datapackfileiconprovider.cpp \
     datapacktreeview.cpp \
+    datawidgetcontroller.cpp \
     datawidgetinterface.cpp \
     disclaimerdialog.cpp \
     entityconditiondialog.cpp \
@@ -158,6 +159,7 @@ HEADERS += \
     darkfusionstyle.h \
     datapackfileiconprovider.h \
     datapacktreeview.h \
+    datawidgetcontroller.h \
     datawidgetinterface.h \
     disclaimerdialog.h \
     entityconditiondialog.h \

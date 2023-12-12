@@ -2,6 +2,7 @@
 #define ITEMCONDITIONDIALOG_H
 
 #include "basecondition.h"
+#include "datawidgetcontroller.h"
 
 #include <QDialog>
 #include <QJsonArray>
@@ -30,6 +31,7 @@ private:
     QStandardItemModel itemsModel;
     QStandardItemModel potionsModel;
     QStandardItemModel enchantmentsModel;
+    DataWidgetControllerRecord m_controller;
     bool from_1_17;
 
     void initTable(QTableWidget *table);

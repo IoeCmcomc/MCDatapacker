@@ -36,6 +36,20 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     connect(ui->stored_addBtn, &QPushButton::clicked,
             this, &ItemConditionDialog::onAddedStoredEnchant);
 
+    if (from_1_17) {
+        m_controller.addMapping(QStringLiteral("items"), ui->itemRadio,
+                                ui->itemSlot);
+    } else {
+        m_controller.addMapping(QStringLiteral("item"), ui->itemRadio,
+                                ui->itemSlot);
+    }
+    m_controller.addMapping(QStringLiteral("tag"), ui->tagRadio,
+                            ui->itemTagEdit);
+    m_controller.addMapping(QStringLiteral("count"), ui->countInput);
+    m_controller.addMapping(QStringLiteral("durability"), ui->durabilityInput);
+    m_controller.addMapping(QStringLiteral("nbt"), ui->NBTEdit);
+    m_controller.addMapping(QStringLiteral("potion"), ui->potionCombo);
+
     adjustSize();
 }
 
@@ -46,33 +60,7 @@ ItemConditionDialog::~ItemConditionDialog() {
 QJsonObject ItemConditionDialog::toJson() const {
     QJsonObject root;
 
-    if (ui->itemRadio->isChecked()) {
-        if (!ui->itemSlot->isEmpty()) {
-            if (from_1_17) {
-                QJsonArray ids;
-                for (const auto &item: qAsConst(ui->itemSlot->getItems())) {
-                    ids << item.getNamespacedID();
-                }
-                root.insert(QStringLiteral("items"), ids);
-            } else {
-                root.insert(QStringLiteral("item"),
-                            ui->itemSlot->getItem().getNamespacedID());
-            }
-        }
-    } else {
-        if (!ui->itemTagEdit->text().isEmpty())
-            root.insert(QStringLiteral("tag"), ui->itemTagEdit->text());
-    }
-    if (!ui->countInput->isCurrentlyUnset())
-        root.insert(QStringLiteral("count"), ui->countInput->toJson());
-    if (!ui->durabilityInput->isCurrentlyUnset())
-        root.insert(QStringLiteral("durability"),
-                    ui->durabilityInput->toJson());
-    if (!ui->NBTEdit->text().isEmpty())
-        root.insert(QStringLiteral("nbt"), ui->NBTEdit->text());
-    if (ui->potionCombo->currentIndex() != 0)
-        root.insert(QStringLiteral("potion"), ui->potionCombo->currentData(
-                        Qt::UserRole + 1).toString());
+    m_controller.putValueTo(root, {});
 
     QJsonArray enchantments;
     for (auto row = 0; row < ui->enchant_table->rowCount(); ++row) {
@@ -108,28 +96,7 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     if (value.isEmpty())
         return;
 
-    if (from_1_17 && value.contains(QStringLiteral("items"))) {
-        const auto &&items = value[QStringLiteral("items")].toArray();
-        for (const auto &item: items) {
-            ui->itemSlot->appendItem(item.toString());
-        }
-    } else if (value.contains(QStringLiteral("item"))) {
-        ui->itemSlot->setItem(InventoryItem(value[QStringLiteral(
-                                                      "item")].toString()));
-    } else if (value.contains(QStringLiteral("tag"))) {
-        ui->itemTagEdit->setText(value[QStringLiteral("tag")].toString());
-        ui->tagRadio->setChecked(true);
-    }
-
-    if (value.contains(QStringLiteral("count")))
-        ui->countInput->fromJson(value[QStringLiteral("count")]);
-    if (value.contains(QStringLiteral("durability")))
-        ui->durabilityInput->fromJson(value[QStringLiteral("durability")]);
-    if (value.contains(QStringLiteral("nbt")))
-        ui->NBTEdit->setText(value[QStringLiteral("nbt")].toString());
-    if (value.contains(QStringLiteral("potion"))) {
-        setComboValueFrom(ui->potionCombo, value[QStringLiteral("potion")]);
-    }
+    m_controller.setValueFrom(value, {});
 
     if (value.contains(QStringLiteral("enchantments"))) {
         tableFromJson(value[QStringLiteral("enchantments")].toArray(),

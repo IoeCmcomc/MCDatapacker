@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-#define __clang_major__    11
+#define __clang_major__    15
 #endif
 
 #ifndef EXTENDEDTABLEWIDGET_H
@@ -64,8 +64,8 @@ public:
 
     ExtendedTableWidget(QWidget *parent = 0);
 
-    QTableWidget *tableWidget() const;
-    QFrame *container() const;
+    QTableWidget * tableWidget() const;
+    QFrame * container() const;
 
     bool isAddingItem() const;
     QStringList columnTitles() const;

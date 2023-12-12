@@ -2,6 +2,7 @@
 #define LOOTTABLECONDITION_H
 
 #include "basecondition.h"
+#include "datawidgetcontroller.h"
 
 #include <QFrame>
 #include <QVBoxLayout>
@@ -66,6 +67,8 @@ private:
         "value_check",          };
     const QStringList entityTargets = { "this", "killer", "killer_player" };
     QFileSystemWatcher predRefWatcher;
+
+    DataWidgetControllerRecord m_timeCtrl;
 
     void reset(int index);
     void clearModelExceptHeaders(QStandardItemModel &model);
