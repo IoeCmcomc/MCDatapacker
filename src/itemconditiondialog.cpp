@@ -19,7 +19,7 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui->itemSlot->setAcceptTag(false);
     ui->itemSlot->setAcceptMultiple(from_1_17);
 
-    initComboModelView("effect", potionsModel, ui->potionCombo);
+    initComboModelView("potion", potionsModel, ui->potionCombo);
     initComboModelView("enchantment", enchantmentsModel, ui->enchant_combo,
                        false);
     ui->stored_combo->setModel(&enchantmentsModel);
