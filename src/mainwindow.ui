@@ -122,6 +122,13 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="Line" name="statusBarSeparator">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">

@@ -1,8 +1,6 @@
 #include "datawidgetinterface.h"
 #include "ui_datawidgetinterface.h"
 
-#include "stylesheetreapplier.h"
-
 #include <QJsonObject>
 #include <QMouseEvent>
 #include <QShortcut>
@@ -37,9 +35,7 @@ DataWidgetInterface::DataWidgetInterface(QWidget *parent) :
             &QShortcut::activated, this, &DataWidgetInterface::goToNextPage);
 
     ui->scrollArea->verticalScrollBar()->hide();
-    ui->scrollArea->verticalScrollBar()->setStyleSheet(QStringLiteral(
-                                                           "QScrollBar{width:0px;}"));
-    ui->scrollArea->verticalScrollBar()->installEventFilter(styleSheetReapplier);
+    ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     ui->scrollBar->installEventFilter(this);
 
