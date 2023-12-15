@@ -20,6 +20,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
 #ifdef Q_OS_WIN
     Windows::applyGlassEffectToFrame(this, true);
+    for (int i = 0; i < ui->tabWidget->count(); ++i) {
+        ui->tabWidget->widget(i)->setAutoFillBackground(true);
+    }
 #else
     ui->darkThemeLabel->hide();
     ui->darkThemeCombo->hide();
@@ -148,7 +151,8 @@ void SettingsDialog::initSettings() {
 
     m_settings.beginGroup(QStringLiteral("interface"));
     auto &&styles = QStyleFactory::keys();
-    styles << QStringLiteral("DarkFusion");
+    styles << QStringLiteral("DarkFusion") << QStringLiteral("NorwegianWood")
+           << QStringLiteral("Qlementine");
 
     ui->themeCombo->addItems(styles);
     ui->darkThemeCombo->addItems(styles);

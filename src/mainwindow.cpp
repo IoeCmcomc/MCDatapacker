@@ -17,6 +17,7 @@
 #include "statisticsdialog.h"
 #include "rawjsontexteditor.h"
 #include "darkfusionstyle.h"
+#include "norwegianwoodstyle.h"
 
 #include "game.h"
 #include "platforms/windows_specific.h"
@@ -24,6 +25,7 @@
 #include "QSimpleUpdater.h"
 #include "zip.hpp"
 #include "SystemThemeHelper.h"
+#include <oclero/qlementine.hpp>
 
 #include <QDebug>
 #include <QFileDialog>
@@ -813,27 +815,32 @@ void MainWindow::changeAppStyle(const bool darkMode) {
         qApp->style()->objectName()).toString();
 
     if (!darkMode) {
-        if (styleId.toCaseFolded() !=
-            qApp->style()->objectName().toCaseFolded()) {
-            if (styleId == QLatin1String("DarkFusion")) {
-                qApp->setStyle(new DarkFusionStyle);
-            } else {
-                qApp->setStyle(styleId);
-            }
-        }
+        setAppStyle(styleId);
     } else {
         const QString &darkStyleId = settings.value(
             QStringLiteral("interface/darkStyle"), "DarkFusion").toString();
-        if (darkStyleId.toCaseFolded() !=
-            qApp->style()->objectName().toCaseFolded()) {
-            if (darkStyleId == QLatin1String("DarkFusion")) {
-                qApp->setStyle(new DarkFusionStyle);
-            } else {
-                qApp->setStyle(darkStyleId);
-            }
-        }
+        setAppStyle(darkStyleId);
     }
-    qApp->setPalette(style()->standardPalette());
+}
+
+void MainWindow::setAppStyle(const QString &name) {
+    if (name.toCaseFolded() !=
+        qApp->style()->objectName().toCaseFolded()) {
+        if (name == QLatin1String("DarkFusion")) {
+            qApp->setStyle(new DarkFusionStyle);
+        } else if (name == QLatin1String("NorwegianWood")) {
+            qApp->setStyle(new NorwegianWoodStyle);
+        } else if (name == QLatin1String("Qlementine")) {
+            auto *style = new oclero::qlementine::QlementineStyle;
+            style->setAnimationsEnabled(false); // Prevent crash
+            style->setAutoIconColor(
+                oclero::qlementine::AutoIconColor::TextColor);
+            qApp->setStyle(style);
+        } else {
+            qApp->setStyle(name);
+        }
+        qApp->setPalette(style()->standardPalette());
+    }
 }
 
 void MainWindow::changeEvent(QEvent *event) {

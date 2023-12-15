@@ -22,7 +22,12 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     m_mainWin = parent;
     ui->setupUi(this);
 
-    Windows::applyGlassEffectToFrame(this);
+#ifdef Q_OS_WIN
+    Windows::applyGlassEffectToFrame(this, true);
+    for (int i = 0; i < ui->tabWidget->count(); ++i) {
+        ui->tabWidget->widget(i)->setAutoFillBackground(true);
+    }
+#endif
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
                                    QDir::current().dirName(),

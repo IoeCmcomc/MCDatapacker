@@ -131,6 +131,7 @@ private:
     void updateRecentFolders();
     void updateEditMenu();
     void changeAppStyle(const bool darkMode);
+    void setAppStyle(const QString &name);
 };
 
 #endif /* MAINWINDOW_H */

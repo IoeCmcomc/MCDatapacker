@@ -25,5 +25,7 @@
         <file alias="file-tdn">icon/datapack/file-tdn-16x16.png</file>
         <file alias="file-hjmc">icon/datapack/file-hjmc-16x16.png</file>
         <file alias="file-jmc.txt">icon/datapack/file-jmc_txt-16x16.png</file>
+        <file>images/norwegianwoodstyle/woodbackground.png</file>
+        <file>images/norwegianwoodstyle/woodbutton.png</file>
     </qresource>
 </RCC>

@@ -91,3 +91,6 @@
 [submodule "resource/minecraft/info/1.20.4/registries"]
 	path = resource/minecraft/info/1.20.4/registries
 	url = https://github.com/misode/mcmeta.git
+[submodule "lib/qlementine/qlementine"]
+	path = lib/qlementine/qlementine
+	url = https://github.com/oclero/qlementine.git
