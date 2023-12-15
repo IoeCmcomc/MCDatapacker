@@ -2,7 +2,7 @@
 
 #ifdef Q_OS_WIN
 
-#include "stylesheetreapplier.h"
+// #include "stylesheetreapplier.h"
 
 #include <QtWin>
 #include <QSettings>
@@ -46,11 +46,12 @@ namespace Windows {
 #ifdef Q_OS_WIN
         if (QtWin::isCompositionEnabled()) {
             w->setAttribute(Qt::WA_TranslucentBackground, true);
-            w->setAttribute(Qt::WA_NoSystemBackground, false);
-            w->setStyleSheet(transparentStyleSheet.arg(
-                                 w->metaObject()->className()));
+            // The next line seems not to affect the result
+            // w->setAttribute(Qt::WA_NoSystemBackground, false);
+            // w->setStyleSheet(transparentStyleSheet.arg(
+            //                      w->metaObject()->className()));
             QtWin::extendFrameIntoClientArea(w, -1, -1, -1, -1);
-            w->installEventFilter(styleSheetReapplier);
+            // w->installEventFilter(styleSheetReapplier);
         } else {
             w->setAttribute(Qt::WA_TranslucentBackground, false);
             QtWin::resetExtendedFrame(w);

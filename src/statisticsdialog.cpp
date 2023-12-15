@@ -27,6 +27,7 @@ StatisticsDialog::StatisticsDialog(MainWindow *parent) :
     for (int i = 0; i < ui->tabWidget->count(); ++i) {
         ui->tabWidget->widget(i)->setAutoFillBackground(true);
     }
+    ui->frame->setAutoFillBackground(true);
 #endif
 
     ui->packNameLabel->setText(ui->packNameLabel->text().arg(
