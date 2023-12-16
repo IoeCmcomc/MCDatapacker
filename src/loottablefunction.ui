@@ -799,6 +799,9 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="ExtendedTableWidget" name="setPattern_table">
+          <property name="jsonMode">
+           <enum>ExtendedTableWidget::List</enum>
+          </property>
           <property name="columnTitles">
            <stringlist>
             <string>Pattern</string>

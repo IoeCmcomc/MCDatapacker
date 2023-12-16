@@ -158,6 +158,7 @@ void ExtendedTableWidget::fromJson(const QJsonArray &root) {
 
 void ExtendedTableWidget::setJsonMode(const JsonMode &jsonMode) {
     m_jsonMode = jsonMode;
+    emit jsonModeChanged();
 }
 
 void ExtendedTableWidget::setGameVersion(const QVersionNumber &version) {
@@ -185,6 +186,7 @@ void ExtendedTableWidget::setContainer(QFrame *widget) {
     m_layout->addWidget(widget);
 
     ui->container = widget;
+    emit containerChanged();
 
     setAddingItem(m_isAddingItem);
 }
@@ -201,6 +203,8 @@ void ExtendedTableWidget::setTableWidget(QTableWidget *widget) {
     m_layout->insertWidget(0, widget);
 
     ui->__qt__passive_table = widget;
+
+    emit tableWidgetChanged();
 }
 
 bool ExtendedTableWidget::isAddingItem() const {
@@ -208,10 +212,12 @@ bool ExtendedTableWidget::isAddingItem() const {
 }
 
 void ExtendedTableWidget::setAddingItem(bool isAddingItem) {
-    m_isAddingItem = isAddingItem;
-
     ui->container->setVisible(isAddingItem);
     ui->stackedWidget->setCurrentIndex((isAddingItem) ? 1 : 0);
+
+    m_isAddingItem = isAddingItem;
+
+    emit addingItemChanged();
 }
 
 QStringList ExtendedTableWidget::columnTitles() const {
@@ -230,6 +236,8 @@ void ExtendedTableWidget::setColumnTitles(const QStringList &columnTitles) {
         __qtablewidgetitem->setText(columnTitles[i]);
         ui->__qt__passive_table->setHorizontalHeaderItem(i, __qtablewidgetitem);
     }
+
+    emit columnTitlesChanged();
 }
 
 void ExtendedTableWidget::appendColumnMapping(const QString &jsonKey,

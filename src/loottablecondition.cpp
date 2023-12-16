@@ -835,7 +835,6 @@ void LootTableCondition::initDamageSrcPage() {
         ui->damageSrc_stackWidget->setCurrentIndex(0);
     } else {
         ui->damageSrc_stackWidget->setCurrentIndex(1);
-        ui->damageSrc_table->setJsonMode(ExtendedTableWidget::JsonMode::List);
         ui->damageSrc_table->appendColumnMapping("id", ui->damageSrc_tagEdit);
         ui->damageSrc_table->appendColumnMapping("expected",
                                                  ui->damageSrc_expectedCheck);

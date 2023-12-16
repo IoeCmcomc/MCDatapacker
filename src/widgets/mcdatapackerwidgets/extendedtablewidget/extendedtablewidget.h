@@ -21,21 +21,30 @@ namespace Ui {
     class ExtendedTableWidget;
 }
 
-class ExtendedTableWidget : public QWidget
-{
+class ExtendedTableWidget : public QWidget {
     Q_OBJECT
-    Q_PROPERTY(QTableWidget * tableWidget READ tableWidget WRITE setTableWidget)
-    Q_PROPERTY(QFrame * container READ container WRITE setContainer)
     Q_PROPERTY(
-        bool isAddingItem READ isAddingItem WRITE setAddingItem STORED false)
-    Q_PROPERTY(
-        QStringList columnTitles READ columnTitles WRITE setColumnTitles)
+        JsonMode jsonMode READ jsonMode WRITE setJsonMode NOTIFY jsonModeChanged)
+    Q_PROPERTY(QTableWidget * tableWidget
+               READ tableWidget WRITE setTableWidget NOTIFY tableWidgetChanged)
+    Q_PROPERTY(QFrame * container
+               READ container WRITE setContainer NOTIFY containerChanged)
+    Q_PROPERTY(bool isAddingItem
+               READ isAddingItem WRITE setAddingItem NOTIFY addingItemChanged STORED false)
+    Q_PROPERTY(QStringList columnTitles
+               READ columnTitles WRITE setColumnTitles NOTIFY columnTitlesChanged)
 
 public:
     enum class JsonMode {
         SimpleMap,
         ComplexMap,
         List,
+    };
+    Q_ENUM(JsonMode)
+    enum Enum_JsonMode { // Make JsonMode enum accessible to moc compiler
+        SimpleMap  = (int)JsonMode::SimpleMap,
+        ComplexMap = (int)JsonMode::ComplexMap,
+        List       = (int)JsonMode::List,
     };
 
     enum class EditorClass {
@@ -81,12 +90,22 @@ public:
 
     /*static void initComboBoxData(QComboBox *widget, ) */
 
+signals:
+    void jsonModeChanged();
+    void tableWidgetChanged();
+    void containerChanged();
+    void addingItemChanged();
+    void columnTitlesChanged();
+
 public slots:
     void setContainer(QFrame *widget);
     void setTableWidget(QTableWidget *widget);
     void setAddingItem(bool isAddingItem);
     void setColumnTitles(const QStringList &columnTitles);
     void setJsonMode(const ExtendedTableWidget::JsonMode &jsonMode);
+    void setJsonMode(const Enum_JsonMode &mode) {
+        setJsonMode(static_cast<JsonMode>(mode));
+    }
     void setGameVersion(const QVersionNumber &version);
     void clear();
 

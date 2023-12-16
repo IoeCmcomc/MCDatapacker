@@ -224,6 +224,9 @@
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="0" column="0">
             <widget class="ExtendedTableWidget" name="damageSrc_table">
+             <property name="jsonMode">
+              <enum>ExtendedTableWidget::List</enum>
+             </property>
              <property name="columnTitles">
               <stringlist>
                <string>Damage type tag</string>

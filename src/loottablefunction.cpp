@@ -132,7 +132,6 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
     initBannerPatterns();
 
     ui->setEnchant_combo->setModel(&enchantmentsModel);
-    ui->setEnchant_table->setJsonMode(ExtendedTableWidget::JsonMode::SimpleMap);
     ui->setEnchant_table->appendColumnMapping(QString(), ui->setEnchant_combo);
     ui->setEnchant_table->appendColumnMapping(QString(),
                                               ui->setEnchant_numberProvider);
@@ -1131,7 +1130,6 @@ void LootTableFunction::initBannerPatterns() {
         ui->setPattern_colorCombo->addItem(pixmap, it.key());
     }
 
-    ui->setPattern_table->setJsonMode(ExtendedTableWidget::JsonMode::List);
     ui->setPattern_table->appendColumnMapping("pattern",
                                               ui->setPattern_patternCombo);
     ui->setPattern_table->appendColumnMapping("color",
