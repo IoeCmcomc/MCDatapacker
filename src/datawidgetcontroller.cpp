@@ -4,6 +4,7 @@
 #include "optionalspinbox.h"
 #include "inventoryslot.h"
 #include "truefalsebox.h"
+#include "extendedtablewidget.h"
 
 #include "modelfunctions.h"
 
@@ -123,7 +124,7 @@ void DataWidgetControllerNumberProvider::putValueTo(QJsonObject &obj,
 
 
 bool DataWidgetControllerInventorySlot::hasAcceptableValue() const {
-    return m_widget->isEnabled() && m_widget->isEmpty();
+    return m_widget->isEnabled() && !m_widget->isEmpty();
 }
 
 void DataWidgetControllerInventorySlot::setValueFrom(const QJsonObject &obj,
@@ -221,7 +222,7 @@ void DataWidgetControllerComboBox::putValueTo(QJsonObject &obj,
 
 
 bool DataWidgetControllerRadioButton::hasAcceptableValue() const {
-    return m_button->isChecked();
+    return m_controller->hasAcceptableValue() && m_button->isChecked();
 }
 
 void DataWidgetControllerRadioButton::setValueFrom(const QJsonObject &obj,
@@ -233,4 +234,29 @@ void DataWidgetControllerRadioButton::putValueTo(QJsonObject &obj,
                                                  const QString &key) const {
     m_controller->putValueTo(obj, key);
     m_button->setChecked(obj.contains(key));
+}
+
+
+bool DataWidgetControllerExtendedTableWidget::hasAcceptableValue() const {
+    return m_widget->isEnabled() && m_widget->rowCount() > 0;
+}
+
+void DataWidgetControllerExtendedTableWidget::setValueFrom(
+    const QJsonObject &obj, const QString &key) {
+    if (obj.contains(key)) {
+        if (m_widget->jsonMode() == ExtendedTableWidget::JsonMode::List) {
+            m_widget->fromJson(obj.value(key).toArray());
+        } else {
+            m_widget->fromJson(obj.value(key).toObject());
+        }
+    }
+}
+
+void DataWidgetControllerExtendedTableWidget::putValueTo(
+    QJsonObject &obj, const QString &key) const {
+    if (m_widget->jsonMode() == ExtendedTableWidget::JsonMode::List) {
+        obj[key] = m_widget->toJsonArray();
+    } else {
+        obj[key] = m_widget->toJsonObject();
+    }
 }

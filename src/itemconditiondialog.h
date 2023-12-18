@@ -7,35 +7,30 @@
 #include <QDialog>
 #include <QJsonArray>
 
+class ExtendedTableWidget;
+
 namespace Ui {
     class ItemConditionDialog;
 }
 
-class ItemConditionDialog : public QDialog, public BaseCondition
-{
+class ItemConditionDialog : public QDialog, public BaseCondition {
     Q_OBJECT
 
 public:
     explicit ItemConditionDialog(QWidget *parent = nullptr);
     ~ItemConditionDialog();
 
-    QJsonObject toJson() const override;
-    void fromJson(const QJsonObject &value) override;
-
-protected slots:
-    void onAddedEnchant();
-    void onAddedStoredEnchant();
+    QJsonObject toJson() const final;
+    void fromJson(const QJsonObject &value) final;
 
 private:
     Ui::ItemConditionDialog *ui;
+    DataWidgetControllerRecord m_controller;
     QStandardItemModel itemsModel;
     QStandardItemModel potionsModel;
     QStandardItemModel enchantmentsModel;
-    DataWidgetControllerRecord m_controller;
-    bool from_1_17;
 
-    void initTable(QTableWidget *table);
-    void tableFromJson(const QJsonArray &jsonArr, QTableWidget *table);
+    void initTable(ExtendedTableWidget *table);
 };
 
 #endif /* ITEMCONDITIONDIALOG_H */

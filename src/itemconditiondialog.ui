@@ -6,14 +6,185 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>662</width>
-    <height>557</height>
+    <width>587</width>
+    <height>483</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Item condition</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="3" rowspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Count:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="8">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Enchantments</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
+         <number>5</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="ExtendedTableWidget" name="enchantmentsTable">
+          <property name="jsonMode">
+           <enum>ExtendedTableWidget::List</enum>
+          </property>
+          <property name="columnTitles">
+           <stringlist>
+            <string>Enchantment</string>
+            <string>Levels</string>
+           </stringlist>
+          </property>
+          <widget class="QFrame" name="enchantsContainer">
+           <layout class="QFormLayout" name="formLayout_2">
+            <item row="0" column="1">
+             <widget class="QComboBox" name="enchant_combo"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Enchantment:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="NumberProvider" name="enchant_levelInput">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="modes">
+               <set>NumberProvider::ExactAndRange</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Levels:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Stored enchantments</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
+         <number>5</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="ExtendedTableWidget" name="storedEnchantsTable">
+          <property name="jsonMode">
+           <enum>ExtendedTableWidget::List</enum>
+          </property>
+          <property name="columnTitles">
+           <stringlist>
+            <string>Enchantment</string>
+            <string>Levels</string>
+           </stringlist>
+          </property>
+          <widget class="QFrame" name="storedEnchantsContainer">
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="1">
+             <widget class="QComboBox" name="stored_combo"/>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Enchantment:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="NumberProvider" name="stored_levelInput">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="modes">
+               <set>NumberProvider::ExactAndRange</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Levels:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Potion:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="7">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="1" rowspan="2">
     <widget class="InventorySlot" name="itemSlot">
      <property name="sizePolicy">
@@ -36,7 +207,14 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="5">
+   <item row="1" column="4">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Durability:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5" colspan="3">
     <widget class="NumberProvider" name="countInput">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -58,7 +236,38 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4" colspan="2">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>NBT:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QRadioButton" name="tagRadio">
+     <property name="text">
+      <string>Item tag:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="2">
+    <widget class="QRadioButton" name="itemRadio">
+     <property name="text">
+      <string>Item:</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="7">
+    <widget class="QLineEdit" name="itemTagEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5" colspan="3">
     <widget class="NumberProvider" name="durabilityInput">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -80,252 +289,22 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="5">
-    <widget class="QLineEdit" name="itemTagEdit">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string>NBT:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="5">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="6">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Stored enchantments</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Enchantment:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="stored_combo"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Levels:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="NumberProvider" name="stored_levelInput">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="modes">
-         <set>NumberProvider::ExactAndRange</set>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="stored_addBtn">
-        <property name="text">
-         <string>Add</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" rowspan="5">
-       <widget class="QTableWidget" name="stored_table">
-        <property name="toolTip">
-         <string>Right click a row to delete it.</string>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
-        </property>
-        <property name="horizontalScrollMode">
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>150</number>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <column>
-         <property name="text">
-          <string>Enchantment</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Level</string>
-         </property>
-        </column>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="6">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Enchantments</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Enchantment:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="enchant_combo"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Levels:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="NumberProvider" name="enchant_levelInput">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>150</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="modes">
-         <set>NumberProvider::ExactAndRange</set>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="enchant_addBtn">
-        <property name="text">
-         <string>Add</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" rowspan="5">
-       <widget class="QTableWidget" name="enchant_table">
-        <property name="toolTip">
-         <string>Right click a row to delete it.</string>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
-        </property>
-        <property name="horizontalScrollMode">
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>150</number>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <column>
-         <property name="text">
-          <string>Enchantment</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Level</string>
-         </property>
-        </column>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="3">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Count:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Durability:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_9">
-     <property name="text">
-      <string>Potion:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1" colspan="5">
-    <widget class="QLineEdit" name="NBTEdit"/>
-   </item>
-   <item row="5" column="1" colspan="5">
+   <item row="4" column="1" colspan="7">
     <widget class="QComboBox" name="potionCombo"/>
    </item>
-   <item row="0" column="2" rowspan="2">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" rowspan="2">
-    <widget class="QRadioButton" name="itemRadio">
-     <property name="text">
-      <string>Item:</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QRadioButton" name="tagRadio">
-     <property name="text">
-      <string>Item tag:</string>
-     </property>
-    </widget>
+   <item row="5" column="1" colspan="7">
+    <widget class="QLineEdit" name="NBTEdit"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>ExtendedTableWidget</class>
+   <extends>QWidget</extends>
+   <header>extendedtablewidget.h</header>
+   <addpagemethod>setContainer</addpagemethod>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>NumberProvider</class>
    <extends>QFrame</extends>
@@ -348,8 +327,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>485</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -364,12 +343,44 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>553</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tagRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>itemTagEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>75</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>134</x>
+     <y>92</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>itemRadio</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>itemSlot</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>79</x>
+     <y>33</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>114</x>
+     <y>47</y>
     </hint>
    </hints>
   </connection>

@@ -78,6 +78,7 @@ public:
 
     bool isAddingItem() const;
     QStringList columnTitles() const;
+    int rowCount() const;
 
     void appendColumnMapping(const QString &jsonKey, QWidget *editor,
                              VersionPair gameVerLim = {});

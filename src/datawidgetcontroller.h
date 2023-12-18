@@ -14,6 +14,7 @@ class NumberProvider;
 class OptionalSpinBox;
 class InventorySlot;
 class TrueFalseBox;
+class ExtendedTableWidget;
 
 class DataWidgetController {
 public:
@@ -205,14 +206,24 @@ public:
         delete m_controller;
     }
 
-    virtual bool hasAcceptableValue() const final;;
+    virtual bool hasAcceptableValue() const final;
     virtual void setValueFrom(const QJsonObject &obj,
-                              const QString &key) final;;
-    virtual void putValueTo(QJsonObject &obj, const QString &key) const final;;
+                              const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj, const QString &key) const final;
 
 private:
     DataWidgetController *m_controller = nullptr;
     QRadioButton *m_button             = nullptr;
+};
+
+
+class DataWidgetControllerExtendedTableWidget
+    : public DataWidgetControllerWidget<ExtendedTableWidget> {
+public:
+    using DataWidgetControllerWidget::DataWidgetControllerWidget;
+    virtual bool hasAcceptableValue() const final;
+    virtual void setValueFrom(const QJsonObject &obj, const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj, const QString &key) const final;
 };
 
 
@@ -236,5 +247,6 @@ DEFINE_CONTROLLER_WRAPPER(QRadioButton, DataWidgetControllerRadioButton)
 DEFINE_WRAPPER(NumberProvider)
 DEFINE_WRAPPER(InventorySlot)
 DEFINE_WRAPPER(TrueFalseBox)
+DEFINE_WRAPPER(ExtendedTableWidget)
 
 #endif // DATAWIDGETCONTROLLER_H

@@ -14,12 +14,17 @@
 #include <QCheckBox>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTimer>
 
 
 ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
     QWidget(parent), ui(new Ui::ExtendedTableWidget) {
     ui->setupUi(this);
     m_layout = qobject_cast<QVBoxLayout *>(layout());
+
+    ui->table->setObjectName(QStringLiteral("__qt__passive_table"));
+    ui->addBtn->setObjectName(QStringLiteral("__qt__passive_addBtn"));
+    ui->cancelBtn->setObjectName(QStringLiteral("__qt__passive_cancelBtn"));
 
     setContainer(new QFrame(this));
 
@@ -31,20 +36,20 @@ ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
             this, &ExtendedTableWidget::onApplyBtn);
     connect(ui->cancelBtn, &QToolButton::clicked,
             this, &ExtendedTableWidget::onCancelBtn);
-    connect(ui->__qt__passive_table->selectionModel(),
+    connect(ui->table->selectionModel(),
             &QItemSelectionModel::selectionChanged,
             this, &ExtendedTableWidget::updateRemoveBtn);
 
     updateRemoveBtn();
     setAddingItem(false);
 /*
-      QHeaderView* headerView = ui->__qt__passive_table->horizontalHeader();
+      QHeaderView* headerView = ui->table->horizontalHeader();
       headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
  */
 }
 
 QTableWidget * ExtendedTableWidget::tableWidget() const {
-    return ui->__qt__passive_table;
+    return ui->table;
 }
 
 void ExtendedTableWidget::changeEvent(QEvent *e) {
@@ -65,8 +70,8 @@ QJsonObject ExtendedTableWidget::toJsonObject() const {
 
     QJsonObject ret;
 
-    for (int row = 0; row < ui->__qt__passive_table->rowCount(); ++row) {
-        const int cols = ui->__qt__passive_table->columnCount();
+    for (int row = 0; row < ui->table->rowCount(); ++row) {
+        const int cols = ui->table->columnCount();
         if ((m_jsonMode == JsonMode::SimpleMap) && (cols == 2)) {
             const QString &&key   = itemDataToJson(row, 0).toString();
             const auto    &&value = itemDataToJson(row, 1);
@@ -74,7 +79,7 @@ QJsonObject ExtendedTableWidget::toJsonObject() const {
                 ret[key] = value;
         } else {
             QJsonObject     obj;
-            const QString &&key = ui->__qt__passive_table->item(row, 0)->text();
+            const QString &&key = ui->table->item(row, 0)->text();
             for (int col = 1; col < cols; ++col) {
                 const auto &&value = itemDataToJson(row, col);
                 if (!value.isNull())
@@ -92,9 +97,9 @@ QJsonArray ExtendedTableWidget::toJsonArray() const {
         return QJsonArray();
 
     QJsonArray ret;
-    const int  cols = ui->__qt__passive_table->columnCount();
+    const int  cols = ui->table->columnCount();
 
-    for (int row = 0; row < ui->__qt__passive_table->rowCount(); ++row) {
+    for (int row = 0; row < ui->table->rowCount(); ++row) {
         QJsonObject obj;
         for (int col = 0; col < cols; ++col) {
             const auto &&value = itemDataToJson(row, col);
@@ -112,7 +117,7 @@ void ExtendedTableWidget::fromJson(const QJsonObject &root) {
 
     int row = 0;
     for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
-        const int cols = ui->__qt__passive_table->columnCount();
+        const int cols = ui->table->columnCount();
 
         if ((m_jsonMode == JsonMode::SimpleMap) && (cols == 2)) {
             loadItemFromJson(row, 0, it.key());
@@ -166,8 +171,8 @@ void ExtendedTableWidget::setGameVersion(const QVersionNumber &version) {
 }
 
 void ExtendedTableWidget::clear() {
-    ui->__qt__passive_table->clearContents();
-    ui->__qt__passive_table->setRowCount(0);
+    ui->table->clearContents();
+    ui->table->setRowCount(0);
 }
 
 QFrame * ExtendedTableWidget::container() const {
@@ -175,18 +180,24 @@ QFrame * ExtendedTableWidget::container() const {
 }
 
 void ExtendedTableWidget::setContainer(QFrame *widget) {
+    Q_ASSERT(widget != nullptr);
     widget->setFrameShape(QFrame::StyledPanel);
     widget->setFrameShadow(QFrame::Sunken);
     QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     policy.setVerticalStretch(1);
     widget->setSizePolicy(policy);
 
-    m_layout->removeWidget(ui->container);
-    ui->container->deleteLater();
-    m_layout->addWidget(widget);
+    auto *oldContainer = ui->container;
+    if (oldContainer != widget) {
+        m_layout->removeWidget(oldContainer);
+        // Calling oldContainer->deleteLater() directly will not work
+        // in the context of a modal dialog
+        QTimer::singleShot(0, oldContainer, &QObject::deleteLater);
+        m_layout->addWidget(widget);
 
-    ui->container = widget;
-    emit containerChanged();
+        ui->container = widget;
+        emit containerChanged();
+    }
 
     setAddingItem(m_isAddingItem);
 }
@@ -198,11 +209,11 @@ void ExtendedTableWidget::setTableWidget(QTableWidget *widget) {
     widget->setSizePolicy(policy);
     widget->setObjectName(QStringLiteral("__qt__passive_table"));
 
-    m_layout->removeWidget(ui->__qt__passive_table);
-    ui->__qt__passive_table->deleteLater();
+    m_layout->removeWidget(ui->table);
+    ui->table->deleteLater();
     m_layout->insertWidget(0, widget);
 
-    ui->__qt__passive_table = widget;
+    ui->table = widget;
 
     emit tableWidgetChanged();
 }
@@ -224,17 +235,21 @@ QStringList ExtendedTableWidget::columnTitles() const {
     return m_columnTitles;
 }
 
+int ExtendedTableWidget::rowCount() const {
+    return ui->table->rowCount();
+}
+
 void ExtendedTableWidget::setColumnTitles(const QStringList &columnTitles) {
     m_columnTitles = columnTitles;
 
     const int size = columnTitles.size();
 
-    ui->__qt__passive_table->setColumnCount(size);
+    ui->table->setColumnCount(size);
 
     for (int i = 0; i < size; ++i) {
         QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
         __qtablewidgetitem->setText(columnTitles[i]);
-        ui->__qt__passive_table->setHorizontalHeaderItem(i, __qtablewidgetitem);
+        ui->table->setHorizontalHeaderItem(i, __qtablewidgetitem);
     }
 
     emit columnTitlesChanged();
@@ -262,13 +277,13 @@ void ExtendedTableWidget::appendColumnMapping(const QString &jsonKey,
 
     if (!gameVerLim.first.isNull() && gameVerLim.first > m_gameVersion) {
         editor->hide();
-        ui->__qt__passive_table->setColumnHidden(curCol, true);
+        ui->table->setColumnHidden(curCol, true);
     } else {
         if (qobject_cast<NumberProvider *>(editor)) {
-            ui->__qt__passive_table->setItemDelegateForColumn(
+            ui->table->setItemDelegateForColumn(
                 curCol, new NumberProviderDelegate(this));
         } else if (auto *combobox = qobject_cast<QComboBox *>(editor)) {
-            ui->__qt__passive_table->setItemDelegateForColumn(
+            ui->table->setItemDelegateForColumn(
                 curCol, new ComboboxDelegate(combobox, this));
         }
     }
@@ -279,13 +294,13 @@ void ExtendedTableWidget::retranslateUi() {
 
     for (int i = 0; i < m_columnTitles.size(); ++i) {
         QTableWidgetItem *___qtablewidgetitem =
-            ui->__qt__passive_table->horizontalHeaderItem(i);
+            ui->table->horizontalHeaderItem(i);
         ___qtablewidgetitem->setText(m_columnTitles[i]);
     }
 }
 
 QJsonValue ExtendedTableWidget::itemDataToJson(int row, int col) const {
-    auto *item   = ui->__qt__passive_table->item(row, col);
+    auto *item   = ui->table->item(row, col);
     auto *widget = m_columnMappings[col].editor;
 
     switch (m_columnMappings[col].editorClass) {
@@ -335,8 +350,8 @@ int ExtendedTableWidget::indexOfKeyInMapping(const QString &key) const {
 
 void ExtendedTableWidget::loadItemFromJson(int row, int col,
                                            const QJsonValue &value) {
-    if (row >= ui->__qt__passive_table->rowCount())
-        ui->__qt__passive_table->insertRow(row);
+    if (row >= ui->table->rowCount())
+        ui->table->insertRow(row);
 
     auto *item = new QTableWidgetItem();
 
@@ -386,7 +401,7 @@ void ExtendedTableWidget::loadItemFromJson(int row, int col,
         }
     }
 
-    ui->__qt__passive_table->setItem(row, col, item);
+    ui->table->setItem(row, col, item);
 }
 
 
@@ -396,12 +411,12 @@ void ExtendedTableWidget::onAddBtn() {
 
 void ExtendedTableWidget::onRemoveBtn() {
     const auto &&indexes =
-        ui->__qt__passive_table->selectionModel()->selectedRows();
+        ui->table->selectionModel()->selectedRows();
     auto it = indexes.constEnd();
 
     while (it != indexes.constBegin()) {
         --it;
-        ui->__qt__passive_table->removeRow(it->row());
+        ui->table->removeRow(it->row());
     }
     updateRemoveBtn();
 }
@@ -416,10 +431,10 @@ void ExtendedTableWidget::onApplyBtn() {
 
     setAddingItem(false);
 
-    const int row = ui->__qt__passive_table->rowCount();
-    ui->__qt__passive_table->insertRow(row);
+    const int row = ui->table->rowCount();
+    ui->table->insertRow(row);
 
-    for (int col = 0; col < ui->__qt__passive_table->columnCount(); ++col) {
+    for (int col = 0; col < ui->table->columnCount(); ++col) {
         auto *item = new QTableWidgetItem();
 
         auto *widget = m_columnMappings[col].editor;
@@ -438,13 +453,13 @@ void ExtendedTableWidget::onApplyBtn() {
             item->setData(Qt::EditRole, editor->isChecked());
         }
 
-        ui->__qt__passive_table->setItem(row, col, item);
+        ui->table->setItem(row, col, item);
     }
 
 /*
-      ui->__qt__passive_table->setItem(
-          ui->__qt__passive_table->rowCount() - 1, 0,
-          new QTableWidgetItem(ui->__qt__passive_table->rowCount() - 1));
+      ui->table->setItem(
+          ui->table->rowCount() - 1, 0,
+          new QTableWidgetItem(ui->table->rowCount() - 1));
  */
 }
 
@@ -454,5 +469,5 @@ void ExtendedTableWidget::onCancelBtn() {
 
 void ExtendedTableWidget::updateRemoveBtn() {
     ui->removeBtn->setEnabled(
-        ui->__qt__passive_table->selectionModel()->selection().size() > 0);
+        ui->table->selectionModel()->selection().size() > 0);
 }
