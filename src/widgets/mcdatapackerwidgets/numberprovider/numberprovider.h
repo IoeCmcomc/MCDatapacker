@@ -9,15 +9,19 @@ namespace Ui {
     class NumberProvider;
 }
 
-class NumberProvider : public QFrame
-{
+class NumberProvider : public QFrame {
     Q_OBJECT
 
-    Q_PROPERTY(Modes modes READ getModes WRITE setModes)
-    Q_PROPERTY(Mode currentMode READ currentMode WRITE setCurrentMode)
-    Q_PROPERTY(int minLimit READ minLimit WRITE setMinLimit)
-    Q_PROPERTY(int maxLimit READ maxLimit WRITE setMaxLimit)
-    Q_PROPERTY(bool isUnset READ isCurrentlyUnset)
+    Q_PROPERTY(Modes modes READ getModes WRITE setModes NOTIFY modesChanged)
+    Q_PROPERTY(
+        Mode currentMode READ currentMode WRITE setCurrentMode NOTIFY currentModeChanged)
+    Q_PROPERTY(
+        double minLimit READ minLimit WRITE setMinLimit NOTIFY minLimitChanged)
+    Q_PROPERTY(
+        double maxLimit READ maxLimit WRITE setMaxLimit NOTIFY maxLimitChanged)
+    Q_PROPERTY(bool isUnset READ isCurrentlyUnset STORED false)
+    Q_PROPERTY(
+        bool isIntegerOnly READ isIntegerOnly WRITE setIntegerOnly NOTIFY integerOnlyChanged)
 
 public:
     explicit NumberProvider(QWidget *parent = nullptr);
@@ -40,18 +44,20 @@ public:
     void setModes(const Modes &value);
     Mode currentMode() const;
     void setCurrentMode(const Mode &value);
+    bool isIntegerOnly() const;
+    void setIntegerOnly(bool value);
 
     int exactValue() const;
-    void setExactValue(const int value);
+    void setExactValue(const double value);
     int minValue() const;
-    void setMinValue(const int value);
+    void setMinValue(const double value);
     int maxValue() const;
-    void setMaxValue(const int value);
+    void setMaxValue(const double value);
 
     int minLimit() const;
-    void setMinLimit(const int &min);
+    void setMinLimit(const double min);
     int maxLimit() const;
-    void setMaxLimit(const int &max);
+    void setMaxLimit(const double max);
 
     void minimizeMinLimit();
 
@@ -62,6 +68,12 @@ public:
 
 signals:
     void editingFinished();
+    void modesChanged();
+    void currentModeChanged();
+    void minLimitChanged();
+    void maxLimitChanged();
+    void unsetChanged();
+    void integerOnlyChanged();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -75,6 +87,7 @@ private:
     QMenu m_menu;
     Modes m_modes;
     Mode m_currentMode;
+    bool m_integerOnly = true;
 
     void setMenu();
     void swapMinMax();

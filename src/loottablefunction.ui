@@ -915,7 +915,7 @@
         <item row="0" column="1">
          <widget class="NumberProvider" name="setCount_countInput">
           <property name="minLimit">
-           <number>-2147483647</number>
+           <double>-2147483647.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -941,7 +941,14 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="NumberProvider" name="setDamage_damageInput"/>
+         <widget class="NumberProvider" name="setDamage_damageInput">
+          <property name="maxLimit">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="isIntegerOnly" stdset="0">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="1" column="0" colspan="2">
          <widget class="TrueFalseBox" name="setDamage_addCheck">

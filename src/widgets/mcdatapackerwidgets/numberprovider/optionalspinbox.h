@@ -3,25 +3,27 @@
 
 #include <QSpinBox>
 
-class OptionalSpinBox : public QSpinBox
-{
+class OptionalSpinBox : public QDoubleSpinBox {
 public:
-    OptionalSpinBox(QWidget *parent = nullptr);
+    explicit OptionalSpinBox(QWidget *parent = nullptr);
 
     bool isUnset() const;
     void unset();
 
+    bool isIntegerOnly() const;
+    void setIntegerOnly(bool newIntegerOnly);
+
 protected:
-    QValidator::State validate(QString &text, int &pos) const override;
-    int valueFromText(const QString &text) const override;
-    QString textFromValue(int value) const override;
-    void fixup(QString &input) const override;
-    QSize sizeHint() const override;
-    QSize minimumSizeHint() const override;
+    QValidator::State validate(QString &text, int &pos) const final;
+    double valueFromText(const QString &text) const final;
+    QString textFromValue(double value) const final;
+    void fixup(QString &input) const final;
+    QSize sizeHint() const final;
+    QSize minimumSizeHint() const final;
 
 private:
-    QString m_unsetDisplayStr = "-";
-    bool mutable m_isUnset    = true;
+    bool mutable m_isUnset = true;
+    bool m_integerOnly     = true;
 };
 
 #endif /* OPTIONALSPINBOX_H */

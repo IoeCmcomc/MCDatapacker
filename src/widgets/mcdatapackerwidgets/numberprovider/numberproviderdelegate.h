@@ -7,8 +7,7 @@
 #include <QStandardItem>
 #include <QStyledItemDelegate>
 
-class NumberProviderDelegate : public QStyledItemDelegate
-{
+class NumberProviderDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:
     NumberProviderDelegate(QObject *parent = nullptr);
@@ -16,8 +15,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const override;
+    QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                           const QModelIndex &index) const override;
 
     void setEditorData(QWidget *editor,
                        const QModelIndex &index) const override;

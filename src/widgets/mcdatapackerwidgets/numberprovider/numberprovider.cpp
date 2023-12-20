@@ -12,6 +12,7 @@ NumberProvider::NumberProvider(QWidget *parent) :
     QFrame(parent), ui(new Ui::NumberProvider) {
     ui->setupUi(this);
 
+    setIntegerOnly(m_integerOnly);
     setModes(Exact | Range | Binomial);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
@@ -67,7 +68,7 @@ void NumberProvider::onMinMaxEdited() {
 void NumberProvider::fromJson(const QJsonValue &value) {
     /*unset(); */
     if (value.isDouble()) {
-        ui->spinBox->setValue(value.toInt());
+        ui->spinBox->setValue(m_integerOnly ? value.toInt() : value.toDouble());
         ui->stackedWidget->setCurrentIndex(0);
     } else if (value.isObject()) {
         auto obj  = value.toObject();
@@ -79,14 +80,18 @@ void NumberProvider::fromJson(const QJsonValue &value) {
                 ui->probSpinBox->setValue(obj.value(QStringLiteral("p")).toInt());
             ui->stackedWidget->setCurrentIndex(2);
         } else {
-            if (obj.contains(QStringLiteral("min")))
-                setMinValue(obj.value(QStringLiteral("min")).toInt());
-            else
+            if (obj.contains(QStringLiteral("min"))) {
+                const auto min = obj[QStringLiteral("min")];
+                setMinValue(m_integerOnly ? min.toInt() : min.toDouble());
+            } else {
                 ui->minSpinBox->unset();
-            if (obj.contains(QStringLiteral("max")))
-                setMaxValue(obj.value(QStringLiteral("max")).toInt());
-            else
+            }
+            if (obj.contains(QStringLiteral("max"))) {
+                const auto max = obj[QStringLiteral("max")];
+                setMinValue(m_integerOnly ? max.toInt() : max.toDouble());
+            } else {
                 ui->maxSpinBox->unset();
+            }
         }
     }
 }
@@ -103,10 +108,6 @@ QJsonValue NumberProvider::toJson() {
 
         case 1: { /* Range */
             QJsonObject root;
-/*
-          qDebug() << ui->minSpinBox->isUnset() <<
-              ui->maxSpinBox->isUnset();
- */
             if (!ui->minSpinBox->isUnset())
                 root.insert(QLatin1String("min"), ui->minSpinBox->value());
             if (!ui->maxSpinBox->isUnset())
@@ -143,6 +144,7 @@ void NumberProvider::setModes(const NumberProvider::Modes &value) {
             ui->stackedWidget->setCurrentIndex(2);
     }
     ui->inputTypeButton->setHidden(value != 0 && (value & (value - 1)) == 0);
+    emit modesChanged();
 }
 
 void NumberProvider::setMenu() {
@@ -173,13 +175,26 @@ void NumberProvider::setCurrentMode(const Mode &value) {
     const static QMap<Mode, uint8_t> modeMap =
     { { Exact, 0 }, { Range, 1 }, { Binomial, 2 } };
     ui->stackedWidget->setCurrentIndex(modeMap.value(value));
+    emit currentModeChanged();
+}
+
+bool NumberProvider::isIntegerOnly() const {
+    return m_integerOnly;
+}
+
+void NumberProvider::setIntegerOnly(bool value) {
+    m_integerOnly = value;
+    ui->spinBox->setIntegerOnly(value);
+    ui->minSpinBox->setIntegerOnly(value);
+    ui->maxSpinBox->setIntegerOnly(value);
+    emit integerOnlyChanged();
 }
 
 int NumberProvider::exactValue() const {
     return ui->spinBox->value();
 }
 
-void NumberProvider::setExactValue(const int value) {
+void NumberProvider::setExactValue(const double value) {
     ui->spinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(0);
 }
@@ -188,7 +203,7 @@ int NumberProvider::minValue() const {
     return ui->minSpinBox->value();
 }
 
-void NumberProvider::setMinValue(const int value) {
+void NumberProvider::setMinValue(const double value) {
     ui->minSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
@@ -198,7 +213,7 @@ int NumberProvider::maxValue() const {
     return ui->maxSpinBox->value();
 }
 
-void NumberProvider::setMaxValue(const int value) {
+void NumberProvider::setMaxValue(const double value) {
     ui->maxSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
     onMinMaxEdited();
@@ -208,25 +223,27 @@ int NumberProvider::minLimit() const {
     return ui->minSpinBox->minimum();
 }
 
-void NumberProvider::setMinLimit(const int &min) {
+void NumberProvider::setMinLimit(const double min) {
     ui->spinBox->setMinimum(min);
     ui->minSpinBox->setMinimum(min);
     ui->maxSpinBox->setMinimum(min);
+    emit minLimitChanged();
 }
 
 int NumberProvider::maxLimit() const {
     return ui->maxSpinBox->maximum();
 }
 
-void NumberProvider::setMaxLimit(const int &max) {
+void NumberProvider::setMaxLimit(const double max) {
     ui->spinBox->setMaximum(max);
     ui->minSpinBox->setMaximum(max);
     ui->maxSpinBox->setMaximum(max);
+    emit maxLimitChanged();
 }
 
-/*! Set the minimum limit to the minimum interger value */
+/*! Set the minimum limit to the minimum  value */
 void NumberProvider::minimizeMinLimit() {
-    setMinLimit(INT_MIN);
+    setMinLimit(m_integerOnly ? INT_MIN : DBL_MIN);
 }
 
 bool NumberProvider::isCurrentlyUnset() const {

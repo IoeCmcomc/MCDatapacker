@@ -3,47 +3,75 @@
 #include <QDebug>
 #include <QLineEdit>
 
-OptionalSpinBox::OptionalSpinBox(QWidget *parent) : QSpinBox(parent) {
+const QString &&unsetDisplayStr = QStringLiteral("-");
+
+OptionalSpinBox::OptionalSpinBox(QWidget *parent) : QDoubleSpinBox(parent) {
+    setStepType(QAbstractSpinBox::AdaptiveDecimalStepType);
+    setIntegerOnly(m_integerOnly);
 }
 
 QValidator::State OptionalSpinBox::validate(QString &text, int &pos) const {
-    if (text == m_unsetDisplayStr)
+    if (text == unsetDisplayStr) {
         return QValidator::Acceptable;
-    else
-        return QSpinBox::validate(text, pos);
-}
-
-int OptionalSpinBox::valueFromText(const QString &text) const {
-    /*qDebug() << "valueFromText" << text << isUnset << minimum() << maximum(); */
-    if (text == m_unsetDisplayStr) {
-        m_isUnset = true;
-        return qMax(0, minimum());
     } else {
-        m_isUnset = false;
-        return QSpinBox::valueFromText(text);
+        auto state = QDoubleSpinBox::validate(text, pos);
+        if (!m_integerOnly) return state;
+
+        if (state == QValidator::Invalid) return QValidator::Invalid;
+
+        bool ok = false;
+        if ([[maybe_unused]] int _ = text.toInt(&ok); !ok)
+            return QValidator::Invalid;
+
+        return state;
     }
 }
 
-QString OptionalSpinBox::textFromValue(int value) const {
+double OptionalSpinBox::valueFromText(const QString &text) const {
+    /*qDebug() << "valueFromText" << text << isUnset << minimum() << maximum(); */
+    if (text == unsetDisplayStr) {
+        m_isUnset = true;
+        return qMax(0., minimum());
+    } else {
+        m_isUnset = false;
+        const double value = QDoubleSpinBox::valueFromText(text);
+        return m_integerOnly ? (int)value : value;
+    }
+}
+
+QString OptionalSpinBox::textFromValue(double value) const {
     /*qDebug() << "textFromValue" << value << isUnset << minimum() << maximum(); */
-    if (m_isUnset && (value == qMax(0, minimum())))
-        return m_unsetDisplayStr;
+    if (m_isUnset && (value == qMax(0., minimum())))
+        return unsetDisplayStr;
     else {
         m_isUnset = false;
-        return QSpinBox::textFromValue(value);
+        if (m_integerOnly) {
+            return QString::number((int)value);
+        } else {
+            QString &&text = QDoubleSpinBox::textFromValue(value);
+            if (int decSepPos = text.indexOf(locale().decimalPoint());
+                decSepPos != -1) {
+                if (int i = text.indexOf('0', decSepPos); i != -1) {
+                    // Trims trailing zeros in the decimal parts
+                    // Trims the decimal point if necessary
+                    return text.left(i - (i - decSepPos == 1));
+                }
+            }
+            return text;
+        }
     }
 }
 
 void OptionalSpinBox::fixup(QString &input) const {
     if (input.isEmpty())
-        input = m_unsetDisplayStr;
+        input = unsetDisplayStr;
     else
-        QSpinBox::fixup(input);
+        QDoubleSpinBox::fixup(input);
 }
 
 QSize OptionalSpinBox::sizeHint() const {
     bool  isUnsetBefore = m_isUnset;
-    QSize size          = QSpinBox::sizeHint();
+    QSize size          = QDoubleSpinBox::sizeHint();
 
     m_isUnset = isUnsetBefore;
     return size;
@@ -51,10 +79,23 @@ QSize OptionalSpinBox::sizeHint() const {
 
 QSize OptionalSpinBox::minimumSizeHint() const {
     bool  isUnsetBefore = m_isUnset;
-    QSize size          = QSpinBox::minimumSizeHint();
+    QSize size          = QDoubleSpinBox::minimumSizeHint();
 
     m_isUnset = isUnsetBefore;
     return size;
+}
+
+bool OptionalSpinBox::isIntegerOnly() const {
+    return m_integerOnly;
+}
+
+void OptionalSpinBox::setIntegerOnly(bool newIntegerOnly) {
+    m_integerOnly = newIntegerOnly;
+    if (newIntegerOnly) {
+        setDecimals(0);
+    } else {
+        setDecimals(std::numeric_limits<float>::digits10);
+    }
 }
 
 bool OptionalSpinBox::isUnset() const {
@@ -64,5 +105,5 @@ bool OptionalSpinBox::isUnset() const {
 void OptionalSpinBox::unset() {
     m_isUnset = true;
     clear();
-    setValue(qMax(0, minimum()));
+    setValue(qMax(0., minimum()));
 }
