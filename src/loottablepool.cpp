@@ -7,12 +7,21 @@
 
 #include <QJsonObject>
 
+#include <mutex>
+
 LootTablePool::LootTablePool(QWidget *parent) :
     QTabWidget(parent),
     ui(new Ui::LootTablePool) {
     ui->setupUi(this);
+}
 
+LootTablePool::~LootTablePool() {
+    delete ui;
+}
+
+void LootTablePool::init() {
     auto *cond = new LootTableCondition();
+
     ui->conditionsInterface->setMainWidget(cond);
 
     ui->conditionsInterface->mapToSetter(
@@ -33,10 +42,6 @@ LootTablePool::LootTablePool(QWidget *parent) :
             this, &LootTablePool::updateConditionsTab);
 }
 
-LootTablePool::~LootTablePool() {
-    delete ui;
-}
-
 void LootTablePool::changeEvent(QEvent *event) {
     QTabWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange)
@@ -44,6 +49,11 @@ void LootTablePool::changeEvent(QEvent *event) {
     updateEntriesTab(ui->entriesInterface->entriesCount());
     updateFunctionsTab(ui->functionsInterface->entriesCount());
     updateConditionsTab(ui->conditionsInterface->entriesCount());
+}
+
+void LootTablePool::showEvent(QShowEvent *event) {
+    std::call_once(m_fullyInitialized, &LootTablePool::init, this);
+    QTabWidget::showEvent(event);
 }
 
 QJsonObject LootTablePool::toJson() const {
@@ -71,6 +81,7 @@ QJsonObject LootTablePool::toJson() const {
 }
 
 void LootTablePool::fromJson(QJsonObject root) {
+    std::call_once(m_fullyInitialized, &LootTablePool::init, this);
     reset();
 
     ui->rollsInput->fromJson(root.value("rolls"));

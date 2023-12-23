@@ -7,8 +7,7 @@ namespace Ui {
     class LootTablePool;
 }
 
-class LootTablePool : public QTabWidget
-{
+class LootTablePool : public QTabWidget {
     Q_OBJECT
 
 public:
@@ -20,11 +19,15 @@ public:
 
 protected:
     void changeEvent(QEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private:
     Ui::LootTablePool *ui;
 
     void reset();
+    void init();
+
+    std::once_flag m_fullyInitialized;
 
 private /*slots*/ :
     void updateEntriesTab(int size);

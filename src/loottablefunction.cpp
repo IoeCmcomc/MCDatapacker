@@ -13,10 +13,14 @@
 #include <QJsonObject>
 #include <QStringListModel>
 
+#include <mutex>
+
 LootTableFunction::LootTableFunction(QWidget *parent) :
-    QTabWidget(parent),
-    ui(new Ui::LootTableFunction) {
+    QTabWidget(parent), ui(new Ui::LootTableFunction) {
     ui->setupUi(this);
+}
+
+void LootTableFunction::init() {
     updateConditionsTab(0);
 
     if (Game::version() < Game::v1_17) {
@@ -448,6 +452,8 @@ QJsonObject LootTableFunction::toJson() const {
 void LootTableFunction::fromJson(const QJsonObject &root) {
     if (!root.contains(QLatin1String("function")))
         return;
+
+    std::call_once(m_fullyInitialized, &LootTableFunction::init, this);
 
     QString function = root.value(QLatin1String("function")).toString();
     Glhp::removePrefix(function, "minecraft:"_QL1);
@@ -930,6 +936,11 @@ void LootTableFunction::changeEvent(QEvent *event) {
         ui->retranslateUi(this);
         updateConditionsTab(ui->conditionsInterface->entriesCount());
     }
+}
+
+void LootTableFunction::showEvent(QShowEvent *event) {
+    std::call_once(m_fullyInitialized, &LootTableFunction::init, this);
+    QTabWidget::showEvent(event);
 }
 
 void LootTableFunction::onTypeChanged(int index) {

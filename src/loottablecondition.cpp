@@ -13,11 +13,19 @@
 #include <QDialog>
 #include <QDoubleSpinBox>
 
+#include <mutex>
+
 LootTableCondition::LootTableCondition(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::LootTableCondition) {
     ui->setupUi(this);
+}
 
+LootTableCondition::~LootTableCondition() {
+    delete ui;
+}
+
+void LootTableCondition::init() {
     if (Game::version() < Game::v1_17) {
         qobject_cast<QListView *>(ui->conditionTypeCombo->view())
         ->setRowHidden(15, true);
@@ -56,10 +64,6 @@ LootTableCondition::LootTableCondition(QWidget *parent) :
     m_timeCtrl.addMapping("value", ui->time_valueInput);
     m_timeCtrl.addMapping("period", ui->time_periodSpinBox);
     initToolEnchantPage();
-}
-
-LootTableCondition::~LootTableCondition() {
-    delete ui;
 }
 
 QJsonObject LootTableCondition::toJson() const {
@@ -725,6 +729,7 @@ void LootTableCondition::setDepth(int value) {
 }
 
 void LootTableCondition::resetAll() {
+    std::call_once(m_fullyInitialized, &LootTableCondition::init, this);
     for (int i = 0; i < ui->stackedWidget->count(); ++i)
         reset(i);
     ui->conditionTypeCombo->setCurrentIndex(0);
@@ -735,6 +740,11 @@ void LootTableCondition::changeEvent(QEvent *event) {
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
     }
+}
+
+void LootTableCondition::showEvent(QShowEvent *event) {
+    std::call_once(m_fullyInitialized, &LootTableCondition::init, this);
+    QFrame::showEvent(event);
 }
 
 void LootTableCondition::blockStates_onAdded() {

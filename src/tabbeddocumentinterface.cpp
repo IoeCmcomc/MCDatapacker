@@ -557,7 +557,7 @@ QString TabbedDocumentInterface::readTextFile(const QString &path, bool &ok) {
         in.setCodec("UTF-8");
 
 #ifndef QT_NO_CURSOR
-        QApplication::setOverrideCursor(Qt::WaitCursor);
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
 
         while (!in.atEnd()) {

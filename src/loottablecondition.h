@@ -13,8 +13,7 @@ namespace Ui {
     class LootTableCondition;
 }
 
-class LootTableCondition : public QFrame, public BaseCondition
-{
+class LootTableCondition : public QFrame, public BaseCondition {
     Q_OBJECT
 
 public:
@@ -33,6 +32,7 @@ public:
 
 protected:
     void changeEvent(QEvent *) override;
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     void blockStates_onAdded();
@@ -69,10 +69,12 @@ private:
     QFileSystemWatcher predRefWatcher;
 
     DataWidgetControllerRecord m_timeCtrl;
+    std::once_flag m_fullyInitialized;
 
     void reset(int index);
     void clearModelExceptHeaders(QStandardItemModel &model);
 
+    void init();
     void initBlockStatesPage();
     void initDamageSrcPage();
     void initEntityScoresPage();

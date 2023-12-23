@@ -48,7 +48,9 @@ void AdvancementTabDock::loadAdvancements() {
         return;
     }
 
-    qApp->setOverrideCursor(Qt::WaitCursor);
+#ifndef QT_NO_CURSOR
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
 
     // Read all showable advancements
 
@@ -174,7 +176,9 @@ void AdvancementTabDock::loadAdvancements() {
         }
     }
 
-    qApp->restoreOverrideCursor();
+#ifndef QT_NO_CURSOR
+    QGuiApplication::restoreOverrideCursor();
+#endif
 }
 
 void AdvancementTabDock::changeEvent(QEvent *e) {

@@ -11,8 +11,7 @@ namespace Ui {
     class LootTableFunction;
 }
 
-class LootTableFunction : public QTabWidget
-{
+class LootTableFunction : public QTabWidget {
     Q_OBJECT
 
 public:
@@ -24,6 +23,7 @@ public:
 
 protected:
     void changeEvent(QEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 
 private /*slots*/ :
     void onTypeChanged(int index);
@@ -98,6 +98,9 @@ private:
 
     Ui::LootTableFunction *ui;
 
+    std::once_flag m_fullyInitialized;
+
+    void init();
     void initBlocksModel();
     void initCondInterface();
     void initFuncInterface();
