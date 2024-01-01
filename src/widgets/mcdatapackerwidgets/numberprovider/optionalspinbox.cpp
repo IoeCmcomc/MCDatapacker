@@ -98,6 +98,11 @@ void OptionalSpinBox::setIntegerOnly(bool newIntegerOnly) {
     }
 }
 
+void OptionalSpinBox::setValue(double value) {
+    m_isUnset = false;
+    QDoubleSpinBox::setValue(value);
+}
+
 bool OptionalSpinBox::isUnset() const {
     return m_isUnset;
 }

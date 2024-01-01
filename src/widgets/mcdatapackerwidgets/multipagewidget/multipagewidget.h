@@ -61,11 +61,12 @@ class QFrame;
 QT_END_NAMESPACE
 
 /*! [0] */
-class MultiPageWidget : public QWidget
-{
+class MultiPageWidget : public QWidget {
     Q_OBJECT
-    Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex)
-    Q_PROPERTY(QString pageTitle READ pageTitle WRITE setPageTitle STORED false)
+    Q_PROPERTY(
+        int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(
+        QString pageTitle READ pageTitle WRITE setPageTitle STORED false NOTIFY pageTitleChanged)
     Q_PROPERTY(QString labelText READ labelText WRITE setLabelText STORED false)
     Q_PROPERTY(
         bool showSeparator READ showSeparator WRITE setShowSeparator STORED false)
@@ -79,7 +80,7 @@ public:
     int currentIndex() const;
     QString labelText() const;
     bool showSeparator() const;
-    QWidget *widget(int index);
+    QWidget * widget(int index);
     QString pageTitle() const;
 
 public slots:
@@ -90,6 +91,8 @@ public slots:
     void setCurrentIndex(int index);
     void setLabelText(const QString &str);
     void setShowSeparator(bool value);
+    void setPageHidden(int index, bool hidden);
+    void setPageHidden(QWidget *page, bool hidden);
 
 private slots:
     void pageWindowTitleChanged();
@@ -97,6 +100,7 @@ private slots:
 signals:
     void currentIndexChanged(int index);
     void pageTitleChanged(const QString &title);
+    void currentPageHiddenChanged(bool hidden);
 
 private:
     QLabel *label               = nullptr;

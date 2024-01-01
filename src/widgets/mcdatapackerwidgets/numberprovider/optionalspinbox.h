@@ -13,6 +13,8 @@ public:
     bool isIntegerOnly() const;
     void setIntegerOnly(bool newIntegerOnly);
 
+    void setValue(double value);
+
 protected:
     QValidator::State validate(QString &text, int &pos) const final;
     double valueFromText(const QString &text) const final;

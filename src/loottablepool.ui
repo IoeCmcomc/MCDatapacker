@@ -45,6 +45,9 @@
         <height>20</height>
        </size>
       </property>
+      <property name="isIntegerOnly" stdset="0">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
     <item row="1" column="0">
@@ -67,6 +70,9 @@
         <width>130</width>
         <height>20</height>
        </size>
+      </property>
+      <property name="isIntegerOnly" stdset="0">
+       <bool>false</bool>
       </property>
      </widget>
     </item>
@@ -162,15 +168,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DataWidgetInterface</class>
+   <class>NumberProvider</class>
    <extends>QFrame</extends>
-   <header location="global">datawidgetinterface.h</header>
+   <header>numberprovider.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>NumberProvider</class>
+   <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
-   <header location="global">numberprovider.h</header>
+   <header location="global">datawidgetinterface.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -76,7 +76,7 @@ public:
     QString includeFile() const override;
     QIcon icon() const override;
     bool isContainer() const override;
-    QWidget *createWidget(QWidget *parent) override;
+    QWidget * createWidget(QWidget *parent) override;
     bool isInitialized() const override;
     void initialize(QDesignerFormEditorInterface *formEditor) override;
     QString domXml() const override;

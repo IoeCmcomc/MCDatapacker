@@ -53,6 +53,8 @@
 #include <QStackedWidget>
 #include <QFrame>
 #include <QLabel>
+#include <QListView>
+#include <QStandardItemModel>
 
 #include "multipagewidget.h"
 
@@ -120,12 +122,29 @@ void MultiPageWidget::setShowSeparator(bool value) {
     hLine->setVisible(value);
 }
 
+void MultiPageWidget::setPageHidden(int index, bool hidden) {
+    if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
+        auto *model = qobject_cast<QStandardItemModel *>(comboBox->model());
+        Q_ASSERT(model != nullptr);
+        view->setRowHidden(index, hidden);
+        model->item(index, 0)->setEnabled(!hidden);
+
+        emit currentPageHiddenChanged(hidden);
+    }
+}
+
+void MultiPageWidget::setPageHidden(QWidget *page, bool hidden) {
+    if (const int i = stackWidget->indexOf(page); i != -1) {
+        setPageHidden(i, hidden);
+    }
+}
+
 void MultiPageWidget::insertPage(int index, QWidget *page) {
     page->setParent(stackWidget);
 
     stackWidget->insertWidget(index, page);
 
-    QString title = page->windowTitle();
+    QString &&title = page->windowTitle();
     if (title.isEmpty()) {
         title = tr("Page %1").arg(comboBox->count() + 1);
         page->setWindowTitle(title);
@@ -150,7 +169,7 @@ void MultiPageWidget::pageWindowTitleChanged() {
     comboBox->setItemText(index, page->windowTitle());
 }
 
-QWidget* MultiPageWidget::widget(int index) {
+QWidget * MultiPageWidget::widget(int index) {
     return stackWidget->widget(index);
 }
 
