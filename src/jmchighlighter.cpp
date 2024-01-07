@@ -3,10 +3,11 @@
 
 JmcHighlighter::JmcHighlighter(QTextDocument *parent,
                                const bool isHeaderFile) : Highlighter{parent} {
-    m_quoteDelimiters += QStringLiteral("'");
+    m_quoteDelimiters += '\'';
     bracketPairs.append({ '(', ')' });
+    initBracketCharset();
     if (!isHeaderFile) {
-        m_singleCommentCharset += QStringLiteral("#");
+        m_singleCommentChar = QLatin1Char('#');
     }
 
     const QRegularExpression commandRegex{

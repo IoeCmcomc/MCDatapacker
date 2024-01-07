@@ -86,9 +86,10 @@ public:
     friend class CodeEditor;
 
 protected:
-    QString m_quoteDelimiters = QStringLiteral("\"");
-    QString m_singleCommentCharset;
+    QSet<QChar> m_quoteDelimiters;
+    QChar m_singleCommentChar;
     QVector<BracketPair> bracketPairs;
+    QSet<QChar> m_bracketCharset;
     QRegularExpression namespacedIdRegex{ QStringLiteral(
                                               R"(#?\b[a-z0-9-_.]+:[a-z0-9-_.\/]+)") };
     CodePalette m_palette;
@@ -101,6 +102,9 @@ protected:
     QVector<QTextBlock> &changedBlocks();
     virtual void rehighlightDelayed() {
     };
+    void initBracketCharset();
+    void formatNamespacedIds(TextBlockData *data,
+                             const QTextCharFormat &baseFmt = {});
 
 private:
     QVector<QTextBlock> m_changedBlocks;

@@ -403,10 +403,10 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/libqlementine.a
 
 win32-msvc*: {
     LIBS += -lAdvAPI32
-    CONFIG(force_debug_info) {
-        DEFINES += _DISABLE_VECTOR_ANNOTATION=1 _DISABLE_STRING_ANNOTATION=1
-        QMAKE_CXXFLAGS += -fsanitize=address
-    }
+    # CONFIG(force_debug_info) {
+    #     DEFINES += _DISABLE_VECTOR_ANNOTATION=1 _DISABLE_STRING_ANNOTATION=1
+    #     QMAKE_CXXFLAGS += -fsanitize=address
+    # }
 }
 
 #message($$INCLUDEPATH)

@@ -9,9 +9,9 @@
 
 namespace Command {
     struct CacheKey {
-        const int         typeId = 0;
-        const QString     literalStr;
-        const QVariantMap props;
+        int         typeId = 0;
+        QString     literalStr;
+        QVariantMap props;
         CacheKey(const int id, const QString &str,
                  const QVariantMap &p = QVariantMap()) : typeId(id),
             literalStr(str), props(p) {
@@ -45,13 +45,27 @@ namespace std {
         using result_type   = std::size_t;
 
         result_type operator()(argument_type const& key) const {
-            static QVariantMapHasher variantMapHash;
+            static argument_type lastKey{ -1, {} };
+            static result_type   lastHash = 0;
+
+            if (key == lastKey) {
+                return lastHash;
+            }
 
             result_type const h1(std::hash<int>()(key.typeId));
             result_type const h2(std::hash<QString>()(key.literalStr));
-            result_type const h3(variantMapHash.hash(key.props));
 
-            return ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
+            if (key.props.isEmpty()) {
+                lastHash = h1 ^ (h2 << 1);
+            } else {
+                static QVariantMapHasher variantMapHash;
+
+                result_type const h3(variantMapHash.hash(key.props));
+                lastHash = ((h1 ^ (h2 << 1)) >> 1) ^ (h3 << 1);
+            }
+
+            lastKey = key;
+            return lastHash;
         }
     };
 }

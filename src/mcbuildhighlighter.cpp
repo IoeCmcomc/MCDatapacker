@@ -4,7 +4,8 @@ McbuildHighlighter::McbuildHighlighter(QTextDocument *parent,
                                        const bool isMacroFile)
     : Highlighter{parent} {
     bracketPairs.append({ '(', ')' });
-    m_singleCommentCharset += QStringLiteral("#");
+    initBracketCharset();
+    m_singleCommentChar = QLatin1Char('#');
 
     const QRegularExpression commandRegex{
         QStringLiteral(

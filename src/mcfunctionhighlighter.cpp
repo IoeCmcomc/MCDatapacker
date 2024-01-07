@@ -25,7 +25,7 @@ McfunctionHighlighter::McfunctionHighlighter(QTextDocument *parent,
 }
 
 void McfunctionHighlighter::setupRules() {
-    m_singleCommentCharset += QStringLiteral("#");
+    m_singleCommentChar = QLatin1Char('#');
 
     const QRegularExpression keywordRegex{ QStringLiteral(
                                                R"((?<=^| )(?>(?>a)(?>dvancement|ttribute)|b(?>an(?>-ip|list|)|ossbar)|cl(?>ear|one)|d(?>ata(?:pack)?|e(?>bug|faultgamemode|op)|ifficulty)|e(?>chant|ffect|x(?>ecute|perience))|f(?>ill|orceload|unction)|g(?>ame(?>mode|rule)|ive)|help|item|jfr|ki(?>ck|ll)|l(?>ist|o(?>cate(?:biome)?|ot))|m(?>e|sg)|op|p(?>ar(?>don(?:-ip)?|ticle)|erf|laysound|ublish)|re(?>cipe|load|placeitem)|s(?>a(?>ve-(?>all|o(?>ff|n))|y)|c(?>hedule|oreboard)|e(?>ed|t(?>block|idletimeout|worldspawn))|p(?>awnpoint|ectate|readplayer)|top(?:sound)?|ummon)|t(?>ag|e(?>am(?:msg)?|l(?>eport|l(?:raw)?))|i(?>me|tle)|m|p|rigger)|w(?>eather|hitelist|orldborder|)|xp)(?= |$))") };
@@ -43,21 +43,12 @@ void McfunctionHighlighter::setupRules() {
 }
 
 void McfunctionHighlighter::highlightBlock(const QString &text) {
+    // qDebug() << "McfunctionHighlighter::highlightBlock" <<
+    //     currentBlock().blockNumber() << isManualHighlight();
     Highlighter::highlightBlock(text);
     if (this->document()) {
         auto *data = static_cast<TextBlockData *>(currentBlockUserData());
-
-        if (!data)
-            return;
-
-        const auto &infos = data->namespacedIds();
-
-        auto fmt = m_palette[CodePalette::ResourceLocation];
-        for (const auto info: infos) {
-            fmt.setFontUnderline(true);
-            fmt.setToolTip(info->link);
-            setFormat(info->start, info->length, fmt);
-        }
+        formatNamespacedIds(data, m_palette[CodePalette::ResourceLocation]);
 
         if (!isManualHighlight()) {
             for (const HighlightingRule &rule : qAsConst(highlightingRules)) {
@@ -65,8 +56,8 @@ void McfunctionHighlighter::highlightBlock(const QString &text) {
                     rule.pattern.globalMatch(text);
                 while (matchIterator.hasNext()) {
                     QRegularExpressionMatch &&match = matchIterator.next();
-                    setFormat(match.capturedStart(), match.capturedLength(),
-                              m_palette[rule.formatRole]);
+                    mergeFormat(match.capturedStart(), match.capturedLength(),
+                                m_palette[rule.formatRole]);
                 }
             }
         } else {

@@ -711,7 +711,7 @@ void CodeEditor::openReplaceDialog() {
 
 void CodeEditor::toggleComment() {
     if (!m_highlighter ||
-        m_highlighter->m_singleCommentCharset.isEmpty())
+        m_highlighter->m_singleCommentChar.isNull())
         return;
 
     auto       txtCursor    = textCursor();
@@ -745,8 +745,7 @@ void CodeEditor::toggleComment() {
     bool        anchorShouldComment = false;
     int         anchorCharAdded     = 0;
     int         posCharAdded        = 0;
-    const QChar commentChar         =
-        m_highlighter->m_singleCommentCharset[0];
+    const QChar commentChar         = m_highlighter->m_singleCommentChar;
 
     for (int i = 0; i < count; i++) {
         txtCursor.movePosition(QTextCursor::StartOfLine);
@@ -1189,24 +1188,36 @@ void CodeEditor::createBracketSelection(int pos, bool isPrimary) {
 }
 
 void CodeEditor::followNamespacedId(const QMouseEvent *event) {
-    TextBlockData *data =
-        dynamic_cast<TextBlockData *>(textCursor().block().userData());
-
-    if (!data || !m_highlighter)
+    if (!m_highlighter)
         return;
 
-    QVector<NamespacedIdInfo *> infos = data->namespacedIds();
+    // const auto &&cursor     = cursorForPosition(event->pos());
+    // const int    posInBlock = cursor.positionInBlock();
 
-    /*qDebug() << "followNamespacedId" << infos.count(); */
+    // const auto &&formats = cursor.block().layout()->formats();
 
-    const auto &&cursor         = cursorForPosition(event->pos());
-    const auto &&cursorBlockPos = cursor.positionInBlock();
+    // for (const auto &format: qAsConst(formats)) {
+    //     int formatStart = format.start;
+    //     if (format.format.isAnchor()
+    //         && (formatStart <= posInBlock)
+    //         && (posInBlock <= formatStart + format.length)) {
+    //         emit openFileRequest(format.format.anchorHref());
+    //         break;
+    //     }
+    // }
 
-    for (const auto &info: infos) {
-        if (cursorBlockPos >= info->start &&
-            cursorBlockPos <= (info->start + info->length)) {
-            emit openFileRequest(info->link);
-            break;
+    const auto &&cursor = cursorForPosition(event->pos());
+    if (TextBlockData *data =
+            dynamic_cast<TextBlockData *>(cursor.block().userData())) {
+        const int posInBlock = cursor.positionInBlock();
+
+        const auto &infos = data->namespacedIds();
+        for (const auto &info: infos) {
+            if (posInBlock >= info->start &&
+                posInBlock <= (info->start + info->length)) {
+                emit openFileRequest(info->link);
+                break;
+            }
         }
     }
 }
