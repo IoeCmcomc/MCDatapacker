@@ -5,6 +5,7 @@
 #include "inventoryslot.h"
 #include "truefalsebox.h"
 #include "extendedtablewidget.h"
+#include "datawidgetinterface.h"
 
 #include "modelfunctions.h"
 
@@ -259,4 +260,20 @@ void DataWidgetControllerExtendedTableWidget::putValueTo(
     } else {
         obj[key] = m_widget->toJsonObject();
     }
+}
+
+bool DataWidgetControllerDataWidgetInterface::hasAcceptableValue() const {
+    return m_widget->isEnabled() && m_widget->hasEntries();
+}
+
+void DataWidgetControllerDataWidgetInterface::setValueFrom(
+    const QJsonObject &obj, const QString &key) {
+    if (obj.contains(key)) {
+        m_widget->setJson(obj.value(key).toArray());
+    }
+}
+
+void DataWidgetControllerDataWidgetInterface::putValueTo(
+    QJsonObject &obj, const QString &key) const {
+    obj[key] = m_widget->json();
 }

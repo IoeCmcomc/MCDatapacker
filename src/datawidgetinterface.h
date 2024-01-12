@@ -6,7 +6,9 @@
 #include <QVBoxLayout>
 #include <QFrame>
 
+QT_BEGIN_NAMESPACE
 class QPropertyAnimation;
+QT_END_NAMESPACE
 
 namespace Ui {
     class DataWidgetInterface;
@@ -104,6 +106,8 @@ private slots:
     void sidebarAnimFinished();
 
 private:
+    static constexpr int m_sidebarSlideTime = 50;
+
     QVBoxLayout m_layout;
     QRect m_sidebarRect;
     QJsonArray m_json;
@@ -113,7 +117,6 @@ private:
     int m_currentIndex              = -1;
     bool m_reactToSignal            = true;
     bool m_sidebarHiding            = false;
-    const int m_sidebarSlideTime    = 50;
 
     void loadData(int index);
     void saveData(int index);

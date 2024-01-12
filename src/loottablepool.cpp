@@ -40,15 +40,24 @@ void LootTablePool::init() {
             this, &LootTablePool::updateFunctionsTab);
     connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTablePool::updateConditionsTab);
+
+    m_controller.addMapping(QStringLiteral("rolls"), ui->rollsInput, true);
+    m_controller.addMapping(QStringLiteral("bonus_rolls"), ui->bonusRollsInput);
+    m_controller.addMapping(QStringLiteral("entries"), ui->entriesInterface);
+    m_controller.addMapping(QStringLiteral("functions"),
+                            ui->functionsInterface);
+    m_controller.addMapping(QStringLiteral("conditions"),
+                            ui->conditionsInterface);
+
+    updateCounts();
 }
 
 void LootTablePool::changeEvent(QEvent *event) {
     QTabWidget::changeEvent(event);
-    if (event->type() == QEvent::LanguageChange)
+    if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
-    updateEntriesTab(ui->entriesInterface->entriesCount());
-    updateFunctionsTab(ui->functionsInterface->entriesCount());
-    updateConditionsTab(ui->conditionsInterface->entriesCount());
+        updateCounts();
+    }
 }
 
 void LootTablePool::showEvent(QShowEvent *event) {
@@ -59,44 +68,14 @@ void LootTablePool::showEvent(QShowEvent *event) {
 QJsonObject LootTablePool::toJson() const {
     QJsonObject root;
 
-    if (!ui->bonusRollsInput->isCurrentlyUnset()
-        && ui->bonusRollsInput->isVisible()) {
-        root.insert("bonus_rolls", ui->bonusRollsInput->toJson());
-    }
-    root.insert("rolls", ui->rollsInput->toJson());
-
-    auto &&conditions = ui->conditionsInterface->json();
-    if (!conditions.isEmpty())
-        root.insert("conditions", conditions);
-
-    auto &&functions = ui->functionsInterface->json();
-    if (!functions.isEmpty())
-        root.insert("functions", functions);
-
-    auto &&entries = ui->entriesInterface->json();
-    if (!entries.isEmpty())
-        root.insert("entries", entries);
-
+    m_controller.putValueTo(root, {});
     return root;
 }
 
-void LootTablePool::fromJson(QJsonObject root) {
+void LootTablePool::fromJson(const QJsonObject &root) {
     std::call_once(m_fullyInitialized, &LootTablePool::init, this);
     reset();
-
-    ui->rollsInput->fromJson(root.value("rolls"));
-    if (root.contains("bonus_rolls"))
-        ui->bonusRollsInput->fromJson(root.value("bonus_rolls"));
-
-    if (root.contains("conditions")) {
-        ui->conditionsInterface->setJson(root.value("conditions").toArray());
-    }
-    if (root.contains("functions")) {
-        ui->functionsInterface->setJson(root.value("functions").toArray());
-    }
-    if (root.contains("entries")) {
-        ui->entriesInterface->setJson(root.value("entries").toArray());
-    }
+    m_controller.setValueFrom(root, {});
 }
 
 void LootTablePool::reset() {
@@ -106,6 +85,12 @@ void LootTablePool::reset() {
     ui->entriesInterface->setJson({});
     ui->functionsInterface->setJson({});
     ui->conditionsInterface->setJson({});
+}
+
+void LootTablePool::updateCounts() {
+    updateEntriesTab(ui->entriesInterface->entriesCount());
+    updateFunctionsTab(ui->functionsInterface->entriesCount());
+    updateConditionsTab(ui->conditionsInterface->entriesCount());
 }
 
 void LootTablePool::updateEntriesTab(int size) {

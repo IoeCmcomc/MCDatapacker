@@ -15,6 +15,7 @@ class OptionalSpinBox;
 class InventorySlot;
 class TrueFalseBox;
 class ExtendedTableWidget;
+class DataWidgetInterface;
 
 class DataWidgetController {
 public:
@@ -227,6 +228,16 @@ public:
 };
 
 
+class DataWidgetControllerDataWidgetInterface
+    : public DataWidgetControllerWidget<DataWidgetInterface> {
+public:
+    using DataWidgetControllerWidget::DataWidgetControllerWidget;
+    virtual bool hasAcceptableValue() const final;
+    virtual void setValueFrom(const QJsonObject &obj, const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj, const QString &key) const final;
+};
+
+
 template<class T>
 struct _ControllerWrapper {
     using type = void;
@@ -248,5 +259,6 @@ DEFINE_WRAPPER(NumberProvider)
 DEFINE_WRAPPER(InventorySlot)
 DEFINE_WRAPPER(TrueFalseBox)
 DEFINE_WRAPPER(ExtendedTableWidget)
+DEFINE_WRAPPER(DataWidgetInterface)
 
 #endif // DATAWIDGETCONTROLLER_H

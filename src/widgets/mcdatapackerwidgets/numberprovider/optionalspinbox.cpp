@@ -40,7 +40,7 @@ double OptionalSpinBox::valueFromText(const QString &text) const {
 }
 
 QString OptionalSpinBox::textFromValue(double value) const {
-    /*qDebug() << "textFromValue" << value << isUnset << minimum() << maximum(); */
+    // qDebug() << "textFromValue" << value << m_isUnset << minimum() << maximum();
     if (m_isUnset && (value == qMax(0., minimum())))
         return unsetDisplayStr;
     else {
@@ -51,9 +51,13 @@ QString OptionalSpinBox::textFromValue(double value) const {
             QString &&text = QDoubleSpinBox::textFromValue(value);
             if (int decSepPos = text.indexOf(locale().decimalPoint());
                 decSepPos != -1) {
-                if (int i = text.indexOf('0', decSepPos); i != -1) {
+                if (text.endsWith('0')) {
+                    int i = text.length() - 1;
+                    for (; text[i] == '0'; --i) {
+                    }
+                    ++i;
                     // Trims trailing zeros in the decimal parts
-                    // Trims the decimal point if necessary
+                    // Also trims the decimal point if necessary
                     return text.left(i - (i - decSepPos == 1));
                 }
             }
@@ -110,5 +114,5 @@ bool OptionalSpinBox::isUnset() const {
 void OptionalSpinBox::unset() {
     m_isUnset = true;
     clear();
-    setValue(qMax(0., minimum()));
+    QDoubleSpinBox::setValue(qMax(0., minimum()));
 }
