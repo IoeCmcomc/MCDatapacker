@@ -218,34 +218,37 @@ namespace re2c {
             re2c:tags = 1;
 
             hex = [0-9a-fA-F];
-            uuid = @_p1 hex{1,8} @p1_ '-' @_p2 hex{1,4} @p2_ '-'  @_p3 hex{1,4} @p3_ '-' @_p4 hex{1,4} @p4_ '-' @_p5 hex{1,12} @p5_;
+            uuid = @_p1 hex+ @p1_ '-' @_p2 hex+ @p2_ '-'  @_p3 hex+ @p3_ '-' @_p4 hex+ @p4_ '-' @_p5 hex+ @p5_;
 
             uuid {
-                bool              ok;
-                constexpr static uint8_t last2HexDigitMask = 0xff;
+            if (YYCURSOR - input.cbegin() > 36) {
+                return QStringView();
+            }
+            bool              ok;
+            constexpr static uint8_t last2HexDigitMask = 0xff;
 
-                const auto l             = strToUHex<uint32_t>(GET_PART(1), ok);
-                const auto w1            = strToUHex<uint16_t>(GET_PART(2), ok);
-                const auto w2            = strToUHex<uint16_t>(GET_PART(3), ok);
-                const auto clock_seq_low = strToUHex<uint16_t>(GET_PART(4), ok);
+            const auto l             = strToUHex<uint32_t>(GET_PART(1).right(8), ok);
+            const auto w1            = strToUHex<uint16_t>(GET_PART(2).right(4), ok);
+            const auto w2            = strToUHex<uint16_t>(GET_PART(3).right(4), ok);
+            const auto clock_seq_low = strToUHex<uint16_t>(GET_PART(4).right(4), ok);
 
-                const uint8_t b1   = clock_seq_low >> 8;
-                const uint8_t b2   = clock_seq_low & last2HexDigitMask;
-                auto          node = strToUHex<uint64_t>(GET_PART(5), ok);
-                const uint8_t b8   = node & last2HexDigitMask;
-                node >>= 8;
-                const uint8_t b7 = node & last2HexDigitMask;
-                node >>= 8;
-                const uint8_t b6 = node & last2HexDigitMask;
-                node >>= 8;
-                const uint8_t b5 = node & last2HexDigitMask;
-                node >>= 8;
-                const uint8_t b4 = node & last2HexDigitMask;
-                node >>= 8;
-                const uint8_t b3 = node;
+            const uint8_t b1   = clock_seq_low >> 8;
+            const uint8_t b2   = clock_seq_low & last2HexDigitMask;
+            auto          node = strToUHex<uint64_t>(GET_PART(5).right(12), ok);
+            const uint8_t b8   = node & last2HexDigitMask;
+            node >>= 8;
+            const uint8_t b7 = node & last2HexDigitMask;
+            node >>= 8;
+            const uint8_t b6 = node & last2HexDigitMask;
+            node >>= 8;
+            const uint8_t b5 = node & last2HexDigitMask;
+            node >>= 8;
+            const uint8_t b4 = node & last2HexDigitMask;
+            node >>= 8;
+            const uint8_t b3 = node;
 
-                result = QUuid{l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8};
-                return QStringView(input.cbegin(), YYCURSOR);
+            result = QUuid{l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8};
+            return QStringView(input.cbegin(), YYCURSOR);
             }
          *      { return QStringView(); }
          */

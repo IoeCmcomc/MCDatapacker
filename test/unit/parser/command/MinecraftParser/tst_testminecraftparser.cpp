@@ -4,7 +4,7 @@
 #include "../../../../../src/parsers/command/minecraftparser.h"
 #include "../../../../../src/parsers/command/visitors/reprprinter.h"
 
-//#define QBENCHMARK          if (true)
+#define QBENCHMARK          if (true)
 
 #define DECLARE_TAG_VARS    int i = 0; int c = 0; QString cat;
 #define SET_TAG(x)    i = 0; cat =#x;
@@ -337,6 +337,8 @@ void TestMinecraftParser::commands_data() {
     SET_TAG(kill)
     QTest::newRow(GEN_TAG) << R"(kill 1-2-3-4-5)" <<
         "RootNode[2](LiteralNode(kill), EntityNode[](UuidNode({00000001-0002-0003-0004-000000000005})))";
+    QTest::newRow(GEN_TAG) << R"(kill 2024-170124-ffaaaa-cacbac-12455124)" <<
+        "RootNode[2](LiteralNode(kill), EntityNode[](UuidNode({00002024-0124-aaaa-cbac-000012455124})))";
 
     SET_TAG(locate)
     QTest::newRow(GEN_TAG) << "locate mansion" <<
