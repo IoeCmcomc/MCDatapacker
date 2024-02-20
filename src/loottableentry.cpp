@@ -3,7 +3,6 @@
 
 #include "loottablecondition.h"
 #include "loottablefunction.h"
-#include "loottableeditordock.h"
 #include "inventoryslot.h"
 #include "inventoryitem.h"
 #include "globalhelpers.h"
@@ -17,7 +16,7 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
     ui->setupUi(this);
     setTabEnabled(ENTRIES_TAB, false);
 
-    connect(ui->typeCmobo, qOverload<int>(&QComboBox::currentIndexChanged),
+    connect(ui->multiPageWidget, &MultiPageWidget::currentIndexChanged,
             this, &LootTableEntry::onTypeChanged);
     connect(this, &QTabWidget::currentChanged,
             this, &LootTableEntry::onTabChanged);
@@ -33,6 +32,8 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
 
     ui->itemSlot->setAcceptMultiple(false);
     ui->itemSlot->setAcceptTag(false);
+
+    updateEntriesTab(0);
 }
 
 LootTableEntry::~LootTableEntry() {
@@ -57,48 +58,48 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
     if (root.contains(QLatin1String("weight")))
         ui->weightSpin->setValue(root.value(QLatin1String("weight")).toInt());
 
-    ui->typeCmobo->setCurrentIndex(index);
+    ui->multiPageWidget->setCurrentIndex(index);
     switch (index) {
         case 0: /* Empty */
             break;
 
         case 1: {  /* Item */
             if (root.contains(QLatin1String("name")))
-                ui->itemSlot->appendItem(InventoryItem(root.value(QLatin1String(
-                                                                      "name"))
-                                                       .toString()));
+                ui->itemSlot->setItem(InventoryItem(root.value(QLatin1String(
+                                                                   "name"))
+                                                    .toString()));
             break;
         }
 
         case 2: { /* Loot table */
             if (root.contains(QLatin1String("name")))
-                ui->nameEdit->setText(root.value(QLatin1String(
-                                                     "name")).toString());
+                ui->tableNameEdit->setText(root.value(QLatin1String(
+                                                          "name")).toString());
             break;
         }
 
         case 3: { /*Tag */
             if (root.contains(QLatin1String("name")))
-                ui->nameEdit->setText(root.value(QLatin1String(
-                                                     "name")).toString());
+                ui->tagNameEdit->setText(root.value(QLatin1String(
+                                                        "name")).toString());
             ui->tagExpandCheck->setupFromJsonObject(root,
                                                     QStringLiteral("expand"));
             break;
         }
 
 
-        case 4: { /*Dynamic */
+        case 4: { /* Dynamic */
             if (root.contains(QLatin1String("name"))) {
                 auto name = root.value(QLatin1String("name")).toString();
                 if (name == QLatin1String("minecraft:contents")
                     || name == QLatin1String("minecraft:self")) {
-                    ui->nameEdit->setText(name);
+                    ui->dynamicNameEdit->setText(name);
                 }
             }
             break;
         }
 
-        default: { /*Group */
+        default: { /* Group */
             if (type == QLatin1String("alternatives")) {
                 ui->selectAltRadio->setChecked(true);
             } else if (type == QLatin1String("group")) {
@@ -134,7 +135,7 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
 
 QJsonObject LootTableEntry::toJson() const {
     QJsonObject root;
-    const int   index = ui->typeCmobo->currentIndex();
+    const int   index = ui->multiPageWidget->currentIndex();
 
     const QString &&type = QStringLiteral("minecraft:") + entryTypes[index];
 
@@ -142,7 +143,7 @@ QJsonObject LootTableEntry::toJson() const {
     root.insert("weight", ui->weightSpin->value());
     if (const int quality = ui->qualitySpin->value(); quality != 0)
         root.insert("quality", quality);
-    if (ui->typeCmobo->currentIndex())
+    if (ui->multiPageWidget->currentIndex())
         switch (index) {
             case 0: /*Empty */
                 break;
@@ -154,19 +155,29 @@ QJsonObject LootTableEntry::toJson() const {
             }
 
             case 2: { /*Loot table */
-                if (!ui->nameEdit->text().isEmpty())
-                    root.insert("name", ui->nameEdit->text());
+                if (!ui->tableNameEdit->text().isEmpty())
+                    root.insert("name", ui->tableNameEdit->text());
                 break;
             }
 
             case 3: {/*Tag */
-                if (!ui->nameEdit->text().isEmpty())
-                    root.insert("name", ui->nameEdit->text());
+                if (!ui->tagNameEdit->text().isEmpty())
+                    root.insert("name", ui->tagNameEdit->text());
                 ui->tagExpandCheck->insertToJsonObject(root, "expand");
                 break;
             }
 
-            case 4: {/*Group */
+            case 4: {/* Dynamic */
+                if ((ui->dynamicNameEdit->text() ==
+                     QLatin1String("minecraft:contents"))
+                    || (ui->dynamicNameEdit->text() ==
+                        QLatin1String("minecraft:self"))) {
+                    root.insert("name", ui->dynamicNameEdit->text());
+                }
+                break;
+            }
+
+            case 5: {/* Group */
                 if (ui->selectAltRadio->isChecked())
                     root.insert("type", "minecraft:alternatives");
                 else if (ui->selectSeqRadio->isChecked())
@@ -175,16 +186,6 @@ QJsonObject LootTableEntry::toJson() const {
                 auto &&children = ui->entriesInterface->json();
                 if (!children.isEmpty())
                     root.insert("children", children);
-                break;
-            }
-
-            case 5: {/*Dynamic */
-                if ((ui->nameEdit->text() ==
-                     QLatin1String("minecraft:contents"))
-                    || (ui->nameEdit->text() ==
-                        QLatin1String("minecraft:self"))) {
-                    root.insert("name", ui->nameEdit->text());
-                }
                 break;
             }
 
@@ -204,8 +205,8 @@ QJsonObject LootTableEntry::toJson() const {
 }
 
 void LootTableEntry::resetAll() {
-    for (int i = 0; i < ui->stackedWidget->count(); ++i)
-        reset(i);
+    ui->qualitySpin->setValue(0);
+    ui->weightSpin->setValue(0);
     ui->functionsInterface->setJson({});
     ui->conditionsInterface->setJson({});
 }
@@ -221,51 +222,7 @@ void LootTableEntry::changeEvent(QEvent *event) {
 }
 
 void LootTableEntry::onTypeChanged(int index) {
-    ui->nameEdit->setPlaceholderText(QStringLiteral("namespace:id"));
-    setTabEnabled(ENTRIES_TAB, index == 4);
-    switch (index) {
-        case 0: { /*Empty */
-            ui->stackedWidget->setCurrentIndex(0);
-            break;
-        }
-
-        case 1: { /*Item */
-            ui->stackedWidget->setCurrentIndex(1);
-            break;
-        }
-
-        case 2: { /*Loot table */
-            ui->stackedWidget->setCurrentIndex(2);
-            ui->tagExpandCheck->setEnabled(false);
-            break;
-        }
-
-        case 3: {/*Tag */
-            ui->stackedWidget->setCurrentIndex(2);
-            ui->tagExpandCheck->setEnabled(true);
-            break;
-        }
-
-        case 4: {/*Group */
-            ui->stackedWidget->setCurrentIndex(3);
-            break;
-        }
-
-        case 5: {/*Dynamic */
-            ui->stackedWidget->setCurrentIndex(2);
-            ui->nameEdit->setPlaceholderText(tr("%1 or %2",
-                                                "\"minecraft:contents or minecraft:self\"").
-                                             arg(QLatin1String(
-                                                     "minecraft:contents"),
-                                                 QLatin1String(
-                                                     "minecraft:self")));
-            ui->tagExpandCheck->setEnabled(false);
-            break;
-        }
-
-        default:
-            break;
-    }
+    setTabEnabled(ENTRIES_TAB, index == 5);
 }
 
 void LootTableEntry::onTabChanged(int index) {
@@ -303,42 +260,6 @@ void LootTableEntry::updateFunctionsTab(int size) {
 
 void LootTableEntry::updateConditionsTab(int size) {
     setTabText(3, tr("Conditions (%1)").arg(size));
-}
-
-void LootTableEntry::reset(int index) {
-    switch (index) {
-        case 0: /*Empty */
-            break;
-
-        case 1: {  /*Item */
-            ui->itemSlot->clearItems();
-            break;
-        }
-
-        case 2: { /*Loot table */
-            ui->nameEdit->clear();
-            break;
-        }
-
-        case 3: { /*Tag */
-            ui->nameEdit->clear();
-            ui->tagExpandCheck->unset();
-            break;
-        }
-
-        case 4: { /*Group */
-            ui->entriesInterface->setJson({});
-            break;
-        }
-
-        case 5: { /*Dynamic */
-            ui->nameEdit->clear();
-            break;
-        }
-
-        default:
-            break;
-    }
 }
 
 void LootTableEntry::initCondInterface() {

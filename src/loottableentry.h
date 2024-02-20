@@ -38,7 +38,6 @@ private:
 
     static constexpr const int ENTRIES_TAB = 1;
 
-    void reset(int index);
     void initCondInterface();
     void initFuncInterface();
     void initEntryInterface();
