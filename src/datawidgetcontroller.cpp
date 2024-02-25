@@ -6,8 +6,10 @@
 #include "truefalsebox.h"
 #include "extendedtablewidget.h"
 #include "datawidgetinterface.h"
+#include "multipagewidget.h"
 
 #include "modelfunctions.h"
+#include "globalhelpers.h"
 
 #include <QSpinBox>
 #include <QJsonArray>
@@ -276,4 +278,80 @@ void DataWidgetControllerDataWidgetInterface::setValueFrom(
 void DataWidgetControllerDataWidgetInterface::putValueTo(
     QJsonObject &obj, const QString &key) const {
     obj[key] = m_widget->json();
+}
+
+StringIndexMap::StringIndexMap(std::initializer_list<std::pair<QString,
+                                                               int> > list) {
+    const int maxIndex = std::max_element(list.begin(), list.end())->second;
+
+    m_indexToString.reserve(maxIndex + 1);
+
+    for (const auto &[str, index]: list) {
+        m_stringToIndex[str]   = index;
+        m_indexToString[index] = str;
+    }
+}
+
+void StringIndexMap::insert(const QString &str, const int index) {
+    m_stringToIndex.insert(str, index);
+    if (index <= m_indexToString.size()) {
+        m_indexToString.resize(index + 1);
+    }
+    m_indexToString[index] = str;
+}
+
+int StringIndexMap::indexOf(const QString &str) const {
+    const auto it = m_stringToIndex.constFind(str);
+
+    return (it != m_stringToIndex.cend()) ? it.value() : -1;
+}
+
+QString StringIndexMap::stringOf(const int index) const {
+    return (index > 0 && index < m_indexToString.size())
+               ? m_indexToString.at(index) : QString();
+}
+
+bool DataWidgetControllerMultiPageWidget::hasAcceptableValue() const {
+    return DataWidgetControllerWidget<MultiPageWidget>::hasAcceptableValue() &&
+           (m_widget->count() > 0);
+}
+
+void DataWidgetControllerMultiPageWidget::setValueFrom(const QJsonObject &obj,
+                                                       const QString &key) {
+    m_caughtChoice.clear();
+    if (obj.contains(key) || key.isNull()) {
+        const auto &record = key.isNull() ? obj : obj.value(key).toObject();
+        if (record.contains(m_choiceKey)) {
+            QString &&choice = record.value(m_choiceKey).toString();
+            Glhp::removePrefix(choice);
+            const int index = m_indexMap.indexOf(choice);
+            if (index != -1) {
+                m_caughtChoice = choice;
+                m_widget->setCurrentIndex(index);
+                auto *controller = m_widgetChoices[choice];
+                Q_ASSERT(controller != nullptr);
+                controller->setValueFrom(record, {});
+            }
+        }
+    }
+}
+
+void DataWidgetControllerMultiPageWidget::putValueTo(QJsonObject &obj,
+                                                     const QString &key) const {
+    QJsonObject  newRecord;
+    QJsonObject &record = key.isNull() ? obj : newRecord;
+
+    const QString &choice = m_indexMap.stringOf(m_widget->currentIndex());
+
+    Q_ASSERT(!choice.isNull());
+    record[m_choiceKey] = choice;
+    const auto *controller = m_widgetChoices[choice];
+    Q_ASSERT(controller != nullptr);
+
+    if (controller->hasAcceptableValue()) {
+        controller->putValueTo(record, {});
+        if (!key.isNull()) {
+            obj[key] = record;
+        }
+    }
 }

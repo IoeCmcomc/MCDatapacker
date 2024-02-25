@@ -86,8 +86,6 @@ void MultiPageWidget::setPageHidden(int index, bool hidden) {
         Q_ASSERT(model != nullptr);
         view->setRowHidden(index, hidden);
         model->item(index, 0)->setEnabled(!hidden);
-
-        emit currentPageHiddenChanged(hidden);
     }
 }
 

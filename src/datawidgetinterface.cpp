@@ -313,6 +313,7 @@ void DataWidgetInterface::setJson(const QJsonArray &json) {
                             ((m_json.size() > 0) * 2 - 1);
     ui->scrollBar->setMaximum(computedMax);
     if (!m_json.isEmpty()) {
+        Q_ASSERT(m_mainWidget != nullptr);
         ui->scrollBar->setValue((m_json.size() - 1) *
                                 ui->scrollBar->pageStep());
         onSliderMoved(ui->scrollBar->value());

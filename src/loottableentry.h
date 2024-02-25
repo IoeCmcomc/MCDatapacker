@@ -1,6 +1,8 @@
 #ifndef LOOTTABLEENTRY_H
 #define LOOTTABLEENTRY_H
 
+#include "datawidgetcontroller.h"
+
 #include <QTabWidget>
 #include <QHBoxLayout>
 
@@ -32,7 +34,9 @@ private /*slots*/ :
     void updateConditionsTab(int size);
 
 private:
+    DataWidgetControllerRecord m_controller;
     Ui::LootTableEntry *ui;
+    DataWidgetControllerMultiPageWidget m_typeCtrl;
     const QStringList entryTypes =
     { "empty", "item", "loot_table", "tag", "dynamic" };
 

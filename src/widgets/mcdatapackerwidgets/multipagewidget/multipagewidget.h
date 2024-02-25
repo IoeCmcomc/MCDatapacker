@@ -57,10 +57,8 @@ private slots:
 signals:
     void currentIndexChanged(int index);
     void pageTitleChanged(const QString &title);
-    void currentPageHiddenChanged(bool hidden);
 
 private:
-
     QLabel *label               = nullptr;
     QComboBox *comboBox         = nullptr;
     QFrame *hLine               = nullptr;

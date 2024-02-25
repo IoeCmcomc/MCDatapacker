@@ -16,6 +16,7 @@ class InventorySlot;
 class TrueFalseBox;
 class ExtendedTableWidget;
 class DataWidgetInterface;
+class MultiPageWidget;
 
 class DataWidgetController {
 public:
@@ -50,7 +51,8 @@ public:
         qDeleteAll(m_widgetMappings);
     }
 
-    template<class T, typename ...Args>
+    template<class T, typename ...Args,
+             typename = std::enable_if_t<std::is_base_of_v<QWidget, T> > >
     DataWidgetController * addMapping(const QString &key, T *widget,
                                       Args&& ... params) {
         DataWidgetController *controller = new ControllerWrapper<T>(
@@ -203,6 +205,9 @@ public:
             new ControllerWrapper<T>(widget, std::forward<Args>(params)...);
         m_button = btn;
     };
+    DataWidgetControllerRadioButton(const DataWidgetControllerRadioButton &) =
+    delete;
+    void operator=(const DataWidgetControllerRadioButton &) = delete;
     ~DataWidgetControllerRadioButton() {
         delete m_controller;
     }
@@ -238,6 +243,74 @@ public:
 };
 
 
+/*!
+    \class StringIndexMap
+
+    \brief A simple data structure to map bi-directionally between
+    QString and int.
+ */
+class StringIndexMap {
+public:
+    StringIndexMap() = default;
+    StringIndexMap(
+        std::initializer_list<std::pair<QString, int> > list);
+
+    void insert(const QString &str, const int index);
+
+    int indexOf(const QString &str) const;
+    QString stringOf(const int index) const;
+
+private:
+    QMap<QString, int> m_stringToIndex;
+    QVector<QString> m_indexToString;
+};
+
+class DataWidgetControllerMultiPageWidget
+    : public DataWidgetControllerWidget<MultiPageWidget> {
+public:
+    DataWidgetControllerMultiPageWidget(
+        MultiPageWidget *widget, const QString &choiceKey)
+        :  DataWidgetControllerWidget<MultiPageWidget>(widget),
+        m_choiceKey{choiceKey} {
+    };
+
+    template<class T, typename ...Args,
+             typename = std::enable_if_t<std::is_base_of_v<QWidget, T> > >
+    DataWidgetController * addChoice(const QString &key, const int index,
+                                     T *widget, Args&& ... params) {
+        DataWidgetController *controller = new ControllerWrapper<T>(
+            widget, std::forward<Args>(params)...);
+
+        m_indexMap.insert(key, index);
+        m_widgetChoices[key] = controller;
+        return controller;
+    };
+    DataWidgetController * addChoice(const QString &key, const int index,
+                                     DataWidgetController *controller) {
+        m_indexMap.insert(key, index);
+        m_widgetChoices[key] = controller;
+        return controller;
+    };
+
+    void setWidget(MultiPageWidget *widget) {
+        m_widget = widget;
+    }
+    QString caughtChoice() const {
+        return m_caughtChoice;
+    }
+
+    virtual bool hasAcceptableValue() const final;
+    virtual void setValueFrom(const QJsonObject &obj, const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj, const QString &key) const final;
+
+private:
+    StringIndexMap m_indexMap;
+    QMap<QString, DataWidgetController *> m_widgetChoices;
+    QString m_choiceKey;
+    QString m_caughtChoice;
+};
+
+
 template<class T>
 struct _ControllerWrapper {
     using type = void;
@@ -260,5 +333,6 @@ DEFINE_WRAPPER(InventorySlot)
 DEFINE_WRAPPER(TrueFalseBox)
 DEFINE_WRAPPER(ExtendedTableWidget)
 DEFINE_WRAPPER(DataWidgetInterface)
+DEFINE_WRAPPER(MultiPageWidget)
 
 #endif // DATAWIDGETCONTROLLER_H
