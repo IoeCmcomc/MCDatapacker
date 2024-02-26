@@ -7,10 +7,9 @@
 #include "jmchighlighter.h"
 #include "mcbuildhighlighter.h"
 #include "jsonhighlighter.h"
-//#include "game.h"
+#include "mainwindow.h"
 #include "parsers/command/mcfunctionparser.h"
 #include "parsers/jsonparser.h"
-
 
 #include <QMessageBox>
 #include <QTextStream>
@@ -19,6 +18,7 @@
 #include <QShortcut>
 #include <QJsonDocument>
 #include <QDirIterator>
+#include <QAction>
 
 void openAllFiles(TabbedDocumentInterface *widget,
                   CodeFile::FileType minType, CodeFile::FileType maxType) {
@@ -79,6 +79,16 @@ TabbedDocumentInterface::TabbedDocumentInterface(QWidget *parent) :
             &QShortcut::activated, this, [this]() {
         openAllFiles(this, CodeFile::JsonText, CodeFile::JsonText_end);
     });
+    auto *mainWin = qobject_cast<MainWindow *>(window());
+    Q_ASSERT(mainWin != nullptr);
+    connect(ui->newDatapackBtn, &QPushButton::clicked,
+            mainWin, &MainWindow::newDatapack);
+    connect(ui->openDatapackBtn, &QPushButton::clicked,
+            mainWin, qOverload<>(&MainWindow::openFolder));
+    connect(ui->optionsBtn, &QPushButton::clicked,
+            mainWin, &MainWindow::pref_settings);
+    connect(ui->recentLabel, &QLabel::linkActivated, mainWin,
+            qOverload<const QString &>(&MainWindow::openFolder));
 }
 
 TabbedDocumentInterface::~TabbedDocumentInterface() {
@@ -480,6 +490,35 @@ void TabbedDocumentInterface::paste() {
     }
 }
 
+void TabbedDocumentInterface::setPackOpened(const bool value) {
+    m_packOpened = value;
+    ui->stackedWidget->setCurrentIndex(value ? 1 : 0);
+}
+
+void TabbedDocumentInterface::updateRecentPacks(
+    const QVector<QAction *> &actions,
+    const int size) {
+    const static QString itemTemplate{
+        R"(<li><a href="%1">%2</a><br><em>%1</em></li>)" };
+
+    if (size == 0) {
+        ui->recentLabel->clear();
+        ui->recentDatapacksGroup->hide();
+        return;
+    } else {
+        ui->recentDatapacksGroup->show();
+    }
+    QString &&text = QStringLiteral("<ol>");
+    for (const auto *action: actions) {
+        if (action->isEnabled()) {
+            const QString &&link = action->data().toString();
+            text += itemTemplate.arg(link, link.section('/', -1));
+        }
+    }
+    text += "</ol>";
+    ui->recentLabel->setText(text);
+}
+
 void TabbedDocumentInterface::changeEvent(QEvent *event) {
     QWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange)
@@ -488,7 +527,7 @@ void TabbedDocumentInterface::changeEvent(QEvent *event) {
 
 QTextDocument * TabbedDocumentInterface::getDocAt(int index) const {
     if (auto *editor =
-            qobject_cast<CodeEditor *>(ui->stackedWidget->widget(index))) {
+            qobject_cast<CodeEditor *>(ui->tabWidget->widget(index))) {
         return editor->document();
     } else {
         return nullptr;
@@ -501,11 +540,10 @@ void TabbedDocumentInterface::onTabChanged(int index) {
     if (index > -1) {
         auto *curFile = getCurFile();
         Q_ASSERT(curFile != nullptr);
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(2);
         emit curFileChanged(curFile->path());
     } else {
-        if (ui->stackedWidget->currentIndex() != 0)
-            ui->stackedWidget->setCurrentIndex(0);
+        ui->stackedWidget->setCurrentIndex(1);
 
         emit curFileChanged(QString());
     }

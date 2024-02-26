@@ -8,6 +8,8 @@
 #include <QStackedWidget>
 #include <QTabBar>
 
+class MainWindow;
+
 namespace Ui {
     class TabbedDocumentInterface;
 }
@@ -50,6 +52,8 @@ public /*slots*/ :
     void cut();
     void copy();
     void paste();
+    void setPackOpened(const bool value);
+    void updateRecentPacks(const QVector<QAction *> &actions, const int size);
 
 signals:
     void curFileChanged(const QString &path);
@@ -74,6 +78,7 @@ private:
     Ui::TabbedDocumentInterface *ui;
 
     QVector<CodeFile> files;
+    bool m_packOpened = false;
 
     QString readTextFile(const QString &path, bool &ok);
     void addFile(const QString &path);

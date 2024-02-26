@@ -47,16 +47,7 @@ public:
 
     PackMetaInfo getPackInfo() const;
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
-    void changeEvent(QEvent *event) override;
-
-signals:
-    void curFileChanged(const QString &filepath);
-    void curDirChanged(const QDir &dir);
-    void gameVersionChanged(const QString &ver);
-
-private /*slots*/ :
+public /*slots*/ :
     /* File menu */
     void open();
     void newDatapack();
@@ -75,7 +66,19 @@ private /*slots*/ :
     void about();
     void checkForUpdates();
     void disclaimer();
-    /* Internal slots */
+
+    void openFolder(const QString &dirpath);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+    void changeEvent(QEvent *event) override;
+
+signals:
+    void curFileChanged(const QString &filepath);
+    void curDirChanged(const QDir &dir);
+    void gameVersionChanged(const QString &ver);
+
+private /*slots*/ :
     void onSystemWatcherFileChanged(const QString &filepath);
     void onCurFileChanged(const QString &path);
     void onDatapackChanged();
@@ -116,7 +119,6 @@ private:
     void writeSettings();
     void moveOldSettings();
     bool maybeSave();
-    void openFolder(const QString &dirpath);
     void loadFolder(const QString &dirPath, const PackMetaInfo &packInfo);
     bool folderIsVaild(const QDir &dir, bool reportError = true);
     PackMetaInfo readPackMcmeta(const QString &filepath,

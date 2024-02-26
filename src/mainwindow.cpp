@@ -616,6 +616,7 @@ void MainWindow::loadFolder(const QString &dirPath,
         this->fileWatcher.addPath(curDir.path());
     }
     ui->tabbedInterface->clear();
+    ui->tabbedInterface->setPackOpened(true);
     updateWindowTitle(false);
     m_packInfo = packInfo;
     m_statusBar->onCurDirChanged();
@@ -768,7 +769,7 @@ void MainWindow::updateRecentFolders() {
 
     auto itEnd = 0u;
 
-    const auto recentPathsSize = recentPaths.size();
+    const int recentPathsSize = recentPaths.size();
 
     if (recentPathsSize <= maxRecentFoldersActions)
         itEnd = recentPathsSize;
@@ -787,6 +788,9 @@ void MainWindow::updateRecentFolders() {
 
     for (int i = itEnd; i < maxRecentFoldersActions; ++i)
         recentFoldersActions.at(i)->setVisible(false);
+
+    ui->tabbedInterface->updateRecentPacks(recentFoldersActions,
+                                           recentPathsSize);
 }
 
 void MainWindow::updateEditMenu() {
