@@ -109,7 +109,7 @@
          <widget class="QLineEdit" name="tagNameEdit"/>
         </item>
         <item row="1" column="0" colspan="2">
-         <widget class="TrueFalseBox" name="tagExpandCheck">
+         <widget class="QCheckBox" name="tagExpandCheck">
           <property name="text">
            <string>Expand</string>
           </property>
@@ -339,11 +339,6 @@
    <header>multipagewidget.h</header>
    <addpagemethod>addPage</addpagemethod>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>DataWidgetInterface</class>

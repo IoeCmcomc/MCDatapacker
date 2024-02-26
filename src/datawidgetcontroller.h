@@ -8,6 +8,7 @@ class QSpinBox;
 class QLineEdit;
 class QComboBox;
 class QRadioButton;
+class QCheckBox;
 QT_END_NAMESPACE
 
 class NumberProvider;
@@ -172,6 +173,15 @@ class DataWidgetControllerLineEdit
     virtual void putValueTo(QJsonObject &obj, const QString &key) const final;
 };
 
+class DataWidgetControllerCheckBox
+    : public DataWidgetControllerWidget<QCheckBox> {
+public:
+    using DataWidgetControllerWidget::DataWidgetControllerWidget;
+    virtual bool hasAcceptableValue() const final;
+    virtual void setValueFrom(const QJsonObject &obj, const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj, const QString &key) const final;
+};
+
 class DataWidgetControllerTrueFalseBox
     : public DataWidgetControllerWidget<TrueFalseBox> {
 public:
@@ -328,6 +338,7 @@ DEFINE_CONTROLLER_WRAPPER(QSpinBox, DataWidgetControllerSpinBox)
 DEFINE_CONTROLLER_WRAPPER(QLineEdit, DataWidgetControllerLineEdit)
 DEFINE_CONTROLLER_WRAPPER(QComboBox, DataWidgetControllerComboBox)
 DEFINE_CONTROLLER_WRAPPER(QRadioButton, DataWidgetControllerRadioButton)
+DEFINE_CONTROLLER_WRAPPER(QCheckBox, DataWidgetControllerCheckBox)
 DEFINE_WRAPPER(NumberProvider)
 DEFINE_WRAPPER(InventorySlot)
 DEFINE_WRAPPER(TrueFalseBox)

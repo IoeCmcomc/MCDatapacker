@@ -178,6 +178,21 @@ void DataWidgetControllerLineEdit::putValueTo(QJsonObject &obj,
 }
 
 
+bool DataWidgetControllerCheckBox::hasAcceptableValue() const {
+    return m_widget->isEnabled();
+}
+
+void DataWidgetControllerCheckBox::setValueFrom(const QJsonObject &obj,
+                                                const QString &key) {
+    m_widget->setChecked(obj.value(key).toBool());
+}
+
+void DataWidgetControllerCheckBox::putValueTo(QJsonObject &obj,
+                                              const QString &key) const {
+    obj[key] = m_widget->isChecked();
+}
+
+
 bool DataWidgetControllerTrueFalseBox::hasAcceptableValue() const {
     return m_widget->isEnabled();
 }
