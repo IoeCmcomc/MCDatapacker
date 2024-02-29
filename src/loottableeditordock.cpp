@@ -2,48 +2,22 @@
 #include "ui_loottableeditordock.h"
 
 #include "mainwindow.h"
-#include "loottablepool.h"
-#include "loottablefunction.h"
-
-#include "modelfunctions.h"
-#include "globalhelpers.h"
-#include "game.h"
 #include "platforms/windows_specific.h"
 
 #include <QDebug>
-#include <QJsonArray>
-#include <QAction>
-#include <QItemSelection>
 #include <QJsonDocument>
-#include <QListView>
 
 
 LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::LootTableEditorDock) {
+    QDockWidget(parent), ui(new Ui::LootTableEditorDock) {
     ui->setupUi(this);
-
-    if (Game::version() < Game::v1_16) {
-        hideComboRow(ui->lootTableTypeCombo, 8);
-        hideComboRow(ui->lootTableTypeCombo, 9);
-        hideComboRow(ui->lootTableTypeCombo, 10);
-        hideComboRow(ui->lootTableTypeCombo, 11);
-    }
-    if (Game::version() < Game::v1_20) {
-        ui->randomSeqEdit->hide();
-        ui->randomSeqLabel->hide();
-        hideComboRow(ui->lootTableTypeCombo, 12);
-        hideComboRow(ui->lootTableTypeCombo, 13);
-    }
+    m_mainWin = qobject_cast<MainWindow *>(this->parent());
+    Q_ASSERT(m_mainWin != nullptr);
 
     connect(ui->writeLootTableBtn, &QPushButton::clicked,
             this, &LootTableEditorDock::writeJson);
     connect(ui->readLootTableBtn, &QPushButton::clicked,
             this, &LootTableEditorDock::readJson);
-    connect(ui->poolsInterface, &DataWidgetInterface::entriesCountChanged,
-            this, &LootTableEditorDock::updatePoolsTab);
-    connect(ui->functionsInterface, &DataWidgetInterface::entriesCountChanged,
-            this, &LootTableEditorDock::updateFunctionsTab);
 
     connect(this, &QDockWidget::topLevelChanged, [ = ](bool floating) {
         adjustSize();
@@ -52,12 +26,6 @@ LootTableEditorDock::LootTableEditorDock(QWidget *parent) :
             resize(minimumWidth(), height());
         }
     });
-
-    auto *pool = new LootTablePool();
-    ui->poolsInterface->setupMainWidget(pool);
-
-    auto *func = new LootTableFunction();
-    ui->functionsInterface->setupMainWidget(func);
 }
 
 LootTableEditorDock::~LootTableEditorDock() {
@@ -65,82 +33,18 @@ LootTableEditorDock::~LootTableEditorDock() {
 }
 
 void LootTableEditorDock::writeJson() {
-    QJsonObject root;
-
-    if (ui->lootTableTypeCombo->currentIndex() == 0) {
-        return;
-    }
-    const QString &&type = QStringLiteral("minecraft:") +
-                           types[ui->lootTableTypeCombo->currentIndex()];
-
-    root.insert("type", type);
-
-    if (Game::version() >= Game::v1_20) {
-        if (auto &&sequence = ui->randomSeqEdit->text(); !sequence.isEmpty()) {
-            root["random_sequence"] = sequence;
-        }
-    }
-
-    QJsonArray pools = ui->poolsInterface->json();
-    if (!pools.isEmpty())
-        root.insert("pools", pools);
-
-    QJsonArray functions = ui->functionsInterface->json();
-    if (!functions.isEmpty())
-        root.insert("functions", functions);
-
-    qobject_cast<MainWindow *>(parent())->
-    setCodeEditorText(QJsonDocument(root).toJson());
+    m_mainWin->setCodeEditorText(QJsonDocument(ui->lootTable->toJson()).toJson());
 }
 
 void LootTableEditorDock::readJson() {
-    QString input =
-        qobject_cast<MainWindow *>(parent())->getCodeEditorText();
-    QJsonDocument json_doc = QJsonDocument::fromJson(input.toUtf8());
+    QString &&input = m_mainWin->getCodeEditorText();
 
-    if (json_doc.isNull() || (!json_doc.isObject()))
-        return;
-
-    QJsonObject root = json_doc.object();
-    if (root.isEmpty() || !root.contains("pools")) {
-        return;
-    }
-
-    QString type = root.value("type").toString();
-    Glhp::removePrefix(type, "minecraft:"_QL1);
-
-    const int index = types.indexOf(type);
-    if (index > -1) {
-        const auto &&model =
-            static_cast<QStandardItemModel *>(ui->lootTableTypeCombo->model());
-        const auto &&item = model->item(index, 0);
-        if (!item->isEnabled())
-            return;
-
-        ui->lootTableTypeCombo->setCurrentIndex(index);
-    }
-
-    if (Game::version() >= Game::v1_20) {
-        ui->randomSeqEdit->setText(root.value("random_sequence").toString());
-    }
-
-    ui->poolsInterface->setJson(root.value("pools").toArray());
-    ui->functionsInterface->setJson(root.value("functions").toArray());
+    ui->lootTable->fromJson(QJsonDocument::fromJson(input.toUtf8()).object());
 }
 
 void LootTableEditorDock::changeEvent(QEvent *event) {
     QDockWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
-        updatePoolsTab(ui->poolsInterface->entriesCount());
-        updateFunctionsTab(ui->functionsInterface->entriesCount());
     }
-}
-
-void LootTableEditorDock::updatePoolsTab(int size) {
-    ui->tabWidget->setTabText(0, tr("Pools (%1)").arg(size));
-}
-
-void LootTableEditorDock::updateFunctionsTab(int size) {
-    ui->tabWidget->setTabText(1, tr("Functions (%1)").arg(size));
 }

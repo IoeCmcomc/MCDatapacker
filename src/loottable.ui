@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LootTable</class>
+ <widget class="QTabWidget" name="LootTable">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>372</width>
+    <height>119</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Loot table</string>
+  </property>
+  <property name="tabPosition">
+   <enum>QTabWidget::South</enum>
+  </property>
+  <property name="currentIndex">
+   <number>0</number>
+  </property>
+  <widget class="QWidget" name="general">
+   <attribute name="title">
+    <string>General</string>
+   </attribute>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>Type:</string>
+      </property>
+      <property name="buddy">
+       <cstring>lootTableTypeCombo</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="lootTableTypeCombo">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <item>
+       <property name="text">
+        <string>Empty</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Entity drops</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Block drops</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Treasure chest</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Fishing</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Cat or villager gift</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Advancement reward</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Generic</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Bartering with piglins</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Command</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Target selector</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Predicates in advancements</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Archaeology</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Advancement location</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="randomSeqLabel">
+      <property name="text">
+       <string>Random sequence:</string>
+      </property>
+      <property name="buddy">
+       <cstring>randomSeqEdit</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="randomSeqEdit"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="pools">
+   <attribute name="title">
+    <string>Pools (%1)</string>
+   </attribute>
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="DataWidgetInterface" name="poolsInterface">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="functions">
+   <attribute name="title">
+    <string>Functions (%1)</string>
+   </attribute>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="DataWidgetInterface" name="functionsInterface">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DataWidgetInterface</class>
+   <extends>QFrame</extends>
+   <header location="global">datawidgetinterface.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

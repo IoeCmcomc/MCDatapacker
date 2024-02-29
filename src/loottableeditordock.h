@@ -2,17 +2,14 @@
 #define LOOTTABLEEDITORDOCK_H
 
 #include <QDockWidget>
-#include <QStandardItemModel>
-#include <QJsonObject>
-#include <QModelIndex>
-#include <QHBoxLayout>
+
+class MainWindow;
 
 namespace Ui {
     class LootTableEditorDock;
 }
 
-class LootTableEditorDock : public QDockWidget
-{
+class LootTableEditorDock : public QDockWidget {
     Q_OBJECT
 
 public:
@@ -27,20 +24,7 @@ protected:
 
 private:
     Ui::LootTableEditorDock *ui;
-    const QStringList types = {
-        QStringLiteral("empty"),                QStringLiteral("entity"),
-        QStringLiteral("block"),                QStringLiteral("chest"),
-        QStringLiteral("fishing"),              QStringLiteral("gift"),
-        QStringLiteral("advancement_reward"),   QStringLiteral("generic"),
-        QStringLiteral("barter"),               QStringLiteral("command"),
-        QStringLiteral("selector"),             QStringLiteral(
-            "advancement_entity"),              QStringLiteral("archaelogy"),
-        QStringLiteral("advancement_location"),
-    };
-
-private /*slots*/ :
-    void updatePoolsTab(int size);
-    void updateFunctionsTab(int size);
+    MainWindow *m_mainWin = nullptr;
 };
 
 #endif /* LOOTTABLEEDITORDOCK_H */

@@ -65,6 +65,7 @@ SOURCES += \
     layouttreenode.cpp \
     linenumberarea.cpp \
     locationconditiondialog.cpp \
+    loottable.cpp \
     loottablecondition.cpp \
     loottableeditordock.cpp \
     loottableentry.cpp \
@@ -182,6 +183,7 @@ HEADERS += \
     layouttreenode.h \
     linenumberarea.h \
     locationconditiondialog.h \
+    loottable.h \
     loottablecondition.h \
     loottableeditordock.h \
     loottableentry.h \
@@ -274,6 +276,7 @@ FORMS += \
     itemconditiondialog.ui \
     itemmodifierdock.ui \
     locationconditiondialog.ui \
+    loottable.ui \
     loottablecondition.ui \
     loottableeditordock.ui \
     loottableentry.ui \
