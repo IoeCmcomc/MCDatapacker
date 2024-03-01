@@ -67,6 +67,8 @@ BlockItemSelectorDialog::BlockItemSelectorDialog(QWidget *parent,
     ui->buttonBox->addButton(selectButton, QDialogButtonBox::ActionRole);
     connect(selectButton, &QPushButton::clicked, this,
             &BlockItemSelectorDialog::accept);
+    connect(ui->listView, &QAbstractItemView::doubleClicked, this,
+            &BlockItemSelectorDialog::accept);
 
     checkOK();
 }
