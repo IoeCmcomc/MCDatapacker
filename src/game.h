@@ -24,8 +24,7 @@ namespace Game {
     QString versionString();
 
     QVariantMap getInfo(const QString &type);
-    QVariantMap getInfo(const QString &type, const QString &version,
-                        const int depth = 0);
+    QVariantMap getInfo(const QString &type, const QString &version);
     QVariantMap loadInfo(const QString &type, const QString &version,
                          const int depth = 0);
     QVector<QString> getRegistry(const QString &type);

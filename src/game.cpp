@@ -91,15 +91,14 @@ QVariantMap Game::getInfo(const QString &type) {
 }
 
 QVariantMap Game::getInfo(const QString &type,
-                          const QString &version,
-                          const int depth) {
+                          const QString &version) {
     static LRU::Cache<std::tuple<QString, QString>, QVariantMap> cache{ 20 };
 
     const std::tuple inputPair{ type, version };
 
     if (cache.contains(inputPair)) return cache.lookup(inputPair);
 
-    const auto &&result = loadInfo(type, version, depth);
+    const auto &&result = loadInfo(type, version);
 
     cache.emplace(std::piecewise_construct,
                   std::forward_as_tuple(type, version),
@@ -152,7 +151,8 @@ QVariantMap Game::loadInfo(const QString &type, const QString &version,
     }
 
     if (root.contains(QLatin1String("base"))) {
-        const auto &&tmpMap = getInfo(type, root["base"].toString(), depth + 1);
+        const auto &&tmpMap =
+            loadInfo(type, root["base"].toString(), depth + 1);
         retMap.insert(std::move(tmpMap));
         root.remove(QLatin1String("base"));
     }
@@ -169,5 +169,6 @@ QVariantMap Game::loadInfo(const QString &type, const QString &version,
         retMap.insert(root[QLatin1String("added")].toVariant().toMap());
     else
         retMap.insert(root.toVariantMap());
+
     return retMap;
 }
