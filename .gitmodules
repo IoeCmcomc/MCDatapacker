@@ -1,18 +1,18 @@
 [submodule "lib/QFindDialogs"]
 	path = lib/QFindDialogs/QFindDialogs
-	url = https://github.com/teamYetZio/QFindDialogs
+        url = https://github.com/Yet-Zio/QFindDialogs.git
 [submodule "lib/QSimpleDialog"]
 	path = lib/QSimpleDialog
-	url = https://github.com/ultravires/QSimpleUpdater.git
+        url = https://github.com/alex-spataru/QSimpleUpdater.git
 [submodule "lib/nbt-cpp"]
 	path = lib/nbt/nbt-cpp
-	url = git@github.com:handtruth/nbt-cpp.git
+        url = https://github.com/handtruth/nbt-cpp.git
 [submodule "lib/json"]
 	path = lib/json/json
-	url = git@github.com:nlohmann/json.git
+        url = https://github.com/nlohmann/json.git
 [submodule "lib/lru-cache"]
 	path = lib/lru-cache/lru-cache
-	url = git@github.com:goldsborough/lru-cache.git
+        url = https://github.com/goldsborough/lru-cache.git
 [submodule "lib/QSimpleUpdater"]
 	path = lib/QSimpleUpdater
 	url = https://github.com/alex-spataru/QSimpleUpdater.git
