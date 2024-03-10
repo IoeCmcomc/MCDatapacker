@@ -9,6 +9,9 @@
 #include <QFileSystemWatcher>
 #include <QDir>
 
+#include <mutex>
+
+
 namespace Ui {
     class LootTableCondition;
 }

@@ -13,7 +13,6 @@
 #include <QJsonObject>
 #include <QStringListModel>
 
-#include <mutex>
 
 LootTableFunction::LootTableFunction(QWidget *parent) :
     QTabWidget(parent), ui(new Ui::LootTableFunction) {

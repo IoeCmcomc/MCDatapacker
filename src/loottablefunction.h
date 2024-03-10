@@ -7,6 +7,9 @@
 #include <QStandardItemModel>
 #include <QHBoxLayout>
 
+#include <mutex>
+
+
 namespace Ui {
     class LootTableFunction;
 }

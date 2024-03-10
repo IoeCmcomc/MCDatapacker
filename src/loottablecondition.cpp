@@ -13,7 +13,6 @@
 #include <QDialog>
 #include <QDoubleSpinBox>
 
-#include <mutex>
 
 LootTableCondition::LootTableCondition(QWidget *parent) :
     QFrame(parent),
