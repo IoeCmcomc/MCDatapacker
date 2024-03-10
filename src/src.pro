@@ -51,6 +51,7 @@ SOURCES += \
     filenamedelegate.cpp \
     fileswitcher.cpp \
     game.cpp \
+    gameinfomodel.cpp \
     globalhelpers.cpp \
     highlighter.cpp \
     imgviewer.cpp \
@@ -169,6 +170,7 @@ HEADERS += \
     filenamedelegate.h \
     fileswitcher.h \
     game.h \
+    gameinfomodel.h \
     globalhelpers.h \
     highlighter.h \
     imgviewer.h \

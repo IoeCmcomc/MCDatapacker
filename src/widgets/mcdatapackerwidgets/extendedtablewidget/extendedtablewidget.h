@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#define __clang_major__    15
-#endif
-
 #ifndef EXTENDEDTABLEWIDGET_H
 #define EXTENDEDTABLEWIDGET_H
 

@@ -88,7 +88,9 @@ void initComboModelViewFromRegistry(const QString &registry,
 }
 
 void setComboValueFrom(QComboBox *combo, const QVariant &vari, int role) {
-    const auto *model = qobject_cast<QStandardItemModel *>(combo->model());
+    const auto *model = qobject_cast<QAbstractItemModel *>(combo->model());
+
+    Q_ASSERT(model != nullptr);
 
     if (vari.canConvert<QString>()) {
         QString &&str = vari.toString();
@@ -103,7 +105,7 @@ void setComboValueFrom(QComboBox *combo, const QVariant &vari, int role) {
         }
 
         for (int i = 0; i < model->rowCount(); ++i) {
-            QString &&val = model->item(i, 0)->data(role).toString();
+            QString &&val = model->data(model->index(i, 0), role).toString();
             if (val == str) {
                 combo->setCurrentIndex(i);
                 return;
@@ -111,7 +113,7 @@ void setComboValueFrom(QComboBox *combo, const QVariant &vari, int role) {
         }
     } else {
         for (int i = 0; i < model->rowCount(); ++i) {
-            if (model->item(i, 0)->data(role) == vari) {
+            if (model->data(model->index(i, 0), role) == vari) {
                 combo->setCurrentIndex(i);
                 return;
             }

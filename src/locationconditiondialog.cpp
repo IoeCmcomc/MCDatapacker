@@ -12,7 +12,9 @@
 
 LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),
-    ui(new Ui::LocationConditionDialog) {
+    ui(new Ui::LocationConditionDialog),
+    biomesModel(this, "biome", GameInfoModel::Info,
+                GameInfoModel::PrependPrefix | GameInfoModel::HasOptionalItem) {
     ui->setupUi(this);
 
     const auto typeFlags = NumberProvider::Exact
@@ -27,7 +29,8 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     ui->lightInput->setModes(typeFlags);
     ui->lightInput->setMaxLimit(15);
 
-    initComboModelView("biome", biomesModel, ui->biomeCombo);
+    // initComboModelView("biome", biomesModel, ui->biomeCombo);
+    ui->biomeCombo->setModel(&biomesModel);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
     if (Game::version() >= Game::v1_19) {
         initComboModelViewFromRegistry("worldgen/structure", featuresModel,
@@ -73,7 +76,7 @@ QJsonObject LocationConditionDialog::toJson() const {
 
     if (ui->biomeCombo->currentIndex() != 0)
         root.insert(QStringLiteral("biome"), ui->biomeCombo->currentData(
-                        Qt::UserRole + 1).toString());
+                        GameInfoModel::IdRole).toString());
     if (ui->dimensionCombo->currentIndex() != 0)
         root.insert(QStringLiteral("dimension"),
                     ui->dimensionCombo->currentData(

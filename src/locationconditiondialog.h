@@ -3,6 +3,7 @@
 
 #include "basecondition.h"
 #include "loottablecondition.h"
+#include "gameinfomodel.h"
 
 #include <QDialog>
 
@@ -27,7 +28,8 @@ protected slots:
 
 private:
     Ui::LocationConditionDialog *ui;
-    QStandardItemModel biomesModel;
+    // QStandardItemModel biomesModel;
+    GameInfoModel biomesModel;
     QStandardItemModel dimensionsModel;
     QStandardItemModel featuresModel;
     QStandardItemModel blocksModel;
