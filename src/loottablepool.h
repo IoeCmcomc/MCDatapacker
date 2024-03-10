@@ -5,6 +5,9 @@
 
 #include <QTabWidget>
 
+#include <mutex>
+
+
 namespace Ui {
     class LootTablePool;
 }

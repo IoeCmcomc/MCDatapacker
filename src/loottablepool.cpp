@@ -7,7 +7,6 @@
 
 #include <QJsonObject>
 
-#include <mutex>
 
 LootTablePool::LootTablePool(QWidget *parent) :
     QTabWidget(parent),

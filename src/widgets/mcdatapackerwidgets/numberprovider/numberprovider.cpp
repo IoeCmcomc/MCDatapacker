@@ -8,6 +8,8 @@
 #include <QVector>
 #include <QResizeEvent>
 
+#include <cfloat>
+
 NumberProvider::NumberProvider(QWidget *parent) :
     QFrame(parent), ui(new Ui::NumberProvider) {
     ui->setupUi(this);
