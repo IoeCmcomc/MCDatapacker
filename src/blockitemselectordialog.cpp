@@ -167,12 +167,12 @@ void BlockItemSelectorDialog::setCategory(const SelectCategory &category) {
     using Filter = InventoryItemFilterModel::Filter;
     switch (m_category) {
         case SelectCategory::Blocks: {
-            filterModel.setFilters(Filter::ObtainableBlocks);
+            filterModel.setFilters(Filter::AllBlocks);
             break;
         }
 
         case SelectCategory::ObtainableItems: {
-            filterModel.setFilters(Filter::BlockItems | Filter::NonblockItem);
+            filterModel.setFilters(Filter::AllItems);
             break;
         }
     }

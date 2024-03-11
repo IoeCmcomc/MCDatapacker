@@ -38,6 +38,7 @@ private:
     QPoint initPos;
     Ui::InventorySlotEditor *ui;
     InventorySlot *slot = nullptr;
+    bool m_itemsOnly    = true;
 
     void appendItem(const InventoryItem &invItem);
 };

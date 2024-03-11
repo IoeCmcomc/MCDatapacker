@@ -4,31 +4,37 @@
 #include "inventoryslot.h"
 #include "blockitemselectordialog.h"
 #include "tagselectordialog.h"
-#include "globalhelpers.h"
+// #include "globalhelpers.h"
 
 #include <QMenu>
 #include <QScreen>
 #include <QMouseEvent>
 
-InventorySlotEditor::InventorySlotEditor(InventorySlot *parent) :
-    QFrame(parent),
-    ui(new Ui::InventorySlotEditor) {
+InventorySlotEditor::InventorySlotEditor(InventorySlot *parent)
+    : QFrame(parent), ui(new Ui::InventorySlotEditor) {
 /*    qDebug() << "InventorySlotEditor::InventorySlotEditor"; */
     ui->setupUi(this);
     this->slot    = parent;
     this->initPos = QCursor::pos();
+    m_itemsOnly   =
+        parent->selectCategory() ==
+        InventorySlot::SelectCategory::ObtainableItems;
+
 
     setWindowFlags(Qt::Popup);
 
     if (slot->getAcceptTag()) {
         auto *newBtnMenu = new QMenu(ui->newButton);
-        newBtnMenu->addAction(tr("Item..."), this,
+        newBtnMenu->addAction(m_itemsOnly ? tr("Item...") : tr("Block..."),
+                              this,
                               &InventorySlotEditor::onNewItem);
-        newBtnMenu->addAction(tr("Item tag..."), this,
+        newBtnMenu->addAction(m_itemsOnly ? tr("Item tag...")
+                                        : tr("Block tag..."), this,
                               &InventorySlotEditor::onNewItemTag);
         ui->newButton->setMenu(newBtnMenu);
     } else {
-        ui->newButton->setText(tr("New item..."));
+        ui->newButton->setText(m_itemsOnly ? tr("New item...")
+                                         : tr("New block..."));
         auto connection = connect(ui->newButton,
                                   &QPushButton::clicked, this,
                                   &InventorySlotEditor::onNewItem);
@@ -38,7 +44,7 @@ InventorySlotEditor::InventorySlotEditor(InventorySlot *parent) :
         appendItem(invItem);
     }
     ui->listView->setModel(&model);
-    ui->groupBox->setTitle(tr("Items") +
+    ui->groupBox->setTitle((m_itemsOnly ? tr("Items") : tr("Blocks")) +
                            QString(" (%1)").arg(model.rowCount()));
 
     connect(ui->listView->selectionModel(),
@@ -73,7 +79,8 @@ void InventorySlotEditor::show() {
 
     move(newPoint);
 
-    ui->groupBox->setTitle(tr("Items (%1)").arg(model.rowCount()));
+    ui->groupBox->setTitle((m_itemsOnly ? tr("Items") : tr("Blocks")) +
+                           QString(" (%1)").arg(model.rowCount()));
 
     QFrame::show();
 }
@@ -88,7 +95,7 @@ void InventorySlotEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void InventorySlotEditor::onNewItem() {
-    BlockItemSelectorDialog dialog(this);
+    BlockItemSelectorDialog dialog(this, slot->selectCategory());
 
     if (dialog.exec()) {
         auto newItems = dialog.getSelectedItems();
@@ -104,7 +111,8 @@ void InventorySlotEditor::onNewItem() {
 }
 
 void InventorySlotEditor::onNewItemTag() {
-    TagSelectorDialog dialog(this, CodeFile::ItemTag);
+    TagSelectorDialog dialog(
+        this, (m_itemsOnly) ? CodeFile::ItemTag : CodeFile::BlockTag);
 
     if (dialog.exec()) {
         InventoryItem invItem(dialog.getSelectedID());

@@ -31,10 +31,9 @@ QTimer InventorySlot::m_timer = QTimer(qApp);
 [[maybe_unused]] const char _ = _initTimer(InventorySlot::m_timer);
 
 
-InventorySlot::InventorySlot(QWidget *parent)
-    : QFrame(parent) {
+InventorySlot::InventorySlot(QWidget *parent) : QFrame(parent) {
     setAcceptDrops(true);
-    /*setMinimumSize(sizeHint()); */
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     adjustSize();
     setBackground();
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
@@ -270,12 +269,22 @@ void InventorySlot::onCustomContextMenu(const QPoint &point) {
         QAction *seclectTagAction = new QAction(tr("Select tag..."), cMenu);
         seclectTagAction->setEnabled(getAcceptTag());
         connect(seclectTagAction, &QAction::triggered, this, [this]() {
-            TagSelectorDialog dialog(this, CodeFile::ItemTag);
+            TagSelectorDialog dialog(
+                this, (m_selectCategory == SelectCategory::Blocks)
+                        ? CodeFile::BlockTag : CodeFile::ItemTag);
             if (dialog.exec()) {
                 setItem(InventoryItem(dialog.getSelectedID()));
             }
         });
         cMenu->addAction(seclectTagAction);
+    }
+
+    if (getAcceptMultiple()) {
+        QAction *listAction = new QAction(tr("List all..."), cMenu);
+        connect(listAction, &QAction::triggered, this, [this]() {
+            (new InventorySlotEditor(this))->show();
+        });
+        cMenu->addAction(listAction);
     }
 
     if (!cMenu->isEmpty()) {
@@ -296,6 +305,10 @@ void InventorySlot::onTimerTimeout() {
     if (curItemIndex >= items.count())
         curItemIndex = 0;
     update();
+}
+
+InventorySlot::SelectCategory InventorySlot::selectCategory() const {
+    return m_selectCategory;
 }
 
 void InventorySlot::setSelectCategory(const SelectCategory &selectCategory) {

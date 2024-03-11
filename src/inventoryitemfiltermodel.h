@@ -9,8 +9,10 @@ public:
     enum Filter {
         UnobtainableBlocks = 1,
         ObtainableBlocks   = 2,
+        AllBlocks          = ObtainableBlocks | UnobtainableBlocks,
         BlockItems         = ObtainableBlocks,
         NonblockItem       = 4,
+        AllItems           = BlockItems | NonblockItem,
     };
     Q_DECLARE_FLAGS(Filters, Filter)
 

@@ -65,6 +65,7 @@ public:
     bool getAcceptMultiple() const;
     void setAcceptMultiple(bool value);
 
+    SelectCategory selectCategory() const;
     void setSelectCategory(const SelectCategory &selectCategory);
 
 signals:
