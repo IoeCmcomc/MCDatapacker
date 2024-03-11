@@ -219,6 +219,12 @@
          <height>22</height>
         </size>
        </property>
+       <property name="modes">
+        <set>NumberProvider::ExactAndRange</set>
+       </property>
+       <property name="maxLimit">
+        <double>15.000000000000000</double>
+       </property>
       </widget>
      </item>
      <item row="3" column="0">
@@ -276,6 +282,9 @@
           <height>22</height>
          </size>
         </property>
+        <property name="modes">
+         <set>NumberProvider::ExactAndRange</set>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">
@@ -292,6 +301,9 @@
           <height>22</height>
          </size>
         </property>
+        <property name="modes">
+         <set>NumberProvider::ExactAndRange</set>
+        </property>
        </widget>
       </item>
       <item row="2" column="1">
@@ -307,6 +319,9 @@
           <width>0</width>
           <height>22</height>
          </size>
+        </property>
+        <property name="modes">
+         <set>NumberProvider::ExactAndRange</set>
         </property>
        </widget>
       </item>
@@ -372,69 +387,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="StackedWidget" name="blockStackWidget">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="page_3">
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <property name="leftMargin">
-           <number>5</number>
-          </property>
-          <property name="topMargin">
-           <number>5</number>
-          </property>
-          <property name="rightMargin">
-           <number>5</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item>
-           <widget class="QComboBox" name="blockCombo"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="page_4">
-         <layout class="QGridLayout" name="gridLayout_5">
-          <property name="leftMargin">
-           <number>5</number>
-          </property>
-          <property name="topMargin">
-           <number>5</number>
-          </property>
-          <property name="rightMargin">
-           <number>5</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QComboBox" name="blocksCombo"/>
-          </item>
-          <item row="0" column="1">
-           <widget class="QToolButton" name="addBlockBtn">
-            <property name="icon">
-             <iconset theme="list-add">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QListWidget" name="blocksList">
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustToContents</enum>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QRadioButton" name="block_tagRadio">
         <property name="text">
@@ -451,6 +403,16 @@
       </item>
       <item row="2" column="1">
        <widget class="QLineEdit" name="blockNBTEdit"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="InventorySlot" name="blockSlot">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -470,9 +432,9 @@
    <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
-   <class>StackedWidget</class>
-   <extends>QStackedWidget</extends>
-   <header>stackedwidget.h</header>
+   <class>InventorySlot</class>
+   <extends>QFrame</extends>
+   <header>inventoryslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -2,7 +2,7 @@
 #include "ui_locationconditiondialog.h"
 
 #include "globalhelpers.h"
-#include "inventoryitem.h"
+#include "inventoryslot.h"
 
 #include "game.h"
 
@@ -17,17 +17,10 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
                 GameInfoModel::PrependPrefix | GameInfoModel::HasOptionalItem) {
     ui->setupUi(this);
 
-    const auto typeFlags = NumberProvider::Exact
-                           | NumberProvider::Range;
 
-    ui->xInput->setModes(typeFlags);
     ui->xInput->minimizeMinLimit();
-    ui->yInput->setModes(typeFlags);
     ui->yInput->minimizeMinLimit();
-    ui->zInput->setModes(typeFlags);
     ui->zInput->minimizeMinLimit();
-    ui->lightInput->setModes(typeFlags);
-    ui->lightInput->setMaxLimit(15);
 
     // initComboModelView("biome", biomesModel, ui->biomeCombo);
     ui->biomeCombo->setModel(&biomesModel);
@@ -47,6 +40,9 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     }
 
     from_1_17 = Game::version() >= Game::v1_17;
+    ui->blockSlot->setAcceptMultiple(from_1_17);
+    ui->blockSlot->setAcceptTag(false);
+    ui->blockSlot->setSelectCategory(InventorySlot::SelectCategory::Blocks);
 
     connect(ui->addstateBtn, &QPushButton::clicked,
             this, &LocationConditionDialog::onAddedState);
@@ -104,20 +100,15 @@ QJsonObject LocationConditionDialog::toJson() const {
         if (ui->block_blockRadio->isChecked()) {
             if (from_1_17) {
                 QJsonArray blocks;
-                for (int i = 0; i < ui->blocksList->count(); ++i) {
-                    blocks <<
-                        ui->blocksList->item(i)->data(Qt::UserRole +
-                                                      1).value<InventoryItem>().
-                        getNamespacedID();
+                for (int i = 0; i < ui->blockSlot->itemCount(); ++i) {
+                    blocks << ui->blockSlot->itemNamespacedID(i);
                 }
                 if (!blocks.isEmpty()) {
                     block.insert(QStringLiteral("blocks"), blocks);
                 }
             } else {
-                auto invItem = ui->blockCombo->currentData(Qt::UserRole + 1)
-                               .value<InventoryItem>();
                 block.insert(QStringLiteral("block"),
-                             invItem.getNamespacedID());
+                             ui->blockSlot->itemNamespacedID());
             }
         } else if (!ui->blockTagEdit->text().isEmpty()) {
             block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
@@ -185,31 +176,15 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("block"))) {
         QJsonObject block = value[QStringLiteral("block")].toObject();
         ui->block_tagRadio->setChecked(block.contains(QStringLiteral("tag")));
+        ui->blockSlot->clearItems();
         if (from_1_17 && block.contains(QStringLiteral("blocks"))) {
             const auto &&blocks = block["blocks"].toArray();
-            for (const auto &block: blocks) {
-                auto &&blockId = block.toString();
-                if (!blockId.startsWith(QStringLiteral("minecraft:")))
-                    blockId.prepend(QStringLiteral("minecraft:"));
-                const auto &vari = QVariant::fromValue(InventoryItem(
-                                                           blockId));
-                const auto &itemList = blocksModel.match(
-                    blocksModel.index(0, 0), Qt::UserRole + 1, vari,
-                    1, Qt::MatchExactly);
-                if (!itemList.isEmpty()) {
-                    const auto &index = itemList.at(0);
-                    auto       *item  = new QListWidgetItem(
-                        index.data().toString(),
-                        ui->blocksList);
-                    item->setData(Qt::UserRole + 1, vari);
-                    item->setIcon(index.data(Qt::DecorationRole).value<QIcon>());
-                    ui->blocksList->addItem(item);
-                }
+            for (const auto &blockId: blocks) {
+                ui->blockSlot->appendItem(blockId.toString());
             }
         } else if (block.contains(QStringLiteral("block"))) {
             InventoryItem invItem(block[QStringLiteral("block")].toString());
-            /*qDebug() << invItem; */
-            setComboValueFrom(ui->blockCombo, QVariant::fromValue(invItem));
+            ui->blockSlot->setItem(invItem);
         } else if (block.contains(QStringLiteral("tag"))) {
             if (block.contains(QStringLiteral("tag")))
                 ui->blockTagEdit->setText(block[QStringLiteral(
@@ -284,47 +259,13 @@ void LocationConditionDialog::onAddedState() {
 void LocationConditionDialog::initBlockGroup() {
     ui->blockGroup->setChecked(false);
 
-    const auto &&blocksInfo = Game::getInfo(QStringLiteral("block"));
-    const auto &&keys       = blocksInfo.keys();
-    for (const auto &key : keys) {
-        InventoryItem  invItem(key);
-        QStandardItem *item = new QStandardItem();
-        item->setIcon(QIcon(invItem.getPixmap()));
-        if (invItem.getName().isEmpty()) {
-            auto &&name =
-                blocksInfo.value(key).toMap().value("name").toString();
-            item->setText(name);
-        } else {
-            item->setText(invItem.getName());
-        }
-        item->setData(QVariant::fromValue(invItem), Qt::UserRole + 1);
-        blocksModel.appendRow(item);
-    }
-    ui->blockCombo->setModel(&blocksModel);
-
-    if (from_1_17) {
-        ui->blockStackWidget->setCurrentIndex(1);
-        ui->blocksCombo->setModel(&blocksModel);
-        ui->blocksList->installEventFilter(&viewFilter);
-        connect(ui->addBlockBtn, &QToolButton::clicked, this, [this](){
-            auto *item =
-                new QListWidgetItem(ui->blocksCombo->currentText(),
-                                    ui->blocksList);
-            item->setData(Qt::UserRole + 1,
-                          ui->blocksCombo->currentData(Qt::UserRole + 1));
-            item->setIcon(ui->blocksCombo->itemIcon(ui->blocksCombo->
-                                                    currentIndex()));
-            ui->blocksList->addItem(item);
-        });
-    }
-
     connect(ui->blockGroup, &QGroupBox::toggled, this, [this](bool checked) {
         if (ui->fluidGroup->isChecked() && checked)
             ui->fluidGroup->setChecked(false);
         ui->stateGroup->setEnabled(checked);
     });
     connect(ui->block_blockRadio, &QRadioButton::toggled,
-            ui->blockStackWidget, &QWidget::setEnabled);
+            ui->blockSlot, &QWidget::setEnabled);
     connect(ui->block_tagRadio, &QRadioButton::toggled,
             ui->blockTagEdit, &QWidget::setEnabled);
 }

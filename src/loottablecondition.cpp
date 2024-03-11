@@ -75,10 +75,8 @@ QJsonObject LootTableCondition::toJson() const {
 
     switch (ui->conditionTypeCombo->currentIndex()) {
         case 0: { /*Block states */
-            if (ui->blockState_blockCombo->currentIndex() != 0) {
-                auto invItem = ui->blockState_blockCombo->currentData(
-                    Qt::UserRole + 1).value<InventoryItem>();
-                root.insert("block", invItem.getNamespacedID());
+            if (!ui->blockState_slot->isEmpty()) {
+                root.insert("block", ui->blockState_slot->itemNamespacedID());
             }
             QJsonObject states = LocationConditionDialog::jsonFromStateTable(
                 ui->blockState_table);
@@ -332,9 +330,9 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     reset(condIndex);
     switch (condIndex) {
         case 0: { /*Block states */
-            if (value.contains("block"))
-                setComboValueFrom(ui->blockState_blockCombo, QVariant::fromValue
-                                      (InventoryItem(value["block"].toString())));
+            if (value.contains("block")) {
+                ui->blockState_slot->setItem(value["block"].toString());
+            }
             if (value.contains("properties")) {
                 QJsonObject states = value["properties"].toObject();
                 LocationConditionDialog::setupStateTableFromJson(
@@ -606,7 +604,7 @@ void LootTableCondition::onCurDirChanged(const QDir &dir) {
 void LootTableCondition::reset(int index) {
     switch (index) {
         case 0: { /*Block states */
-            ui->blockState_blockCombo->setCurrentIndex(0);
+            ui->blockState_slot->clearItems();
             ui->blockState_table->setRowCount(0);
             break;
         }
@@ -812,27 +810,10 @@ void LootTableCondition::toolEnchant_onAdded() {
 }
 
 void LootTableCondition::initBlockStatesPage() {
-    const auto &&blocksInfo = Game::getInfo("block");
+    ui->blockState_slot->setAcceptMultiple(false);
+    ui->blockState_slot->setAcceptTag(false);
+    ui->blockState_slot->setSelectCategory(InventorySlot::SelectCategory::Blocks);
 
-    blocksModel.appendRow(new QStandardItem(tr("(not set)")));
-    const auto &&keys = blocksInfo.keys();
-    for (const auto &key : keys) {
-        InventoryItem  invItem(key);
-        QStandardItem *item = new QStandardItem();
-        item->setIcon(QIcon(invItem.getPixmap()));
-        if (invItem.getName().isEmpty()) {
-            QString &&name =
-                blocksInfo.value(key).toMap().value("name").toString();
-            item->setText(name);
-        } else {
-            item->setText(invItem.getName());
-        }
-        QVariant vari;
-        vari.setValue(invItem);
-        item->setData(vari, Qt::UserRole + 1);
-        blocksModel.appendRow(item);
-    }
-    ui->blockState_blockCombo->setModel(&blocksModel);
     ui->blockState_table->installEventFilter(&viewFilter);
 
     connect(ui->blockState_addBtn, &QPushButton::clicked,

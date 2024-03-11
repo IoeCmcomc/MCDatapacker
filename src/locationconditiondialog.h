@@ -32,7 +32,6 @@ private:
     GameInfoModel biomesModel;
     QStandardItemModel dimensionsModel;
     QStandardItemModel featuresModel;
-    QStandardItemModel blocksModel;
     QStandardItemModel fluidsModel;
     bool from_1_17 = false;
 

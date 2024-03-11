@@ -64,18 +64,6 @@
          <property name="text">
           <string>Block:</string>
          </property>
-         <property name="buddy">
-          <cstring>blockState_blockCombo</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="blockState_blockCombo">
-         <item>
-          <property name="text">
-           <string>(not set)</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
@@ -150,6 +138,16 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="InventorySlot" name="blockState_slot">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
         </widget>
        </item>
       </layout>
@@ -1168,7 +1166,7 @@
           <set>NumberProvider::ExactAndRange</set>
          </property>
          <property name="minLimit">
-          <number>-2147483647</number>
+          <double>-2147483647.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -1188,7 +1186,7 @@
           <enum>NumberProvider::Range</enum>
          </property>
          <property name="minLimit">
-          <number>-2147483647</number>
+          <double>-2147483647.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -1327,6 +1325,12 @@
    <class>StackedWidget</class>
    <extends>QStackedWidget</extends>
    <header location="global">stackedwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>InventorySlot</class>
+   <extends>QFrame</extends>
+   <header location="global">inventoryslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
