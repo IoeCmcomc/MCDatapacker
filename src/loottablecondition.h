@@ -3,10 +3,10 @@
 
 #include "basecondition.h"
 #include "datawidgetcontroller.h"
+#include "gameinfomodel.h"
 
 #include <QFrame>
 #include <QVBoxLayout>
-#include <QFileSystemWatcher>
 #include <QDir>
 
 #include <mutex>
@@ -40,7 +40,6 @@ protected:
 private slots:
     void blockStates_onAdded();
     void entityScores_onAdded();
-    void setupRefCombo();
     void tableBonus_onAdded();
     void toolEnchant_onAdded();
     void onTypeChanged(const int &i);
@@ -57,9 +56,8 @@ private:
 
     Ui::LootTableCondition *ui;
     int depth = 0;
-    QStandardItemModel blocksModel;
+    GameInfoModel m_conditionsModel;
     QStandardItemModel enchantmentsModel;
-    QStandardItemModel condRefsModel;
     QStandardItemModel tableBonusModel;
     const QStringList condTypes = {
         "block_state_property", "damage_source_properties", "entity_properties",
@@ -69,7 +67,6 @@ private:
         "time_check",           "tool_enchantment",         "weather_check",
         "value_check",          };
     const QStringList entityTargets = { "this", "killer", "killer_player" };
-    QFileSystemWatcher predRefWatcher;
 
     DataWidgetControllerRecord m_timeCtrl;
     std::once_flag m_fullyInitialized;

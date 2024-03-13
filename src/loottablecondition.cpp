@@ -7,11 +7,14 @@
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
 #include "entityconditiondialog.h"
+#include "gameinfomodel.h"
+
 #include "globalhelpers.h"
 #include "game.h"
 
 #include <QDialog>
 #include <QDoubleSpinBox>
+#include <QCompleter>
 
 
 LootTableCondition::LootTableCondition(QWidget *parent) :
@@ -47,8 +50,6 @@ void LootTableCondition::init() {
         connect(mainWin, &MainWindow::curDirChanged,
                 this, &LootTableCondition::onCurDirChanged);
     }
-    connect(&predRefWatcher, &QFileSystemWatcher::directoryChanged,
-            this, &LootTableCondition::setupRefCombo);
 
     initBlockStatesPage();
     initDamageSrcPage();
@@ -57,7 +58,10 @@ void LootTableCondition::init() {
     ui->matchTool_propBtn->assignDialogClass<ItemConditionDialog>();
     ui->location_propBtn->assignDialogClass<LocationConditionDialog>();
     initRandChancePage();
-    setupRefCombo();
+    m_conditionsModel.setDatapackCategory("predicates", true);
+    auto *completer = new QCompleter(&m_conditionsModel, this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->ref_nameEdit->setCompleter(completer);
     initTableBonusPage();
     ui->time_valueInput->setModes(NumberProvider::ExactAndRange);
     m_timeCtrl.addMapping("value", ui->time_valueInput);
@@ -216,8 +220,8 @@ QJsonObject LootTableCondition::toJson() const {
         }
 
         case 9: {/*Reference */
-            if (!ui->ref_nameCombo->currentText().isEmpty())
-                root.insert("name", ui->ref_nameCombo->currentText());
+            if (!ui->ref_nameEdit->text().isEmpty())
+                root.insert("name", ui->ref_nameEdit->text());
             break;
         }
 
@@ -502,7 +506,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
 
         case 9: {/*Reference */
             if (value.contains("name"))
-                ui->ref_nameCombo->setCurrentText(value["name"].toString());
+                ui->ref_nameEdit->setText(value["name"].toString());
             break;
         }
 
@@ -594,11 +598,7 @@ void LootTableCondition::onTypeChanged(const int &i) {
 }
 
 void LootTableCondition::onCurDirChanged(const QDir &dir) {
-    if (!predRefWatcher.directories().isEmpty())
-        predRefWatcher.removePaths(predRefWatcher.directories());
-    predRefWatcher.addPath(dir.path());
-    predRefWatcher.directories();
-    setupRefCombo();
+    m_conditionsModel.setDatapackCategory("predicates", true);
 }
 
 void LootTableCondition::reset(int index) {
@@ -668,7 +668,7 @@ void LootTableCondition::reset(int index) {
         }
 
         case 9: {/*Reference */
-            ui->ref_nameCombo->setCurrentText("");
+            ui->ref_nameEdit->setText("");
             break;
         }
 
@@ -767,18 +767,6 @@ void LootTableCondition::entityScores_onAdded() {
     auto  json      = ui->entityScores_valueInput->toJson();
     valueItem->setData(ExtendedRole::NumberProviderRole, json);
     appendRowToTableWidget(ui->entityScores_table, { objItem, valueItem });
-}
-
-void LootTableCondition::setupRefCombo() {
-    /*qDebug() << "setupRefCombo"; */
-    if (condRefsModel.rowCount() > 0)
-        condRefsModel.clear();
-    auto predRefIDs =
-        Glhp::fileIdList(QDir::currentPath(), QStringLiteral("predicates"));
-
-    for (const auto &predRef : qAsConst(predRefIDs))
-        condRefsModel.appendRow(new QStandardItem(predRef));
-    ui->ref_nameCombo->setModel(&condRefsModel);
 }
 
 void LootTableCondition::tableBonus_onAdded() {

@@ -11,18 +11,18 @@
 #include <QJsonArray>
 
 LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
-    QDialog(parent), BaseCondition(),
-    ui(new Ui::LocationConditionDialog),
-    biomesModel(this, "biome", GameInfoModel::Info,
-                GameInfoModel::PrependPrefix | GameInfoModel::HasOptionalItem) {
+    QDialog(parent), BaseCondition(), ui(new Ui::LocationConditionDialog) {
     ui->setupUi(this);
-
 
     ui->xInput->minimizeMinLimit();
     ui->yInput->minimizeMinLimit();
     ui->zInput->minimizeMinLimit();
 
     // initComboModelView("biome", biomesModel, ui->biomeCombo);
+    biomesModel.setSource(QStringLiteral("biome"), GameInfoModel::Info,
+                          GameInfoModel::PrependPrefix |
+                          GameInfoModel::HasOptionalItem);
+    biomesModel.setDatapackCategory(QStringLiteral("worldgen/biome"));
     ui->biomeCombo->setModel(&biomesModel);
     initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
     if (Game::version() >= Game::v1_19) {
