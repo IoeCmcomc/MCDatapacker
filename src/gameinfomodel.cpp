@@ -8,6 +8,8 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileSystemWatcher>
+#include <QCompleter>
+#include <QListView>
 
 GameInfoModel::GameInfoModel(QObject *parent)
     : QAbstractListModel(parent) {
@@ -28,6 +30,14 @@ void GameInfoModel::setSource(const QString &key, LoadFrom loadFrom,
     beginResetModel();
     loadData();
     endResetModel();
+}
+
+void GameInfoModel::setInfo(const QString &key, Options options) {
+    setSource(key, LoadFrom::Info, options);
+}
+
+void GameInfoModel::setRegistry(const QString &key, Options options) {
+    setSource(key, LoadFrom::Registry, options);
 }
 
 void GameInfoModel::setDatapackCategory(const QString &cat, bool autoWatch) {
@@ -69,6 +79,10 @@ void GameInfoModel::setDatapackCategory(const QString &cat, bool autoWatch) {
     }
 
     updateDatapackIds();
+}
+
+void GameInfoModel::setOptionalItem(bool value) {
+    m_options.setFlag(Option::HasOptionalItem, value);
 }
 
 void GameInfoModel::updateDatapackIds() {
@@ -181,6 +195,18 @@ QVariant GameInfoModel::data(const QModelIndex &index, int role) const {
         default:
             return {};
     }
+}
+
+QCompleter * GameInfoModel::createCompleter() {
+    auto *completer = new QCompleter(this, this);
+
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setFilterMode(Qt::MatchContains);
+    auto *completerPopup = qobject_cast<QListView *>(completer->popup());
+    completerPopup->setUniformItemSizes(true);
+    completerPopup->setLayoutMode(QListView::Batched);
+
+    return completer;
 }
 
 int GameInfoModel::staticRowCount() const {

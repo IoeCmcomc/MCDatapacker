@@ -38,9 +38,6 @@
     </property>
     <item row="2" column="0" colspan="3">
      <widget class="QStackedWidget" name="stackedWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
       <widget class="QWidget" name="apply_bonus">
        <layout class="QFormLayout" name="formLayout_2">
         <item row="0" column="0">
@@ -265,33 +262,27 @@
       </widget>
       <widget class="QWidget" name="copy_state">
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Block:</string>
-          </property>
-          <property name="buddy">
-           <cstring>copyState_blockCombo</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="4">
-         <widget class="QComboBox" name="copyState_blockCombo"/>
-        </item>
-        <item row="1" column="0" rowspan="2" colspan="5">
+        <item row="1" column="0" rowspan="2" colspan="4">
          <widget class="Line" name="line_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
-        <item row="3" column="2">
+        <item row="3" column="1">
          <widget class="QLineEdit" name="copyState_lineEdit"/>
         </item>
-        <item row="4" column="0" colspan="5">
+        <item row="4" column="0" colspan="4">
          <widget class="QListWidget" name="copyState_list">
           <property name="toolTip">
            <string>Right click a row to delete it.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QPushButton" name="copyState_addBtn">
+          <property name="text">
+           <string>Add</string>
           </property>
          </widget>
         </item>
@@ -305,10 +296,20 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="3">
-         <widget class="QPushButton" name="copyState_addBtn">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
           <property name="text">
-           <string>Add</string>
+           <string>Block:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="InventorySlot" name="copyState_blockSlot">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
          </widget>
         </item>
@@ -1195,7 +1196,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="setNBT_NBTEdit"/>
+         <widget class="QPlainTextEdit" name="setNBT_NBTEdit"/>
         </item>
        </layout>
       </widget>
@@ -1509,6 +1510,12 @@
    <class>OptionalSpinBox</class>
    <extends>QSpinBox</extends>
    <header location="global">optionalspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>InventorySlot</class>
+   <extends>QFrame</extends>
+   <header location="global">inventoryslot.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>RawJsonTextEditor</class>

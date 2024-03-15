@@ -2,7 +2,6 @@
 #include "ui_locationconditiondialog.h"
 
 #include "globalhelpers.h"
-#include "inventoryslot.h"
 
 #include "game.h"
 
@@ -18,22 +17,24 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     ui->yInput->minimizeMinLimit();
     ui->zInput->minimizeMinLimit();
 
-    // initComboModelView("biome", biomesModel, ui->biomeCombo);
-    biomesModel.setSource(QStringLiteral("biome"), GameInfoModel::Info,
-                          GameInfoModel::PrependPrefix |
-                          GameInfoModel::HasOptionalItem);
-    biomesModel.setDatapackCategory(QStringLiteral("worldgen/biome"));
-    ui->biomeCombo->setModel(&biomesModel);
-    initComboModelView("dimension", dimensionsModel, ui->dimensionCombo);
+    m_biomeModel.setInfo(QStringLiteral("biome"));
+    m_biomeModel.setDatapackCategory(QStringLiteral("worldgen/biome"));
+    ui->biomeCombo->setModel(&m_biomeModel);
+    m_dimensionModel.setInfo(QStringLiteral("dimension"));
+    m_dimensionModel.setDatapackCategory(QStringLiteral("dimension"));
+    ui->dimensionCombo->setModel(&m_dimensionModel);
     if (Game::version() >= Game::v1_19) {
-        initComboModelViewFromRegistry("worldgen/structure", featuresModel,
-                                       ui->featureCombo);
+        m_featureModel.setRegistry(QStringLiteral("worldgen/structure"));
+        m_featureModel.setDatapackCategory(QStringLiteral("worldgen/structure"));
     } else if (Game::version() == Game::v1_18_2) {
-        initComboModelViewFromRegistry("worldgen/configured_structure_feature",
-                                       featuresModel, ui->featureCombo);
+        m_featureModel.setRegistry(QStringLiteral(
+                                       "worldgen/configured_structure_feature"));
+        m_featureModel.setDatapackCategory(
+            QStringLiteral("worldgen/configured_structure_feature"));
     } else {
-        initComboModelView("feature", featuresModel, ui->featureCombo);
+        m_featureModel.setInfo(QStringLiteral("feature"));
     }
+    ui->featureCombo->setModel(&m_featureModel);
 
     if (Game::version() < Game::v1_16) {
         ui->smokeyCheck->hide();
@@ -77,7 +78,7 @@ QJsonObject LocationConditionDialog::toJson() const {
         root.insert(QStringLiteral("dimension"),
                     ui->dimensionCombo->currentData(
                         Qt::UserRole + 1).toString());
-    if (ui->featureCombo->currentText() != 0) {
+    if (ui->featureCombo->currentIndex() != 0) {
         if (Game::version() >= Game::v1_19) {
             root.insert(QStringLiteral("structure"),
                         ui->featureCombo->currentData(
@@ -273,8 +274,8 @@ void LocationConditionDialog::initBlockGroup() {
 void LocationConditionDialog::initFluidGroup() {
     ui->fluidGroup->setChecked(false);
 
-    initComboModelView(QStringLiteral("fluid"), fluidsModel, ui->fluidCombo,
-                       false);
+    m_fluidModel.setInfo(QStringLiteral("fluid"), GameInfoModel::PrependPrefix);
+    ui->fluidCombo->setModel(&m_fluidModel);
 
     connect(ui->fluidGroup, &QGroupBox::toggled, this, [this](bool checked) {
         if (ui->blockGroup->isChecked() && checked)

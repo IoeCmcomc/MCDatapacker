@@ -56,8 +56,9 @@ private:
 
     Ui::LootTableCondition *ui;
     int depth = 0;
-    GameInfoModel m_conditionsModel;
-    QStandardItemModel enchantmentsModel;
+    GameInfoModel m_conditionModel;
+    GameInfoModel m_damageTagModel;
+    GameInfoModel m_enchantmentModel;
     QStandardItemModel tableBonusModel;
     const QStringList condTypes = {
         "block_state_property", "damage_source_properties", "entity_properties",

@@ -5,6 +5,7 @@
 
 QT_BEGIN_NAMESPACE
 class QFileSystemWatcher;
+class QCompleter;
 QT_END_NAMESPACE
 
 /*!
@@ -26,6 +27,7 @@ public:
         NoOptions       = 0,
         HasOptionalItem = 1,
         PrependPrefix   = 2,
+        Default         = HasOptionalItem | PrependPrefix,
         IdsAreTags      = 4,
         ForceKeyAsName  = 8,
         DontShowIcons   = 16,
@@ -39,16 +41,20 @@ public:
 
     explicit GameInfoModel(QObject *parent = nullptr);
     explicit GameInfoModel(QObject *parent, const QString &key,
-                           LoadFrom loadFrom, Options options = NoOptions);
+                           LoadFrom loadFrom, Options options = Default);
 
     void setSource(const QString &key,
-                   LoadFrom loadFrom, Options options           = NoOptions);
+                   LoadFrom loadFrom, Options options           = Default);
+    void setInfo(const QString &key, Options options            = Default);
+    void setRegistry(const QString &key, Options options        = Default);
     void setDatapackCategory(const QString &cat, bool autoWatch = false);
+    void setOptionalItem(bool value);
+    QCompleter * createCompleter();
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const override;
+
 
 public slots:
     void updateDatapackIds();
@@ -61,7 +67,7 @@ private:
     QVector<QString> m_dataIds;
     QVector<QString> m_datapackIds;
     LoadFrom m_loadFrom = Info;
-    Options m_options   = NoOptions;
+    Options m_options   = Default;
 
     int staticRowCount() const;
     void loadData();

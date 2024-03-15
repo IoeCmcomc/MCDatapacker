@@ -58,8 +58,9 @@ void LootTableCondition::init() {
     ui->matchTool_propBtn->assignDialogClass<ItemConditionDialog>();
     ui->location_propBtn->assignDialogClass<LocationConditionDialog>();
     initRandChancePage();
-    m_conditionsModel.setDatapackCategory("predicates", true);
-    auto *completer = new QCompleter(&m_conditionsModel, this);
+    m_conditionModel.setOptionalItem(false);
+    m_conditionModel.setDatapackCategory("predicates", true);
+    auto *completer = new QCompleter(&m_conditionModel, this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     ui->ref_nameEdit->setCompleter(completer);
     initTableBonusPage();
@@ -547,8 +548,8 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                         enchantObj[QStringLiteral("enchantment")].toString();
                     if (!enchantId.contains(QStringLiteral(":")))
                         enchantId = QStringLiteral("minecraft:") + enchantId;
-                    auto indexes = enchantmentsModel.match(
-                        enchantmentsModel.index(0, 0),
+                    auto indexes = m_enchantmentModel.match(
+                        m_enchantmentModel.index(0, 0),
                         Qt::UserRole + 1,
                         enchantId);
                     if (indexes.isEmpty()) continue;
@@ -598,7 +599,8 @@ void LootTableCondition::onTypeChanged(const int &i) {
 }
 
 void LootTableCondition::onCurDirChanged(const QDir &dir) {
-    m_conditionsModel.setDatapackCategory("predicates", true);
+    Q_UNUSED(dir)
+    m_conditionModel.setDatapackCategory("predicates", true);
 }
 
 void LootTableCondition::reset(int index) {
@@ -813,6 +815,11 @@ void LootTableCondition::initDamageSrcPage() {
         ui->damageSrc_stackWidget->setCurrentIndex(0);
     } else {
         ui->damageSrc_stackWidget->setCurrentIndex(1);
+        m_damageTagModel.setInfo(QStringLiteral("tag/damage_type"),
+                                 GameInfoModel::PrependPrefix |
+                                 GameInfoModel::ForceKeyAsName);
+        m_damageTagModel.setDatapackCategory("tags/damage_type", true);
+        ui->damageSrc_tagEdit->setCompleter(m_damageTagModel.createCompleter());
         ui->damageSrc_table->appendColumnMapping("id", ui->damageSrc_tagEdit);
         ui->damageSrc_table->appendColumnMapping("expected",
                                                  ui->damageSrc_expectedCheck);
@@ -866,9 +873,9 @@ void LootTableCondition::initRandChancePage() {
 }
 
 void LootTableCondition::initTableBonusPage() {
-    initComboModelView("enchantment", enchantmentsModel,
-                       ui->tableBonus_enchantCombo, false);
-    ui->toolEnchant_enchantCombo->setModel(&enchantmentsModel);
+    m_enchantmentModel.setInfo(QStringLiteral("enchantment"), GameInfoModel::PrependPrefix);
+    ui->tableBonus_enchantCombo->setModel(&m_enchantmentModel);
+    ui->toolEnchant_enchantCombo->setModel(&m_enchantmentModel);
 
     ui->tableBonus_listView->setModel(&tableBonusModel);
     ui->tableBonus_listView->installEventFilter(&viewFilter);

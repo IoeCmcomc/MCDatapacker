@@ -2,6 +2,7 @@
 #define ENTITYCONDITIONDIALOG_H
 
 #include "basecondition.h"
+#include "gameinfomodel.h"
 
 #include <QDialog>
 
@@ -29,12 +30,14 @@ private slots:
 
 private:
     Ui::EntityConditionDialog *ui;
-    QStandardItemModel entityModel;
-    QStandardItemModel effectModel;
+    GameInfoModel m_entityModel;
+    GameInfoModel m_effectModel;
     QStandardItemModel entityEffectModel;
+    GameInfoModel m_recipeModel;
     QStandardItemModel playerRecipeModel;
+    GameInfoModel m_advancementModel;
     QStandardItemModel playerAdvanModel;
-    QStandardItemModel statTypeModel;
+    GameInfoModel m_statTypeModel;
     QStandardItemModel playerStatModel;
 
     void initEffectsPage();

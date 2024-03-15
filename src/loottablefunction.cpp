@@ -37,10 +37,10 @@ void LootTableFunction::init() {
         ui->lootTable_typeLabel->hide();
         ui->lootTable_typeCombo->hide();
     } else {
-        initComboModelViewFromRegistry(QStringLiteral("block_entity_type"),
-                                       blockEntityTypesModel,
-                                       ui->setContents_typeCombo, false);
-        ui->lootTable_typeCombo->setModel(&blockEntityTypesModel);
+        m_blockEntityTypeModel.setRegistry(QStringLiteral("block_entity_type"),
+                                           GameInfoModel::PrependPrefix);
+        ui->setContents_typeCombo->setModel(&m_blockEntityTypeModel);
+        ui->lootTable_typeCombo->setModel(&m_blockEntityTypeModel);
     }
     if (Game::version() < Game::v1_19) {
         hideComboRow(ui->functionTypeCombo, SetInstrument);
@@ -60,8 +60,9 @@ void LootTableFunction::init() {
     connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTableFunction::updateConditionsTab);
 
-    initComboModelView("enchantment", enchantmentsModel,
-                       ui->bonus_enchantCombo, false);
+    m_enchantmentModel.setInfo(QStringLiteral("enchantment"),
+                               GameInfoModel::PrependPrefix);
+    ui->bonus_enchantCombo->setModel(&m_enchantmentModel);
 
     ui->copyNBT_table->installEventFilter(&viewFilter);
     connect(ui->copyNBT_addBtn, &QPushButton::clicked,
@@ -69,16 +70,16 @@ void LootTableFunction::init() {
 
     initBlocksModel();
 
-    ui->copyState_blockCombo->setModel(&blocksModel);
+    ui->copyState_blockSlot->setAcceptMultiple(false);
+    ui->copyState_blockSlot->setAcceptTag(false);
+    ui->copyState_blockSlot->setSelectCategory(
+        InventorySlot::SelectCategory::Blocks);
     ui->copyState_list->installEventFilter(&viewFilter);
     connect(ui->copyState_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::copyState_onAdded);
 
     if (Game::version() < Game::v1_17) {
-        qobject_cast<QListView *>(ui->copyNBT_entityCombo->view())->setRowHidden(
-            4, true);
-        qobject_cast<QStandardItemModel *>(ui->copyNBT_entityCombo->model())->
-        item(4, 0)->setEnabled(false);
+        hideComboRow(ui->copyNBT_entityCombo, 4);
         ui->copyNBT_storageLabel->hide();
         ui->copyNBT_storageEdit->hide();
     }
@@ -90,7 +91,7 @@ void LootTableFunction::init() {
     });
 
 
-    ui->enchantRand_enchantCombo->setModel(&enchantmentsModel);
+    ui->enchantRand_enchantCombo->setModel(&m_enchantmentModel);
     ui->enchantRand_list->installEventFilter(&viewFilter);
     connect(ui->enchantRand_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::enchantRand_onAdded);
@@ -98,9 +99,7 @@ void LootTableFunction::init() {
     if (Game::version() >= Game::v1_19) {
         initComboModelView(QStringLiteral("tag/structure"),
                            featuresModel, ui->map_destCombo,
-                           true, true, true, true);
-        initComboModelViewFromRegistry(QStringLiteral("worldgen/structure"),
-                                       featuresModel, ui->map_destCombo, false);
+                           true, true, false, true);
     } else if (Game::version() == Game::v1_18_2) {
         initComboModelView(QStringLiteral("tag/configured_structure_feature"),
                            featuresModel, ui->map_destCombo, true, true, true);
@@ -111,17 +110,21 @@ void LootTableFunction::init() {
         initComboModelView(QStringLiteral("feature"), featuresModel,
                            ui->map_destCombo);
     }
-    initComboModelView(QStringLiteral("map_icon"), mapIconsModel,
-                       ui->map_decoCombo);
-
+    m_mapIconModel.setInfo(QStringLiteral("map_icon"));
+    ui->map_decoCombo->setModel(&m_mapIconModel);
 
     ui->limitCount_limitInput->setModes(NumberProvider::ExactAndRange);
 
     ui->lootEnchant_countInput->setModes(NumberProvider::ExactAndRange);
 
+    m_functionModel.setOptionalItem(false);
+    m_functionModel.setDatapackCategory("item_modifiers");
+    ui->ref_nameEdit->setCompleter(m_functionModel.createCompleter());
+
     ui->setAttr_amountInput->setModes(NumberProvider::Range);
-    initComboModelView(QStringLiteral("attribute"), attributesModel,
-                       ui->setAttr_attrCombo, false);
+    m_attributeModel.setInfo(QStringLiteral("attribute"),
+                             GameInfoModel::PrependPrefix);
+    ui->setAttr_attrCombo->setModel(&m_attributeModel);
 
     NumberProviderDelegate *delegate = new NumberProviderDelegate(this);
     delegate->setInputModes(NumberProvider::ExactAndRange);
@@ -134,21 +137,26 @@ void LootTableFunction::init() {
 
     initBannerPatterns();
 
-    ui->setEnchant_combo->setModel(&enchantmentsModel);
+    ui->setEnchant_combo->setModel(&m_enchantmentModel);
     ui->setEnchant_table->appendColumnMapping(QString(), ui->setEnchant_combo);
     ui->setEnchant_table->appendColumnMapping(QString(),
                                               ui->setEnchant_numberProvider);
 
+    m_lootTableModel.setOptionalItem(false);
+    m_lootTableModel.setDatapackCategory("loot_tables", true);
+    ui->lootTable_idEdit->setCompleter(m_lootTableModel.createCompleter());
+
     ui->setName_textEdit->setOneLine(true);
     ui->setName_textEdit->setDarkMode(true);
 
-    initComboModelView(QStringLiteral("effect"),
-                       effectsModel,
-                       ui->stewEffect_effectCombo);
+    m_effectModel.setInfo(QStringLiteral("effect"),
+                          GameInfoModel::PrependPrefix);
+    ui->stewEffect_effectCombo->setModel(&m_effectModel);
     connect(ui->stewEffect_addBtn, &QPushButton::clicked,
             this, &LootTableFunction::effectStew_onAdded);
-    ui->setPotion_potionCombo->setModel(&effectsModel);
-    ui->setPotion_potionCombo->addItem("empty", "empty");
+    m_potionModel.setInfo(QStringLiteral("potion"),
+                          GameInfoModel::PrependPrefix);
+    ui->setPotion_potionCombo->setModel(&m_potionModel);
 }
 
 LootTableFunction::~LootTableFunction() {
@@ -208,10 +216,7 @@ QJsonObject LootTableFunction::toJson() const {
         }
 
         case CopyState: { /* Copy states */
-            root.insert("block",
-                        qvariant_cast<InventoryItem>(
-                            ui->copyState_blockCombo->currentData(
-                                Qt::UserRole + 1)).getNamespacedID());
+            root.insert("block", ui->copyState_blockSlot->itemNamespacedID());
             QJsonArray properties;
             for (int i = 0; i < ui->copyState_list->count(); i++) {
                 properties.append(ui->copyState_list->item(i)->text());
@@ -401,7 +406,7 @@ QJsonObject LootTableFunction::toJson() const {
         }
 
         case SetNbt: { /* Set NBT string */
-            root.insert("tag", ui->setNBT_NBTEdit->text());
+            root.insert("tag", ui->setNBT_NBTEdit->toPlainText());
             break;
         }
 
@@ -551,10 +556,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             if (!root.contains("block"))
                 return;
 
-            QVariant vari;
-            vari.setValue(InventoryItem(root.value("block").toString()));
-
-            setComboValueFrom(ui->copyState_blockCombo, vari);
+            ui->copyState_blockSlot->setItem(root.value("block").toString());
 
             if (root.contains("properties")) {
                 QJsonArray properties = root.value("properties").toArray();
@@ -857,7 +859,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             if (!root.contains("tag"))
                 return;
 
-            ui->setNBT_NBTEdit->setText(root.value("tag").toString());
+            ui->setNBT_NBTEdit->setPlainText(root.value("tag").toString());
             break;
         }
 

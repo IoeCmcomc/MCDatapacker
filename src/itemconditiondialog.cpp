@@ -2,11 +2,9 @@
 #include "ui_itemconditiondialog.h"
 
 #include "numberproviderdelegate.h"
-#include "inventoryslot.h"
 #include "extendedtablewidget.h"
 
 #include "game.h"
-#include "platforms/windows_specific.h"
 
 #include <QJsonObject>
 
@@ -20,13 +18,16 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui->itemSlot->setAcceptTag(false);
     ui->itemSlot->setAcceptMultiple(from_1_17);
 
-    initComboModelView("potion", potionsModel, ui->potionCombo);
-    initComboModelView("enchantment", enchantmentsModel, ui->enchant_combo,
-                       false);
-    ui->stored_combo->setModel(&enchantmentsModel);
+    m_potionModel.setInfo(QStringLiteral("potion"));
+    ui->potionCombo->setModel(&m_potionModel);
+    m_enchantmentModel.setInfo(QStringLiteral("enchantment"),
+                               GameInfoModel::PrependPrefix |
+                               GameInfoModel::DontShowIcons);
+    ui->enchant_combo->setModel(&m_enchantmentModel);
+    ui->stored_combo->setModel(&m_enchantmentModel);
 
-    initTable(ui->enchantmentsTable);
-    initTable(ui->storedEnchantsTable);
+    initTable(ui->enchantmentsTable, ui->enchant_combo, ui->enchant_levelInput);
+    initTable(ui->storedEnchantsTable, ui->stored_combo, ui->stored_levelInput);
 
     if (from_1_17) {
         m_controller.addMapping(QStringLiteral("items"), ui->itemRadio,
@@ -68,9 +69,10 @@ void ItemConditionDialog::fromJson(const QJsonObject &value) {
     m_controller.setValueFrom(value, {});
 }
 
-void ItemConditionDialog::initTable(ExtendedTableWidget *table) {
-    table->appendColumnMapping("enchantment", ui->enchant_combo);
-    table->appendColumnMapping("levels", ui->enchant_levelInput);
+void ItemConditionDialog::initTable(ExtendedTableWidget *table,
+                                    QComboBox *combo, NumberProvider *input) {
+    table->appendColumnMapping("enchantment", combo);
+    table->appendColumnMapping("levels", input);
 
     auto *delegate = new NumberProviderDelegate(this);
 

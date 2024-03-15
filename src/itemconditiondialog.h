@@ -3,11 +3,12 @@
 
 #include "basecondition.h"
 #include "datawidgetcontroller.h"
+#include "gameinfomodel.h"
 
 #include <QDialog>
 #include <QJsonArray>
 
-class ExtendedTableWidget;
+// class ExtendedTableWidget;
 
 namespace Ui {
     class ItemConditionDialog;
@@ -26,11 +27,11 @@ public:
 private:
     Ui::ItemConditionDialog *ui;
     DataWidgetControllerRecord m_controller;
-    QStandardItemModel itemsModel;
-    QStandardItemModel potionsModel;
-    QStandardItemModel enchantmentsModel;
+    GameInfoModel m_potionModel;
+    GameInfoModel m_enchantmentModel;
 
-    void initTable(ExtendedTableWidget *table);
+    void initTable(ExtendedTableWidget *table, QComboBox *combo,
+                   NumberProvider *input);
 };
 
 #endif /* ITEMCONDITIONDIALOG_H */

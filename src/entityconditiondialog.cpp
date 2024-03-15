@@ -1,7 +1,7 @@
 #include "entityconditiondialog.h"
-#include "modelfunctions.h"
 #include "ui_entityconditiondialog.h"
 
+#include "modelfunctions.h"
 #include "numberproviderdelegate.h"
 #include "itemconditiondialog.h"
 #include "locationconditiondialog.h"
@@ -32,12 +32,24 @@ EntityConditionDialog::EntityConditionDialog(QWidget *parent) :
     QDialog(parent), ui(new Ui::EntityConditionDialog) {
     ui->setupUi(this);
 
-    initComboModelView(QStringLiteral("entity"), entityModel,
-                       ui->entityTypeCombo);
-    initComboModelView(QStringLiteral("effect"), effectModel,
-                       ui->effectCombo, false);
-    initComboModelView(QStringLiteral("stat_type"), statTypeModel,
-                       ui->statTypeCombo, false);
+    m_entityModel.setInfo(QStringLiteral("entity"));
+    ui->entityTypeCombo->setModel(&m_entityModel);
+    m_effectModel.setInfo(QStringLiteral("effect"),
+                          GameInfoModel::PrependPrefix);
+    ui->effectCombo->setModel(&m_effectModel);
+    m_statTypeModel.setInfo(QStringLiteral("stat_type"),
+                            GameInfoModel::PrependPrefix);
+    ui->statTypeCombo->setModel(&m_statTypeModel);
+
+    m_advancementModel.setRegistry(QStringLiteral("advancement"),
+                                   GameInfoModel::PrependPrefix);
+    m_advancementModel.setDatapackCategory(QStringLiteral("advancements"));
+    ui->advanEdit->setCompleter(m_advancementModel.createCompleter());
+
+    m_recipeModel.setRegistry(QStringLiteral("recipe"),
+                              GameInfoModel::PrependPrefix);
+    m_recipeModel.setDatapackCategory(QStringLiteral("recipes"));
+    ui->recipeEdit->setCompleter(m_recipeModel.createCompleter());
 
     ui->tabWidget->setTabVisible(2, Game::version() >= Game::v1_16);
     ui->tabWidget->setTabVisible(3, Game::version() >= Game::v1_17);
@@ -353,8 +365,8 @@ void EntityConditionDialog::playerFromJson(const QJsonObject &player) {
             QString statType = statObj[QStringLiteral("type")].toString();
             if (!statType.contains(QStringLiteral(":")))
                 statType = QStringLiteral("minecraft:") + statType;
-            auto indexes = statTypeModel.match(
-                statTypeModel.index(0, 0), Qt::UserRole + 1, statType);
+            auto indexes = m_statTypeModel.match(
+                m_statTypeModel.index(0, 0), Qt::UserRole + 1, statType);
             if (indexes.isEmpty()) continue;
             auto *typeItem = new QStandardItem();
             typeItem->setData(statType);
@@ -449,8 +461,8 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
         for (auto &&effectID : effects.keys()) {
             if (!effectID.contains(QStringLiteral(":")))
                 effectID = QStringLiteral("minecraft:") + effectID;
-            auto indexes = effectModel.match(
-                effectModel.index(0, 0), Qt::UserRole + 1, effectID);
+            auto indexes = m_effectModel.match(
+                m_effectModel.index(0, 0), Qt::UserRole + 1, effectID);
             if (indexes.isEmpty()) continue;
             auto *effectItem = new QStandardItem();
             effectItem->setData(effectID);

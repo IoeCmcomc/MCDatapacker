@@ -28,11 +28,10 @@ protected slots:
 
 private:
     Ui::LocationConditionDialog *ui;
-    // QStandardItemModel biomesModel;
-    GameInfoModel biomesModel;
-    QStandardItemModel dimensionsModel;
-    QStandardItemModel featuresModel;
-    QStandardItemModel fluidsModel;
+    GameInfoModel m_biomeModel;
+    GameInfoModel m_dimensionModel;
+    GameInfoModel m_featureModel;
+    GameInfoModel m_fluidModel;
     bool from_1_17 = false;
 
     void initBlockGroup();

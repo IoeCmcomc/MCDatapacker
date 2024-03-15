@@ -2,10 +2,10 @@
 #define LOOTTABLEFUNCTION_H
 
 #include "vieweventfilter.h"
+#include "gameinfomodel.h"
 
 #include <QTabWidget>
 #include <QStandardItemModel>
-#include <QHBoxLayout>
 
 #include <mutex>
 
@@ -69,15 +69,16 @@ private:
         FurnaceSmelt = ExplosionDecay,
     };
 
-    QHBoxLayout conditionsLayout;
-    QHBoxLayout entriesLayout;
+    GameInfoModel m_attributeModel;
     QStandardItemModel blocksModel;
-    QStandardItemModel enchantmentsModel;
-    QStandardItemModel effectsModel;
+    GameInfoModel m_blockEntityTypeModel;
+    GameInfoModel m_enchantmentModel;
+    GameInfoModel m_effectModel;
+    GameInfoModel m_functionModel;
     QStandardItemModel featuresModel;
-    QStandardItemModel mapIconsModel;
-    QStandardItemModel attributesModel;
-    QStandardItemModel blockEntityTypesModel;
+    GameInfoModel m_lootTableModel;
+    GameInfoModel m_mapIconModel;
+    GameInfoModel m_potionModel;
     ViewEventFilter viewFilter;
     const QStringList functTypes =
     { "apply_bonus",        "copy_nbt",            "copy_state",
