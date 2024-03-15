@@ -255,6 +255,8 @@ void MainWindow::initResourcesMenu() {
                           R"(https://modrinth.com)"));
     connectActionLink(ui->actionSmithed, QStringLiteral(
                           R"(https://smithed.net)"));
+    connectActionLink(ui->actionDatapack_Hub,
+                      QStringLiteral(R"(https://datapackhub.net/)"));
 }
 
 void MainWindow::open() {

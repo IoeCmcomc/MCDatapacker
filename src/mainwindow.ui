@@ -210,6 +210,7 @@
       <addaction name="actionPlanetMinecraft"/>
       <addaction name="actionModrinth"/>
       <addaction name="actionSmithed"/>
+      <addaction name="actionDatapack_Hub"/>
      </widget>
      <addaction name="menuOnlineTools"/>
      <addaction name="menu_Offline_tools"/>
@@ -520,6 +521,11 @@
   <action name="actionDatamancer">
    <property name="text">
     <string>Datamancer</string>
+   </property>
+  </action>
+  <action name="actionDatapack_Hub">
+   <property name="text">
+    <string>Datapack Hub</string>
    </property>
   </action>
  </widget>
