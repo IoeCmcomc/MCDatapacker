@@ -18,8 +18,7 @@
 
 
 LootTableCondition::LootTableCondition(QWidget *parent) :
-    QFrame(parent),
-    ui(new Ui::LootTableCondition) {
+    QTabWidget(parent), ui(new Ui::LootTableCondition) {
     ui->setupUi(this);
 }
 
@@ -38,6 +37,10 @@ void LootTableCondition::init() {
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this, &LootTableCondition::onTypeChanged);
+    connect(this, &QTabWidget::currentChanged,
+            this, &LootTableCondition::onTabChanged);
+    connect(ui->nested_dataInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableCondition::updateConditionsTab);
     MainWindow  *mainWin = nullptr;
     const auto &&widgets = qApp->topLevelWidgets();
     for (auto *wid : widgets) {
@@ -57,6 +60,9 @@ void LootTableCondition::init() {
     initEntityScoresPage();
     ui->matchTool_propBtn->assignDialogClass<ItemConditionDialog>();
     ui->location_propBtn->assignDialogClass<LocationConditionDialog>();
+    connect(ui->nested_linkLabel, &QLabel::linkActivated, this, [this]() {
+        setCurrentIndex(1);
+    });
     initRandChancePage();
     m_conditionModel.setOptionalItem(false);
     m_conditionModel.setDatapackCategory("predicates", true);
@@ -433,6 +439,8 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
             if (nestedMode == NestedMode::Invalid) {
                 return;
             }
+            if (!ui->nested_dataInterface->mainWidget())
+                initNestedCondPage();
             if (nestedMode == NestedMode::SingleInvert
                 && value.contains("term")) {
                 ui->nested_dataInterface->setJson({ value["term"].toObject() });
@@ -462,8 +470,6 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
 
                     termRef = term;
                 }
-                if (!ui->nested_dataInterface->mainWidget())
-                    initNestedCondPage();
 
                 ui->nested_dataInterface->setJson(terms);
 
@@ -591,16 +597,24 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
     }
 }
 
-void LootTableCondition::onTypeChanged(const int &i) {
+void LootTableCondition::onTypeChanged(const int i) {
     ui->stackedWidget->setCurrentIndex(i);
     const int nestedConditionIndex = 6;
-    if ((i == nestedConditionIndex) && !ui->nested_dataInterface->mainWidget())
+    setTabEnabled(1, i == nestedConditionIndex);
+}
+
+void LootTableCondition::onTabChanged(const int i) {
+    if ((i == 1) && !ui->nested_dataInterface->mainWidget())
         initNestedCondPage();
 }
 
 void LootTableCondition::onCurDirChanged(const QDir &dir) {
     Q_UNUSED(dir)
     m_conditionModel.setDatapackCategory("predicates", true);
+}
+
+void LootTableCondition::updateConditionsTab(int size) {
+    setTabText(1, tr("Conditions (%1)").arg(size));
 }
 
 void LootTableCondition::reset(int index) {
@@ -735,7 +749,7 @@ void LootTableCondition::resetAll() {
 }
 
 void LootTableCondition::changeEvent(QEvent *event) {
-    QFrame::changeEvent(event);
+    QTabWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
     }
@@ -743,7 +757,7 @@ void LootTableCondition::changeEvent(QEvent *event) {
 
 void LootTableCondition::showEvent(QShowEvent *event) {
     std::call_once(m_fullyInitialized, &LootTableCondition::init, this);
-    QFrame::showEvent(event);
+    QTabWidget::showEvent(event);
 }
 
 void LootTableCondition::blockStates_onAdded() {
@@ -873,7 +887,8 @@ void LootTableCondition::initRandChancePage() {
 }
 
 void LootTableCondition::initTableBonusPage() {
-    m_enchantmentModel.setInfo(QStringLiteral("enchantment"), GameInfoModel::PrependPrefix);
+    m_enchantmentModel.setInfo(QStringLiteral("enchantment"),
+                               GameInfoModel::PrependPrefix);
     ui->tableBonus_enchantCombo->setModel(&m_enchantmentModel);
     ui->toolEnchant_enchantCombo->setModel(&m_enchantmentModel);
 
@@ -912,6 +927,9 @@ void LootTableCondition::addInvertCondition(QJsonObject &json) const {
 
 void LootTableCondition::simplifyCondition(QVariantMap &condMap,
                                            int depth) const {
+    const QString anyOfString =
+        (Game::version() < Game::v1_20) ? "alternative" : "any_of";
+
     /*const QString tab = QString(" ").repeated(depth); */
 
     /*qDebug().noquote() << tab << "simplifyCondJson" << depth; */
@@ -930,8 +948,7 @@ void LootTableCondition::simplifyCondition(QVariantMap &condMap,
                     auto subTerm = sub["term"].toMap();
                     condMap = subTerm;
                     simplifyCondition(condMap, depth + 2);
-                } else if (sub["condition"].toString().endsWith("alternative"))
-                {
+                } else if (sub["condition"].toString().endsWith(anyOfString)) {
                     auto &subTermsRef = sub["terms"];
                     auto  subTerms    = subTermsRef.toList();
                     /*qDebug().noquote() << tab << "sub terms count:" << */
@@ -952,7 +969,7 @@ void LootTableCondition::simplifyCondition(QVariantMap &condMap,
                     }
                 }
             }
-        } else if (condMap["condition"].toString().endsWith("alternative")) {
+        } else if (condMap["condition"].toString().endsWith(anyOfString)) {
             auto &subsRef = condMap["terms"];
             auto  subs    = subsRef.toList();
             /*qDebug().noquote() << tab << "subs count:" << subs.count(); */

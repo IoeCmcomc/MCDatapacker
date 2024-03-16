@@ -74,7 +74,7 @@ void NumberProvider::fromJson(const QJsonValue &value) {
         ui->stackedWidget->setCurrentIndex(0);
     } else if (value.isObject()) {
         auto obj  = value.toObject();
-        auto type = obj[QStringLiteral("type")].toString();
+        auto type = obj.value(QLatin1String("type")).toString();
         if (type == QStringLiteral("minecraft:binomial")) {
             if (obj.contains(QStringLiteral("n")))
                 ui->numSpinBox->setValue(obj.value(QStringLiteral("n")).toInt());
@@ -90,7 +90,7 @@ void NumberProvider::fromJson(const QJsonValue &value) {
             }
             if (obj.contains(QStringLiteral("max"))) {
                 const auto max = obj[QStringLiteral("max")];
-                setMinValue(m_integerOnly ? max.toInt() : max.toDouble());
+                setMaxValue(m_integerOnly ? max.toInt() : max.toDouble());
             } else {
                 ui->maxSpinBox->unset();
             }

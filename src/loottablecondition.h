@@ -16,7 +16,7 @@ namespace Ui {
     class LootTableCondition;
 }
 
-class LootTableCondition : public QFrame, public BaseCondition {
+class LootTableCondition : public QTabWidget, public BaseCondition {
     Q_OBJECT
 
 public:
@@ -42,8 +42,10 @@ private slots:
     void entityScores_onAdded();
     void tableBonus_onAdded();
     void toolEnchant_onAdded();
-    void onTypeChanged(const int &i);
+    void onTypeChanged(const int i);
+    void onTabChanged(const int i);
     void onCurDirChanged(const QDir &dir);
+    void updateConditionsTab(int size);
 
 private:
     enum class NestedMode {

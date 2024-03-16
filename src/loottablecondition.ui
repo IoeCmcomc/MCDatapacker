@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>LootTableCondition</class>
- <widget class="QFrame" name="LootTableCondition">
+ <widget class="QTabWidget" name="LootTableCondition">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>402</height>
+    <width>470</width>
+    <height>483</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,1250 +25,1294 @@
   <property name="windowTitle">
    <string>Condition</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>8</number>
-   </property>
-   <property name="topMargin">
-    <number>8</number>
-   </property>
-   <property name="rightMargin">
-    <number>8</number>
-   </property>
-   <property name="bottomMargin">
-    <number>8</number>
-   </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Condition:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QStackedWidget" name="stackedWidget">
-     <widget class="QWidget" name="block_state_property">
-      <layout class="QFormLayout" name="formLayout_3">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Block:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Block states</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>State:</string>
+  <property name="tabPosition">
+   <enum>QTabWidget::South</enum>
+  </property>
+  <property name="currentIndex">
+   <number>0</number>
+  </property>
+  <widget class="QWidget" name="general">
+   <attribute name="title">
+    <string>General</string>
+   </attribute>
+   <layout class="QFormLayout" name="formLayout_13">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Condition:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="conditionTypeCombo">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <item>
+       <property name="text">
+        <string>Block states</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Damage source</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Entity properties</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Entity scores</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Killed by player</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Location</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Nested conditions</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Tool properties</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Random chance</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Reference</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Survives explosion</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Table bonus</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Time</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Tool enchantment</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Weather</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Value check</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="block_state_property">
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Block:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Block states</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>State:</string>
+             </property>
+             <property name="buddy">
+              <cstring>blockState_stateEdit</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="blockState_stateEdit"/>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Value:</string>
+             </property>
+             <property name="buddy">
+              <cstring>blockState_valueEdit</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QLineEdit" name="blockState_valueEdit"/>
+           </item>
+           <item row="0" column="4">
+            <widget class="QPushButton" name="blockState_addBtn">
+             <property name="text">
+              <string>Add</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="5">
+            <widget class="QTableWidget" name="blockState_table">
+             <property name="toolTip">
+              <string>Right click a row to delete it.</string>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>125</number>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>State</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="InventorySlot" name="blockState_slot">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="damage_source_properties">
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0" colspan="2">
+         <widget class="StackedWidget" name="damageSrc_stackWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="page_3">
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="TrueFalseBox" name="damageSrc_explosionCheck">
+              <property name="text">
+               <string>Explosion</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="TrueFalseBox" name="damageSrc_projectileCheck">
+              <property name="text">
+               <string>Projectile</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="TrueFalseBox" name="damageSrc_fireCheck">
+              <property name="text">
+               <string>Fire</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="TrueFalseBox" name="damageSrc_lightningCheck">
+              <property name="text">
+               <string>Lightning</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="TrueFalseBox" name="damageSrc_magicCheck">
+              <property name="text">
+               <string>Magic</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="TrueFalseBox" name="damageSrc_starvationCheck">
+              <property name="text">
+               <string>Starvation</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="TrueFalseBox" name="damageSrc_bypassArmorCheck">
+              <property name="text">
+               <string>Bypasses armor</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_4">
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="ExtendedTableWidget" name="damageSrc_table">
+              <property name="jsonMode">
+               <enum>ExtendedTableWidget::List</enum>
+              </property>
+              <property name="columnTitles">
+               <stringlist>
+                <string>Damage type tag</string>
+                <string>Expected</string>
+               </stringlist>
+              </property>
+              <widget class="QFrame" name="container">
+               <layout class="QFormLayout" name="formLayout_6">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_26">
+                  <property name="text">
+                   <string>Tag ID:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" colspan="2">
+                 <widget class="QCheckBox" name="damageSrc_expectedCheck">
+                  <property name="text">
+                   <string>Is expected</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="damageSrc_tagEdit"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Source entity:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="DialogDataButton" name="damageSrc_entityPropBtn">
+          <property name="text">
+           <string>Entity properties...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Direct entity:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="DialogDataButton" name="damageSrc_directPropBtn">
+          <property name="text">
+           <string>Entity properties...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QWidget" name="damageSrc_spacer" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="entity">
+       <layout class="QFormLayout" name="formLayout">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Entity type:</string>
+          </property>
+          <property name="buddy">
+           <cstring>entity_typeCombo</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="entity_typeCombo">
+          <item>
+           <property name="text">
+            <string>This (itself)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer player</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="DialogDataButton" name="entity_propBtn">
+          <property name="text">
+           <string>Entity properties...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="entity_scores">
+       <layout class="QFormLayout" name="formLayout_4">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Entity type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="entityScores_typeCombo">
+          <item>
+           <property name="text">
+            <string>This (itself)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Killer player</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Scores</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Objective:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Value:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="NumberProvider" name="entityScores_valueInput">
+             <property name="minimumSize">
+              <size>
+               <width>125</width>
+               <height>20</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QPushButton" name="entityScores_addBtn">
+             <property name="text">
+              <string>Add score</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="entityScores_objectiveEdit"/>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QTableWidget" name="entityScores_table">
+             <property name="toolTip">
+              <string>Right click a row to delete it.</string>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Objective</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="killed_by_player">
+       <layout class="QFormLayout" name="formLayout_8">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0" colspan="2">
+         <widget class="QCheckBox" name="playerKill_invertedCheck">
+          <property name="text">
+           <string>Inverted</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="location_check">
+       <layout class="QFormLayout" name="formLayout_9">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0" colspan="2">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Offsets</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>X:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="OptionalSpinBox" name="location_xOffset">
+             <property name="minimum">
+              <number>-999999999</number>
+             </property>
+             <property name="maximum">
+              <number>999999999</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Y:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="OptionalSpinBox" name="location_yOffset">
+             <property name="minimum">
+              <number>-999999999</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Z:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="OptionalSpinBox" name="location_zOffset">
+             <property name="minimum">
+              <number>-999999999</number>
+             </property>
+             <property name="maximum">
+              <number>999999999</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="DialogDataButton" name="location_propBtn">
+          <property name="text">
+           <string>Location properties...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="nested">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="4">
+         <widget class="QCheckBox" name="nested_invertedCheck">
+          <property name="text">
+           <string>Inverted</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Combination mode:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QRadioButton" name="nested_andRadio">
+          <property name="text">
+           <string>AND</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QRadioButton" name="nested_orRadio">
+          <property name="text">
+           <string>OR</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="5">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0" colspan="6">
+         <widget class="QLabel" name="nested_linkLabel">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add and remove conditions in the &lt;a href=&quot;/conditions&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Conditions&lt;/span&gt;&lt;/a&gt; tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="indent">
+           <number>16</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="match_tool">
+       <layout class="QFormLayout" name="formLayout_10">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0" colspan="2">
+         <widget class="DialogDataButton" name="matchTool_propBtn">
+          <property name="text">
+           <string>Item properties...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="random_chance">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="2" column="2" rowspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="randChance_lootingLabel">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
-            <property name="buddy">
-             <cstring>blockState_stateEdit</cstring>
+            <property name="text">
+             <string>Looting multiplier:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="blockState_stateEdit"/>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Value:</string>
+          <item>
+           <widget class="QDoubleSpinBox" name="randChance_lootingInput">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
-            <property name="buddy">
-             <cstring>blockState_valueEdit</cstring>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="blockState_valueEdit"/>
+         </layout>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="randChance_lootingCheck">
+          <property name="text">
+           <string>With looting</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" rowspan="2">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Chance:</string>
+            </property>
+           </widget>
           </item>
-          <item row="0" column="4">
-           <widget class="QPushButton" name="blockState_addBtn">
+          <item>
+           <widget class="QSlider" name="randChance_slider">
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="pageStep">
+             <number>2</number>
+            </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedControls">
+             <bool>false</bool>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
+            </property>
+            <property name="tickInterval">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="randChance_spinBox">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0" rowspan="2" colspan="3">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="3">
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>438</width>
+            <height>273</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="reference">
+       <layout class="QFormLayout" name="formLayout_11">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="ref_nameEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="survives_explosion"/>
+      <widget class="QWidget" name="table_bonus">
+       <layout class="QGridLayout" name="gridLayout_8">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>Enchantment:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="tableBonus_enchantCombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Chance:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSlider" name="tableBonus_chanceSlider">
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="singleStep">
+             <number>1</number>
+            </property>
+            <property name="pageStep">
+             <number>2</number>
+            </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedControls">
+             <bool>false</bool>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::TicksBelow</enum>
+            </property>
+            <property name="tickInterval">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="tableBonus_chanceSpinBox">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="tableBonus_addBtn">
             <property name="text">
              <string>Add</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="5">
-           <widget class="QTableWidget" name="blockState_table">
-            <property name="toolTip">
-             <string>Right click a row to delete it.</string>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustToContents</enum>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
-            </property>
-            <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>125</number>
-            </attribute>
-            <attribute name="horizontalHeaderStretchLastSection">
-             <bool>true</bool>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>State</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </column>
-           </widget>
-          </item>
          </layout>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="InventorySlot" name="blockState_slot">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="damage_source_properties">
-      <layout class="QFormLayout" name="formLayout_2">
-       <item row="0" column="0" colspan="2">
-        <widget class="StackedWidget" name="damageSrc_stackWidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="currentIndex">
-          <number>1</number>
-         </property>
-         <widget class="QWidget" name="page_3">
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="TrueFalseBox" name="damageSrc_explosionCheck">
-             <property name="text">
-              <string>Explosion</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="TrueFalseBox" name="damageSrc_projectileCheck">
-             <property name="text">
-              <string>Projectile</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="TrueFalseBox" name="damageSrc_fireCheck">
-             <property name="text">
-              <string>Fire</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="TrueFalseBox" name="damageSrc_lightningCheck">
-             <property name="text">
-              <string>Lightning</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="TrueFalseBox" name="damageSrc_magicCheck">
-             <property name="text">
-              <string>Magic</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="TrueFalseBox" name="damageSrc_starvationCheck">
-             <property name="text">
-              <string>Starvation</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="TrueFalseBox" name="damageSrc_bypassArmorCheck">
-             <property name="text">
-              <string>Bypasses armor</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QListView" name="tableBonus_listView">
+          <property name="toolTip">
+           <string>Right click a row to delete it.</string>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::IgnoreAction</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="resizeMode">
+           <enum>QListView::Adjust</enum>
+          </property>
+          <property name="uniformItemSizes">
+           <bool>true</bool>
+          </property>
          </widget>
-         <widget class="QWidget" name="page_4">
-          <layout class="QGridLayout" name="gridLayout_7">
-           <item row="0" column="0">
-            <widget class="ExtendedTableWidget" name="damageSrc_table">
-             <property name="jsonMode">
-              <enum>ExtendedTableWidget::List</enum>
-             </property>
-             <property name="columnTitles">
-              <stringlist>
-               <string>Damage type tag</string>
-               <string>Expected</string>
-              </stringlist>
-             </property>
-             <widget class="QFrame" name="container">
-              <layout class="QFormLayout" name="formLayout_6">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_26">
-                 <property name="text">
-                  <string>Tag ID:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="2">
-                <widget class="QCheckBox" name="damageSrc_expectedCheck">
-                 <property name="text">
-                  <string>Is expected</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="damageSrc_tagEdit"/>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-          </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="time_check">
+       <layout class="QFormLayout" name="formLayout_5">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_19">
+          <property name="text">
+           <string>Value:</string>
+          </property>
          </widget>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Source entity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="DialogDataButton" name="damageSrc_entityPropBtn">
-         <property name="text">
-          <string>Entity properties...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Direct entity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="DialogDataButton" name="damageSrc_directPropBtn">
-         <property name="text">
-          <string>Entity properties...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QWidget" name="damageSrc_spacer" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="entity">
-      <layout class="QFormLayout" name="formLayout">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Entity type:</string>
-         </property>
-         <property name="buddy">
-          <cstring>entity_typeCombo</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="entity_typeCombo">
-         <item>
-          <property name="text">
-           <string>This (itself)</string>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumberProvider" name="time_valueInput">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>20</height>
+           </size>
           </property>
-         </item>
-         <item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_20">
           <property name="text">
-           <string>Killer</string>
+           <string>Period:</string>
           </property>
-         </item>
-         <item>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="time_periodSpinBox">
+          <property name="specialValueText">
+           <string>-</string>
+          </property>
+          <property name="maximum">
+           <number>999999999</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="label_23">
           <property name="text">
-           <string>Killer player</string>
+           <string>If present, time gets modulo-divided by this period (for example, if set to 24000, value operates on a time period of days).</string>
           </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="DialogDataButton" name="entity_propBtn">
-         <property name="text">
-          <string>Entity properties...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="entity_scores">
-      <layout class="QFormLayout" name="formLayout_4">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Entity type:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="entityScores_typeCombo">
-         <item>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tool_enchantment">
+       <layout class="QGridLayout" name="gridLayout_9">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_21">
           <property name="text">
-           <string>This (itself)</string>
+           <string>Enchantment:</string>
           </property>
-         </item>
-         <item>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QComboBox" name="toolEnchant_enchantCombo">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_22">
           <property name="text">
-           <string>Killer</string>
+           <string>Levels:</string>
           </property>
-         </item>
-         <item>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="NumberProvider" name="toolEnchant_levelsInput">
+          <property name="minimumSize">
+           <size>
+            <width>125</width>
+            <height>20</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QPushButton" name="toolEnchant_addBtn">
           <property name="text">
-           <string>Killer player</string>
+           <string>Add enchantment</string>
           </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Scores</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Objective:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Value:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="NumberProvider" name="entityScores_valueInput">
-            <property name="minimumSize">
-             <size>
-              <width>125</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QPushButton" name="entityScores_addBtn">
-            <property name="text">
-             <string>Add score</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="entityScores_objectiveEdit"/>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QTableWidget" name="entityScores_table">
-            <property name="toolTip">
-             <string>Right click a row to delete it.</string>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustToContents</enum>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
-            </property>
-            <attribute name="horizontalHeaderStretchLastSection">
-             <bool>true</bool>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>Objective</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="killed_by_player">
-      <layout class="QFormLayout" name="formLayout_8">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="playerKill_invertedCheck">
-         <property name="text">
-          <string>Inverted</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="location_check">
-      <layout class="QFormLayout" name="formLayout_9">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Offsets</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>X:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="OptionalSpinBox" name="location_xOffset">
-            <property name="minimum">
-             <number>-999999999</number>
-            </property>
-            <property name="maximum">
-             <number>999999999</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Y:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="OptionalSpinBox" name="location_yOffset">
-            <property name="minimum">
-             <number>-999999999</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Z:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="OptionalSpinBox" name="location_zOffset">
-            <property name="minimum">
-             <number>-999999999</number>
-            </property>
-            <property name="maximum">
-             <number>999999999</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="DialogDataButton" name="location_propBtn">
-         <property name="text">
-          <string>Location properties...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="nested">
-      <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="0">
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLabel" name="label_15">
-         <property name="text">
-          <string>Combination mode:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QRadioButton" name="nested_orRadio">
-         <property name="text">
-          <string>OR</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QRadioButton" name="nested_andRadio">
-         <property name="text">
-          <string>AND</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QCheckBox" name="nested_invertedCheck">
-         <property name="text">
-          <string>Inverted</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="5">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0" colspan="6">
-        <widget class="DataWidgetInterface" name="nested_dataInterface">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Sunken</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="match_tool">
-      <layout class="QFormLayout" name="formLayout_10">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0" colspan="2">
-        <widget class="DialogDataButton" name="matchTool_propBtn">
-         <property name="text">
-          <string>Item properties...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="random_chance">
-      <layout class="QGridLayout" name="gridLayout_6">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="2" column="2" rowspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="randChance_lootingLabel">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QTableWidget" name="toolEnchant_table">
+          <property name="toolTip">
+           <string>Right click a row to delete it.</string>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>150</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <column>
            <property name="text">
-            <string>Looting multiplier:</string>
+            <string>Enchantment</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="randChance_lootingInput">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="randChance_lootingCheck">
-         <property name="text">
-          <string>With looting</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" rowspan="2">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="3">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_14">
+          </column>
+          <column>
            <property name="text">
-            <string>Chance:</string>
+            <string>Value</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="randChance_slider">
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="pageStep">
-            <number>2</number>
-           </property>
-           <property name="sliderPosition">
-            <number>0</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="invertedControls">
-            <bool>false</bool>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBelow</enum>
-           </property>
-           <property name="tickInterval">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="randChance_spinBox">
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0" rowspan="2" colspan="3">
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="3">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>438</width>
-           <height>273</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="reference">
-      <layout class="QFormLayout" name="formLayout_11">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_16">
-         <property name="text">
-          <string>Name:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="ref_nameEdit"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="survives_explosion"/>
-     <widget class="QWidget" name="table_bonus">
-      <layout class="QGridLayout" name="gridLayout_8">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_17">
-         <property name="text">
-          <string>Enchantment:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="tableBonus_enchantCombo">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="Line" name="line_5">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>Chance:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="tableBonus_chanceSlider">
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="pageStep">
-            <number>2</number>
-           </property>
-           <property name="sliderPosition">
-            <number>0</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="invertedControls">
-            <bool>false</bool>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBelow</enum>
-           </property>
-           <property name="tickInterval">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="tableBonus_chanceSpinBox">
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="tableBonus_addBtn">
-           <property name="text">
-            <string>Add</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QListView" name="tableBonus_listView">
-         <property name="toolTip">
-          <string>Right click a row to delete it.</string>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="defaultDropAction">
-          <enum>Qt::IgnoreAction</enum>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="resizeMode">
-          <enum>QListView::Adjust</enum>
-         </property>
-         <property name="uniformItemSizes">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="time_check">
-      <layout class="QFormLayout" name="formLayout_5">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_19">
-         <property name="text">
-          <string>Value:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="NumberProvider" name="time_valueInput">
-         <property name="minimumSize">
-          <size>
-           <width>150</width>
-           <height>20</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_20">
-         <property name="text">
-          <string>Period:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="time_periodSpinBox">
-         <property name="specialValueText">
-          <string>-</string>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="label_23">
-         <property name="text">
-          <string>If present, time gets modulo-divided by this period (for example, if set to 24000, value operates on a time period of days).</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tool_enchantment">
-      <layout class="QGridLayout" name="gridLayout_9">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_21">
-         <property name="text">
-          <string>Enchantment:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="toolEnchant_enchantCombo">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_22">
-         <property name="text">
-          <string>Levels:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="NumberProvider" name="toolEnchant_levelsInput">
-         <property name="minimumSize">
-          <size>
-           <width>125</width>
-           <height>20</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QPushButton" name="toolEnchant_addBtn">
-         <property name="text">
-          <string>Add enchantment</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QTableWidget" name="toolEnchant_table">
-         <property name="toolTip">
-          <string>Right click a row to delete it.</string>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SingleSelection</enum>
-         </property>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>150</number>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <column>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="weather_check">
+       <layout class="QFormLayout" name="formLayout_7">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="TrueFalseBox" name="weather_rainingCheck">
           <property name="text">
-           <string>Enchantment</string>
+           <string>Raining</string>
           </property>
-         </column>
-         <column>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="TrueFalseBox" name="weather_thunderCheck">
           <property name="text">
-           <string>Value</string>
+           <string>Thundering</string>
           </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="value_check">
+       <layout class="QFormLayout" name="formLayout_12">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_24">
+          <property name="toolTip">
+           <string>The value to check</string>
+          </property>
+          <property name="text">
+           <string>Value:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="NumberProvider" name="value_valueInput">
+          <property name="modes">
+           <set>NumberProvider::ExactAndRange</set>
+          </property>
+          <property name="minLimit">
+           <double>-2147483647.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_25">
+          <property name="text">
+           <string>Range:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="NumberProvider" name="value_rangeInput">
+          <property name="modes">
+           <set>NumberProvider::ExactAndRange</set>
+          </property>
+          <property name="currentMode">
+           <enum>NumberProvider::Range</enum>
+          </property>
+          <property name="minLimit">
+           <double>-2147483647.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
-     <widget class="QWidget" name="weather_check">
-      <layout class="QFormLayout" name="formLayout_7">
-       <property name="leftMargin">
-        <number>2</number>
-       </property>
-       <property name="topMargin">
-        <number>2</number>
-       </property>
-       <property name="rightMargin">
-        <number>2</number>
-       </property>
-       <property name="bottomMargin">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="TrueFalseBox" name="weather_rainingCheck">
-         <property name="text">
-          <string>Raining</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="TrueFalseBox" name="weather_thunderCheck">
-         <property name="text">
-          <string>Thundering</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="conditions">
+   <attribute name="title">
+    <string>Conditions (%1)</string>
+   </attribute>
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="DataWidgetInterface" name="nested_dataInterface">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
      </widget>
-     <widget class="QWidget" name="value_check">
-      <layout class="QFormLayout" name="formLayout_12">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_24">
-         <property name="toolTip">
-          <string>The value to check</string>
-         </property>
-         <property name="text">
-          <string>Value:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="NumberProvider" name="value_valueInput">
-         <property name="modes">
-          <set>NumberProvider::ExactAndRange</set>
-         </property>
-         <property name="minLimit">
-          <double>-2147483647.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_25">
-         <property name="text">
-          <string>Range:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="NumberProvider" name="value_rangeInput">
-         <property name="modes">
-          <set>NumberProvider::ExactAndRange</set>
-         </property>
-         <property name="currentMode">
-          <enum>NumberProvider::Range</enum>
-         </property>
-         <property name="minLimit">
-          <double>-2147483647.000000000000000</double>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="conditionTypeCombo">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <item>
-      <property name="text">
-       <string>Block states</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Damage source</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Entity properties</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Entity scores</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Killed by player</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Location</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Nested conditions</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Tool properties</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Random chance</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Reference</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Survives explosion</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Table bonus</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Time</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Tool enchantment</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Weather</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Value check</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-  </layout>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1290,15 +1334,21 @@
    <header>dialogdatabutton.h</header>
   </customwidget>
   <customwidget>
-   <class>TrueFalseBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">truefalsebox.h</header>
-  </customwidget>
-  <customwidget>
    <class>DataWidgetInterface</class>
    <extends>QFrame</extends>
    <header location="global">datawidgetinterface.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>InventorySlot</class>
+   <extends>QFrame</extends>
+   <header>inventoryslot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TrueFalseBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">truefalsebox.h</header>
   </customwidget>
   <customwidget>
    <class>OptionalSpinBox</class>
@@ -1309,12 +1359,6 @@
    <class>StackedWidget</class>
    <extends>QStackedWidget</extends>
    <header location="global">stackedwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>InventorySlot</class>
-   <extends>QFrame</extends>
-   <header location="global">inventoryslot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
