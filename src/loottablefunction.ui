@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>549</width>
-    <height>455</height>
+    <width>513</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TabWidget</string>
+   <string>Function</string>
   </property>
   <property name="tabPosition">
    <enum>QTabWidget::South</enum>
@@ -23,7 +23,7 @@
    <attribute name="title">
     <string>General</string>
    </attribute>
-   <layout class="QGridLayout" name="gridLayout_8">
+   <layout class="QFormLayout" name="formLayout_18">
     <property name="leftMargin">
      <number>7</number>
     </property>
@@ -36,8 +36,173 @@
     <property name="bottomMargin">
      <number>7</number>
     </property>
-    <item row="2" column="0" colspan="3">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Function:</string>
+      </property>
+      <property name="buddy">
+       <cstring>functionTypeCombo</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="functionTypeCombo">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <item>
+       <property name="text">
+        <string>Apply bonus</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy state</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enchant randomly </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Enchant with levels</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Exploration map</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Fill player head</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Limit count</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Looting enchant</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Reference</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sequence</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set attributes</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set banner pattern</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set contents</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set count</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set damage</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set enchantments</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set instrument</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set loot table</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set lore</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set name</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set NBT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set potion</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Set stew effect</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Copy name</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Explosion decay</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Furnace smelt</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
      <widget class="QStackedWidget" name="stackedWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <widget class="QWidget" name="apply_bonus">
        <layout class="QFormLayout" name="formLayout_2">
         <item row="0" column="0">
@@ -572,26 +737,14 @@
        </layout>
       </widget>
       <widget class="QWidget" name="sequence">
-       <layout class="QGridLayout" name="gridLayout_10">
-        <property name="leftMargin">
-         <number>4</number>
-        </property>
-        <property name="topMargin">
-         <number>4</number>
-        </property>
-        <property name="rightMargin">
-         <number>4</number>
-        </property>
-        <property name="bottomMargin">
-         <number>4</number>
-        </property>
+       <layout class="QFormLayout" name="formLayout_19">
         <item row="0" column="0">
-         <widget class="DataWidgetInterface" name="funcInterface">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
+         <widget class="QLabel" name="seq_linkLabel">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add and remove functions in the &lt;a href=&quot;/functions&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Functions&lt;/span&gt;&lt;/a&gt; tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
+          <property name="indent">
+           <number>16</number>
           </property>
          </widget>
         </item>
@@ -611,6 +764,12 @@
         </item>
         <item row="8" column="0" colspan="5">
          <widget class="QTableWidget" name="setAttr_table">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="toolTip">
            <string>Right click a row to delete it.</string>
           </property>
@@ -727,38 +886,24 @@
            <string>Slots</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="setAttr_headCheck">
-             <property name="text">
-              <string>Head</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="0" column="0">
             <widget class="QCheckBox" name="setAttr_offhandCheck">
              <property name="text">
               <string>Offhand</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
+           <item row="0" column="1">
             <widget class="QCheckBox" name="setAttr_mainhandCheck">
              <property name="text">
               <string>Mainhand</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="QCheckBox" name="setAttr_legsCheck">
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="setAttr_headCheck">
              <property name="text">
-              <string>Legs</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="QCheckBox" name="setAttr_feetCheck">
-             <property name="text">
-              <string>Feet</string>
+              <string>Head</string>
              </property>
             </widget>
            </item>
@@ -766,6 +911,20 @@
             <widget class="QCheckBox" name="setAttr_chestCheck">
              <property name="text">
               <string>Chest</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="setAttr_feetCheck">
+             <property name="text">
+              <string>Feet</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="setAttr_legsCheck">
+             <property name="text">
+              <string>Legs</string>
              </property>
             </widget>
            </item>
@@ -852,24 +1011,6 @@
       </widget>
       <widget class="QWidget" name="set_contents">
        <layout class="QFormLayout" name="formLayout_14">
-        <property name="horizontalSpacing">
-         <number>4</number>
-        </property>
-        <property name="verticalSpacing">
-         <number>4</number>
-        </property>
-        <property name="leftMargin">
-         <number>4</number>
-        </property>
-        <property name="topMargin">
-         <number>4</number>
-        </property>
-        <property name="rightMargin">
-         <number>4</number>
-        </property>
-        <property name="bottomMargin">
-         <number>4</number>
-        </property>
         <item row="0" column="0">
          <widget class="QLabel" name="setContent_typeLabel">
           <property name="text">
@@ -884,18 +1025,15 @@
          <widget class="QComboBox" name="setContents_typeCombo"/>
         </item>
         <item row="1" column="0" colspan="2">
-         <widget class="DataWidgetInterface" name="entryInterface">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QLabel" name="setContents_linkLabel">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add and remove entries in the &lt;a href=&quot;/entries&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Entries&lt;/span&gt;&lt;/a&gt; tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
+          <property name="textFormat">
+           <enum>Qt::RichText</enum>
           </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
+          <property name="indent">
+           <number>16</number>
           </property>
          </widget>
         </item>
@@ -1170,15 +1308,14 @@
           </item>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_32">
-          <property name="text">
-           <string>Name:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
+        <item row="1" column="0" colspan="2">
          <widget class="RawJsonTextEditor" name="setName_textEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
@@ -1287,175 +1424,13 @@
       <widget class="QWidget" name="empty"/>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Function:</string>
-      </property>
-      <property name="buddy">
-       <cstring>functionTypeCombo</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="3">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QComboBox" name="functionTypeCombo">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <item>
-       <property name="text">
-        <string>Apply bonus</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Copy NBT</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Copy state</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Enchant randomly </string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Enchant with levels</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Exploration map</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Fill player head</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Limit count</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Looting enchant</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Reference</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Sequence</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set attributes</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set banner pattern</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set contents</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set count</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set damage</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set enchantments</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set instrument</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set loot table</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set lore</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set name</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set NBT</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set potion</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Set stew effect</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Copy name</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Explosion decay</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Furnace smelt</string>
-       </property>
-      </item>
-     </widget>
-    </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="conditions">
+  <widget class="QWidget" name="functions">
    <attribute name="title">
-    <string>Conditions (%1)</string>
+    <string>Functions (%1)</string>
    </attribute>
-   <layout class="QGridLayout" name="gridLayout_6">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -1468,7 +1443,71 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="0" column="0">
+    <item>
+     <widget class="DataWidgetInterface" name="funcInterface">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="entries">
+   <attribute name="title">
+    <string>Entries (%1)</string>
+   </attribute>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item>
+     <widget class="DataWidgetInterface" name="entryInterface">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="conditions">
+   <attribute name="title">
+    <string>Conditions (%1)</string>
+   </attribute>
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <property name="leftMargin">
+     <number>4</number>
+    </property>
+    <property name="topMargin">
+     <number>4</number>
+    </property>
+    <property name="rightMargin">
+     <number>4</number>
+    </property>
+    <property name="bottomMargin">
+     <number>4</number>
+    </property>
+    <item>
      <widget class="DataWidgetInterface" name="conditionsInterface">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>

@@ -37,6 +37,8 @@ private /*slots*/ :
     void setAttr_onAdded();
     void effectStew_onAdded();
     void updateConditionsTab(int size);
+    void updateFunctionsTab(int size);
+    void updateEntriesTab(int size);
 
 private:
     enum Type {

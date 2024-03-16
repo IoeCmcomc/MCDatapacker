@@ -33,6 +33,7 @@ void LootTableCondition::init() {
         static_cast<QStandardItemModel *>(ui->conditionTypeCombo->model())->item(
             15, 0)->setEnabled(false);
     }
+    setTabEnabled(1, false);
 
     connect(ui->conditionTypeCombo,
             qOverload<int>(&QComboBox::currentIndexChanged),

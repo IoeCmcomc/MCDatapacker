@@ -1,6 +1,7 @@
 #include "loottablefunction.h"
 
 #include "loottablecondition.h"
+#include "loottableentry.h"
 #include "ui_loottablefunction.h"
 #include "inventoryitem.h"
 #include "numberproviderdelegate.h"
@@ -21,6 +22,10 @@ LootTableFunction::LootTableFunction(QWidget *parent) :
 
 void LootTableFunction::init() {
     updateConditionsTab(0);
+    updateFunctionsTab(0);
+    updateEntriesTab(0);
+    setTabEnabled(1, false);
+    setTabEnabled(2, false);
 
     if (Game::version() < Game::v1_17) {
         hideComboRow(ui->functionTypeCombo, SetEnchantments);
@@ -50,6 +55,7 @@ void LootTableFunction::init() {
     }
     if (Game::version() < Game::v1_20_2) {
         hideComboRow(ui->functionTypeCombo, Sequence);
+        setTabVisible(1, false);
     }
 
     connect(ui->functionTypeCombo,
@@ -59,6 +65,10 @@ void LootTableFunction::init() {
             &LootTableFunction::onTabChanged);
     connect(ui->conditionsInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTableFunction::updateConditionsTab);
+    connect(ui->funcInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableFunction::updateFunctionsTab);
+    connect(ui->entryInterface, &DataWidgetInterface::entriesCountChanged,
+            this, &LootTableFunction::updateEntriesTab);
 
     m_enchantmentModel.setInfo(QStringLiteral("enchantment"),
                                GameInfoModel::PrependPrefix);
@@ -121,6 +131,10 @@ void LootTableFunction::init() {
     m_functionModel.setDatapackCategory("item_modifiers");
     ui->ref_nameEdit->setCompleter(m_functionModel.createCompleter());
 
+    connect(ui->seq_linkLabel, &QLabel::linkActivated, this, [this](){
+        setCurrentIndex(1);
+    });
+
     ui->setAttr_amountInput->setModes(NumberProvider::Range);
     m_attributeModel.setInfo(QStringLiteral("attribute"),
                              GameInfoModel::PrependPrefix);
@@ -136,6 +150,10 @@ void LootTableFunction::init() {
             this, &LootTableFunction::setAttr_onAdded);
 
     initBannerPatterns();
+
+    connect(ui->setContents_linkLabel, &QLabel::linkActivated, this, [this](){
+        setCurrentIndex(2);
+    });
 
     ui->setEnchant_combo->setModel(&m_enchantmentModel);
     ui->setEnchant_table->appendColumnMapping(QString(), ui->setEnchant_combo);
@@ -951,15 +969,28 @@ void LootTableFunction::onTypeChanged(int index) {
         ui->stackedWidget->setCurrentIndex(maxIndex);
     else
         ui->stackedWidget->setCurrentIndex(index);
-    if ((index == SetContents) && !ui->entryInterface->mainWidget())
-        initEntryInterface();
-    else if ((index == Sequence) && !ui->funcInterface->mainWidget())
-        initFuncInterface();
+    setTabEnabled(1, index == Sequence);
+    setTabEnabled(2, index == SetContents);
 }
 
 void LootTableFunction::onTabChanged(int index) {
-    if ((index == 1) && (!ui->conditionsInterface->mainWidget()))
-        initCondInterface();
+    switch (index) {
+        case 1: {
+            if (!ui->funcInterface->mainWidget())
+                initFuncInterface();
+            break;
+        }
+        case 2: {
+            if (!ui->entryInterface->mainWidget())
+                initEntryInterface();
+            break;
+        }
+        case 3: {
+            if (!ui->conditionsInterface->mainWidget())
+                initCondInterface();
+            break;
+        }
+    }
 }
 
 void LootTableFunction::copyNBT_onAdded() {
@@ -1067,7 +1098,15 @@ void LootTableFunction::effectStew_onAdded() {
 }
 
 void LootTableFunction::updateConditionsTab(int size) {
-    setTabText(1, tr("Conditions (%1)").arg(size));
+    setTabText(3, tr("Conditions (%1)").arg(size));
+}
+
+void LootTableFunction::updateFunctionsTab(int size) {
+    setTabText(1, tr("Functions (%1)").arg(size));
+}
+
+void LootTableFunction::updateEntriesTab(int size) {
+    setTabText(2, tr("Entries (%1)").arg(size));
 }
 
 void LootTableFunction::initBlocksModel() {
@@ -1113,7 +1152,7 @@ void LootTableFunction::initFuncInterface() {
 }
 
 void LootTableFunction::initEntryInterface() {
-    auto *entry = new LootTableFunction();
+    auto *entry = new LootTableEntry();
 
     ui->entryInterface->setupMainWidget(entry);
 }

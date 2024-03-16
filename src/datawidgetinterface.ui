@@ -24,7 +24,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
-    <number>7</number>
+    <number>1</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -60,7 +60,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>85</width>
+        <width>91</width>
         <height>250</height>
        </rect>
       </property>
@@ -146,8 +146,7 @@
          <string>Add new entry after current</string>
         </property>
         <property name="icon">
-         <iconset theme="list-add">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset theme="list-add"/>
         </property>
        </widget>
       </item>
@@ -157,8 +156,7 @@
          <string>Remove current entry</string>
         </property>
         <property name="icon">
-         <iconset theme="list-remove">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset theme="list-remove"/>
         </property>
        </widget>
       </item>
