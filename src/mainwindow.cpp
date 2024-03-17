@@ -467,6 +467,8 @@ void MainWindow::readSettings() {
 }
 
 void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
+    const static int startupFontSize = qApp->font().pointSize();
+
     settings.beginGroup(QStringLiteral("interface"));
 
     Windows::setDarkFrame(this, Windows::isDarkMode());
@@ -477,6 +479,17 @@ void MainWindow::readPrefSettings(QSettings &settings, bool fromDialog) {
     const QString &localeCode =
         settings.value(QStringLiteral("locale"), QString()).toString();
     setLocale(localeCode.isEmpty() ? QLocale::system().name() : localeCode);
+
+    const auto &&fontScale = settings.value(
+        QStringLiteral("fontSizeScale"), QStringLiteral("100"));
+    bool      ok    = false;
+    const int scale = fontScale.toInt(&ok);
+    if (ok && (fromDialog || scale != 100)) {
+        auto &&appFont = qApp->font();
+        appFont.setPointSize(startupFontSize / 100.0 * scale);
+        qApp->setFont(appFont);
+    }
+
     settings.endGroup();
 
     settings.beginGroup(QStringLiteral("game"));

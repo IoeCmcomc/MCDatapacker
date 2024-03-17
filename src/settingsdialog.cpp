@@ -86,6 +86,8 @@ void SettingsDialog::onAccepted() {
     m_settings.setValue("locale", ui->languageCombo->currentData().toString());
     m_settings.setValue("style", ui->themeCombo->currentText());
     m_settings.setValue("darkStyle", ui->darkThemeCombo->currentText());
+    m_settings.setValue("fontSizeScale",
+                        ui->fontScaleCombo->currentText().chopped(1));
     m_settings.endGroup();
 
     m_settings.beginGroup("game");
@@ -163,6 +165,9 @@ void SettingsDialog::initSettings() {
     ui->darkThemeCombo->setCurrentText(
         m_settings.value(QStringLiteral("darkStyle"),
                          QStringLiteral("DarkFusion")).toString());
+    ui->fontScaleCombo->setCurrentText(
+        m_settings.value(QStringLiteral("fontSizeScale"),
+                         QStringLiteral("100")).toString() + QLatin1Char('%'));
     m_settings.endGroup();
 
     m_settings.beginGroup(QStringLiteral("game"));
@@ -173,8 +178,9 @@ void SettingsDialog::initSettings() {
     ui->gameVersionCombo->setCurrentText(
         m_settings.value(QStringLiteral("version"),
                          Game::defaultVersionString).toString());
-    ui->customCmdEdit->setText(m_settings.value(QStringLiteral(
-                                                    "customCommandSyntaxFilePath")).toString());
+    ui->customCmdEdit->setText(
+        m_settings.value(QStringLiteral(
+                             "customCommandSyntaxFilePath")).toString());
     checkCustomCmd();
     m_settings.endGroup();
 
