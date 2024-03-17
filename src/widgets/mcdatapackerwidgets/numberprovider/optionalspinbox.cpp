@@ -14,13 +14,15 @@ QValidator::State OptionalSpinBox::validate(QString &text, int &pos) const {
     if (text == unsetDisplayStr) {
         return QValidator::Acceptable;
     } else {
+        if (text.isEmpty()) return QValidator::Intermediate;
+
         auto state = QDoubleSpinBox::validate(text, pos);
         if (!m_integerOnly) return state;
 
         if (state == QValidator::Invalid) return QValidator::Invalid;
 
         bool ok = false;
-        if ([[maybe_unused]] int _ = text.toInt(&ok); !ok)
+        if ([[maybe_unused]] int64_t _ = text.toLongLong(&ok); !ok)
             return QValidator::Invalid;
 
         return state;
@@ -28,8 +30,9 @@ QValidator::State OptionalSpinBox::validate(QString &text, int &pos) const {
 }
 
 double OptionalSpinBox::valueFromText(const QString &text) const {
-    /*qDebug() << "valueFromText" << text << isUnset << minimum() << maximum(); */
-    if (text == unsetDisplayStr) {
+    // qDebug() << this->objectName() << "valueFromText" << text << m_isUnset <<
+    //     minimum() << maximum();
+    if (text == unsetDisplayStr || text.isEmpty()) {
         m_isUnset = true;
         return qMax(0., minimum());
     } else {
@@ -40,13 +43,14 @@ double OptionalSpinBox::valueFromText(const QString &text) const {
 }
 
 QString OptionalSpinBox::textFromValue(double value) const {
-    // qDebug() << "textFromValue" << value << m_isUnset << minimum() << maximum();
+    // qDebug() << this->objectName() << "textFromValue" << value << m_isUnset <<
+    //     minimum() << maximum();
     if (m_isUnset && (value == qMax(0., minimum())))
         return unsetDisplayStr;
     else {
         m_isUnset = false;
         if (m_integerOnly) {
-            return QString::number((int)value);
+            return QString::number((int64_t)value);
         } else {
             QString &&text = QDoubleSpinBox::textFromValue(value);
             if (int decSepPos = text.indexOf(locale().decimalPoint());
@@ -67,6 +71,7 @@ QString OptionalSpinBox::textFromValue(double value) const {
 }
 
 void OptionalSpinBox::fixup(QString &input) const {
+    // qDebug() << this->objectName() << "fixup" << input;
     if (input.isEmpty())
         input = unsetDisplayStr;
     else

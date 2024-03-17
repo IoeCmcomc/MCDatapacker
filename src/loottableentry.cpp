@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QJsonArray>
 
+
 LootTableEntry::LootTableEntry(QWidget *parent) :
     QTabWidget(parent), ui(new Ui::LootTableEntry),
     m_typeCtrl(nullptr, "type") {
@@ -109,96 +110,6 @@ void LootTableEntry::fromJson(const QJsonObject &root) {
         default:
             break;
     }
-
-    // if (!root.contains("type"))
-    //     return;
-
-    // QString type = root.value(QLatin1String("type")).toString();
-    // Glhp::removePrefix(type, "minecraft:"_QL1);
-
-    // const int index = entryTypes.indexOf(type);
-    // if (index == -1)
-    //     return;
-
-    // if (root.contains(QLatin1String("quality"))) {
-    //     ui->qualitySpin->setValue(root.value(QLatin1String("quality")).toInt());
-    // }
-    // if (root.contains(QLatin1String("weight")))
-    //     ui->weightSpin->setValue(root.value(QLatin1String("weight")).toInt());
-
-    // ui->multiPageWidget->setCurrentIndex(index);
-    // switch (index) {
-    //     case 0: /* Empty */
-    //         break;
-
-    //     case 1: {  /* Item */
-    //         if (root.contains(QLatin1String("name")))
-    //             ui->itemSlot->setItem(InventoryItem(root.value(QLatin1String(
-    //                                                                "name"))
-    //                                                 .toString()));
-    //         break;
-    //     }
-
-    //     case 2: { /* Loot table */
-    //         if (root.contains(QLatin1String("name")))
-    //             ui->tableNameEdit->setText(root.value(QLatin1String(
-    //                                                       "name")).toString());
-    //         break;
-    //     }
-
-    //     case 3: { /*Tag */
-    //         if (root.contains(QLatin1String("name")))
-    //             ui->tagNameEdit->setText(root.value(QLatin1String(
-    //                                                     "name")).toString());
-    //         ui->tagExpandCheck->setupFromJsonObject(root,
-    //                                                 QStringLiteral("expand"));
-    //         break;
-    //     }
-
-
-    //     case 4: { /* Dynamic */
-    //         if (root.contains(QLatin1String("name"))) {
-    //             auto name = root.value(QLatin1String("name")).toString();
-    //             if (name == QLatin1String("minecraft:contents")
-    //                 || name == QLatin1String("minecraft:self")) {
-    //                 ui->dynamicNameEdit->setText(name);
-    //             }
-    //         }
-    //         break;
-    //     }
-
-    //     default: { /* Group */
-    //         if (type == QLatin1String("alternatives")) {
-    //             ui->selectAltRadio->setChecked(true);
-    //         } else if (type == QLatin1String("group")) {
-    //             ui->selectAllRadio->setChecked(true);
-    //         } else if (type == QLatin1String("sequence")) {
-    //             ui->selectAltRadio->setChecked(true);
-    //         } else {
-    //             break;
-    //         }
-
-    //         if (root.contains(QLatin1String("children"))) {
-    //             if (!ui->entriesInterface->mainWidget())
-    //                 initEntryInterface();
-    //             ui->entriesInterface->setJson(
-    //                 root.value(QLatin1String("children")).toArray());
-    //         }
-    //     }
-    // }
-
-    // if (root.contains(QLatin1String("conditions"))) {
-    //     if (!ui->conditionsInterface->mainWidget())
-    //         initCondInterface();
-    //     ui->conditionsInterface->setJson(
-    //         root.value(QLatin1String("conditions")).toArray());
-    // }
-    // if (root.contains(QLatin1String("functions"))) {
-    //     if (!ui->functionsInterface->mainWidget())
-    //         initFuncInterface();
-    //     ui->functionsInterface->setJson(
-    //         root.value(QLatin1String("functions")).toArray());
-    // }
 }
 
 QJsonObject LootTableEntry::toJson() const {
@@ -215,78 +126,10 @@ QJsonObject LootTableEntry::toJson() const {
     }
 
     return root;
-
-    // const int index = ui->multiPageWidget->currentIndex();
-
-    // const QString &&type = QStringLiteral("minecraft:") + entryTypes[index];
-
-    // root.insert("type", type);
-    // root.insert("weight", ui->weightSpin->value());
-    // if (const int quality = ui->qualitySpin->value(); quality != 0)
-    //     root.insert("quality", quality);
-    // if (ui->multiPageWidget->currentIndex())
-    //     switch (index) {
-    //         case 0: /*Empty */
-    //             break;
-
-    //         case 1: { /*Item */
-    //             if (ui->itemSlot->itemCount() == 1)
-    //                 root.insert("name", ui->itemSlot->itemNamespacedID(0));
-    //             break;
-    //         }
-
-    //         case 2: { /*Loot table */
-    //             if (!ui->tableNameEdit->text().isEmpty())
-    //                 root.insert("name", ui->tableNameEdit->text());
-    //             break;
-    //         }
-
-    //         case 3: {/*Tag */
-    //             if (!ui->tagNameEdit->text().isEmpty())
-    //                 root.insert("name", ui->tagNameEdit->text());
-    //             ui->tagExpandCheck->insertToJsonObject(root, "expand");
-    //             break;
-    //         }
-
-    //         case 4: {/* Dynamic */
-    //             if ((ui->dynamicNameEdit->text() ==
-    //                  QLatin1String("minecraft:contents"))
-    //                 || (ui->dynamicNameEdit->text() ==
-    //                     QLatin1String("minecraft:self"))) {
-    //                 root.insert("name", ui->dynamicNameEdit->text());
-    //             }
-    //             break;
-    //         }
-
-    //         case 5: {/* Group */
-    //             if (ui->selectAltRadio->isChecked())
-    //                 root.insert("type", "minecraft:alternatives");
-    //             else if (ui->selectSeqRadio->isChecked())
-    //                 root.insert("type", "minecraft:sequence");
-
-    //             auto &&children = ui->entriesInterface->json();
-    //             if (!children.isEmpty())
-    //                 root.insert("children", children);
-    //             break;
-    //         }
-
-    //         default:
-    //             break;
-    //     }
-
-    // auto &&conditions = ui->conditionsInterface->json();
-    // if (!conditions.isEmpty())
-    //     root.insert("conditions", conditions);
-
-    // auto &&functions = ui->functionsInterface->json();
-    // if (!functions.isEmpty())
-    //     root.insert("functions", functions);
-
-    // return root;
 }
 
 void LootTableEntry::resetAll() {
-    ui->qualitySpin->setValue(0);
+    ui->qualitySpin->unset();
     ui->weightSpin->setValue(0);
     ui->functionsInterface->setJson({});
     ui->conditionsInterface->setJson({});

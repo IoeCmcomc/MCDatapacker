@@ -50,7 +50,7 @@ public:
     int exactValue() const;
     void setExactValue(const double value);
     int minValue() const;
-    void setMinValue(const double value);
+    void setMinValue(const double value, bool setMaxLater = false);
     int maxValue() const;
     void setMaxValue(const double value);
 
@@ -90,7 +90,6 @@ private:
     bool m_integerOnly = true;
 
     void setMenu();
-    void swapMinMax();
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(NumberProvider::Modes)

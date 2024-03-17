@@ -82,13 +82,15 @@ void NumberProvider::fromJson(const QJsonValue &value) {
                 ui->probSpinBox->setValue(obj.value(QStringLiteral("p")).toInt());
             ui->stackedWidget->setCurrentIndex(2);
         } else {
+            const bool hasMax = obj.contains(QStringLiteral("max"));
             if (obj.contains(QStringLiteral("min"))) {
                 const auto min = obj[QStringLiteral("min")];
-                setMinValue(m_integerOnly ? min.toInt() : min.toDouble());
+                setMinValue(m_integerOnly ? min.toInt() : min.toDouble(),
+                            hasMax);
             } else {
                 ui->minSpinBox->unset();
             }
-            if (obj.contains(QStringLiteral("max"))) {
+            if (hasMax) {
                 const auto max = obj[QStringLiteral("max")];
                 setMaxValue(m_integerOnly ? max.toInt() : max.toDouble());
             } else {
@@ -205,10 +207,12 @@ int NumberProvider::minValue() const {
     return ui->minSpinBox->value();
 }
 
-void NumberProvider::setMinValue(const double value) {
+void NumberProvider::setMinValue(const double value, bool setMaxLater) {
     ui->minSpinBox->setValue(value);
     ui->stackedWidget->setCurrentIndex(1);
-    onMinMaxEdited();
+    if (!setMaxLater) {
+        onMinMaxEdited();
+    }
 }
 
 int NumberProvider::maxValue() const {

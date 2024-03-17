@@ -93,7 +93,7 @@ void DataWidgetControllerSpinBox::putValueTo(QJsonObject &obj,
 
 
 bool DataWidgetControllerOptionalSpinBox::hasAcceptableValue() const {
-    return m_widget->isEnabled() && !m_widget->isUnset();
+    return m_widget->isEnabled();
 }
 
 void DataWidgetControllerOptionalSpinBox::setValueFrom(const QJsonObject &obj,
@@ -105,7 +105,9 @@ void DataWidgetControllerOptionalSpinBox::setValueFrom(const QJsonObject &obj,
 
 void DataWidgetControllerOptionalSpinBox::putValueTo(QJsonObject &obj,
                                                      const QString &key) const {
-    obj[key] = m_widget->value();
+    if (!m_widget->isUnset()) {
+        obj[key] = m_widget->value();
+    }
 }
 
 

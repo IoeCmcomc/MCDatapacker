@@ -429,11 +429,8 @@ QJsonObject LootTableFunction::toJson() const {
         }
 
         case SetPotion: {
-            if (ui->setPotion_potionCombo->currentIndex() != 0) {
-                root.insert("potion",
-                            ui->setPotion_potionCombo->currentData(
-                                Qt::UserRole + 1).toString());
-            }
+            root.insert("id", ui->setPotion_potionCombo->currentData(
+                            Qt::UserRole + 1).toString());
             break;
         }
 
@@ -577,6 +574,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
             ui->copyState_blockSlot->setItem(root.value("block").toString());
 
             if (root.contains("properties")) {
+                ui->copyState_list->clear();
                 QJsonArray properties = root.value("properties").toArray();
                 for (auto propRef : properties) {
                     ui->copyState_list->addItem(propRef.toString());
@@ -587,6 +585,7 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
 
         case EnchantRandomly: { /* Enchant randomly */
             if (root.contains("enchantments")) {
+                ui->enchantRand_list->clear();
                 QJsonArray enchantments = root.value("enchantments").toArray();
                 for (auto enchantmentRef : enchantments) {
                     auto enchantmentId  = enchantmentRef.toString();
@@ -865,10 +864,6 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
                     entityTargets.indexOf(root.value("entity").toString()));
 
             if (root.contains("name"))
-/*
-              ui->setName_textEdit->getTextEdit()->setPlainText(
-                  root.value("name").toString());
- */
                 ui->setName_textEdit->fromJson(root.value("name"));
             break;
         }
@@ -882,12 +877,12 @@ void LootTableFunction::fromJson(const QJsonObject &root) {
         }
 
         case SetPotion: {
-            if (!root.contains("potion"))
+            if (!root.contains("id"))
                 return;
 
             if (Game::version() >= Game::v1_18) {
                 setComboValueFrom(ui->setPotion_potionCombo,
-                                  root["potion"].toString());
+                                  root["id"].toString());
             }
             break;
         }
@@ -954,6 +949,8 @@ void LootTableFunction::changeEvent(QEvent *event) {
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
         updateConditionsTab(ui->conditionsInterface->entriesCount());
+        updateFunctionsTab(ui->funcInterface->entriesCount());
+        updateEntriesTab(ui->entryInterface->entriesCount());
     }
 }
 

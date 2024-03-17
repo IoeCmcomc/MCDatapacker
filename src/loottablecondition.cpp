@@ -753,6 +753,7 @@ void LootTableCondition::changeEvent(QEvent *event) {
     QTabWidget::changeEvent(event);
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
+        updateConditionsTab(ui->nested_dataInterface->entriesCount());
     }
 }
 
