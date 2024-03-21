@@ -76,15 +76,12 @@
             </spacer>
            </item>
            <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string/>
-             </property>
+            <widget class="QLabel" name="grayIconLabel">
              <property name="pixmap">
               <pixmap resource="../resource/app/app.qrc">:/icon/favicon_grayscale.png</pixmap>
              </property>
-             <property name="textInteractionFlags">
-              <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
              </property>
             </widget>
            </item>

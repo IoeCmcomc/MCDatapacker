@@ -197,6 +197,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>searchLineEdit</tabstop>
+  <tabstop>filterByBlockCheck</tabstop>
+  <tabstop>filterByItemCheck</tabstop>
+  <tabstop>listView</tabstop>
+  <tabstop>obtainableBlocksCheck</tabstop>
+  <tabstop>unobtainableBlocksCheck</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

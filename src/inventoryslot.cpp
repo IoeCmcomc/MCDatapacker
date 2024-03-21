@@ -7,17 +7,15 @@
 #include "codefile.h"
 
 #include <QDebug>
-#include <QLabel>
 #include <QMouseEvent>
 #include <QMimeData>
 #include <QDrag>
-#include <QPainter>
-#include <QGridLayout>
 #include <QApplication>
 #include <QMenu>
 #include <QAction>
 #include <QVariant>
-
+#include <QStylePainter>
+#include <QStyleOptionFocusRect>
 
 static char _initTimer(QTimer &timer) {
     timer.setTimerType(Qt::VeryCoarseTimer);
@@ -38,6 +36,7 @@ InventorySlot::InventorySlot(QWidget *parent) : QFrame(parent) {
     setBackground();
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     setLineWidth(2);
+    setFocusPolicy(Qt::TabFocus);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InventorySlot::customContextMenuRequested, this,
@@ -393,6 +392,29 @@ void InventorySlot::mouseReleaseEvent(QMouseEvent *event) {
     update();
 }
 
+void InventorySlot::keyPressEvent(QKeyEvent *event) {
+    switch (event->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Space:
+        case Qt::Key_Return: {
+            BlockItemSelectorDialog dialog(this, m_selectCategory);
+            dialog.setAllowMultiple(getAcceptMultiple());
+            if (dialog.exec()) {
+                setItems(dialog.getSelectedItems());
+            }
+            event->accept();
+            break;
+        }
+        case Qt::Key_Delete: {
+            clearItems();
+            event->accept();
+            break;
+        }
+        default:
+            QFrame::keyPressEvent(event);
+    }
+}
+
 void InventorySlot::paintEvent(QPaintEvent *event) {
     QFrame::paintEvent(event);
 
@@ -427,6 +449,15 @@ void InventorySlot::paintEvent(QPaintEvent *event) {
             }
         }
         painter.end();
+        if (hasFocus()) {
+            QStylePainter painter(this);
+
+            QStyleOptionFocusRect option;
+            option.initFrom(this);
+            option.backgroundColor = palette().color(QPalette::Window);
+
+            painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
+        }
     }
 }
 

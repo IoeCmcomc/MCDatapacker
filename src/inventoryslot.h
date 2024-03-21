@@ -4,7 +4,6 @@
 #include "inventoryitem.h"
 
 #include <QFrame>
-#include <QLabel>
 #include <QTimer>
 
 class InventorySlot : public QFrame
@@ -28,7 +27,7 @@ public:
 
     explicit InventorySlot(QWidget *parent = nullptr);
 
-    QSize sizeHint() const override;
+    QSize sizeHint() const final;
 
     void setItems(const QVector<InventoryItem> &items);
     void setItem(const InventoryItem &item);
@@ -72,14 +71,15 @@ signals:
     void itemChanged();
 
 protected:
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dragMoveEvent(QDragMoveEvent *event) override;
-    void dragLeaveEvent(QDragLeaveEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void paintEvent(QPaintEvent *event) override;
+    void dragEnterEvent(QDragEnterEvent *event) final;
+    void dragMoveEvent(QDragMoveEvent *event) final;
+    void dragLeaveEvent(QDragLeaveEvent *event) final;
+    void dropEvent(QDropEvent *event) final;
+    void mousePressEvent(QMouseEvent *event) final;
+    void mouseMoveEvent(QMouseEvent *event) final;
+    void mouseReleaseEvent(QMouseEvent *event) final;
+    void keyPressEvent(QKeyEvent *event) final;
+    void paintEvent(QPaintEvent *event) final;
 
 private slots:
     void onCustomContextMenu(const QPoint &point);

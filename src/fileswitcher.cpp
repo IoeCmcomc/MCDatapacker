@@ -75,7 +75,7 @@ void FileSwitcher::focusOutEvent(QFocusEvent *) {
 }
 
 void FileSwitcher::keyReleaseEvent(QKeyEvent *event) {
-    QListWidget::keyPressEvent(event);
+    QListWidget::keyReleaseEvent(event);
     if (!event->modifiers().testFlag(Qt::ControlModifier)) {
         deleteLater();
     }
