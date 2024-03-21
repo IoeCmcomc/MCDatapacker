@@ -15,7 +15,7 @@
 <context>
     <name>SettingsDialog</name>
     <message numerus="yes">
-        <location filename="../src/settingsdialog.cpp" line="132"/>
+        <location filename="../src/settingsdialog.cpp" line="137"/>
         <source>&lt;b style=&quot;color:green&quot;&gt;Valid&lt;/b&gt;. %n command(s) detected.</source>
         <translation>
             <numerusform>&lt;b style=&quot;color:green&quot;&gt;Valid&lt;/b&gt;. %n command detected.</numerusform>
@@ -33,7 +33,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/statusbar.cpp" line="97"/>
+        <location filename="../src/statusbar.cpp" line="93"/>
         <source>%Ln problem(s)</source>
         <translation>
             <numerusform>%Ln problem</numerusform>
