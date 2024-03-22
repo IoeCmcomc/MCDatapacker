@@ -677,7 +677,8 @@ PackMetaInfo MainWindow::readPackMcmeta(const QString &filepath,
         errorMsg = file.errorString();
         return ret;
     } else {
-        QTextStream     in(&file);
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
         const QString &&json_string = in.readAll();
         file.close();
 

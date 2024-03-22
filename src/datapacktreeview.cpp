@@ -226,10 +226,13 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                                      tr("Flat world generator preset"), jsonExt,
                                      QLatin1String(
                                          "worldgen/flat_level_generator_preset"));
-                    addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
+                    addNewFileAction(worldMenu, tr("Structure feature"),
+                                     jsonExt,
                                      QLatin1String("worldgen/structure"));
                 } else if (Game::version() >= Game::v1_17) {
-                    addNewFileAction(worldMenu, tr("Structure feature"), jsonExt,
+                    addNewFileAction(worldMenu,
+                                     tr("Structure feature"),
+                                     jsonExt,
                                      QLatin1String(
                                          "worldgen/configured_structure_feature"));
                 }
@@ -514,27 +517,31 @@ void DatapackTreeView::contextMenuModifyTagFile(const QString &filepath,
         }
     }
 
-    QFile file(filepath);
-    if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        QJsonDocument doc  = QJsonDocument::fromJson(file.readAll());
-        QJsonObject   root = doc.object();
-        if (!root.isEmpty()) {
-            if (root.contains("values") && root.value("values").isArray()) {
-                auto values = root.value("values").toVariant().toStringList();
-                if ((!values.contains(str)) && added) {
-                    values.push_back(str);
-                } else if (values.contains(str) && (!added)) {
-                    values.removeAll(str);
-                }
-                root["values"] = QJsonArray::fromStringList(values);
-                file.resize(0);
+    QFile       file(filepath);
+    QJsonObject root;
+    if (file.open(QIODevice::ReadOnly)) {
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        root = doc.object();
+        file.close();
+    }
+    if (!root.isEmpty()) {
+        if (root.contains("values") && root.value("values").isArray()) {
+            auto values = root.value("values").toVariant().toStringList();
+            if ((!values.contains(str)) && added) {
+                values.push_back(str);
+            } else if (values.contains(str) && (!added)) {
+                values.removeAll(str);
+            }
+            root["values"] = QJsonArray::fromStringList(values);
+
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QTextStream out(&file);
                 out.setCodec("UTF-8");
                 out << QJsonDocument(root).toJson();
             }
+            file.close();
         }
     }
-    file.close();
 }
 
 void DatapackTreeView::contextMenuOnRename() {

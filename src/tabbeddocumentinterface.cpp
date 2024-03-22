@@ -584,7 +584,8 @@ QString TabbedDocumentInterface::readTextFile(const QString &path, bool &ok) {
     QFile   file(path);
     QString content;
 
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // Removing QFile::Text enum allows '\r' to be recognized as a line sepatator
+    if (!file.open(QFile::ReadOnly)) {
         QMessageBox::information(this, tr("Loading text file error"),
                                  tr("Cannot read file %1:\n%2.")
                                  .arg(QDir::toNativeSeparators(path),
