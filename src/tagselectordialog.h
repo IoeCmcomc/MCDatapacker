@@ -1,7 +1,6 @@
 #ifndef TAGSELECTORDIALOG_H
 #define TAGSELECTORDIALOG_H
 
-#include "mainwindow.h"
 #include "codefile.h"
 
 #include <QDialog>
@@ -13,8 +12,7 @@ namespace Ui {
     class TagSelectorDialog;
 }
 
-class TagSelectorDialog : public QDialog
-{
+class TagSelectorDialog : public QDialog {
     Q_OBJECT
 
 public:
@@ -31,11 +29,11 @@ protected slots:
 private:
     QSortFilterProxyModel filterModel;
     QStandardItemModel model;
-    QVariantMap MCRTagInfo;
+    QVariantMap m_tagInfo;
     Ui::TagSelectorDialog *ui;
     QPushButton *selectButton = nullptr;
 
-    void setupTagTreeView(CodeFile::FileType type);
+    void setupTagView(CodeFile::FileType type);
     QString getInternalSelectedID();
 };
 

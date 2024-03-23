@@ -2,6 +2,7 @@
 #define LOOTTABLEENTRY_H
 
 #include "datawidgetcontroller.h"
+#include "gameinfomodel.h"
 
 #include <QTabWidget>
 #include <QHBoxLayout>
@@ -34,6 +35,8 @@ private /*slots*/ :
     void updateConditionsTab(int size);
 
 private:
+    GameInfoModel m_lootTableModel;
+    GameInfoModel m_itemTagModel;
     DataWidgetControllerRecord m_controller;
     DataWidgetControllerMultiPageWidget m_typeCtrl;
     Ui::LootTableEntry *ui;

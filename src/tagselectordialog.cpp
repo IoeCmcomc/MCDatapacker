@@ -11,13 +11,12 @@
 
 TagSelectorDialog::TagSelectorDialog(QWidget *parent,
                                      CodeFile::FileType type) :
-    QDialog(parent),
-    ui(new Ui::TagSelectorDialog) {
+    QDialog(parent), ui(new Ui::TagSelectorDialog) {
     ui->setupUi(this);
 
     filterModel.setParent(ui->tagListView);
     model.setParent(this);
-    setupTagTreeView(type);
+    setupTagView(type);
     connect(ui->tagFilterBox, &QLineEdit::textChanged,
             this, [this](const QString &input) {
         filterModel.setFilterRegularExpression(input);
@@ -25,13 +24,11 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
 
     connect(ui->tagListView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
-            this,
-            &TagSelectorDialog::checkOK);
+            this, &TagSelectorDialog::checkOK);
 
     connect(ui->tagListView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
-            this,
-            &TagSelectorDialog::showDetails);
+            this, &TagSelectorDialog::showDetails);
 
     selectButton = new QPushButton(tr("Select"), this);
     ui->buttonBox->removeButton(ui->buttonBox->button(QDialogButtonBox::Ok));
@@ -46,7 +43,7 @@ TagSelectorDialog::~TagSelectorDialog() {
     delete ui;
 }
 
-void TagSelectorDialog::setupTagTreeView(
+void TagSelectorDialog::setupTagView(
     CodeFile::FileType type = CodeFile::ItemTag) {
     model.setParent(ui->tagListView);
     filterModel.setSourceModel(&model);
@@ -54,7 +51,7 @@ void TagSelectorDialog::setupTagTreeView(
     filterModel.setFilterRole(Qt::DisplayRole);
     ui->tagListView->setModel(&filterModel);
 
-    QString tagStr = QStringLiteral("tag/");
+    QString &&tagStr = QStringLiteral("tag/");
     switch (type) {
         case CodeFile::BlockTag:
             tagStr += QStringLiteral("block");
@@ -80,22 +77,22 @@ void TagSelectorDialog::setupTagTreeView(
             break;
     }
 
-    auto tagStrSplited = tagStr.split('/');
+    auto &&tagStrSplited = tagStr.split('/');
     std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
                    tagStrSplited.begin(), [](const QString &str) -> QString {
         return str + 's';
     });
-    auto tagDir = tagStrSplited.join('/');
+    const QString &tagDir = tagStrSplited.join('/');
 
-    auto fileIDList = Glhp::fileIdList(QDir::currentPath(), tagDir);
+    const auto &fileIDList = Glhp::fileIdList(QDir::currentPath(), tagDir);
     for (const auto &id : fileIDList) {
         model.appendRow(new QStandardItem(id));
     }
 
-    MCRTagInfo = Game::getInfo(tagStr);
+    m_tagInfo = Game::getInfo(tagStr);
 
-    auto tagIter = MCRTagInfo.constBegin();
-    while ((tagIter != MCRTagInfo.constEnd())) {
+    auto tagIter = m_tagInfo.constBegin();
+    while ((tagIter != m_tagInfo.constEnd())) {
         auto *item = new QStandardItem(
             QStringLiteral("minecraft:") + tagIter.key());
         model.appendRow(item);
@@ -104,21 +101,18 @@ void TagSelectorDialog::setupTagTreeView(
 }
 
 QString TagSelectorDialog::getInternalSelectedID() {
-    auto indexes = ui->tagListView->selectionModel()->selectedIndexes();
+    const auto indexes = ui->tagListView->selectionModel()->selectedIndexes();
 
     if (indexes.isEmpty()) return QString();
 
-    QStandardItem *item =
+    const QStandardItem *item =
         model.itemFromIndex(filterModel.mapToSource(indexes[0]));
     auto id = item->text();
     return id;
 }
 
 QString TagSelectorDialog::getSelectedID() {
-    const auto &&internalID = getInternalSelectedID();
-    const auto  &id         = internalID;
-
-    return '#' + id;
+    return '#' + getInternalSelectedID();
 }
 
 void TagSelectorDialog::checkOK() {
@@ -126,12 +120,12 @@ void TagSelectorDialog::checkOK() {
 }
 
 void TagSelectorDialog::showDetails() {
-    auto id = getInternalSelectedID();
+    QString &&id = getInternalSelectedID();
 
     if (!id.isEmpty()) {
         Glhp::removePrefix(id, "minecraft:"_QL1);
-        if (MCRTagInfo.contains(id)) {
-            const auto details = MCRTagInfo[id].toString();
+        if (m_tagInfo.contains(id)) {
+            const auto details = m_tagInfo[id].toString();
             ui->tagDetailsLabel->setText(details);
             return;
         }

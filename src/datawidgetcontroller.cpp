@@ -324,7 +324,7 @@ int StringIndexMap::indexOf(const QString &str) const {
 }
 
 QString StringIndexMap::stringOf(const int index) const {
-    return (index > 0 && index < m_indexToString.size())
+    return (index >= 0 && index < m_indexToString.size())
                ? m_indexToString.at(index) : QString();
 }
 

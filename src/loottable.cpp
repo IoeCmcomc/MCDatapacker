@@ -73,9 +73,9 @@ void LootTable::fromJson(QJsonObject &&root) {
 QJsonObject LootTable::toJson() const {
     QJsonObject root;
 
-    if (ui->lootTableTypeCombo->currentIndex() == 0) {
-        return {};
-    }
+    // if (ui->lootTableTypeCombo->currentIndex() == 0) {
+    //     return {};
+    // }
     const QString &&type = QStringLiteral("minecraft:") +
                            types[ui->lootTableTypeCombo->currentIndex()];
 

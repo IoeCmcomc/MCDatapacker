@@ -11,8 +11,8 @@
 
 
 LootTableEntry::LootTableEntry(QWidget *parent) :
-    QTabWidget(parent), ui(new Ui::LootTableEntry),
-    m_typeCtrl(nullptr, "type") {
+    QTabWidget(parent), m_typeCtrl(nullptr, "type"),
+    ui(new Ui::LootTableEntry) {
     ui->setupUi(this);
     setTabEnabled(ENTRIES_TAB, false);
 
@@ -32,6 +32,20 @@ LootTableEntry::LootTableEntry(QWidget *parent) :
 
     ui->itemSlot->setAcceptMultiple(false);
     ui->itemSlot->setAcceptTag(false);
+
+    m_lootTableModel.setRegistry(QStringLiteral("loot_table"),
+                                 GameInfoModel::PrependPrefix |
+                                 GameInfoModel::DontShowIcons);
+    m_lootTableModel.setDatapackCategory(QStringLiteral("loot_tables"), true);
+    ui->tableNameEdit->setCompleter(m_lootTableModel.createCompleter());
+
+    m_itemTagModel.setInfo(QStringLiteral(
+                               "tag/item"),
+                           GameInfoModel::PrependPrefix |
+                           GameInfoModel::DontShowIcons |
+                           GameInfoModel::ForceKeyAsName);
+    m_itemTagModel.setDatapackCategory(QStringLiteral("tags/items"), true);
+    ui->tagNameEdit->setCompleter(m_itemTagModel.createCompleter());
 
     m_typeCtrl.setWidget(ui->multiPageWidget);
     m_controller.addMapping(QStringLiteral("functions"),
