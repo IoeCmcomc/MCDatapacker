@@ -1,8 +1,9 @@
 ![GitHub](https://img.shields.io/github/license/IoeCmcomc/MCDatapacker)
 ![GitHub repo size](https://img.shields.io/github/repo-size/IoeCmcomc/MCDatapacker)
-![Lines of code](https://img.shields.io/tokei/lines/github/IoeCmcomc/MCDatapacker)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FIoeCmcomc%2FMCDatapacker&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 ![GitHub all releases](https://img.shields.io/github/downloads/IoeCmcomc/MCDatapacker/total)
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/IoeCmcomc/MCDatapacker.svg)](http://isitmaintained.com/project/IoeCmcomc/MCDatapacker "Percentage of issues still open")
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/IoeCmcomc/MCDatapacker.svg)](http://isitmaintained.com/project/IoeCmcomc/MCDatapacker "Average time to resolve an issue")
 
 <br />
 <p align="center">
@@ -38,7 +39,7 @@ MCDatapacker provides a unified interface for making and editing datapacks. It a
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Advancement%20viewer.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Loot%20table%20editor.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/New%20file%20menus.png" width="30%"></img>
-<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Predicate%20location%20dialog%20in%20the%20predicate%20editor.png" width="30%"></img>
+<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Predicate%20editor.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Recipe%20editor.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Startup%20screen.png" width="30%"></img>
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Syntax%20checking%20for%20function%20files.png" width="30%"></img>
@@ -67,7 +68,7 @@ Sometimes, when you run the executable, a SmartScreen warning saying that "Windo
 Download the .AppImage file, make it executable and run it.
 
 ## Contributing
-To report issues and suggest features or enhancements, please go to [Issues](https://github.com/IoeCmcomc/MCDatapacker/issues) page. For questions and suggestions, the [Discussion](https://github.com/IoeCmcomc/MCDatapacker/discussions) page is the right place. If you don't have a Github account, you can also reply on [this Planet Minecraft page](https://www.planetminecraft.com/mod/program-mcdatapacker-a-datapack-editor/).
+To report issues and suggest features or enhancements, please go to [Issues](https://github.com/IoeCmcomc/MCDatapacker/issues) page. For questions and general suggestions, the [Discussion](https://github.com/IoeCmcomc/MCDatapacker/discussions) page is the right place. If you don't have a Github account, you can also reply on [this Planet Minecraft page](https://www.planetminecraft.com/mod/program-mcdatapacker-a-datapack-editor/).
 
 If you prefer to ask anonymously, you can fill in [this form](https://forms.gle/RbWePVvVNtYLhpvx8) instead.
 
