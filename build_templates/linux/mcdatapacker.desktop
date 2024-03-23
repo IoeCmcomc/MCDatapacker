@@ -8,4 +8,4 @@ Name=MCDatapacker
 StartupNotify=true
 Terminal=false
 Type=Application
-X-AppImage-Version=0.9.0
+X-AppImage-Version=0.10.0

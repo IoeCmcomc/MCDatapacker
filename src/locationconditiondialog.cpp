@@ -154,11 +154,13 @@ void LocationConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("dimension")))
         setComboValueFrom(ui->dimensionCombo,
                           value[QStringLiteral("dimension")]);
-    if (value.contains(QStringLiteral("feature"))) {
-        if (Game::version() >= Game::v1_19) {
+    if (Game::version() >= Game::v1_19) {
+        if (value.contains(QStringLiteral("structure"))) {
             setComboValueFrom(ui->featureCombo,
                               value[QStringLiteral("structure")]);
-        } else {
+        }
+    } else {
+        if (value.contains(QStringLiteral("feature"))) {
             setComboValueFrom(ui->featureCombo,
                               value[QStringLiteral("feature")]);
         }

@@ -8,7 +8,7 @@
 <p align="center">
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png" width="150">
   <p align="center">
-    <b>MCDatapacker is a Minecraft datapack creator and editor for Minecraft 1.15 – 1.20.2.</b>
+    <b>MCDatapacker is a Minecraft datapack creator and editor for Minecraft 1.15 – 1.20.4.</b>
   </p>
 </p>
 
@@ -17,7 +17,7 @@
 MCDatapacker provides a unified interface for making and editing datapacks. It allows you to create new datapacks, open existing datapacks, manage files, and edit them quickly and conveniently.
 
 ## Features
-- Create and open any datapacks from 1.15 to 1.20.2;
+- Create and open any datapacks from 1.15 to 1.20.4;
 - Add, rename, and delete files via the left-side tree view;
 - Multi-tab interface;
 - Code editor with syntax highlighting, error checking for function and JSON files, smart code completion for function files;
@@ -52,7 +52,7 @@ MCDatapacker provides a unified interface for making and editing datapacks. It a
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Raw%20JSON%20text%20editor.png" width="30%"></img>
 
 ## Download
-The program currently supports 1.15 - 1.20.2 data packs, and it run on Windows (tested on Windows 7 and Windows 11) and Linux (tested on Ubuntu 20.04.5).
+The program currently supports 1.15 - 1.20.4 data packs, and it run on Windows (tested on Windows 7 and Windows 11) and Linux (tested on Ubuntu 20.04.5).
 
 Warning: This program may contains errors. Use it with your own risk.
 
