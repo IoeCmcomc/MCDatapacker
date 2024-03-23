@@ -218,8 +218,9 @@ void GameInfoModel::loadData() {
         m_data.clear();
         m_dataIds.clear();
     } else if (m_loadFrom == GameInfoModel::Info) {
-        m_data    = Game::getInfo(m_key);
-        m_dataIds = m_data.keys().toVector();
+        m_data = Game::getInfo(m_key);
+        const auto &&keys = m_data.keys();
+        m_dataIds = keys.toVector();
     } else {
         auto &&items = Game::getRegistry(m_key);
         m_dataIds = items;

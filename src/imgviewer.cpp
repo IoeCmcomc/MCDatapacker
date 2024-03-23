@@ -130,68 +130,6 @@ void ImgViewer::rotateView(const int nVal) {
     }
 }
 
-bool ImgViewer::saveViewToDisk(QString &strError) {
-    Q_UNUSED(strError)
-/*
-      if (m_image.isNull()) {
-          strError = QObject::tr("Save failed.");
-          return false;
-      }
- */
-
-/*
-      / * save a copy * /
-      QImage imageCopy = m_image;
- */
-
-/*
-      / * Output file dialog * /
-      QString fileFormat  = getImageFormat(m_fileName);
-      QString strFilePath = QFileDialog::getSaveFileName(
-          this,
-          tr("Save File"),
-          QDir::homePath(),
-          fileFormat);
- */
-
-
-/*
-      / * If Cancel is pressed, getSaveFileName() returns a null string. * /
-      if (strFilePath == "") {
-          strError = QObject::tr("");
-          return false;
-      }
- */
-
-/*
-      / * ensure output path has proper extension * /
-      if (!strFilePath.endsWith(fileFormat))
-          strFilePath += "." + fileFormat;
- */
-
-/*
-      / * save image in modified state * /
-      if (isModified()) {
-          QTransform t;
-          t.rotate(m_rotateAngle);
-          imageCopy = imageCopy.transformed(t, Qt::SmoothTransformation);
-      }
- */
-
-/*
-      / *
-         quality factor (-1 default, 100 max)
-         note: -1 is about 4 times smaller than original, 100 is larger than original
- * /
-      if (!imageCopy.save(strFilePath, fileFormat.toLocal8Bit().constData(),
-                          100)) {
-          strError = QObject::tr("Save failed.");
-          return false;
-      }
- */
-    return true;
-}
-
 bool ImgViewer::setImage(const QString &path) {
     QImage image(path);
 

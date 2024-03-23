@@ -73,7 +73,7 @@ public:
 
         ArgPtr getNode() const;
         template <typename T>
-        typename std::enable_if_t<std::is_assignable_v<ArgPtr, T> >
+        typename std::enable_if_t<std::is_assignable_v<ArgPtr, T>, void>
         setNode(T &&node) {
             m_isValid = node->isValid();
             m_ptr     = std::forward<T>(node);

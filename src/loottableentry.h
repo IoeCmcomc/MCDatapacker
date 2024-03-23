@@ -35,8 +35,8 @@ private /*slots*/ :
 
 private:
     DataWidgetControllerRecord m_controller;
-    Ui::LootTableEntry *ui;
     DataWidgetControllerMultiPageWidget m_typeCtrl;
+    Ui::LootTableEntry *ui;
     const QStringList entryTypes =
     { "empty", "item", "loot_table", "tag", "dynamic" };
 

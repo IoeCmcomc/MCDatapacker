@@ -27,7 +27,6 @@ public:
     void fitWindow();
     void originalSize();
     void rotateView(const int nVal);
-    bool saveViewToDisk(QString &strError);
     inline bool isModified() {
         return m_rotateAngle != 0;
     }

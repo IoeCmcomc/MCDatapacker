@@ -8,7 +8,7 @@ namespace Command {
         return m_repr;
     }
 
-    void ReprPrinter::reprResourceLocation(ResourceLocationNode *node) {
+    void ReprPrinter::reprResourceLocation(ResourceLocationNode const *node) {
         m_repr += '(';
 
         if (node->isTag())
@@ -28,7 +28,7 @@ namespace Command {
         m_repr += ')';
     }
 
-    void ReprPrinter::reprEntityNode(EntityNode *node) {
+    void ReprPrinter::reprEntityNode(EntityNode const *node) {
         m_repr += '[';
         if (node->singleOnly() && node->playerOnly()) {
             m_repr += "single, player";

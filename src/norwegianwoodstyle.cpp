@@ -234,7 +234,7 @@ void NorwegianWoodStyle::drawPrimitive(PrimitiveElement element,
             QPen bottomPen(semiTransparentBlack, penWidth);
 
             if (option->state & (State_Sunken | State_On))
-                qSwap(topPen, bottomPen);
+                std::swap(topPen, bottomPen);
 //! [25]
 
 //! [26]
@@ -244,8 +244,8 @@ void NorwegianWoodStyle::drawPrimitive(PrimitiveElement element,
             int x4 = x + width;
 
             if (option->direction == Qt::RightToLeft) {
-                qSwap(x1, x4);
-                qSwap(x2, x3);
+                std::swap(x1, x4);
+                std::swap(x2, x3);
             }
 
             QPolygon topHalf;

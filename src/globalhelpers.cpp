@@ -152,42 +152,61 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
 }
 
 QIcon Glhp::fileTypeToIcon(const CodeFile::FileType type) {
+    using IconCache = QMap<CodeFile::FileType, QIcon>;
+    static IconCache cache;
+
+    auto it = cache.constFind(type);
+    if (it != cache.cend()) {
+        return it.value();
+    }
+
+    QIcon icon;
     switch (type) {
-        case CodeFile::Function:
-            return QIcon(QStringLiteral(":/file-mcfunction"));
-
-        case CodeFile::Structure:
-            return QIcon(QStringLiteral(":/file-nbt"));
-
-        case CodeFile::Meta:
-            return QIcon(QStringLiteral(":/file-mcmeta"));
-
-        case CodeFile::McBuild:
-            return QIcon(QStringLiteral(":/file-mc"));
-
-        case CodeFile::McBuildMacro:
-            return QIcon(QStringLiteral(":/file-mcm"));
-
-        case CodeFile::Jmc:
-            return QIcon(QStringLiteral(":/file-jmc"));
-
-        case CodeFile::JmcHeader:
-            return QIcon(QStringLiteral(":/file-hjmc"));
-
-        case CodeFile::JmcCert:
-            return QIcon(QStringLiteral(":/file-jmc.txt"));
-
-        case CodeFile::TridentCode:
-            return QIcon(QStringLiteral(":/file-tdn"));
-
+        case CodeFile::Function: {
+            icon.addPixmap(QStringLiteral(":/file-mcfunction"));
+            break;
+        }
+        case CodeFile::Structure: {
+            icon.addPixmap(QStringLiteral(":/file-nbt"));
+            break;
+        }        case CodeFile::Meta: {
+            icon.addPixmap(QStringLiteral(":/file-mcmeta"));
+            break;
+        }
+        case CodeFile::McBuild: {
+            icon.addPixmap(QStringLiteral(":/file-mc"));
+            break;
+        }
+        case CodeFile::McBuildMacro: {
+            icon.addPixmap(QStringLiteral(":/file-mcm"));
+            break;
+        }
+        case CodeFile::Jmc: {
+            icon.addPixmap(QStringLiteral(":/file-jmc"));
+            break;
+        }
+        case CodeFile::JmcHeader: {
+            icon.addPixmap(QStringLiteral(":/file-hjmc"));
+            break;
+        }
+        case CodeFile::JmcCert: {
+            icon.addPixmap(QStringLiteral(":/file-jmc.txt"));
+            break;
+        }
+        case CodeFile::TridentCode: {
+            icon.addPixmap(QStringLiteral(":/file-tdn"));
+            break;
+        }
         default: {
             if ((type >= CodeFile::JsonText) && (type < CodeFile::JsonText_end))
-                return QIcon(QStringLiteral(":/file-json"));
+                icon.addPixmap(QStringLiteral(":/file-json"));
 
             break;
         }
     }
-    return QIcon();
+
+    cache.insert(it, type, icon);
+    return icon;
 }
 
 bool Glhp::isPathRelativeTo(const QString &dirpath, QStringView path,

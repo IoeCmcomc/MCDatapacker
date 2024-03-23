@@ -597,15 +597,13 @@ void InventorySlot::startDrag([[maybe_unused]] QMouseEvent *event) {
         this->hideItem();
     }
 
-    QVector<InventoryItem> before = this->items;
+    QVector<InventoryItem> before = items;
 
     int dragAction = drag->exec(
-        Qt::CopyAction | Qt::MoveAction | Qt::IgnoreAction,
-        Qt::MoveAction);
+        Qt::CopyAction | Qt::MoveAction | Qt::IgnoreAction);
     isDragged = true;
-    items[0].getNamespacedID();
     if (dragAction == Qt::MoveAction) {
-        if (this->items == before) {
+        if (items == before) {
             clearItems();
         } else {
             emit itemChanged();

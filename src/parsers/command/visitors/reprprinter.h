@@ -497,8 +497,8 @@ private:
             m_repr += ')';
         };
 
-        void reprResourceLocation(ResourceLocationNode *node);
-        void reprEntityNode(EntityNode *node);
+        void reprResourceLocation(ResourceLocationNode const *node);
+        void reprEntityNode(EntityNode const *node);
     };
 }
 

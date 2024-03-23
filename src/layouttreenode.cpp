@@ -124,7 +124,7 @@ void LayoutTreeNode::firstWalk(const float distance) {
 
         float midpoint = (getFirst()->m_col + getLast()->m_col) / 2;
 
-        auto *w = getPrev();
+        const auto *w = getPrev();
         if (w != nullptr) {
             m_col = w->m_col + distance;
             m_mod = m_col - midpoint;
