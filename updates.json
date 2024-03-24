@@ -2,15 +2,15 @@
   "updates": {
     "windows": {
       "open-url": "",
-      "latest-version": "0.9.0",
-      "download-url": "https://github.com/IoeCmcomc/MCDatapacker/releases/download/v0.9.0/MCDatapacker_v0.9.0_win32.zip",
+      "latest-version": "0.10.0",
+      "download-url": "https://github.com/IoeCmcomc/MCDatapacker/releases/download/v0.10.0/MCDatapacker_v0.10.0_win32.zip",
       "changelog": "",
       "mandatory": false
     },
     "windows-x64": {
       "open-url": "",
-      "latest-version": "0.9.0",
-      "download-url": "https://github.com/IoeCmcomc/MCDatapacker/releases/download/v0.9.0/MCDatapacker_v0.9.0_win64.zip",
+      "latest-version": "0.10.0",
+      "download-url": "https://github.com/IoeCmcomc/MCDatapacker/releases/download/v0.10.0/MCDatapacker_v0.10.0_win64.zip",
       "changelog": "",
       "mandatory": false
     }
