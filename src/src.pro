@@ -412,6 +412,7 @@ win32-msvc*: {
     #     DEFINES += _DISABLE_VECTOR_ANNOTATION=1 _DISABLE_STRING_ANNOTATION=1
     #     QMAKE_CXXFLAGS += -fsanitize=address
     # }
+    QMAKE_LFLAGS_DEBUG += /DEBUG:FASTLINK
 }
 
 #message($$INCLUDEPATH)

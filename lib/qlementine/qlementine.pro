@@ -107,4 +107,4 @@ RESOURCES += \
     qlementine/lib/resources/qlementine.qrc \
     qlementine/lib/resources/qlementine_font_roboto.qrc
 win32:RESOURCES += qlementine/lib/resources/qlementine_font_inter_windows.qrc
-else:qlementine/lib/resources/qlementine_font_inter.qrc
+else:RESOURCES += qlementine/lib/resources/qlementine_font_inter.qrc

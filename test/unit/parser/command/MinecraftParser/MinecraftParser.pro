@@ -6,7 +6,7 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-CONFIG(debug, debug|release) {
+*-g++: CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS_DEBUG += --coverage -O0 -fPIC -fprofile-abs-path
     QMAKE_LFLAGS_DEBUG += --coverage -fPIC -fprofile-abs-path
     QMAKE_LFLAGS_WINDOWS += --coverage -fPIC -O0 -fprofile-abs-path
