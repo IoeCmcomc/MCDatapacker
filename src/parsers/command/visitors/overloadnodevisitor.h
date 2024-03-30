@@ -15,11 +15,15 @@
 #include "../nodes/floatrangenode.h"
 #include "../nodes/intrangenode.h"
 #include "../nodes/itemstacknode.h"
+#include "../nodes/nbtnodes.h"
 #include "../nodes/nbtpathnode.h"
 #include "../nodes/particlenode.h"
 #include "../nodes/swizzlenode.h"
 #include "../nodes/timenode.h"
 #include "../nodes/targetselectornode.h"
+#include "../nodes/resourcelocationnode.h"
+#include "../nodes/uuidnode.h"
+#include "../nodes/internalregexpatternnode.h"
 
 namespace Command {
     template <class T, class U>

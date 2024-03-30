@@ -3,6 +3,8 @@
 #include "schemaargumentnode.h"
 #include "schemaliteralnode.h"
 
+#include "nlohmann/json.hpp"
+
 namespace Command::Schema {
     Node::Node() {
     }
@@ -36,8 +38,7 @@ namespace Command::Schema {
         m_redirect = newRedirect;
     }
 
-    Node *Node::parent() const
-    {
+    Node * Node::parent() const {
         return m_parent;
     }
 
@@ -56,7 +57,7 @@ namespace Command::Schema {
         for (auto& [key, val] : j.at("children").items()) {
             if (val["type"] == "literal") {
                 LiteralNode *child = val.get<LiteralNode *>();
-                child->m_parent = this;
+                child->m_parent                                = this;
                 m_literalChildren[QString::fromStdString(key)] = child;
             } else if (val.at("type") == "argument") {
                 ArgumentNode *child = val.get<ArgumentNode *>();

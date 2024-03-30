@@ -2,27 +2,26 @@
 #define COMMANDPARSER_H
 
 #include "../parser.h"
-#include "nodes/singlevaluenode.h"
-#include "nodes/stringnode.h"
-#include "nodes/rootnode.h"
-#include "nodes/literalnode.h"
 #include "parsenodecache.h"
 #include "schema/schemarootnode.h"
+#include "nodes/argumentnode.h"
+#include "nodes/rootnode.h"
 
-#include <QJsonObject>
-#include <QObject>
-
-#include <stdexcept>
 
 template<typename T>
 T strToDec(QStringView v, bool &ok) {
+    using uT = std::make_unsigned_t<T>;
+
+    constexpr uT maxLimit    = std::numeric_limits<T>::max();
+    constexpr uT absMinLimit = 0 - uT(std::numeric_limits<T>::min());
+
     if (v.isEmpty()) {
         ok = false;
         return 0;
     }
 
-    std::make_unsigned_t<T> value = 0;
-    int                     sign  = 1;
+    uT  value = 0;
+    int sign  = 1;
 
     switch (v.at(0).toLatin1()) {
         case '-': {
@@ -39,7 +38,7 @@ T strToDec(QStringView v, bool &ok) {
 
     ok = false;
     for (int i = 0; i < v.length(); ++i) {
-        if (value > std::numeric_limits<T>::max() / 10) {
+        if (value > maxLimit / 10) {
             ok = false;
             return 0;
         }
@@ -66,8 +65,8 @@ T strToDec(QStringView v, bool &ok) {
                 return 0;
             }
         }
-        if (((sign == 1) && (value > std::numeric_limits<T>::max()))
-            || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
+        if (((sign == 1) && (value > maxLimit))
+            || ((sign == -1) && (value > absMinLimit))) {
             ok = false;
             return 0;
         }
@@ -76,6 +75,15 @@ T strToDec(QStringView v, bool &ok) {
 }
 
 namespace Command {
+    class BoolNode;
+    class DoubleNode;
+    class FloatNode;
+    class IntegerNode;
+    class LongNode;
+    class StringNode;
+    class LiteralNode;
+    class RootNode;
+
     class SchemaParser : public Parser {
         Q_DECLARE_TR_FUNCTIONS(Parser)
 

@@ -1,10 +1,12 @@
 #ifndef PARTICLENODE_H
 #define PARTICLENODE_H
 
-#include "singlevaluenode.h"
-#include "resourcelocationnode.h"
+#include "argumentnode.h"
 
 namespace Command {
+    class FloatNode;
+    class ResourceLocationNode;
+
     class ParticleColorNode : public ParseNode {
 public:
         explicit ParticleColorNode(int length);

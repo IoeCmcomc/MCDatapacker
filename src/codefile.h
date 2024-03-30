@@ -60,15 +60,9 @@ struct CodeFile {
 
     CodeFile(const QString &path);
 
-    inline bool isValid() const {
-        return (!info.filePath().isEmpty()) && data.isValid();
-    }
-    inline QString name() const {
-        return info.fileName();
-    }
-    inline QString path() const {
-        return info.filePath();
-    }
+    bool isValid() const;
+    QString name() const;
+    QString path() const;
     void changePath(const QString &path);
 };
 

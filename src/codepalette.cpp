@@ -1,5 +1,7 @@
 #include "codepalette.h"
 
+#include <QDebug>
+
 CodePalette::CodePalette(std::initializer_list<QPair<Role,
                                                      QTextCharFormat> > formats)
 {

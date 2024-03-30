@@ -9,9 +9,9 @@ TEMPLATE = app
 SOURCES +=  tst_testuuidnode.cpp \
     ../../../../../../src/parsers/command/nodes/argumentnode.cpp \
     ../../../../../../src/parsers/command/nodes/parsenode.cpp \
-    ../../../../../../src/parsers/command/nodes/singlevaluenode.cpp
+    ../../../../../../src/parsers/command/nodes/uuidnode.cpp
 
 HEADERS += \
     ../../../../../../src/parsers/command/nodes/argumentnode.h \
     ../../../../../../src/parsers/command/nodes/parsenode.h \
-    ../../../../../../src/parsers/command/nodes/singlevaluenode.h
+    ../../../../../../src/parsers/command/nodes/uuidnode.h

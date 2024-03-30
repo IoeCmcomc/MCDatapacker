@@ -2,7 +2,6 @@
 #define PARSER_H
 
 #include <QVariantList>
-#include <QDebug>
 #include <QCoreApplication>
 
 #include <stdexcept>

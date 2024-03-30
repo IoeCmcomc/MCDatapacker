@@ -4,9 +4,6 @@
 #include "vieweventfilter.h"
 #include "modelfunctions.h"
 
-#include <QDebug>
-#include <QStandardItemModel>
-
 class BaseCondition
 {
 public:

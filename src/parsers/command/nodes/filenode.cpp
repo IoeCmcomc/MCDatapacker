@@ -1,5 +1,7 @@
 #include "filenode.h"
 
+#include <QDebug>
+
 namespace Command {
     FileNode::FileNode() : ParseNode(ParseNode::Kind::Container) {
         m_isValid = true;

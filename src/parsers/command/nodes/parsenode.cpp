@@ -1,6 +1,8 @@
 #include "parsenode.h"
 #include "../visitors/nodevisitor.h"
 
+#include <QDebug>
+
 namespace Command {
     bool ParseNode::isValid() const {
         return m_isValid;

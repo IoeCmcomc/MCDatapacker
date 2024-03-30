@@ -5,11 +5,9 @@
 
 #include <QTreeView>
 #include <QFileSystemModel>
-#include <QMenu>
-#include <QAction>
 
-class DatapackTreeView : public QTreeView
-{
+
+class DatapackTreeView : public QTreeView {
     Q_OBJECT
 public:
     DatapackTreeView(QWidget *parent = nullptr);
@@ -48,12 +46,12 @@ private:
     QPoint cMenuPos;
     DatapackFileIconProvider iconProvider;
 
-    QMenu *mkContextMenu(QModelIndex index);
-    QAction *addNewFileAction(QMenu *menu,
-                              const QString &name, QLatin1String ext,
-                              QLatin1String catDir = QLatin1String());
+    QMenu * mkContextMenu(QModelIndex index);
+    QAction * addNewFileAction(QMenu *menu,
+                               const QString &name, QLatin1String ext,
+                               QLatin1String catDir = QLatin1String());
     QModelIndex makeNewFile(QModelIndex index, const QString &name,
-                            const QString &catDir  = QString(),
+                            const QString &catDir = QString(),
                             const QString &nspace = QString());
     QModelIndex getSelected();
     bool isStringInTagFile(const QString &filepath, const QString &str);

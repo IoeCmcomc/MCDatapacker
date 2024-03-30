@@ -26,12 +26,12 @@ InventoryItem::InventoryItem(InventoryItem &&other)
     : m_pixmap{std::move(other.m_pixmap)},
     m_name{std::move(other.m_name)},
     m_namespacedId{std::move(other.m_namespacedId)},
-    m_flags{other.m_flags} {
+    m_types{other.m_types} {
 }
 
 InventoryItem &InventoryItem::operator=(InventoryItem &&other) {
     if (this != &other) {
-        m_flags        = std::exchange(other.m_flags, Null);
+        m_types        = std::exchange(other.m_types, Invalid);
         m_pixmap       = std::move(other.m_pixmap);
         m_name         = std::move(other.m_name);
         m_namespacedId = std::move(other.m_namespacedId);
@@ -48,7 +48,7 @@ void InventoryItem::setupItem(QString id) {
     if (MCRItemInfo.contains(id)) {
         setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
                                                         "name")).toString());
-        m_flags = Item;
+        m_types = Item;
     } else if (MCRBlockInfo.contains(id)) {
         const auto &blockMap = MCRBlockInfo.value(id).toMap();
         setIsItem(!blockMap.contains(QStringLiteral("unobtainable")));
@@ -134,15 +134,15 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
 }
 
 bool InventoryItem::isNull() const {
-    return m_flags == Null;
+    return m_types == Invalid;
 }
 
-InventoryItem::Flags InventoryItem::getFlags() const {
-    return m_flags;
+InventoryItem::Types InventoryItem::getFlags() const {
+    return m_types;
 }
 
-void InventoryItem::setFlags(const Flags &flags) {
-    m_flags = flags;
+void InventoryItem::setFlags(const Types &flags) {
+    m_types = flags;
 }
 
 bool InventoryItem::operator==(const InventoryItem &other) {
@@ -202,9 +202,9 @@ void InventoryItem::setNamespacedID(const QString &id) {
             this->m_namespacedId = QStringLiteral("#") + idNoTag;
         setName(QCoreApplication::translate("InventoryItem",
                                             "Item tag: ") + idNoTag);
-        m_flags |= Tag;
+        m_types |= Tag;
     } else {
-        m_flags &= ~Tag;
+        m_types &= ~Tag;
         setupItem(id);
         if (!id.contains(':'))
             this->m_namespacedId = QStringLiteral("minecraft:") + id;
@@ -214,23 +214,23 @@ void InventoryItem::setNamespacedID(const QString &id) {
 }
 
 bool InventoryItem::isBlock() const {
-    return m_flags.testFlag(Block);
+    return m_types.testFlag(Block);
 }
 
 void InventoryItem::setIsBlock(const bool &value) {
-    m_flags.setFlag(Block, value);
+    m_types.setFlag(Block, value);
 }
 
 bool InventoryItem::isItem() const {
-    return m_flags.testFlag(Item);
+    return m_types.testFlag(Item);
 }
 
 void InventoryItem::setIsItem(const bool &value) {
-    m_flags.setFlag(Item, value);
+    m_types.setFlag(Item, value);
 }
 
 bool InventoryItem::isTag() const {
-    return m_flags.testFlag(Tag);
+    return m_types.testFlag(Tag);
 }
 
 QPixmap InventoryItem::getPixmap() const {
@@ -261,16 +261,16 @@ QString InventoryItem::toolTip() const {
 }
 
 QDataStream &operator<<(QDataStream &out, const InventoryItem &obj) {
-    out << obj.m_flags << obj.getNamespacedID() << obj.getName();
+    out << obj.m_types << obj.getNamespacedID() << obj.getName();
     return out;
 }
 QDataStream &operator>>(QDataStream &in, InventoryItem &obj) {
-    InventoryItem::Flags flags;
+    InventoryItem::Types flags;
     QString              namespacedID;
     QString              name;
 
     in >> flags >> namespacedID >> name;
-    obj.m_flags = flags;
+    obj.m_types = flags;
     obj.setNamespacedID(namespacedID);
     obj.setName(name);
     return in;

@@ -1,6 +1,10 @@
 #include "itemstacknode.h"
 #include "../visitors/nodevisitor.h"
 
+#include "nbtnodes.h"
+#include "resourcelocationnode.h"
+
+
 namespace Command {
     ItemStackNode::ItemStackNode(int length)
         : ArgumentNode(ParserType::ItemStack, length) {

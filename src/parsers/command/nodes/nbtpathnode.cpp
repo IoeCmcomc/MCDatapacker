@@ -1,6 +1,9 @@
 #include "nbtpathnode.h"
 #include "../visitors/nodevisitor.h"
 
+#include "nbtnodes.h"
+#include "stringnode.h"
+
 namespace Command {
     NbtPathStepNode::NbtPathStepNode(int length)
         : ParseNode(ParseNode::Kind::Container, length) {

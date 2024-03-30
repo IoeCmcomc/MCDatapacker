@@ -1,6 +1,9 @@
 #include "particlenode.h"
 #include "../visitors/nodevisitor.h"
 
+#include "singlevaluenode.h"
+#include "resourcelocationnode.h"
+
 namespace Command {
     ParticleColorNode::ParticleColorNode(int length)
         : ParseNode(Kind::Container, length) {

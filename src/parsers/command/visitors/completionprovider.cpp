@@ -2,6 +2,7 @@
 
 #include "../schema/schemanode.h"
 #include "../schema/schemaargumentnode.h"
+#include "../nodes/uuidnode.h"
 #include "game.h"
 #include "globalhelpers.h"
 

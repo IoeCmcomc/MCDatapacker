@@ -36,7 +36,6 @@ public:
         void visit(ParticleNode *node) final;
         void visit(UuidNode *node) final;
 
-
         QVector<QString> suggestions() const;
 
 private:

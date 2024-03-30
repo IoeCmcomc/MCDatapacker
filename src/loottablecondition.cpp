@@ -42,8 +42,8 @@ void LootTableCondition::init() {
             this, &LootTableCondition::onTabChanged);
     connect(ui->nested_dataInterface, &DataWidgetInterface::entriesCountChanged,
             this, &LootTableCondition::updateConditionsTab);
-    MainWindow  *mainWin = nullptr;
-    const auto &&widgets = qApp->topLevelWidgets();
+    const MainWindow *mainWin = nullptr;
+    const auto      &&widgets = qApp->topLevelWidgets();
     for (auto *wid : widgets) {
         if (wid->objectName() == QStringLiteral("MainWindow")) {
             mainWin = qobject_cast<MainWindow *>(wid);

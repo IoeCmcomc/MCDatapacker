@@ -5,8 +5,7 @@
 
 #include <QDockWidget>
 #include <QStandardItemModel>
-#include <QListView>
-/*#include <QVector> */
+
 
 namespace Ui {
     class VisualRecipeEditorDock;
@@ -52,9 +51,5 @@ private:
     void readStonecuttingJson(const QJsonObject &root);
     void readSmithingJson(const QJsonObject &root);
 };
-
-QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
-                             const bool emptyAsArray = false);
-QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal);
 
 #endif /* VISUALRECIPEEDITORDOCK_H */

@@ -1,9 +1,11 @@
 #ifndef TARGETSELECTORNODE_H
 #define TARGETSELECTORNODE_H
 
-#include "mapnode.h"
+#include "parsenode.h"
 
 namespace Command {
+    class MapNode;
+
     class TargetSelectorNode : public ParseNode
     {
 public:

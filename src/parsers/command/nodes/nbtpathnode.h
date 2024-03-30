@@ -1,10 +1,13 @@
 #ifndef NBTPATHNODE_H
 #define NBTPATHNODE_H
 
-#include "nbtnodes.h"
-#include "stringnode.h"
+#include "argumentnode.h"
 
 namespace Command {
+    class StringNode;
+    class IntegerNode;
+    class NbtCompoundNode;
+
     class NbtPathStepNode : public ParseNode {
 public:
         enum class Type {

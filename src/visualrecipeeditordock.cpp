@@ -11,15 +11,68 @@
 #include "platforms/windows_specific.h"
 
 #include <QDebug>
-#include <QMap>
-#include <QStringLiteral>
-#include <QLabel>
-#include <QVector>
-#include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QMessageBox>
-#include <QMouseEvent>
+
+static QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {
+    QJsonArray keyArray;
+
+    if (keyVal.isObject()) {
+        keyArray.push_back(keyVal);
+    } else {
+        keyArray = keyVal.toArray();
+    }
+    /*    qDebug() << keyVal << keyArray; */
+
+    QVector<InventoryItem> items;
+    for (const auto &key : qAsConst(keyArray)) {
+        QJsonObject &&keyJson = key.toObject();
+        QString       itemID;
+
+        if (keyJson.contains(QStringLiteral("item"))) {
+            itemID = keyJson[QStringLiteral("item")].toString();
+        } else if (keyJson.contains(QStringLiteral("tag"))) {
+            itemID = '#' +
+                     keyJson[QStringLiteral("tag")].toString();
+        } else {
+            qWarning() <<
+                "JsonToIngredients: JSON ingredient has no 'item' nor 'tag' key.";
+        }
+        /*qDebug() << keyJson << keyJson.contains("item") << itemID; */
+        if (!itemID.isEmpty() &&
+            (!items.contains(InventoryItem(itemID)))) {
+            items.push_back(InventoryItem(itemID));
+        }
+    }
+    return items;
+}
+
+static QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
+                                    const bool emptyAsArray = false) {
+    QJsonArray keyItems;
+
+    for (const auto &item : items) {
+        auto itemID = item.getNamespacedID();
+        /*
+           if (!itemID.contains(':'))
+              itemID = QStringLiteral("minecraft:") + itemID;
+         */
+        QJsonObject keyItem;
+        if (item.isTag())
+            keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
+        else
+            keyItem.insert(QStringLiteral("item"), itemID);
+        keyItems.push_back(keyItem);
+    }
+    /*qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems; */
+    if (keyItems.isEmpty()) {
+        return emptyAsArray ? QJsonArray() : QJsonValue();
+    } else if (keyItems.count() == 1) {
+        return keyItems.at(0);
+    } else {
+        return keyItems;
+    }
+}
 
 VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     QDockWidget(parent),
@@ -366,33 +419,6 @@ QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
     return root;
 }
 
-QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
-                             const bool emptyAsArray) {
-    QJsonArray keyItems;
-
-    for (const auto &item : items) {
-        auto itemID = item.getNamespacedID();
-/*
-          if (!itemID.contains(':'))
-              itemID = QStringLiteral("minecraft:") + itemID;
- */
-        QJsonObject keyItem;
-        if (item.isTag())
-            keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
-        else
-            keyItem.insert(QStringLiteral("item"), itemID);
-        keyItems.push_back(keyItem);
-    }
-    /*qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems; */
-    if (keyItems.isEmpty()) {
-        return emptyAsArray ? QJsonArray() : QJsonValue();
-    } else if (keyItems.count() == 1) {
-        return keyItems.at(0);
-    } else {
-        return keyItems;
-    }
-}
-
 void VisualRecipeEditorDock::readRecipe() {
     QString input = qobject_cast<MainWindow *>(parent())->getCodeEditorText();
 
@@ -640,37 +666,4 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
                                                       "count")].toInt());
         }
     }
-}
-
-QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {
-    QJsonArray keyArray;
-
-    if (keyVal.isObject()) {
-        keyArray.push_back(keyVal);
-    } else {
-        keyArray = keyVal.toArray();
-    }
-/*    qDebug() << keyVal << keyArray; */
-
-    QVector<InventoryItem> items;
-    for (const auto &key : qAsConst(keyArray)) {
-        QJsonObject &&keyJson = key.toObject();
-        QString       itemID;
-
-        if (keyJson.contains(QStringLiteral("item"))) {
-            itemID = keyJson[QStringLiteral("item")].toString();
-        } else if (keyJson.contains(QStringLiteral("tag"))) {
-            itemID = '#' +
-                     keyJson[QStringLiteral("tag")].toString();
-        } else {
-            qWarning() <<
-                "JsonToIngredients: JSON ingredient has no 'item' nor 'tag' key.";
-        }
-        /*qDebug() << keyJson << keyJson.contains("item") << itemID; */
-        if (!itemID.isEmpty() &&
-            (!items.contains(InventoryItem(itemID)))) {
-            items.push_back(InventoryItem(itemID));
-        }
-    }
-    return items;
 }

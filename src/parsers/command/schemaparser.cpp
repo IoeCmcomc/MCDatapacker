@@ -4,6 +4,10 @@
 #include "schema/schemaargumentnode.h"
 #include "schema/schemaliteralnode.h"
 #include "schema/schemaloader.h"
+#include "nodes/singlevaluenode.h"
+#include "nodes/stringnode.h"
+#include "nodes/literalnode.h"
+
 
 #include "re2c_generated_functions.h"
 

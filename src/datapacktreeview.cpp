@@ -12,13 +12,14 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QStringList>
 #include <QSaveFile>
 #include <QToolTip>
 #include <QApplication>
 #include <QClipboard>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QMenu>
+#include <QAction>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);

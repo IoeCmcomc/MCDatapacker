@@ -1,6 +1,9 @@
 #include "targetselectornode.h"
 #include "../visitors/nodevisitor.h"
 
+#include "mapnode.h"
+
+
 namespace Command {
     TargetSelectorNode::TargetSelectorNode(int length)
         : ParseNode(Kind::Container, length) {

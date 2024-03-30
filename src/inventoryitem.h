@@ -1,22 +1,19 @@
 #ifndef INVENTORYITEM_H
 #define INVENTORYITEM_H
 
-#include <QObject>
-#include <QString>
 #include <QPixmap>
 #include <QDebug>
 
-class InventoryItem
-{
+class InventoryItem {
 public:
-    enum Flag : unsigned int {
-        Null      = 0,
+    enum Type : unsigned int {
+        Invalid      = 0,
         Block     = 1,
         Item      = 2,
         BlockItem = Block | Item,
         Tag       = 4,
     };
-    Q_DECLARE_FLAGS(Flags, Flag);
+    Q_DECLARE_FLAGS(Types, Type);
 
     InventoryItem()                           = default;
     ~InventoryItem()                          = default;
@@ -57,8 +54,8 @@ public:
 
     bool isNull() const;
 
-    Flags getFlags() const;
-    void setFlags(const Flags &flags);
+    Types getFlags() const;
+    void setFlags(const Types &flags);
 
     friend QDataStream &operator<<(QDataStream &out, const InventoryItem &obj);
     friend QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
@@ -68,7 +65,7 @@ private:
     mutable QPixmap m_pixmap;
     QString m_name;
     QString m_namespacedId;
-    Flags m_flags = Flag::Null;
+    Types m_types = Type::Invalid;
 
     void setupItem(QString id);
     QPixmap loadPixmap(QString id) const;

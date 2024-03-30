@@ -7,6 +7,7 @@
 #include "game.h"
 
 #include <QJsonObject>
+#include <QTableWidget>
 
 ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(),

@@ -21,6 +21,7 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/anglenode.cpp \
     ../../../../../src/parsers/command/nodes/blockstatenode.cpp \
     ../../../../../src/parsers/command/nodes/componentnode.cpp \
+    ../../../../../src/parsers/command/nodes/internalregexpatternnode.cpp \
     ../../../../../src/parsers/command/nodes/stylenode.cpp \
     ../../../../../src/parsers/command/nodes/entitynode.cpp \
     ../../../../../src/parsers/command/nodes/gamemodenode.cpp \
@@ -40,6 +41,7 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/swizzlenode.cpp \
     ../../../../../src/parsers/command/nodes/targetselectornode.cpp \
     ../../../../../src/parsers/command/nodes/timenode.cpp \
+    ../../../../../src/parsers/command/nodes/uuidnode.cpp \
     ../../../../../src/parsers/command/parsenodecache.cpp \
     ../../../../../src/parsers/command/schema/schemaloader.cpp \
     ../../../../../src/parsers/command/schemaparser.cpp \
@@ -60,6 +62,7 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/anglenode.h \
     ../../../../../src/parsers/command/nodes/blockstatenode.h \
     ../../../../../src/parsers/command/nodes/componentnode.h \
+    ../../../../../src/parsers/command/nodes/internalregexpatternnode.h \
     ../../../../../src/parsers/command/nodes/stylenode.h \
     ../../../../../src/parsers/command/nodes/entitynode.h \
     ../../../../../src/parsers/command/nodes/gamemodenode.h \
@@ -80,6 +83,7 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/swizzlenode.h \
     ../../../../../src/parsers/command/nodes/targetselectornode.h \
     ../../../../../src/parsers/command/nodes/timenode.h \
+    ../../../../../src/parsers/command/nodes/uuidnode.h \
     ../../../../../src/parsers/command/parsenodecache.h \
     ../../../../../src/parsers/command/schema/schemaloader.h \
     ../../../../../src/parsers/command/schemaparser.h \

@@ -1,10 +1,12 @@
 #ifndef ITEMSTACKNODE_H
 #define ITEMSTACKNODE_H
 
-#include "nbtnodes.h"
-#include "resourcelocationnode.h"
+#include "argumentnode.h"
 
 namespace Command {
+    class NbtCompoundNode;
+    class ResourceLocationNode;
+
     class ItemStackNode : public ArgumentNode {
 public:
         explicit ItemStackNode(int length);

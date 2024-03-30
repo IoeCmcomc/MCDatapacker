@@ -31,10 +31,6 @@ namespace Command {
         return m_ptr;
     }
 
-//    void EntityNode::setNode(const NodePtr &ptr) {
-//        m_ptr = ptr;
-//    }
-
     EntityNode::EntityNode(ParserType parserType, int length,
                            const NodePtr &ptr)
         : ArgumentNode(parserType, length), m_ptr(ptr) {

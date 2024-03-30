@@ -1,15 +1,14 @@
 #ifndef STATUSBAR_H
 #define STATUSBAR_H
 
-#include "codefile.h"
-
-#include <QDir>
 #include <QStatusBar>
 
+QT_BEGIN_NAMESPACE
+class QLabel;
+QT_END_NAMESPACE
 
 class MainWindow;
 class TabbedDocumentInterface;
-class QLabel;
 class ImgViewer;
 class CodeEditor;
 

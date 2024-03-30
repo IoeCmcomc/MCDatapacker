@@ -29,7 +29,7 @@
 
 
 // Adapted from: https://stackoverflow.com/a/56678483/12682038
-qreal perceivedLightness(const QColor &color) {
+static qreal perceivedLightness(const QColor &color) {
     const static auto sRGBtoLin =
         [](qreal colorChannel) {
             if (colorChannel <= 0.04045) {
@@ -231,7 +231,8 @@ void CodeEditor::mouseDoubleClickEvent(QMouseEvent *e) {
     }
 }
 
-void debugTextCursor(const QTextCursor &tc) {
+#ifndef QT_NO_DEBUG_OUTPUT
+static void debugTextCursor(const QTextCursor &tc) {
     //return;
 
     const QString reprTemplate("'%1|%2' (pos: %3)");
@@ -255,6 +256,7 @@ void debugTextCursor(const QTextCursor &tc) {
             .arg(line.midRef(right)).arg(anchor).arg(pos);
     }
 }
+#endif
 
 void CodeEditor::startOfWordExtended(QTextCursor &tc) {
     static const QString extendedAcceptedCharset("#.:/-");
@@ -548,7 +550,7 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     delete menu;
 }
 
-QPoint translatedMargins(const QPoint &p, const QMargins &margins) {
+static QPoint translatedMargins(const QPoint &p, const QMargins &margins) {
     return QPoint{ p.x() - margins.left(), p.y() - margins.right() };
 }
 

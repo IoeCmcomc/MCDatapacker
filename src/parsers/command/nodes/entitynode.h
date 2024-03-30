@@ -1,10 +1,6 @@
 #ifndef ENTITYNODE_H
 #define ENTITYNODE_H
 
-//#include "stringnode.h"
-//#include "targetselectornode.h"
-//#include "singlevaluenode.h"
-
 #include "argumentnode.h"
 
 namespace Command {

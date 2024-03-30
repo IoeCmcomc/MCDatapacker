@@ -20,6 +20,12 @@
 #include "../nodes/swizzlenode.h"
 #include "../nodes/timenode.h"
 #include "../nodes/targetselectornode.h"
+#include "../nodes/nbtnodes.h"
+#include "../nodes/resourcelocationnode.h"
+#include "../nodes/uuidnode.h"
+#include "../nodes/internalregexpatternnode.h"
+
+#include <QDebug>
 
 namespace Command {
     class ReprPrinter : public NodeVisitor

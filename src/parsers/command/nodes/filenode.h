@@ -3,6 +3,8 @@
 
 #include "parsenode.h"
 
+#include <QMap>
+
 namespace Command {
     struct SourceMapper {
         struct Info {

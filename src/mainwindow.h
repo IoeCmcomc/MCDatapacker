@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QSessionManager>
-#include <QMap>
 #include <QTranslator>
 #include <QSettings>
 #include <QFileSystemWatcher>
@@ -11,7 +10,6 @@
 #include <QDir>
 #include <QVersionNumber>
 #include <QLocale>
-#include <QJsonObject>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -93,7 +91,6 @@ private /*slots*/ :
 private:
     Ui::MainWindow *ui;
 
-    static QMap<QString, QVariantMap> MCRInfoMaps;
     QFileSystemWatcher fileWatcher;
     QTranslator m_translator;
     QTranslator m_translatorQt;
@@ -109,7 +106,7 @@ private:
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
     QString m_initialStyleId;
-    const int maxRecentFoldersActions = 10;
+    const static int maxRecentFoldersActions = 10;
 
     void initDocks();
     void initMenu();

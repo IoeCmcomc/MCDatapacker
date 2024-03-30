@@ -5,6 +5,7 @@
 #include "platforms/windows_specific.h"
 
 #include <QDebug>
+#include <QJsonObject>
 #include <QJsonDocument>
 
 

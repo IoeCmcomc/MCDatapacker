@@ -5,7 +5,6 @@
 
 #include <QStringList>
 
-#include <optional>
 
 namespace Command {
     template<typename T>

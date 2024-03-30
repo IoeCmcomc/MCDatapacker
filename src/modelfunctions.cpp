@@ -5,6 +5,9 @@
 
 #include <QListView>
 #include <QApplication>
+#include <QTableView>
+#include <QTableWidget>
+#include <QComboBox>
 
 void initModelView(QStandardItemModel &model,
                    QTableView *tableView,

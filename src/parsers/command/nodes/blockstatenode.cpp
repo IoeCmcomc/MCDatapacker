@@ -1,5 +1,9 @@
 #include "blockstatenode.h"
+
 #include "../visitors/nodevisitor.h"
+#include "mapnode.h"
+#include "nbtnodes.h"
+#include "resourcelocationnode.h"
 
 namespace Command {
     BlockStateNode::BlockStateNode(int length)

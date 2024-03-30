@@ -1,7 +1,9 @@
 #ifndef PARSENODE_H
 #define PARSENODE_H
 
-#include <QDebug>
+#include <QSharedPointer>
+
+#include <variant>
 
 namespace Command {
     class NodeVisitor;

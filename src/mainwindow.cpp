@@ -396,7 +396,7 @@ void MainWindow::onSystemWatcherFileChanged(const QString &filepath) {
         uniqueMessageBox->setDefaultButton(QMessageBox::Yes);
         uniqueMessageBox->exec();
         auto userDecision = uniqueMessageBox->result();
-        delete uniqueMessageBox;
+        uniqueMessageBox->deleteLater();
         uniqueMessageBox    = nullptr;
         reloadExternChanges = (userDecision == QMessageBox::Yes) ? 0 : 2;
     }
@@ -917,7 +917,7 @@ void MainWindow::updateWindowTitle(bool changed) {
 
 void MainWindow::installUpdate(const QString &url, const QString &filepath) {
     using namespace miniz_cpp;
-    qDebug() << filepath;
+    Q_UNUSED(url);
 
     const auto appDirPath = qApp->applicationDirPath();
     qDebug() << filepath << appDirPath << qApp->arguments()[0];

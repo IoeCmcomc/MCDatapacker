@@ -6,6 +6,7 @@
 
 #include <QBuffer>
 #include <QDataStream>
+#include <QVariantMap>
 
 namespace Command {
     struct CacheKey {
@@ -99,11 +100,7 @@ public:
             return m_cache.stats();
         }
 
-        void print() {
-            for (const auto entry: m_cache) {
-                qDebug() << entry.key().literalStr << entry.value();
-            }
-        }
+        void print();
 
 private:
         Cache m_cache;

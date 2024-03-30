@@ -1,21 +1,13 @@
 #ifndef SCHEMA_NODE_H
 #define SCHEMA_NODE_H
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json_fwd.hpp>
 
 #include <QMap>
 #include <QHash>
 
 using json = nlohmann::json;
 
-// Source: https://github.com/nlohmann/json/issues/274#issuecomment-305324120
-inline void to_json(json& j, const QString& q) {
-    j = json(q.toStdString());
-}
-
-inline void from_json(const json& j, QString& q) {
-    q = QString::fromStdString(j.get<std::string>());
-}
 
 namespace Command::Schema {
     class LiteralNode;
@@ -45,12 +37,12 @@ public:
         bool isExecutable() const;
         Node * redirect() const;
         void setRedirect(Node *newRedirect);
-        Node *parent() const;
+        Node * parent() const;
 
-    protected:
+protected:
         LiteralChildrenType m_literalChildren;
         QVector<ArgumentNode *> m_argumentChildren;
-        Node *m_parent = nullptr;
+        Node *m_parent    = nullptr;
         Node *m_redirect  = nullptr;
         Kind m_kind       = Kind::Unknown;
         bool m_executable = false;

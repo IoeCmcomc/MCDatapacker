@@ -6,6 +6,18 @@ CodeFile::CodeFile(const QString &path) {
     changePath(path);
 }
 
+bool CodeFile::isValid() const {
+    return (!info.filePath().isEmpty()) && data.isValid();
+}
+
+QString CodeFile::name() const {
+    return info.fileName();
+}
+
+QString CodeFile::path() const {
+    return info.filePath();
+}
+
 void CodeFile::changePath(const QString &path) {
     info     = QFileInfo(path);
     fileType = Glhp::pathToFileType(QDir::currentPath(), path);

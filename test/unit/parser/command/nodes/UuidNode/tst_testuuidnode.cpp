@@ -1,7 +1,7 @@
 #include <QtTest>
 #include <QCoreApplication>
 
-#include "../../../../../../src/parsers/command/nodes/singlevaluenode.h"
+#include "../../../../../../src/parsers/command/nodes/uuidnode.h"
 
 using namespace Command;
 

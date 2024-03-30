@@ -83,8 +83,10 @@ SOURCES += \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/gamemodenode.cpp \
+    parsers/command/nodes/internalregexpatternnode.cpp \
     parsers/command/nodes/macronode.cpp \
     parsers/command/nodes/stylenode.cpp \
+    parsers/command/nodes/uuidnode.cpp \
     parsers/command/re2c_generated_functions.cpp \
     parsers/command/nodes/anglenode.cpp \
     parsers/command/nodes/argumentnode.cpp \
@@ -209,6 +211,7 @@ HEADERS += \
     parsers/command/nodes/filenode.h \
     parsers/command/nodes/floatrangenode.h \
     parsers/command/nodes/gamemodenode.h \
+    parsers/command/nodes/internalregexpatternnode.h \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \
     parsers/command/nodes/literalnode.h \
@@ -227,6 +230,7 @@ HEADERS += \
     parsers/command/nodes/swizzlenode.h \
     parsers/command/nodes/targetselectornode.h \
     parsers/command/nodes/timenode.h \
+    parsers/command/nodes/uuidnode.h \
     parsers/command/parsenodecache.h \
     parsers/command/minecraftparser.h \
     parsers/command/re2c_functions.re \

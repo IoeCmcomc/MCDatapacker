@@ -3,9 +3,6 @@
 
 #include "argumentnode.h"
 
-#include <QUuid>
-#include <QRegularExpression>
-
 namespace Command {
     template <class Base, typename T, ArgumentNode::ParserType PT>
     class SingleValueNode : public Base {
@@ -91,8 +88,6 @@ DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Team, QString)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(TemplateMirror, QString)
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(TemplateRotation, QString)
 
-DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(Uuid, QUuid)
-
 namespace Command {
     template<>
     constexpr std::array staticSuggestions<ColorNode> = {
@@ -173,14 +168,7 @@ namespace Command {
  * Namespaced ID: ___:greedy_string
  */
 DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(InternalGreedyString, QString)
-/*
- * InternalRegexPatternNode represent a regular expression pattern.
- * Agument nodes of this type must be put at the end of a command branch.
- *
- * Namespaced ID: ___:regex_pattern
- */
-DECLARE_SINGLE_VALUE_ARGUMENT_CLASS(InternalRegexPattern, QRegularExpression)
 
-#undef DECLARE_SINGLE_VALUE_ARGUMENT_CLASS
+// #undef DECLARE_SINGLE_VALUE_ARGUMENT_CLASS
 
 #endif // SINGLEVALUENODE_H

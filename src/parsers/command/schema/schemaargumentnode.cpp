@@ -1,5 +1,7 @@
 #include "schemaargumentnode.h"
 
+#include <QDebug>
+
 namespace Command::Schema {
     ArgumentNode::ArgumentNode() : Node(Node::Kind::Argument),
         m_parserType{ParserType::Unknown} {
@@ -105,7 +107,8 @@ namespace Command::Schema {
 
                 switch (val.type()) {
                     case Type::boolean: {
-                        n->m_props[mapKey] = val.get<bool>();
+                        n->m_props[mapKey] =
+                            val.get_ref<const json::boolean_t &>();
                         break;
                     }
 
@@ -115,17 +118,20 @@ namespace Command::Schema {
                     }
 
                     case Type::number_integer: {
-                        n->m_props[mapKey] = val.get<int>();
+                        n->m_props[mapKey] =
+                            val.get_ref<const json::number_integer_t &>();
                         break;
                     }
 
                     case Type::number_float: {
-                        n->m_props[mapKey] = val.get<double>();
+                        n->m_props[mapKey] =
+                            val.get_ref<const json::number_float_t &>();
                         break;
                     }
 
                     case Type::number_unsigned: {
-                        n->m_props[mapKey] = val.get<unsigned int>();
+                        n->m_props[mapKey] =
+                            val.get_ref<const json::number_unsigned_t &>();
                         break;
                     }
 

@@ -1,11 +1,14 @@
 #ifndef BLOCKSTATENODE_H
 #define BLOCKSTATENODE_H
 
-#include "mapnode.h"
-#include "nbtnodes.h"
-#include "resourcelocationnode.h"
+#include "argumentnode.h"
+
 
 namespace Command {
+    class MapNode;
+    class NbtCompoundNode;
+    class ResourceLocationNode;
+
     class BlockStateNode : public ArgumentNode {
 public:
         explicit BlockStateNode(int length);

@@ -2,6 +2,8 @@
 #include <QCoreApplication>
 
 #include "../../../../../src/parsers/command/schemaparser.h"
+#include "../../../../../src/parsers/command/nodes/singlevaluenode.h"
+#include "../../../../../src/parsers/command/nodes/stringnode.h"
 
 using namespace Command;
 

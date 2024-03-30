@@ -5,9 +5,8 @@
 #include "datawidgetcontroller.h"
 #include "gameinfomodel.h"
 
-#include <QFrame>
-#include <QVBoxLayout>
 #include <QDir>
+#include <QTabWidget>
 
 #include <mutex>
 

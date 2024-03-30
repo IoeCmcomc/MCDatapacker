@@ -16,20 +16,29 @@
 #include "nodes/swizzlenode.h"
 #include "nodes/timenode.h"
 #include "nodes/targetselectornode.h"
+#include "nodes/nbtnodes.h"
+#include "nodes/resourcelocationnode.h"
+#include "nodes/uuidnode.h"
+#include "nodes/internalregexpatternnode.h"
 
 #include <QVersionNumber>
+#include <QDebug>
+
 
 template<typename T>
 T strWithExpToDec(QStringView v, bool &ok) {
-    constexpr std::make_unsigned_t<T> maxLimit = std::numeric_limits<T>::max();
+    using uT = std::make_unsigned_t<T>;
+
+    constexpr uT maxLimit    = std::numeric_limits<T>::max();
+    constexpr uT absMinLimit = 0 - uT(std::numeric_limits<T>::min());
 
     if (v.isEmpty()) {
         ok = false;
         return 0;
     }
 
-    std::make_unsigned_t<T> value = 0;
-    int                     sign  = 1;
+    uT  value = 0;
+    int sign  = 1;
 
     switch (v.at(0).toLatin1()) {
         case '-': {
@@ -92,7 +101,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
                         }
                     } else {
                         for (int j = 0; j < abs(exp); ++j) {
-                            if (value > std::numeric_limits<T>::min() * 10) {
+                            if (value > absMinLimit / 10) {
                                 ok = false;
                                 return 0;
                             }
@@ -111,7 +120,7 @@ T strWithExpToDec(QStringView v, bool &ok) {
             }
         }
         if (((sign == 1) && (value > maxLimit))
-            || ((sign == -1) && (value > -std::numeric_limits<T>::min()))) {
+            || ((sign == -1) && (value > absMinLimit))) {
             ok = false;
             return 0;
         }

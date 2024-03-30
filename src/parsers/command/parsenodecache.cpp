@@ -1,5 +1,7 @@
 #include "parsenodecache.h"
 
+#include <QDebug>
+
 namespace Command {
     bool CacheKey::operator==(const CacheKey &rhs) const {
         return (typeId == rhs.typeId) && (literalStr == rhs.literalStr)
@@ -62,6 +64,12 @@ namespace Command {
 
     WeakNodePtr &ParseNodeCache::operator [](const CacheKey &key) {
         return m_cache.lookup(key);
+    }
+
+    void ParseNodeCache::print() {
+        for (const auto entry: m_cache) {
+            qDebug() << entry.key().literalStr << entry.value();
+        }
     }
 
     const WeakNodePtr &ParseNodeCache::operator[](

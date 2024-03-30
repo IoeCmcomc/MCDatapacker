@@ -4,9 +4,14 @@
 #include "vieweventfilter.h"
 
 #include <QStandardItemModel>
-#include <QTableView>
-#include <QComboBox>
-#include <QTableWidget>
+
+QT_BEGIN_NAMESPACE
+class QComboBox;
+class QTableWidget;
+class QTableWidgetItem;
+class QAbstractItemDelegate;
+class QTableView;
+QT_END_NAMESPACE
 
 void initModelView(QStandardItemModel &model, QTableView *tableView,
                    std::initializer_list<QStandardItem *> headers,
