@@ -47,7 +47,7 @@ void initComboModelView(const QString &infoType, QStandardItemModel &model,
         else
             item->setText(key);
         QString &&iconPath =
-            QString(":minecraft/texture/%1/%2.png").arg(infoType, key);
+            QString(":/minecraft/texture/%1/%2.png").arg(infoType, key);
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
@@ -77,7 +77,7 @@ void initComboModelViewFromRegistry(const QString &registry,
     for (QString value : values) {
         QStandardItem *item     = new QStandardItem(value);
         QString      &&iconPath =
-            QString(":minecraft/texture/%1/%2.png").arg(registry, value);
+            QString(":/minecraft/texture/%1/%2.png").arg(registry, value);
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);

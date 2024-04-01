@@ -88,17 +88,17 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
         iconpath = ":/minecraft/texture/item/banner_pattern.png";
         iconpix  = QPixmap(iconpath);
     } else if (MCRItemInfo.contains(id)) {
-        iconpath = QStringLiteral(":minecraft/texture/item/") + id +
+        iconpath = QStringLiteral(":/minecraft/texture/item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
     } else {
-        iconpath = QStringLiteral(":minecraft/texture/inv_item/") + id +
+        iconpath = QStringLiteral(":/minecraft/texture/inv_item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
     }
 
     if (!iconpix) {
-        iconpath = QStringLiteral(":minecraft/texture/block/") + id +
+        iconpath = QStringLiteral(":/minecraft/texture/block/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
     }

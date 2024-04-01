@@ -30,6 +30,9 @@ namespace Game {
     QVector<QString> getRegistry(const QString &type);
     QVector<QString> getRegistry(const QString &type, const QString &version);
     QVector<QString> loadRegistry(const QString &type, const QString &version);
+
+    bool isVanillaFileExists(const QString &catDir, const QString &path);
+    QString realVanillaFilePath(const QString &catDir, const QString &path);
 }
 
 #endif // GAME_H

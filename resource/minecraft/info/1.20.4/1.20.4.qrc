@@ -42,5 +42,6 @@
         <file>registries/worldgen/configured_feature/data.min.json</file>
         <file>registries/worldgen/template_pool/data.min.json</file>
         <file>registries/worldgen/structure/data.min.json</file>
+        <file>vanilla_lookup.json</file>
     </qresource>
 </RCC>

@@ -94,3 +94,36 @@
 [submodule "lib/qlementine/qlementine"]
 	path = lib/qlementine/qlementine
 	url = https://github.com/oclero/qlementine.git
+[submodule "resource/minecraft/info/1.20.4/data-json"]
+	path = resource/minecraft/info/1.20.4/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.15/data-json"]
+	path = resource/minecraft/info/1.15/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.16/data-json"]
+	path = resource/minecraft/info/1.16/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.17/data-json"]
+	path = resource/minecraft/info/1.17/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.18/data-json"]
+	path = resource/minecraft/info/1.18/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.18.2/data-json"]
+	path = resource/minecraft/info/1.18.2/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.19/data-json"]
+	path = resource/minecraft/info/1.19/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.19.3/data-json"]
+	path = resource/minecraft/info/1.19.3/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.19.4/data-json"]
+	path = resource/minecraft/info/1.19.4/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.20/data-json"]
+	path = resource/minecraft/info/1.20/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "resource/minecraft/info/1.20.2/data-json"]
+	path = resource/minecraft/info/1.20.2/data-json
+	url = https://github.com/misode/mcmeta.git
