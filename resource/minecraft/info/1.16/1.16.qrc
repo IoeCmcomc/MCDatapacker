@@ -26,6 +26,6 @@
         <file>registries/mob_effect/data.min.json</file>
         <file>registries/enchantment/data.min.json</file>
         <file>registries/point_of_interest_type/data.min.json</file>
-        <file>vanilla_lookup.json</file>
+        <file>vanilla_lookup.cbor</file>
     </qresource>
 </RCC>

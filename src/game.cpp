@@ -197,69 +197,70 @@ QVariantMap Game::loadInfo(const QString &type, const QString &version,
 using VanillaLookupMap = QMap<QString, QMap<QString, QString> >;
 
 static VanillaLookupMap loadVainllaLookupMap() {
-    QFile f(":/minecraft/" + Game::versionString() + "/vanilla_lookup.json");
-
-    f.open(QIODevice::ReadOnly | QIODevice::Text);
-    const QByteArray &&data = f.readAll();
-    f.close();
-
-    QJsonParseError       errorPtr;
-    const QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
-    if (doc.isNull()) {
-        qWarning() << "Parse failed" << errorPtr.error;
-        return {};
-    }
-    QJsonObject &&root = doc.object();
-    if (root.isEmpty()) {
-        qWarning() << "Root is empty. Return empty";
-        return {};
-    }
-
-    QSet<QString> versionPool;
-
+    QSet<QString>    versionPool;
     VanillaLookupMap res;
-    for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
-        const auto           &&value   = it.value();
-        const auto            &aliases = value.toObject();
-        QMap<QString, QString> aliasMap;
-        for (auto it2 = aliases.constBegin(); it2 != aliases.constEnd();
-             ++it2) {
-            aliasMap[it2.key()] = *versionPool.insert(it2.value().toString());
-            // aliasMap[it2.key()] = it2.value().toString();
+
+    QFile f(":/minecraft/" + Game::versionString() + "/vanilla_lookup.cbor");
+
+    if (Q_LIKELY(f.exists())) {
+        f.open(QIODevice::ReadOnly);
+        const QByteArray &&data = f.readAll();
+        f.close();
+
+        QCborParserError   errorPtr;
+        const QCborValue &&rootValue = QCborValue::fromCbor(data, &errorPtr);
+        if (rootValue.isInvalid()) {
+            qWarning() << "Parse failed" << errorPtr.errorString();
+            return {};
         }
-        res[it.key()] = std::move(aliasMap);
+        const auto &root = rootValue.toMap();
+        if (root.isEmpty()) {
+            qWarning() << "Root is empty. Return empty";
+            return {};
+        }
+
+        for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
+            const auto            &aliases = it.value().toMap();
+            QMap<QString, QString> aliasMap;
+            for (auto it2 = aliases.cbegin(); it2 != aliases.cend(); ++it2) {
+                aliasMap[it2.key().toString()] =
+                    *versionPool.insert(it2.value().toString());
+            }
+            res[it.key().toString()] = std::move(aliasMap);
+        }
+    } else {
+        QFile f2(":/minecraft/" + Game::versionString() +
+                 "/vanilla_lookup.json");
+
+        f2.open(QIODevice::ReadOnly | QIODevice::Text);
+        const QByteArray &&data = f.readAll();
+        f2.close();
+
+        QJsonParseError       errorPtr;
+        const QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
+        if (doc.isNull()) {
+            qWarning() << "Parse failed" << errorPtr.error;
+            return {};
+        }
+        QJsonObject &&root = doc.object();
+        if (root.isEmpty()) {
+            qWarning() << "Root is empty. Return empty";
+            return {};
+        }
+
+        for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
+            const auto           &&value   = it.value();
+            const auto            &aliases = value.toObject();
+            QMap<QString, QString> aliasMap;
+            for (auto it2 = aliases.constBegin(); it2 != aliases.constEnd();
+                 ++it2) {
+                aliasMap[it2.key()] =
+                    *versionPool.insert(it2.value().toString());
+                // aliasMap[it2.key()] = it2.value().toString();
+            }
+            res[it.key()] = std::move(aliasMap);
+        }
     }
-
-    // QFile f(":/minecraft/" + Game::versionString() + "/vanilla_lookup.cbor");
-
-    // f.open(QIODevice::ReadOnly);
-    // const QByteArray &&data = f.readAll();
-    // f.close();
-
-    // QCborParserError   errorPtr;
-    // const QCborValue &&rootValue = QCborValue::fromCbor(data, &errorPtr);
-    // if (rootValue.isInvalid()) {
-    //     qWarning() << "Parse failed" << errorPtr.errorString();
-    //     return {};
-    // }
-    // const auto &root = rootValue.toMap();
-    // if (root.isEmpty()) {
-    //     qWarning() << "Root is empty. Return empty";
-    //     return {};
-    // }
-
-    // QSet<QString> versionPool;
-
-    // VanillaLookupMap res;
-    // for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
-    //     const auto            &aliases = it.value().toMap();
-    //     QMap<QString, QString> aliasMap;
-    //     for (auto it2 = aliases.cbegin(); it2 != aliases.cend(); ++it2) {
-    //         aliasMap[it2.key().toString()] =
-    //             *versionPool.insert(it2.value().toString());
-    //     }
-    //     res[it.key().toString()] = std::move(aliasMap);
-    // }
 
     return res;
 }

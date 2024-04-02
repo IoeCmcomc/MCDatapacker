@@ -376,6 +376,7 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\" \
     APP_VERSION_MINOR=$$VERSION_MINOR \
     APP_VERSION_PATCH=$$VERSION_PATCH
 
+QMAKE_RESOURCE_FLAGS += -threshold 40 -compress 9 -compress-algo zlib --verbose
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/debug/ -lnbt

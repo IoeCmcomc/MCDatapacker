@@ -108,3 +108,5 @@ RESOURCES += \
     qlementine/lib/resources/qlementine_font_roboto.qrc
 win32:RESOURCES += qlementine/lib/resources/qlementine_font_inter_windows.qrc
 else:RESOURCES += qlementine/lib/resources/qlementine_font_inter.qrc
+
+QMAKE_RESOURCE_FLAGS += -threshold 40 -compress 9 -compress-algo zlib

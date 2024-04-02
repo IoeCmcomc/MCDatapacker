@@ -38,6 +38,18 @@ def is_file_equal(path1: str, path2: str) -> bool:
         text2 = f.read()
     return text1 == text2
 
+def paths_to_dict(paths: dict[str, str]) -> dict:
+    folders = {}
+    for path, ver in paths.items():
+        parts = path.split('/')
+        last_part = parts[-1]
+        cur_dir = folders
+        for part in parts[:-1]:
+            cur_dir = cur_dir.setdefault(part, {})
+        cur_dir[last_part] = ver
+
+    return folders
+
 PREFIX_LEN = len("data/minecraft/")
 
 def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo]) -> None:
@@ -54,15 +66,22 @@ def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo]) -> N
             if category not in lookup_dict:
                 lookup_dict[category] = {}
             lookup_dict[category][key] = ver
+    
+    # for category, aliases in lookup_dict.items():
+    #     lookup_dict[category] = paths_to_dict(aliases)
         
     json_path = join(abspath("../resource/minecraft/info"), version, f"vanilla_lookup.json")
     with open(json_path, 'w') as f:
-        json_dump(lookup_dict, f, indent=2, sort_keys=True)
+        json_dump(lookup_dict, f, indent=1, sort_keys=True)
     cbor_path = join(abspath("../resource/minecraft/info"), version, f"vanilla_lookup.cbor")
     with open(cbor_path, 'wb') as f:
         cbor_dump(lookup_dict, f, canonical=True)
 
 def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, FileInfo] = None, prev_aliases: set[str] = None) -> tuple[dict[str, FileInfo], set[str]]:
+    def add_elem():
+        elem = ET.SubElement(resource, "file", alias=alias_path)
+        elem.text = rel_path
+    
     print(f"Generating .qrc file for {version} vanilla datapack...")
 
     prefix = f"/minecraft/{version}/data-json"
@@ -99,16 +118,16 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
             # print(rel_path, alias_path)
             if not alias_path in info_dict:
                 info_dict[alias_path] = FileInfo(file_size, version)
-                ET.SubElement(resource, "file", alias=alias_path).text = rel_path
+                add_elem()
                 added += 1
             elif info_dict[alias_path].size != file_size:
                 info_dict[alias_path] = FileInfo(file_size, version)
-                ET.SubElement(resource, "file", alias=alias_path).text = rel_path
+                add_elem()
                 updated += 1
             elif prev_ver:
                     prev_path = join(info_dir, version, "data-json",  alias_path)
                     if not is_file_equal(file_path, prev_path):
-                        ET.SubElement(resource, "file", alias=alias_path).text = rel_path
+                        add_elem()
                         info_dict[alias_path] = FileInfo(file_size, version)
                         updated += 1
                     else:
