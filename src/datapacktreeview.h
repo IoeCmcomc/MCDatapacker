@@ -34,11 +34,13 @@ private slots:
     void contextMenuOnNewFolder();
     void contextMenuOnNew(const QString &name,
                           const QString &catDir = QString());
+    void contextMenuOnNewCustomTag();
     void contextMenuOnOpen();
     void contextMenuOnRename();
     void contextMenuOnDelete();
     void contextMenuOnCopyId();
     void resizeFirstColumn();
+    void showContainingFolder() const;
 
 private:
     QFileSystemModel dirModel;

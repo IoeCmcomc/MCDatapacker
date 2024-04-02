@@ -20,6 +20,8 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QAction>
+#include <QProcess>
+#include <QDesktopServices>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
@@ -104,19 +106,17 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
         }
     }
 
-
     if (path != QLatin1String("data") &&
         path != QLatin1String("pack.mcmeta")) {
-        QAction *cMenuActionRename = new QAction(tr("Rename"), cMenu);
-        connect(cMenuActionRename, &QAction::triggered,
-                this, &DatapackTreeView::contextMenuOnRename);
-        cMenu->addAction(cMenuActionRename);
-
-        QAction *cMenuActionDelete = new QAction(tr("Delete"), cMenu);
-        connect(cMenuActionDelete, &QAction::triggered,
-                this, &DatapackTreeView::contextMenuOnDelete);
-        cMenu->addAction(cMenuActionDelete);
+        cMenu->addAction(tr("Rename"), this,
+                         &DatapackTreeView::contextMenuOnRename);
+        cMenu->addAction(tr("Delete"), this,
+                         &DatapackTreeView::contextMenuOnDelete);
     }
+
+    cMenu->addAction(tr("Show containing folder"), this,
+                     &DatapackTreeView::showContainingFolder);
+
 
     if (path != QLatin1String("pack.mcmeta")) {
         cMenu->addSeparator();
@@ -193,20 +193,8 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
             if (Game::version() >= Game::v1_18_2) {
                 QAction *action = new QAction(tr("Other..."), tagMenu);
 
-                connect(action, &QAction::triggered, this, [this]() {
-                    bool ok;
-                    const QString &tagType =
-                        QInputDialog::getText(
-                            this, tr("Tag folder path"),
-                            tr(
-                                "Please type the folder path of the tag (without the 'tags' prefix):"),
-                            QLineEdit::Normal, QString(), &ok);
-                    if (ok && !tagType.isEmpty()) {
-                        this->contextMenuOnNew(QLatin1String(".json"),
-                                               QStringLiteral(
-                                                   "tags/") + tagType);
-                    }
-                });
+                connect(action, &QAction::triggered, this,
+                        &DatapackTreeView::contextMenuOnNewCustomTag);
                 tagMenu->addAction(action);
             }
 
@@ -455,6 +443,24 @@ void DatapackTreeView::contextMenuOnNew(const QString &ext,
     }
 }
 
+void DatapackTreeView::contextMenuOnNewCustomTag() {
+    bool           ok;
+    const QString &tagType =
+        QInputDialog::getText(
+            this,
+            tr("Tag folder path"),
+            tr(
+                "Please type the folder path of the tag (without the 'tags' prefix):"),
+            QLineEdit::Normal,
+            QString(),
+            &ok);
+
+    if (ok && !tagType.isEmpty()) {
+        this->contextMenuOnNew(QLatin1String(".json"),
+                               QStringLiteral("tags/") + tagType);
+    }
+}
+
 void DatapackTreeView::contextMenuOnOpen() {
     /*QModelIndex selected = getSelected(); */
     QModelIndex selected = indexAt(cMenuPos);
@@ -582,12 +588,43 @@ void DatapackTreeView::contextMenuOnCopyId() {
 
     if (selected.isValid()) {
         QString &&filepath = dirModel.filePath(selected);
-        qApp->clipboard()->setText(Glhp::toNamespacedID(dirPath, filepath));
+        qApp->clipboard()->setText(Glhp::toNamespacedID(dirPath,
+                                                        filepath));
     }
 }
 
 void DatapackTreeView::resizeFirstColumn() {
     resizeColumnToContents(0);
+}
+
+// Based from: https://stackoverflow.com/q/3490336/12682038
+void DatapackTreeView::showContainingFolder() const {
+    QModelIndex &&selected = indexAt(cMenuPos);
+
+    if (selected.isValid()) {
+        QString &&filepath = dirModel.filePath(selected);
+#ifdef Q_OS_WIN
+        bool ok = QProcess::startDetached(QStringLiteral("explorer.exe"), {
+            QStringLiteral("/select,"), QDir::toNativeSeparators(filepath) });
+        if (ok) {
+            return;
+        }
+#elif Q_OS_MACOS // not tested
+        QProcess::execute("/usr/bin/osascript",
+                          { "-e",
+                            "tell application \"Finder\" to reveal POSIX file \"" + filepath +
+                            "\"" });
+        bool exitCode = QProcess::execute("/usr/bin/osascript",
+                                          { "-e",
+                                            "tell application \"Finder\" to activate" });
+        if (exitCode == 0) {
+            return;
+        }
+#endif
+        const auto &&finfo = dirModel.fileInfo(selected);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(finfo.isDir()? filepath :
+                                                      finfo.path()));
+    }
 }
 
 void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {
