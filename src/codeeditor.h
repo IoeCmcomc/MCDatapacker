@@ -64,6 +64,16 @@ signals:
     void updateStatusBarRequest(CodeEditor *editor);
     void showMessageRequest(const QString &msg, int timeout);
 
+public: // Slots
+    void openFindDialog();
+    void openReplaceDialog();
+    void toggleComment();
+    void copyLineUp();
+    void copyLineDown();
+    void moveLineUp();
+    void moveLineDown();
+    void selectCurrentLine();
+
 protected:
     friend class LineNumberArea;
     friend class ProblemArea;
@@ -84,14 +94,6 @@ private /*slots*/ :
     void updateGutterWidth(int newBlockCount);
     void onCursorPositionChanged();
     void updateGutter(const QRect &rect, int dy);
-    void openFindDialog();
-    void openReplaceDialog();
-    void toggleComment();
-    void copyLineUp();
-    void copyLineDown();
-    void moveLineUp();
-    void moveLineDown();
-    void selectCurrentLine();
     void onUndoAvailable(bool value);
     void onRedoAvailable(bool value);
     void insertCompletion(const QString &completion);

@@ -13,7 +13,6 @@
 AdvancementTabDock::AdvancementTabDock(QWidget *parent) :
     QDockWidget(parent), ui(new Ui::AdvancementTabDock) {
     ui->setupUi(this);
-    hide();
 
     connect(this, &QDockWidget::visibilityChanged, this,
             [this](const bool visible) {

@@ -4,6 +4,7 @@
 #include "globalhelpers.h"
 #include "tabbeddocumentinterface.h"
 #include "imgviewer.h"
+#include "codeeditor.h"
 
 #include "game.h"
 

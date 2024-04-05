@@ -1,14 +1,18 @@
 #ifndef TABBEDCODEEDITORINTERFACE_H
 #define TABBEDCODEEDITORINTERFACE_H
 
-#include "codeeditor.h"
-#include "imgviewer.h"
+#include "codefile.h"
 
 #include <QFrame>
-#include <QStackedWidget>
-#include <QTabBar>
+
+QT_BEGIN_NAMESPACE
+class QTextDocument;
+class QTabBar;
+QT_END_NAMESPACE
 
 class MainWindow;
+class CodeEditor;
+class ImgViewer;
 
 namespace Ui {
     class TabbedDocumentInterface;
@@ -18,6 +22,11 @@ class TabbedDocumentInterface : public QFrame {
     Q_OBJECT
 
 public:
+    enum class ActionType {
+        ZoomIn,
+        ZoomOut,
+    };
+
     explicit TabbedDocumentInterface(QWidget *parent = nullptr);
     ~TabbedDocumentInterface();
 
@@ -46,12 +55,8 @@ public /*slots*/ :
     bool saveAllFile();
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);
-    void undo();
-    void redo();
-    void selectAll();
-    void cut();
-    void copy();
-    void paste();
+    void invokeCodeEditor(void (CodeEditor::*method)());
+    void invokeActionType(ActionType act);
     void setPackOpened(const bool value);
     void updateRecentPacks(const QVector<QAction *> &actions, const int size);
 

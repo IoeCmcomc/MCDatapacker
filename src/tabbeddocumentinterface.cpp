@@ -8,6 +8,8 @@
 #include "mcbuildhighlighter.h"
 #include "jsonhighlighter.h"
 #include "mainwindow.h"
+#include "codeeditor.h"
+#include "imgviewer.h"
 #include "parsers/command/mcfunctionparser.h"
 #include "parsers/jsonparser.h"
 
@@ -465,39 +467,35 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
     }
 }
 
-void TabbedDocumentInterface::undo() {
+void TabbedDocumentInterface::invokeCodeEditor(void (CodeEditor::*method)()) {
     if (auto *editor = getCodeEditor()) {
-        editor->undo();
+        (editor->*method)();
     }
 }
 
-void TabbedDocumentInterface::redo() {
-    if (auto *editor = getCodeEditor()) {
-        editor->redo();
-    }
-}
+void TabbedDocumentInterface::invokeActionType(ActionType act) {
+    constexpr qreal zoomInFactor  = 1.15;
+    constexpr qreal zoomOutFactor = 1. / zoomInFactor;
 
-void TabbedDocumentInterface::selectAll() {
-    if (auto *editor = getCodeEditor()) {
-        editor->selectAll();
-    }
-}
-
-void TabbedDocumentInterface::cut() {
-    if (auto *editor = getCodeEditor()) {
-        editor->cut();
-    }
-}
-
-void TabbedDocumentInterface::copy() {
-    if (auto *editor = getCodeEditor()) {
-        editor->copy();
-    }
-}
-
-void TabbedDocumentInterface::paste() {
-    if (auto *editor = getCodeEditor()) {
-        editor->paste();
+    switch (act) {
+        case ActionType::ZoomIn: {
+            if (auto *editor = getCodeEditor()) {
+                editor->zoomIn();
+            } else if (auto *viewer = getImgViewer()) {
+                viewer->scale(zoomInFactor, zoomInFactor);
+            }
+            break;
+        }
+        case ActionType::ZoomOut: {
+            if (auto *editor = getCodeEditor()) {
+                editor->zoomOut();
+            } else if (auto *viewer = getImgViewer()) {
+                viewer->scale(zoomOutFactor, zoomOutFactor);
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
 

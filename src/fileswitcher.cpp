@@ -5,6 +5,7 @@
 #include <QShortcut>
 #include <QApplication>
 #include <QScreen>
+#include <QKeyEvent>
 
 FileSwitcher::FileSwitcher(TabbedDocumentInterface *parent, bool backward)
     : QListWidget(parent) {
