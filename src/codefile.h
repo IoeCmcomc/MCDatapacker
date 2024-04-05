@@ -53,14 +53,12 @@ struct CodeFile {
         Text_end,
     };
 
-    QVariant  data;
     QFileInfo info;
     FileType  fileType   = Unknown;
     bool      isModified = false;
 
     CodeFile(const QString &path);
 
-    bool isValid() const;
     QString name() const;
     QString path() const;
     void changePath(const QString &path);

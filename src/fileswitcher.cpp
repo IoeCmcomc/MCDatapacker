@@ -111,8 +111,10 @@ void FileSwitcher::initFileList() {
     for (const auto &file: *files) {
         const QFileInfo  finfo(file.info);
         QListWidgetItem *fileItem = new QListWidgetItem(this);
-        fileItem->setText
-            (QDir::current().relativeFilePath(finfo.filePath()));
+        const QString  &&path     = (file.path().startsWith(":"))
+                    ? file.path()
+                    : QDir::current().relativeFilePath(file.path());
+        fileItem->setText(path);
         fileItem->setIcon(Glhp::fileTypeToIcon(file.fileType));
         fileItem->setToolTip(finfo.filePath());
         addItem(fileItem);

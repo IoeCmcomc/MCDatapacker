@@ -225,6 +225,12 @@ void TabbedDocumentInterface::addFile(const QString &path) {
 
         auto *codeEditor = new CodeEditor(this);
         codeEditor->setPlainText(text);
+        if (!newFile.info.isWritable()) {
+            codeEditor->setReadOnly(true);
+            codeEditor->setTextInteractionFlags(
+                codeEditor->textInteractionFlags() |
+                Qt::TextSelectableByKeyboard);
+        }
 
         if (newFile.fileType >= CodeFile::JsonText
             && newFile.fileType < CodeFile::JsonText_end) {
@@ -310,8 +316,13 @@ void TabbedDocumentInterface::addFile(const QString &path) {
     }
     if (widget) {
         files << newFile;
-        const auto &&icon  = Glhp::fileTypeToIcon(newFile.fileType);
-        const int    index =
+        QIcon icon;
+        if (newFile.info.isWritable()) {
+            icon = Glhp::fileTypeToIcon(newFile.fileType);
+        } else {
+            icon.addFile(QStringLiteral(":/icon/file-readonly.png"));
+        }
+        const int index =
             ui->tabWidget->addTab(widget, icon, newFile.name());
         ui->tabWidget->setCurrentIndex(index);
     }

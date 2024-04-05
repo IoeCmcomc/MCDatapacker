@@ -72,6 +72,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(document(), &QTextDocument::contentsChanged,
             this, &CodeEditor::onTextChanged);
 
+    connect(new QShortcut(QKeySequence(
+                              Qt::CTRL + Qt::Key_L), this),
+            &QShortcut::activated, this, &CodeEditor::selectCurrentLine);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this),
@@ -90,9 +93,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(new QShortcut(QKeySequence(
                               Qt::CTRL + Qt::SHIFT + Qt::Key_Up), this),
             &QShortcut::activated, this, &CodeEditor::moveLineUp);
-    connect(new QShortcut(QKeySequence(
-                              Qt::CTRL + Qt::Key_L), this),
-            &QShortcut::activated, this, &CodeEditor::selectCurrentLine);
 
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
@@ -528,8 +528,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 
     QAction *formatAction = new QAction(tr("Format"), menu);
 
-    formatAction->setDisabled(!((CodeFile::JsonText <= m_fileType) &&
-                                (m_fileType <= CodeFile::JsonText_end)));
+    formatAction->setDisabled(isReadOnly()
+                              || !((CodeFile::JsonText <= m_fileType) &&
+                                   (m_fileType <= CodeFile::JsonText_end)));
     if (formatAction->isEnabled()) {
         connect(formatAction, &QAction::triggered, this, [ = ]() {
             QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
@@ -545,9 +546,8 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     }
     menu->addAction(formatAction);
 
-    /*... */
     menu->exec(e->globalPos());
-    delete menu;
+    menu->deleteLater();
 }
 
 static QPoint translatedMargins(const QPoint &p, const QMargins &margins) {
@@ -705,6 +705,9 @@ void CodeEditor::openFindDialog() {
 }
 
 void CodeEditor::openReplaceDialog() {
+    if (isReadOnly())
+        return;
+
     auto *frdialog = new FindReplaceDialog(this);
 
     frdialog->setEditor(this);
@@ -712,7 +715,7 @@ void CodeEditor::openReplaceDialog() {
 }
 
 void CodeEditor::toggleComment() {
-    if (!m_highlighter ||
+    if (isReadOnly() || !m_highlighter ||
         m_highlighter->m_singleCommentChar.isNull())
         return;
 
@@ -811,6 +814,9 @@ void CodeEditor::copyLineUp() {
 }
 
 void CodeEditor::copyLineDown() {
+    if (isReadOnly())
+        return;
+
     QTextCursor &&cursor = textCursor();
 
     selectEnclosingLines(cursor);
@@ -832,6 +838,9 @@ void CodeEditor::copyLineDown() {
 }
 
 void CodeEditor::moveLineUp() {
+    if (isReadOnly())
+        return;
+
     QTextCursor &&cursor = textCursor();
 
     selectEnclosingLines(cursor);
@@ -855,6 +864,9 @@ void CodeEditor::moveLineUp() {
 }
 
 void CodeEditor::moveLineDown() {
+    if (isReadOnly())
+        return;
+
     QTextCursor &&cursor = textCursor();
 
     selectEnclosingLines(cursor);

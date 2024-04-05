@@ -28,5 +28,6 @@
         <file>images/norwegianwoodstyle/woodbackground.png</file>
         <file>images/norwegianwoodstyle/woodbutton.png</file>
         <file>icon/favicon_grayscale.png</file>
+        <file>icon/file-readonly.png</file>
     </qresource>
 </RCC>

@@ -292,7 +292,7 @@ bool Game::isVanillaFileExists(const QString &catDir, const QString &path) {
 
 QString Game::realVanillaFilePath(const QString &catDir, const QString &path) {
     const static QString pathTemplate(
-        QStringLiteral(":minecraft/%1/data-json/data/minecraft/%2/%3"));
+        QStringLiteral(":/minecraft/%1/data-json/data/minecraft/%2/%3"));
 
     const QString &&directPath = pathTemplate.arg(Game::versionString(),
                                                   catDir, path);

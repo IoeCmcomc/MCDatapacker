@@ -6,10 +6,6 @@ CodeFile::CodeFile(const QString &path) {
     changePath(path);
 }
 
-bool CodeFile::isValid() const {
-    return (!info.filePath().isEmpty()) && data.isValid();
-}
-
 QString CodeFile::name() const {
     return info.fileName();
 }
@@ -27,8 +23,7 @@ QDebug operator<<(QDebug debug, const CodeFile &file) {
     QDebugStateSaver saver(debug);
 
     debug.nospace() << "CodeFile(" << file.info << ", "
-                    << file.fileType << ", "
-                    << file.data << ')';
+                    << file.fileType << ')';
 
     return debug;
 }

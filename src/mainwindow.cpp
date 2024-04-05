@@ -815,7 +815,7 @@ void MainWindow::updateEditMenu() {
         ui->actionRedo->setEnabled(editor->getCanRedo());
         ui->actionSelectAll->setEnabled(true);
         const bool hasSelection = editor->textCursor().hasSelection();
-        ui->actionCut->setEnabled(hasSelection);
+        ui->actionCut->setEnabled(hasSelection && !editor->isReadOnly());
         ui->actionCopy->setEnabled(hasSelection);
         ui->actionPaste->setEnabled(editor->canPaste());
     } else {
