@@ -194,8 +194,6 @@ QVariantMap Game::loadInfo(const QString &type, const QString &version,
     return retMap;
 }
 
-using VanillaLookupMap = QMap<QString, QMap<QString, QString> >;
-
 static VanillaLookupMap loadVainllaLookupMap() {
     QSet<QString>    versionPool;
     VanillaLookupMap res;
@@ -265,7 +263,7 @@ static VanillaLookupMap loadVainllaLookupMap() {
     return res;
 }
 
-static VanillaLookupMap &getVainllaLookupMap() {
+VanillaLookupMap Game::getVainllaLookupMap() {
     static VanillaLookupMap lookupTable = loadVainllaLookupMap();
 
     return lookupTable;

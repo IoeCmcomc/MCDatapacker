@@ -1177,6 +1177,8 @@
   "story/smelt_iron.json": "1.17",
   "story/upgrade_tools.json": "1.17"
  },
+ "chat_type": {},
+ "datapacks": {},
  "dimension": {
   "overworld.json": "1.19",
   "the_end.json": "1.19",
@@ -3482,6 +3484,7 @@
   "villages.json": "1.18.2",
   "woodland_mansions.json": "1.18.2"
  },
+ "worldgen/template_pool": {},
  "worldgen/world_preset": {
   "amplified.json": "1.19",
   "debug_all_block_states.json": "1.19",

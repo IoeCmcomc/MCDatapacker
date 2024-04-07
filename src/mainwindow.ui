@@ -271,6 +271,7 @@
     <addaction name="actionLootTableEditor"/>
     <addaction name="actionPredicateEditor"/>
     <addaction name="actionRecipeEditor"/>
+    <addaction name="actionDefaultDatapack"/>
     <addaction name="separator"/>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
@@ -565,7 +566,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Advancement viewer</string>
+    <string>&amp;Advancement viewer</string>
    </property>
   </action>
   <action name="actionItemModifierEditor">
@@ -573,7 +574,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Item modifier editor</string>
+    <string>&amp;Item modifier editor</string>
    </property>
   </action>
   <action name="actionLootTableEditor">
@@ -581,7 +582,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Loot table editor</string>
+    <string>&amp;Loot table editor</string>
    </property>
   </action>
   <action name="actionPredicateEditor">
@@ -589,7 +590,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Predicate editor</string>
+    <string>&amp;Predicate editor</string>
    </property>
   </action>
   <action name="actionRecipeEditor">
@@ -597,7 +598,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Recipe editor</string>
+    <string>&amp;Recipe editor</string>
    </property>
   </action>
   <action name="actionSelectCurrentLine">
@@ -650,7 +651,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Find...</string>
+    <string>&amp;Find...</string>
    </property>
   </action>
   <action name="actionReplace">
@@ -658,7 +659,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Replace...</string>
+    <string>&amp;Replace...</string>
    </property>
   </action>
   <action name="actionZoomIn">
@@ -666,7 +667,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Zoom in</string>
+    <string>&amp;Zoom in</string>
    </property>
   </action>
   <action name="actionZoomOut">
@@ -674,7 +675,15 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Zoom out</string>
+    <string>Zoom &amp;out</string>
+   </property>
+  </action>
+  <action name="actionDefaultDatapack">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Default datapack</string>
    </property>
   </action>
  </widget>

@@ -38,7 +38,7 @@ public:
     CodeFile * getCurFile();
     QString getCurFilePath();
     QTextDocument * getCurDoc();
-    QVector<CodeFile> * getFiles();
+    QVector<CodeFile> &getFiles();
     CodeEditor * getCodeEditor() const;
     ImgViewer * getImgViewer() const;
 

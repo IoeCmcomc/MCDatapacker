@@ -469,3 +469,13 @@ QString Glhp::fileTypeToName(const CodeFile::FileType type) {
 
     return QCoreApplication::translate("Glhp", valueMap[type]);
 }
+
+bool Glhp::removeInternalPrefix(QString &path) {
+    if (removePrefix(path, ":/minecraft/"_QL1)) {
+        const int index = path.indexOf('/');
+        path.remove(0, index + 1);
+        return true;
+    } else {
+        return false;
+    }
+}

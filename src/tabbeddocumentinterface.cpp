@@ -354,8 +354,8 @@ QTextDocument * TabbedDocumentInterface::getCurDoc() {
     }
 }
 
-QVector<CodeFile> * TabbedDocumentInterface::getFiles() {
-    return &files;
+QVector<CodeFile> &TabbedDocumentInterface::getFiles() {
+    return files;
 }
 
 CodeEditor * TabbedDocumentInterface::getCodeEditor() const {
@@ -552,7 +552,7 @@ void TabbedDocumentInterface::onTabChanged(int index) {
         ui->stackedWidget->setCurrentIndex(2);
         emit curFileChanged(curFile->path());
     } else {
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(m_packOpened ? 1 : 0);
 
         emit curFileChanged(QString());
     }

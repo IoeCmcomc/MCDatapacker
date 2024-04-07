@@ -4040,6 +4040,7 @@
   "quartz.json": "1.20",
   "redstone.json": "1.20"
  },
+ "trim_pattern": {},
  "worldgen/biome": {
   "basalt_deltas.json": "1.19.4",
   "crimson_forest.json": "1.19.4",

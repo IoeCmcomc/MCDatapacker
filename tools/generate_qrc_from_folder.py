@@ -50,25 +50,32 @@ def paths_to_dict(paths: dict[str, str]) -> dict:
 
     return folders
 
+def extract_category(path: str) -> str:
+    category, path = path.split('/', 1)
+    if category in ('tags', 'worldgen'):
+        subcat, path = path.split('/', 1)
+        category += '/' + subcat
+    return category, path
+
 PREFIX_LEN = len("data/minecraft/")
 
-def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo]) -> None:
+def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo], categories: set[str] = None) -> None:
     lookup_dict: dict[str, dict[str, str]] = {}
 
     for alias, file_info in info_dict.items():
         ver = file_info.version
         if (ver != version):
             key = alias[PREFIX_LEN:]
-            category, key = key.split('/', 1)
-            if category in ('tags', 'worldgen'):
-                subcat, key = key.split('/', 1)
-                category += '/' + subcat
+            category, key = extract_category(key)
             if category not in lookup_dict:
                 lookup_dict[category] = {}
             lookup_dict[category][key] = ver
     
     # for category, aliases in lookup_dict.items():
     #     lookup_dict[category] = paths_to_dict(aliases)
+    for category in categories:
+        if category not in lookup_dict:
+            lookup_dict[category] = {}
         
     json_path = join(abspath("../resource/minecraft/info"), version, f"vanilla_lookup.json")
     with open(json_path, 'w') as f:
@@ -90,6 +97,7 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
     # qrc_dir = abspath(f"../resource/minecraft/info")
     qrc_path = join(qrc_dir, f"{version}-data-json.qrc")
     target_dir = join(qrc_dir, "data-json")
+    minecraft_dir = join(target_dir, "data", "minecraft")
     # target_dir = join(qrc_dir, f"{version}/data-json")
 
     if not prev_info_dict:
@@ -97,6 +105,7 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
     else:
         info_dict = deepcopy(prev_info_dict)
     aliases = set()
+    categories = set()
 
     added = 0
     updated = 0
@@ -113,7 +122,10 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
             file_path = join(dirpath, filename)
             rel_path = relpath(file_path, qrc_dir).replace('\\', '/')
             alias_path = relpath(file_path, target_dir).replace('\\', '/')
+            id_path = relpath(file_path, minecraft_dir).replace('\\', '/')
             aliases.add(alias_path)
+            category, _ = extract_category(id_path)
+            categories.add(category)
             file_size = getsize(file_path)
             # print(rel_path, alias_path)
             if not alias_path in info_dict:
@@ -146,9 +158,10 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
     with open(version + "-diff_info.json", 'w') as f:
         json_dump(info_dict, f, indent=4)
 
-    save_resource_lookup_file(version, info_dict)
+    save_resource_lookup_file(version, info_dict, categories)
 
     print(f"{version} has {len(aliases)} file(s).")
+    print(f"This version has {len(categories)} categories.")
     print(f"Added {added} file(s), updated {updated} file(s), kept {kept} file(s), removed {removed} file(s)")
 
     return info_dict, aliases

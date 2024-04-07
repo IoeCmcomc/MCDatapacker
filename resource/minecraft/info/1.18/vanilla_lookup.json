@@ -3372,6 +3372,8 @@
   "wooden_trapdoors.json": "1.16",
   "wool.json": "1.15"
  },
+ "worldgen/biome": {},
+ "worldgen/configured_carver": {},
  "worldgen/configured_feature": {
   "bonus_chest.json": "1.17",
   "end_gateway_delayed.json": "1.17",
@@ -3420,6 +3422,9 @@
   "village_snowy.json": "1.17",
   "village_taiga.json": "1.17"
  },
+ "worldgen/noise": {},
+ "worldgen/noise_settings": {},
+ "worldgen/placed_feature": {},
  "worldgen/processor_list": {
   "bastion_generic_degradation.json": "1.17",
   "bottom_rampart.json": "1.17",

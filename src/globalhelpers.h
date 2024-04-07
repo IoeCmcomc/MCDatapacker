@@ -45,6 +45,7 @@ namespace Glhp {
 
     bool removePrefix(QString &str, QLatin1String prefix);
     bool removePrefix(QString &str, QStringView prefix = minecraftPrefix);
+    bool removeInternalPrefix(QString &path);
 
     extern const QMap<QString, QString> colorHexes;
     extern const QMap<char, QString>    colorCodes;

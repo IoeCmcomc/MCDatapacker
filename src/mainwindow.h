@@ -22,6 +22,7 @@ class LootTableEditorDock;
 class PredicateDock;
 class StatusBar;
 class VisualRecipeEditorDock;
+class VanillaDatapackDock;
 
 namespace libqdark {
     class SystemThemeHelper;
@@ -90,6 +91,7 @@ private /*slots*/ :
     void onLootTableDockAction(const bool checked);
     void onPredicateDockAction(const bool checked);
     void onRecipeDockAction(const bool checked);
+    void onVanillaDockAction(const bool checked);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
@@ -108,6 +110,7 @@ private:
     ItemModifierDock *m_itemModifierDock             = nullptr;
     LootTableEditorDock *m_lootTableEditorDock       = nullptr;
     PredicateDock *m_predicateDock                   = nullptr;
+    VanillaDatapackDock *m_vanillaDock               = nullptr;
     VisualRecipeEditorDock *m_recipeEditorDock       = nullptr;
     libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
     QVector<QAction *> recentFoldersActions;

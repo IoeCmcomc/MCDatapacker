@@ -1179,6 +1179,7 @@
   "team_msg_command_incoming.json": "1.19.3",
   "team_msg_command_outgoing.json": "1.19.3"
  },
+ "damage_type": {},
  "datapacks": {
   "bundle/data/minecraft/advancements/recipes/tools/bundle.json": "1.19.3",
   "update_1_20/data/minecraft/advancements/recipes/building_blocks/bamboo_block.json": "1.19.3",
@@ -3020,6 +3021,7 @@
   "default_spawns.json": "1.19",
   "full_moon_spawns.json": "1.19"
  },
+ "tags/damage_type": {},
  "tags/entity_types": {
   "arrows.json": "1.19",
   "axolotl_always_hostiles.json": "1.19",
@@ -3215,6 +3217,7 @@
   "world_preset/extended.json": "1.19",
   "world_preset/normal.json": "1.19"
  },
+ "worldgen/biome": {},
  "worldgen/configured_carver": {
   "canyon.json": "1.19",
   "cave.json": "1.19",
@@ -3462,6 +3465,7 @@
   "tunnelers_dream.json": "1.19",
   "water_world.json": "1.19"
  },
+ "worldgen/multi_noise_biome_source_parameter_list": {},
  "worldgen/noise": {
   "aquifer_barrier.json": "1.18",
   "aquifer_fluid_level_floodedness.json": "1.18",

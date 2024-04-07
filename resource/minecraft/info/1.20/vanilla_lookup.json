@@ -1,4 +1,5 @@
 {
+ "advancements": {},
  "chat_type": {
   "chat.json": "1.19.3",
   "emote_command.json": "1.19.3",
@@ -65,6 +66,7 @@
   "the_end.json": "1.19",
   "the_nether.json": "1.19.3"
  },
+ "loot_tables": {},
  "recipes": {
   "acacia_boat.json": "1.19.4",
   "acacia_button.json": "1.19.3",
@@ -1442,6 +1444,8 @@
   "world_preset/extended.json": "1.19",
   "world_preset/normal.json": "1.19"
  },
+ "trim_material": {},
+ "trim_pattern": {},
  "worldgen/biome": {
   "basalt_deltas.json": "1.19.4",
   "beach.json": "1.19.4",

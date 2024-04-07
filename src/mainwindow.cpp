@@ -19,29 +19,30 @@
 #include "darkfusionstyle.h"
 #include "norwegianwoodstyle.h"
 #include "codeeditor.h"
+#include "vanilladatapackdock.h"
 
 #include "game.h"
 #include "platforms/windows_specific.h"
 
 #include "QSimpleUpdater.h"
-#include "zip.hpp"
 #include "SystemThemeHelper.h"
+#include "zip.hpp"
 #include <oclero/qlementine.hpp>
 
-#include <QDebug>
-#include <QFileDialog>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QSettings>
-#include <QScreen>
-#include <QFileInfo>
-#include <QCloseEvent>
-#include <QProcess>
-#include <QShortcut>
 #include <QClipboard>
+#include <QCloseEvent>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QProcess>
 #include <QProgressDialog>
 #include <QSaveFile>
-#include <QDesktopServices>
+#include <QScreen>
+#include <QSettings>
+#include <QShortcut>
 
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
@@ -54,9 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_initialStyleId = style()->objectName();
     moveOldSettings();
     readSettings();
-    loadLanguage(locale().name());
-
-    /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
     m_statusBar = new StatusBar(this, ui->tabbedInterface);
     setStatusBar(m_statusBar);
@@ -138,6 +136,8 @@ void MainWindow::initDocks() {
             &MainWindow::onPredicateDockAction);
     connect(ui->actionRecipeEditor, &QAction::triggered, this,
             &MainWindow::onRecipeDockAction);
+    connect(ui->actionDefaultDatapack, &QAction::triggered, this,
+            &MainWindow::onVanillaDockAction);
 }
 
 void MainWindow::initMenu() {
@@ -911,16 +911,17 @@ void MainWindow::setAppStyle(const QString &name) {
 void MainWindow::changeEvent(QEvent *event) {
     if (event != nullptr) {
         switch (event->type()) {
-            /* this event is sent if a translator is loaded */
+            /* This event is sent if a translator is loaded */
             case QEvent::LanguageChange: {
-                /*qDebug() << "QEvent::LanguageChange"; */
                 ui->retranslateUi(this);
                 break;
             }
 
-            /* this event is sent if the system locale changes (internal locale changes on Windows) */
+            /* This event is sent if the system locale changes
+             * (internal locale changes on Windows).
+             * It is also sent when the widget' locale changes.
+             */
             case QEvent::LocaleChange: {
-                qDebug() << "QEvent::LocaleChange" << locale();
                 const QString &locale = QSettings().value("interface/locale",
                                                           QString()).toString();
                 loadLanguage(
@@ -1098,6 +1099,23 @@ void MainWindow::onRecipeDockAction(const bool checked) {
         }
     } else if (m_recipeEditorDock) {
         m_recipeEditorDock->hide();
+    }
+}
+
+void MainWindow::onVanillaDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_vanillaDock)) {
+            m_vanillaDock = new VanillaDatapackDock(this);
+            addDockWidget(Qt::RightDockWidgetArea, m_vanillaDock);
+            connect(m_vanillaDock, &QDockWidget::visibilityChanged,
+                    ui->actionDefaultDatapack, &QAction::setChecked);
+            connect(m_vanillaDock, &VanillaDatapackDock::openFileRequested,
+                    ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+        } else {
+            m_vanillaDock->show();
+        }
+    } else if (m_vanillaDock) {
+        m_vanillaDock->hide();
     }
 }
 

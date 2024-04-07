@@ -13,10 +13,10 @@ public:
     explicit StringVectorModel(const StringVector &vec,
                                QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex &parent    = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex &parent    = QModelIndex()) const final;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const final;
     QVariant data(const QModelIndex &index,
-                  int role = Qt::DisplayRole) const override;
+                  int role = Qt::DisplayRole) const final;
 
     StringVector vector() const;
     void setVector(const StringVector &newVector);

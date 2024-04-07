@@ -103,13 +103,13 @@ void FileSwitcher::onSelectPrevItem() {
 }
 
 void FileSwitcher::initFileList() {
-    const auto *files = parent->getFiles();
+    const auto &files = parent->getFiles();
 
-    if (!files) {
+    if (files.isEmpty()) {
         return;
     }
 
-    for (const auto &file: *files) {
+    for (const auto &file: files) {
         const QFileInfo  finfo(file.info);
         QListWidgetItem *fileItem = new QListWidgetItem(this);
         const QString  &&path     = (file.path().startsWith(":"))

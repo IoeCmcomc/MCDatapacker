@@ -1143,6 +1143,7 @@
   "the_end.json": "1.17",
   "the_nether.json": "1.18"
  },
+ "dimension_type": {},
  "loot_tables": {
   "blocks/acacia_button.json": "1.17",
   "blocks/acacia_door.json": "1.17",
@@ -3412,6 +3413,7 @@
   "wooden_trapdoors.json": "1.16",
   "wool.json": "1.15"
  },
+ "tags/worldgen": {},
  "worldgen/biome": {
   "badlands.json": "1.18",
   "bamboo_jungle.json": "1.18",
@@ -3627,6 +3629,8 @@
   "warped_fungus_planted.json": "1.18",
   "weeping_vines.json": "1.18"
  },
+ "worldgen/configured_structure_feature": {},
+ "worldgen/density_function": {},
  "worldgen/noise": {
   "aquifer_barrier.json": "1.18",
   "aquifer_fluid_level_floodedness.json": "1.18",
@@ -3688,6 +3692,7 @@
   "vegetation.json": "1.18",
   "vegetation_large.json": "1.18"
  },
+ "worldgen/noise_settings": {},
  "worldgen/placed_feature": {
   "acacia.json": "1.18",
   "acacia_checked.json": "1.18",
@@ -3931,6 +3936,7 @@
   "zombie_snowy.json": "1.17",
   "zombie_taiga.json": "1.17"
  },
+ "worldgen/structure_set": {},
  "worldgen/template_pool": {
   "bastion/blocks/gold.json": "1.17",
   "bastion/bridge/bridge_pieces.json": "1.17",

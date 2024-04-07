@@ -3,7 +3,7 @@ TEMPLATE = app
 
 TARGET = MCDatapacker
 
-QT += core gui uitools svg widgets-private gui-private
+QT += core gui uitools svg widgets-private gui-private testlib
 win32:QT += winextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -146,6 +146,8 @@ SOURCES += \
     tagselectordialog.cpp \
     translatedtextobjectdialog.cpp \
     truefalsebox.cpp \
+    vanilladatapackdock.cpp \
+    vanilladatapackmodel.cpp \
     vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
@@ -268,6 +270,8 @@ HEADERS += \
     tagselectordialog.h \
     translatedtextobjectdialog.h \
     truefalsebox.h \
+    vanilladatapackdock.h \
+    vanilladatapackmodel.h \
     vieweventfilter.h \
     visualrecipeeditordock.h
 
@@ -300,6 +304,7 @@ FORMS += \
     tabbeddocumentinterface.ui \
     tagselectordialog.ui \
     translatedtextobjectdialog.ui \
+    vanilladatapackdock.ui \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \

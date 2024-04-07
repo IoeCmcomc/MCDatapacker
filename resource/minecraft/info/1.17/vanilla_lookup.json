@@ -80,6 +80,8 @@
   "story/follow_ender_eye.json": "1.16",
   "story/mine_stone.json": "1.16"
  },
+ "dimension": {},
+ "dimension_type": {},
  "loot_tables": {
   "blocks/cake.json": "1.15",
   "blocks/fire.json": "1.16",
@@ -1022,6 +1024,7 @@
   "lava.json": "1.15",
   "water.json": "1.15"
  },
+ "tags/game_events": {},
  "tags/items": {
   "acacia_logs.json": "1.15",
   "anvil.json": "1.15",
@@ -1067,5 +1070,13 @@
   "wooden_stairs.json": "1.16",
   "wooden_trapdoors.json": "1.16",
   "wool.json": "1.15"
- }
+ },
+ "worldgen/biome": {},
+ "worldgen/configured_carver": {},
+ "worldgen/configured_feature": {},
+ "worldgen/configured_structure_feature": {},
+ "worldgen/configured_surface_builder": {},
+ "worldgen/noise_settings": {},
+ "worldgen/processor_list": {},
+ "worldgen/template_pool": {}
 }
