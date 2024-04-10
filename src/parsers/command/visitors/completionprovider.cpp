@@ -198,6 +198,27 @@ namespace Command {
         m_suggestions += QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
 
+    void CompletionProvider::visit(LootModifierNode *) {
+        m_suggestions += Glhp::fileIdList(
+            QDir::currentPath(), QStringLiteral("item_modifiers"),
+            QString(), false);
+        m_suggestions += Game::getRegistry(QStringLiteral("item_modifier"));
+    }
+
+    void CompletionProvider::visit(LootPredicateNode *) {
+        m_suggestions += Glhp::fileIdList(
+            QDir::currentPath(), QStringLiteral("predicates"),
+            QString(), false);
+        m_suggestions += Game::getRegistry(QStringLiteral("predicate"));
+    }
+
+    void CompletionProvider::visit(LootTableNode *) {
+        m_suggestions += Glhp::fileIdList(
+            QDir::currentPath(), QStringLiteral("loot_tables"),
+            QString(), false);
+        m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
+    }
+
     QVector<QString> CompletionProvider::suggestions() const {
         return m_suggestions;
     }

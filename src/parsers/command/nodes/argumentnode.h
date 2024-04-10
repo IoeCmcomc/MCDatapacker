@@ -45,8 +45,12 @@ public:
             ItemEnchantment,
             ItemPredicate,
             ItemSlot,
+            ItemSlots,
             ItemStack,
             Item = ItemStack, // Obsolete
+            LootModifier,
+            LootPredicate,
+            LootTable,
             Message,
             MobEffect,
             NbtPath,

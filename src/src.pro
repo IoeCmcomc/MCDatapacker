@@ -83,6 +83,7 @@ SOURCES += \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/gamemodenode.cpp \
+    parsers/command/nodes/inlinableresourcenode.cpp \
     parsers/command/nodes/internalregexpatternnode.cpp \
     parsers/command/nodes/macronode.cpp \
     parsers/command/nodes/stylenode.cpp \
@@ -213,6 +214,7 @@ HEADERS += \
     parsers/command/nodes/filenode.h \
     parsers/command/nodes/floatrangenode.h \
     parsers/command/nodes/gamemodenode.h \
+    parsers/command/nodes/inlinableresourcenode.h \
     parsers/command/nodes/internalregexpatternnode.h \
     parsers/command/nodes/intrangenode.h \
     parsers/command/nodes/itemstacknode.h \

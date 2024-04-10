@@ -792,6 +792,17 @@ namespace Command {
         }
     }
 
+    void MinecraftParser::parseInlinableResource(InlinableResourceNode *node) {
+        if (curChar() == '{') {
+            node->setNode(parseCompoundTag());
+        } else {
+            const auto &&resLoc =
+                QSharedPointer<ResourceLocationNode>::create(0);
+            parseResourceLocation(resLoc.get(), false);
+            node->setNode(std::move(resLoc));
+        }
+    }
+
     NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
                                           const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;
@@ -822,7 +833,12 @@ namespace Command {
             case ParserType::ItemPredicate: { return minecraft_itemPredicate();
             }
             case ParserType::ItemSlot: { return minecraft_itemSlot(); }
+            case ParserType::ItemSlots: { return minecraft_itemSlots(); }
             case ParserType::ItemStack: { return minecraft_itemStack(); }
+            case ParserType::LootModifier: { return minecraft_lootModifier(); }
+            case ParserType::LootPredicate: { return minecraft_lootPredicate();
+            }
+            case ParserType::LootTable: { return minecraft_lootTable(); }
             case ParserType::Message: { return minecraft_message(); }
             case ParserType::MobEffect: { return minecraft_mobEffect(); }
             case ParserType::NbtCompoundTag: { return minecraft_nbtCompoundTag();
@@ -1133,13 +1149,21 @@ namespace Command {
         return ret;
     }
 
-    QSharedPointer<ItemSlotNode> MinecraftParser::
-    minecraft_itemSlot() {
+    QSharedPointer<ItemSlotNode> MinecraftParser::minecraft_itemSlot() {
         const auto slot = advanceView(re2c::itemSlot(peekRest()));
 
         return QSharedPointer<ItemSlotNode>::create(
             spanText(slot), errorIfNot(!slot.isEmpty(),
                                        QT_TR_NOOP("Invalid empty item slot")));
+    }
+
+    QSharedPointer<ItemSlotsNode> MinecraftParser::minecraft_itemSlots() {
+        const auto slot = advanceView(re2c::itemSlots(peekRest()));
+
+        return QSharedPointer<ItemSlotsNode>::create(
+            spanText(slot),
+            errorIfNot(!slot.isEmpty(),
+                       QT_TR_NOOP("Invalid empty item slot or slot range")));
     }
 
     QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
@@ -1170,6 +1194,28 @@ namespace Command {
             ret->setNbt(parseCompoundTag());
         }
         ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<LootModifierNode> MinecraftParser::minecraft_lootModifier() {
+        const auto &&ret = QSharedPointer<LootModifierNode>::create(0);
+
+        parseInlinableResource(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<LootPredicateNode> MinecraftParser::minecraft_lootPredicate()
+    {
+        const auto &&ret = QSharedPointer<LootPredicateNode>::create(0);
+
+        parseInlinableResource(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<LootTableNode> MinecraftParser::minecraft_lootTable() {
+        const auto &&ret = QSharedPointer<LootTableNode>::create(0);
+
+        parseInlinableResource(ret.get());
         return ret;
     }
 
@@ -1311,6 +1357,16 @@ namespace Command {
                 const auto &&endColor = parseParticleColor();
                 ret->setParams(std::move(startColor), std::move(size),
                                std::move(endColor));
+                break;
+            }
+            ucase ("entity_effect"_QL1): {
+                if (gameVer >= QVersionNumber(1, 20, 5)) {
+                    resLoc->setTrailingTrivia(eat(' ',
+                                                  "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                    const auto &&color = parseParticleColor();
+                    color->setTrailingTrivia(eat(' '));
+                    ret->setParams(std::move(color), brigadier_float());
+                }
                 break;
             }
             ucase ("item"_QL1): {
@@ -1608,7 +1664,10 @@ namespace Command {
 
     void MinecraftParser::setGameVer(const QVersionNumber &newGameVer,
                                      const bool autoLoadSchema) {
-        gameVer = newGameVer;
+        gameVer = QVersionNumber(1, 20, 5);
+        qWarning() <<
+            "The command parser is in 1.20.5 mode, except the schema.";
+        // gameVer = newGameVer;
 
         if (autoLoadSchema) {
             loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +

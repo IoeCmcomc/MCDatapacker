@@ -914,6 +914,7 @@ namespace Command {
                 if (isRoot) {
                     if (!schemaNode->isEmpty() && !schemaNode->redirect()) {
                         const QString &cmdGuide = commandGuideStr(schemaNode);
+                        Q_ASSERT(!cmdGuide.isEmpty());
                         reportError(QT_TR_NOOP(
                                         "Unknown command '%1'. Available commands: %2"),
                                     { literal, cmdGuide },
@@ -927,11 +928,13 @@ namespace Command {
                 } else {
                     if (!schemaNode->isEmpty() && !schemaNode->redirect()) {
                         const QString &cmdGuide = commandGuideStr(schemaNode);
-                        reportError(QT_TR_NOOP(
-                                        "Unknown sub-command '%1'. Available sub-commands: %2"),
-                                    { literal, cmdGuide },
-                                    start,
-                                    literal.length());
+                        if (!cmdGuide.isEmpty()) {
+                            reportError(QT_TR_NOOP(
+                                            "Unknown sub-command '%1'. Available sub-commands: %2"),
+                                        { literal, cmdGuide },
+                                        start,
+                                        literal.length());
+                        }
                     } else {
                         reportError(QT_TR_NOOP("Unknown sub-command '%1'"),
                                     { literal }, start, literal.length());

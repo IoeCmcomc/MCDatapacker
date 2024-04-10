@@ -22,7 +22,7 @@ protected:
             return this;                  \
         }                                 \
 
-class CharFormatBuilder : public Builder<QTextCharFormat> {
+class CharFmtBuilder : public Builder<QTextCharFormat> {
 public:
     BUILDER_METHOD(bg, setBackground, QBrush)
     BUILDER_METHOD(fg, setForeground, QBrush)
@@ -93,6 +93,7 @@ public:
         ItemEnchantment,
         ItemPredicate,
         ItemSlot,
+        ItemSlots,
         ItemStack,
         Message,
         MobEffect,

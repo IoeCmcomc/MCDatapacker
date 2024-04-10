@@ -35,6 +35,9 @@ public:
         void visit(ItemPredicateNode *node) final;
         void visit(ParticleNode *node) final;
         void visit(UuidNode *node) final;
+        void visit(LootModifierNode *node) final;
+        void visit(LootPredicateNode *node) final;
+        void visit(LootTableNode *node) final;
 
         QVector<QString> suggestions() const;
 

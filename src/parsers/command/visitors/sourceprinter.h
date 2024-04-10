@@ -72,6 +72,13 @@ public:
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
+        void visit(InlinableResourceNode *node) override {
+            m_text += node->leadingTrivia();
+            m_text += node->leftText();
+            node->getNode()->accept(this, m_order);
+            m_text += node->rightText();
+            m_text += node->trailingTrivia();
+        };
         void visit(IntRangeNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();

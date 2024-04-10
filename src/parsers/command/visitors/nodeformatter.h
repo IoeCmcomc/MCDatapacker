@@ -383,6 +383,11 @@ public:
 
             m_pos += node->trailingTrivia().length();
         }
+        void visit(InlinableResourceNode *node) final {
+            m_pos += node->leadingTrivia().length();
+            node->getNode()->accept(this, m_order);
+            m_pos += node->trailingTrivia().length();
+        }
 
         void visit(KeyNode *node) final {
             m_pos += node->leadingTrivia().length();

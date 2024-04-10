@@ -3,27 +3,28 @@
 
 #include "nodevisitor.h"
 
-#include "../nodes/rootnode.h"
-#include "../nodes/literalnode.h"
-#include "../nodes/stringnode.h"
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
-#include "../nodes/stylenode.h"
-#include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
+#include "../nodes/gamemodenode.h"
+#include "../nodes/inlinableresourcenode.h"
+#include "../nodes/internalregexpatternnode.h"
 #include "../nodes/intrangenode.h"
 #include "../nodes/itemstacknode.h"
+#include "../nodes/literalnode.h"
 #include "../nodes/nbtnodes.h"
 #include "../nodes/nbtpathnode.h"
 #include "../nodes/particlenode.h"
-#include "../nodes/swizzlenode.h"
-#include "../nodes/timenode.h"
-#include "../nodes/targetselectornode.h"
 #include "../nodes/resourcelocationnode.h"
+#include "../nodes/rootnode.h"
+#include "../nodes/stringnode.h"
+#include "../nodes/stylenode.h"
+#include "../nodes/swizzlenode.h"
+#include "../nodes/targetselectornode.h"
+#include "../nodes/timenode.h"
 #include "../nodes/uuidnode.h"
-#include "../nodes/internalregexpatternnode.h"
 
 namespace Command {
     template <class T, class U>
@@ -209,6 +210,9 @@ public:
         void visit(ItemSlotNode *node) override {
             _visit(node);
         }
+        void visit(ItemSlotsNode *node) override {
+            _visit(node);
+        }
         void visit(MessageNode *node) override {
             _visit(node);
         }
@@ -266,6 +270,18 @@ public:
         void visit(GamemodeNode *node) override {
             _visit(node);
         }
+        void visit(InlinableResourceNode *node) override {
+            _visit(node);
+        }
+        void visit(LootModifierNode *node) override {
+            _visit(node);
+        }
+        void visit(LootPredicateNode *node) override {
+            _visit(node);
+        }
+        void visit(LootTableNode *node) override {
+            _visit(node);
+        }
         void visit(InternalGreedyStringNode *node) override {
             _visit(node);
         }
@@ -280,6 +296,8 @@ private:
                 visit(static_cast<BlockStateNode *>(node));
             } else if constexpr (is_base_of<EntityNode, U>) {
                 visit(static_cast<EntityNode *>(node));
+            } else if constexpr (is_base_of<InlinableResourceNode, U>) {
+                visit(static_cast<InlinableResourceNode *>(node));
             } else if constexpr (is_base_of<ItemStackNode, U>) {
                 visit(static_cast<ItemStackNode *>(node));
             } else if constexpr (is_base_of<NbtNode, U>) {

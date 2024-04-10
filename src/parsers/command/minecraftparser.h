@@ -5,21 +5,22 @@
 #include "nodes/axesnode.h"
 #include "nodes/blockstatenode.h"
 #include "nodes/componentnode.h"
-#include "nodes/stylenode.h"
-#include "nodes/gamemodenode.h"
 #include "nodes/entitynode.h"
 #include "nodes/floatrangenode.h"
+#include "nodes/gamemodenode.h"
+#include "nodes/inlinableresourcenode.h"
+#include "nodes/internalregexpatternnode.h"
 #include "nodes/intrangenode.h"
 #include "nodes/itemstacknode.h"
+#include "nodes/nbtnodes.h"
 #include "nodes/nbtpathnode.h"
 #include "nodes/particlenode.h"
-#include "nodes/swizzlenode.h"
-#include "nodes/timenode.h"
-#include "nodes/targetselectornode.h"
-#include "nodes/nbtnodes.h"
 #include "nodes/resourcelocationnode.h"
+#include "nodes/stylenode.h"
+#include "nodes/swizzlenode.h"
+#include "nodes/targetselectornode.h"
+#include "nodes/timenode.h"
 #include "nodes/uuidnode.h"
-#include "nodes/internalregexpatternnode.h"
 
 #include <QVersionNumber>
 #include <QDebug>
@@ -283,6 +284,7 @@ private:
                                    bool acceptTag = false);
         void parseBlock(BlockStateNode *node, bool acceptTag);
         void parseEntity(EntityNode *node, bool allowFakePlayer);
+        void parseInlinableResource(InlinableResourceNode *node);
 
         NodePtr invokeMethod(ArgumentNode::ParserType parserType,
                              const QVariantMap &props) final;
@@ -311,8 +313,12 @@ private:
             const QVariantMap &props = {});
         QSharedPointer<ItemEnchantmentNode> minecraft_itemEnchantment();
         QSharedPointer<ItemSlotNode> minecraft_itemSlot();
+        QSharedPointer<ItemSlotsNode> minecraft_itemSlots();
         QSharedPointer<ItemStackNode> minecraft_itemStack();
         QSharedPointer<ItemPredicateNode> minecraft_itemPredicate();
+        QSharedPointer<LootModifierNode> minecraft_lootModifier();
+        QSharedPointer<LootPredicateNode> minecraft_lootPredicate();
+        QSharedPointer<LootTableNode> minecraft_lootTable();
         QSharedPointer<MessageNode> minecraft_message();
         QSharedPointer<MobEffectNode> minecraft_mobEffect();
         QSharedPointer<NbtCompoundNode> minecraft_nbtCompoundTag();

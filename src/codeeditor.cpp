@@ -400,10 +400,12 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
                     Command::CompletionProvider suggester{ posInLine };
                     suggester.startVisiting(line);
                     completionInfo = suggester.suggestions();
+                    // qDebug() << "initial:" << completionInfo;
                     std::sort(completionInfo.begin(), completionInfo.end());
                     completionInfo.erase(std::unique(completionInfo.begin(),
                                                      completionInfo.end()),
                                          completionInfo.end());
+                    // qDebug() << "processed:" << completionInfo;
                 }
             }
         }
@@ -422,8 +424,8 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
     m_completer->popup()->setCurrentIndex(
         m_completer->completionModel()->index(0, 0));
 
-//    qDebug() << m_completer->completionCount() << m_completer->model() <<
-//        completionPrefix;
+    // qDebug() << m_completer->completionCount() << m_completer->model() <<
+    //     completionPrefix;
 
     QRect     cr = cursorRect();
     const int prefixOffset

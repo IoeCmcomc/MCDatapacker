@@ -3,27 +3,28 @@
 
 #include "nodevisitor.h"
 
-#include "../nodes/rootnode.h"
-#include "../nodes/literalnode.h"
-#include "../nodes/stringnode.h"
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
-#include "../nodes/stylenode.h"
-#include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
+#include "../nodes/gamemodenode.h"
+#include "../nodes/inlinableresourcenode.h"
+#include "../nodes/internalregexpatternnode.h"
 #include "../nodes/intrangenode.h"
 #include "../nodes/itemstacknode.h"
+#include "../nodes/literalnode.h"
+#include "../nodes/nbtnodes.h"
 #include "../nodes/nbtpathnode.h"
 #include "../nodes/particlenode.h"
-#include "../nodes/swizzlenode.h"
-#include "../nodes/timenode.h"
-#include "../nodes/targetselectornode.h"
-#include "../nodes/nbtnodes.h"
 #include "../nodes/resourcelocationnode.h"
+#include "../nodes/rootnode.h"
+#include "../nodes/stringnode.h"
+#include "../nodes/stylenode.h"
+#include "../nodes/swizzlenode.h"
+#include "../nodes/targetselectornode.h"
+#include "../nodes/timenode.h"
 #include "../nodes/uuidnode.h"
-#include "../nodes/internalregexpatternnode.h"
 
 #include <QDebug>
 
@@ -352,6 +353,9 @@ public:
         void visit(ItemSlotNode *node) final {
             m_repr += QString("ItemSlotNode(\"%1\")").arg(node->value());
         };
+        void visit(ItemSlotsNode *node) final {
+            m_repr += QString("ItemSlotsNode(\"%1\")").arg(node->value());
+        };
         void visit(MessageNode *node) final {
             m_repr += QString("MessageNode(\"%1\")").arg(node->value());
         };
@@ -449,6 +453,26 @@ public:
         void visit(GamemodeNode *node) final {
             m_repr += QString("GamemodeNode(\"%1\")").arg(node->text());
         };
+        void visit(InlinableResourceNode *node) {
+            m_repr += "InlinableResourceNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(LootModifierNode *node) {
+            m_repr += "LootModifierNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(LootPredicateNode *node) {
+            m_repr += "LootPredicateNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(LootTableNode *node) {
+            m_repr += "LootTableNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
         void visit(InternalGreedyStringNode *node) final {
             m_repr += QString("InternalGreedyStringNode(\"%1\")").arg(
                 node->text());
