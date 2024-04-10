@@ -26,9 +26,15 @@ namespace Command {
                     qDebug() << "I choose you" << child;
                     if (!isFirst) {
                         Q_ASSERT(prevChild->schemaNode() != nullptr);
-                        m_suggestions +=
-                            prevChild->schemaNode()->literalChildren().
-                            keys().toVector();
+                        auto &&literals =
+                            prevChild->schemaNode()->literalChildren();
+                        if (literals.isEmpty() &&
+                            prevChild->schemaNode()->redirect()) {
+                            literals =
+                                prevChild->schemaNode()->redirect()->
+                                literalChildren();
+                        }
+                        m_suggestions += literals.keys().toVector();
                     } else if (child->schemaNode()) {
                         m_suggestions +=
                             child->schemaNode()->parent()->literalChildren().

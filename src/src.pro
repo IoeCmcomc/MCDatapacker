@@ -20,7 +20,7 @@ win32:LIBS += -lDwmapi
 DEFINES += QT_DEPRECATED_WARNINGS
 
 # Application-specific defines
-DEFINES += MCFUNCTIONPARSER_USE_CACHE
+DEFINES += MCFUNCTIONPARSER_USE_CACHE PARSENODE_REPRPRINTER
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.

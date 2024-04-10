@@ -114,6 +114,9 @@ public:
 }
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node);
+#ifdef PARSENODE_REPRPRINTER
+QDebug operator<<(QDebug debug, Command::ParseNode *node);
+#endif
 
 #define DEFINE_ACCEPT_METHOD(Type)                             \
         void Type::accept(NodeVisitor * visitor, VisitOrder) { \
