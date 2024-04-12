@@ -6,6 +6,7 @@
 namespace Command {
     class FloatNode;
     class ResourceLocationNode;
+    class NbtCompoundNode;
 
     class ParticleColorNode : public ParseNode {
 public:
@@ -47,9 +48,15 @@ public:
         QSharedPointer<ResourceLocationNode> resLoc() const;
         void setResLoc(QSharedPointer<ResourceLocationNode> newResLoc);
 
+        QSharedPointer<NbtCompoundNode> options() const;
+        void setOptions(QSharedPointer<NbtCompoundNode> newOptions);
+
+        bool hasParams() const;
+
 private:
         QSharedPointer<ResourceLocationNode> m_resLoc;
-        ParamVector m_params;
+        ParamVector m_params;                      // For pre-1.20.5 syntax
+        QSharedPointer<NbtCompoundNode> m_options; // For 1.20.5+ syntax
     };
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Particle)

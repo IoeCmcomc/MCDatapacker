@@ -3,6 +3,7 @@
 
 #include "singlevaluenode.h"
 #include "resourcelocationnode.h"
+#include "nbtnodes.h"
 
 namespace Command {
     ParticleColorNode::ParticleColorNode(int length)
@@ -53,6 +54,7 @@ namespace Command {
         m_r       = std::move(r);
     }
 
+
     ParticleNode::ParticleNode(int length)
         : ArgumentNode(ParserType::Particle, length) {
     }
@@ -66,8 +68,12 @@ namespace Command {
             visitor->visit(this);
         Q_ASSERT(m_resLoc != nullptr);
         m_resLoc->accept(visitor, order);
-        for (const auto &param: qAsConst(m_params)) {
-            param->accept(visitor, order);
+        if (m_options) {
+            m_options->accept(visitor, order);
+        } else {
+            for (const auto &param: qAsConst(m_params)) {
+                param->accept(visitor, order);
+            }
         }
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
@@ -85,5 +91,18 @@ namespace Command {
     {
         m_isValid = newResLoc->isValid();
         m_resLoc  = std::move(newResLoc);
+    }
+
+    QSharedPointer<NbtCompoundNode> ParticleNode::options() const {
+        return m_options;
+    }
+
+    void ParticleNode::setOptions(QSharedPointer<NbtCompoundNode> newOptions) {
+        m_isValid &= newOptions->isValid();
+        m_options  = newOptions;
+    }
+
+    bool ParticleNode::hasParams() const {
+        return m_options || !m_params.isEmpty();
     }
 }

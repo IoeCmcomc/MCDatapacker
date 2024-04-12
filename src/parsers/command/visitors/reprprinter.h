@@ -129,6 +129,11 @@ public:
             m_repr += "ItemStackNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
+            if (node->components() && !node->components()->isEmpty()) {
+                m_repr += '[';
+                node->components()->accept(this, m_order);
+                m_repr += ']';
+            }
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
                 node->nbt()->accept(this, m_order);
@@ -414,7 +419,10 @@ public:
         void visit(ParticleNode *node) final {
             m_repr += "ParticleNode(id: ";
             node->resLoc()->accept(this, m_order);
-            if (!node->params().isEmpty()) {
+            if (const auto options = node->options()) {
+                m_repr += ", options: ";
+                options->accept(this, m_order);
+            } else if (!node->params().isEmpty()) {
                 m_repr += ", params: ";
                 reprList(node->params());
             }

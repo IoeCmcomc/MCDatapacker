@@ -99,6 +99,9 @@ public:
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             node->resLoc()->accept(this, m_order);
+            if (node->components()) {
+                node->components()->accept(this, m_order);
+            }
             if (node->nbt()) {
                 node->nbt()->accept(this, m_order);
             }
@@ -258,7 +261,11 @@ public:
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             node->resLoc()->accept(this, m_order);
-            printList(node->params());
+            if (const auto options = node->options()) {
+                options->accept(this, m_order);
+            } else {
+                printList(node->params());
+            }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };

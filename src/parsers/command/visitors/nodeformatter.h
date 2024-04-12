@@ -141,6 +141,14 @@ public:
                                            m_palette[CodePalette::ItemStack] };
             m_pos += node->resLoc()->length();
 
+            if (node->components()) {
+                m_formatRanges << FormatRange{
+                    m_pos, node->components()->length(),
+                    m_palette[CodePalette::BlockState_States] //TODO: Use a separate enum
+                    };
+                node->components()->accept(this, m_order);
+            }
+
             if (node->nbt())
                 node->nbt()->accept(this, m_order);
 
@@ -353,10 +361,14 @@ public:
 
             m_pos += node->resLoc()->length();
             m_pos += node->resLoc()->trailingTrivia().length();
-            const auto &&params = node->params();
-            if (!params.isEmpty()) {
-                for (const auto &child: params) {
-                    child->accept(this, m_order);
+            if (const auto options = node->options()) {
+                options->accept(this, m_order);
+            } else {
+                const auto &&params = node->params();
+                if (!params.isEmpty()) {
+                    for (const auto &child: params) {
+                        child->accept(this, m_order);
+                    }
                 }
             }
 

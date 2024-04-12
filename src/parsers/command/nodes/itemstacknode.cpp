@@ -19,10 +19,21 @@ namespace Command {
             visitor->visit(this);
         if (m_resLoc)
             m_resLoc->accept(visitor, order);
+        if (m_components)
+            m_components->accept(visitor, order);
         if (m_nbt)
             m_nbt->accept(visitor, order);
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
+    }
+
+    QSharedPointer<MapNode> ItemStackNode::components() const {
+        return m_components;
+    }
+
+    void ItemStackNode::setComponents(QSharedPointer<MapNode> components) {
+        m_isValid   &= components->isValid();
+        m_components = std::move(components);
     }
 
     QSharedPointer<NbtCompoundNode> ItemStackNode::nbt() const {

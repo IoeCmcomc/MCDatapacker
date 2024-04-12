@@ -279,6 +279,7 @@ private:
         QSharedPointer<TargetSelectorNode> parseTargetSelector();
         QSharedPointer<NbtPathStepNode> parseNbtPathStep();
         QSharedPointer<ParticleColorNode> parseParticleColor();
+        QSharedPointer<ParticleNode> parseOldParticle();
         QSharedPointer<EntityArgumentValueNode> parseNegEntityArg();
         void parseResourceLocation(ResourceLocationNode *node,
                                    bool acceptTag = false);

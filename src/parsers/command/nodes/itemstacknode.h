@@ -6,12 +6,16 @@
 namespace Command {
     class NbtCompoundNode;
     class ResourceLocationNode;
+    class MapNode;
 
     class ItemStackNode : public ArgumentNode {
 public:
         explicit ItemStackNode(int length);
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
+
+        QSharedPointer<MapNode> components() const;
+        void setComponents(QSharedPointer<MapNode> components);
 
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
@@ -21,6 +25,7 @@ public:
 
 private:
         QSharedPointer<ResourceLocationNode> m_resLoc;
+        QSharedPointer<MapNode> m_components;
         QSharedPointer<NbtCompoundNode> m_nbt;
     };
 
