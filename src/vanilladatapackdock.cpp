@@ -50,12 +50,13 @@ void VanillaDatapackDock::onDoubleClicked(const QModelIndex &index) {
         category += subCatIndex.data().toString();
     }
 
-    QString relPath = m_model.filePath(index);
+    const QString &path    = m_model.filePath(index);
+    QString        relPath = path;
     Glhp::removeInternalPrefix(relPath);
     const QString &&prefix = QStringLiteral("data-json/data/minecraft/") +
                              category + '/';
     Glhp::removePrefix(relPath, prefix);
-    emit openFileRequested(Game::realVanillaFilePath(category, relPath));
+    emit openFileRequested(path, Game::realVanillaFilePath(category, relPath));
 }
 
 void VanillaDatapackDock::onCustomContextMenu(const QPoint &pos) {

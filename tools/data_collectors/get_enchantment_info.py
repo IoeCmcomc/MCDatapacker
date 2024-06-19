@@ -1,25 +1,11 @@
-import urllib.request
-from bs4 import BeautifulSoup
 import json
 import re
 
-req = urllib.request.urlopen('https://minecraft.wiki/w/Java_Edition_data_values') 
-ids_soup = BeautifulSoup(req.read(), "html.parser")
+from commons import get_selenium_soup, find_tr_tags, get_html
+
+ids_soup = get_selenium_soup("https://minecraft.wiki/w/Java_Edition_data_values?diff=next&oldid=2500088")
 
 h3 = ids_soup.find("span", id="Enchantments").parent
-
-def find_tr_tags(tag):
-    return (tag.name == "tr") and (tag.th is None) \
-           and (("upcoming" not in tag.find("td").text) or ("only" in tag.find("td").text))
-
-def get_html(tag):
-    html = str()
-    for child in tag.children:
-        #print(type(child))
-        #print(child)
-        html += str(child)
-        #break
-    return html
 
 print(h3.name)
 info = dict()

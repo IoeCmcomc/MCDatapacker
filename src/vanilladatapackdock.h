@@ -21,7 +21,7 @@ public:
     ~VanillaDatapackDock();
 
 signals:
-    void openFileRequested(const QString &path);
+    void openFileRequested(const QString &path, const QString &actualPath = {});
 
 protected:
     void changeEvent(QEvent *e);

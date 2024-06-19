@@ -56,6 +56,7 @@ compile_commands.json
 tools/data_collectors/**/*.json
 tools/data_collectors/texture
 tools/info_diff
+tools/**/*.txt
 
 # Python
 __pycache__/

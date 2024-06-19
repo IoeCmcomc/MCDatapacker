@@ -16,7 +16,7 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
 
     const auto &&gameVer = Game::version();
 
-    if (gameVer >= Game::v1_20_3)
+    if (gameVer >= Game::v1_20_4)
         ui->formatInput->setValue(26);
     else if (gameVer >= Game::v1_20_2)
         ui->formatInput->setValue(18);

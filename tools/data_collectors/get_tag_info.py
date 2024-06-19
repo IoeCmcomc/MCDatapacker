@@ -1,26 +1,12 @@
-from bs4 import BeautifulSoup
 import json
 from pathlib import Path
-from selenium import webdriver
 
-driver = webdriver.ChromiumEdge()
-driver.get("https://minecraft.wiki/wiki/Tag")
-html = driver.page_source
-driver.quit()
-soup = BeautifulSoup(html, "lxml")
+from commons import get_httpx_soup, find_tr_tags, get_html
+
+soup = get_httpx_soup("https://minecraft.wiki/w/Tag?oldid=2548536&action=render")
 
 h3 = soup.find("span", id="Java_Edition_2").parent
 print(h3.name)
-
-def find_tr_tags(tag):
-    return (tag.name == "tr") and (tag.th is None) \
-           and (("upcoming" not in tag.find("td").text) or ("only" in tag.find("td").text))
-
-def get_html(tag):
-    html = str()
-    for child in tag.children:
-        html += str(child)
-    return html
 
 h4 = h3
 while (h4 := h4.find_next_sibling("h4")) != None:

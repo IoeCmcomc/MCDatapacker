@@ -24,6 +24,7 @@ public:
     int childCount() const;
     void appendChild(VanillaNodeItem *child);
     VanillaNodeItem * child(int row);
+    void sortChildren();
 
     friend class VanillaDatapackModel;
 

@@ -1109,8 +1109,10 @@ void MainWindow::onVanillaDockAction(const bool checked) {
             addDockWidget(Qt::RightDockWidgetArea, m_vanillaDock);
             connect(m_vanillaDock, &QDockWidget::visibilityChanged,
                     ui->actionDefaultDatapack, &QAction::setChecked);
-            connect(m_vanillaDock, &VanillaDatapackDock::openFileRequested,
-                    ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+            connect(m_vanillaDock,
+                    &VanillaDatapackDock::openFileRequested,
+                    ui->tabbedInterface,
+                    &TabbedDocumentInterface::onOpenAliasedFile);
         } else {
             m_vanillaDock->show();
         }

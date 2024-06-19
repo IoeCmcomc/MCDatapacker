@@ -30,7 +30,9 @@ public:
     explicit TabbedDocumentInterface(QWidget *parent = nullptr);
     ~TabbedDocumentInterface();
 
-    void openFile(const QString &filepath, bool reload = false);
+    void openFile(const QString &filepath,
+                  const QString &realPath = {},
+                  bool reload             = false);
 
     int getCurIndex() const;
     void setCurIndex(int i);
@@ -49,6 +51,7 @@ public:
 
 public /*slots*/ :
     void onOpenFile(const QString &filepath);
+    void onOpenAliasedFile(const QString &filepath, const QString &realPath);
     void onOpenFileWithLine(const QString &filepath, const int lineNo);
     bool saveCurFile();
     bool saveCurFile(const QString &path);
@@ -86,7 +89,7 @@ private:
     bool m_packOpened = false;
 
     QString readTextFile(const QString &path, bool &ok);
-    void addFile(const QString &path);
+    void addFile(const QString &path, const QString &realPath = {});
     bool saveFile(int index, const QString &filepath);
     void updateTabTitle(int index, bool changed = false);
 

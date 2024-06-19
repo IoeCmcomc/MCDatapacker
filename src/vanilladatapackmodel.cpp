@@ -6,6 +6,8 @@
 #include <QDirIterator>
 #include <QAbstractItemModelTester>
 
+#include <algorithm>
+
 VanillaNodeItem::VanillaNodeItem(const QString &name, VanillaNodeItem *parent)
     : m_name{name}, m_parent{parent} {
 }
@@ -48,6 +50,17 @@ VanillaNodeItem * VanillaNodeItem::child(int row) {
         return nullptr;
 
     return m_children.at(row);
+}
+
+int sortFunc(const VanillaNodeItem *lhs, const VanillaNodeItem *rhs) {
+    return lhs->name() < rhs->name();
+}
+
+void VanillaNodeItem::sortChildren() {
+    std::sort(m_children.begin(), m_children.end(), sortFunc);
+    for (auto *child: qAsConst(m_children)) {
+        child->sortChildren();
+    }
 }
 
 VanillaNodeItem::VanillaNodeItem(bool isFile, VanillaNodeItem *parent)
@@ -250,4 +263,5 @@ void VanillaDatapackModel::setupNodeItems() {
             insertAliasToRoot(vanillaPath, category, alias);
         }
     }
+    m_rootItem->sortChildren();
 }

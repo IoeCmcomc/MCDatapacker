@@ -1,14 +1,14 @@
 from os import walk
 from os.path import join, getsize, abspath, relpath
-from json import dump as json_dump
+from json import dump as json_dump, JSONEncoder
+from typing import ClassVar, Optional
 import xml.etree.cElementTree as ET
-from collections import namedtuple
 from copy import deepcopy
-from hashlib import md5
-from functools import cache
+from functools import cache, cached_property
 from cbor2 import dump as cbor_dump
-
-FileInfo = namedtuple('FileInfo', ('size', 'version',))
+from dataclasses import dataclass
+from xxhash import xxh64
+from pprint import pprint
 
 # Source: https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
 def chunk_reader(fobj, chunk_size=1024):
@@ -19,24 +19,73 @@ def chunk_reader(fobj, chunk_size=1024):
             return
         yield chunk
 
-# Adapted from: https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
-@cache
-def get_hash(filename):
-    hashobj = md5()
-    with open(filename, "rb") as f:
-            hashobj.update(f.read(1024))
-    return hashobj.digest()
+@dataclass(frozen=True)
+class File:
+    version: str
+    path: str
+    rel_path: str
+    alias: str
 
-def is_file_equal(path1: str, path2: str) -> bool:
-    if get_hash(path1) != get_hash(path2):
-        return False
-    text1 = ""
-    text2 = ""
-    with open(path1, "r") as f:
-        text1 = f.read()
-    with open(path2, "r") as f:
-        text2 = f.read()
-    return text1 == text2
+    partial_hash_count: ClassVar[int] = 0
+    size_count: ClassVar[int] = 0
+    data_count: ClassVar[int] = 0
+    
+    @classmethod
+    @cache
+    # Adapted from: https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
+    def __hash_from_path(cls, path) -> int:
+        # print(f"hashing {path}")
+        hashobj = xxh64()
+        if path:
+            with open(path, "rb") as f:
+                for chunk in chunk_reader(f):
+                    hashobj.update(chunk)
+        return hashobj.intdigest()
+
+    def __hash__(self) -> int:
+        return self.__hash_from_path(self.path)
+    
+    @cached_property
+    def partial_hash(self) -> int:
+        self.__class__.partial_hash_count += 1
+        hashobj = xxh64()
+        if self.path:
+            with open(self.path, "rb") as f:
+                head_part = f.read(1024)
+                hashobj.update(head_part)
+        return hashobj.digest()
+    
+    @cached_property
+    def data(self) -> bytes:
+        self.__class__.data_count += 1
+
+        result = bytes()
+        if self.path:
+            with open(self.path, "rb") as f:
+                result = f.read()
+        
+        return result
+    
+    @cached_property
+    def size(self) -> int:
+        self.__class__.size_count += 1
+        return getsize(self.path)
+    
+    def __eq__(self, other: object) -> bool:
+        assert isinstance(other, File)
+        if other is self:
+            return True
+        if self.size != other.size:
+            return False
+        elif self.partial_hash != other.partial_hash:
+            return False
+        return self.data == other.data
+
+class CustomJSONEncoder(JSONEncoder):
+        def default(self, o):
+            if isinstance(o, File):
+                return {'version': o.version, 'alias': o.alias}
+            return super().default(o)
 
 def paths_to_dict(paths: dict[str, str]) -> dict:
     folders = {}
@@ -59,7 +108,19 @@ def extract_category(path: str) -> str:
 
 PREFIX_LEN = len("data/minecraft/")
 
-def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo], categories: set[str] = None) -> None:
+@dataclass(frozen=True)
+class FileAlias:
+    alias: str
+    file: File
+
+    def __eq__(self, value: object) -> bool:
+        return self.alias == value.alias
+    
+    def __hash__(self) -> int:
+        return hash(self.alias)
+
+
+def save_resource_lookup_file(version: str, info_dict: dict[str, File], categories: set[str] = None) -> None:
     lookup_dict: dict[str, dict[str, str]] = {}
 
     for alias, file_info in info_dict.items():
@@ -69,7 +130,10 @@ def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo], cate
             category, key = extract_category(key)
             if category not in lookup_dict:
                 lookup_dict[category] = {}
-            lookup_dict[category][key] = ver
+            if alias != file_info.alias:
+                lookup_dict[category][key] = f"{ver}/data-json/{file_info.alias}"
+            else:
+                lookup_dict[category][key] = ver
     
     # for category, aliases in lookup_dict.items():
     #     lookup_dict[category] = paths_to_dict(aliases)
@@ -84,11 +148,7 @@ def save_resource_lookup_file(version: str, info_dict: dict[str, FileInfo], cate
     with open(cbor_path, 'wb') as f:
         cbor_dump(lookup_dict, f, canonical=True)
 
-def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, FileInfo] = None, prev_aliases: set[str] = None) -> tuple[dict[str, FileInfo], set[str]]:
-    def add_elem():
-        elem = ET.SubElement(resource, "file", alias=alias_path)
-        elem.text = rel_path
-    
+def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, File] = None, prev_aliases: set[FileAlias] = None) -> tuple[dict[str, File], set[FileAlias]]:    
     print(f"Generating .qrc file for {version} vanilla datapack...")
 
     prefix = f"/minecraft/{version}/data-json"
@@ -104,16 +164,18 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
         info_dict = {}
     else:
         info_dict = deepcopy(prev_info_dict)
-    aliases = set()
-    categories = set()
+    aliases: set[FileAlias] = set()
+    categories: set[str] = set()
 
     added = 0
     updated = 0
     kept = 0
     removed = 0
+    moved = 0
 
     root = ET.Element("RCC")
     resource = ET.SubElement(root, "qresource", prefix=prefix)
+    included_files: dict[str, File] = {}
 
     walk_iter = walk(target_dir)
     next(walk_iter) # Skip data folder
@@ -123,46 +185,83 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
             rel_path = relpath(file_path, qrc_dir).replace('\\', '/')
             alias_path = relpath(file_path, target_dir).replace('\\', '/')
             id_path = relpath(file_path, minecraft_dir).replace('\\', '/')
-            aliases.add(alias_path)
+            file_info = File(version, file_path, rel_path, alias_path)
+            aliases.add(FileAlias(alias_path, file_info))
             category, _ = extract_category(id_path)
             categories.add(category)
             file_size = getsize(file_path)
             # print(rel_path, alias_path)
             if not alias_path in info_dict:
-                info_dict[alias_path] = FileInfo(file_size, version)
-                add_elem()
+                info_dict[alias_path] = file_info
+                included_files[alias_path] = file_info
+                # add_elem()
                 added += 1
             elif info_dict[alias_path].size != file_size:
-                info_dict[alias_path] = FileInfo(file_size, version)
-                add_elem()
+                info_dict[alias_path] = file_info
+                included_files[alias_path] = file_info
+                # add_elem()
                 updated += 1
             elif prev_ver:
-                    prev_path = join(info_dir, version, "data-json",  alias_path)
-                    if not is_file_equal(file_path, prev_path):
-                        add_elem()
-                        info_dict[alias_path] = FileInfo(file_size, version)
+                    prev_file = info_dict[alias_path]
+                    if not file_info == prev_file:
+                        # add_elem()
+                        included_files[alias_path] = file_info
+                        info_dict[alias_path] = file_info
                         updated += 1
                     else:
                         kept += 1
     
     if prev_aliases:
-        removed_files = prev_aliases - aliases
+        removed_files = list(file.file for file in (prev_aliases - aliases))
+        added_files = list(file.file for file in (aliases - prev_aliases))
+
+        report_lines = []
+
+        for i in range(len(removed_files) - 1, -1, -1):
+            removed_file = removed_files[i]
+            for j in range(len(added_files) - 1, -1, -1):
+                added_file = added_files[j]
+                if removed_file == added_file:
+                    old_file: File = info_dict[removed_file.alias]
+                    info_dict[added_file.alias] = old_file
+                    del info_dict[removed_file.alias]
+                    report_lines.append(f"Found a moved file!")
+                    report_lines.append(f"\tfrom: {old_file.path}")
+                    report_lines.append(f"\tto: {added_file.path}")
+                    del removed_files[i]
+                    del added_files[j]
+                    del included_files[added_file.alias]
+                    moved += 1
+                    break
+        
+                
+        print(f"{File.data_count=}, {File.partial_hash_count=}, {File.size_count=}")
+
+        with open(f"report_{prev_ver}_{version}.txt", "w") as f:
+            f.write('\n'.join(report_lines))
+
         for alias in removed_files:
-            del info_dict[alias]
+            del info_dict[alias.alias]
             removed += 1
+
+    added -= moved
+
+    for alias, file in sorted(included_files.items()):
+        elem = ET.SubElement(resource, "file", alias=file.alias)
+        elem.text = file.rel_path
 
     tree = ET.ElementTree(root)
     ET.indent(tree, space="\t", level=0)
     tree.write(qrc_path)
 
     with open(version + "-diff_info.json", 'w') as f:
-        json_dump(info_dict, f, indent=4)
+        json_dump(info_dict, f, indent=4, cls=CustomJSONEncoder)
 
     save_resource_lookup_file(version, info_dict, categories)
 
     print(f"{version} has {len(aliases)} file(s).")
     print(f"This version has {len(categories)} categories.")
-    print(f"Added {added} file(s), updated {updated} file(s), kept {kept} file(s), removed {removed} file(s)")
+    print(f"Added {added} file(s), updated {updated} file(s), kept {kept} file(s), removed {removed} file(s), moved {moved} file(s)")
 
     return info_dict, aliases
 
@@ -188,4 +287,8 @@ if __name__ == "__main__":
     prev_ver, version = version, "1.20.2"
     info, aliases = generate_qrc(version, prev_ver, info, aliases)
     prev_ver, version = version, "1.20.4"
+    info, aliases = generate_qrc(version, prev_ver, info, aliases)
+    prev_ver, version = version, "1.20.6"
+    info, aliases = generate_qrc(version, prev_ver, info, aliases)
+    prev_ver, version = version, "1.21"
     info, aliases = generate_qrc(version, prev_ver, info, aliases)

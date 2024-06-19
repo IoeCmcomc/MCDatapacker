@@ -331,6 +331,7 @@ RESOURCES += \
     ../resource/minecraft/info/1.20/1.20.qrc \
     ../resource/minecraft/info/1.20.2/1.20.2.qrc \
     ../resource/minecraft/info/1.20.4/1.20.4.qrc \
+    ../resource/minecraft/info/1.20.6/1.20.6.qrc \
     ../resource/minecraft/info/1.15/1.15-data-json.qrc \
     ../resource/minecraft/info/1.16/1.16-data-json.qrc \
     ../resource/minecraft/info/1.17/1.17-data-json.qrc \
@@ -342,6 +343,7 @@ RESOURCES += \
     ../resource/minecraft/info/1.20/1.20-data-json.qrc \
     ../resource/minecraft/info/1.20.2/1.20.2-data-json.qrc \
     ../resource/minecraft/info/1.20.4/1.20.4-data-json.qrc \
+    ../resource/minecraft/info/1.20.6/1.20.6-data-json.qrc \
     ../resource/minecraft/minecraft.qrc \
     ../resource/app/icons/default/default.qrc
 

@@ -97,12 +97,14 @@ TabbedDocumentInterface::~TabbedDocumentInterface() {
     delete ui;
 }
 
-void TabbedDocumentInterface::openFile(const QString &filepath, bool reload) {
+void TabbedDocumentInterface::openFile(const QString &filepath,
+                                       const QString &realPath,
+                                       bool reload) {
     if (filepath.isEmpty()
         || ((getCurFilePath() == filepath) && (!reload)))
         return;
     else {
-        addFile(filepath);
+        addFile(filepath, realPath);
     }
 }
 
@@ -215,13 +217,15 @@ void TabbedDocumentInterface::onModificationChanged(bool changed) {
     emit curModificationChanged(changed);
 }
 
-void TabbedDocumentInterface::addFile(const QString &path) {
+void TabbedDocumentInterface::addFile(const QString &path,
+                                      const QString &realPath) {
     CodeFile newFile(path);
     QWidget *widget = nullptr;
 
     if (newFile.fileType >= CodeFile::Text) {
         bool        ok;
-        const auto &text = readTextFile(path, ok);
+        const auto &text =
+            readTextFile(!realPath.isNull() ? realPath : path, ok);
         if (!ok)
             return;
 
@@ -402,6 +406,17 @@ void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
         }
     }
     openFile(filepath);
+}
+
+void TabbedDocumentInterface::onOpenAliasedFile(const QString &filepath,
+                                                const QString &realPath) {
+    for (int i = 0; i < count(); i++) {
+        if (files[i].path() == filepath) {
+            setCurIndex(i);
+            return;
+        }
+    }
+    openFile(filepath, realPath);
 }
 
 void TabbedDocumentInterface::onOpenFileWithLine(const QString &filepath,
