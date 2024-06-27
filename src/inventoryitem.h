@@ -7,7 +7,7 @@
 class InventoryItem {
 public:
     enum Type : unsigned int {
-        Invalid      = 0,
+        Invalid   = 0,
         Block     = 1,
         Item      = 2,
         BlockItem = Block | Item,
@@ -72,6 +72,7 @@ private:
 };
 
 Q_DECLARE_METATYPE(InventoryItem);
+Q_DECLARE_TYPEINFO(InventoryItem, Q_RELOCATABLE_TYPE);
 //Q_DECLARE_OPAQUE_POINTER(InventoryItem *)
 
 /*

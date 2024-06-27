@@ -14,6 +14,8 @@ struct Subfragment {
     QRectF  rect;
     QString text;
 };
+static_assert(qIsRelocatable<Subfragment>() == false);
+Q_DECLARE_TYPEINFO(Subfragment, Q_RELOCATABLE_TYPE);
 
 using Subfragments = QVector<Subfragment>;
 

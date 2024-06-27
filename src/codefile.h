@@ -64,6 +64,9 @@ struct CodeFile {
     void changePath(const QString &path);
 };
 
+static_assert(qIsRelocatable<CodeFile>() == false);
+Q_DECLARE_TYPEINFO(CodeFile, Q_RELOCATABLE_TYPE);
+
 QDebug operator<<(QDebug debug, const CodeFile &file);
 
 #endif /* CODEFILE_H */

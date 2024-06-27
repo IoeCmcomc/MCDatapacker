@@ -66,6 +66,7 @@ public:
         EditorClass editorClass   = EditorClass::Unknown;
         VersionPair gameVerLimits = {};
     };
+    static_assert(qIsRelocatable<ColumnMapping>() == false);
 
     ExtendedTableWidget(QWidget *parent = 0);
 
@@ -133,5 +134,6 @@ private slots:
 };
 
 typedef ExtendedTableWidget::ItemRole ExtendedRole;
+Q_DECLARE_TYPEINFO(ExtendedTableWidget::ColumnMapping, Q_RELOCATABLE_TYPE);
 
 #endif /* EXTENDEDTABLEWIDGET_H */

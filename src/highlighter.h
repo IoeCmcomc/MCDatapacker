@@ -6,23 +6,26 @@
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
 
+
 struct BracketInfo {
     int  pos       = 0;
     char character = '\0';
 };
-
+static_assert(qIsRelocatable<BracketInfo>());
 
 struct BracketPair {
     char left  = '\0';
     char right = '\0';
 };
-
+static_assert(qIsRelocatable<BracketPair>());
 
 struct NamespacedIdInfo {
     int     start  = 0;
     int     length = 1;
     QString link;
 };
+// static_assert(qIsRelocatable<NamespacedIdInfo>() == false);
+// Q_DECLARE_TYPEINFO(NamespacedIdInfo, Q_RELOCATABLE_TYPE);
 
 
 class TextBlockData : public QTextBlockUserData {
@@ -64,6 +67,7 @@ public:
         QRegularExpression pattern;
         CodePalette::Role  formatRole;
     };
+    static_assert(qIsRelocatable<HighlightingRule>() == false);
 
     using HighlightingRules = QVector<HighlightingRule>;
 
@@ -118,5 +122,7 @@ private:
     void collectNamespacedIds(QStringView sv, TextBlockData *data);
     QString locateNamespacedId(QString id);
 };
+
+Q_DECLARE_TYPEINFO(Highlighter::HighlightingRule, Q_RELOCATABLE_TYPE);
 
 #endif /* HIGHLIGHTER_H */

@@ -28,6 +28,11 @@ struct ProblemInfo {
     int     length = 1;
     QString message;
 };
+static_assert(qIsRelocatable<ProblemInfo>() == false);
+Q_DECLARE_TYPEINFO(ProblemInfo, Q_RELOCATABLE_TYPE);
+
+static_assert(qIsRelocatable<QTextEdit::ExtraSelection>() == false);
+Q_DECLARE_TYPEINFO(QTextEdit::ExtraSelection, Q_RELOCATABLE_TYPE);
 
 class CodeEditor : public QPlainTextEdit {
     Q_OBJECT

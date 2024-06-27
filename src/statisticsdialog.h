@@ -16,15 +16,18 @@ namespace Command {
 
 class MainWindow;
 
+struct SyntaxErrorInfo {
+    QString path;
+    QString msg;
+    int     line = -1;
+};
+
+static_assert(qIsRelocatable<SyntaxErrorInfo>() == false);
+Q_DECLARE_TYPEINFO(SyntaxErrorInfo, Q_RELOCATABLE_TYPE);
+
 class StatisticsDialog : public QDialog
 {
     Q_OBJECT
-
-    struct SyntaxErrorInfo {
-        QString path;
-        QString msg;
-        int     line = -1;
-    };
 
 public:
     explicit StatisticsDialog(MainWindow *parent = nullptr);

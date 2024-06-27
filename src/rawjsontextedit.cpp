@@ -338,6 +338,8 @@ void RawJsonTextEdit::initSimilarWidthCharGroups(const QFont &font,
         int   width;
     };
 
+    static_assert(qIsRelocatable<CharWidth>());
+
     QVector<CharWidth> charWidths;
     const QFontMetrics metrics(font);
     const int          mask = isBold * boldCharMask;
