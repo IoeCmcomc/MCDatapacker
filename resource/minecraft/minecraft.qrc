@@ -1575,8 +1575,6 @@
         <file>texture/inv_item/stripped_cherry_log.png</file>
         <file>texture/inv_item/stripped_cherry_wood.png</file>
         <file>texture/inv_item/short_grass.png</file>
-    </qresource>
-    <qresource prefix="/">
         <file>texture/item/armadillo_scute.png</file>
         <file>texture/item/armadillo_spawn_egg.png</file>
         <file>texture/item/wolf_armor.png</file>

@@ -63,15 +63,23 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
     }
 
     if (isTag()) {
+        Glhp::removePrefix(id, "#"_QL1);
+        Glhp::removePrefix(id);
+
         QPixmap iconpix(32, 32);
         iconpix.fill(Qt::transparent);
         {
             QPainter painter(&iconpix);
             QFont    font = painter.font();
-            font.setPixelSize(32);
+            font.setPixelSize(16);
             painter.setFont(font);
-            painter.drawText(QRect(0, 0, 32, 32), Qt::AlignCenter,
+            painter.drawText(QRect(0, 0, 32, 16), Qt::AlignCenter,
                              QStringLiteral("#"));
+            font.setPixelSize(10);
+            painter.setFont(font);
+            painter.drawText(QRect(0, 16, 32, 16),
+                             Qt::AlignCenter | Qt::TextWrapAnywhere,
+                             id);
             painter.end();
         }
         return iconpix;
@@ -81,7 +89,7 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
     QPixmap iconpix;
     QString iconpath;
 
-    Glhp::removePrefix(id, "minecraft:"_QL1);
+    Glhp::removePrefix(id);
     const auto &&MCRItemInfo = Game::getInfo(QStringLiteral("item"));
 
     if (id.endsWith(QLatin1String("banner_pattern"))) {
@@ -103,16 +111,27 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
         iconpix = QPixmap(iconpath);
     }
 
-    if (!iconpix) { // Draw missing texture
-        const static QColor magenta = QColor(248, 0, 248);
-        iconpix = QPixmap(16, 16);
-        iconpix.fill(magenta);
+    if (!iconpix) {
+        const static QColor magenta     = QColor(248, 0, 248);
+        const static int    borderWidth = 4;
+        iconpix = QPixmap(32, 32);
+        iconpix.fill(Qt::white);
         {
             QPainter            painter(&iconpix);
             const static QBrush brush(Qt::black);
-            painter.fillRect(0, 0, 8, 8, brush);
-            painter.fillRect(8, 8, 8, 8, brush);
-            painter.end();
+            // Draw the top and bottom parts of the missing texture
+            painter.fillRect(0, 0, 16, borderWidth, brush);
+            painter.fillRect(16, 0, 16, borderWidth, magenta);
+            painter.fillRect(0, 32 - borderWidth, 16, borderWidth, magenta);
+            painter.fillRect(16, 32 - borderWidth, 16, borderWidth, brush);
+            // Draw the id text in the middle
+            QFont font = painter.font();
+            font.setPixelSize(10);
+            painter.setFont(font);
+            painter.drawText(QRect(0, borderWidth, 32, 32 - borderWidth * 2),
+                             Qt::AlignCenter | Qt::TextWrapAnywhere,
+                             id);
+            // painter.end();
         }
     }
     static const int   pixmapLength = 32;
