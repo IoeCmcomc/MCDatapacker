@@ -4,6 +4,7 @@
 #include "inventoryitem.h"
 
 #include "globalhelpers.h"
+#include "game.h"
 #include "platforms/windows_specific.h"
 
 #include <QDirIterator>
@@ -37,9 +38,9 @@ AdvancementTabDock::~AdvancementTabDock() {
 void AdvancementTabDock::loadAdvancements() {
     const static QMap<QString,
                       AdvancemDisplayInfo::FrameType> stringToFrameType = {
-        { "task",      AdvancemDisplayInfo::FrameType::Task      },
-        { "goal",      AdvancemDisplayInfo::FrameType::Goal      },
-        { "challenge", AdvancemDisplayInfo::FrameType::Challenge },
+        { "task",      AdvancemDisplayInfo::FrameType::Task           },
+        { "goal",      AdvancemDisplayInfo::FrameType::Goal           },
+        { "challenge", AdvancemDisplayInfo::FrameType::Challenge      },
     };
 
     if (isHidden()) {
@@ -50,6 +51,9 @@ void AdvancementTabDock::loadAdvancements() {
 #ifndef QT_NO_CURSOR
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
+
+    const QString &&itemIdField =
+        (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
 
     // Read all showable advancements
 
@@ -85,8 +89,9 @@ void AdvancementTabDock::loadAdvancements() {
                         const auto &&display = obj["display"].toObject();
                         if (display.contains("icon")) {
                             const auto &&icon = display["icon"].toObject();
-                            if (icon.contains("item")) {
-                                const auto &&item = icon["item"].toString();
+                            if (icon.contains(itemIdField)) {
+                                const auto &&item =
+                                    icon[itemIdField].toString();
                                 if (!item.isEmpty()) {
                                     advancemInfo.displayIcon =
                                         InventoryItem{ item }.getPixmap();

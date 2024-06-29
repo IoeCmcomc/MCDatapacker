@@ -338,8 +338,10 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
         root.insert(QStringLiteral("ingredients"), ingredients);
     }
 
-    QJsonObject result;
-    result.insert(QStringLiteral("item"), ui->outputSlot->itemNamespacedID());
+    QJsonObject     result;
+    const QString &&itemIdField =
+        (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+    result.insert(itemIdField, ui->outputSlot->itemNamespacedID());
     result.insert(QStringLiteral("count"), ui->resultCountInput->value());
     root.insert(QStringLiteral("result"), result);
 
@@ -361,7 +363,14 @@ QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
     const auto &items = ui->smeltingSlot_0->getItems();
     root.insert("ingredient", ingredientsToJson(items));
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result{
+            { QStringLiteral("id"), ui->outputSlot->itemNamespacedID() }, };
+        root.insert(QStringLiteral("result"), result);
+    } else {
+        root.insert(QStringLiteral("result"),
+                    ui->outputSlot->itemNamespacedID());
+    }
     root.insert(QStringLiteral("experience"), ui->experienceInput->value());
     if (ui->cookTimeCheck->isChecked())
         root.insert(QStringLiteral("cookingtime"), ui->cookTimeInput->value());
@@ -375,7 +384,14 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
     const auto &items = ui->stonecuttingSlot->getItems();
     root.insert(QStringLiteral("ingredient"), ingredientsToJson(items));
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result{
+            { QStringLiteral("id"), ui->outputSlot->itemNamespacedID() }, };
+        root.insert(QStringLiteral("result"), result);
+    } else {
+        root.insert(QStringLiteral("result"),
+                    ui->outputSlot->itemNamespacedID());
+    }
     root.insert(QStringLiteral("count"), ui->resultCountInput->value());
 
     return root;
@@ -409,9 +425,10 @@ QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
     }
 
     if (!from_v1_20 || (ui->smithTypeCombo->currentIndex() == 0)) {
-        QJsonObject result;
-        result.insert(QStringLiteral("item"),
-                      ui->outputSlot->itemNamespacedID());
+        QJsonObject     result;
+        const QString &&itemIdField =
+            (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+        result.insert(itemIdField, ui->outputSlot->itemNamespacedID());
         result.insert(QStringLiteral("count"), ui->resultCountInput->value());
         root.insert(QStringLiteral("result"), result);
     }
@@ -551,10 +568,12 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
 
     if (!root.contains(QStringLiteral("result"))) return;
 
-    QJsonObject result = root[QStringLiteral("result")].toObject();
-    if (!result.contains(QStringLiteral("item"))) return;
+    QJsonObject     result      = root[QStringLiteral("result")].toObject();
+    const QString &&itemIdField =
+        (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+    if (!result.contains(itemIdField)) return;
 
-    QString itemID = result[QStringLiteral("item")].toString();
+    QString itemID = result[itemIdField].toString();
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
@@ -585,7 +604,15 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
     ui->smeltingSlot_0->setItems(JsonToIngredients(ingredient));
     if (!root.contains(QStringLiteral("result"))) return;
 
-    QString itemID = root[QStringLiteral("result")].toString();
+    QString itemID;
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result = root[QStringLiteral("result")].toObject();
+        if (!result.contains(QStringLiteral("id"))) return;
+
+        itemID = result[QStringLiteral("id")].toString();
+    } else {
+        itemID = root[QStringLiteral("result")].toString();
+    }
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
@@ -613,7 +640,15 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
 
     if (!root.contains(QStringLiteral("result"))) return;
 
-    QString itemID = root[QStringLiteral("result")].toString();
+    QString itemID;
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result = root[QStringLiteral("result")].toObject();
+        if (!result.contains(QStringLiteral("id"))) return;
+
+        itemID = result[QStringLiteral("id")].toString();
+    } else {
+        itemID = root[QStringLiteral("result")].toString();
+    }
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
@@ -652,10 +687,13 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
     if (!isArmorTrimMode) {
         if (!root.contains(QStringLiteral("result"))) return;
 
-        const QJsonObject &&result = root[QStringLiteral("result")].toObject();
-        if (!result.contains(QStringLiteral("item"))) return;
+        const QJsonObject &&result =
+            root[QStringLiteral("result")].toObject();
+        const QString &&itemIdField =
+            (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+        if (!result.contains(itemIdField)) return;
 
-        const QString &&itemID = result[QStringLiteral("item")].toString();
+        const QString &&itemID = result[itemIdField].toString();
         if (!itemID.isEmpty())
             ui->outputSlot->setItem(InventoryItem(itemID));
         else
