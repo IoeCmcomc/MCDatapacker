@@ -57,6 +57,7 @@ tools/data_collectors/**/*.json
 tools/data_collectors/texture
 tools/info_diff
 tools/**/*.txt
+build/
 
 # Python
 __pycache__/

@@ -108,10 +108,10 @@ HEADERS += \
     ../../../../../src/parsers/command/re2c_generated_functions.h
 
 RESOURCES += \
-    ../../../../../resource/minecraft/info/1.18.2/1.18.2.qrc
+    ../../../../../res/mc/info/1.18.2/1.18.2.qrc
 
 DISTFILES += \
-    ../../../../../resource/minecraft/info/1.18.2/summary/commands/data.min.json
+    ../../../../../res/mc/info/1.18.2/summary/commands/data.min.json
 
 include($$PWD/../../../../../lib/lru-cache/lru-cache.pri)
 include($$PWD/../../../../../lib/json/json.pri)

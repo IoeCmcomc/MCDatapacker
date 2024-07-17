@@ -417,7 +417,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/gui_fire.png</pixmap>
+                     <pixmap resource="../res/mc/minecraft.qrc">:/minecraft/texture/gui_fire.png</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -581,7 +581,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/plus.png</pixmap>
+                     <pixmap resource="../res/mc/minecraft.qrc">:/minecraft/texture/plus.png</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -643,7 +643,7 @@
                <enum>Qt::PlainText</enum>
               </property>
               <property name="pixmap">
-               <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/right_arrow.png</pixmap>
+               <pixmap resource="../res/mc/minecraft.qrc">:/minecraft/texture/right_arrow.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -1121,7 +1121,7 @@
   <tabstop>showNotifCheck</tabstop>
  </tabstops>
  <resources>
-  <include location="../resource/minecraft/minecraft.qrc"/>
+  <include location="../res/mc/minecraft.qrc"/>
  </resources>
  <connections>
   <connection>

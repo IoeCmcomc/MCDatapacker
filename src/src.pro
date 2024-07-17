@@ -323,39 +323,39 @@ TRANSLATIONS += \
     ../translations/qtxmlpatterns_vi.ts
 
 RESOURCES += \
-    ../resource/app/app.qrc \
-    ../resource/minecraft/info/1.15/1.15.qrc \
-    ../resource/minecraft/info/1.16/1.16.qrc \
-    ../resource/minecraft/info/1.17/1.17.qrc \
-    ../resource/minecraft/info/1.18/1.18.qrc \
-    ../resource/minecraft/info/1.18.2/1.18.2.qrc \
-    ../resource/minecraft/info/1.19/1.19.qrc \
-    ../resource/minecraft/info/1.19.3/1.19.3.qrc \
-    ../resource/minecraft/info/1.19.4/1.19.4.qrc \
-    ../resource/minecraft/info/1.20/1.20.qrc \
-    ../resource/minecraft/info/1.20.2/1.20.2.qrc \
-    ../resource/minecraft/info/1.20.4/1.20.4.qrc \
-    ../resource/minecraft/info/1.20.6/1.20.6.qrc \
-    ../resource/minecraft/info/1.15/1.15-data-json.qrc \
-    ../resource/minecraft/info/1.16/1.16-data-json.qrc \
-    ../resource/minecraft/info/1.17/1.17-data-json.qrc \
-    ../resource/minecraft/info/1.18/1.18-data-json.qrc \
-    ../resource/minecraft/info/1.18.2/1.18.2-data-json.qrc \
-    ../resource/minecraft/info/1.19/1.19-data-json.qrc \
-    ../resource/minecraft/info/1.19.3/1.19.3-data-json.qrc \
-    ../resource/minecraft/info/1.19.4/1.19.4-data-json.qrc \
-    ../resource/minecraft/info/1.20/1.20-data-json.qrc \
-    ../resource/minecraft/info/1.20.2/1.20.2-data-json.qrc \
-    ../resource/minecraft/info/1.20.4/1.20.4-data-json.qrc \
-    ../resource/minecraft/info/1.20.6/1.20.6-data-json.qrc \
-    ../resource/minecraft/minecraft.qrc \
-    ../resource/app/icons/default/default.qrc
+    ../res/app/app.qrc \
+    ../res/mc/info/1.15/1.15.qrc \
+    ../res/mc/info/1.16/1.16.qrc \
+    ../res/mc/info/1.17/1.17.qrc \
+    ../res/mc/info/1.18/1.18.qrc \
+    ../res/mc/info/1.18.2/1.18.2.qrc \
+    ../res/mc/info/1.19/1.19.qrc \
+    ../res/mc/info/1.19.3/1.19.3.qrc \
+    ../res/mc/info/1.19.4/1.19.4.qrc \
+    ../res/mc/info/1.20/1.20.qrc \
+    ../res/mc/info/1.20.2/1.20.2.qrc \
+    ../res/mc/info/1.20.4/1.20.4.qrc \
+    ../res/mc/info/1.20.6/1.20.6.qrc \
+    ../res/mc/info/1.15/1.15-data-json.qrc \
+    ../res/mc/info/1.16/1.16-data-json.qrc \
+    ../res/mc/info/1.17/1.17-data-json.qrc \
+    ../res/mc/info/1.18/1.18-data-json.qrc \
+    ../res/mc/info/1.18.2/1.18.2-data-json.qrc \
+    ../res/mc/info/1.19/1.19-data-json.qrc \
+    ../res/mc/info/1.19.3/1.19.3-data-json.qrc \
+    ../res/mc/info/1.19.4/1.19.4-data-json.qrc \
+    ../res/mc/info/1.20/1.20-data-json.qrc \
+    ../res/mc/info/1.20.2/1.20.2-data-json.qrc \
+    ../res/mc/info/1.20.4/1.20.4-data-json.qrc \
+    ../res/mc/info/1.20.6/1.20.6-data-json.qrc \
+    ../res/mc/minecraft.qrc \
+    ../res/app/icons/default/default.qrc
 
 DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
-    ../resource/app/fonts/LICENSE_Monocraft.txt
+    ../res/app/fonts/LICENSE_Monocraft.txt
 
-RC_ICONS = ../resource/app/icon/favicon.ico
+RC_ICONS = ../res/app/icon/favicon.ico
 
 include(widgets/mcdatapackerwidgets/mcdatapackerwidgets.pri)
 
