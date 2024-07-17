@@ -153,7 +153,7 @@ private:
     class NbtCompoundNode : public NbtNode {
 public:
 
-        using Pair  = QSharedPointer<PairNode<NbtPtr> >;
+        using Pair  = QSharedPointer<PairNode<KeyPtr, NbtPtr> >;
         using Pairs = QVector<Pair>;
 
         explicit NbtCompoundNode(int length = 0);
@@ -166,7 +166,7 @@ public:
         Pairs::const_iterator find(const QString &key) const;
         void insert(KeyPtr key, NbtPtr node);
         void clear();
-        PairNode<NbtPtr> inline * constLast() const {
+        PairNode<KeyPtr, NbtPtr> inline * constLast() const {
             return m_pairs.constLast().data();
         }
         Pairs pairs() const;

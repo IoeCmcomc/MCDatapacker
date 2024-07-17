@@ -27,11 +27,11 @@ namespace Command {
             visitor->visit(this);
     }
 
-    QSharedPointer<MapNode> ItemStackNode::components() const {
+    QSharedPointer<ParseNode> ItemStackNode::components() const {
         return m_components;
     }
 
-    void ItemStackNode::setComponents(QSharedPointer<MapNode> components) {
+    void ItemStackNode::setComponents(QSharedPointer<ParseNode> components) {
         m_isValid   &= components->isValid();
         m_components = std::move(components);
     }
@@ -73,5 +73,14 @@ namespace Command {
             nbt()->accept(visitor, order);
         if (order == VisitOrder::Postorder)
             visitor->visit(this);
+    }
+
+    bool ItemPredicateNode::isAll() const {
+        return m_all;
+    }
+
+    void ItemPredicateNode::setAll(bool all) {
+        m_isValid = true;
+        m_all     = all;
     }
 }

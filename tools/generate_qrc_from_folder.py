@@ -4,11 +4,12 @@ from json import dump as json_dump, JSONEncoder
 from typing import ClassVar, Optional
 import xml.etree.cElementTree as ET
 from copy import deepcopy
-from functools import cache, cached_property
+from functools import cache, cached_property, total_ordering
 from cbor2 import dump as cbor_dump
 from dataclasses import dataclass
 from xxhash import xxh64
 from pprint import pprint
+from jellyfish import levenshtein_distance
 
 # Source: https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
 def chunk_reader(fobj, chunk_size=1024):
@@ -80,6 +81,10 @@ class File:
         elif self.partial_hash != other.partial_hash:
             return False
         return self.data == other.data
+    
+    def __lt__(self, other) -> bool:
+        assert isinstance(other, File)
+        return self.path > other.path
 
 class CustomJSONEncoder(JSONEncoder):
         def default(self, o):
@@ -131,6 +136,7 @@ def save_resource_lookup_file(version: str, info_dict: dict[str, File], categori
             if category not in lookup_dict:
                 lookup_dict[category] = {}
             if alias != file_info.alias:
+                # print(f"{category=}, {key=}, {file_info.alias=}")
                 lookup_dict[category][key] = f"{ver}/data-json/{file_info.alias}"
             else:
                 lookup_dict[category][key] = ver
@@ -180,7 +186,7 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
     walk_iter = walk(target_dir)
     next(walk_iter) # Skip data folder
     for dirpath, dirnames, filenames in walk_iter:
-        for filename in filenames:
+        for filename in sorted(filenames):
             file_path = join(dirpath, filename)
             rel_path = relpath(file_path, qrc_dir).replace('\\', '/')
             alias_path = relpath(file_path, target_dir).replace('\\', '/')
@@ -212,28 +218,45 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
                         kept += 1
     
     if prev_aliases:
-        removed_files = list(file.file for file in (prev_aliases - aliases))
-        added_files = list(file.file for file in (aliases - prev_aliases))
+        removed_files = sorted(list(file.file for file in (prev_aliases - aliases)))
+        added_files = sorted(list(file.file for file in (aliases - prev_aliases)))
 
         report_lines = []
 
         for i in range(len(removed_files) - 1, -1, -1):
             removed_file = removed_files[i]
+            if removed_file.alias.endswith("hanging_signs.json"):
+                print(f"{removed_file.alias}")
+            the_added_file = None
+            ii = 0
+            jj = 0
+            added_file_path_distance = 123456
             for j in range(len(added_files) - 1, -1, -1):
                 added_file = added_files[j]
                 if removed_file == added_file:
-                    old_file: File = info_dict[removed_file.alias]
-                    info_dict[added_file.alias] = old_file
-                    del info_dict[removed_file.alias]
-                    report_lines.append(f"Found a moved file!")
-                    report_lines.append(f"\tfrom: {old_file.path}")
-                    report_lines.append(f"\tto: {added_file.path}")
-                    del removed_files[i]
-                    del added_files[j]
-                    del included_files[added_file.alias]
-                    moved += 1
-                    break
-        
+                    path_distance = levenshtein_distance(removed_file.alias, added_file.alias)
+                    if removed_file.alias.endswith("hanging_signs.json"):
+                        print(f"{added_file.alias=}, {path_distance=}, {added_file_path_distance=}")
+                    if path_distance < added_file_path_distance:
+                        added_file_path_distance = path_distance
+                        the_added_file = added_file
+                        ii = i
+                        jj = j
+
+            if removed_file.alias.endswith("hanging_signs.json"):
+                print(f"{the_added_file.alias=}")
+
+            if isinstance(the_added_file, File):
+                old_file: File = info_dict[removed_file.alias]
+                info_dict[the_added_file.alias] = old_file
+                del info_dict[removed_file.alias]
+                report_lines.append(f"Found a moved file!")
+                report_lines.append(f"\tfrom: {old_file.path}")
+                report_lines.append(f"\tto: {the_added_file.path}")
+                del removed_files[ii]
+                del added_files[jj]
+                del included_files[the_added_file.alias]
+                moved += 1        
                 
         print(f"{File.data_count=}, {File.partial_hash_count=}, {File.size_count=}")
 

@@ -440,7 +440,7 @@ namespace Command {
                     return brigadier_integer();
                 }
                 ucase ("predicate"_QL1): {
-                    const auto &&ret = parseNegEntityArg();
+                    const auto &&ret = parseInvertible();
                     ret->setNode(minecraft_resourceLocation());
                     return ret;
                 }
@@ -453,7 +453,7 @@ namespace Command {
                         spanText(literal), !literal.isEmpty());
                 }
                 ucase ("gamemode"_QL1): {
-                    const auto &&ret        = parseNegEntityArg();
+                    const auto &&ret        = parseInvertible();
                     const QString &&literal =
                         oneOf(staticSuggestions<GamemodeNode>);
                     ret->setNode(QSharedPointer<StringNode>::create(
@@ -462,7 +462,7 @@ namespace Command {
                 }
                 ucase ("name"_QL1): {
                     const int start  = pos();
-                    const auto &&ret = parseNegEntityArg();
+                    const auto &&ret = parseInvertible();
                     QString literal;
                     if (curChar() == '"' || curChar() == '\'') {
                         literal = getQuotedString();
@@ -478,7 +478,7 @@ namespace Command {
                     return ret;
                 }
                 ucase ("type"_QL1): {
-                    const auto &&ret    = parseNegEntityArg();
+                    const auto &&ret    = parseInvertible();
                     const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(
                         0);
 
@@ -487,13 +487,13 @@ namespace Command {
                     return ret;
                 }
                 ucase ("nbt"_QL1): {
-                    const auto &&ret = parseNegEntityArg();
+                    const auto &&ret = parseInvertible();
                     ret->setNode(parseCompoundTag());
                     return ret;
                 }
                 ucase ("tag"_QL1):
                 ucase ("team"_QL1): {
-                    const auto &&ret    = parseNegEntityArg();
+                    const auto &&ret    = parseInvertible();
                     QStringView literal = getLiteralString();
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(literal), true));
@@ -735,17 +735,121 @@ namespace Command {
         return ret;
     }
 
-    QSharedPointer<EntityArgumentValueNode> MinecraftParser::parseNegEntityArg()
-    {
+    QSharedPointer<InvertibleNode> MinecraftParser::parseInvertible() {
         const bool   isNegative = curChar() == '!';
         const auto &&ret        =
-            QSharedPointer<EntityArgumentValueNode>::create(isNegative);
+            QSharedPointer<InvertibleNode>::create(isNegative);
 
         if (isNegative) {
             advance();
             ret->setLeftText(spanText(pos() - 1));
         }
         return ret;
+    }
+
+    QSharedPointer<ListNode> MinecraftParser::parseItemPredEntry() {
+        auto    &&obj   = QSharedPointer<ListNode>::create(0);
+        const int start = pos();
+
+        while (curChar() != ',' && curChar() != ']') {
+            const auto &&trivia = skipWs(false);
+            const auto &&elem   = parseItemPredMatch();
+            elem->setLeadingTrivia(trivia);
+            obj->append(elem);
+
+            const int trailingTriviaPos = pos();
+            while (curChar().isSpace()) {
+                advance();
+            }
+            if (curChar() != ',' && curChar() != ']') {
+                expect('|',
+                       "Unexpected %1, expecting separator %2 or closing character");
+                advance();
+                while (curChar().isSpace()) {
+                    advance();
+                }
+            }
+
+            elem->setTrailingTrivia(spanText(trailingTriviaPos));
+        }
+        obj->setLength(pos() - start);
+        return obj;
+    }
+
+    QSharedPointer<ItemPredicateMatchNode> MinecraftParser::parseItemPredMatch(
+        const bool isPredicate) {
+        const int start = pos();
+
+        const auto &&trivia = skipWs(false);
+        auto       &&key    = parseInvertible();
+
+        key->setLeadingTrivia(trivia);
+        key->setNode(minecraft_resourceLocation());
+
+        const auto &&trailingTriviaPos = pos();
+        skipWs(false);
+
+        auto &&obj =
+            QSharedPointer<ItemPredicateMatchNode>::create(key, isPredicate);
+
+        bool      hasValue    = false;
+        const int sepValuePos = pos();
+        if (curChar() == '=') {
+            hasValue = true;
+            advance();
+            obj->first->setTrailingTrivia(spanText(trailingTriviaPos));
+            obj->setMode(ItemPredicateMatchNode::Mode::FullMatch);
+        } else if (curChar() == '~') {
+            hasValue = true;
+            advance();
+            obj->first->setTrailingTrivia(spanText(trailingTriviaPos));
+            obj->setMode(ItemPredicateMatchNode::Mode::PartialMatch);
+        } else {
+            obj->first->setTrailingTrivia(spanText(trailingTriviaPos));
+        }
+
+        if (hasValue) {
+            const auto &&valueTrivia = skipWs(false);
+            const auto &&value       = parseTagValue();
+            value->setLeadingTrivia(spanText(valueTrivia));
+            value->setTrailingTrivia(skipWs(false));
+            obj->setIsValid(obj->isValid() && obj->second->isValid());
+            obj->second = std::move(value);
+        }
+        if (!isPredicate &&
+            obj->mode() == ItemPredicateMatchNode::Mode::PartialMatch) {
+            reportError(
+                QT_TR_NOOP(
+                    "Cannot test for sub-predicate in a item stack"),
+                {}, sepValuePos, pos() - sepValuePos);
+        }
+
+
+        obj->setLength(pos() - start);
+
+        if (!isPredicate) {
+            if (key->isInverted()) {
+                if (hasValue) {
+                    reportError(
+                        QT_TR_NOOP(
+                            "Cannot invert a key-value pair of component in an item stack"),
+                        {},
+                        start,
+                        obj->length());
+                } else if (gameVer < QVersionNumber(1, 21)) {
+                    reportError(
+                        QT_TR_NOOP(
+                            "Removal of default components in an item stack is only available on 1.21+"),
+                        {},
+                        start,
+                        obj->length());
+                }
+            } else if (!hasValue) {
+                reportError(QT_TR_NOOP("Missing component value"),
+                            {}, start, obj->length());
+            }
+        }
+        return obj;
     }
 
     void MinecraftParser::parseResourceLocation(ResourceLocationNode *node,
@@ -1252,10 +1356,10 @@ namespace Command {
 
         if (curChar() == '[' && gameVer >= QVersionNumber(1, 20, 5)) {
             ret->setComponents(
-                parseMap<MapNode, NbtNode>('[', ']', '=',
-                                           [this](const QString &) {
-                return parseTagValue();
-            }, false, "0-9a-z-_.:"_QL1));
+                parseList<ListNode, ItemPredicateMatchNode>('[', ']', ',',
+                                                            [this]() {
+                return parseItemPredMatch(false);
+            }));
         }
 
         if (curChar() == '{') {
@@ -1267,12 +1371,28 @@ namespace Command {
 
     QSharedPointer<ItemPredicateNode> MinecraftParser::
     minecraft_itemPredicate() {
-        const int    start  = pos();
-        const auto &&ret    = QSharedPointer<ItemPredicateNode>::create(0);
-        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+        const int    start = pos();
+        const auto &&ret   = QSharedPointer<ItemPredicateNode>::create(0);
 
-        parseResourceLocation(resLoc.get(), true);
-        ret->setResLoc(std::move(resLoc));
+        const bool from_1_20_5 = gameVer >= QVersionNumber(1, 20, 5);
+
+        if (curChar() == '*' && from_1_20_5) {
+            ret->setAll(true);
+            advance();
+        } else {
+            const auto &&resLoc =
+                QSharedPointer<ResourceLocationNode>::create(0);
+
+            parseResourceLocation(resLoc.get(), true);
+            ret->setResLoc(std::move(resLoc));
+        }
+
+        if (curChar() == '[' && from_1_20_5) {
+            ret->setComponents(
+                parseList<ListNode, ListNode>('[', ']', ',', [this]() {
+                return parseItemPredEntry();
+            }));
+        }
 
         if (curChar() == '{') {
             ret->setNbt(parseCompoundTag());

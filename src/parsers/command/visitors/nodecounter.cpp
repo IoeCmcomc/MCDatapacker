@@ -25,10 +25,14 @@ namespace Command {
     }
 
     void NodeCounter::visit(
-        EntityArgumentValueNode *node) {
-        if (node->getNode() && (node->getNode()->parserType() ==
-                                ArgumentNode::ParserType::NbtCompoundTag)) {
-            ++m_nbtAccessCount;
+        InvertibleNode *node) {
+        if (const auto *parent = node->getNode().get()) {
+            if (parent->kind() == ParseNode::Kind::Argument) {
+                if (((ArgumentNode *)parent)->parserType() ==
+                    ArgumentNode::ParserType::NbtCompoundTag) {
+                    ++m_nbtAccessCount;
+                }
+            }
         }
     }
 

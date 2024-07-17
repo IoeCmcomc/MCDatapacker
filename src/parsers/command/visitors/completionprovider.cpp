@@ -183,13 +183,15 @@ namespace Command {
     }
 
     void CompletionProvider::visit(ItemPredicateNode *node) {
-        if ((m_cursorRow >= m_pos) &&
-            (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
-            addSuggestionsFromInfo(QStringLiteral("item"));
-            addSuggestionsFromInfo(QStringLiteral("tag/item"), true);
-            m_suggestions += Glhp::fileIdList(
-                QDir::currentPath(), QStringLiteral("tags/items"),
-                QString(), false);
+        if (node->resLoc()) {
+            if ((m_cursorRow >= m_pos) &&
+                (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
+                addSuggestionsFromInfo(QStringLiteral("item"));
+                addSuggestionsFromInfo(QStringLiteral("tag/item"), true);
+                m_suggestions += Glhp::fileIdList(
+                    QDir::currentPath(), QStringLiteral("tags/items"),
+                    QString(), false);
+            }
         }
     }
 

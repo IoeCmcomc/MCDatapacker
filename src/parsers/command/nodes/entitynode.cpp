@@ -89,12 +89,12 @@ namespace Command {
         m_all     = all;
     }
 
-    EntityArgumentValueNode::EntityArgumentValueNode(bool negative)
-        : ParseNode(Kind::Container, 0), m_negative(negative) {
+    InvertibleNode::InvertibleNode(bool inverted)
+        : ParseNode(Kind::Container, 0), m_inverted(inverted) {
     }
 
-    void EntityArgumentValueNode::accept(NodeVisitor *visitor,
-                                         VisitOrder order) {
+    void InvertibleNode::accept(NodeVisitor *visitor,
+                                VisitOrder order) {
         if (order == VisitOrder::LetTheVisitorDecide) {
             visitor->visit(this);
             return;
@@ -107,15 +107,15 @@ namespace Command {
             visitor->visit(this);
     }
 
-    bool EntityArgumentValueNode::isNegative() const {
-        return m_negative;
+    bool InvertibleNode::isInverted() const {
+        return m_inverted;
     }
 
-    void EntityArgumentValueNode::setNegative(bool negative) {
-        m_negative = negative;
+    void InvertibleNode::setInverted(bool inverted) {
+        m_inverted = inverted;
     }
 
-    EntityArgumentValueNode::ArgPtr EntityArgumentValueNode::getNode()  const {
+    NodePtr InvertibleNode::getNode()  const {
         return m_ptr;
     }
 }

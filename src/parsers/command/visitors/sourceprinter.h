@@ -108,6 +108,23 @@ public:
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
+        void visit(ItemPredicateNode *node) override {
+            m_text += node->leadingTrivia();
+            m_text += node->leftText();
+            if (!node->isAll()) {
+                node->resLoc()->accept(this, m_order);
+            } else {
+                m_text += '*';
+            }
+            if (node->components()) {
+                node->components()->accept(this, m_order);
+            }
+            if (node->nbt()) {
+                node->nbt()->accept(this, m_order);
+            }
+            m_text += node->rightText();
+            m_text += node->trailingTrivia();
+        };
         void visit(MapNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
@@ -123,7 +140,7 @@ public:
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void visit(EntityArgumentValueNode *node) override {
+        void visit(InvertibleNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             if (node->getNode()) {

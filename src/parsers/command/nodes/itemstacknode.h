@@ -14,8 +14,8 @@ public:
 
         void accept(NodeVisitor *visitor, VisitOrder order) override;
 
-        QSharedPointer<MapNode> components() const;
-        void setComponents(QSharedPointer<MapNode> components);
+        QSharedPointer<ParseNode> components() const;
+        void setComponents(QSharedPointer<ParseNode> components);
 
         QSharedPointer<NbtCompoundNode> nbt() const;
         void setNbt(QSharedPointer<NbtCompoundNode> nbt);
@@ -25,7 +25,7 @@ public:
 
 private:
         QSharedPointer<ResourceLocationNode> m_resLoc;
-        QSharedPointer<MapNode> m_components;
+        QSharedPointer<ParseNode> m_components;
         QSharedPointer<NbtCompoundNode> m_nbt;
     };
 
@@ -34,6 +34,12 @@ public:
         explicit ItemPredicateNode(int length);
 
         void accept(NodeVisitor *visitor, VisitOrder order) final;
+
+        bool isAll() const;
+        void setAll(bool all);
+
+private:
+        bool m_all = false;
     };
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, ItemStack)

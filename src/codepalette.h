@@ -148,6 +148,7 @@ public:
         NbtPath_Step,
         TargetSelector_Variable,
         TargetSelector_Arguments,
+        ItemStack_Components,
         Key,
         Operator       = Operation,
         CommandLiteral = Keyword,

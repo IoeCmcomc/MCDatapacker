@@ -13,7 +13,9 @@
 #include "../nodes/internalregexpatternnode.h"
 #include "../nodes/intrangenode.h"
 #include "../nodes/itemstacknode.h"
+#include "../nodes/itempredicatematchnode.h"
 #include "../nodes/literalnode.h"
+#include "../nodes/listnode.h"
 #include "../nodes/nbtnodes.h"
 #include "../nodes/nbtpathnode.h"
 #include "../nodes/particlenode.h"
@@ -102,7 +104,7 @@ public:
         void visit(MapNode *node) override {
             _visit(node);
         }
-        void visit(EntityArgumentValueNode *node) override {
+        void visit(InvertibleNode *node) override {
             _visit(node);
         }
         void visit(NbtNode *node) override {
@@ -280,6 +282,12 @@ public:
             _visit(node);
         }
         void visit(LootTableNode *node) override {
+            _visit(node);
+        }
+        void visit(ItemPredicateMatchNode *node) override {
+            _visit(node);
+        }
+        void visit(ListNode *node) override {
             _visit(node);
         }
         void visit(InternalGreedyStringNode *node) override {

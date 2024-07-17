@@ -22,7 +22,7 @@ namespace Command {
     class ComponentNode;
     class DimensionNode;
     class EntityAnchorNode;
-    class EntityArgumentValueNode;
+    class InvertibleNode;
     class EntityNode;
     class EntitySummonNode;
     class FloatRangeNode;
@@ -34,10 +34,12 @@ namespace Command {
     class IntRangeNode;
     class ItemEnchantmentNode;
     class ItemPredicateNode;
+    class ItemPredicateMatchNode;
     class ItemSlotNode;
     class ItemSlotsNode;
     class ItemStackNode;
     class KeyNode;
+    class ListNode;
     class LootModifierNode;
     class LootPredicateNode;
     class LootTableNode;
@@ -116,7 +118,7 @@ public:
         virtual void visit(ComponentNode *node)            = 0;
         virtual void visit(DimensionNode *node)            = 0;
         virtual void visit(EntityAnchorNode *node)         = 0;
-        virtual void visit(EntityArgumentValueNode *node)  = 0;
+        virtual void visit(InvertibleNode *node)           = 0;
         virtual void visit(EntityNode *node)               = 0;
         virtual void visit(EntitySummonNode *node)         = 0;
         virtual void visit(FloatRangeNode *node)           = 0;
@@ -128,10 +130,12 @@ public:
         virtual void visit(IntRangeNode *node)             = 0;
         virtual void visit(ItemEnchantmentNode *node)      = 0;
         virtual void visit(ItemPredicateNode *node)        = 0;
+        virtual void visit(ItemPredicateMatchNode *node)   = 0;
         virtual void visit(ItemSlotNode *node)             = 0;
         virtual void visit(ItemSlotsNode *node)            = 0;
         virtual void visit(ItemStackNode *node)            = 0;
         virtual void visit(KeyNode *node)                  = 0;
+        virtual void visit(ListNode *node)                 = 0;
         virtual void visit(LootModifierNode *node)         = 0;
         virtual void visit(LootPredicateNode *node)        = 0;
         virtual void visit(LootTableNode *node)            = 0;

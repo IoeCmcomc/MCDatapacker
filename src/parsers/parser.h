@@ -134,6 +134,6 @@ private:
 };
 
 static_assert(qIsRelocatable<Parser::Error>() == false);
-Q_DECLARE_TYPEINFO(Parser::Error, Q_RELOCATABLE_TYPE);
+// Q_DECLARE_TYPEINFO(Parser::Error, Q_RELOCATABLE_TYPE);
 
 #endif // PARSER_H

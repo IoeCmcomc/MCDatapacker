@@ -21,7 +21,11 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/anglenode.cpp \
     ../../../../../src/parsers/command/nodes/blockstatenode.cpp \
     ../../../../../src/parsers/command/nodes/componentnode.cpp \
+    ../../../../../src/parsers/command/nodes/filenode.cpp \
     ../../../../../src/parsers/command/nodes/internalregexpatternnode.cpp \
+    ../../../../../src/parsers/command/nodes/itempredicatematchnode.cpp \
+    ../../../../../src/parsers/command/nodes/listnode.cpp \
+    ../../../../../src/parsers/command/nodes/macronode.cpp \
     ../../../../../src/parsers/command/nodes/stylenode.cpp \
     ../../../../../src/parsers/command/nodes/entitynode.cpp \
     ../../../../../src/parsers/command/nodes/gamemodenode.cpp \
@@ -63,7 +67,11 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/anglenode.h \
     ../../../../../src/parsers/command/nodes/blockstatenode.h \
     ../../../../../src/parsers/command/nodes/componentnode.h \
+    ../../../../../src/parsers/command/nodes/filenode.h \
     ../../../../../src/parsers/command/nodes/internalregexpatternnode.h \
+    ../../../../../src/parsers/command/nodes/itempredicatematchnode.h \
+    ../../../../../src/parsers/command/nodes/listnode.h \
+    ../../../../../src/parsers/command/nodes/macronode.h \
     ../../../../../src/parsers/command/nodes/stylenode.h \
     ../../../../../src/parsers/command/nodes/entitynode.h \
     ../../../../../src/parsers/command/nodes/gamemodenode.h \

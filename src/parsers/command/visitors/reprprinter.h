@@ -13,6 +13,8 @@
 #include "../nodes/internalregexpatternnode.h"
 #include "../nodes/intrangenode.h"
 #include "../nodes/itemstacknode.h"
+#include "../nodes/listnode.h"
+#include "../nodes/itempredicatematchnode.h"
 #include "../nodes/literalnode.h"
 #include "../nodes/nbtnodes.h"
 #include "../nodes/nbtpathnode.h"
@@ -129,7 +131,7 @@ public:
             m_repr += "ItemStackNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
-            if (node->components() && !node->components()->isEmpty()) {
+            if (node->components() /*&& !node->components()->isEmpty()*/) {
                 m_repr += '[';
                 node->components()->accept(this, m_order);
                 m_repr += ']';
@@ -154,9 +156,9 @@ public:
 
             m_repr += ')';
         };
-        void visit(EntityArgumentValueNode *node) final {
-            m_repr += "EntityArgumentValueNode";
-            if (node->isNegative())
+        void visit(InvertibleNode *node) final {
+            m_repr += "InvertibleNode";
+            if (node->isInverted())
                 m_repr += "[!]";
             m_repr += '(';
             if (node->getNode())
@@ -439,7 +441,11 @@ public:
         };
         void visit(ItemPredicateNode *node) final {
             m_repr += "ItemPredicateNode(";
-            node->resLoc()->accept(this, m_order);
+            if (node->isAll()) {
+                m_repr += "*";
+            } else {
+                node->resLoc()->accept(this, m_order);
+            }
             m_repr += ')';
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
@@ -481,6 +487,31 @@ public:
             node->getNode()->accept(this, m_order);
             m_repr += ')';
         }
+        void visit(ItemPredicateMatchNode *node) final {
+            using Mode = ItemPredicateMatchNode::Mode;
+            static const QMap<Mode, QString> mode2Name {
+                { Mode::FullMatch, "FullMatch" },
+                { Mode::PartialMatch, "PartialMatch" },
+                { Mode::MatchKey, "MatchKey" },
+            };
+
+            m_repr += QString("ItemPredicateMatchNode<%1>").arg(
+                mode2Name[node->mode()]);
+
+            if (node->first) {
+                m_repr += "(key: ";
+                node->first->accept(this, m_order);
+                if (node->second) {
+                    m_repr += ", value: ";
+                    node->second->accept(this, m_order);
+                }
+                m_repr += ')';
+            }
+        };
+        void visit(ListNode *node) final {
+            m_repr += QString("ListNode[%1]").arg(node->size());
+            reprList(node->children());
+        };
         void visit(InternalGreedyStringNode *node) final {
             m_repr += QString("InternalGreedyStringNode(\"%1\")").arg(
                 node->text());

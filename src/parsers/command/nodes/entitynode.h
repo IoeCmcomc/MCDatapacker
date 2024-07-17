@@ -56,28 +56,27 @@ private:
         bool m_all = false;
     };
 
-    class EntityArgumentValueNode final : public ParseNode {
+    class InvertibleNode final : public ParseNode {
 public:
-        using ArgPtr = QSharedPointer<ArgumentNode>;
-
-        explicit EntityArgumentValueNode(bool negative = false);
+        explicit InvertibleNode(bool inverted = false);
 
         void accept(NodeVisitor *visitor, VisitOrder order) final;
 
-        bool isNegative() const;
-        void setNegative(bool negative);
+        bool isInverted() const;
+        void setInverted(bool inverted);
 
-        ArgPtr getNode() const;
+        NodePtr getNode() const;
         template <typename T>
-        typename std::enable_if_t<std::is_assignable_v<ArgPtr, T>, void>
+        typename std::enable_if_t<std::is_assignable_v<NodePtr, T>, void>
         setNode(T &&node) {
+            setLength(node->length());
             m_isValid = node->isValid();
             m_ptr     = std::forward<T>(node);
         }
 
 private:
-        ArgPtr m_ptr;
-        bool m_negative = false;
+        NodePtr m_ptr;
+        bool m_inverted = false;
     };
 
     DECLARE_TYPE_ENUM(ArgumentNode::ParserType, Entity)

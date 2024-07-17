@@ -11,7 +11,9 @@
 #include "nodes/inlinableresourcenode.h"
 #include "nodes/internalregexpatternnode.h"
 #include "nodes/intrangenode.h"
+#include "nodes/itempredicatematchnode.h"
 #include "nodes/itemstacknode.h"
+#include "nodes/listnode.h"
 #include "nodes/nbtnodes.h"
 #include "nodes/nbtpathnode.h"
 #include "nodes/particlenode.h"
@@ -185,6 +187,27 @@ private:
 
         QString eatListSep(QChar sepChr, QChar endChr);
 
+        template<class Container, class Type, class Func>
+        QSharedPointer<Container> parseList(QChar beginChar,
+                                            QChar endChar,
+                                            QChar sepChar, Func func) {
+            auto    &&obj   = QSharedPointer<Container>::create(0);
+            const int start = pos();
+
+            obj->setLeftText(this->eat(beginChar));
+
+            while (curChar() != endChar) {
+                const auto &&trivia = skipWs(false);
+                const auto &&elem   = qSharedPointerCast<Type>(func());
+                elem->setLeadingTrivia(trivia);
+                obj->append(elem);
+                elem->setTrailingTrivia(eatListSep(sepChar, endChar));
+            }
+            obj->setRightText(eat(endChar));
+            obj->setLength(pos() - start);
+            return obj;
+        }
+
         template<class Container, class Type>
         QSharedPointer<Container> parseMap(QChar beginChar,
                                            QChar endChar,
@@ -280,7 +303,10 @@ private:
         QSharedPointer<NbtPathStepNode> parseNbtPathStep();
         QSharedPointer<ParticleColorNode> parseParticleColor();
         QSharedPointer<ParticleNode> parseOldParticle();
-        QSharedPointer<EntityArgumentValueNode> parseNegEntityArg();
+        QSharedPointer<InvertibleNode> parseInvertible();
+        QSharedPointer<ListNode> parseItemPredEntry();
+        QSharedPointer<ItemPredicateMatchNode> parseItemPredMatch(
+            const bool isPredicate = true);
         void parseResourceLocation(ResourceLocationNode *node,
                                    bool acceptTag = false);
         void parseBlock(BlockStateNode *node, bool acceptTag);

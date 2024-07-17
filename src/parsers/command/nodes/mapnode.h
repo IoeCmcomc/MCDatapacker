@@ -12,12 +12,13 @@ public:
 
     using KeyPtr = QSharedPointer<KeyNode>;
 
-    template<typename T>
-    class PairNode : public ParseNode, public QPair<KeyPtr, T> {
+    template<typename KeyType = KeyPtr, typename ValueType = NodePtr>
+    class PairNode : public ParseNode, public QPair<KeyType, ValueType> {
 public:
-        PairNode(KeyPtr key, T node) : ParseNode(
+        PairNode(KeyType key, ValueType node) : ParseNode(
                 ParseNode::Kind::Container, 0) {
-            m_isValid    = key->isValid() && node->isValid();
+            Q_ASSERT(key != nullptr);
+            m_isValid    = key->isValid() && node && node->isValid();
             this->first  = std::move(key);
             this->second = std::move(node);
         }
@@ -25,7 +26,7 @@ public:
 
     class MapNode : public ParseNode {
 public:
-        using Pair = QSharedPointer<PairNode<NodePtr> >;
+        using Pair = QSharedPointer<PairNode<> >;
 
         using Pairs = QVector<Pair>;
 
@@ -39,7 +40,7 @@ public:
         Pairs::const_iterator find(const QString &key) const;
         void insert(KeyPtr key, NodePtr node);
         void clear();
-        PairNode<NodePtr> inline * constLast() const {
+        PairNode<> inline * constLast() const {
             return m_pairs.constLast().data();
         }
         Pairs pairs() const;

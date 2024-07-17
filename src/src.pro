@@ -85,6 +85,8 @@ SOURCES += \
     parsers/command/nodes/gamemodenode.cpp \
     parsers/command/nodes/inlinableresourcenode.cpp \
     parsers/command/nodes/internalregexpatternnode.cpp \
+    parsers/command/nodes/itempredicatematchnode.cpp \
+    parsers/command/nodes/listnode.cpp \
     parsers/command/nodes/macronode.cpp \
     parsers/command/nodes/stylenode.cpp \
     parsers/command/nodes/uuidnode.cpp \
@@ -217,7 +219,9 @@ HEADERS += \
     parsers/command/nodes/inlinableresourcenode.h \
     parsers/command/nodes/internalregexpatternnode.h \
     parsers/command/nodes/intrangenode.h \
+    parsers/command/nodes/itempredicatematchnode.h \
     parsers/command/nodes/itemstacknode.h \
+    parsers/command/nodes/listnode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/macronode.h \
     parsers/command/nodes/mapnode.h \
@@ -385,7 +389,7 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\" \
     APP_VERSION_MINOR=$$VERSION_MINOR \
     APP_VERSION_PATCH=$$VERSION_PATCH
 
-QMAKE_RESOURCE_FLAGS += -threshold 40 -compress 9 -compress-algo zlib --verbose
+QMAKE_RESOURCE_FLAGS += -threshold 40 -compress 9 -compress-algo zlib
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/debug/ -lnbt
