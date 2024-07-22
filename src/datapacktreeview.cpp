@@ -291,6 +291,8 @@ void DatapackTreeView::load(const QDir &dir) {
     setRootIndex(dirModel.index(dirPath));
     resizeFirstColumn();
 
+    expand(dirModel.index(dirPath + "/data"));
+
     emit datapackChanged();
 }
 

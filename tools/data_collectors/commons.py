@@ -25,7 +25,7 @@ def get_image_online(url: str) -> Image:
     with urlopen(req) as url:
         return Image.open(BytesIO(url.read()))
 
-def get_image_online_httpx(url: str, client: Optional[httpx.Client]) -> Image:
+def get_image_online_httpx(url: str, client: Optional[httpx.Client] = None) -> Image:
     if client:
         return Image.open(BytesIO(client.get(url).content))
     else:

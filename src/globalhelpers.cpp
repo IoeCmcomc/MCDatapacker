@@ -139,7 +139,13 @@ CodeFile::FileType Glhp::pathToFileType(const QString &dirpath,
             for (const auto &pair: catPathToFileType) {
                 if (isPathRelativeTo(dirpath, filepath, pair.first)) {
                     return pair.second;
-                }
+                }/* else if (pair.first.endsWith('s')) {
+                    QStringView singular = pair.first;
+                    singular.chop(1);
+                    if (isPathRelativeTo(dirpath, filepath, singular)) {
+                        return pair.second;
+                    }
+                    }*/
             }
             return CodeFile::JsonText;
         }

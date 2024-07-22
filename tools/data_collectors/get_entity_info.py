@@ -1,8 +1,8 @@
 import json
 
-from commons import get_httpx_soup, find_tr_tags, get_html
+from commons import get_httpx_soup, find_tr_tags
 
-ids_soup = get_httpx_soup("https://minecraft.wiki/w/Java_Edition_data_values/Entities")
+ids_soup = get_httpx_soup("https://minecraft.wiki/w/Java_Edition_data_values/Entities?action=render")
 
 info = dict()
 tables = ids_soup.find_all("table")

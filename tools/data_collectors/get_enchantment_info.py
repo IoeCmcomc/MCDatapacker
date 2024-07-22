@@ -1,9 +1,8 @@
 import json
-import re
 
-from commons import get_selenium_soup, find_tr_tags, get_html
+from commons import get_httpx_soup, find_tr_tags
 
-ids_soup = get_selenium_soup("https://minecraft.wiki/w/Java_Edition_data_values?diff=next&oldid=2500088")
+ids_soup = get_httpx_soup("https://minecraft.wiki/w/Java_Edition_data_values?action=render")
 
 h3 = ids_soup.find("span", id="Enchantments").parent
 

@@ -147,10 +147,10 @@ def save_resource_lookup_file(version: str, info_dict: dict[str, File], categori
         if category not in lookup_dict:
             lookup_dict[category] = {}
         
-    json_path = join(abspath("../resource/minecraft/info"), version, f"vanilla_lookup.json")
+    json_path = join(abspath("../res/mc/info"), version, f"vanilla_lookup.json")
     with open(json_path, 'w') as f:
         json_dump(lookup_dict, f, indent=1, sort_keys=True)
-    cbor_path = join(abspath("../resource/minecraft/info"), version, f"vanilla_lookup.cbor")
+    cbor_path = join(abspath("../res/mc/info"), version, f"vanilla_lookup.cbor")
     with open(cbor_path, 'wb') as f:
         cbor_dump(lookup_dict, f, canonical=True)
 
@@ -158,9 +158,9 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
     print(f"Generating .qrc file for {version} vanilla datapack...")
 
     prefix = f"/minecraft/{version}/data-json"
-    info_dir = abspath(f"../resource/minecraft/info") 
+    info_dir = abspath(f"../res/mc/info") 
     qrc_dir = join(info_dir, version)
-    # qrc_dir = abspath(f"../resource/minecraft/info")
+    # qrc_dir = abspath(f"../res/mc/info")
     qrc_path = join(qrc_dir, f"{version}-data-json.qrc")
     target_dir = join(qrc_dir, "data-json")
     minecraft_dir = join(target_dir, "data", "minecraft")

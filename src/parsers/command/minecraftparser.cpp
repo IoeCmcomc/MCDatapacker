@@ -531,6 +531,19 @@ namespace Command {
                 break;
             }
 
+            case 'n': {
+                ret->setVariable(Variable::N);
+                if (gameVer < QVersionNumber(1, 21)) {
+                    reportError(
+                        QT_TR_NOOP(
+                            "The @n selector is only available on 1.21+"),
+                        {},
+                        pos() - 1,
+                        2);
+                }
+                break;
+            }
+
             case 'p': {
                 ret->setVariable(Variable::P);
                 break;
@@ -1795,10 +1808,10 @@ namespace Command {
 
     void MinecraftParser::setGameVer(const QVersionNumber &newGameVer,
                                      const bool autoLoadSchema) {
-        gameVer = QVersionNumber(1, 20, 5);
-        qWarning() <<
-            "The command parser is in 1.20.5 mode, except the schema.";
-        // gameVer = newGameVer;
+        // gameVer = QVersionNumber(1, 20, 5);
+        // qWarning() <<
+        //     "The command parser is in 1.20.5 mode, except the schema.";
+        gameVer = newGameVer;
 
         if (autoLoadSchema) {
             loadSchema(QStringLiteral(":/minecraft/") + newGameVer.toString() +

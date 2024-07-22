@@ -1,0 +1,1 @@
+{"added": {"generic.fall_damage_multiplier": null, "generic.gravity": null, "generic.jump_strength": null, "generic.safe_fall_distance": null, "generic.scale": null, "generic.step_height": null, "player.block_break_speed": null, "player.block_interaction_range": null, "player.entity_interaction_range": null}, "base": "1.20.2", "removed": ["horse.jump_strength"]}
