@@ -21,6 +21,7 @@
 namespace Command {
     ListNode::ListNode(int length) : ParseNode(
             ParseNode::Kind::Container, length) {
+        m_isValid = true;
     }
 
     DEFINE_LIST_ACCEPT_METHOD(ListNode);

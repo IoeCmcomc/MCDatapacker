@@ -7,6 +7,7 @@ namespace Command {
                                                    const bool isPredicate)
         : PairNode<NodePtr, NodePtr> (key, nullptr),
         m_mode{Mode::MatchKey}, m_isPredicate{isPredicate} {
+        m_isValid = key->isValid();
     }
 
     DEFINE_ACCEPT_METHOD(ItemPredicateMatchNode)

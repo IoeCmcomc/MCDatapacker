@@ -223,7 +223,11 @@ void StatisticsDialog::collectFunctionData(const QString &path) {
         QTextStream in(&file);
         in.setCodec("UTF-8");
 
-        text = in.readAll();
+        while (!in.atEnd()) {
+            text += in.readLine();
+            if (!in.atEnd())
+                text += '\n';
+        }
     }
 
     if (!text.isNull()) {

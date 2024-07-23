@@ -826,7 +826,7 @@ namespace Command {
             const auto &&value       = parseTagValue();
             value->setLeadingTrivia(spanText(valueTrivia));
             value->setTrailingTrivia(skipWs(false));
-            obj->setIsValid(obj->isValid() && obj->second->isValid());
+            obj->setIsValid(obj->isValid() && value->isValid());
             obj->second = std::move(value);
         }
         if (!isPredicate &&
@@ -1808,9 +1808,6 @@ namespace Command {
 
     void MinecraftParser::setGameVer(const QVersionNumber &newGameVer,
                                      const bool autoLoadSchema) {
-        // gameVer = QVersionNumber(1, 20, 5);
-        // qWarning() <<
-        //     "The command parser is in 1.20.5 mode, except the schema.";
         gameVer = newGameVer;
 
         if (autoLoadSchema) {

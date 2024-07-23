@@ -36,6 +36,8 @@ private slots:
     void genRepr();
     void commands_data();
     void commands();
+    void commands_1_21_data();
+    void commands_1_21();
     void benchmark_data();
     void benchmark();
     void benchmarkCommandBoxes_data();
@@ -515,6 +517,67 @@ void TestMinecraftParser::commands() {
     }
     Q_ASSERT(result);
     QVERIFY(result->isValid());
+    QCOMPARE(repr(result.get()), parseTreeRepr);
+}
+
+void TestMinecraftParser::commands_1_21_data() {
+    DECLARE_TAG_VARS
+
+    QTest::addColumn<QString>("command");
+
+    QTest::addColumn<QString>("parseTreeRepr");
+
+    QElapsedTimer localTimer;
+    localTimer.start();
+
+    SET_TAG(item_components_in_item_stacks)
+    QTest::newRow(GEN_TAG) <<
+        "give @s apple[minecraft:custom_data={}]" <<
+        "RootNode[3](LiteralNode(give), EntityNode[player](TargetSelectorNode(@s)), ItemStackNode(ResourceLocationNode(apple))[ListNode[1](ItemPredicateMatchNode<FullMatch>(key: InvertibleNode(ResourceLocationNode(minecraft:custom_data)), value: NbtCompoundNode()))])";
+    QTest::newRow(GEN_TAG) <<
+        "give @s stick[]{foo:'bar'}" <<
+        "RootNode[3](LiteralNode(give), EntityNode[player](TargetSelectorNode(@s)), ItemStackNode(ResourceLocationNode(stick))[ListNode[0]()]{NbtCompoundNode(KeyNode(\"foo\"): NbtStringNode(\"bar\"))})";
+    QTest::newRow(GEN_TAG) <<
+        "give @s diamond_pickaxe[!tool]" <<
+        "RootNode[3](LiteralNode(give), EntityNode[player](TargetSelectorNode(@s)), ItemStackNode(ResourceLocationNode(diamond_pickaxe))[ListNode[1](ItemPredicateMatchNode<MatchKey>(key: InvertibleNode[!](ResourceLocationNode(tool))))])";
+
+    SET_TAG(item_components_in_item_predicates)
+    QTest::newRow(GEN_TAG) <<
+        "clear @s *[minecraft:custom_data~{ajjgui:{kit:1b}}]" <<
+        "RootNode[3](LiteralNode(clear), EntityNode[player](TargetSelectorNode(@s)), ItemPredicateNode(*)[ListNode[1](ListNode[1](ItemPredicateMatchNode<PartialMatch>(key: InvertibleNode(ResourceLocationNode(minecraft:custom_data)), value: NbtCompoundNode(KeyNode(\"ajjgui\"): NbtCompoundNode(KeyNode(\"kit\"): NbtByteNode(1))))))])";
+    QTest::newRow(GEN_TAG) <<
+        R"(clear @s *[custom_data~{gm4_metallurgy: {stored_shamir: "lumos"}}, damage | !max_item_stack=1])"
+                           <<
+        "RootNode[3](LiteralNode(clear), EntityNode[player](TargetSelectorNode(@s)), ItemPredicateNode(*)[ListNode[2](ListNode[1](ItemPredicateMatchNode<PartialMatch>(key: InvertibleNode(ResourceLocationNode(custom_data)), value: NbtCompoundNode(KeyNode(\"gm4_metallurgy\"): NbtCompoundNode(KeyNode(\"stored_shamir\"): NbtStringNode(\"lumos\"))))), ListNode[2](ItemPredicateMatchNode<MatchKey>(key: InvertibleNode(ResourceLocationNode(damage))), ItemPredicateMatchNode<FullMatch>(key: InvertibleNode[!](ResourceLocationNode(max_item_stack)), value: NbtIntNode(1))))])";
+
+    SET_TAG(transfer)
+    QTest::newRow(GEN_TAG) <<
+        "transfer test.mc 12345 @a" <<
+        "RootNode[4](LiteralNode(transfer), StringNode(\"test.mc\"), IntegerNode(12345), EntityNode[player](TargetSelectorNode(@a)))";
+
+    SET_TAG(particle)
+    QTest::newRow(GEN_TAG) <<
+        "particle minecraft:dust{color:[1.0, 0.0, 0.0], scale:2.0}" <<
+        "RootNode[2](LiteralNode(particle), ParticleNode(id: ResourceLocationNode(minecraft:dust), options: NbtCompoundNode(KeyNode(\"color\"): NbtListNode[3](NbtDoubleNode(1), NbtDoubleNode(0), NbtDoubleNode(0)), KeyNode(\"scale\"): NbtDoubleNode(2))))";
+}
+
+void TestMinecraftParser::commands_1_21() {
+    //QSKIP("Node representation not implemented yet.");
+
+    Command::MinecraftParser::setGameVer(QVersionNumber(1, 21));
+
+    QFETCH(QString, command);
+    QFETCH(QString, parseTreeRepr);
+
+    MinecraftParser           parser(command);
+    QSharedPointer<ParseNode> result;
+    QBENCHMARK
+    {
+        result = parser.parse();
+    }
+    Q_ASSERT(result);
+    QVERIFY(result->isValid());
+    qDebug() << repr(result.get());
     QCOMPARE(repr(result.get()), parseTreeRepr);
 }
 

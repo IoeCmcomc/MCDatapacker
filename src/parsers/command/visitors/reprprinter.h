@@ -447,6 +447,11 @@ public:
                 node->resLoc()->accept(this, m_order);
             }
             m_repr += ')';
+            if (node->components() /*&& !node->components()->isEmpty()*/) {
+                m_repr += '[';
+                node->components()->accept(this, m_order);
+                m_repr += ']';
+            }
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
                 node->nbt()->accept(this, m_order);

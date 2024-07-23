@@ -108,10 +108,12 @@ HEADERS += \
     ../../../../../src/parsers/command/re2c_generated_functions.h
 
 RESOURCES += \
-    ../../../../../res/mc/info/1.18.2/1.18.2.qrc
+    ../../../../../res/mc/info/1.18.2/1.18.2.qrc \
+    ../../../../../res/mc/info/1.21/1.21.qrc
 
 DISTFILES += \
-    ../../../../../res/mc/info/1.18.2/summary/commands/data.min.json
+    ../../../../../res/mc/info/1.18.2/summary/commands/data.min.json \
+    ../../../../../res/mc/info/1.21/summary/commands/data.min.json
 
 include($$PWD/../../../../../lib/lru-cache/lru-cache.pri)
 include($$PWD/../../../../../lib/json/json.pri)
