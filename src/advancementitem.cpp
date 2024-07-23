@@ -1,6 +1,7 @@
 #include "advancementitem.h"
 
 #include "advancementtab.h"
+#include "game.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -58,7 +59,7 @@ void AdvancementItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 
     QFileInfo finfo{
         QStringLiteral("data/") + m_id.section(":", 0, 0)
-        + QStringLiteral("/advancements/") +
+        + "/" + Game::canonicalCategory(QStringLiteral("advancements")) + "/" +
         m_id.section(":", 1, 1) + QStringLiteral(".json") };
 
     if (finfo.exists() && finfo.isFile()) {

@@ -273,12 +273,15 @@ bool Game::isVanillaFileExists(const QString &catDir, const QString &path) {
     const static QString pathTemplate(
         QStringLiteral(":minecraft/%1/data-json/data/minecraft/%2/%3"));
 
-    if (QFile::exists(pathTemplate.arg(Game::versionString(), catDir, path))) {
+    const QString &actualCatDir = canonicalCategory(catDir);
+
+    if (QFile::exists(pathTemplate.arg(Game::versionString(), actualCatDir,
+                                       path))) {
         return true;
     } else if (Game::version() > Game::v1_15) {
         const auto &lookupMap = getVainllaLookupMap();
-        if (lookupMap.contains(catDir)) {
-            const auto &&aliases = lookupMap.value(catDir);
+        if (lookupMap.contains(actualCatDir)) {
+            const auto &&aliases = lookupMap.value(actualCatDir);
             return aliases.contains(path);
         } else {
             return false;
@@ -293,22 +296,23 @@ QString Game::realVanillaFilePath(const QString &catDir, const QString &path) {
         QStringLiteral(":/minecraft/%1/data-json/data/minecraft/%2/%3"));
     const static QString pathTemplatePrefix(QStringLiteral(":/minecraft/"));
 
-    const QString &&directPath = pathTemplate.arg(Game::versionString(),
-                                                  catDir, path);
+    const QString  &actualCatDir = canonicalCategory(catDir);
+    const QString &&directPath   = pathTemplate.arg(Game::versionString(),
+                                                    actualCatDir, path);
 
     if (QFile::exists(directPath)) {
         return directPath;
     } else if (Game::version() > Game::v1_15) {
         const auto &lookupMap = getVainllaLookupMap();
-        if (lookupMap.contains(catDir)) {
-            const auto &&aliases = lookupMap.value(catDir);
+        if (lookupMap.contains(actualCatDir)) {
+            const auto &&aliases = lookupMap.value(actualCatDir);
             if (aliases.contains(path)) {
-                // qDebug() << catDir << path << aliases.value(path);
+                // qDebug() << actualCatDir << path << aliases.value(path);
                 const auto &&aliasValue = aliases.value(path);
                 if (aliasValue.contains('/')) {
                     return pathTemplatePrefix + aliasValue;
                 } else { // aliasValue only contains a game verison
-                    return pathTemplate.arg(aliasValue, catDir, path);
+                    return pathTemplate.arg(aliasValue, actualCatDir, path);
                 }
             } else {
                 return {};
@@ -319,4 +323,13 @@ QString Game::realVanillaFilePath(const QString &catDir, const QString &path) {
     } else {
         return {};
     }
+}
+
+QString Game::canonicalCategory(QStringView catDir) {
+    return canonicalCategory(catDir, Game::version());
+}
+
+QString Game::canonicalCategory(QStringView catDir,
+                                const QVersionNumber &version) {
+    return Glhp::canonicalCategory(catDir, version >= Game::v1_21);
 }

@@ -135,7 +135,7 @@ QVariant VanillaDatapackModel::data(const QModelIndex &index, int role) const {
         }
         case Qt::DecorationRole: {
             if (fileItem) {
-                return Glhp::fileTypeToIcon(fileItem->file().fileType);
+                return CodeFile::fileTypeToIcon(fileItem->file().fileType);
             }
             return {};
         }
@@ -189,7 +189,9 @@ QModelIndex VanillaDatapackModel::parent(const QModelIndex &index) const {
 }
 
 QVariant VanillaDatapackModel::headerData(
-    int section, Qt::Orientation orientation, int role) const {
+    [[maybe_unused]] int section,
+    [[maybe_unused]] Qt::Orientation orientation,
+    [[maybe_unused]] int role) const {
     return QVariant();
 }
 

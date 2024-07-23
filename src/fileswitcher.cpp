@@ -116,7 +116,7 @@ void FileSwitcher::initFileList() {
                     ? file.path()
                     : QDir::current().relativeFilePath(file.path());
         fileItem->setText(path);
-        fileItem->setIcon(Glhp::fileTypeToIcon(file.fileType));
+        fileItem->setIcon(CodeFile::fileTypeToIcon(file.fileType));
         fileItem->setToolTip(finfo.filePath());
         addItem(fileItem);
     }

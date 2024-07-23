@@ -35,7 +35,7 @@ void openAllFiles(TabbedDocumentInterface *widget,
         const QString &&path  = it.next();
         const auto    &&finfo = it.fileInfo();
         if (finfo.isFile()) {
-            const auto type = Glhp::pathToFileType(dirPath, path);
+            const auto type = CodeFile::pathToFileType(dirPath, path);
             if ((type >= minType) && (type <= maxType)) {
                 widget->onOpenFile(path);
             }
@@ -324,7 +324,7 @@ void TabbedDocumentInterface::addFile(const QString &path,
         files << newFile;
         QIcon icon;
         if (newFile.info.isWritable()) {
-            icon = Glhp::fileTypeToIcon(newFile.fileType);
+            icon = CodeFile::fileTypeToIcon(newFile.fileType);
         } else {
             icon.addFile(QStringLiteral(":/icon/file-readonly.png"));
         }
@@ -471,7 +471,7 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
             file->changePath(newpath);
             updateTabTitle(i, file->isModified);
             ui->tabWidget->setTabIcon(
-                i, Glhp::fileTypeToIcon(Glhp::pathToFileType(
+                i, CodeFile::fileTypeToIcon(CodeFile::pathToFileType(
                                             QDir::currentPath(),
                                             file->path())));
 

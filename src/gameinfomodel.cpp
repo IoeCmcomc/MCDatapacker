@@ -41,7 +41,7 @@ void GameInfoModel::setRegistry(const QString &key, Options options) {
 }
 
 void GameInfoModel::setDatapackCategory(const QString &cat, bool autoWatch) {
-    m_dtpCategory = cat;
+    m_dtpCategory = Game::canonicalCategory(cat);
 
     if (autoWatch) {
         if (m_watcher) {
@@ -64,7 +64,8 @@ void GameInfoModel::setDatapackCategory(const QString &cat, bool autoWatch) {
         for (const auto &nspaceDir : nspaceDirs) {
             const QString &&watchPath = dataPath +
                                         nspaceDir.section('.', 0,
-                                                          0) + "/" + cat;
+                                                          0) + "/" +
+                                        m_dtpCategory;
             if (QFile::exists(watchPath)) {
                 qDebug() << watchPath;
                 m_watcher->addPath(watchPath);

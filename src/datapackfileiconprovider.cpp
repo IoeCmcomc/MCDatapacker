@@ -7,7 +7,7 @@ DatapackFileIconProvider::DatapackFileIconProvider() = default;
 
 QIcon DatapackFileIconProvider::icon(const QFileInfo &info) const {
     if (info.isFile()) {
-        const auto &&fileIcon = Glhp::fileTypeToIcon(Glhp::pathToFileType(
+        const auto &&fileIcon = CodeFile::fileTypeToIcon(CodeFile::pathToFileType(
                                                          QDir::currentPath(),
                                                          info.filePath()));
         if (!fileIcon.isNull())

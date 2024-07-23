@@ -5,6 +5,7 @@
 
 #include "globalhelpers.h"
 #include "game.h"
+#include "codefile.h"
 #include "platforms/windows_specific.h"
 
 #include <QDirIterator>
@@ -38,9 +39,9 @@ AdvancementTabDock::~AdvancementTabDock() {
 void AdvancementTabDock::loadAdvancements() {
     const static QMap<QString,
                       AdvancemDisplayInfo::FrameType> stringToFrameType = {
-        { "task",      AdvancemDisplayInfo::FrameType::Task           },
-        { "goal",      AdvancemDisplayInfo::FrameType::Goal           },
-        { "challenge", AdvancemDisplayInfo::FrameType::Challenge      },
+        { "task",      AdvancemDisplayInfo::FrameType::Task      },
+        { "goal",      AdvancemDisplayInfo::FrameType::Goal      },
+        { "challenge", AdvancemDisplayInfo::FrameType::Challenge },
     };
 
     if (isHidden()) {
@@ -72,7 +73,8 @@ void AdvancementTabDock::loadAdvancements() {
 
         const auto &&finfo = it.fileInfo();
         if (finfo.isFile()) {
-            if (Glhp::pathToFileType(dirPath, path) == CodeFile::Advancement) {
+            if (CodeFile::pathToFileType(dirPath, path) ==
+                CodeFile::Advancement) {
                 QJsonObject obj;
                 QFile       file(path);
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {

@@ -62,6 +62,11 @@ struct CodeFile {
     QString name() const;
     QString path() const;
     void changePath(const QString &path);
+
+    static CodeFile::FileType pathToFileType(const QString &dirpath,
+                                             const QString &filepath);
+    static QIcon fileTypeToIcon(const CodeFile::FileType type);
+    static QString fileTypeToName(const CodeFile::FileType type);
 };
 
 static_assert(qIsRelocatable<CodeFile>() == false);

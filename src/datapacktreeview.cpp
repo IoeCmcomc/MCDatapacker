@@ -4,6 +4,7 @@
 
 #include "globalhelpers.h"
 #include "game.h"
+#include "codefile.h"
 
 #include <QModelIndex>
 #include <QFile>
@@ -57,7 +58,7 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenu->addAction(cMenuActionOpen);
     }
 
-    const auto &&fileType = Glhp::pathToFileType(dirPath, finfo.filePath());
+    const auto &&fileType = CodeFile::pathToFileType(dirPath, finfo.filePath());
     if ((fileType == CodeFile::Function || fileType >= CodeFile::JsonText) &&
         path.startsWith(QLatin1String("data/"))) {
         const QString &&filePathId = Glhp::toNamespacedID(dirPath,
@@ -354,14 +355,15 @@ void DatapackTreeView::onFileRenamed(const QString &path,
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
-    if (Glhp::pathToFileType(dirPath, oldpath) == CodeFile::Function) {
+    if (CodeFile::pathToFileType(dirPath, oldpath) == CodeFile::Function) {
         if (isStringInTagFile(dirPath +
                               "/data/minecraft/tags/functions/load.json",
                               Glhp::toNamespacedID(dirPath, oldpath))) {
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
                 Glhp::toNamespacedID(dirPath, oldpath), false);
-            if (Glhp::pathToFileType(dirPath, newpath) == CodeFile::Function) {
+            if (CodeFile::pathToFileType(dirPath,
+                                         newpath) == CodeFile::Function) {
                 if (!isStringInTagFile(dirPath +
                                        "/data/minecraft/tags/functions/load.json",
                                        Glhp::toNamespacedID(dirPath,
@@ -401,8 +403,9 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
         if (finfo.exists() && finfo.isFile())
             finfo = dirModel.fileInfo(index.parent());
 
-        QDir tmpDir;
-        if (!catDir.isEmpty()) {
+        QDir           tmpDir;
+        const QString &actualCatDir = Game::canonicalCategory(catDir);
+        if (!actualCatDir.isEmpty()) {
             QString pathWithNspace = dirPath + QStringLiteral("/data/")
                                      + ((nspace.isEmpty()) ? Glhp::relNamespace(
                                             dirPath,
@@ -411,14 +414,14 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
             if (!tmpDir.exists())
                 return QModelIndex();
 
-            pathWithNspace += '/' + catDir;
+            pathWithNspace += '/' + actualCatDir;
             if (!QFileInfo::exists(pathWithNspace))
                 tmpDir.mkpath(pathWithNspace);
-            tmpDir.cd(catDir);
+            tmpDir.cd(actualCatDir);
         }
 
         QString newPath;
-        if (catDir.isEmpty() || finfo.path().startsWith(tmpDir.path()))
+        if (actualCatDir.isEmpty() || finfo.path().startsWith(tmpDir.path()))
             newPath = finfo.filePath() + "/" + name;
         else
             newPath = tmpDir.path() + "/" + name;

@@ -7,6 +7,7 @@
 #include "globalhelpers.h"
 #include "platforms/windows_specific.h"
 #include "game.h"
+#include "codefile.h"
 
 #include <QDirIterator>
 #include <QProgressDialog>
@@ -113,7 +114,7 @@ void StatisticsDialog::collectAndSetupData() {
         if (finfo.isFile()) {
             ++fileCount;
 
-            const auto type = Glhp::pathToFileType(dirPath, path);
+            const auto type = CodeFile::pathToFileType(dirPath, path);
             if (type == CodeFile::Function)
                 collectFunctionData(path);
             if (fileTypeCounts.contains(type))
@@ -148,8 +149,8 @@ void StatisticsDialog::collectAndSetupData() {
     for (auto it = fileTypeCounts.cbegin(); it != fileTypeCounts.cend();
          ++it) {
         ui->fileTypesTable->setItem(row, 0, new QTableWidgetItem(
-                                        Glhp::fileTypeToIcon(it.key()),
-                                        Glhp::fileTypeToName(it.key())));
+                                        CodeFile::fileTypeToIcon(it.key()),
+                                        CodeFile::fileTypeToName(it.key())));
         auto *countItem = new QTableWidgetItem();
         countItem->setData(Qt::DisplayRole, it.value());
         ui->fileTypesTable->setItem(row, 1, countItem);

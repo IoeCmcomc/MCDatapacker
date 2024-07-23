@@ -1,8 +1,6 @@
 #ifndef GLOBALHELPERS_H
 #define GLOBALHELPERS_H
 
-#include "codefile.h"
-
 #include <QString>
 #include <QVariant>
 #include <QDir>
@@ -26,10 +24,7 @@ namespace Glhp {
     QString relPath(const QString &dirpath, QString path);
     QString relNamespace(const QString &dirpath, QString path);
 
-    CodeFile::FileType pathToFileType(const QString &dirpath,
-                                      const QString &filepath);
-    QIcon fileTypeToIcon(const CodeFile::FileType type);
-    QString fileTypeToName(const CodeFile::FileType type);
+
 
     QString toNamespacedID(const QString &dirpath, QStringView filepath,
                            bool noTagForm = false);
@@ -39,13 +34,18 @@ namespace Glhp {
     QVector<QString> fileIdList(const QString &dirpath,
                                 const QString &catDir = QString(),
                                 const QString &nspace = QString(),
-                                bool noTagForm        = true);
+                                bool noTagForm        = true,
+                                bool from_1_21        = false);
 
     constexpr QStringView minecraftPrefix{ u"minecraft:" };
 
     bool removePrefix(QString &str, QLatin1String prefix);
     bool removePrefix(QString &str, QStringView prefix = minecraftPrefix);
     bool removeInternalPrefix(QString &path);
+
+    QString canonicalCategory(QStringView catDir, const bool from_1_21);
+    QStringView canonicalCategoryView(QStringView catDir, const bool from_1_21);
+
 
     extern const QMap<QString, QString> colorHexes;
     extern const QMap<char, QString>    colorCodes;

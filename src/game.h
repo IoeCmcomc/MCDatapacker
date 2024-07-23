@@ -37,6 +37,10 @@ namespace Game {
     VanillaLookupMap getVainllaLookupMap();
     bool isVanillaFileExists(const QString &catDir, const QString &path);
     QString realVanillaFilePath(const QString &catDir, const QString &path);
+
+    QString canonicalCategory(QStringView catDir);
+    QString canonicalCategory(QStringView catDir,
+                              const QVersionNumber &version);
 }
 
 #endif // GAME_H

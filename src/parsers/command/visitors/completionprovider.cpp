@@ -6,6 +6,8 @@
 #include "game.h"
 #include "globalhelpers.h"
 
+#include <QDebug>
+
 namespace Command {
     CompletionProvider::CompletionProvider(const int row) : OverloadNodeVisitor(
             LetTheVisitorDecide), m_cursorRow{row} {
@@ -19,8 +21,8 @@ namespace Command {
             bool  isFirst   = true;
             for (const auto &child: children) {
                 m_pos += child->leadingTrivia().length();
-                qDebug() << m_pos << child << child->length() <<
-                    child->schemaNode();
+                // qDebug() << m_pos << child << child->length() <<
+                //     child->schemaNode();
                 if ((m_cursorRow >= m_pos) &&
                     (m_cursorRow <= (m_pos + child->length()))) {
                     qDebug() << "I choose you" << child;
@@ -120,23 +122,25 @@ namespace Command {
     }
 
     void CompletionProvider::visit(ResourceLocationNode *node) {
+        const bool from_1_21 = Game::version() >= Game::v1_21;
+
         m_suggestions += Glhp::fileIdList(
             QDir::currentPath(), QStringLiteral("advancements"),
-            QString(), false);
+            QString(), false, from_1_21);
         m_suggestions += Game::getRegistry(QStringLiteral("advancement"));
         m_suggestions += Glhp::fileIdList(
             QDir::currentPath(), QStringLiteral("item_modifiers"),
-            QString(), false);
+            QString(), false, from_1_21);
         m_suggestions += Glhp::fileIdList(
             QDir::currentPath(), QStringLiteral("loot_tables"),
-            QString(), false);
+            QString(), false, from_1_21);
         m_suggestions += Glhp::fileIdList(
             QDir::currentPath(), QStringLiteral("predicates"),
-            QString(), false);
+            QString(), false, from_1_21);
         m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
         m_suggestions += Glhp::fileIdList(
             QDir::currentPath(), QStringLiteral("recipes"),
-            QString(), false);
+            QString(), false, from_1_21);
         m_suggestions += Game::getRegistry(QStringLiteral("recipe"));
         m_suggestions += Game::getRegistry(QStringLiteral("sound_event"));
     }

@@ -16,7 +16,11 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
 
     const auto &&gameVer = Game::version();
 
-    if (gameVer >= Game::v1_20_4)
+    if (gameVer >= Game::v1_21)
+        ui->formatInput->setValue(48);
+    else if (gameVer >= Game::v1_20_6)
+        ui->formatInput->setValue(41);
+    else if (gameVer >= Game::v1_20_4)
         ui->formatInput->setValue(26);
     else if (gameVer >= Game::v1_20_2)
         ui->formatInput->setValue(18);
@@ -93,6 +97,8 @@ void NewDatapackDialog::onFormatSpinChanged(const int format) {
         { 15, QStringLiteral("1.20–1.20.1")   },
         { 18, QStringLiteral("1.20.2")        },
         { 26, QStringLiteral("1.20.3–1.20.4") },
+        { 41, QStringLiteral("1.20.5–1.20.6") },
+        { 48, QStringLiteral("1.21")          },
     };
 
     Q_ASSERT(format >= 0);
