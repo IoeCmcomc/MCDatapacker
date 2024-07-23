@@ -12,8 +12,9 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui(new Ui::AboutDialog) {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose, true);
-    ui->mainInfoLabel->setText(ui->mainInfoLabel->text().arg(qApp->
-                                                             applicationVersion()));
+    // ui->mainInfoLabel->setText(ui->mainInfoLabel->text().arg(qApp->
+    //                                                          applicationVersion()));
+    ui->mainInfoLabel->setText(ui->mainInfoLabel->text().arg("0.11.0-alpha1"));
 
     Windows::applyGlassEffectToFrame(this);
 

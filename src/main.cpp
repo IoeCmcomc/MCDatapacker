@@ -14,7 +14,8 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("IoeCmcomc");
     QCoreApplication::setApplicationName("MCDatapacker");
     QCoreApplication::setApplicationVersion(APP_VERSION);
-    qInfo() << "MCDatapacker" << ("v" APP_VERSION);
+    // qInfo() << "MCDatapacker" << ("v" APP_VERSION);
+    qInfo() << "MCDatapacker" << ("v0.11.0-alpha1");
 
     /*Q_INIT_RESOURCE(application); */
 

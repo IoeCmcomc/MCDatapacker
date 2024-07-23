@@ -4,7 +4,7 @@
 #include "globalhelpers.h"
 
 #include <QDirIterator>
-#include <QAbstractItemModelTester>
+// #include <QAbstractItemModelTester>
 
 #include <algorithm>
 
@@ -84,9 +84,9 @@ CodeFile VanillaFileItem::file() const {
 VanillaDatapackModel::VanillaDatapackModel(QObject *parent)
     : QAbstractItemModel{parent} {
     setupNodeItems();
-    new QAbstractItemModelTester(this,
-                                 QAbstractItemModelTester::FailureReportingMode::Warning,
-                                 this);
+    // new QAbstractItemModelTester(this,
+    //                              QAbstractItemModelTester::FailureReportingMode::Warning,
+    //                              this);
 }
 
 Qt::ItemFlags VanillaDatapackModel::flags(const QModelIndex &index) const {
