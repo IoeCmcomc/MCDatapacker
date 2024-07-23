@@ -78,13 +78,17 @@ void TagSelectorDialog::setupTagView(
     }
 
     auto &&tagStrSplited = tagStr.split('/');
-    std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
-                   tagStrSplited.begin(), [](const QString &str) -> QString {
-        return str + 's';
-    });
+    if (Game::version() < Game::v1_21) {
+        std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
+                       tagStrSplited.begin(),
+                       [](const QString &str) -> QString {
+            return str + 's';
+        });
+    }
     const QString &tagDir = tagStrSplited.join('/');
 
-    const auto &fileIDList = Glhp::fileIdList(QDir::currentPath(), tagDir);
+    const auto &fileIDList = Glhp::fileIdList(
+        QDir::currentPath(), tagDir, {}, true, Game::version() >= Game::v1_21);
     for (const auto &id : fileIDList) {
         model.appendRow(new QStandardItem(id));
     }

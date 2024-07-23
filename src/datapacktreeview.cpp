@@ -27,6 +27,7 @@
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
     dirModel.setIconProvider(&iconProvider);
+    dirModel.setNameFilterDisables(false);
 
     setItemDelegateForColumn(0, new FileNameDelegate(this));
 
@@ -150,6 +151,12 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                 addNewFileAction(newMenu, tr("Dimension type"), jsonExt,
                                  QLatin1String("type"));
             }
+            if (Game::version() >= Game::v1_21) {
+                addNewFileAction(newMenu, tr("Enchantment"), jsonExt,
+                                 QLatin1String("enchantment"));
+                addNewFileAction(newMenu, tr("Enchantment provider"), jsonExt,
+                                 QLatin1String("enchantment_provider"));
+            }
             addNewFileAction(newMenu, tr("Function"),
                              QLatin1String(".mcfunction"),
                              QLatin1String("functions"));
@@ -158,6 +165,12 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
             if (Game::version() >= Game::v1_17) {
                 addNewFileAction(newMenu, tr("Item modifier"), jsonExt,
                                  QLatin1String("item_modifiers"));
+            }
+            if (Game::version() >= Game::v1_21) {
+                addNewFileAction(newMenu, tr("Jukebox provider"), jsonExt,
+                                 QLatin1String("jukebox_provider"));
+                addNewFileAction(newMenu, tr("Painting variant"), jsonExt,
+                                 QLatin1String("painting_variant"));
             }
             addNewFileAction(newMenu, tr("Predicate"), jsonExt,
                              QLatin1String("predicates"));
@@ -171,6 +184,10 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                                  QLatin1String("trim_material"));
                 addNewFileAction(newMenu, tr("Trim pattern"), jsonExt,
                                  QLatin1String("trim_pattern"));
+            }
+            if (Game::version() >= Game::v1_20_6) {
+                addNewFileAction(newMenu, tr("Wolf variant"), jsonExt,
+                                 QLatin1String("wolf_variant"));
             }
 
             /*"Tag" menu */
@@ -284,6 +301,8 @@ QModelIndex DatapackTreeView::getSelected() {
 void DatapackTreeView::load(const QDir &dir) {
     dirPath = dir.path();
     dirModel.setRootPath(dirPath);
+    // filterModel.setSourceModel(&dirModel);
+    // setModel(&filterModel);
     setModel(&dirModel);
 
     for (int i = 1; i < dirModel.columnCount(); ++i)
@@ -417,7 +436,7 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
             pathWithNspace += '/' + actualCatDir;
             if (!QFileInfo::exists(pathWithNspace))
                 tmpDir.mkpath(pathWithNspace);
-            tmpDir.cd(actualCatDir);
+            Q_UNUSED(tmpDir.cd(actualCatDir));
         }
 
         QString newPath;

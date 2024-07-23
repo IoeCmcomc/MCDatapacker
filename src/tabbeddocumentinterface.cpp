@@ -421,7 +421,6 @@ void TabbedDocumentInterface::onOpenAliasedFile(const QString &filepath,
 
 void TabbedDocumentInterface::onOpenFileWithLine(const QString &filepath,
                                                  const int lineNo) {
-    qDebug() << filepath << lineNo;
     onOpenFile(filepath);
     if (auto *editor = getCodeEditor()) {
         editor->goToLine(lineNo);
@@ -472,8 +471,8 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
             updateTabTitle(i, file->isModified);
             ui->tabWidget->setTabIcon(
                 i, CodeFile::fileTypeToIcon(CodeFile::pathToFileType(
-                                            QDir::currentPath(),
-                                            file->path())));
+                                                QDir::currentPath(),
+                                                file->path())));
 
             onModificationChanged(false);
             setCurIndex(getCurIndex());
