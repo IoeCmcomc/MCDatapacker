@@ -20,6 +20,8 @@
 #include "norwegianwoodstyle.h"
 #include "codeeditor.h"
 #include "vanilladatapackdock.h"
+#include "numberprovider.h"
+#include "numberproviderdialog.h"
 
 #include "game.h"
 #include "platforms/windows_specific.h"
@@ -46,6 +48,10 @@
 
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
+
+void bindNumberProviderDialog(NumberProvider *obj) {
+    obj->assignDialogClass<NumberProviderDialog>();
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow),
@@ -122,6 +128,8 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::initDocks() {
+    NumberProvider::postCtorCallback = bindNumberProviderDialog;
+
     connect(ui->actionAdvancementViewer, &QAction::triggered, this,
             &MainWindow::onAdvancementsDockAction);
 

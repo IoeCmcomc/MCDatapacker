@@ -2,7 +2,7 @@ CONFIG      += plugin debug_and_release c++17
 TARGET      = $$qtLibraryTarget(mcdatapackerwidgetsplugin)
 TEMPLATE    = lib
 
-DEFINES += "__clang_major__=15"
+# DEFINES += "__clang_major__=15"
 
 HEADERS     = \
     extendedtablewidget/extendedtablewidgetplugin.h \

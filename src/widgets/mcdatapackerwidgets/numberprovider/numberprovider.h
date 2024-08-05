@@ -1,9 +1,13 @@
 #ifndef NUMBERPROVIDER_H
 #define NUMBERPROVIDER_H
 
+#include "dialogdatabutton.h"
+
 #include <QFrame>
 #include <QMenu>
 #include <QJsonValue>
+#include <QVersionNumber>
+
 
 namespace Ui {
     class NumberProvider;
@@ -27,11 +31,12 @@ public:
     explicit NumberProvider(QWidget *parent = nullptr);
     ~NumberProvider();
 
-    enum Mode {
+    enum Mode: uint8_t {
         Exact         = 1,
         Range         = 2,
         ExactAndRange = Exact | Range,
-        Binomial      = 4,
+        Advanced = 4,
+        All           = ExactAndRange | Advanced,
     };
     Q_ENUM(Mode);
     Q_DECLARE_FLAGS(Modes, Mode)
@@ -66,6 +71,12 @@ public:
 
     void interpretText();
 
+    static void(*postCtorCallback)(NumberProvider *obj);
+    template<class T>
+    void assignDialogClass() {
+        dataBtn()->assignDialogClass<T>();
+    }
+
 signals:
     void editingFinished();
     void modesChanged();
@@ -81,6 +92,7 @@ protected:
 
 private slots:
     void onMinMaxEdited();
+    void advancedDataChanged(const QJsonValue &value);
 
 private:
     Ui::NumberProvider *ui;
@@ -89,7 +101,9 @@ private:
     Mode m_currentMode;
     bool m_integerOnly = true;
 
+    DialogDataButton *dataBtn();
     void setMenu();
+    static bool hasComplexData(const QJsonValue value);
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(NumberProvider::Modes)

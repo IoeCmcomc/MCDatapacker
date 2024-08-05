@@ -82,7 +82,7 @@
           </sizepolicy>
          </property>
          <property name="maximum">
-          <number>2147483647</number>
+          <double>2147483647.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -118,10 +118,10 @@
           </sizepolicy>
          </property>
          <property name="maximum">
-          <number>2147483647</number>
+          <double>2147483647.000000000000000</double>
          </property>
          <property name="value">
-          <number>1</number>
+          <double>1.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -141,19 +141,19 @@
           </sizepolicy>
          </property>
          <property name="maximum">
-          <number>2147483647</number>
+          <double>2147483647.000000000000000</double>
          </property>
          <property name="value">
-          <number>2</number>
+          <double>2.000000000000000</double>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="binomial">
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="leftMargin">
-        <number>7</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
         <number>0</number>
@@ -164,49 +164,10 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="numLabel">
-         <property name="toolTip">
-          <string>Number of tries</string>
-         </property>
+       <item>
+        <widget class="DialogDataButton" name="dataBtn">
          <property name="text">
-          <string>Tries:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="numSpinBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximum">
-          <number>999999999</number>
-         </property>
-         <property name="value">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="probLabel">
-         <property name="text">
-          <string>Probability:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QDoubleSpinBox" name="probSpinBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="value">
-          <double>0.500000000000000</double>
+          <string>Change...</string>
          </property>
         </widget>
        </item>
@@ -218,9 +179,14 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>DialogDataButton</class>
+   <extends>QWidget</extends>
+   <header>dialogdatabutton.h</header>
+  </customwidget>
+  <customwidget>
    <class>OptionalSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header location="global">optionalspinbox.h</header>
+   <extends>QDoubleSpinBox</extends>
+   <header>optionalspinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

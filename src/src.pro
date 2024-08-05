@@ -80,6 +80,7 @@ SOURCES += \
     nbttextobjectdialog.cpp \
     newdatapackdialog.cpp \
     norwegianwoodstyle.cpp \
+    numberproviderdialog.cpp \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/gamemodenode.cpp \
@@ -177,6 +178,7 @@ HEADERS += \
     filenamedelegate.h \
     fileswitcher.h \
     game.h \
+    gameconstants.h \
     gameinfomodel.h \
     globalhelpers.h \
     highlighter.h \
@@ -206,6 +208,7 @@ HEADERS += \
     nbttextobjectdialog.h \
     newdatapackdialog.h \
     norwegianwoodstyle.h \
+    numberproviderdialog.h \
     parsers/command/mcfunctionparser.h \
     parsers/command/nodes/anglenode.h \
     parsers/command/nodes/argumentnode.h \
@@ -302,6 +305,7 @@ FORMS += \
     inventorysloteditor.ui \
     nbttextobjectdialog.ui \
     newdatapackdialog.ui \
+    numberproviderdialog.ui \
     predicatedock.ui \
     rawjsontexteditor.ui \
     scoreboardtextobjectdialog.ui \

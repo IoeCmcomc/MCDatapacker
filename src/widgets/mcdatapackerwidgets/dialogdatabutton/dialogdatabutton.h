@@ -1,10 +1,8 @@
 #ifndef DIALOGDATABUTTON_H
 #define DIALOGDATABUTTON_H
 
-#include "ui_dialogdatabutton.h"
-
 #include <QJsonObject>
-#include <QLabel>
+#include <QPushButton>
 
 #include <type_traits>
 
@@ -31,13 +29,13 @@ public:
     QString text() const;
 
     QJsonObject getData() const;
-    void setData(const QJsonObject &value);
+    void setData(const QJsonObject &value, const bool emitChanged = true);
 
     template<class T, typename =
                  std::enable_if_t<std::is_base_of_v<QDialog, T>, void> >
     void assignDialogClass() {
         if (!m_dialogClassAssigned) {
-            connect(ui->button, &QPushButton::clicked, this, [this]() {
+            connect(button(), &QPushButton::clicked, this, [this]() {
                 T dialog(this);
                 dialog.fromJson(m_data);
                 if (dialog.exec())
@@ -53,13 +51,14 @@ signals:
     void dataChanged(const QJsonValue &value);
 
 public slots:
-    void reset();
+    void reset(const bool emitChanged = true);
 
 private:
     QJsonObject m_data;
     Ui::DialogDataButton *ui;
     bool m_dialogClassAssigned = false;
 
+    QPushButton *button();
     void checkSecondary();
 };
 

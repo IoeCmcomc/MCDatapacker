@@ -2,6 +2,7 @@
 #include "ui_numberprovider.h"
 
 #include "stylesheetreapplier.h"
+#include "gameconstants.h"
 
 #include <QJsonObject>
 #include <QDebug>
@@ -10,19 +11,35 @@
 
 #include <cfloat>
 
+void(*NumberProvider::postCtorCallback)(NumberProvider *obj) = nullptr;
+
+bool removePrefix(QString &str, QStringView prefix = u"minecraft:") {
+    bool &&r = str.startsWith(prefix);
+
+    if (r)
+        str.remove(0, prefix.length());
+    return r;
+}
+
 NumberProvider::NumberProvider(QWidget *parent) :
     QFrame(parent), ui(new Ui::NumberProvider) {
     ui->setupUi(this);
 
     setIntegerOnly(m_integerOnly);
-    setModes(Exact | Range | Binomial);
+    setModes(All);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
             this, &NumberProvider::onMinMaxEdited);
     connect(ui->maxSpinBox, &QSpinBox::editingFinished,
             this, &NumberProvider::onMinMaxEdited);
+    connect(ui->dataBtn, &DialogDataButton::dataChanged,
+            this, &NumberProvider::advancedDataChanged);
 
     ui->inputTypeButton->installEventFilter(styleSheetReapplier);
+
+    if (postCtorCallback != nullptr) {
+        postCtorCallback(this);
+    }
 }
 
 NumberProvider::~NumberProvider() {
@@ -34,18 +51,16 @@ void NumberProvider::resizeEvent(QResizeEvent *event) {
 
     ui->minLabel->setHidden(eventWidth < 200);
     ui->maxLabel->setHidden(eventWidth < 180);
-    ui->numLabel->setHidden(eventWidth < 250);
-    ui->probLabel->setHidden(eventWidth < 200);
 
     QFrame::resizeEvent(event);
 }
 
 void NumberProvider::mouseReleaseEvent(QMouseEvent *event) {
-    auto cursorWidget = qApp->widgetAt(mapToGlobal(event->pos()));
+    const auto *cursorWidget = qApp->widgetAt(mapToGlobal(event->pos()));
 
     if (cursorWidget != nullptr
-        && qobject_cast<QAbstractSpinBox *>(cursorWidget) == nullptr
-        && qobject_cast<QToolButton *>(cursorWidget) == nullptr) {
+        && qobject_cast<const QAbstractSpinBox *>(cursorWidget) == nullptr
+        && qobject_cast<const QToolButton *>(cursorWidget) == nullptr) {
         interpretText();
         emit editingFinished();
         return;
@@ -67,6 +82,17 @@ void NumberProvider::onMinMaxEdited() {
     }
 }
 
+void NumberProvider::advancedDataChanged(const QJsonValue &value)
+{
+    if (hasComplexData(value)) {
+        ui->dataBtn->setData(value.toObject(), false);
+        ui->stackedWidget->setCurrentIndex(2);
+    } else {
+        fromJson(value);
+        ui->dataBtn->reset(false);
+    }
+}
+
 void NumberProvider::fromJson(const QJsonValue &value) {
     /*unset(); */
     if (value.isDouble()) {
@@ -74,14 +100,15 @@ void NumberProvider::fromJson(const QJsonValue &value) {
         ui->stackedWidget->setCurrentIndex(0);
     } else if (value.isObject()) {
         auto obj  = value.toObject();
-        auto type = obj.value(QLatin1String("type")).toString();
-        if (type == QStringLiteral("minecraft:binomial")) {
-            if (obj.contains(QStringLiteral("n")))
-                ui->numSpinBox->setValue(obj.value(QStringLiteral("n")).toInt());
-            if (obj.contains(QStringLiteral("p")))
-                ui->probSpinBox->setValue(obj.value(QStringLiteral("p")).toInt());
-            ui->stackedWidget->setCurrentIndex(2);
-        } else {
+        QString &&type = obj.value(QLatin1String("type")).toString();
+        removePrefix(type);
+        if (type == "constant") {
+            const auto &constant = obj.value("value");
+            ui->spinBox->setValue(m_integerOnly
+                                      ? constant.toInt() : constant.toDouble());
+            ui->stackedWidget->setCurrentIndex(0);
+        } else if (!obj.contains(QLatin1String("type"))
+            || type == QStringLiteral("uniform")) {
             const bool hasMax = obj.contains(QStringLiteral("max"));
             if (obj.contains(QStringLiteral("min"))) {
                 const auto min = obj[QStringLiteral("min")];
@@ -96,6 +123,9 @@ void NumberProvider::fromJson(const QJsonValue &value) {
             } else {
                 ui->maxSpinBox->unset();
             }
+        } else {
+            ui->dataBtn->setData(obj);
+            ui->stackedWidget->setCurrentIndex(2);
         }
     }
 }
@@ -120,13 +150,8 @@ QJsonValue NumberProvider::toJson() {
             break;
         }
 
-        case 2: { /*Binomial */
-            QJsonObject root;
-            root.insert(QLatin1String("type"),
-                        QLatin1String("minecraft:binomial"));
-            root.insert("n", ui->numSpinBox->value());
-            root.insert("p", ui->probSpinBox->value());
-            value = root;
+        case 2: { /* Advanced */
+            value = ui->dataBtn->getData();
             break;
         }
 
@@ -151,23 +176,53 @@ void NumberProvider::setModes(const NumberProvider::Modes &value) {
     emit modesChanged();
 }
 
+DialogDataButton *NumberProvider::dataBtn()
+{
+    return ui->dataBtn;
+}
+
 void NumberProvider::setMenu() {
     m_menu.clear();
 
     if (m_modes.testFlag(Exact))
-        m_menu.addAction(tr("Exactly"), this, [ = ]() {
+        m_menu.addAction(tr("Exactly"), this, [ this ]() {
             ui->stackedWidget->setCurrentIndex(0);
         });
     if (m_modes.testFlag(Range))
-        m_menu.addAction(tr("Range"), this, [ = ]() {
+        m_menu.addAction(tr("Range"), this, [ this ]() {
             ui->stackedWidget->setCurrentIndex(1);
         });
-    if (m_modes.testFlag(Binomial))
-        m_menu.addAction(tr("Binomial"), this, [ = ]() {
+    if (m_modes.testFlag(Advanced))
+        m_menu.addAction(tr("Advanced"), this, [ this ]() {
             ui->stackedWidget->setCurrentIndex(2);
         });
     ui->inputTypeButton->setMenu(&m_menu);
     ui->inputTypeButton->setPopupMode(QToolButton::InstantPopup);
+}
+
+bool NumberProvider::hasComplexData(const QJsonValue value)
+{
+    if (value.isObject()) {
+        const auto &&obj = value.toObject();
+        QString &&type = obj.value(QLatin1String("type")).toString();
+        removePrefix(type);
+        if (type == "constant") {
+            return false;
+        } else if (!obj.contains(QLatin1String("type"))
+                   || type == QLatin1String("uniform")) {
+            if (const auto &&min = obj.value(QLatin1String("min")); min.isObject()) {
+                return true;
+            } else if (const auto &&max = obj.value(QLatin1String("max")); max.isObject()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    } else {
+        return false;
+    }
 }
 
 NumberProvider::Mode NumberProvider::currentMode() const {
@@ -177,7 +232,7 @@ NumberProvider::Mode NumberProvider::currentMode() const {
 void NumberProvider::setCurrentMode(const Mode &value) {
     m_currentMode = value;
     const static QMap<Mode, uint8_t> modeMap =
-    { { Exact, 0 }, { Range, 1 }, { Binomial, 2 } };
+    { { Exact, 0 }, { Range, 1 }, { Advanced, 2 } };
     ui->stackedWidget->setCurrentIndex(modeMap.value(value));
     emit currentModeChanged();
 }
@@ -260,8 +315,8 @@ bool NumberProvider::isCurrentlyUnset() const {
         case 1: /* Range */
             return (ui->minSpinBox->isUnset() && ui->maxSpinBox->isUnset());
 
-        case 2: /*Binomial */
-            return true;
+        case 2: /* Advanced */
+            return ui->dataBtn->getData().isEmpty();
 
         default:
             return false;
@@ -272,12 +327,11 @@ void NumberProvider::unset() const {
     ui->spinBox->unset();
     ui->minSpinBox->unset();
     ui->maxSpinBox->unset();
+    ui->dataBtn->reset();
 }
 
 void NumberProvider::interpretText() {
     ui->spinBox->interpretText();
     ui->minSpinBox->interpretText();
     ui->maxSpinBox->interpretText();
-    ui->numSpinBox->interpretText();
-    ui->probSpinBox->interpretText();
 }
