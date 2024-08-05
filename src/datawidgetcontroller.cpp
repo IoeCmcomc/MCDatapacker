@@ -16,6 +16,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QRadioButton>
+#include <QButtonGroup>
 
 DataWidgetController::DataWidgetController(const bool required)
     : m_required{required} {
@@ -25,6 +26,12 @@ bool DataWidgetController::isRequired() const {
     return m_required;
 }
 
+
+DataWidgetController * DataWidgetControllerRecord::addMapping(
+    const QString &key, DataWidgetController *controller) {
+    m_widgetMappings[key] = controller;
+    return controller;
+}
 
 bool DataWidgetControllerRecord::hasAcceptableValue() const {
     bool valid = true;
@@ -164,7 +171,8 @@ void DataWidgetControllerInventorySlot::putValueTo(QJsonObject &obj,
 
 
 bool DataWidgetControllerLineEdit::hasAcceptableValue() const {
-    return m_widget->isEnabled() && !m_widget->text().isEmpty();
+    return m_widget->isEnabled() &&
+           (!m_required || !m_widget->text().isEmpty());
 }
 
 void DataWidgetControllerLineEdit::setValueFrom(const QJsonObject &obj,
@@ -176,7 +184,9 @@ void DataWidgetControllerLineEdit::setValueFrom(const QJsonObject &obj,
 
 void DataWidgetControllerLineEdit::putValueTo(QJsonObject &obj,
                                               const QString &key) const {
-    obj[key] = m_widget->text();
+    if (!m_widget->text().isEmpty()) {
+        obj[key] = m_widget->text();
+    }
 }
 
 
@@ -297,6 +307,25 @@ void DataWidgetControllerDataWidgetInterface::putValueTo(
     obj[key] = m_widget->json();
 }
 
+
+bool DataWidgetControllerDialogDataButton::hasAcceptableValue() const {
+    return m_widget->isEnabled() && m_widget->getData().isEmpty();
+}
+
+void DataWidgetControllerDialogDataButton::setValueFrom(const QJsonObject &obj,
+                                                        const QString &key) {
+    if (obj.contains(key)) {
+        m_widget->setData(obj.value(key).toObject());
+    }
+}
+
+void DataWidgetControllerDialogDataButton::putValueTo(QJsonObject &obj,
+                                                      const QString &key) const
+{
+    obj[key] = m_widget->getData();
+}
+
+
 StringIndexMap::StringIndexMap(std::initializer_list<std::pair<QString,
                                                                int> > list) {
     const int maxIndex = std::max_element(list.begin(), list.end())->second;
@@ -328,6 +357,10 @@ QString StringIndexMap::stringOf(const int index) const {
                ? m_indexToString.at(index) : QString();
 }
 
+void removePrefix(QString &str) {
+    Glhp::removePrefix(str);
+}
+
 bool DataWidgetControllerMultiPageWidget::hasAcceptableValue() const {
     return DataWidgetControllerWidget<MultiPageWidget>::hasAcceptableValue() &&
            (m_widget->count() > 0);
@@ -335,40 +368,53 @@ bool DataWidgetControllerMultiPageWidget::hasAcceptableValue() const {
 
 void DataWidgetControllerMultiPageWidget::setValueFrom(const QJsonObject &obj,
                                                        const QString &key) {
-    m_caughtChoice.clear();
-    if (obj.contains(key) || key.isNull()) {
-        const auto &record = key.isNull() ? obj : obj.value(key).toObject();
-        if (record.contains(m_choiceKey)) {
-            QString &&choice = record.value(m_choiceKey).toString();
-            Glhp::removePrefix(choice);
-            const int index = m_indexMap.indexOf(choice);
-            if (index != -1) {
-                m_caughtChoice = choice;
-                m_widget->setCurrentIndex(index);
-                auto *controller = m_widgetChoices[choice];
-                Q_ASSERT(controller != nullptr);
-                controller->setValueFrom(record, {});
-            }
-        }
-    }
+    setValueFromImpl(obj, key);
 }
 
 void DataWidgetControllerMultiPageWidget::putValueTo(QJsonObject &obj,
                                                      const QString &key) const {
-    QJsonObject  newRecord;
-    QJsonObject &record = key.isNull() ? obj : newRecord;
+    putValueToImpl(obj, key);
+}
 
-    const QString &choice = m_indexMap.stringOf(m_widget->currentIndex());
+int DataWidgetControllerMultiPageWidget::currentIndex() const {
+    return m_widget->currentIndex();
+}
 
-    Q_ASSERT(!choice.isNull());
-    record[m_choiceKey] = choice;
-    const auto *controller = m_widgetChoices[choice];
-    Q_ASSERT(controller != nullptr);
+void DataWidgetControllerMultiPageWidget::setCurrentIndex(const int index) {
+    m_widget->setCurrentIndex(index);
+}
 
-    if (controller->hasAcceptableValue()) {
-        controller->putValueTo(record, {});
-        if (!key.isNull()) {
-            obj[key] = record;
-        }
+
+bool DataWidgetControllerButtonGroup::hasAcceptableValue() const {
+    return DataWidgetController::hasAcceptableValue() &&
+           !m_group->buttons().isEmpty();
+}
+
+void DataWidgetControllerButtonGroup::setValueFrom(const QJsonObject &obj,
+                                                   const QString &key) {
+    setValueFromImpl(obj, key);
+}
+
+void DataWidgetControllerButtonGroup::putValueTo(QJsonObject &obj,
+                                                 const QString &key) const {
+    putValueToImpl(obj, key);
+}
+
+int DataWidgetControllerButtonGroup::currentIndex() const {
+    const int id = m_group->checkedId();
+
+    return (id < -1) ? -id - 2 : id;
+}
+
+void DataWidgetControllerButtonGroup::setCurrentIndex(const int index) {
+    if (Q_UNLIKELY(index == -1)) {
+        return;
     }
+    auto *button = m_group->button(index);
+
+    if (!button) {
+        button = m_group->button(-index - 2);
+    }
+    Q_ASSERT(button != nullptr);
+    button->setChecked(true);
 }
