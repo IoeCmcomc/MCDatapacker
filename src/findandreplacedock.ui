@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FindAndReplaceDock</class>
+ <widget class="QDockWidget" name="FindAndReplaceDock">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>495</width>
+    <height>298</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Find</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Find:</string>
+        </property>
+        <property name="buddy">
+         <cstring>findEdit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="findEdit"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="findBtn">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QFrame" name="replaceFrame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Replace with:</string>
+           </property>
+           <property name="buddy">
+            <cstring>replaceEdit</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="replaceEdit"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="replaceBtn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Replace</string>
+           </property>
+           <property name="popupMode">
+            <enum>QToolButton::MenuButtonPopup</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QToolButton" name="foldBtn">
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <property name="arrowType">
+       <enum>Qt::UpArrow</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="moreFrame">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item row="0" column="0" rowspan="2">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Options</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="matchCaseCheck">
+            <property name="text">
+             <string>Match case</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="matchWholeCheck">
+            <property name="text">
+             <string>Match whole words only</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="regexCheck">
+            <property name="text">
+             <string>Use regular expressions</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="warpCheck">
+            <property name="text">
+             <string>Warp around</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Mode</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QRadioButton" name="findRadio">
+            <property name="text">
+             <string>Find only</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="findReplaceRadio">
+            <property name="text">
+             <string>Find and replace</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Scope</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QRadioButton" name="fileRadio">
+            <property name="text">
+             <string>In current file</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="packRadio">
+            <property name="text">
+             <string>In datapack</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Expanding</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>0</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>findEdit</tabstop>
+  <tabstop>replaceEdit</tabstop>
+  <tabstop>findBtn</tabstop>
+  <tabstop>replaceBtn</tabstop>
+  <tabstop>foldBtn</tabstop>
+  <tabstop>matchWholeCheck</tabstop>
+  <tabstop>matchCaseCheck</tabstop>
+  <tabstop>regexCheck</tabstop>
+  <tabstop>warpCheck</tabstop>
+  <tabstop>findRadio</tabstop>
+  <tabstop>findReplaceRadio</tabstop>
+  <tabstop>fileRadio</tabstop>
+  <tabstop>packRadio</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

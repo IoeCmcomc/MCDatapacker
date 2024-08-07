@@ -653,6 +653,9 @@
    <property name="text">
     <string>&amp;Find...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
   </action>
   <action name="actionReplace">
    <property name="enabled">
@@ -660,6 +663,9 @@
    </property>
    <property name="text">
     <string>&amp;Replace...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
    </property>
   </action>
   <action name="actionZoomIn">

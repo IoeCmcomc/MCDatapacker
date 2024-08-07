@@ -7,6 +7,7 @@
 
 #include "codefile.h"
 #include "parsers/parser.h"
+#include "findandreplacedock.h"
 
 QT_BEGIN_NAMESPACE
 class QCompleter;
@@ -32,7 +33,8 @@ static_assert(qIsRelocatable<ProblemInfo>() == false);
 Q_DECLARE_TYPEINFO(ProblemInfo, Q_RELOCATABLE_TYPE);
 
 static_assert(qIsRelocatable<QTextEdit::ExtraSelection>() == false);
-Q_DECLARE_TYPEINFO(QTextEdit::ExtraSelection, Q_RELOCATABLE_TYPE);
+Q_DECLARE_TYPEINFO(QTextEdit::ExtraSelection,
+                   Q_RELOCATABLE_TYPE);
 
 class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
@@ -72,6 +74,10 @@ signals:
 public: // Slots
     void openFindDialog();
     void openReplaceDialog();
+    bool find(const QString &text, FindAndReplaceDock::Options options);
+    void replaceSelection(const QString &text);
+    void replaceAllWith(const QString &query, const QString &text,
+                        FindAndReplaceDock::Options options);
     void toggleComment();
     void copyLineUp();
     void copyLineDown();
@@ -138,9 +144,13 @@ private:
     void handleKeyPressEvent(QKeyEvent *e);
     void indentOnNewLine(QKeyEvent *e);
     void initCompleter();
+    bool findCursor(QTextCursor &cursor, const QString &text,
+                    FindAndReplaceDock::Options options);
+    void replaceSelectedCursor(QTextCursor &cursor, const QString &text);
     static void startOfWordExtended(QTextCursor &tc);
     static QString textUnderCursorExtended(QTextCursor tc);
     static void selectEnclosingLines(QTextCursor &cursor);
+
     void startCompletion(const QString &completionPrefix);
 };
 

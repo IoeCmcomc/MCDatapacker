@@ -58,7 +58,12 @@ public /*slots*/ :
     bool saveAllFile();
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);
-    void invokeCodeEditor(void (CodeEditor::*method)());
+    template<typename Func, typename ...Args>
+    void invokeCodeEditor(Func method, Args ... args) {
+        if (auto *editor = getCodeEditor()) {
+            (editor->*method)(std::forward<Args>(args)...);
+        }
+    };
     void invokeActionType(ActionType act);
     void setPackOpened(const bool value);
     void updateRecentPacks(const QVector<QAction *> &actions, const int size);

@@ -75,9 +75,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(new QShortcut(QKeySequence(
                               Qt::CTRL + Qt::Key_L), this),
             &QShortcut::activated, this, &CodeEditor::selectCurrentLine);
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_F), this),
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_H), this),
             &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Slash), this),
             &QShortcut::activated, this, &CodeEditor::toggleComment);
@@ -134,6 +134,61 @@ void CodeEditor::initCompleter() {
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
     setCompleter(completer);
+}
+
+bool CodeEditor::findCursor(QTextCursor &cursor,
+                            const QString &text,
+                            FindAndReplaceDock::Options options) {
+    QTextDocument::FindFlags flags;
+
+    const bool matchCase = options &
+                           FindAndReplaceDock::Option::MatchCase;
+    const bool useRegex = options &
+                          FindAndReplaceDock::Option::UseRegex;
+    const bool warpAround = options &
+                            FindAndReplaceDock::Option::WarpAround;
+
+    if (options & FindAndReplaceDock::Option::FindWholeWord) {
+        flags |= QTextDocument::FindWholeWords;
+    }
+
+    QRegularExpression regex{ text };
+    QTextCursor        matchCursor;
+    if (!useRegex) {
+        if (matchCase) {
+            flags |= QTextDocument::FindCaseSensitively;
+        }
+        matchCursor = document()->find(text, cursor, flags);
+    } else {
+        if (matchCase) {
+            regex.setPatternOptions(
+                regex.patternOptions() | QRegularExpression::
+                CaseInsensitiveOption);
+        }
+        matchCursor = document()->find(regex, cursor, flags);
+    }
+
+    if (matchCursor.isNull()) {
+        if (warpAround) {
+            moveCursor(QTextCursor::Start);
+            matchCursor = useRegex ? document()->find(regex, cursor, flags)
+                             : document()->find(text, cursor, flags);
+        }
+    }
+    if (matchCursor.isNull()) {
+        return false;
+    } else {
+        cursor.setPosition(matchCursor.anchor());
+        cursor.setPosition(matchCursor.position(), QTextCursor::KeepAnchor);
+        return true;
+    }
+}
+
+void CodeEditor::replaceSelectedCursor(QTextCursor &cursor,
+                                       const QString &text) {
+    if (cursor.hasSelection()) {
+        cursor.insertText(text);
+    }
 }
 
 void CodeEditor::readPrefSettings() {
@@ -714,6 +769,43 @@ void CodeEditor::openReplaceDialog() {
 
     frdialog->setEditor(this);
     frdialog->show();
+}
+
+bool CodeEditor::find(const QString &text,
+                      FindAndReplaceDock::Options options) {
+    auto &&cursor = textCursor();
+
+    if (findCursor(cursor, text, options)) {
+        setTextCursor(cursor);
+        return true;
+    } else {
+        setTextCursor({});
+        return false;
+    }
+}
+
+void CodeEditor::replaceSelection(const QString &text) {
+    auto &&cursor = textCursor();
+
+    replaceSelectedCursor(cursor, text);
+    setTextCursor(std::move(cursor));
+}
+
+void CodeEditor::replaceAllWith(const QString &query, const QString &text,
+                                FindAndReplaceDock::Options options) {
+    options.setFlag(FindAndReplaceDock::Option::WarpAround, false);
+    if (options & FindAndReplaceDock::Option::FindInDatapack) {
+    } else {
+        auto &&cursor = textCursor();
+        cursor.beginEditBlock();
+        cursor.movePosition(QTextCursor::Start);
+
+        while (findCursor(cursor, query, options)) {
+            replaceSelectedCursor(cursor, text);
+        }
+        cursor.endEditBlock();
+        setTextCursor(cursor);
+    }
 }
 
 void CodeEditor::toggleComment() {

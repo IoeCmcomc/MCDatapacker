@@ -23,6 +23,7 @@ class PredicateDock;
 class StatusBar;
 class VisualRecipeEditorDock;
 class VanillaDatapackDock;
+class FindAndReplaceDock;
 
 namespace libqdark {
     class SystemThemeHelper;
@@ -57,6 +58,8 @@ public /*slots*/ :
     void saveAll();
     void restart();
     /* Edit menu */
+    void find();
+    void findAndReplace();
     /* View menu */
     /* Tools menu */
     void statistics();
@@ -120,6 +123,7 @@ private:
 
     void initDocks();
     void initMenu();
+    void initFindDocks(FindAndReplaceDock *dock);
     void connectEditAction(QAction * action, void (CodeEditor::*method)());
     void connectActionLink(QAction *action, const QString &&url);
     void initResourcesMenu();

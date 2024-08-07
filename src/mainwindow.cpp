@@ -22,6 +22,7 @@
 #include "vanilladatapackdock.h"
 #include "numberprovider.h"
 #include "numberproviderdialog.h"
+#include "findandreplacedock.h"
 
 #include "game.h"
 #include "platforms/windows_specific.h"
@@ -183,8 +184,9 @@ void MainWindow::initMenu() {
     connectEditAction(ui->actionMoveLineUp, &CodeEditor::moveLineUp);
     connectEditAction(ui->actionMoveLineDown, &CodeEditor::moveLineDown);
     connectEditAction(ui->actionToggleComment, &CodeEditor::toggleComment);
-    connectEditAction(ui->actionFind, &CodeEditor::openFindDialog);
-    connectEditAction(ui->actionReplace, &CodeEditor::openReplaceDialog);
+    connect(ui->actionFind, &QAction::triggered, this, &MainWindow::find);
+    connect(ui->actionReplace, &QAction::triggered,
+            this, &MainWindow::findAndReplace);
     /* View menu */
     connect(ui->actionZoomIn, &QAction::triggered, this, [this](){
         ui->tabbedInterface->invokeActionType(
@@ -220,6 +222,24 @@ void MainWindow::initMenu() {
     connect(qApp->clipboard(), &QClipboard::changed, this,
             &MainWindow::updateEditMenu);
     ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+}
+
+void MainWindow::initFindDocks(FindAndReplaceDock *dock) {
+    if (const auto *editor = ui->tabbedInterface->getCodeEditor()) {
+        const auto &&cursor = editor->textCursor();
+        if (cursor.hasSelection()) {
+            dock->setQuery(cursor.selectedText());
+        }
+    }
+
+    connect(dock, &FindAndReplaceDock::findCurFileRequested,
+            ui->tabbedInterface,
+            [ = ](const QString &text, FindAndReplaceDock::Options options){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::find, text,
+                                              options);
+    });
+
+    addDockWidget(Qt::RightDockWidgetArea, dock);
 }
 
 void MainWindow::connectEditAction(QAction *action,
@@ -328,6 +348,39 @@ void MainWindow::restart() {
 
     QProcess process;
     process.startDetached(qApp->arguments()[0], qApp->arguments());
+}
+
+void MainWindow::find() {
+    auto *dock = new FindAndReplaceDock(this);
+
+    initFindDocks(dock);
+    dock->show();
+    dock->activateWindow();
+}
+
+void MainWindow::findAndReplace() {
+    auto *dock = new FindAndReplaceDock(this);
+
+    initFindDocks(dock);
+
+    dock->setOptions(
+        dock->options() | FindAndReplaceDock::Option::FindAndReplace);
+
+    connect(dock, &FindAndReplaceDock::replaceCurFileRequested,
+            ui->tabbedInterface, [ = ](const QString &text){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceSelection,
+                                              text);
+    });
+    connect(dock, &FindAndReplaceDock::replaceAllCurFileRequested,
+            ui->tabbedInterface,
+            [ = ](const QString &query, const QString &text,
+                  FindAndReplaceDock::Options options){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceAllWith,
+                                              query, text, options);
+    });
+
+    dock->show();
+    dock->activateWindow();
 }
 
 void MainWindow::statistics() {

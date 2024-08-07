@@ -481,12 +481,6 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
     }
 }
 
-void TabbedDocumentInterface::invokeCodeEditor(void (CodeEditor::*method)()) {
-    if (auto *editor = getCodeEditor()) {
-        (editor->*method)();
-    }
-}
-
 void TabbedDocumentInterface::invokeActionType(ActionType act) {
     constexpr qreal zoomInFactor  = 1.15;
     constexpr qreal zoomOutFactor = 1. / zoomInFactor;

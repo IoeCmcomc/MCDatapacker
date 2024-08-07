@@ -50,6 +50,7 @@ SOURCES += \
     entitynamestextobjectdialog.cpp \
     filenamedelegate.cpp \
     fileswitcher.cpp \
+    findandreplacedock.cpp \
     game.cpp \
     gameinfomodel.cpp \
     globalhelpers.cpp \
@@ -177,6 +178,7 @@ HEADERS += \
     entitynamestextobjectdialog.h \
     filenamedelegate.h \
     fileswitcher.h \
+    findandreplacedock.h \
     game.h \
     gameconstants.h \
     gameinfomodel.h \
@@ -292,6 +294,7 @@ FORMS += \
     disclaimerdialog.ui \
     entityconditiondialog.ui \
     entitynamestextobjectdialog.ui \
+    findandreplacedock.ui \
     itemconditiondialog.ui \
     itemmodifierdock.ui \
     locationconditiondialog.ui \
