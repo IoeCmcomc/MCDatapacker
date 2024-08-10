@@ -238,6 +238,28 @@ void MainWindow::initFindDocks(FindAndReplaceDock *dock) {
         ui->tabbedInterface->invokeCodeEditor(&CodeEditor::find, text,
                                               options);
     });
+    connect(dock, &FindAndReplaceDock::resetCursorRequested,
+            ui->tabbedInterface, [ = ](){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::resetTextCursor);
+    });
+
+    connect(dock, &FindAndReplaceDock::openFileRequested,
+            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+    connect(ui->tabbedInterface, &TabbedDocumentInterface::findCompleted,
+            dock, &FindAndReplaceDock::onFindCurFileCompleted);
+
+    connect(dock, &FindAndReplaceDock::replaceCurFileRequested,
+            ui->tabbedInterface, [ = ](const QString &text){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceSelection,
+                                              text);
+    });
+    connect(dock, &FindAndReplaceDock::replaceAllCurFileRequested,
+            ui->tabbedInterface,
+            [ = ](const QString &query, const QString &text,
+                  FindAndReplaceDock::Options options){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceAllWith,
+                                              query, text, options);
+    });
 
     addDockWidget(Qt::RightDockWidgetArea, dock);
 }
@@ -365,19 +387,6 @@ void MainWindow::findAndReplace() {
 
     dock->setOptions(
         dock->options() | FindAndReplaceDock::Option::FindAndReplace);
-
-    connect(dock, &FindAndReplaceDock::replaceCurFileRequested,
-            ui->tabbedInterface, [ = ](const QString &text){
-        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceSelection,
-                                              text);
-    });
-    connect(dock, &FindAndReplaceDock::replaceAllCurFileRequested,
-            ui->tabbedInterface,
-            [ = ](const QString &query, const QString &text,
-                  FindAndReplaceDock::Options options){
-        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceAllWith,
-                                              query, text, options);
-    });
 
     dock->show();
     dock->activateWindow();

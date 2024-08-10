@@ -2,7 +2,10 @@
 #define FINDANDREPLACEDOCK_H
 
 #include <QDockWidget>
-#include <QTextDocument>
+
+QT_BEGIN_NAMESPACE
+class QDirIterator;
+QT_END_NAMESPACE;
 
 namespace Ui {
     class FindAndReplaceDock;
@@ -37,11 +40,17 @@ signals:
     void replaceCurFileRequested(const QString &text);
     void replaceAllCurFileRequested(const QString &query, const QString &text,
                                     Options options);
+    void openFileRequested(const QString &filePath);
+    void resetCursorRequested();
+
+public slots:
+    void onFindCurFileCompleted(const bool found);
 
 protected:
     void changeEvent(QEvent *e);
 
 private slots:
+    void onQueryChanged(const QString &text);
     void onFoldBtnClicked(const bool checked);
     void onFindBtnClicked();
     void onReplaceBtnClicked();
@@ -49,6 +58,12 @@ private slots:
 
 private:
     Ui::FindAndReplaceDock *ui;
+    QDirIterator *m_dirIter = nullptr;
+    bool m_continue         = false;
+    bool m_continueFile     = false;
+
+    bool findInFile(const QString &path);
+    void showMatchInEditor(const QString &path, const QString &query);
 };
 
 #endif // FINDANDREPLACEDOCK_H

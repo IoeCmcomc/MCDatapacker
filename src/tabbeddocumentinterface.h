@@ -75,6 +75,7 @@ signals:
     void showMessageRequest(const QString &msg, int timeout);
     void updateEditMenuRequest();
     void settingsChanged();
+    void findCompleted(const bool found);
 
 protected:
     void changeEvent(QEvent *event) override;

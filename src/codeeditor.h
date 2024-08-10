@@ -70,6 +70,7 @@ signals:
     void openFileRequest(const QString &filepath);
     void updateStatusBarRequest(CodeEditor *editor);
     void showMessageRequest(const QString &msg, int timeout);
+    void findCompleted(const bool found);
 
 public: // Slots
     void openFindDialog();
@@ -78,6 +79,7 @@ public: // Slots
     void replaceSelection(const QString &text);
     void replaceAllWith(const QString &query, const QString &text,
                         FindAndReplaceDock::Options options);
+    void resetTextCursor();
     void toggleComment();
     void copyLineUp();
     void copyLineDown();

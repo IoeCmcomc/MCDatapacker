@@ -304,6 +304,8 @@ void TabbedDocumentInterface::addFile(const QString &path,
 
         connect(this, &TabbedDocumentInterface::settingsChanged,
                 codeEditor, &CodeEditor::readPrefSettings);
+        connect(codeEditor, &CodeEditor::findCompleted,
+                this, &TabbedDocumentInterface::findCompleted);
 
         widget = codeEditor;
     } else if (newFile.fileType == CodeFile::Image) {

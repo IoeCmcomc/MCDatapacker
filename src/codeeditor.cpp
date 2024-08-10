@@ -170,7 +170,8 @@ bool CodeEditor::findCursor(QTextCursor &cursor,
 
     if (matchCursor.isNull()) {
         if (warpAround) {
-            moveCursor(QTextCursor::Start);
+            qDebug() << "No matches found. Trying to warp around...";
+            cursor.movePosition(QTextCursor::Start);
             matchCursor = useRegex ? document()->find(regex, cursor, flags)
                              : document()->find(text, cursor, flags);
         }
@@ -187,6 +188,7 @@ bool CodeEditor::findCursor(QTextCursor &cursor,
 void CodeEditor::replaceSelectedCursor(QTextCursor &cursor,
                                        const QString &text) {
     if (cursor.hasSelection()) {
+        // qDebug() << "Replacing" << cursor.selectedText() << "with" << text;
         cursor.insertText(text);
     }
 }
@@ -777,9 +779,11 @@ bool CodeEditor::find(const QString &text,
 
     if (findCursor(cursor, text, options)) {
         setTextCursor(cursor);
+        emit findCompleted(true);
         return true;
     } else {
-        setTextCursor({});
+        moveCursor(QTextCursor::End);
+        emit findCompleted(false);
         return false;
     }
 }
@@ -806,6 +810,10 @@ void CodeEditor::replaceAllWith(const QString &query, const QString &text,
         cursor.endEditBlock();
         setTextCursor(cursor);
     }
+}
+
+void CodeEditor::resetTextCursor() {
+    moveCursor(QTextCursor::Start);
 }
 
 void CodeEditor::toggleComment() {

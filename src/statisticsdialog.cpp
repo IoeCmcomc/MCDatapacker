@@ -219,7 +219,7 @@ void StatisticsDialog::collectAndSetupData() {
 void StatisticsDialog::collectFunctionData(const QString &path) {
     QString text;
 
-    if (QFile file(path); file.open(QFile::ReadOnly | QFile::Text)) {
+    if (QFile file(path); file.open(QFile::ReadOnly)) {
         QTextStream in(&file);
         in.setCodec("UTF-8");
 
