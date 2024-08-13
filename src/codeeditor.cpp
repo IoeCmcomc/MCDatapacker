@@ -170,7 +170,6 @@ bool CodeEditor::findCursor(QTextCursor &cursor,
 
     if (matchCursor.isNull()) {
         if (warpAround) {
-            qDebug() << "No matches found. Trying to warp around...";
             cursor.movePosition(QTextCursor::Start);
             matchCursor = useRegex ? document()->find(regex, cursor, flags)
                              : document()->find(text, cursor, flags);
@@ -188,7 +187,6 @@ bool CodeEditor::findCursor(QTextCursor &cursor,
 void CodeEditor::replaceSelectedCursor(QTextCursor &cursor,
                                        const QString &text) {
     if (cursor.hasSelection()) {
-        // qDebug() << "Replacing" << cursor.selectedText() << "with" << text;
         cursor.insertText(text);
     }
 }
@@ -493,7 +491,11 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
                 + m_completer->popup()->verticalScrollBar()->sizeHint().width());
 
     m_needCompleting = false;
-    m_completer->complete(cr);       // popup it up!
+    // Don't show if there is only one suggestion which is same as the prefix
+    if (m_completer->completionModel()->index(1, 0).isValid()
+        || m_completer->currentCompletion() != completionPrefix) {
+        m_completer->complete(cr);       // popup it up!
+    }
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
@@ -536,7 +538,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
 
     if (!isCompletionShortcut &&
         (hasModifier || e->text().isEmpty() || completionPrefix.length() < 2
-         || eow.contains(e->text().right(1)))) {
+            || eow.contains(e->text().right(1)))) {
+        m_completer->popup()->hide();
+        return;
+    } else if (m_completer && m_completer->popup()->isVisible()
+                && !m_completer->completionModel()->index(1, 0).isValid()
+                && m_completer->currentCompletion() == m_completer->completionPrefix()) {
         m_completer->popup()->hide();
         return;
     } else if (isCompletionShortcut) {
