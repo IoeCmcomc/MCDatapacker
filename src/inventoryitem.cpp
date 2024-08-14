@@ -43,17 +43,19 @@ void InventoryItem::setupItem(QString id) {
     Glhp::removePrefix(id, "minecraft:"_QL1);
 
     const auto &&MCRItemInfo  = Game::getInfo(QStringLiteral("item"));
-    const auto &&MCRBlockInfo = Game::getInfo(QStringLiteral("block"));
 
     if (MCRItemInfo.contains(id)) {
         setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
                                                         "name")).toString());
         m_types = Item;
-    } else if (MCRBlockInfo.contains(id)) {
-        const auto &blockMap = MCRBlockInfo.value(id).toMap();
-        setIsItem(!blockMap.contains(QStringLiteral("unobtainable")));
-        setName(blockMap.value(QStringLiteral("name")).toString());
-        setIsBlock(true);
+    } else {
+        const auto&& MCRBlockInfo = Game::getInfo(QStringLiteral("block"));
+        if (MCRBlockInfo.contains(id)) {
+            const auto& blockMap = MCRBlockInfo.value(id).toMap();
+            setIsItem(!blockMap.contains(QStringLiteral("unobtainable")));
+            setName(blockMap.value(QStringLiteral("name")).toString());
+            setIsBlock(true);
+        }
     }
 }
 

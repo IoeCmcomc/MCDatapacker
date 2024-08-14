@@ -50,6 +50,7 @@ private:
                                         const bool getTag = false);
         void addSuggestionsFromInfo(const QString &key,
                                     const bool &useTagForm = false);
+        void addItemInfo();
     };
 }
 

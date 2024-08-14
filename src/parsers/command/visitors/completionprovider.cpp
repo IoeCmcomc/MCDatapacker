@@ -182,7 +182,7 @@ namespace Command {
     void CompletionProvider::visit(ItemStackNode *node) {
         if ((m_cursorRow >= m_pos) &&
             (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
-            addSuggestionsFromInfo(QStringLiteral("item"));
+            addItemInfo();
         }
     }
 
@@ -190,7 +190,7 @@ namespace Command {
         if (node->resLoc()) {
             if ((m_cursorRow >= m_pos) &&
                 (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
-                addSuggestionsFromInfo(QStringLiteral("item"));
+                addItemInfo();
                 addSuggestionsFromInfo(QStringLiteral("tag/item"), true);
                 m_suggestions += Glhp::fileIdList(
                     QDir::currentPath(), QStringLiteral("tags/items"),
@@ -274,6 +274,20 @@ namespace Command {
             });
         } else {
             m_suggestions += keys.toVector();
+        }
+    }
+    void CompletionProvider::addItemInfo()
+    {
+        const QVariantMap&& itemInfoMap = Game::getInfo(QStringLiteral("item"));
+        const auto&& keys = itemInfoMap.keys();
+        m_suggestions += keys.toVector();
+
+        const QVariantMap&& blockInfoMap = Game::getInfo(QStringLiteral("block"));
+        for (auto it = blockInfoMap.cbegin(); it != blockInfoMap.cend(); ++it) {
+            const auto &value = it.value();
+            if ((value.type() != QVariant::Map) || !value.toMap().value("unobtainable", false).toBool()) {
+                m_suggestions += it.key();
+            }
         }
     }
 }
