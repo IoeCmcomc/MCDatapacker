@@ -91,6 +91,7 @@ void NumberProvider::advancedDataChanged(const QJsonValue &value)
         fromJson(value);
         ui->dataBtn->reset(false);
     }
+    emit editingFinished();
 }
 
 void NumberProvider::fromJson(const QJsonValue &value) {

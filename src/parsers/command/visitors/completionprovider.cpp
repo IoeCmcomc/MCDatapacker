@@ -25,7 +25,7 @@ namespace Command {
                 //     child->schemaNode();
                 if ((m_cursorRow >= m_pos) &&
                     (m_cursorRow <= (m_pos + child->length()))) {
-                    qDebug() << "I choose you" << child;
+                    //qDebug() << "I choose you" << child;
                     if (!isFirst) {
                         Q_ASSERT(prevChild->schemaNode() != nullptr);
                         auto &&literals =

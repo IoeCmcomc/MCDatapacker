@@ -59,6 +59,7 @@ QWidget *NumberProviderDelegate::createEditor(QWidget *parent,
         editor->setModes(m_inputModes);
         editor->setMinLimit(m_minLimit);
         editor->setMaxLimit(m_maxLimit);
+        editor->setIntegerOnly(m_integerOnly);
 
         connect(editor, &NumberProvider::editingFinished,
                 this, &NumberProviderDelegate::commitAndCloseEditor);
@@ -120,28 +121,29 @@ void NumberProviderDelegate::commitAndCloseEditor() {
     emit  closeEditor(editor);
 }
 
+void NumberProviderDelegate::setIntegerOnly(bool newIntegerOnly)
+{
+    m_integerOnly = newIntegerOnly;
+}
+
 QString NumberProviderDelegate::textRepr(const QJsonValue &value) const {
-    if (value.isDouble()) {
+    if (NumberProvider::hasComplexData(value)) {
+        return tr("Number provider");
+    } else if (value.isDouble()) {
         const int exactInt = value.toInt();
         return QString::number(exactInt);
     } else if (value.isObject()) {
         const auto    &&obj  = value.toObject();
-        const QString &&type = obj[QLatin1String("type")].toString();
-        if (type == QLatin1String("minecraft:binomial")) {
-            int    num  = obj.value(QLatin1String("n")).toInt();
-            double prob = obj.value(QLatin1String("p")).toInt();
-            return QString("n: %1; p: %2").arg(num).arg(prob);
-        } else {
-            const QString &&min = (obj.contains(QLatin1String("min")))
-                                      ? QString::number(
-                obj.value(QLatin1String("min")).toInt())
-                                      : QString();
-            const QString &&max = (obj.contains(QLatin1String("max")))
-                                      ? QString::number(
-                obj.value(QLatin1String("max")).toInt())
-                                      : QString();
-            return QString("%1..%2").arg(min, max);
-        }
+
+        const QString &&min = (obj.contains(QLatin1String("min")))
+                                  ? QString::number(
+            obj.value(QLatin1String("min")).toInt())
+                                  : QString();
+        const QString &&max = (obj.contains(QLatin1String("max")))
+                                  ? QString::number(
+            obj.value(QLatin1String("max")).toInt())
+                                  : QString();
+        return QString("%1..%2").arg(min, max);
     } else {
         return QString();
     }

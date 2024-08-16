@@ -95,6 +95,8 @@ private slots:
     void advancedDataChanged(const QJsonValue &value);
 
 private:
+    friend class NumberProviderDelegate;
+
     Ui::NumberProvider *ui;
     QMenu m_menu;
     Modes m_modes;
