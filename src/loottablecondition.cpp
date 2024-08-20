@@ -116,12 +116,12 @@ QJsonObject LootTableCondition::toJson() const {
                 pred["tags"] = ui->damageSrc_table->toJsonArray();
             }
 
-            if (!ui->damageSrc_entityPropBtn->getData().isEmpty())
+            if (!ui->damageSrc_entityPropBtn->getJsonObj().isEmpty())
                 pred.insert("source_entity",
-                            ui->damageSrc_entityPropBtn->getData());
-            if (!ui->damageSrc_directPropBtn->getData().isEmpty())
+                            ui->damageSrc_entityPropBtn->getJsonObj());
+            if (!ui->damageSrc_directPropBtn->getJsonObj().isEmpty())
                 pred.insert("direct_entity",
-                            ui->damageSrc_directPropBtn->getData());
+                            ui->damageSrc_directPropBtn->getJsonObj());
             if (!pred.isEmpty())
                 root.insert("predicate", pred);
             break;
@@ -130,8 +130,8 @@ QJsonObject LootTableCondition::toJson() const {
         case 2: { /*Entity properites */
             root.insert("entity",
                         entityTargets[ui->entity_typeCombo->currentIndex()]);
-            if (!ui->entity_propBtn->getData().isEmpty())
-                root.insert("predicate", ui->entity_propBtn->getData());
+            if (!ui->entity_propBtn->getJsonObj().isEmpty())
+                root.insert("predicate", ui->entity_propBtn->getJsonObj());
             break;
         }
 
@@ -165,8 +165,8 @@ QJsonObject LootTableCondition::toJson() const {
                 root.insert("offsetY", ui->location_yOffset->value());
             if (!ui->location_zOffset->isUnset())
                 root.insert("offsetZ", ui->location_zOffset->value());
-            if (!ui->location_propBtn->getData().isEmpty())
-                root.insert("predicate", ui->location_propBtn->getData());
+            if (!ui->location_propBtn->getJsonObj().isEmpty())
+                root.insert("predicate", ui->location_propBtn->getJsonObj());
             break;
         }
 
@@ -211,8 +211,8 @@ QJsonObject LootTableCondition::toJson() const {
         }
 
         case 7: { /*Match tool */
-            if (!ui->matchTool_propBtn->getData().isEmpty())
-                root.insert("predicate", ui->matchTool_propBtn->getData());
+            if (!ui->matchTool_propBtn->getJsonObj().isEmpty())
+                root.insert("predicate", ui->matchTool_propBtn->getJsonObj());
             break;
         }
 
@@ -378,10 +378,10 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                 }
 
                 if (pred.contains("source_entity"))
-                    ui->damageSrc_entityPropBtn->setData(
+                    ui->damageSrc_entityPropBtn->setJson(
                         pred["source_entity"].toObject());
                 if (pred.contains("direct_entity"))
-                    ui->damageSrc_directPropBtn->setData(
+                    ui->damageSrc_directPropBtn->setJson(
                         pred["direct_entity"].toObject());
             }
             break;
@@ -393,7 +393,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
                     (entityTargets.indexOf(value["entity"].toString()));
 
             if (value.contains("predicate"))
-                ui->entity_propBtn->setData(value["predicate"].toObject());
+                ui->entity_propBtn->setJson(value["predicate"].toObject());
             break;
         }
 
@@ -432,7 +432,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
             if (value.contains("offsetZ"))
                 ui->location_zOffset->setValue(value["offsetZ"].toInt());
             if (value.contains("predicate"))
-                ui->location_propBtn->setData(value["predicate"].toObject());
+                ui->location_propBtn->setJson(value["predicate"].toObject());
             break;
         }
 
@@ -498,7 +498,7 @@ void LootTableCondition::fromJson(const QJsonObject &root, bool redirected) {
 
         case 7: { /*Match tool */
             if (value.contains("predicate"))
-                ui->matchTool_propBtn->setData(value["predicate"].toObject());
+                ui->matchTool_propBtn->setJson(value["predicate"].toObject());
             break;
         }
 

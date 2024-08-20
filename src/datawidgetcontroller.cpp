@@ -7,6 +7,7 @@
 #include "extendedtablewidget.h"
 #include "datawidgetinterface.h"
 #include "multipagewidget.h"
+#include "idtagselector.h"
 
 #include "modelfunctions.h"
 #include "globalhelpers.h"
@@ -309,21 +310,39 @@ void DataWidgetControllerDataWidgetInterface::putValueTo(
 
 
 bool DataWidgetControllerDialogDataButton::hasAcceptableValue() const {
-    return m_widget->isEnabled() && m_widget->getData().isEmpty();
+    return m_widget->isEnabled() && m_widget->getJsonObj().isEmpty();
 }
 
 void DataWidgetControllerDialogDataButton::setValueFrom(const QJsonObject &obj,
                                                         const QString &key) {
     if (obj.contains(key)) {
-        m_widget->setData(obj.value(key).toObject());
+        m_widget->setJson(obj.value(key).toObject());
     }
 }
 
 void DataWidgetControllerDialogDataButton::putValueTo(QJsonObject &obj,
                                                       const QString &key) const
 {
-    obj[key] = m_widget->getData();
+    obj[key] = m_widget->getJsonObj();
 }
+
+
+bool DataWidgetControllerIdTagSelector::hasAcceptableValue() const {
+    return m_widget->isEnabled() && m_widget->hasData();
+}
+
+void DataWidgetControllerIdTagSelector::setValueFrom(const QJsonObject &obj,
+                                                     const QString &key) {
+    if (obj.contains(key)) {
+        m_widget->fromJson(obj.value(key));
+    }
+}
+
+void DataWidgetControllerIdTagSelector::putValueTo(QJsonObject &obj,
+                                                   const QString &key) const {
+    obj[key] = m_widget->toJson();
+}
+
 
 
 StringIndexMap::StringIndexMap(std::initializer_list<std::pair<QString,

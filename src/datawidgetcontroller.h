@@ -20,6 +20,7 @@ class ExtendedTableWidget;
 class DataWidgetInterface;
 class MultiPageWidget;
 class DialogDataButton;
+class IdTagSelector;
 
 class DataWidgetController {
 public:
@@ -330,6 +331,18 @@ public:
 };
 
 
+class DataWidgetControllerIdTagSelector
+    : public DataWidgetControllerWidget<IdTagSelector> {
+public:
+    using DataWidgetControllerWidget::DataWidgetControllerWidget;
+    virtual bool hasAcceptableValue() const final;
+    virtual void setValueFrom(const QJsonObject &obj,
+                              const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj,
+                            const QString &key) const final;
+};
+
+
 /*!
     \class StringIndexMap
 
@@ -584,5 +597,6 @@ DEFINE_WRAPPER(ExtendedTableWidget)
 DEFINE_WRAPPER(DataWidgetInterface)
 DEFINE_WRAPPER(MultiPageWidget)
 DEFINE_WRAPPER(DialogDataButton)
+DEFINE_WRAPPER(IdTagSelector)
 
 #endif // DATAWIDGETCONTROLLER_H

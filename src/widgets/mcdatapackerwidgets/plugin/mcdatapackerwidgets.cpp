@@ -4,6 +4,7 @@
 #include "numberprovider/numberproviderplugin.h"
 #include "dialogdatabutton/dialogdatabuttonplugin.h"
 #include "multipagewidget/multipagewidgetplugin.h"
+#include "idtagselector/idtagselectorplugin.h"
 
 MCDatapackerWidgets::MCDatapackerWidgets(QObject *parent)
     : QObject(parent) {
@@ -11,6 +12,7 @@ MCDatapackerWidgets::MCDatapackerWidgets(QObject *parent)
     m_widgets << new NumberProviderPlugin(this);
     m_widgets << new DialogDataButtonPlugin(this);
     m_widgets << new MultiPageWidgetPlugin(this);
+    m_widgets << new IdTagSelectorPlugin(this);
 }
 
 QList<QDesignerCustomWidgetInterface*> MCDatapackerWidgets::customWidgets()

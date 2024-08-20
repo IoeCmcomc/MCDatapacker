@@ -145,9 +145,14 @@ void appendRowToModel(QStandardItemModel &model, const QString &text,
 }
 
 void hideComboRow(QComboBox *comboBox, const int row) {
+    setComboRowHidden(comboBox, row, true);
+}
+
+void setComboRowHidden(QComboBox *comboBox, const int row, bool hidden) {
     if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
         auto *model = static_cast<QStandardItemModel *>(comboBox->model());
-        view->setRowHidden(row, true);
-        model->item(row, 0)->setEnabled(false);
+        Q_ASSERT(model != nullptr);
+        view->setRowHidden(row, hidden);
+        model->item(row, 0)->setEnabled(!hidden);
     }
 }

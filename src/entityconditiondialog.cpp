@@ -139,35 +139,35 @@ QJsonObject EntityConditionDialog::toJson() const {
     if (!flags.isEmpty())
         root.insert(QStringLiteral("flags"), flags);
     QJsonObject equipment;
-    if (!ui->mainhandPropBtn->getData().isEmpty())
+    if (!ui->mainhandPropBtn->getJsonObj().isEmpty())
         equipment.insert(QStringLiteral("mainhand"),
-                         ui->mainhandPropBtn->getData());
-    if (!ui->offhandPropBtn->getData().isEmpty())
+                         ui->mainhandPropBtn->getJsonObj());
+    if (!ui->offhandPropBtn->getJsonObj().isEmpty())
         equipment.insert(QStringLiteral("offhand"),
-                         ui->offhandPropBtn->getData());
-    if (!ui->headPropBtn->getData().isEmpty())
-        equipment.insert(QStringLiteral("head"), ui->headPropBtn->getData());
-    if (!ui->chestPropBtn->getData().isEmpty())
-        equipment.insert(QStringLiteral("chest"), ui->chestPropBtn->getData());
-    if (!ui->legsPropBtn->getData().isEmpty())
-        equipment.insert(QStringLiteral("legs"), ui->legsPropBtn->getData());
-    if (!ui->feetPropBtn->getData().isEmpty())
-        equipment.insert(QStringLiteral("feet"), ui->feetPropBtn->getData());
+                         ui->offhandPropBtn->getJsonObj());
+    if (!ui->headPropBtn->getJsonObj().isEmpty())
+        equipment.insert(QStringLiteral("head"), ui->headPropBtn->getJsonObj());
+    if (!ui->chestPropBtn->getJsonObj().isEmpty())
+        equipment.insert(QStringLiteral("chest"), ui->chestPropBtn->getJsonObj());
+    if (!ui->legsPropBtn->getJsonObj().isEmpty())
+        equipment.insert(QStringLiteral("legs"), ui->legsPropBtn->getJsonObj());
+    if (!ui->feetPropBtn->getJsonObj().isEmpty())
+        equipment.insert(QStringLiteral("feet"), ui->feetPropBtn->getJsonObj());
     if (!equipment.isEmpty())
         root.insert(QStringLiteral("equipment"), equipment);
-    if (!ui->locatPropBtn->getData().isEmpty())
-        root.insert(QStringLiteral("location"), ui->locatPropBtn->getData());
-    if (!ui->vehicleBtn->getData().isEmpty()
+    if (!ui->locatPropBtn->getJsonObj().isEmpty())
+        root.insert(QStringLiteral("location"), ui->locatPropBtn->getJsonObj());
+    if (!ui->vehicleBtn->getJsonObj().isEmpty()
         && (Game::version() >= Game::v1_16)) {
-        root.insert(QStringLiteral("vehicle"), ui->vehicleBtn->getData());
+        root.insert(QStringLiteral("vehicle"), ui->vehicleBtn->getJsonObj());
     }
     if (Game::version() >= Game::v1_17) {
-        if (!ui->passengerBtn->getData().isEmpty())
+        if (!ui->passengerBtn->getJsonObj().isEmpty())
             root.insert(QStringLiteral("passenger"),
-                        ui->passengerBtn->getData());
-        if (!ui->steppingOnBtn->getData().isEmpty())
+                        ui->passengerBtn->getJsonObj());
+        if (!ui->steppingOnBtn->getJsonObj().isEmpty())
             root.insert(QStringLiteral("stepping_on"),
-                        ui->steppingOnBtn->getData());
+                        ui->steppingOnBtn->getJsonObj());
     }
 
     QJsonObject effects;
@@ -207,9 +207,9 @@ QJsonObject EntityConditionDialog::toJson() const {
             player.insert(QStringLiteral("level"),
                           ui->playerLevelInput->toJson());
         if (Game::version() >= Game::v1_17) {
-            if (!ui->lookingAtBtn->getData().isEmpty())
+            if (!ui->lookingAtBtn->getJsonObj().isEmpty())
                 player.insert(QStringLiteral("looking_at"),
-                              ui->lookingAtBtn->getData());
+                              ui->lookingAtBtn->getJsonObj());
         }
 
         QJsonObject advancements;
@@ -297,9 +297,9 @@ QJsonObject EntityConditionDialog::toJson() const {
             lightningBolt.insert("lightning_bolt",
                                  ui->blocksOnFireInput->toJson());
         }
-        if (!ui->entityStruckBtn->getData().isEmpty())
+        if (!ui->entityStruckBtn->getJsonObj().isEmpty())
             lightningBolt.insert(QStringLiteral("entity_struck"),
-                                 ui->entityStruckBtn->getData());
+                                 ui->entityStruckBtn->getJsonObj());
         if (!lightningBolt.isEmpty()) {
             if (Game::version() >= Game::v1_19) {
                 lightningBolt["type"] = "lightning";
@@ -343,7 +343,7 @@ void EntityConditionDialog::playerFromJson(const QJsonObject &player) {
     }
     if ((Game::version() >= Game::v1_17)
         && player.contains(QStringLiteral("looking_at"))) {
-        ui->lookingAtBtn->setData(player[QStringLiteral(
+        ui->lookingAtBtn->setJson(player[QStringLiteral(
                                              "looking_at")].toObject());
     }
     if (player.contains(QStringLiteral("level")))
@@ -419,40 +419,40 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
     if (value.contains(QStringLiteral("equipment"))) {
         auto equipment = value[QStringLiteral("equipment")].toObject();
         if (equipment.contains(QStringLiteral("mainhand")))
-            ui->mainhandPropBtn->setData(equipment[QStringLiteral(
+            ui->mainhandPropBtn->setJson(equipment[QStringLiteral(
                                                        "mainhand")].toObject());
         if (equipment.contains(QStringLiteral("offhand")))
-            ui->offhandPropBtn->setData(equipment[QStringLiteral(
+            ui->offhandPropBtn->setJson(equipment[QStringLiteral(
                                                       "offhand")].toObject());
         if (equipment.contains(QStringLiteral("head")))
-            ui->headPropBtn->setData(equipment[QStringLiteral(
+            ui->headPropBtn->setJson(equipment[QStringLiteral(
                                                    "head")].toObject());
         if (equipment.contains(QStringLiteral("chest")))
-            ui->chestPropBtn->setData(equipment[QStringLiteral(
+            ui->chestPropBtn->setJson(equipment[QStringLiteral(
                                                     "chest")].toObject());
         if (equipment.contains(QStringLiteral("legs")))
-            ui->legsPropBtn->setData(equipment[QStringLiteral(
+            ui->legsPropBtn->setJson(equipment[QStringLiteral(
                                                    "legs")].toObject());
         if (equipment.contains(QStringLiteral("feet")))
-            ui->feetPropBtn->setData(equipment[QStringLiteral(
+            ui->feetPropBtn->setJson(equipment[QStringLiteral(
                                                    "feet")].toObject());
     }
     if (value.contains(QStringLiteral("location")))
-        ui->locatPropBtn->setData(value[QStringLiteral("location")].toObject());
+        ui->locatPropBtn->setJson(value[QStringLiteral("location")].toObject());
     if (Game::version() >= Game::v1_16) {
         if (value.contains(QStringLiteral("vehicle")))
-            ui->locatPropBtn->setData(value[QStringLiteral(
+            ui->locatPropBtn->setJson(value[QStringLiteral(
                                                 "vehicle")].toObject());
         if (value.contains(QStringLiteral("targeted_entity")))
-            ui->targetEntityBtn->setData(value[QStringLiteral(
+            ui->targetEntityBtn->setJson(value[QStringLiteral(
                                                    "targeted_entity")].toObject());
     }
     if (Game::version() >= Game::v1_17) {
         if (value.contains(QStringLiteral("passenger")))
-            ui->passengerBtn->setData(value[QStringLiteral(
+            ui->passengerBtn->setJson(value[QStringLiteral(
                                                 "passenger")].toObject());
         if (value.contains(QStringLiteral("stepping_on")))
-            ui->steppingOnBtn->setData(value[QStringLiteral(
+            ui->steppingOnBtn->setJson(value[QStringLiteral(
                                                  "stepping_on")].toObject());
     }
 
@@ -519,7 +519,7 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                                                             "blocks_set_on_fire"]);
                     }
                     if (typeSpecific.contains("entity_struck")) {
-                        ui->entityStruckBtn->setData(
+                        ui->entityStruckBtn->setJson(
                             typeSpecific["entity_struck"].toObject());
                     }
                     break;
@@ -569,7 +569,7 @@ void EntityConditionDialog::fromJson(const QJsonObject &value) {
                                                     "blocks_set_on_fire"]);
             }
             if (lightningBolt.contains("entity_struck")) {
-                ui->entityStruckBtn->setData(
+                ui->entityStruckBtn->setJson(
                     lightningBolt["entity_struck"].toObject());
             }
         }

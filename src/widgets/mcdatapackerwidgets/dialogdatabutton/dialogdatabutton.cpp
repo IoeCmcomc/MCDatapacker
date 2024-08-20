@@ -24,26 +24,37 @@ QString DialogDataButton::text() const {
     return ui->button->text();
 }
 
-void DialogDataButton::reset(const bool emitChanged) {
-    setData(QJsonObject(), emitChanged);
-}
-
-QPushButton *DialogDataButton::button() {
-    return ui->button;
-}
-
-void DialogDataButton::checkSecondary() {
-    ui->secondButton->setDisabled(m_data.isEmpty());
-}
-
-QJsonObject DialogDataButton::getData() const {
+QVariant DialogDataButton::data() const
+{
     return m_data;
 }
 
-void DialogDataButton::setData(const QJsonObject &value, const bool emitChanged) {
+void DialogDataButton::setData(const QVariant& value, const bool emitChanged)
+{
     m_data = value;
     checkSecondary();
     if (emitChanged) {
         emit dataChanged(value);
     }
+}
+
+void DialogDataButton::reset(const bool emitChanged) {
+    setJson(QJsonObject(), emitChanged);
+}
+
+QPushButton * DialogDataButton::button() {
+    return ui->button;
+}
+
+void DialogDataButton::checkSecondary() {
+    ui->secondButton->setDisabled(m_data.isNull());
+}
+
+QJsonObject DialogDataButton::getJsonObj() const {
+    return m_data.toJsonObject();
+}
+
+void DialogDataButton::setJson(const QJsonObject &value,
+                               const bool emitChanged) {
+    setData(value, emitChanged);
 }

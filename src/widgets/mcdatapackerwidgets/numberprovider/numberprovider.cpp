@@ -11,7 +11,7 @@
 
 #include <cfloat>
 
-void(*NumberProvider::postCtorCallback)(NumberProvider *obj) = nullptr;
+void(*NumberProvider::postCtorCallback)(NumberProvider * obj) = nullptr;
 
 bool removePrefix(QString &str, QStringView prefix = u"minecraft:") {
     bool &&r = str.startsWith(prefix);
@@ -26,7 +26,7 @@ NumberProvider::NumberProvider(QWidget *parent) :
     ui->setupUi(this);
 
     setIntegerOnly(m_integerOnly);
-    setModes(All);
+    setModes(ExactAndRange | Advanced);
 
     connect(ui->minSpinBox, &QSpinBox::editingFinished,
             this, &NumberProvider::onMinMaxEdited);
@@ -82,13 +82,14 @@ void NumberProvider::onMinMaxEdited() {
     }
 }
 
-void NumberProvider::advancedDataChanged(const QJsonValue &value)
-{
-    if (hasComplexData(value)) {
-        ui->dataBtn->setData(value.toObject(), false);
+void NumberProvider::advancedDataChanged(const QVariant &value) {
+    const auto &&json = value.toJsonValue();
+
+    if (hasComplexData(json)) {
+        ui->dataBtn->setJson(json.toObject(), false);
         ui->stackedWidget->setCurrentIndex(2);
     } else {
-        fromJson(value);
+        fromJson(json);
         ui->dataBtn->reset(false);
     }
     emit editingFinished();
@@ -100,7 +101,7 @@ void NumberProvider::fromJson(const QJsonValue &value) {
         ui->spinBox->setValue(m_integerOnly ? value.toInt() : value.toDouble());
         ui->stackedWidget->setCurrentIndex(0);
     } else if (value.isObject()) {
-        auto obj  = value.toObject();
+        auto      obj  = value.toObject();
         QString &&type = obj.value(QLatin1String("type")).toString();
         removePrefix(type);
         if (type == "constant") {
@@ -109,7 +110,7 @@ void NumberProvider::fromJson(const QJsonValue &value) {
                                       ? constant.toInt() : constant.toDouble());
             ui->stackedWidget->setCurrentIndex(0);
         } else if (!obj.contains(QLatin1String("type"))
-            || type == QStringLiteral("uniform")) {
+                   || type == QStringLiteral("uniform")) {
             const bool hasMax = obj.contains(QStringLiteral("max"));
             if (obj.contains(QStringLiteral("min"))) {
                 const auto min = obj[QStringLiteral("min")];
@@ -125,7 +126,7 @@ void NumberProvider::fromJson(const QJsonValue &value) {
                 ui->maxSpinBox->unset();
             }
         } else {
-            ui->dataBtn->setData(obj);
+            ui->dataBtn->setJson(obj);
             ui->stackedWidget->setCurrentIndex(2);
         }
     }
@@ -152,7 +153,7 @@ QJsonValue NumberProvider::toJson() {
         }
 
         case 2: { /* Advanced */
-            value = ui->dataBtn->getData();
+            value = ui->dataBtn->getJsonObj();
             break;
         }
 
@@ -177,8 +178,7 @@ void NumberProvider::setModes(const NumberProvider::Modes &value) {
     emit modesChanged();
 }
 
-DialogDataButton *NumberProvider::dataBtn()
-{
+DialogDataButton * NumberProvider::dataBtn() {
     return ui->dataBtn;
 }
 
@@ -201,19 +201,20 @@ void NumberProvider::setMenu() {
     ui->inputTypeButton->setPopupMode(QToolButton::InstantPopup);
 }
 
-bool NumberProvider::hasComplexData(const QJsonValue value)
-{
+bool NumberProvider::hasComplexData(const QJsonValue value) {
     if (value.isObject()) {
-        const auto &&obj = value.toObject();
-        QString &&type = obj.value(QLatin1String("type")).toString();
+        const auto &&obj  = value.toObject();
+        QString    &&type = obj.value(QLatin1String("type")).toString();
         removePrefix(type);
         if (type == "constant") {
             return false;
         } else if (!obj.contains(QLatin1String("type"))
                    || type == QLatin1String("uniform")) {
-            if (const auto &&min = obj.value(QLatin1String("min")); min.isObject()) {
+            if (const auto &&min = obj.value(QLatin1String("min"));
+                min.isObject()) {
                 return true;
-            } else if (const auto &&max = obj.value(QLatin1String("max")); max.isObject()) {
+            } else if (const auto &&max = obj.value(QLatin1String("max"));
+                       max.isObject()) {
                 return true;
             } else {
                 return false;
@@ -317,7 +318,7 @@ bool NumberProvider::isCurrentlyUnset() const {
             return (ui->minSpinBox->isUnset() && ui->maxSpinBox->isUnset());
 
         case 2: /* Advanced */
-            return ui->dataBtn->getData().isEmpty();
+            return ui->dataBtn->getJsonObj().isEmpty();
 
         default:
             return false;

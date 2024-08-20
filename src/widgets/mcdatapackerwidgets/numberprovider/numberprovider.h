@@ -35,8 +35,7 @@ public:
         Exact         = 1,
         Range         = 2,
         ExactAndRange = Exact | Range,
-        Advanced = 4,
-        All           = ExactAndRange | Advanced,
+        Advanced      = 4,
     };
     Q_ENUM(Mode);
     Q_DECLARE_FLAGS(Modes, Mode)
@@ -71,7 +70,7 @@ public:
 
     void interpretText();
 
-    static void(*postCtorCallback)(NumberProvider *obj);
+    static void (*postCtorCallback)(NumberProvider *obj);
     template<class T>
     void assignDialogClass() {
         dataBtn()->assignDialogClass<T>();
@@ -92,7 +91,7 @@ protected:
 
 private slots:
     void onMinMaxEdited();
-    void advancedDataChanged(const QJsonValue &value);
+    void advancedDataChanged(const QVariant &value);
 
 private:
     friend class NumberProviderDelegate;
@@ -103,7 +102,7 @@ private:
     Mode m_currentMode;
     bool m_integerOnly = true;
 
-    DialogDataButton *dataBtn();
+    DialogDataButton * dataBtn();
     void setMenu();
     static bool hasComplexData(const QJsonValue value);
 };
