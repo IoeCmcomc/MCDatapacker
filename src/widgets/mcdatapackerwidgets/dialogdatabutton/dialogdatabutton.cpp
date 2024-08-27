@@ -24,13 +24,11 @@ QString DialogDataButton::text() const {
     return ui->button->text();
 }
 
-QVariant DialogDataButton::data() const
-{
+QVariant DialogDataButton::data() const {
     return m_data;
 }
 
-void DialogDataButton::setData(const QVariant& value, const bool emitChanged)
-{
+void DialogDataButton::setData(const QVariant& value, const bool emitChanged) {
     m_data = value;
     checkSecondary();
     if (emitChanged) {
@@ -39,7 +37,7 @@ void DialogDataButton::setData(const QVariant& value, const bool emitChanged)
 }
 
 void DialogDataButton::reset(const bool emitChanged) {
-    setJson(QJsonObject(), emitChanged);
+    setData(QVariant(), emitChanged);
 }
 
 QPushButton * DialogDataButton::button() {

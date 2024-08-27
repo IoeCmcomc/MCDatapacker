@@ -328,9 +328,13 @@ QJsonValue ExtendedTableWidget::itemDataToJson(int row, int col) const {
         }
 
         case EditorClass::QComboBox: {
-            const auto  *editor = qobject_cast<QComboBox *>(widget);
-            const int    index  = item->data(ComboboxIndexRole).toInt();
-            const auto &&vari   = editor->itemData(index, ComboboxDataRole);
+            const auto *editor = qobject_cast<QComboBox *>(widget);
+            Q_ASSERT(editor != nullptr);
+            if (editor->isEditable()) {
+                return item->text();
+            }
+            const int    index = item->data(ComboboxIndexRole).toInt();
+            const auto &&vari  = editor->itemData(index, ComboboxDataRole);
             if (!vari.isNull()) {
                 return vari.toJsonValue();
             } else {
@@ -386,19 +390,25 @@ void ExtendedTableWidget::loadItemFromJson(int row, int col,
 
         case EditorClass::QComboBox: {
             auto *editor = qobject_cast<QComboBox *>(widget);
-            int   index  = editor->findData(value.toVariant(),
-                                            ExtendedRole::ComboboxDataRole);
-            if (index == -1)
-                index = editor->findText(value.toString());
-            if (index == -1) {
-                delete item;
-                return;
-            }
+            Q_ASSERT(editor != nullptr);
+            if (editor->isEditable()) {
+                item->setText(value.toString());
+            } else {
+                int index = editor->findData(value.toVariant(),
+                                             ExtendedRole::ComboboxDataRole);
+                if (index == -1)
+                    index = editor->findText(value.toString());
+                if (index == -1) {
+                    delete item;
+                    return;
+                }
 
-            item->setText(editor->itemData(index, Qt::DisplayRole).toString());
-            item->setData(Qt::DecorationRole,
-                          editor->itemData(index, Qt::DecorationRole));
-            item->setData(ComboboxIndexRole, index);
+                item->setText(editor->itemData(index,
+                                               Qt::DisplayRole).toString());
+                item->setData(Qt::DecorationRole,
+                              editor->itemData(index, Qt::DecorationRole));
+                item->setData(ComboboxIndexRole, index);
+            }
             break;
         }
 

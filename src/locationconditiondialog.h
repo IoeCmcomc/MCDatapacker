@@ -4,6 +4,7 @@
 #include "basecondition.h"
 #include "loottablecondition.h"
 #include "gameinfomodel.h"
+#include "datawidgetcontroller.h"
 
 #include <QDialog>
 
@@ -23,15 +24,13 @@ public:
     QJsonObject toJson() const override;
     void fromJson(const QJsonObject &value) override;
 
-protected slots:
-    void onAddedState();
-
 private:
-    Ui::LocationConditionDialog *ui;
     GameInfoModel m_biomeModel;
     GameInfoModel m_dimensionModel;
     GameInfoModel m_featureModel;
     GameInfoModel m_fluidModel;
+    DataWidgetControllerRecord m_controller;
+    Ui::LocationConditionDialog *ui;
     bool from_1_17 = false;
 
     void initBlockGroup();
@@ -39,6 +38,7 @@ private:
 
     static void setupStateTableFromJson(QTableWidget *table,
                                         const QJsonObject &json);
+
     static QJsonObject jsonFromStateTable(const QTableWidget *table);
 };
 

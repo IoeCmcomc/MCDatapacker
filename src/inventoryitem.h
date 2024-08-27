@@ -5,6 +5,7 @@
 #include <QDebug>
 
 class InventoryItem {
+    Q_GADGET
 public:
     enum Type : unsigned int {
         Invalid   = 0,
@@ -13,6 +14,7 @@ public:
         BlockItem = Block | Item,
         Tag       = 4,
     };
+    Q_ENUM(Type)
     Q_DECLARE_FLAGS(Types, Type);
 
     InventoryItem()                           = default;
@@ -59,6 +61,7 @@ public:
 
     friend QDataStream &operator<<(QDataStream &out, const InventoryItem &obj);
     friend QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
+    friend QDebug operator<<(QDebug debug, const InventoryItem &item);
 
 
 private:
@@ -74,12 +77,5 @@ private:
 Q_DECLARE_METATYPE(InventoryItem);
 Q_DECLARE_TYPEINFO(InventoryItem, Q_RELOCATABLE_TYPE);
 //Q_DECLARE_OPAQUE_POINTER(InventoryItem *)
-
-/*
-   QDataStream & operator<<(QDataStream & out, const InventoryItem &obj);
-   QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
- */
-
-QDebug operator<<(QDebug debug, const InventoryItem &item);
 
 #endif /* INVENTORYITEM_H */

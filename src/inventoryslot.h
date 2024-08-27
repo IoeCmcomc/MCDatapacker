@@ -12,8 +12,10 @@ class InventorySlot : public QFrame
 
 public:
     enum AcceptPolicy : uchar {
-        AcceptMultiple = 1,
-        AcceptTags     = 2,
+        AcceptItem  = 1,
+        AcceptItems = 2,
+        AcceptTag   = 4,
+        AcceptTags  = 8,
     };
     Q_DECLARE_FLAGS(AcceptPolicies, AcceptPolicy);
 
@@ -64,8 +66,14 @@ public:
     bool getAcceptMultiple() const;
     void setAcceptMultiple(bool value);
 
+    bool getAcceptItemsOrTag() const;
+    void setAcceptItemsOrTag();
+
     SelectCategory selectCategory() const;
     void setSelectCategory(const SelectCategory &selectCategory);
+
+    AcceptPolicies acceptPolicies() const;
+    void setAcceptPolicies(const AcceptPolicies &newAcceptPolicies);
 
 signals:
     void itemChanged();
@@ -90,7 +98,8 @@ private:
     QPoint mousePressPos;
     QVector<InventoryItem> items;
     int curItemIndex                = -1;
-    AcceptPolicies m_acceptPolicies = { AcceptMultiple, AcceptTags };
+    AcceptPolicies m_acceptPolicies =
+    { AcceptItem, AcceptItems, AcceptTag, AcceptTags };
     SelectCategory m_selectCategory = SelectCategory::ObtainableItems;
     bool isCreative                 = false;
     bool isDragged                  = false;

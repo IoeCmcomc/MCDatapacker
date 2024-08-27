@@ -42,7 +42,7 @@ InventoryItem &InventoryItem::operator=(InventoryItem &&other) {
 void InventoryItem::setupItem(QString id) {
     Glhp::removePrefix(id, "minecraft:"_QL1);
 
-    const auto &&MCRItemInfo  = Game::getInfo(QStringLiteral("item"));
+    const auto &&MCRItemInfo = Game::getInfo(QStringLiteral("item"));
 
     if (MCRItemInfo.contains(id)) {
         setName(MCRItemInfo.value(id).toMap().value(QStringLiteral(
@@ -301,8 +301,9 @@ QDebug operator<<(QDebug debug, const InventoryItem &item) {
     QDebugStateSaver saver(debug);
 
     debug.nospace() << "InventoryItem(";
+    debug.nospace() << item.m_types;
     if (!item.isNull()) {
-        debug.nospace() << item.getNamespacedID();
+        debug.nospace() << ", " << item.getNamespacedID();
         if (!item.getName().isEmpty())
             debug.nospace() << ", " << item.getName();
     }

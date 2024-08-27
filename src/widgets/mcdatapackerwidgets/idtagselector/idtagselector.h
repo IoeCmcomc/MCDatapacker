@@ -54,6 +54,15 @@ public:
 
     bool hasData() const;
 
+    QString id() const;
+    void setId(const QString &id);
+
+    QString tag() const;
+    void setTag(const QString &tag);
+
+    QJsonArray ids() const;
+    void setIds(const QJsonArray &ids);
+
 signals:
     void editingFinished();
     void modesChanged(Modes modes);
@@ -67,6 +76,7 @@ private slots:
     void dataBtnClicked();
     void listDataChanged(const QVariant &value);
     void onTypeComboIndexChanged(const int index);
+    void onTextEdited(const QString &text);
 
 private:
     friend class IdTagSelectorDelegate;

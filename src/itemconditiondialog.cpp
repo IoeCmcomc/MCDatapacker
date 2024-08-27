@@ -16,8 +16,13 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
 
     const bool from_1_17 = Game::version() >= Game::v1_17;
 
-    ui->itemSlot->setAcceptTag(false);
-    ui->itemSlot->setAcceptMultiple(from_1_17);
+    if (Game::version() >= Game::v1_20_6) {
+        ui->itemSlot->setAcceptPolicies(InventorySlot::AcceptItems
+                                        | InventorySlot::AcceptTag);
+    } else {
+        ui->itemSlot->setAcceptTag(false);
+        ui->itemSlot->setAcceptMultiple(from_1_17);
+    }
 
     m_potionModel.setInfo(QStringLiteral("potion"));
     ui->potionCombo->setModel(&m_potionModel);

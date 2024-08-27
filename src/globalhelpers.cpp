@@ -265,10 +265,13 @@ bool Glhp::removeInternalPrefix(QString &path) {
 
 const static QSet<QStringView> PLURAL_CATEGORY_VIEWS{
     u"advancements", u"functions", u"item_modifiers", u"loot_tables",
-    u"recipes", u"structures", u"tags/blocks", u"tags/entity_types",
-    u"tags/fluids", u"tags/functions", u"tags/game_events", u"tags/items"
+    u"predicates", u"recipes", u"structures", u"tags/blocks",
+    u"tags/entity_types", u"tags/fluids", u"tags/functions",
+    u"tags/game_events", u"tags/items"
 };
 
+// Change plural form of a category to singular form
+// if the game version is from 1.21
 QString Glhp::canonicalCategory(QStringView catDir, const bool from_1_21) {
     if (from_1_21 && PLURAL_CATEGORY_VIEWS.contains(catDir)) {
         catDir.chop(1);

@@ -41,7 +41,8 @@ public:
 
     explicit GameInfoModel(QObject *parent = nullptr);
     explicit GameInfoModel(QObject *parent, const QString &key,
-                           LoadFrom loadFrom, Options options = Default);
+                           LoadFrom loadFrom, Options options = Default,
+                           const QString &packCategory        = {});
 
     void setSource(const QString &key,
                    LoadFrom loadFrom, Options options           = Default);

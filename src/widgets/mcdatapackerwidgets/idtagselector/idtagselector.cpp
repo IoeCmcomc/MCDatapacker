@@ -13,6 +13,7 @@
 #include <QCompleter>
 #include <QListView>
 #include <QStandardItemModel>
+#include <QRegularExpressionValidator>
 
 Q_GLOBAL_STATIC(QStringListModel, staticEmptyModel);
 
@@ -32,6 +33,10 @@ IdTagSelector::IdTagSelector(QWidget *parent) :
     ui->typeCombo->setObjectName(QStringLiteral("__qt__passive_comboBox"));
     ui->comboBox->completer()->setFilterMode(Qt::MatchContains);
     ui->comboBox->completer()->setCompletionMode(QCompleter::PopupCompletion);
+    ui->comboBox->setValidator(
+        new QRegularExpressionValidator(QRegularExpression{
+        QStringLiteral(R"([a-z0-9-_.]+:[a-z0-9-_.\/]+)") },
+                                        ui->comboBox));
     setModes(Id | Tag | ListOfIds);
     setIdDisplayName(tr("ID"));
 
@@ -42,6 +47,8 @@ IdTagSelector::IdTagSelector(QWidget *parent) :
             this, &IdTagSelector::listDataChanged);
     connect(ui->typeCombo, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &IdTagSelector::onTypeComboIndexChanged);
+    connect(ui->comboBox, &QComboBox::editTextChanged,
+            this, &IdTagSelector::onTextEdited);
 }
 
 IdTagSelector::~IdTagSelector() {
@@ -92,6 +99,16 @@ void IdTagSelector::onTypeComboIndexChanged(const int index) {
     ui->typeCombo->blockSignals(false);
 }
 
+void IdTagSelector::onTextEdited(const QString &text) {
+    const int i = ui->comboBox->findData(text, Qt::EditRole,
+                                         Qt::MatchFixedString);
+
+    if (i != -1) {
+        qDebug() << text << i;
+        ui->comboBox->setCurrentIndex(i);
+    }
+}
+
 QString IdTagSelector::idDisplayName() const {
     return m_idDisplayName;
 }
@@ -126,6 +143,37 @@ bool IdTagSelector::hasData() const {
     }
 }
 
+QString IdTagSelector::id() const {
+    return (m_currentMode == Id) ? ui->comboBox->currentText() : QString();
+}
+
+void IdTagSelector::setId(const QString &id) {
+    setCurrentMode(Id);
+    ui->comboBox->setEditText(id);
+}
+
+QString IdTagSelector::tag() const {
+    return (m_currentMode == Tag) ? ui->comboBox->currentText() : QString();
+}
+
+void IdTagSelector::setTag(const QString &tag) {
+    setCurrentMode(Tag);
+    ui->comboBox->setEditText(tag);
+}
+
+QJsonArray IdTagSelector::ids() const {
+    if (m_currentMode == ListOfIds) {
+        return ui->dataBtn->data().toJsonArray();
+    } else {
+        return {};
+    }
+}
+
+void IdTagSelector::setIds(const QJsonArray &ids) {
+    setCurrentMode(ListOfIds);
+    ui->dataBtn->setData(ids);
+}
+
 void IdTagSelector::fromJson(const QJsonValue &value) {
     ui->comboBox->setEditText({});
 
@@ -135,7 +183,7 @@ void IdTagSelector::fromJson(const QJsonValue &value) {
     } else if (value.isString()) {
         QString &&str = value.toString();
         if (str.startsWith('#')) {
-            str.remove(1);
+            str.remove('#');
             setCurrentMode(Tag);
         } else {
             setCurrentMode(Id);
@@ -192,6 +240,10 @@ IdTagSelector::Mode IdTagSelector::currentMode() const {
 }
 
 void IdTagSelector::setCurrentMode(const Mode &value) {
+    if (!(m_modes & value)) {
+        return;
+    }
+
     m_currentMode = value;
     switch (value) {
         case Id: {

@@ -15,11 +15,15 @@ GameInfoModel::GameInfoModel(QObject *parent)
     : QAbstractListModel(parent) {
 }
 
-GameInfoModel::GameInfoModel(QObject *parent, const QString &key,
-                             LoadFrom loadFrom, Options options)
+GameInfoModel::GameInfoModel(QObject *parent,
+                             const QString &key,
+                             LoadFrom loadFrom,
+                             Options options,
+                             const QString &packCategory)
     : QAbstractListModel(parent), m_key{key}, m_loadFrom{loadFrom},
     m_options{options} {
     loadData();
+    setDatapackCategory(packCategory);
 }
 
 void GameInfoModel::setSource(const QString &key, LoadFrom loadFrom,

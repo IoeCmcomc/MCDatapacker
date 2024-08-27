@@ -26,4 +26,7 @@ namespace Game {
                               const QVersionNumber &version);
 }
 
+#define FROM_VER(ver)     (Game::version() >= Game::ver)
+#define UNTIL_VER(ver)    (Game::version() < Game::ver)
+
 #endif // GAME_H

@@ -10,6 +10,7 @@ class QComboBox;
 class QRadioButton;
 class QCheckBox;
 class QButtonGroup;
+class QPlainTextEdit;
 QT_END_NAMESPACE
 
 class NumberProvider;
@@ -56,6 +57,12 @@ DataWidgetController * makeController(T *widget, Args&& ... params) {
     return new ControllerWrapper<T>(widget, std::forward<Args>(params)...);
 }
 
+template<class T, typename ...Args,
+         typename = enable_if_is_base_of_qwidget<T> >
+ControllerWrapper<T> * makeConcreteController(T *widget, Args&& ... params) {
+    return new ControllerWrapper<T>(widget, std::forward<Args>(params)...);
+}
+
 struct DataWidgetControllerRecordPair {
     QString               key;
     DataWidgetController *controller = nullptr;
@@ -88,23 +95,29 @@ public:
     explicit DataWidgetControllerRecord(
         std::initializer_list<DataWidgetControllerRecordPair> list)
         : DataWidgetController{false} {
-        for (auto &&elem: list) {
-            m_widgetMappings[elem.key] = elem.controller;
-        }
+        addMappings(list);
     }
 
     template<class T, typename ...Args,
+             typename ConcreteClass = ControllerWrapper<T>,
              typename = enable_if_is_base_of_qwidget<T> >
-    DataWidgetController * addMapping(const QString &key, T *widget,
-                                      Args&& ... params) {
-        DataWidgetController *controller = makeController(
+    ConcreteClass * addMapping(const QString &key, T *widget,
+                               Args&& ... params) {
+        ConcreteClass *controller = makeConcreteController(
             widget, std::forward<Args>(params)...);
 
-        m_widgetMappings[key] = controller;
+        addMapping(key, controller);
         return controller;
     };
     DataWidgetController * addMapping(const QString &key,
                                       DataWidgetController *controller);
+
+    void addMappings(std::initializer_list<DataWidgetControllerRecordPair> list)
+    {
+        for (auto &&elem: list) {
+            addMapping(elem.key, elem.controller);
+        }
+    }
 
     virtual bool hasAcceptableValue() const final;
     virtual void setValueFrom(const QJsonObject &obj,
@@ -207,12 +220,18 @@ public:
 class DataWidgetControllerInventorySlot
     : public DataWidgetControllerWidget<InventorySlot> {
 public:
-    using DataWidgetControllerWidget::DataWidgetControllerWidget;
+    DataWidgetControllerInventorySlot(InventorySlot *widget,
+                                      const bool required     = false,
+                                      const bool useSameField = true);
+
     virtual bool hasAcceptableValue() const final;
     virtual void setValueFrom(const QJsonObject &obj,
                               const QString &key) final;
     virtual void putValueTo(QJsonObject &obj,
                             const QString &key) const final;
+
+private:
+    bool m_useSameField = true;
 };
 
 class DataWidgetControllerLineEdit
@@ -334,6 +353,23 @@ public:
 class DataWidgetControllerIdTagSelector
     : public DataWidgetControllerWidget<IdTagSelector> {
 public:
+    DataWidgetControllerIdTagSelector(IdTagSelector *widget,
+                                      const bool required     = false,
+                                      const bool useSameField = true);
+
+    virtual bool hasAcceptableValue() const final;
+    virtual void setValueFrom(const QJsonObject &obj,
+                              const QString &key) final;
+    virtual void putValueTo(QJsonObject &obj,
+                            const QString &key) const final;
+
+private:
+    bool m_useSameField = true;
+};
+
+
+class DataWidgetControllerPlainTextEdit
+    : public DataWidgetControllerWidget<QPlainTextEdit> {
     using DataWidgetControllerWidget::DataWidgetControllerWidget;
     virtual bool hasAcceptableValue() const final;
     virtual void setValueFrom(const QJsonObject &obj,
@@ -341,6 +377,7 @@ public:
     virtual void putValueTo(QJsonObject &obj,
                             const QString &key) const final;
 };
+
 
 
 /*!
@@ -589,6 +626,7 @@ DEFINE_CONTROLLER_WRAPPER(QComboBox, DataWidgetControllerComboBox)
 DEFINE_CONTROLLER_WRAPPER(QRadioButton, DataWidgetControllerRadioButton)
 DEFINE_CONTROLLER_WRAPPER(QCheckBox, DataWidgetControllerCheckBox)
 DEFINE_CONTROLLER_WRAPPER(QButtonGroup, DataWidgetControllerButtonGroup)
+DEFINE_CONTROLLER_WRAPPER(QPlainTextEdit, DataWidgetControllerPlainTextEdit)
 DEFINE_WRAPPER(OptionalSpinBox)
 DEFINE_WRAPPER(NumberProvider)
 DEFINE_WRAPPER(InventorySlot)
