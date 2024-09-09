@@ -716,8 +716,12 @@ void MainWindow::loadFolder(const QString &dirPath,
     }
     ui->tabbedInterface->clear();
     ui->tabbedInterface->setPackOpened(true);
+    if (m_vanillaDock) {
+        m_vanillaDock->setPackOpened(true);
+    }
     updateWindowTitle(false);
-    m_packInfo = packInfo;
+    m_packInfo   = packInfo;
+    m_packOpened = true;
     m_statusBar->onCurDirChanged();
     adjustForCurFolder(dirPath);
 
@@ -1176,6 +1180,7 @@ void MainWindow::onVanillaDockAction(const bool checked) {
     if (checked) {
         if (Q_UNLIKELY(!m_vanillaDock)) {
             m_vanillaDock = new VanillaDatapackDock(this);
+            m_vanillaDock->setPackOpened(m_packOpened);
             addDockWidget(Qt::RightDockWidgetArea, m_vanillaDock);
             connect(m_vanillaDock, &QDockWidget::visibilityChanged,
                     ui->actionDefaultDatapack, &QAction::setChecked);

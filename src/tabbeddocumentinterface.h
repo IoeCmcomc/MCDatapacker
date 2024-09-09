@@ -49,6 +49,9 @@ public:
     void clear();
     bool hasUnsavedChanges() const;
 
+    static QString readTextFile(QWidget *parent,
+                                const QString &path, bool &ok);
+
 public /*slots*/ :
     void onOpenFile(const QString &filepath);
     void onOpenAliasedFile(const QString &filepath, const QString &realPath);

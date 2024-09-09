@@ -400,6 +400,41 @@ bool TabbedDocumentInterface::hasUnsavedChanges() const {
     });
 }
 
+QString TabbedDocumentInterface::readTextFile(QWidget *parent,
+                                              const QString &path, bool &ok) {
+    QFile   file(path);
+    QString content;
+
+    // Removing QFile::Text enum allows '\r' to be recognized as a line sepatator
+    if (!file.open(QFile::ReadOnly)) {
+        QMessageBox::information(parent, tr("Loading text file error"),
+                                 tr("Cannot read file %1:\n%2.")
+                                 .arg(QDir::toNativeSeparators(path),
+                                      file.errorString()));
+        ok = false;
+    } else {
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
+
+#ifndef QT_NO_CURSOR
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
+        while (!in.atEnd()) {
+            content += in.readLine();
+            if (!in.atEnd())
+                content += '\n';
+        }
+        ok = true;
+
+#ifndef QT_NO_CURSOR
+        QApplication::restoreOverrideCursor();
+#endif
+    }
+    file.close();
+    return content;
+}
+
 void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
     for (int i = 0; i < count(); i++) {
         if (files[i].path() == filepath) {
@@ -600,35 +635,5 @@ void TabbedDocumentInterface::onSwitchPrevFile() {
 }
 
 QString TabbedDocumentInterface::readTextFile(const QString &path, bool &ok) {
-    QFile   file(path);
-    QString content;
-
-    // Removing QFile::Text enum allows '\r' to be recognized as a line sepatator
-    if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::information(this, tr("Loading text file error"),
-                                 tr("Cannot read file %1:\n%2.")
-                                 .arg(QDir::toNativeSeparators(path),
-                                      file.errorString()));
-        ok = false;
-    } else {
-        QTextStream in(&file);
-        in.setCodec("UTF-8");
-
-#ifndef QT_NO_CURSOR
-        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-
-        while (!in.atEnd()) {
-            content += in.readLine();
-            if (!in.atEnd())
-                content += '\n';
-        }
-        ok = true;
-
-#ifndef QT_NO_CURSOR
-        QApplication::restoreOverrideCursor();
-#endif
-    }
-    file.close();
-    return content;
+    return readTextFile(this, path, ok);
 }

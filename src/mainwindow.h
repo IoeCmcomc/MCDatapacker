@@ -119,6 +119,7 @@ private:
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
     QString m_initialStyleId;
+    bool m_packOpened                        = false;
     const static int maxRecentFoldersActions = 10;
 
     void initDocks();

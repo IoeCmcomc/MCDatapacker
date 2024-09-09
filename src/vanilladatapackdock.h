@@ -20,6 +20,9 @@ public:
     explicit VanillaDatapackDock(QWidget *parent = nullptr);
     ~VanillaDatapackDock();
 
+public: // slots
+    void setPackOpened(const bool value);
+
 signals:
     void openFileRequested(const QString &path, const QString &actualPath = {});
 
@@ -33,6 +36,10 @@ private: // Slots
 private:
     VanillaDatapackModel m_model;
     Ui::VanillaDatapackDock *ui;
+    bool m_packOpened = false;
+
+    QString realPath(const QModelIndex &index) const;
+    void duplicateFile(const QModelIndex &index, const QString &nspace);
 };
 
 #endif // VANILLADATAPACKDOCK_H
