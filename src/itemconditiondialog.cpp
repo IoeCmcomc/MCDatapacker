@@ -14,14 +14,15 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     ui(new Ui::ItemConditionDialog) {
     ui->setupUi(this);
 
-    const bool from_1_17 = Game::version() >= Game::v1_17;
+    ui->itemSlot->setAcceptItemsOrTag();
+    if (UNTIL_VER(v1_20_6)) {
+        if (UNTIL_VER(v1_17)) {
+            ui->itemSlot->setAcceptMultiple(false);
+        }
 
-    if (Game::version() >= Game::v1_20_6) {
-        ui->itemSlot->setAcceptPolicies(InventorySlot::AcceptItems
-                                        | InventorySlot::AcceptTag);
-    } else {
-        ui->itemSlot->setAcceptTag(false);
-        ui->itemSlot->setAcceptMultiple(from_1_17);
+        ui->stackedWidget->setCurrentIndex(0);
+        ui->tabWidget->tabBar()->setEnabled(false);
+        ui->tabWidget->tabBar()->hide();
     }
 
     m_potionModel.setInfo(QStringLiteral("potion"));
@@ -35,23 +36,22 @@ ItemConditionDialog::ItemConditionDialog(QWidget *parent) :
     initTable(ui->enchantmentsTable, ui->enchant_combo, ui->enchant_levelInput);
     initTable(ui->storedEnchantsTable, ui->stored_combo, ui->stored_levelInput);
 
-    if (from_1_17) {
-        m_controller.addMapping(QStringLiteral("items"), ui->itemRadio,
-                                ui->itemSlot);
+    m_controller.addMappings({
+        { FROM_VER(v1_17) ? "items" : "item", ui->itemSlot, false,
+          FROM_VER(v1_20_6) },
+        { QStringLiteral("count"), ui->countInput },
+    });
+    if (FROM_VER(v1_20_6)) {
+        m_controller.addMapping("components", ui->componentsBtn);
     } else {
-        m_controller.addMapping(QStringLiteral("item"), ui->itemRadio,
-                                ui->itemSlot);
+        m_controller.addMappings({
+            { "durability", ui->durabilityInput },
+            { "nbt", ui->NBTEdit },
+            { "potion", ui->potionCombo },
+            { "enchantments", ui->enchantmentsTable },
+            { "stored_enchantments", ui->storedEnchantsTable },
+        });
     }
-    m_controller.addMapping(QStringLiteral("tag"), ui->tagRadio,
-                            ui->itemTagEdit);
-    m_controller.addMapping(QStringLiteral("count"), ui->countInput);
-    m_controller.addMapping(QStringLiteral("durability"), ui->durabilityInput);
-    m_controller.addMapping(QStringLiteral("nbt"), ui->NBTEdit);
-    m_controller.addMapping(QStringLiteral("potion"), ui->potionCombo);
-    m_controller.addMapping(QStringLiteral("enchantments"),
-                            ui->enchantmentsTable);
-    m_controller.addMapping(QStringLiteral("stored_enchantments"),
-                            ui->storedEnchantsTable);
 
     adjustSize();
 }

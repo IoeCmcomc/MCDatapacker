@@ -137,6 +137,8 @@ void MainWindow::initDocks() {
     if (Game::version() >= Game::v1_17) {
         connect(ui->actionItemModifierEditor, &QAction::triggered, this,
                 &MainWindow::onItemModifierDockAction);
+    } else {
+        ui->actionItemModifierEditor->setVisible(false);
     }
 
     connect(ui->actionLootTableEditor, &QAction::triggered, this,
