@@ -43,8 +43,6 @@ IdTagSelector::IdTagSelector(QWidget *parent) :
 
     connect(ui->dataBtn->button(), &QPushButton::clicked,
             this, &IdTagSelector::dataBtnClicked);
-    connect(ui->dataBtn, &DialogDataButton::dataChanged,
-            this, &IdTagSelector::listDataChanged);
     connect(ui->typeCombo, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &IdTagSelector::onTypeComboIndexChanged);
     connect(ui->comboBox, &QComboBox::editTextChanged,
@@ -75,9 +73,6 @@ void IdTagSelector::dataBtnClicked() {
     if (dialog->exec()) {
         ui->dataBtn->setData(dialog->toJson());
     }
-}
-
-void IdTagSelector::listDataChanged(const QVariant &value) {
 }
 
 void IdTagSelector::onTypeComboIndexChanged(const int index) {
@@ -207,8 +202,10 @@ QJsonValue IdTagSelector::toJson() {
         case ListOfIds: {
             return ui->dataBtn->data().toJsonArray();
         }
-        default:
-            break;
+        default: {
+            Q_UNREACHABLE();
+            return {};
+        }
     }
 }
 

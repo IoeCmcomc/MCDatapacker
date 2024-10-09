@@ -74,7 +74,6 @@ protected:
 
 private slots:
     void dataBtnClicked();
-    void listDataChanged(const QVariant &value);
     void onTypeComboIndexChanged(const int index);
     void onTextEdited(const QString &text);
 

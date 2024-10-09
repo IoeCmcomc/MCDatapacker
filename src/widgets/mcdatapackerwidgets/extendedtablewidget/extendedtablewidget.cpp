@@ -26,7 +26,7 @@ ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
     ui->addBtn->setObjectName(QStringLiteral("__qt__passive_addBtn"));
     ui->cancelBtn->setObjectName(QStringLiteral("__qt__passive_cancelBtn"));
 
-    setContainer(new QFrame(this));
+    // setContainer(new QFrame(this));
 
     connect(ui->addBtn, &QToolButton::clicked,
             this, &ExtendedTableWidget::onAddBtn);
@@ -46,6 +46,8 @@ ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
       QHeaderView* headerView = ui->table->horizontalHeader();
       headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
  */
+
+    adjustSize();
 }
 
 QTableWidget * ExtendedTableWidget::tableWidget() const {
@@ -201,6 +203,7 @@ void ExtendedTableWidget::setContainer(QFrame *widget) {
     auto *oldContainer = ui->container;
     if (oldContainer != widget) {
         m_layout->removeWidget(oldContainer);
+        oldContainer->hide();
         // Calling oldContainer->deleteLater() directly will not work
         // in the context of a modal dialog
         QTimer::singleShot(0, oldContainer, &QObject::deleteLater);
