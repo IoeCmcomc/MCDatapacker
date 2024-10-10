@@ -36,7 +36,8 @@ void TestResourceLocationNode::cleanupTestCase() {
 }
 
 void TestResourceLocationNode::general() {
-    ResourceLocationNode node(15, SpanPtr::create("minecraft"), SpanPtr::create("apple"));
+    ResourceLocationNode node(15, SpanPtr::create("minecraft"),
+                              SpanPtr::create("apple"));
 
     QVERIFY(node.isValid() == false);
     QCOMPARE(node.kind(), ParseNode::Kind::Argument);
@@ -45,25 +46,29 @@ void TestResourceLocationNode::general() {
 }
 
 void TestResourceLocationNode::length() {
-    ResourceLocationNode node(17, SpanPtr::create("test"), SpanPtr::create("first/second"));
+    ResourceLocationNode node(17, SpanPtr::create("test"),
+                              SpanPtr::create("first/second"));
 
     QCOMPARE(node.length(), 17);
 }
 
 void TestResourceLocationNode::nspace() {
-    ResourceLocationNode node(17, SpanPtr::create("test"), SpanPtr::create("first/second"));
+    ResourceLocationNode node(17, SpanPtr::create("test"),
+                              SpanPtr::create("first/second"));
 
     QCOMPARE(node.nspace()->text(), SpanPtr::create("test")->text());
 }
 
 void TestResourceLocationNode::id() {
-    ResourceLocationNode node(25, SpanPtr::create("minecraft"), SpanPtr::create("diamond_pickaxe"));
+    ResourceLocationNode node(25, SpanPtr::create("minecraft"),
+                              SpanPtr::create("diamond_pickaxe"));
 
     QCOMPARE(node.id()->text(), SpanPtr::create("diamond_pickaxe")->text());
 }
 
 void TestResourceLocationNode::isTag() {
-    ResourceLocationNode node(12, SpanPtr::create("qwerty"), SpanPtr::create("test"));
+    ResourceLocationNode node(12, SpanPtr::create("qwerty"),
+                              SpanPtr::create("test"));
 
     QCOMPARE(node.isTag(), false);
 

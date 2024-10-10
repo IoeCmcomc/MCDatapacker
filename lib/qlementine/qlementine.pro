@@ -12,8 +12,7 @@ $$PWD/qlementine/lib/include/oclero/qlementine/Common.hpp \
 $$PWD/qlementine/lib/include/oclero/qlementine/animation/WidgetAnimation.hpp \
 $$PWD/qlementine/lib/include/oclero/qlementine/animation/WidgetAnimator.hpp \
 $$PWD/qlementine/lib/include/oclero/qlementine/animation/WidgetAnimationManager.hpp \
-# $$PWD/qlementine/lib/include/oclero/qlementine/csd/FramelessWindow.hpp \
-# $$PWD/qlementine/lib/include/oclero/qlementine/csd/FramelessWindowBehavior.hpp \
+$$PWD/qlementine/lib/include/oclero/qlementine/csd/FramelessWindowBehavior.hpp \
 # $$PWD/qlementine/lib/include/oclero/qlementine/csd/WindowsTitleBar.hpp \
 # $$PWD/qlementine/lib/include/oclero/qlementine/csd/WindowsTitleBarButton.hpp \
 # $$PWD/qlementine/lib/include/oclero/qlementine/csd/WindowsTitleBarCommon.hpp \
@@ -52,13 +51,13 @@ $$PWD/qlementine/lib/include/oclero/qlementine/widgets/PopoverButton.hpp \
 $$PWD/qlementine/lib/include/oclero/qlementine/widgets/RoundedFocusFrame.hpp \
 $$PWD/qlementine/lib/include/oclero/qlementine/widgets/SegmentedControl.hpp \
 $$PWD/qlementine/lib/include/oclero/qlementine/widgets/StatusBadgeWidget.hpp \
-$$PWD/qlementine/lib/include/oclero/qlementine/widgets/Switch.hpp
+$$PWD/qlementine/lib/include/oclero/qlementine/widgets/Switch.hpp \
+$$PWD/qlementine/lib/include/oclero/qlementine/widgets/PlainTextEdit.hpp
 
 SOURCES = \
 $$PWD/qlementine/lib/src/animation/WidgetAnimator.cpp \
 $$PWD/qlementine/lib/src/animation/WidgetAnimationManager.cpp \
-# $$PWD/qlementine/lib/src/csd/FramelessWindow.cpp \
-# $$PWD/qlementine/lib/src/csd/FramelessWindowBehavior.cpp \
+$$PWD/qlementine/lib/src/csd/FramelessWindowBehavior.cpp \
 # $$PWD/qlementine/lib/src/csd/WindowsTitleBar.cpp \
 # $$PWD/qlementine/lib/src/csd/WindowsTitleBarButton.cpp \
 # $$PWD/qlementine/lib/src/csd/WindowsTitleMenuBarProxyStyle.cpp \
@@ -96,7 +95,8 @@ $$PWD/qlementine/lib/src/widgets/PopoverButton.cpp \
 $$PWD/qlementine/lib/src/widgets/RoundedFocusFrame.cpp \
 $$PWD/qlementine/lib/src/widgets/SegmentedControl.cpp \
 $$PWD/qlementine/lib/src/widgets/StatusBadgeWidget.cpp \
-$$PWD/qlementine/lib/src/widgets/Switch.cpp
+$$PWD/qlementine/lib/src/widgets/Switch.cpp \
+$$PWD/qlementine/lib/src/widgets/PlainTextEdit.cpp
 
 # DISTFILES = $$PWD/QFindDialogs/LICENSE
 

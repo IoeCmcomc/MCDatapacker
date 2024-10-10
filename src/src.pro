@@ -375,7 +375,7 @@ include($$PWD/../lib/uberswitch/uberswitch.pri)
 include($$PWD/../lib/lru-cache/lru-cache.pri)
 include($$PWD/../lib/miniz/miniz.pri)
 
-DEFINES -= QSU_INCLUDE_MOC
+DEFINES += QSU_INCLUDE_MOC=1
 
 #PRECOMPILED_HEADER = mcdatapacker_pch.h
 

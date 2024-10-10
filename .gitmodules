@@ -25,123 +25,123 @@
 [submodule "lib/libqdark/libqdark"]
 	path = lib/libqdark/libqdark
 	url = https://github.com/IoeCmcomc/libqdark.git
-[submodule "resource/minecraft/info/1.19/registries"]
-	path = resource/minecraft/info/1.19/registries
+[submodule "res/mc/info/1.19/registries"]
+	path = res/mc/info/1.19/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19.3/summary"]
-	path = resource/minecraft/info/1.19.3/summary
+[submodule "res/mc/info/1.19.3/summary"]
+	path = res/mc/info/1.19.3/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19.3/registries"]
-	path = resource/minecraft/info/1.19.3/registries
+[submodule "res/mc/info/1.19.3/registries"]
+	path = res/mc/info/1.19.3/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19.4/registries"]
-	path = resource/minecraft/info/1.19.4/registries
+[submodule "res/mc/info/1.19.4/registries"]
+	path = res/mc/info/1.19.4/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19.4/summary"]
-	path = resource/minecraft/info/1.19.4/summary
+[submodule "res/mc/info/1.19.4/summary"]
+	path = res/mc/info/1.19.4/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20/registries"]
-	path = resource/minecraft/info/1.20/registries
+[submodule "res/mc/info/1.20/registries"]
+	path = res/mc/info/1.20/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20/summary"]
-	path = resource/minecraft/info/1.20/summary
+[submodule "res/mc/info/1.20/summary"]
+	path = res/mc/info/1.20/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.15/summary"]
-	path = resource/minecraft/info/1.15/summary
+[submodule "res/mc/info/1.15/summary"]
+	path = res/mc/info/1.15/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.15/registries"]
-	path = resource/minecraft/info/1.15/registries
+[submodule "res/mc/info/1.15/registries"]
+	path = res/mc/info/1.15/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.16/registries"]
-	path = resource/minecraft/info/1.16/registries
+[submodule "res/mc/info/1.16/registries"]
+	path = res/mc/info/1.16/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.16/summary"]
-	path = resource/minecraft/info/1.16/summary
+[submodule "res/mc/info/1.16/summary"]
+	path = res/mc/info/1.16/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.17/summary"]
-	path = resource/minecraft/info/1.17/summary
+[submodule "res/mc/info/1.17/summary"]
+	path = res/mc/info/1.17/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.17/registries"]
-	path = resource/minecraft/info/1.17/registries
+[submodule "res/mc/info/1.17/registries"]
+	path = res/mc/info/1.17/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.18/registries"]
-	path = resource/minecraft/info/1.18/registries
+[submodule "res/mc/info/1.18/registries"]
+	path = res/mc/info/1.18/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.18/summary"]
-	path = resource/minecraft/info/1.18/summary
+[submodule "res/mc/info/1.18/summary"]
+	path = res/mc/info/1.18/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.18.2/summary"]
-	path = resource/minecraft/info/1.18.2/summary
+[submodule "res/mc/info/1.18.2/summary"]
+	path = res/mc/info/1.18.2/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.18.2/registries"]
-	path = resource/minecraft/info/1.18.2/registries
+[submodule "res/mc/info/1.18.2/registries"]
+	path = res/mc/info/1.18.2/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19/summary"]
-	path = resource/minecraft/info/1.19/summary
+[submodule "res/mc/info/1.19/summary"]
+	path = res/mc/info/1.19/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.2/summary"]
-	path = resource/minecraft/info/1.20.2/summary
+[submodule "res/mc/info/1.20.2/summary"]
+	path = res/mc/info/1.20.2/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.2/registries"]
-	path = resource/minecraft/info/1.20.2/registries
+[submodule "res/mc/info/1.20.2/registries"]
+	path = res/mc/info/1.20.2/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.4/summary"]
-	path = resource/minecraft/info/1.20.4/summary
+[submodule "res/mc/info/1.20.4/summary"]
+	path = res/mc/info/1.20.4/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.4/registries"]
-	path = resource/minecraft/info/1.20.4/registries
+[submodule "res/mc/info/1.20.4/registries"]
+	path = res/mc/info/1.20.4/registries
 	url = https://github.com/misode/mcmeta.git
 [submodule "lib/qlementine/qlementine"]
 	path = lib/qlementine/qlementine
 	url = https://github.com/oclero/qlementine.git
-[submodule "resource/minecraft/info/1.20.4/data-json"]
-	path = resource/minecraft/info/1.20.4/data-json
+[submodule "res/mc/info/1.20.4/data-json"]
+	path = res/mc/info/1.20.4/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.15/data-json"]
-	path = resource/minecraft/info/1.15/data-json
+[submodule "res/mc/info/1.15/data-json"]
+	path = res/mc/info/1.15/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.16/data-json"]
-	path = resource/minecraft/info/1.16/data-json
+[submodule "res/mc/info/1.16/data-json"]
+	path = res/mc/info/1.16/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.17/data-json"]
-	path = resource/minecraft/info/1.17/data-json
+[submodule "res/mc/info/1.17/data-json"]
+	path = res/mc/info/1.17/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.18/data-json"]
-	path = resource/minecraft/info/1.18/data-json
+[submodule "res/mc/info/1.18/data-json"]
+	path = res/mc/info/1.18/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.18.2/data-json"]
-	path = resource/minecraft/info/1.18.2/data-json
+[submodule "res/mc/info/1.18.2/data-json"]
+	path = res/mc/info/1.18.2/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19/data-json"]
-	path = resource/minecraft/info/1.19/data-json
+[submodule "res/mc/info/1.19/data-json"]
+	path = res/mc/info/1.19/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19.3/data-json"]
-	path = resource/minecraft/info/1.19.3/data-json
+[submodule "res/mc/info/1.19.3/data-json"]
+	path = res/mc/info/1.19.3/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.19.4/data-json"]
-	path = resource/minecraft/info/1.19.4/data-json
+[submodule "res/mc/info/1.19.4/data-json"]
+	path = res/mc/info/1.19.4/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20/data-json"]
-	path = resource/minecraft/info/1.20/data-json
+[submodule "res/mc/info/1.20/data-json"]
+	path = res/mc/info/1.20/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.2/data-json"]
-	path = resource/minecraft/info/1.20.2/data-json
+[submodule "res/mc/info/1.20.2/data-json"]
+	path = res/mc/info/1.20.2/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.6/data-json"]
-	path = resource/minecraft/info/1.20.6/data-json
+[submodule "res/mc/info/1.20.6/data-json"]
+	path = res/mc/info/1.20.6/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.21/data-json"]
-	path = resource/minecraft/info/1.21/data-json
+[submodule "res/mc/info/1.21/data-json"]
+	path = res/mc/info/1.21/data-json
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.6/registries"]
-	path = resource/minecraft/info/1.20.6/registries
+[submodule "res/mc/info/1.20.6/registries"]
+	path = res/mc/info/1.20.6/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.21/registries"]
-	path = resource/minecraft/info/1.21/registries
+[submodule "res/mc/info/1.21/registries"]
+	path = res/mc/info/1.21/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.20.6/summary"]
-	path = resource/minecraft/info/1.20.6/summary
+[submodule "res/mc/info/1.20.6/summary"]
+	path = res/mc/info/1.20.6/summary
 	url = https://github.com/misode/mcmeta.git
-[submodule "resource/minecraft/info/1.21/summary"]
-	path = resource/minecraft/info/1.21/summary
+[submodule "res/mc/info/1.21/summary"]
+	path = res/mc/info/1.21/summary
 	url = https://github.com/misode/mcmeta.git
