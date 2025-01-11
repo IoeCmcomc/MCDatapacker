@@ -3,7 +3,7 @@ from pathlib import Path
 
 from commons import get_httpx_soup, find_tr_tags, get_html
 
-soup = get_httpx_soup("https://minecraft.wiki/w/Tag?action=render")
+soup = get_httpx_soup("https://minecraft.wiki/w/Tag?action=render&oldid=2732709")
 
 h3 = soup.find("span", id="Java_Edition_2").parent
 print(h3.name)

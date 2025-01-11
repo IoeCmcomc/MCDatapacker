@@ -94,10 +94,7 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
     Glhp::removePrefix(id);
     const auto &&MCRItemInfo = Game::getInfo(QStringLiteral("item"));
 
-    if (id.endsWith(QLatin1String("banner_pattern"))) {
-        iconpath = ":/minecraft/texture/item/banner_pattern.png";
-        iconpix  = QPixmap(iconpath);
-    } else if (MCRItemInfo.contains(id)) {
+    if (MCRItemInfo.contains(id)) {
         iconpath = QStringLiteral(":/minecraft/texture/item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
@@ -105,6 +102,13 @@ QPixmap InventoryItem::loadPixmap(QString id) const {
         iconpath = QStringLiteral(":/minecraft/texture/inv_item/") + id +
                    QStringLiteral(".png");
         iconpix = QPixmap(iconpath);
+    }
+
+    if (!iconpix) {
+        if (id.endsWith(QLatin1String("banner_pattern"))) {
+            iconpath = ":/minecraft/texture/item/banner_pattern.png";
+            iconpix  = QPixmap(iconpath);
+        }
     }
 
     if (!iconpix) {

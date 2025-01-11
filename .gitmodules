@@ -145,3 +145,21 @@
 [submodule "res/mc/info/1.21/summary"]
 	path = res/mc/info/1.21/summary
 	url = https://github.com/misode/mcmeta.git
+[submodule "res/mc/info/1.21.4/data-json"]
+	path = res/mc/info/1.21.4/data-json
+	url = https://github.com/misode/mcmeta.git
+[submodule "res/mc/info/1.21.4/summary"]
+	path = res/mc/info/1.21.4/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "res/mc/info/1.21.4/registries"]
+	path = res/mc/info/1.21.4/registries
+	url = https://github.com/misode/mcmeta.git
+[submodule "res/mc/info/1.21.3/summary"]
+	path = res/mc/info/1.21.3/summary
+	url = https://github.com/misode/mcmeta.git
+[submodule "res/mc/info/1.21.3/registries"]
+	path = res/mc/info/1.21.3/registries
+	url = https://github.com/misode/mcmeta.git
+[submodule "res/mc/info/1.21.3/data-json"]
+	path = res/mc/info/1.21.3/data-json
+	url = https://github.com/misode/mcmeta.git

@@ -91,9 +91,7 @@
         <file>texture/block/brown_wall_banner.png</file>
         <file>texture/block/bubble_coral_wall_fan.png</file>
         <file>texture/block/carrots.png</file>
-        <file>texture/block/chain_command_block.png</file>
         <file>texture/block/cocoa.png</file>
-        <file>texture/block/command_block.png</file>
         <file>texture/block/creeper_wall_head.png</file>
         <file>texture/block/crimson_wall_sign.png</file>
         <file>texture/block/cyan_wall_banner.png</file>
@@ -114,7 +112,6 @@
         <file>texture/block/light_gray_wall_banner.png</file>
         <file>texture/block/lime_wall_banner.png</file>
         <file>texture/block/magenta_wall_banner.png</file>
-        <file>texture/block/magma_block.png</file>
         <file>texture/block/melon_stem.png</file>
         <file>texture/block/oak_wall_sign.png</file>
         <file>texture/block/orange_wall_banner.png</file>
@@ -151,20 +148,14 @@
         <file>texture/block/potted_warped_roots.png</file>
         <file>texture/block/potted_white_tulip.png</file>
         <file>texture/block/potted_wither_rose.png</file>
-        <file>texture/block/prismarine.png</file>
-        <file>texture/block/prismarine_slab.png</file>
-        <file>texture/block/prismarine_stairs.png</file>
         <file>texture/block/pumpkin_stem.png</file>
         <file>texture/block/purple_wall_banner.png</file>
         <file>texture/block/red_wall_banner.png</file>
         <file>texture/block/redstone_wall_torch.png</file>
-        <file>texture/block/repeating_command_block.png</file>
-        <file>texture/block/sea_lantern.png</file>
         <file>texture/block/skeleton_wall_skull.png</file>
         <file>texture/block/soul_fire.png</file>
         <file>texture/block/soul_wall_torch.png</file>
         <file>texture/block/spruce_wall_sign.png</file>
-        <file>texture/block/stonecutter.png</file>
         <file>texture/block/sweet_berry_bush.png</file>
         <file>texture/block/tall_seagrass.png</file>
         <file>texture/block/tripwire.png</file>
@@ -1201,7 +1192,6 @@
         <file>texture/block/green_candle_cake.png</file>
         <file>texture/block/kelp_plant.png</file>
         <file>texture/block/lava_cauldron.png</file>
-        <file>texture/block/light.png</file>
         <file>texture/block/light_blue_candle_cake.png</file>
         <file>texture/block/light_gray_candle_cake.png</file>
         <file>texture/block/lime_candle_cake.png</file>
@@ -1502,7 +1492,6 @@
         <file>texture/block/bamboo_wall_hanging_sign.png</file>
         <file>texture/block/bamboo_wall_sign.png</file>
         <file>texture/block/birch_wall_hanging_sign.png</file>
-        <file>texture/block/calibrated_sculk_sensor.png</file>
         <file>texture/block/crimson_wall_hanging_sign.png</file>
         <file>texture/block/cherry_wall_hanging_sign.png</file>
         <file>texture/block/cherry_wall_sign.png</file>
@@ -1679,5 +1668,71 @@
         <file>texture/effect/trial_omen.png</file>
         <file>texture/effect/weaving.png</file>
         <file>texture/effect/wind_charged.png</file>
+        <file>texture/block/pale_oak_wall_hanging_sign.png</file>
+        <file>texture/block/pale_oak_wall_sign.png</file>
+        <file>texture/block/potted_closed_eyeblossom.png</file>
+        <file>texture/block/potted_open_eyeblossom.png</file>
+        <file>texture/block/potted_pale_oak_sapling.png</file>
+        <file>texture/inv_item/closed_eyeblossom.png</file>
+        <file>texture/inv_item/creaking_heart.png</file>
+        <file>texture/inv_item/chiseled_resin_bricks.png</file>
+        <file>texture/inv_item/chiseled_tuff_bricks.png</file>
+        <file>texture/inv_item/open_eyeblossom.png</file>
+        <file>texture/inv_item/pale_hanging_moss.png</file>
+        <file>texture/inv_item/pale_moss_block.png</file>
+        <file>texture/inv_item/pale_moss_carpet.png</file>
+        <file>texture/inv_item/pale_oak_button.png</file>
+        <file>texture/inv_item/pale_oak_door.png</file>
+        <file>texture/inv_item/pale_oak_fence.png</file>
+        <file>texture/inv_item/pale_oak_fence_gate.png</file>
+        <file>texture/inv_item/pale_oak_hanging_sign.png</file>
+        <file>texture/inv_item/pale_oak_leaves.png</file>
+        <file>texture/inv_item/pale_oak_log.png</file>
+        <file>texture/inv_item/pale_oak_planks.png</file>
+        <file>texture/inv_item/pale_oak_pressure_plate.png</file>
+        <file>texture/inv_item/pale_oak_sapling.png</file>
+        <file>texture/inv_item/pale_oak_sign.png</file>
+        <file>texture/inv_item/pale_oak_slab.png</file>
+        <file>texture/inv_item/pale_oak_stairs.png</file>
+        <file>texture/inv_item/pale_oak_trapdoor.png</file>
+        <file>texture/inv_item/pale_oak_wood.png</file>
+        <file>texture/inv_item/polished_tuff_slab.png</file>
+        <file>texture/inv_item/polished_tuff_stairs.png</file>
+        <file>texture/inv_item/polished_tuff_wall.png</file>
+        <file>texture/inv_item/resin_block.png</file>
+        <file>texture/inv_item/resin_brick_slab.png</file>
+        <file>texture/inv_item/resin_brick_stairs.png</file>
+        <file>texture/inv_item/resin_brick_wall.png</file>
+        <file>texture/inv_item/resin_bricks.png</file>
+        <file>texture/inv_item/resin_clump.png</file>
+        <file>texture/inv_item/stripped_pale_oak_log.png</file>
+        <file>texture/inv_item/stripped_pale_oak_wood.png</file>
+        <file>texture/inv_item/tuff_brick_slab.png</file>
+        <file>texture/inv_item/tuff_brick_stairs.png</file>
+        <file>texture/inv_item/tuff_brick_wall.png</file>
+        <file>texture/item/black_bundle.png</file>
+        <file>texture/item/blue_bundle.png</file>
+        <file>texture/item/bordure_indented_banner_pattern.png</file>
+        <file>texture/item/brown_bundle.png</file>
+        <file>texture/item/creaking_spawn_egg.png</file>
+        <file>texture/item/cyan_bundle.png</file>
+        <file>texture/item/field_masoned_banner_pattern.png</file>
+        <file>texture/item/flow_pottery_sherd.png</file>
+        <file>texture/item/gray_bundle.png</file>
+        <file>texture/item/green_bundle.png</file>
+        <file>texture/item/light_blue_bundle.png</file>
+        <file>texture/item/light_gray_bundle.png</file>
+        <file>texture/item/lime_bundle.png</file>
+        <file>texture/item/magenta_bundle.png</file>
+        <file>texture/item/orange_bundle.png</file>
+        <file>texture/item/pale_oak_boat.png</file>
+        <file>texture/item/pale_oak_chest_boat.png</file>
+        <file>texture/item/pink_bundle.png</file>
+        <file>texture/item/purple_bundle.png</file>
+        <file>texture/item/red_bundle.png</file>
+        <file>texture/item/resin_brick.png</file>
+        <file>texture/item/turtle_scute.png</file>
+        <file>texture/item/white_bundle.png</file>
+        <file>texture/item/yellow_bundle.png</file>
     </qresource>
 </RCC>

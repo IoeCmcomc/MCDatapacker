@@ -1,14 +1,13 @@
 from os import walk
 from os.path import join, getsize, abspath, relpath
 from json import dump as json_dump, JSONEncoder
-from typing import ClassVar, Optional
+from typing import ClassVar
 import xml.etree.cElementTree as ET
 from copy import deepcopy
-from functools import cache, cached_property, total_ordering
+from functools import cache, cached_property
 from cbor2 import dump as cbor_dump
 from dataclasses import dataclass
 from xxhash import xxh64
-from pprint import pprint
 from jellyfish import levenshtein_distance
 
 # Source: https://gist.github.com/tfeldmann/fc875e6630d11f2256e746f67a09c1ae
@@ -112,6 +111,7 @@ def extract_category(path: str) -> str:
     return category, path
 
 PREFIX_LEN = len("data/minecraft/")
+INITIAL_FILE_PATH_DISTANCE = 123456
 
 @dataclass(frozen=True)
 class FileAlias:
@@ -225,26 +225,26 @@ def generate_qrc(version: str, prev_ver: str = None, prev_info_dict: dict[str, F
 
         for i in range(len(removed_files) - 1, -1, -1):
             removed_file = removed_files[i]
-            if removed_file.alias.endswith("hanging_signs.json"):
-                print(f"{removed_file.alias}")
+            # if removed_file.alias.endswith("hanging_signs.json"):
+            #     print(f"{removed_file.alias}")
             the_added_file = None
             ii = 0
             jj = 0
-            added_file_path_distance = 123456
+            added_file_path_distance = INITIAL_FILE_PATH_DISTANCE
             for j in range(len(added_files) - 1, -1, -1):
                 added_file = added_files[j]
                 if removed_file == added_file:
                     path_distance = levenshtein_distance(removed_file.alias, added_file.alias)
-                    if removed_file.alias.endswith("hanging_signs.json"):
-                        print(f"{added_file.alias=}, {path_distance=}, {added_file_path_distance=}")
+                    # if removed_file.alias.endswith("hanging_signs.json"):
+                    #     print(f"{added_file.alias=}, {path_distance=}, {added_file_path_distance=}")
                     if path_distance < added_file_path_distance:
                         added_file_path_distance = path_distance
                         the_added_file = added_file
                         ii = i
                         jj = j
 
-            if removed_file.alias.endswith("hanging_signs.json"):
-                print(f"{the_added_file.alias=}")
+            # if removed_file.alias.endswith("hanging_signs.json"):
+            #     print(f"{the_added_file.alias=}")
 
             if isinstance(the_added_file, File):
                 old_file: File = info_dict[removed_file.alias]
@@ -314,4 +314,8 @@ if __name__ == "__main__":
     prev_ver, version = version, "1.20.6"
     info, aliases = generate_qrc(version, prev_ver, info, aliases)
     prev_ver, version = version, "1.21"
+    info, aliases = generate_qrc(version, prev_ver, info, aliases)
+    prev_ver, version = version, "1.21.3"
+    info, aliases = generate_qrc(version, prev_ver, info, aliases)
+    prev_ver, version = version, "1.21.4"
     info, aliases = generate_qrc(version, prev_ver, info, aliases)

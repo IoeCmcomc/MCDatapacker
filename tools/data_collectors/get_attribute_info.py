@@ -3,9 +3,16 @@ import json
 
 from commons import get_selenium_soup, find_tr_tags
 
-ids_soup = get_selenium_soup("https://minecraft.wiki/w/Attribute?oldid=2600109")
+ids_soup = get_selenium_soup("https://minecraft.wiki/w/Attribute?oldid=2729420")
 
 info = dict()
+
+def find_real_tr_tags(tag):
+    if tag.name == "tr":
+        count = len(tag.find_all("td"))
+        if count == 6:
+            return find_tr_tags(tag)
+    return False
 
 def get_per_h3(h3_id):
     h3 = ids_soup.find("span", id=h3_id).parent
@@ -24,12 +31,11 @@ def get_per_h2(h2_id):
     print(h2.name)
     global info
     table = h2.find_next_sibling("table")
-    tr_tags = table.tbody.find_all(find_tr_tags, recursive=False)
+    tr_tags = table.tbody.find_all(find_real_tr_tags, recursive=False)
     for tr_tag in tr_tags:
         td_tags = tr_tag.find_all("td")
         name = td_tags[0].get_text(strip=True)
-        if '.' in name:
-            info[name] = None
+        info[name] = None
 
         
 # get_per_h3("Attributes_available_on_all_living_entities")
@@ -37,7 +43,7 @@ def get_per_h2(h2_id):
 # get_per_h3("Attributes_for_horses")
 # get_per_h3("Attributes_for_bees_and_parrots")
 # get_per_h3("Attributes_for_zombies")
-get_per_h3("Attributes")
+get_per_h2("Attributes")
 
 with open("attribute.json", "w+") as f:
     f.write(json.dumps({"added" : info}, sort_keys=True))

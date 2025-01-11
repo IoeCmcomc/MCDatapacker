@@ -344,6 +344,7 @@ RESOURCES += \
     ../res/mc/info/1.20.4/1.20.4.qrc \
     ../res/mc/info/1.20.6/1.20.6.qrc \
     ../res/mc/info/1.21/1.21.qrc \
+    ../res/mc/info/1.21.3/1.21.3.qrc \
     ../res/mc/info/1.15/1.15-data-json.qrc \
     ../res/mc/info/1.16/1.16-data-json.qrc \
     ../res/mc/info/1.17/1.17-data-json.qrc \
@@ -357,6 +358,7 @@ RESOURCES += \
     ../res/mc/info/1.20.4/1.20.4-data-json.qrc \
     ../res/mc/info/1.20.6/1.20.6-data-json.qrc \
     ../res/mc/info/1.21/1.21-data-json.qrc \
+    ../res/mc/info/1.21.3/1.21.3-data-json.qrc \
     ../res/mc/minecraft.qrc \
     ../res/app/icons/default/default.qrc
 
