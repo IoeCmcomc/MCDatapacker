@@ -45,7 +45,4 @@
         <file>tag/structure.json</file>
         <file>tag/world_preset.json</file>
     </qresource>
-    <qresource prefix="/">
-        <file>tag/enchantment.json</file>
-    </qresource>
 </RCC>

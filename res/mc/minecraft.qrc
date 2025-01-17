@@ -1734,5 +1734,6 @@
         <file>texture/item/turtle_scute.png</file>
         <file>texture/item/white_bundle.png</file>
         <file>texture/item/yellow_bundle.png</file>
+        <file>texture/biome/pale_garden.png</file>
     </qresource>
 </RCC>

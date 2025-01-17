@@ -14,7 +14,7 @@ for table in tables:
         id = td_tags[1].get_text(strip=True)
         info[id] = name
 
-info['player'] = "Player"
+# info['player'] = "Player"
 
 with open("entity.json", "w+") as f:
     f.write(json.dumps({"added" : info}, sort_keys=True))

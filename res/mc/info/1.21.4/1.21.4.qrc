@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/minecraft/1.21">
+    <qresource prefix="/minecraft/1.21.4">
         <file>summary/commands/data.min.json</file>
         <file>registries/block_entity_type/data.min.json</file>
         <file>registries/advancement/data.min.json</file>
