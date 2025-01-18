@@ -53,6 +53,7 @@ CodeFile::FileType CodeFile::pathToFileType(const QString &dirpath,
         { QStringLiteral("enchantment_provider"),
           CodeFile::EnchantmentProvider },
         { QStringLiteral("jukebox_song"), CodeFile::JukeboxSong },
+        { QStringLiteral("instrumental"), CodeFile::GoatHornInstrument },
         { QStringLiteral("painting_variant"), CodeFile::PaintingVariant },
         { QStringLiteral("trim_material"), CodeFile::TrimMaterial },
         { QStringLiteral("trim_pattern"), CodeFile::TrimPattern },
@@ -119,6 +120,9 @@ CodeFile::FileType CodeFile::pathToFileType(const QString &dirpath,
 
         ucase (QLatin1String("tdn")):
             return CodeFile::TridentCode;
+
+        ucase (QLatin1String("cbscript")):
+            return CodeFile::CbScript;
 
         ucase (QLatin1String("json")): {
             for (const auto &pair: catPathToFileType) {
@@ -229,6 +233,8 @@ QString CodeFile::fileTypeToName(const CodeFile::FileType type) {
           QT_TRANSLATE_NOOP("CodeFile", "Jukebox song") },
         { CodeFile::PaintingVariant,
           QT_TRANSLATE_NOOP("CodeFile", "Painting variant") },
+        { CodeFile::GoatHornInstrument,
+          QT_TRANSLATE_NOOP("CodeFile", "Goat horn instrument") },
         { CodeFile::BlockTag, QT_TRANSLATE_NOOP("CodeFile", "Block tag") },
         { CodeFile::EntityTypeTag,
           QT_TRANSLATE_NOOP("CodeFile", "Entity type tag") },
@@ -272,6 +278,8 @@ QString CodeFile::fileTypeToName(const CodeFile::FileType type) {
         // Do not translate "Trident"
         { CodeFile::TridentCode,
           QT_TRANSLATE_NOOP("CodeFile", "Trident code") },
+        { CodeFile::CbScript,
+          QT_TRANSLATE_NOOP("CodeFile", "CBScript code") },
     };
 
     if (type < 0)

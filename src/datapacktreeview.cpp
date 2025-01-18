@@ -160,6 +160,10 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
             addNewFileAction(newMenu, tr("Function"),
                              QLatin1String(".mcfunction"),
                              QLatin1String("functions"));
+            if (Game::version() >= Game::v1_21_3) {
+                addNewFileAction(newMenu, tr("Goat horn instrument"), jsonExt,
+                                 QLatin1String("instrument"));
+            }
             addNewFileAction(newMenu, tr("Loot table"), jsonExt,
                              QLatin1String("loot_tables"));
             if (Game::version() >= Game::v1_17) {

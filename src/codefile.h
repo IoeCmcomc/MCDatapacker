@@ -30,6 +30,7 @@ struct CodeFile {
         EnchantmentProvider, // 1.21+
         JukeboxSong,         // 1.21+
         PaintingVariant,     // 1.21+
+        GoatHornInstrument,  // 1.21.2+
         WorldGen,            /* 1.16.2+ */
         Biome,               /* 1.16.2+ */
         ConfiguredCarver,    /* 1.16.2+ */
@@ -55,6 +56,7 @@ struct CodeFile {
         McBuild,
         McBuildMacro,
         TridentCode,
+        CbScript,
         Text_end,
     };
 
