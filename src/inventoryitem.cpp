@@ -35,6 +35,7 @@ InventoryItem &InventoryItem::operator=(InventoryItem &&other) {
         m_pixmap       = std::move(other.m_pixmap);
         m_name         = std::move(other.m_name);
         m_namespacedId = std::move(other.m_namespacedId);
+        m_components   = std::move(other.m_components);
     }
     return *this;
 }
@@ -171,17 +172,27 @@ void InventoryItem::setFlags(const Types &flags) {
 }
 
 bool InventoryItem::operator==(const InventoryItem &other) {
-    auto r = (getNamespacedID() == other.getNamespacedID());
+    if (getNamespacedID() != other.getNamespacedID()) {
+        return false;
+    }
 
-    r = r && (getName() == other.getName());
-    return r;
+    if (getName() != other.getName()) {
+        return false;
+    }
+
+    return (components() == other.components());
 }
 
 bool InventoryItem::operator==(const InventoryItem &other) const {
-    auto r = (getNamespacedID() == other.getNamespacedID());
+    if (getNamespacedID() != other.getNamespacedID()) {
+        return false;
+    }
 
-    r = r && (getName() == other.getName());
-    return r;
+    if (getName() != other.getName()) {
+        return false;
+    }
+
+    return (components() == other.components());
 }
 
 bool InventoryItem::operator!=(const InventoryItem &other) {
@@ -193,10 +204,23 @@ bool InventoryItem::operator!=(const InventoryItem &other) const {
 }
 
 bool InventoryItem::operator<(const InventoryItem &other) const {
-    if (getNamespacedID() == other.getNamespacedID())
-        return getName() < other.getName();
-    else
+    if (getNamespacedID() == other.getNamespacedID()) {
+        if (getName() == other.getName()) {
+            if (components().size() == other.components().size()) {
+                const auto compos      = components();
+                const auto otherCompos = other.components();
+                return std::lexicographical_compare(
+                    compos.cbegin(), compos.cend(),
+                    otherCompos.cbegin(), otherCompos.cend());
+            } else {
+                return components().size() < other.components().size();
+            }
+        } else {
+            return getName() < other.getName();
+        }
+    } else {
         return getNamespacedID() < other.getNamespacedID();
+    }
 }
 
 QString InventoryItem::getName() const {
@@ -238,6 +262,18 @@ void InventoryItem::setNamespacedID(const QString &id) {
     }
 }
 
+QVariantMap InventoryItem::components() const {
+    return m_components;
+}
+
+void InventoryItem::setComponents(const QVariantMap &newComponents) {
+    if (isTag() && !newComponents.isEmpty()) {
+        qWarning() << "Cannot set item components to an item tag.";
+        return;
+    }
+    m_components = std::move(newComponents);
+}
+
 bool InventoryItem::isBlock() const {
     return m_types.testFlag(Block);
 }
@@ -274,11 +310,17 @@ QString InventoryItem::toolTip() const {
     if (isNull()) {
         return QCoreApplication::translate("InventoryItem", "Empty item");
     } else if (!m_name.isEmpty()) {
-        if (isTag())
+        if (isTag()) {
             return m_name;
-        else
-            return m_name + "<br>" + QString("<br><code>%1</code>").arg(
+        } else {
+            QString &&desc = m_name + "<br>"_QL1 +
+                             QString("<br><code>%1</code>").arg(
                 m_namespacedId);
+            if (!m_components.isEmpty()) {
+                desc += QString("<br>%1 component(s)").arg(m_components.size());
+            }
+            return desc;
+        }
     } else {
         return QCoreApplication::translate("InventoryItem",
                                            "Unknown item: ") + m_namespacedId;
@@ -286,18 +328,21 @@ QString InventoryItem::toolTip() const {
 }
 
 QDataStream &operator<<(QDataStream &out, const InventoryItem &obj) {
-    out << obj.m_types << obj.getNamespacedID() << obj.getName();
+    out << obj.m_types << obj.getNamespacedID() << obj.getName() <<
+        obj.components();
     return out;
 }
 QDataStream &operator>>(QDataStream &in, InventoryItem &obj) {
     InventoryItem::Types flags;
     QString              namespacedID;
     QString              name;
+    QVariantMap          components;
 
     in >> flags >> namespacedID >> name;
     obj.m_types = flags;
     obj.setNamespacedID(namespacedID);
     obj.setName(name);
+    obj.setComponents(components);
     return in;
 }
 
@@ -310,6 +355,8 @@ QDebug operator<<(QDebug debug, const InventoryItem &item) {
         debug.nospace() << ", " << item.getNamespacedID();
         if (!item.getName().isEmpty())
             debug.nospace() << ", " << item.getName();
+        if (!item.components().isEmpty())
+            debug.nospace() << ", " << item.components();
     }
     debug.nospace() << ')';
 

@@ -12,10 +12,11 @@ class InventorySlot : public QFrame
 
 public:
     enum AcceptPolicy : uchar {
-        AcceptItem  = 1,
-        AcceptItems = 2,
-        AcceptTag   = 4,
-        AcceptTags  = 8,
+        AcceptItem       = 1,
+        AcceptItems      = 2,
+        AcceptTag        = 4,
+        AcceptTags       = 8,
+        AcceptComponents = 16,
     };
     Q_DECLARE_FLAGS(AcceptPolicies, AcceptPolicy);
 
@@ -55,8 +56,9 @@ public:
     bool getIsCreative() const;
     void setIsCreative(bool value);
 
-    QString itemNamespacedID(const int index = 0);
-    QString itemName(const int index         = 0);
+    QString itemNamespacedID(const int index   = 0);
+    QString itemName(const int index           = 0);
+    QVariantMap itemComponents(const int index = 0);
 
     void setBackground(const QString &color = QStringLiteral("#8B8B8B"));
 
@@ -68,6 +70,9 @@ public:
 
     bool getAcceptItemsOrTag() const;
     void setAcceptItemsOrTag();
+
+    bool getAcceptComponents() const;
+    void setAcceptComponents(bool value);
 
     SelectCategory selectCategory() const;
     void setSelectCategory(const SelectCategory &selectCategory);

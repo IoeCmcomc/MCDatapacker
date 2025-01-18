@@ -50,6 +50,9 @@ private:
     void readSmeltingJson(const QJsonObject &root);
     void readStonecuttingJson(const QJsonObject &root);
     void readSmithingJson(const QJsonObject &root);
+
+    void tryWriteComponents(QJsonObject &obj, InventorySlot *slot);
+    void tryReadComponents(const QJsonObject &obj, InventorySlot *slot);
 };
 
 #endif /* VISUALRECIPEEDITORDOCK_H */

@@ -179,12 +179,19 @@ QString InventorySlot::itemName(const int index) {
     return items[index].getName();
 }
 
+QVariantMap InventorySlot::itemComponents(const int index) {
+    if (items.isEmpty()) return {};
+
+    return items[index].components();
+}
+
 QString InventorySlot::toolTipText() {
     QString ret;
 
     if (items.count() > 1) {
         QStringList itemNames;
-        int         c = 0;
+
+        int c = 0;
         for (const auto &item : qAsConst(items)) {
             itemNames.push_back(item.getName());
             if (c > 5) {
@@ -204,8 +211,12 @@ QString InventorySlot::toolTipText() {
 }
 
 bool InventorySlot::checkAcceptableItem(const InventoryItem &item) {
-    if (getAcceptTag() && item.isTag()) {
-        return true;
+    if (getAcceptTag()) {
+        if (item.isTag()) {
+            return true;
+        } else if (!getAcceptComponents() && !item.components().isEmpty()) {
+            return false;
+        }
     }
     if (((m_selectCategory == SelectCategory::ObtainableItems) &&
          !item.isItem())
@@ -232,6 +243,9 @@ bool InventorySlot::checkAcceptableItems(const QVector<InventoryItem> &items) {
     int partialTagCount = 0;
 
     for (const auto &item: items) {
+        if (!getAcceptComponents() && !item.components().isEmpty()) {
+            return false;
+        }
         if (item.isTag()) {
             ++partialTagCount;
             // Stop counting if the count is 2
@@ -372,6 +386,18 @@ bool InventorySlot::getAcceptItemsOrTag() const {
 
 void InventorySlot::setAcceptItemsOrTag() {
     m_acceptPolicies = (AcceptItems | AcceptTag);
+}
+
+bool InventorySlot::getAcceptComponents() const {
+    return m_acceptPolicies.testFlag(AcceptComponents);
+}
+
+void InventorySlot::setAcceptComponents(bool value) {
+    if (value) {
+        m_acceptPolicies |= AcceptComponents;
+    } else {
+        m_acceptPolicies &= !AcceptComponents;
+    }
 }
 
 bool InventorySlot::getAcceptTag() const {

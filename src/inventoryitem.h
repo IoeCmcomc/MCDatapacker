@@ -41,6 +41,9 @@ public:
     QString getNamespacedID() const;
     void setNamespacedID(const QString &id);
 
+    QVariantMap components() const;
+    void setComponents(const QVariantMap &newComponents);
+
     bool isBlock() const;
     void setIsBlock(const bool &value);
 
@@ -63,11 +66,11 @@ public:
     friend QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
     friend QDebug operator<<(QDebug debug, const InventoryItem &item);
 
-
 private:
     mutable QPixmap m_pixmap;
     QString m_name;
     QString m_namespacedId;
+    QVariantMap m_components;
     Types m_types = Type::Invalid;
 
     void setupItem(QString id);
