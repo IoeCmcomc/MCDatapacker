@@ -24,6 +24,7 @@
   </property>
   <property name="font">
    <font>
+    <weight>50</weight>
     <bold>false</bold>
     <kerning>true</kerning>
    </font>
@@ -801,6 +802,11 @@
                      <string>Shapeless</string>
                     </property>
                    </item>
+                   <item>
+                    <property name="text">
+                     <string>Transmute</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -1048,6 +1054,9 @@
              </item>
              <item row="3" column="0" colspan="2">
               <widget class="TrueFalseBox" name="showNotifCheck">
+               <property name="toolTip">
+                <string>Currently, this option only works on shaped crafting recipes, including fixed shape and relative shape recipes (see MC-260148).</string>
+               </property>
                <property name="text">
                 <string>Show notification when unlocked</string>
                </property>

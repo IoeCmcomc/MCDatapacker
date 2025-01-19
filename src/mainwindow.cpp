@@ -1285,6 +1285,9 @@ void MainWindow::setCodeEditorText(const QString &text) {
     if (!ui->tabbedInterface->getCodeEditor())
         return;
 
+    if (ui->tabbedInterface->getCodeEditor()->isReadOnly())
+        return;
+
     /*ui->codeEditor->setPlainText(text); */
     QTextCursor cursor = ui->tabbedInterface->getCodeEditor()->textCursor();
 

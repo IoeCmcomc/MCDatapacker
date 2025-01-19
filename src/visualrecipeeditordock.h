@@ -52,6 +52,8 @@ private:
     void readSmithingJson(const QJsonObject &root);
 
     QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal);
+    QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
+                                 const bool emptyAsArray = false);
     void tryWriteComponents(QJsonObject &obj, InventorySlot *slot);
     void tryReadComponents(const QJsonObject &obj, InventorySlot *slot);
 };
