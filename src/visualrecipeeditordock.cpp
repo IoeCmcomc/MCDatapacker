@@ -14,7 +14,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-static QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {
+QVector<InventoryItem> VisualRecipeEditorDock::JsonToIngredients(
+    const QJsonValue &keyVal) {
     QJsonArray keyArray;
 
     if (keyVal.isObject() || keyVal.isString()) {
@@ -34,6 +35,13 @@ static QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {
                     "JsonToIngredients: JSON ingredient has to be a string of namespaced ID or ID tag.";
             }
             itemID = key.toString();
+            if (itemID.startsWith('#') && keyVal.isArray()) {
+                QMessageBox::critical(this,
+                                      tr("JSON input error"),
+                                      tr(
+                                          "Item tags are not allowed in the ingredient list."));
+                return {};
+            }
         } else {
             QJsonObject &&keyJson = key.toObject();
             if (keyJson.contains(QStringLiteral("item"))) {
@@ -97,8 +105,12 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
                                    ui->craftingSlot_7, ui->craftingSlot_8,
                                    ui->craftingSlot_9 });
 
-    for (auto *slot: craftingSlots) {
+    const bool from_v1_21_3 = Game::version() >= Game::v1_21_3;
+    for (auto *slot: std::as_const(craftingSlots)) {
         slot->setAcceptComponents(false);
+        if (from_v1_21_3) {
+            slot->setAcceptItemsOrTag();
+        }
     }
 
     connect(ui->customTabBar, &QTabBar::currentChanged,

@@ -51,6 +51,7 @@ private:
     void readStonecuttingJson(const QJsonObject &root);
     void readSmithingJson(const QJsonObject &root);
 
+    QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal);
     void tryWriteComponents(QJsonObject &obj, InventorySlot *slot);
     void tryReadComponents(const QJsonObject &obj, InventorySlot *slot);
 };

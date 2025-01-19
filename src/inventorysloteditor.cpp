@@ -138,7 +138,7 @@ void InventorySlotEditor::checkRemove() {
 }
 
 bool InventorySlotEditor::canAddItem(const bool addingTag) {
-    qDebug() << slot->acceptPolicies();
+    // qDebug() << slot->acceptPolicies();
     if (!(slot->acceptPolicies() & InventorySlot::AcceptTags)
         && (slot->acceptPolicies() & InventorySlot::AcceptItems)) {
         bool hasTags = false;
@@ -155,7 +155,6 @@ bool InventorySlotEditor::canAddItem(const bool addingTag) {
             QMessageBox::critical(
                 this,
                 tr("Cannot add new item"),
-
                 tr(
                     "This slot only accepts either an item, multiple items or an item tag."),
                 QMessageBox::Ok,

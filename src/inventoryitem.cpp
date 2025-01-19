@@ -338,7 +338,7 @@ QDataStream &operator>>(QDataStream &in, InventoryItem &obj) {
     QString              name;
     QVariantMap          components;
 
-    in >> flags >> namespacedID >> name;
+    in >> flags >> namespacedID >> name >> components;
     obj.m_types = flags;
     obj.setNamespacedID(namespacedID);
     obj.setName(name);

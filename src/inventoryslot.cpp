@@ -396,7 +396,7 @@ void InventorySlot::setAcceptComponents(bool value) {
     if (value) {
         m_acceptPolicies |= AcceptComponents;
     } else {
-        m_acceptPolicies &= !AcceptComponents;
+        m_acceptPolicies &= ~AcceptComponents;
     }
 }
 
