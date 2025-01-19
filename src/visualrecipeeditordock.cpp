@@ -404,15 +404,22 @@ QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
                     QStringLiteral("minecraft:smithing"));
     }
 
-    if (ui->smithingSlot_0->isEmpty())
-        return root;
+    const bool until_v1_21_3 = Game::version() < Game::v1_21_3;
 
-    const auto &base = ui->smithingSlot_0->getItems();
-    root.insert(QStringLiteral("base"), ingredientsToJson(base, from_v1_20));
-    const auto &addition = ui->smithingSlot_1->getItems();
-    root.insert(QStringLiteral("addition"),
-                ingredientsToJson(addition, from_v1_20));
-    if (from_v1_20) {
+    if (!ui->smithingSlot_0->isEmpty()) {
+        const auto &base = ui->smithingSlot_0->getItems();
+        root.insert(QStringLiteral("base"),
+                    ingredientsToJson(base, from_v1_20));
+    } else if (until_v1_21_3) {
+        return root;
+    }
+
+    if (until_v1_21_3 || !ui->smithingSlot_1->isEmpty()) {
+        const auto &addition = ui->smithingSlot_1->getItems();
+        root.insert(QStringLiteral("addition"),
+                    ingredientsToJson(addition, from_v1_20));
+    }
+    if (from_v1_20 && (until_v1_21_3 || !ui->smithingSlot_2->isEmpty())) {
         const auto &templates = ui->smithingSlot_2->getItems();
         root.insert(QStringLiteral("template"),
                     ingredientsToJson(templates, true));
@@ -706,6 +713,8 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
     if (root.contains("template")) {
         const QJsonValue &&templates = root[QStringLiteral("template")];
         ui->smithingSlot_2->setItems(JsonToIngredients(templates));
+    } else {
+        ui->smithingSlot_2->clearItems();
     }
 
     if (!isArmorTrimMode) {
