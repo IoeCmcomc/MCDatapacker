@@ -591,8 +591,6 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
     }
 
     if (type != QStringLiteral("crafting_transmute")) {
-        if (Game::version() < Game::v1_21_3) return;
-
         if (!root.contains(QStringLiteral("result"))) return;
 
         QJsonObject     result      = root[QStringLiteral("result")].toObject();

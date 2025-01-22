@@ -37,6 +37,8 @@ InventorySlot::InventorySlot(QWidget *parent) : QFrame(parent) {
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     setLineWidth(2);
     setFocusPolicy(Qt::TabFocus);
+    setStatusTip(tr(
+                     "Drag-drop to move item(s). Ctrl+Drag to duplicate item(s)."));
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InventorySlot::customContextMenuRequested, this,
