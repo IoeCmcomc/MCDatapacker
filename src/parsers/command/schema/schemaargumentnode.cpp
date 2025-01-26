@@ -19,6 +19,10 @@ namespace Command::Schema {
         return m_props;
     }
 
+    void ArgumentNode::setProperties(const QVariantMap &value) {
+        m_props = std::move(value);
+    }
+
     ArgumentNode::ParserType ArgumentNode::parserType() const {
         return m_parserType;
     }

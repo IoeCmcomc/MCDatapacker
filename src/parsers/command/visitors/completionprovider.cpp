@@ -124,25 +124,50 @@ namespace Command {
     void CompletionProvider::visit(ResourceLocationNode *node) {
         const bool from_1_21 = Game::version() >= Game::v1_21;
 
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("advancements"),
-            QString(), false, from_1_21);
-        m_suggestions += Game::getRegistry(QStringLiteral("advancement"));
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("item_modifiers"),
-            QString(), false, from_1_21);
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("loot_tables"),
-            QString(), false, from_1_21);
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("predicates"),
-            QString(), false, from_1_21);
-        m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("recipes"),
-            QString(), false, from_1_21);
-        m_suggestions += Game::getRegistry(QStringLiteral("recipe"));
-        m_suggestions += Game::getRegistry(QStringLiteral("sound_event"));
+        QString category;
+
+        if (node->schemaNode()->kind() == Schema::Node::Kind::Argument) {
+            const auto *schemaNode =
+                static_cast<const Schema::ArgumentNode *>(node->schemaNode());
+            const auto &props = schemaNode->properties();
+            if (props.contains("category"_QL1)) {
+                category = props.value("category"_QL1).toString();
+                Glhp::removePrefix(category, "minecraft:"_QL1);
+            }
+        }
+
+        if (category == "advancement") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("advancements"),
+                QString(), false, from_1_21);
+            m_suggestions += Game::getRegistry(QStringLiteral("advancement"));
+        } else if (category == "item_modifier") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("item_modifiers"),
+                QString(), false, from_1_21);
+        } else if (category == "loot_table") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("loot_tables"),
+                QString(), false, from_1_21);
+            m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
+        } else if (category == "predicate") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("predicates"),
+                QString(), false, from_1_21);
+        } else if (category == "recipe") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("recipes"),
+                QString(), false, from_1_21);
+            m_suggestions += Game::getRegistry(QStringLiteral("recipe"));
+        } else if (category == "sound_event") {
+            m_suggestions += Game::getRegistry(QStringLiteral("sound_event"));
+        } else if (category == "worldgen/biome") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("worldgen/biome"),
+                QString(), false, from_1_21);
+            m_suggestions +=
+                Game::getRegistry(QStringLiteral("worldgen/biome"));
+        }
     }
 
     void CompletionProvider::visit(ResourceNode *node) {
@@ -276,16 +301,18 @@ namespace Command {
             m_suggestions += keys.toVector();
         }
     }
-    void CompletionProvider::addItemInfo()
-    {
+    void CompletionProvider::addItemInfo() {
         const QVariantMap&& itemInfoMap = Game::getInfo(QStringLiteral("item"));
-        const auto&& keys = itemInfoMap.keys();
+        const auto       && keys        = itemInfoMap.keys();
+
         m_suggestions += keys.toVector();
 
-        const QVariantMap&& blockInfoMap = Game::getInfo(QStringLiteral("block"));
+        const QVariantMap&& blockInfoMap =
+            Game::getInfo(QStringLiteral("block"));
         for (auto it = blockInfoMap.cbegin(); it != blockInfoMap.cend(); ++it) {
             const auto &value = it.value();
-            if ((value.type() != QVariant::Map) || !value.toMap().value("unobtainable", false).toBool()) {
+            if ((value.type() != QVariant::Map) ||
+                !value.toMap().value("unobtainable", false).toBool()) {
                 m_suggestions += it.key();
             }
         }
