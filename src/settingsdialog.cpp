@@ -153,8 +153,7 @@ void SettingsDialog::initSettings() {
 
     m_settings.beginGroup(QStringLiteral("interface"));
     auto &&styles = QStyleFactory::keys();
-    styles << QStringLiteral("DarkFusion") << QStringLiteral("NorwegianWood")
-           << QStringLiteral("Qlementine");
+    styles << QStringLiteral("DarkFusion") << QStringLiteral("NorwegianWood");
 
     ui->themeCombo->addItems(styles);
     ui->darkThemeCombo->addItems(styles);

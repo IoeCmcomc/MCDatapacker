@@ -91,9 +91,6 @@
 [submodule "res/mc/info/1.20.4/registries"]
 	path = res/mc/info/1.20.4/registries
 	url = https://github.com/misode/mcmeta.git
-[submodule "lib/qlementine/qlementine"]
-	path = lib/qlementine/qlementine
-	url = https://github.com/oclero/qlementine.git
 [submodule "res/mc/info/1.20.4/data-json"]
 	path = res/mc/info/1.20.4/data-json
 	url = https://github.com/misode/mcmeta.git

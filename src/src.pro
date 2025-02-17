@@ -435,21 +435,6 @@ else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/libQFindDialogs.a
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/qlementine/release/ -lqlementine
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/qlementine/debug/ -lqlementine
-else:unix: LIBS += -L$$OUT_PWD/../lib/qlementine/ -lqlementine
-
-INCLUDEPATH += $$PWD/../lib/qlementine \
-    $$PWD/../lib/qlementine/qlementine/lib/include
-DEPENDPATH += $$PWD/../lib/qlementine
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/release/libqlementine.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/debug/libqlementine.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/release/qlementine.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/debug/qlementine.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/libqlementine.a
-
-
 win32-msvc*: {
     LIBS += -lAdvAPI32
     # CONFIG(force_debug_info) {

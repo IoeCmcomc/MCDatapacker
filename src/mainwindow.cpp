@@ -30,7 +30,6 @@
 #include "QSimpleUpdater.h"
 #include "SystemThemeHelper.h"
 #include "zip.hpp"
-#include <oclero/qlementine.hpp>
 
 #include <QClipboard>
 #include <QCloseEvent>
@@ -971,12 +970,6 @@ void MainWindow::setAppStyle(const QString &name) {
             qApp->setStyle(new DarkFusionStyle);
         } else if (name == QLatin1String("NorwegianWood")) {
             qApp->setStyle(new NorwegianWoodStyle);
-        } else if (name == QLatin1String("Qlementine")) {
-            auto *style = new oclero::qlementine::QlementineStyle;
-            style->setAnimationsEnabled(false); // Prevent crash
-            style->setAutoIconColor(
-                oclero::qlementine::AutoIconColor::TextColor);
-            qApp->setStyle(style);
         } else {
             qApp->setStyle(name);
         }
