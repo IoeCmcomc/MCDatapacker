@@ -149,13 +149,13 @@ namespace Command::Schema {
     void SchemaLoader::patchNodeProps(const ConstCharsVec &path,
                                       ArgumentNode::ParserType parserType,
                                       QVariantMap newProps) {
-        if (auto *node = getNode(path);
-            node && (node->kind() == Node::Kind::Argument)) {
-            auto *argNode = static_cast<Schema::ArgumentNode *>(node);
-            if (argNode->parserType() == parserType) {
-                auto &&props = argNode->properties();
-                props.insert(newProps);
-                argNode->setProperties(props);
+        if (auto *node = getNode(path)) {
+            if (auto *argNode = schemanode_cast<Schema::ArgumentNode *>(node)) {
+                if (argNode->parserType() == parserType) {
+                    auto &&props = argNode->properties();
+                    props.insert(newProps);
+                    argNode->setProperties(props);
+                }
             }
         }
     }
@@ -249,6 +249,13 @@ namespace Command::Schema {
         patchLootSources({ "replace", "block", "targetPos", "slot", "count" });
         patchLootSources({ "replace", "entity", "entities", "slot" });
         patchLootSources({ "replace", "entity", "entities", "slot", "count" });
+
+        // Currently not used.
+        patchNodeProps({ "summon", "entity", "pos", "nbt" },
+                       ParserType::NbtCompoundTag, {
+            { "dispatcher", "minecraft:entity" },
+            { "dispatchSourceNode", "entity" }
+        });
 
         QVariantMap soundIdPatchMap{ { "category", "sound_event" } };
         patchNodeProps({ "playsound", "sound" },

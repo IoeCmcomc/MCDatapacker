@@ -126,9 +126,9 @@ namespace Command {
 
         QString category;
 
-        if (node->schemaNode()->kind() == Schema::Node::Kind::Argument) {
-            const auto *schemaNode =
-                static_cast<const Schema::ArgumentNode *>(node->schemaNode());
+        if (const auto *schemaNode =
+                schemanode_cast<const Schema::ArgumentNode *>(
+                    node->schemaNode())) {
             const auto &props = schemaNode->properties();
             if (props.contains("category"_QL1)) {
                 category = props.value("category"_QL1).toString();
@@ -262,9 +262,9 @@ namespace Command {
 
     void CompletionProvider::addSuggestionsFromRegistry(ArgumentNode *node,
                                                         const bool getTag) {
-        if (node->schemaNode()->kind() == Schema::Node::Kind::Argument) {
-            const auto *schemaNode =
-                static_cast<const Schema::ArgumentNode *>(node->schemaNode());
+        if (const auto *schemaNode =
+                schemanode_cast<const Schema::ArgumentNode *>(
+                    node->schemaNode())) {
             const auto &props    = schemaNode->properties();
             QString   &&registry = props.value("registry").toString();
             Glhp::removePrefix(registry, QLatin1String("minecraft:"));

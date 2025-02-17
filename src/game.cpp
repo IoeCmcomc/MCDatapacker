@@ -231,7 +231,7 @@ static VanillaLookupMap loadVainllaLookupMap() {
                  "/vanilla_lookup.json");
 
         f2.open(QIODevice::ReadOnly | QIODevice::Text);
-        const QByteArray &&data = f.readAll();
+        const QByteArray &&data = f2.readAll();
         f2.close();
 
         QJsonParseError       errorPtr;

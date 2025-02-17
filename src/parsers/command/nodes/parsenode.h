@@ -111,6 +111,16 @@ public:
 
     DECLARE_TYPE_ENUM(ParseNode::Kind, Error)
     DECLARE_TYPE_ENUM(ParseNode::Kind, Span)
+
+    template<class T>
+    T parsenode_cast(ParseNode *node) {
+        if (node->kind() == nodeTypeEnum<std::remove_pointer_t<T>,
+                                         ParseNode::Kind>) {
+            return static_cast<T>(node);
+        } else {
+            return nullptr;
+        }
+    }
 }
 
 QDebug operator<<(QDebug debug, const Command::ParseNode &node);

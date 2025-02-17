@@ -104,6 +104,8 @@ protected:
         };
     };
 
+    DECLARE_TYPE_ENUM(ParseNode::Kind, Argument);
+
     template <class T>
     constexpr ArgumentNode::ParserType nodeTypeEnum<T,
                                                     ArgumentNode::ParserType> =
@@ -126,6 +128,25 @@ protected:
             return str;
         });
         return newVec;
+    }
+
+    template<class T>
+    T argumentnode_cast(ArgumentNode *node) {
+        if (node->parserType() == nodeTypeEnum<std::remove_pointer_t<T>,
+                                               ArgumentNode::ParserType>) {
+            return static_cast<T>(node);
+        } else {
+            return nullptr;
+        }
+    }
+
+    template<class T>
+    T argumentnode_cast(ParseNode *node) {
+        if (node->kind() == ParseNode::Kind::Argument) {
+            return argumentnode_cast<T>(static_cast<ArgumentNode *>(node));
+        } else {
+            return nullptr;
+        }
     }
 }
 

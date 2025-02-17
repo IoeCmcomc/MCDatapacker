@@ -889,7 +889,7 @@ namespace Command {
             ret->setLeadingTrivia(QStringLiteral(" "));
         }
 
-        if (litNode && ret) {
+        if (litNode && ret && !ret->schemaNode()) {
             ret->setSchemaNode(litNode);
         }
 

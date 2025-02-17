@@ -12,6 +12,7 @@ using json = nlohmann::json;
 namespace Command::Schema {
     class LiteralNode;
     class ArgumentNode;
+    class RootNode;
 
     class Node {
 public:
@@ -51,6 +52,34 @@ protected:
 
         void _from_json(const json &j);
     };
+
+    template<class T>
+    constexpr auto typeToEnum = Node::Kind::Unknown;
+    template<>
+    constexpr auto typeToEnum<LiteralNode> = Node::Kind::Literal;
+    template<>
+    constexpr auto typeToEnum<ArgumentNode> = Node::Kind::Argument;
+    template<>
+    constexpr auto typeToEnum<RootNode> = Node::Kind::Root;
+}
+
+template<class T>
+T schemanode_cast(Command::Schema::Node *node) {
+    if (node->kind() ==
+        Command::Schema::typeToEnum<std::remove_pointer_t<T> >) {
+        return static_cast<T>(node);
+    } else {
+        return nullptr;
+    }
+}
+template<class T>
+T schemanode_cast(const Command::Schema::Node *node) {
+    if (node->kind() == Command::Schema::typeToEnum<
+            std::remove_const_t<std::remove_pointer_t<T> > >) {
+        return static_cast<T>(node);
+    } else {
+        return nullptr;
+    }
 }
 
 #endif // SCHEMA_NODE_H
