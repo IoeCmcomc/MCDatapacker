@@ -153,6 +153,7 @@ SOURCES += \
     truefalsebox.cpp \
     vanilladatapackdock.cpp \
     vanilladatapackmodel.cpp \
+    variantmapfile.cpp \
     vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
@@ -283,6 +284,7 @@ HEADERS += \
     truefalsebox.h \
     vanilladatapackdock.h \
     vanilladatapackmodel.h \
+    variantmapfile.h \
     vieweventfilter.h \
     visualrecipeeditordock.h
 
