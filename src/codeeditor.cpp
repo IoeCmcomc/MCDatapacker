@@ -735,10 +735,13 @@ void CodeEditor::changeEvent(QEvent *e) {
 }
 
 void CodeEditor::onCursorPositionChanged() {
-//    qDebug() << "CodeEditor::onCursorPositionChanged";
+    // qDebug() << "CodeEditor::onCursorPositionChanged";
     setExtraSelections({});
     highlightCurrentLine();
     matchParentheses();
+    if (m_doHighlightSameSelection) {
+        highlightSameSelectedText();
+    }
     problemSelectionStartIndex = extraSelections().size() - 1;
     if (!problemExtraSelections.isEmpty()) {
         setExtraSelections(extraSelections() << problemExtraSelections);
@@ -754,7 +757,7 @@ void CodeEditor::highlightCurrentLine() {
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        const int factor    = 105;
+        const int factor    = 110;
         QColor    lineColor = palette().base().color();
         if (perceivedLightness(lineColor) < 50) {
             lineColor = lineColor.lighter(factor);
@@ -811,7 +814,25 @@ bool CodeEditor::find(const QString &text,
     auto &&cursor = textCursor();
 
     if (findCursor(cursor, text, options)) {
+        m_doHighlightSameSelection = false;
         setTextCursor(cursor);
+        m_doHighlightSameSelection = true;
+
+        QColor    color(Qt::yellow);
+        const int factor = 150;
+        if (perceivedLightness(color) < 50) {
+            color = color.darker(factor);
+        } else {
+            color = color.lighter(factor);
+        }
+        QTextCharFormat format;
+        format.setBackground(color);
+
+        highlightOccurrences(
+            text,
+            options.setFlag(FindAndReplaceDock::Option::WarpAround, false),
+            format);
+
         emit findCompleted(true);
         return true;
     } else {
@@ -1365,6 +1386,48 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
             }
         }
     }
+}
+
+void CodeEditor::highlightOccurrences(const QString &text,
+                                     FindAndReplaceDock::Options options,
+                                     QTextCharFormat format) {
+    QList<QTextEdit::ExtraSelection> &&selections = extraSelections();
+
+    QTextCursor highlightCursor(document());
+
+    while (findCursor(highlightCursor, text, options)) {
+        QTextEdit::ExtraSelection extra;
+        extra.format = format;
+        extra.cursor = highlightCursor;
+        selections << extra;
+    }
+
+    setExtraSelections(selections);
+}
+
+// Adaped from: https://www.qtcentre.org/threads/59746-QPlainTextEdit-find()-highlighting
+void CodeEditor::highlightSameSelectedText() {
+    const QString text = textCursor().selectedText();
+
+    if (text.isEmpty()) {
+        return;
+    }
+
+    QList<QTextEdit::ExtraSelection> &&selections = extraSelections();
+
+    QColor color = palette().color(QPalette::Active, QPalette::Highlight);
+
+    const int factor = 170;
+    if (perceivedLightness(color) < 50) {
+        color = color.lighter(factor);
+    } else {
+        color = color.darker(factor);
+    }
+    color.setAlpha(127);
+    QTextCharFormat format;
+    format.setBackground(color);
+
+    highlightOccurrences(text, {}, format);
 }
 
 QString CodeEditor::textUnderCursorExtended(QTextCursor tc) {

@@ -123,13 +123,14 @@ private:
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     Problems m_problems;
     int problemSelectionStartIndex;
-    int m_fontSize                = 13;
-    int m_tabSize                 = 4;
-    CodeFile::FileType m_fileType = CodeFile::Text;
-    bool canUndo                  = false;
-    bool canRedo                  = false;
-    bool m_insertTabAsSpaces      = true;
-    bool m_needCompleting         = false;
+    int m_fontSize                  = 13;
+    int m_tabSize                   = 4;
+    CodeFile::FileType m_fileType   = CodeFile::Text;
+    bool canUndo                    = false;
+    bool canRedo                    = false;
+    bool m_insertTabAsSpaces        = true;
+    bool m_needCompleting           = false;
+    bool m_doHighlightSameSelection = true;
 
     void highlightCurrentLine();
     void matchParentheses();
@@ -141,6 +142,10 @@ private:
                            int numRightParentheses, bool isPrimary);
     void createBracketSelection(int pos, bool isPrimary);
     void followNamespacedId(const QMouseEvent *event);
+    void highlightOccurrences(const QString &text,
+                             FindAndReplaceDock::Options options,
+                             QTextCharFormat format);
+    void highlightSameSelectedText();
 
     QString textUnderCursor() const;
     void handleKeyPressEvent(QKeyEvent *e);
