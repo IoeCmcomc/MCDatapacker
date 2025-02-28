@@ -22,6 +22,8 @@ protected slots:
 private slots:
     void onCustomCmdBrowse();
     void checkCustomCmd();
+    void onCustomCodePaletteBrowse();
+    void onCustomCodePaletteGetSample();
 
 private:
     Ui::SettingsDialog *ui;

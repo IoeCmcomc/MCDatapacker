@@ -10,6 +10,7 @@ public:
     VariantMapFile() = default;
 
     bool fromJsonFile(const QString &filePath, const bool checkExists = true);
+    void toJsonFile(const QString &filePath, const bool minified      = false);
 
     bool fromCborFile(const QString &filePath, const bool checkExists = true);
 

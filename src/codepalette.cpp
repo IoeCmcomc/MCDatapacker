@@ -1,21 +1,129 @@
 #include "codepalette.h"
 
+#include "variantmapfile.h"
+
 #include <QDebug>
+#include <QMetaEnum>
+
+constexpr int CODE_PALETTE_FORMAT_VERSION = 1;
 
 CodePalette::CodePalette(std::initializer_list<QPair<Role,
-                                                     QTextCharFormat> > formats)
-{
+                                                     QTextCharFormat> > formats,
+                         const QString &id) : m_id{id} {
     for (const auto& pair : formats) {
         if (!m_formats.contains(pair.first)) {
             m_formats.insert(pair.first, pair.second);
         } else {
-            qWarning() << "Duplicate role ignored:" << pair.first;
+            qWarning() << "CodePalette: Duplicate role ignored:" << pair.first;
         }
     }
 }
 
+QVariantMap CodePalette::charFormatToMap(const QTextCharFormat &fmt) {
+    QVariantMap output;
+
+    if (fmt.foreground().style() == Qt::SolidPattern) { // Has foreground color
+        output.insert("color"_QL1, fmt.foreground().color());
+    }
+    if (fmt.background().style() == Qt::SolidPattern) { // Has background color
+        output.insert("background", fmt.background().color());
+    }
+    if (fmt.fontWeight() >= QFont::Bold)
+        output.insert("bold"_QL1, true);
+    if (fmt.fontItalic())
+        output.insert("italic"_QL1, true);
+    if (fmt.fontUnderline())
+        output.insert("underlined"_QL1, true);
+    if (fmt.fontStrikeOut())
+        output.insert("strikethrough_QL1", true);
+
+    return output;
+}
+
+QTextCharFormat CodePalette::charFormatFromMap(const QVariantMap &map) {
+    QTextCharFormat format;
+
+    if (map.contains("color"_QL1)) {
+        format.setForeground(QColor(map["color"].toString()));
+    }
+    if (map.contains("background"_QL1)) {
+        format.setBackground(QColor(map["background"].toString()));
+    }
+    if (map.value("bold"_QL1, false).toBool()) {
+        format.setFontWeight(QFont::Bold);
+    }
+    if (map.value("italic"_QL1, false).toBool()) {
+        format.setFontItalic(true);
+    }
+    if (map.value("unterlined"_QL1, false).toBool()) {
+        format.setFontUnderline(true);
+    }
+    if (map.value("strikethrough"_QL1, false).toBool()) {
+        format.setFontStrikeOut(true);
+    }
+
+    return format;
+}
+
+void CodePalette::saveToJsonFile(const QString &filePath) const {
+    QVariantMap dataMap {
+        { "format_version_number"_QL1, CODE_PALETTE_FORMAT_VERSION },
+        { "id"_QL1, m_id },
+    };
+
+    QVariantMap formatMap;
+    QMetaEnum   metaEnum = QMetaEnum::fromType<Role>();
+
+    for (auto it = m_formats.cbegin(); it != m_formats.cend(); ++it) {
+        Role            role   = it.key();
+        QTextCharFormat format = it.value();
+        formatMap.insert(metaEnum.valueToKey(role), charFormatToMap(format));
+    }
+    dataMap.insert("palette"_QL1, std::move(formatMap));
+
+    VariantMapFile serialiser{ dataMap };
+    serialiser.toJsonFile(filePath);
+    if (!serialiser.errorMessage().isEmpty()) {
+        qWarning() << "CodePalette::saveToJsonFile()" <<
+            serialiser.errorMessage();
+    }
+}
+
+CodePalette CodePalette::loadFromFile(const QString &filePath) {
+    VariantMapFile deserialiser;
+
+    deserialiser.fromFile(filePath);
+    if (!deserialiser.errorMessage().isEmpty()) {
+        qWarning() << "CodePalette::loadFromFile()" <<
+            deserialiser.errorMessage();
+        return CodePalette({});
+    } else {
+        const QVariantMap &dataMap = deserialiser.variantMap;
+        CodePalette        palette{ {}, dataMap.value("id", {}).toString() };
+        QMetaEnum          metaEnum = QMetaEnum::fromType<Role>();
+
+        const auto &formatMap = dataMap.value("palette", {}).toMap();
+        for (auto it = formatMap.cbegin(); it != formatMap.cend(); ++it) {
+            bool ok   = false;
+            int  role = metaEnum.keyToValue(it.key().toLatin1(), &ok);
+            if (ok) {
+                palette.m_formats.insert(static_cast<Role>(role),
+                                         charFormatFromMap(it.value().toMap()));
+            } else {
+                qWarning() << "Unknown code palette role:" << it.key();
+            }
+        }
+
+        return palette;
+    }
+}
+
+QString CodePalette::id() const {
+    return m_id;
+}
+
 using CP = CodePalette;
-const CodePalette defaultCodePalette{
+const CodePalette defaultCodePalette({
     { CP::CmdLiteral, CharFmtBuilder().fg("#0000AA")->bold(true)->ok() },
     { CP::Bool_True, CharFmtBuilder().fg(QColor(0, 190, 0))
       ->weight(QFont::DemiBold)->ok() },
@@ -88,9 +196,9 @@ const CodePalette defaultCodePalette{
     { CP::Gamemode, CharFmtBuilder().fg("#152769")->bold(true)->ok() },
     { CP::RegexPattern, CharFmtBuilder().fg("#444444")->ok() },
     { CP::GreedyString, CharFmtBuilder().fg("#A31621")->ok() },
-};
+}, "default_light"_QL1);
 
-const CodePalette defaultDarkCodePalette{
+const CodePalette defaultDarkCodePalette({
     { CP::CmdLiteral, CharFmtBuilder().fg("#9595FF")->bold(true)->ok() },
     { CP::Bool_True, CharFmtBuilder().fg(QColor(0, 190, 0))
       ->weight(QFont::DemiBold)->ok() },
@@ -164,4 +272,4 @@ const CodePalette defaultDarkCodePalette{
     { CP::Gamemode, CharFmtBuilder().fg("#BBC6F1")->bold(true)->ok() },
     { CP::RegexPattern, CharFmtBuilder().fg("#b4b4b4")->ok() },
     { CP::GreedyString, CharFmtBuilder().fg("#B72E3A")->ok() },
-};
+}, "default_dark"_QL1);

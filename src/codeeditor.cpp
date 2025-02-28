@@ -230,6 +230,11 @@ void CodeEditor::readPrefSettings() {
                         : option.flags() & ~Flag::ShowTabsAndSpaces);
     document()->setDefaultTextOption(option);
     settings.endGroup();
+
+    if (m_highlighter) {
+        applyHighlighterPalette();
+        m_highlighter->QSyntaxHighlighter::rehighlight();
+    }
 }
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
@@ -498,6 +503,30 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
     }
 }
 
+void CodeEditor::applyHighlighterPalette() {
+    Q_ASSERT(m_highlighter != nullptr);
+
+    const QString &&customPalettePath
+        = QSettings().value(QStringLiteral(
+                                "editor/customCodePaletteFilePath")).toString();
+    bool useDefault = true;
+
+    if (QFile::exists(customPalettePath)) {
+        const auto &codePalette = CodePalette::loadFromFile(customPalettePath);
+        if (!codePalette.id().isEmpty()) {
+            m_highlighter->setPalette(codePalette);
+            useDefault = false;
+        }
+    }
+    if (useDefault) {
+        if (perceivedLightness(palette().base().color()) < 50) {
+            m_highlighter->setPalette(defaultDarkCodePalette);
+        } else {
+            m_highlighter->setPalette(defaultCodePalette);
+        }
+    }
+}
+
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (m_completer && m_completer->popup()->isVisible()) {
         /* The following keys are forwarded by the completer to the widget */
@@ -538,12 +567,13 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
 
     if (!isCompletionShortcut &&
         (hasModifier || e->text().isEmpty() || completionPrefix.length() < 2
-            || eow.contains(e->text().right(1)))) {
+         || eow.contains(e->text().right(1)))) {
         m_completer->popup()->hide();
         return;
     } else if (m_completer && m_completer->popup()->isVisible()
-                && !m_completer->completionModel()->index(1, 0).isValid()
-                && m_completer->currentCompletion() == m_completer->completionPrefix()) {
+               && !m_completer->completionModel()->index(1, 0).isValid()
+               && m_completer->currentCompletion() ==
+               m_completer->completionPrefix()) {
         m_completer->popup()->hide();
         return;
     } else if (isCompletionShortcut) {
@@ -691,11 +721,7 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
 void CodeEditor::changeEvent(QEvent *e) {
     if (e->type() == QEvent::PaletteChange) {
         if (m_highlighter) {
-            if (perceivedLightness(palette().base().color()) < 50) {
-                m_highlighter->setPalette(defaultDarkCodePalette);
-            } else {
-                m_highlighter->setPalette(defaultCodePalette);
-            }
+            applyHighlighterPalette();
             onCursorPositionChanged();
             if (m_highlighter->hasAdvancedHighlighting()) {
                 m_highlighter->ensureDelayedRehighlightAll();
@@ -1108,11 +1134,7 @@ bool CodeEditor::getCanUndo() const {
 
 void CodeEditor::setHighlighter(Highlighter *value) {
     m_highlighter = value;
-    if (perceivedLightness(palette().base().color()) < 50) {
-        m_highlighter->setPalette(defaultDarkCodePalette);
-    } else {
-        m_highlighter->setPalette(defaultCodePalette);
-    }
+    applyHighlighterPalette();
 }
 
 void CodeEditor::displayErrors() {

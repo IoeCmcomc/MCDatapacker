@@ -154,6 +154,8 @@ private:
     static void selectEnclosingLines(QTextCursor &cursor);
 
     void startCompletion(const QString &completionPrefix);
+
+    void applyHighlighterPalette();
 };
 
 

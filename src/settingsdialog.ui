@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>578</width>
-    <height>341</height>
+    <width>612</width>
+    <height>392</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -159,6 +159,9 @@
          <property name="text">
           <string>Font size scale:</string>
          </property>
+         <property name="buddy">
+          <cstring>fontScaleCombo</cstring>
+         </property>
         </widget>
        </item>
        <item row="2" column="1">
@@ -190,7 +193,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Minecraft version:</string>
+          <string>Primary Minecraft version:</string>
          </property>
          <property name="buddy">
           <cstring>gameVersionCombo</cstring>
@@ -357,24 +360,45 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QCheckBox" name="editorTabAsSpacesCheck">
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_11">
          <property name="text">
-          <string>Insert Tab characters as spaces</string>
+          <string>Custom code palette file:</string>
          </property>
-         <property name="checked">
-          <bool>true</bool>
+         <property name="buddy">
+          <cstring>customCodePaletEdit</cstring>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="editorShowSpacesCheck">
-         <property name="text">
-          <string>Show spaces and tab characters</string>
-         </property>
-        </widget>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="customCodePaletEdit"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="customCodePaletBtn">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="customCodePaletSampleBtn">
+           <property name="text">
+            <string>Get example...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="7" column="0" colspan="2">
+       <item row="8" column="0" colspan="2">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -386,6 +410,23 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="6" column="0" colspan="2">
+        <widget class="QCheckBox" name="editorTabAsSpacesCheck">
+         <property name="text">
+          <string>Insert Tab characters as spaces</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QCheckBox" name="editorShowSpacesCheck">
+         <property name="text">
+          <string>Show spaces and tab characters</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -421,7 +462,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>252</x>
-     <y>317</y>
+     <y>368</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -437,7 +478,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>320</x>
-     <y>317</y>
+     <y>368</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

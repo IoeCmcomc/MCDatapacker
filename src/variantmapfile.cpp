@@ -5,12 +5,16 @@
 #include <QJsonObject>
 #include <QCborValue>
 #include <QCborMap>
+#include <QFileInfo>
+#include <QDir>
+#include <QSaveFile>
 
 VariantMapFile::VariantMapFile(const QVariantMap &map) : variantMap{map} {
 }
 
 bool VariantMapFile::fromJsonFile(const QString &filePath,
                                   const bool checkExists) {
+    m_errorMessage.clear();
     QFile file(filePath);
 
     if (!checkExists || Q_LIKELY(file.exists())) {
@@ -41,8 +45,28 @@ bool VariantMapFile::fromJsonFile(const QString &filePath,
     }
 }
 
+void VariantMapFile::toJsonFile(const QString &filePath, const bool minified) {
+    m_errorMessage.clear();
+    QFileInfo finfo(filePath);
+    finfo.dir().mkpath(finfo.dir().absolutePath());
+
+    QSaveFile saveFile(filePath);
+    if (saveFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonDocument doc(QJsonObject::fromVariantMap(variantMap));
+        saveFile.write(doc.toJson(minified ? QJsonDocument::Compact :
+                                  QJsonDocument::Indented));
+
+        if (!saveFile.commit()) {
+            m_errorMessage = saveFile.errorString();
+        }
+    } else {
+        m_errorMessage = saveFile.errorString();
+    }
+}
+
 bool VariantMapFile::fromCborFile(const QString &filePath,
                                   const bool checkExists) {
+    m_errorMessage.clear();
     QFile file(filePath);
 
     if (!checkExists || Q_LIKELY(file.exists())) {
@@ -98,7 +122,6 @@ bool VariantMapFile::fromFile(const QString &filePath) {
     return false;
 }
 
-QString VariantMapFile::errorMessage() const
-{
+QString VariantMapFile::errorMessage() const {
     return m_errorMessage;
 }
