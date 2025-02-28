@@ -184,6 +184,7 @@
       <addaction name="actionUpgrader"/>
       <addaction name="actionMcstacker"/>
       <addaction name="actionMinecraft_Tools"/>
+      <addaction name="actionBDEngine"/>
      </widget>
      <widget class="QMenu" name="menu_Offline_tools">
       <property name="title">
@@ -210,7 +211,7 @@
       <addaction name="actionPlanetMinecraft"/>
       <addaction name="actionModrinth"/>
       <addaction name="actionSmithed"/>
-      <addaction name="actionDatapack_Hub"/>
+      <addaction name="actionMCCreations"/>
      </widget>
      <addaction name="menuOnlineTools"/>
      <addaction name="menu_Offline_tools"/>
@@ -690,6 +691,16 @@
    </property>
    <property name="text">
     <string>&amp;Default datapack</string>
+   </property>
+  </action>
+  <action name="actionBDEngine">
+   <property name="text">
+    <string>BDEngine – Block display editor</string>
+   </property>
+  </action>
+  <action name="actionMCCreations">
+   <property name="text">
+    <string>MCCreations</string>
    </property>
   </action>
  </widget>

@@ -293,6 +293,9 @@ void MainWindow::initResourcesMenu() {
                           R"(https://mcstacker.net/)"));
     connectActionLink(ui->actionMinecraft_Tools, QStringLiteral(
                           R"(https://minecraft.tools/en/)"));
+    connectActionLink(ui->actionBDEngine, QStringLiteral(
+                          R"(https://bdengine.app/)"));
+
     // Offline tools
     connectActionLink(ui->actionPackSquash, QStringLiteral(
                           R"(https://github.com/ComunidadAylas/PackSquash/)"));
@@ -319,8 +322,8 @@ void MainWindow::initResourcesMenu() {
                           R"(https://modrinth.com)"));
     connectActionLink(ui->actionSmithed, QStringLiteral(
                           R"(https://smithed.net)"));
-    connectActionLink(ui->actionDatapack_Hub,
-                      QStringLiteral(R"(https://datapackhub.net/)"));
+    connectActionLink(ui->actionMCCreations,
+                      QStringLiteral(R"(https://www.mccreations.net/)"));
 }
 
 void MainWindow::open() {
