@@ -143,8 +143,8 @@ private:
     void createBracketSelection(int pos, bool isPrimary);
     void followNamespacedId(const QMouseEvent *event);
     void highlightOccurrences(const QString &text,
-                             FindAndReplaceDock::Options options,
-                             QTextCharFormat format);
+                              FindAndReplaceDock::Options options,
+                              QTextCharFormat format);
     void highlightSameSelectedText();
 
     QString textUnderCursor() const;
@@ -161,6 +161,7 @@ private:
     void startCompletion(const QString &completionPrefix);
 
     void applyHighlighterPalette();
+    void patchPalette();
 };
 
 

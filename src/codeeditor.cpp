@@ -111,6 +111,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
     updateGutterWidth(0);
     onCursorPositionChanged();
+    patchPalette();
 }
 
 void CodeEditor::setFileType(CodeFile::FileType type) {
@@ -527,6 +528,17 @@ void CodeEditor::applyHighlighterPalette() {
     }
 }
 
+void CodeEditor::patchPalette() {
+    QPalette palet = palette();
+
+    palet.setColor(QPalette::Inactive, QPalette::Highlight,
+                   palet.color(QPalette::Active, QPalette::Highlight));
+    palet.setColor(QPalette::Inactive, QPalette::HighlightedText,
+                   palet.color(QPalette::Active,
+                               QPalette::HighlightedText));
+    setPalette(palet);
+}
+
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (m_completer && m_completer->popup()->isVisible()) {
         /* The following keys are forwarded by the completer to the widget */
@@ -730,6 +742,7 @@ void CodeEditor::changeEvent(QEvent *e) {
                 m_highlighter->rehighlight();
             }
         }
+        patchPalette();
     }
     QPlainTextEdit::changeEvent(e);
 }
@@ -1389,8 +1402,8 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
 }
 
 void CodeEditor::highlightOccurrences(const QString &text,
-                                     FindAndReplaceDock::Options options,
-                                     QTextCharFormat format) {
+                                      FindAndReplaceDock::Options options,
+                                      QTextCharFormat format) {
     QList<QTextEdit::ExtraSelection> &&selections = extraSelections();
 
     QTextCursor highlightCursor(document());
