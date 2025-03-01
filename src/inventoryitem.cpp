@@ -313,7 +313,7 @@ QString InventoryItem::toolTip() const {
         if (isTag()) {
             return m_name;
         } else {
-            QString &&desc = m_name + "<br>"_QL1 +
+            QString desc = m_name + "<br>"_QL1 +
                              QString("<br><code>%1</code>").arg(
                 m_namespacedId);
             if (!m_components.isEmpty()) {

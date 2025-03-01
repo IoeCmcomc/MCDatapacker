@@ -126,8 +126,13 @@ namespace Command::Schema {
                     }
 
                     case Type::number_integer: {
-                        n->m_props[mapKey] =
-                            val.get_ref<const json::number_integer_t &>();
+                        if constexpr (sizeof(json::number_integer_t) == sizeof(qlonglong)) {
+                            n->m_props[mapKey] =
+                                qlonglong(val.get_ref<const json::number_integer_t &>());
+                        } else {
+                            n->m_props[mapKey] =
+                                int(val.get_ref<const json::number_integer_t &>());
+                        }
                         break;
                     }
 
@@ -138,8 +143,13 @@ namespace Command::Schema {
                     }
 
                     case Type::number_unsigned: {
-                        n->m_props[mapKey] =
-                            val.get_ref<const json::number_unsigned_t &>();
+                        if constexpr (sizeof(json::number_unsigned_t) == sizeof(qulonglong)) {
+                            n->m_props[mapKey] =
+                                qulonglong(val.get_ref<const json::number_unsigned_t &>());
+                        } else {
+                            n->m_props[mapKey] =
+                                uint(val.get_ref<const json::number_unsigned_t &>());
+                        }
                         break;
                     }
 

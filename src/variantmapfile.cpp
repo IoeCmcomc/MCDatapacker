@@ -107,7 +107,7 @@ bool VariantMapFile::fromFile(const QString &filePath) {
             qWarning() << "File not supported:" << filePath;
         }
     } else {
-        QString &&newPath = filePath + QLatin1String(".json");
+        QString newPath = filePath + QLatin1String(".json");
         if (QFile::exists(newPath)) {
             return fromJsonFile(newPath, false);
         } else {
