@@ -140,49 +140,7 @@ void CodeEditor::initCompleter() {
 bool CodeEditor::findCursor(QTextCursor &cursor,
                             const QString &text,
                             FindAndReplaceDock::Options options) {
-    QTextDocument::FindFlags flags;
-
-    const bool matchCase = options &
-                           FindAndReplaceDock::Option::MatchCase;
-    const bool useRegex = options &
-                          FindAndReplaceDock::Option::UseRegex;
-    const bool warpAround = options &
-                            FindAndReplaceDock::Option::WarpAround;
-
-    if (options & FindAndReplaceDock::Option::FindWholeWord) {
-        flags |= QTextDocument::FindWholeWords;
-    }
-
-    QRegularExpression regex{ text };
-    QTextCursor        matchCursor;
-    if (!useRegex) {
-        if (matchCase) {
-            flags |= QTextDocument::FindCaseSensitively;
-        }
-        matchCursor = document()->find(text, cursor, flags);
-    } else {
-        if (matchCase) {
-            regex.setPatternOptions(
-                regex.patternOptions() | QRegularExpression::
-                CaseInsensitiveOption);
-        }
-        matchCursor = document()->find(regex, cursor, flags);
-    }
-
-    if (matchCursor.isNull()) {
-        if (warpAround) {
-            cursor.movePosition(QTextCursor::Start);
-            matchCursor = useRegex ? document()->find(regex, cursor, flags)
-                             : document()->find(text, cursor, flags);
-        }
-    }
-    if (matchCursor.isNull()) {
-        return false;
-    } else {
-        cursor.setPosition(matchCursor.anchor());
-        cursor.setPosition(matchCursor.position(), QTextCursor::KeepAnchor);
-        return true;
-    }
+    return FindAndReplaceDock::findCursor(document(), cursor, text, options);
 }
 
 void CodeEditor::replaceSelectedCursor(QTextCursor &cursor,
@@ -1116,10 +1074,17 @@ Parser * CodeEditor::parser() const {
     return m_parser.get();
 }
 
-void CodeEditor::goToLine(const int lineNo) {
+void CodeEditor::goToLine(const int lineNo, const int colNo,
+                          const int selLength) {
     auto &&cursor = textCursor();
 
-    cursor.setPosition(document()->findBlockByLineNumber(lineNo).position());
+    const int pos = document()->findBlockByLineNumber(lineNo).position()
+                    + colNo;
+
+    cursor.setPosition(pos);
+    if (selLength > 0) {
+        cursor.setPosition(pos + selLength, QTextCursor::KeepAnchor);
+    }
     setTextCursor(cursor);
     centerCursor();
 }

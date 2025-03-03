@@ -56,6 +56,8 @@ public /*slots*/ :
     void onOpenFile(const QString &filepath);
     void onOpenAliasedFile(const QString &filepath, const QString &realPath);
     void onOpenFileWithLine(const QString &filepath, const int lineNo);
+    void onOpenFileWithSelection(const QString &filepath, const int lineNo,
+                                 const int colNo, const int selLength = 0);
     bool saveCurFile();
     bool saveCurFile(const QString &path);
     bool saveAllFile();

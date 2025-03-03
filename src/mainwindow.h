@@ -115,6 +115,7 @@ private:
     PredicateDock *m_predicateDock                   = nullptr;
     VanillaDatapackDock *m_vanillaDock               = nullptr;
     VisualRecipeEditorDock *m_recipeEditorDock       = nullptr;
+    FindAndReplaceDock *m_findReplaceDock            = nullptr;
     libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
@@ -148,6 +149,7 @@ private:
     void updateViewMenu();
     void changeAppStyle(const bool darkMode);
     void setAppStyle(const QString &name);
+    void showFindReplaceDock(const bool replaceMode = false);
 };
 
 #endif /* MAINWINDOW_H */

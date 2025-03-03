@@ -226,13 +226,6 @@ void MainWindow::initMenu() {
 }
 
 void MainWindow::initFindDocks(FindAndReplaceDock *dock) {
-    if (const auto *editor = ui->tabbedInterface->getCodeEditor()) {
-        const auto &&cursor = editor->textCursor();
-        if (cursor.hasSelection()) {
-            dock->setQuery(cursor.selectedText());
-        }
-    }
-
     connect(dock, &FindAndReplaceDock::findCurFileRequested,
             ui->tabbedInterface,
             [ = ](const QString &text, FindAndReplaceDock::Options options){
@@ -245,7 +238,8 @@ void MainWindow::initFindDocks(FindAndReplaceDock *dock) {
     });
 
     connect(dock, &FindAndReplaceDock::openFileRequested,
-            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+            ui->tabbedInterface,
+            &TabbedDocumentInterface::onOpenFileWithSelection);
     connect(ui->tabbedInterface, &TabbedDocumentInterface::findCompleted,
             dock, &FindAndReplaceDock::onFindCurFileCompleted);
 
@@ -377,23 +371,11 @@ void MainWindow::restart() {
 }
 
 void MainWindow::find() {
-    auto *dock = new FindAndReplaceDock(this);
-
-    initFindDocks(dock);
-    dock->show();
-    dock->activateWindow();
+    showFindReplaceDock();
 }
 
 void MainWindow::findAndReplace() {
-    auto *dock = new FindAndReplaceDock(this);
-
-    initFindDocks(dock);
-
-    dock->setOptions(
-        dock->options() | FindAndReplaceDock::Option::FindAndReplace);
-
-    dock->show();
-    dock->activateWindow();
+    showFindReplaceDock(true);
 }
 
 void MainWindow::statistics() {
@@ -978,6 +960,33 @@ void MainWindow::setAppStyle(const QString &name) {
         }
         qApp->setPalette(style()->standardPalette());
     }
+}
+
+void MainWindow::showFindReplaceDock(const bool replaceMode) {
+    if (Q_UNLIKELY(!m_findReplaceDock)) {
+        m_findReplaceDock = new FindAndReplaceDock(this);
+        initFindDocks(m_findReplaceDock);
+    }
+
+    if (const auto *editor = ui->tabbedInterface->getCodeEditor()) {
+        const auto &&cursor = editor->textCursor();
+        if (cursor.hasSelection()) {
+            m_findReplaceDock->setQuery(cursor.selectedText());
+        }
+    }
+
+    if (replaceMode) {
+        m_findReplaceDock->setOptions(
+            m_findReplaceDock->options() |
+            FindAndReplaceDock::Option::FindAndReplace);
+    } else {
+        m_findReplaceDock->setOptions(
+            m_findReplaceDock->options().setFlag(
+                FindAndReplaceDock::Option::FindAndReplace, false));
+    }
+
+    m_findReplaceDock->show();
+    m_findReplaceDock->focusToInput();
 }
 
 void MainWindow::changeEvent(QEvent *event) {

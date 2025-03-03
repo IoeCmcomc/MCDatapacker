@@ -64,7 +64,8 @@ public:
     void setParser(std::unique_ptr<Parser> newParser);
     Parser * parser() const;
 
-    void goToLine(const int lineNo);
+    void goToLine(const int lineNo, const int colNo = 0,
+                  const int selLength               = 0);
 
 signals:
     void openFileRequest(const QString &filepath);

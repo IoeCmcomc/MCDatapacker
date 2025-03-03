@@ -458,9 +458,16 @@ void TabbedDocumentInterface::onOpenAliasedFile(const QString &filepath,
 
 void TabbedDocumentInterface::onOpenFileWithLine(const QString &filepath,
                                                  const int lineNo) {
+    onOpenFileWithSelection(filepath, lineNo, 0);
+}
+
+void TabbedDocumentInterface::onOpenFileWithSelection(const QString &filepath,
+                                                      const int lineNo,
+                                                      const int colNo,
+                                                      const int selLength) {
     onOpenFile(filepath);
     if (auto *editor = getCodeEditor()) {
-        editor->goToLine(lineNo);
+        editor->goToLine(lineNo, colNo, selLength);
     }
 }
 
