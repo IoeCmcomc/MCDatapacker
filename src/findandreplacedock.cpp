@@ -14,6 +14,7 @@
 #include <QTextBlock>
 #include <QSettings>
 #include <QPlainTextDocumentLayout>
+#include <QMessageBox>
 
 constexpr int ResultLineRole = Qt::UserRole + 10;
 constexpr int ResultColRole  = Qt::UserRole + 11;
@@ -282,15 +283,27 @@ void FindAndReplaceDock::onFindAllClicked() {
         qvariant_cast<QFont>(settings.value("editor/textFont",
                                             QFontDatabase::systemFont(
                                                 QFontDatabase::FixedFont)));
-    // monoFont.setStyleHint(QFont::Monospace);
-    // monoFont.setFixedPitch(true);
+    monoFont.setStyleHint(QFont::Monospace);
+    monoFont.setFixedPitch(true);
     QFont boldMonoFont = monoFont;
     boldMonoFont.setBold(true);
 
+    const int       entriesCount = countFilesInDir(dirPath);
+    QProgressDialog progress(QString(), tr("Abort"), 0, entriesCount, this);
+    progress.setWindowTitle(tr("Finding in datapack..."));
+    progress.setWindowModality(Qt::WindowModal);
+
     m_matchCount = 0;
+    int i = 0;
     while (it.hasNext()) {
         const QString &&path    = it.next();
         const QString &&relPath = Glhp::relPath(dirPath, path);
+        ++i;
+
+        progress.setValue(i);
+        progress.setLabelText(tr("Current file: %1").arg(relPath));
+        if (progress.wasCanceled())
+            break;
 
         const auto &&finfo = it.fileInfo();
         if (finfo.isFile()) {
@@ -307,7 +320,7 @@ void FindAndReplaceDock::onFindAllClicked() {
                 }
             }
 
-            if (!text.isNull()) {
+            if (mayHasMatchInText(text, query, opts)) {
                 m_textDoc->setPlainText(text);
                 QTreeWidgetItem *fileItem = nullptr;
 
@@ -376,15 +389,19 @@ void FindAndReplaceDock::onReplaceOnly() {
 }
 
 void FindAndReplaceDock::onReplaceAll() {
+    if (ui->fileRadio->isChecked()) {
 #ifndef QT_NO_CURSOR
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
-    emit replaceAllCurFileRequested(ui->findEdit->text(),
-                                    ui->replaceEdit->text(),
-                                    options());
+        emit replaceAllCurFileRequested(ui->findEdit->text(),
+                                        ui->replaceEdit->text(),
+                                        options());
 #ifndef QT_NO_CURSOR
-    QGuiApplication::restoreOverrideCursor();
+        QGuiApplication::restoreOverrideCursor();
 #endif
+    } else {
+        replaceAllInPack();
+    }
 }
 
 void FindAndReplaceDock::clearResults() {
@@ -402,7 +419,6 @@ void FindAndReplaceDock::updateButtonStates() {
     ui->resultsBox->setEnabled(ui->packRadio->isChecked());
     ui->clearResultsBtn->setEnabled(ui->packRadio->isChecked());
     ui->replaceAllBtn->setEnabled(ui->findReplaceCheck->isChecked()
-                                  && ui->fileRadio->isChecked()
                                   && !query.isEmpty());
 }
 
@@ -483,4 +499,117 @@ bool FindAndReplaceDock::mayHasMatchInText(const QString &text,
         return index != -1;
     }
     return false;
+}
+
+int FindAndReplaceDock::countFilesInDir(const QString &dirPath) {
+    QDirIterator it(dirPath, QDir::Files | QDir::NoDotAndDotDot,
+                    QDirIterator::Subdirectories);
+    int count = 0;
+
+    while (it.hasNext()) {
+        it.next();
+        ++count;
+    }
+    return count;
+}
+
+void FindAndReplaceDock::replaceAllInPack() {
+    clearResults();
+
+    auto dialogResult = QMessageBox::warning(this,
+                                             tr("Find and replace all"),
+                                             tr(
+                                                 "This operation is irreversible. Do you want to continue?"),
+                                             QMessageBox::Yes | QMessageBox::No,
+                                             QMessageBox::No);
+    if (dialogResult != QMessageBox::Yes) {
+        return;
+    }
+
+    const QString &&dirPath = QDir::currentPath();
+    QDirIterator    it(dirPath, QDir::Files | QDir::NoDotAndDotDot,
+                       QDirIterator::Subdirectories);
+    Options         opts        = options();
+    const QString &&query       = ui->findEdit->text();
+    const QString &&replacement = ui->replaceEdit->text();
+
+#ifndef QT_NO_CURSOR
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
+    const int       entriesCount = countFilesInDir(dirPath);
+    QProgressDialog progress(QString(), tr("Abort"), 0, entriesCount, this);
+    progress.setWindowTitle(tr("Replacing in datapack..."));
+    progress.setWindowModality(Qt::WindowModal);
+
+    m_matchCount = 0;
+    int i = 0;
+    while (it.hasNext()) {
+        const QString &&path    = it.next();
+        const QString &&relPath = Glhp::relPath(dirPath, path);
+        ++i;
+
+        progress.setValue(i);
+        progress.setLabelText(tr("Current file: %1").arg(relPath));
+        if (progress.wasCanceled())
+            break;
+
+        const auto &&finfo = it.fileInfo();
+        if (finfo.isFile()) {
+            QString text;
+            int     matchesInFile = 0;
+
+            QFile file(path);
+            if (file.open(QFile::ReadOnly)) {
+                QTextStream in(&file);
+                in.setCodec("UTF-8");
+
+                while (!in.atEnd()) {
+                    text += in.readLine();
+                    if (!in.atEnd())
+                        text += '\n';
+                }
+                file.close();
+            }
+
+            if (mayHasMatchInText(text, query, opts)) {
+                m_textDoc->setPlainText(text);
+
+                QTextCursor cursor(m_textDoc);
+
+                while (findCursor(m_textDoc, cursor, query, opts)) {
+                    if (cursor.hasSelection()) {
+                        cursor.insertText(replacement);
+                    }
+                    ++matchesInFile;
+                    ++m_matchCount;
+                }
+            }
+
+            if (matchesInFile > 0) {
+                if (finfo.isWritable()
+                    && file.open(QFile::WriteOnly | QFile::Text)) {
+                    QTextStream out(&file);
+                    out.setCodec("UTF-8");
+                    out << m_textDoc->toPlainText().toUtf8();
+                    file.close();
+                } else {
+                    m_matchCount -= matchesInFile;
+                }
+            }
+        }
+    }
+
+#ifndef QT_NO_CURSOR
+    QGuiApplication::restoreOverrideCursor();
+#endif
+
+    Q_ASSERT(m_matchCount >= 0);
+    QMessageBox::information(this, tr("Find and replace all"),
+                             tr(
+                                 "Replacing all in the datapack is completed. Replaced %n occurrence(s)."
+                                 "\nYou may have to re-open opened files to see the replacements on these files.",
+                                 nullptr, m_matchCount));
+
+    focusToInput();
 }

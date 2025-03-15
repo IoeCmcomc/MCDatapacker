@@ -86,6 +86,8 @@ private:
     void showMatchInEditor(const QString &path, const QString &query);
     bool mayHasMatchInText(const QString &text, const QString &query,
                            Options options);
+    static int countFilesInDir(const QString &dirPath);
+    void replaceAllInPack();
 };
 
 #endif // FINDANDREPLACEDOCK_H
