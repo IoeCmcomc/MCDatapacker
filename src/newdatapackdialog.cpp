@@ -29,6 +29,7 @@ const static QVector<PackFormatVersion> formatReleases = {
     { 48, QStringLiteral("1.21 – 1.21.1")   },
     { 57, QStringLiteral("1.21.2 – 1.21.3") },
     { 61, QStringLiteral("1.21.4")          },
+    { 71, QStringLiteral("1.21.5")          },
 };
 
 int gameVerToFormatReleasesIndex(const QVersionNumber &version) {
@@ -60,8 +61,10 @@ int gameVerToFormatReleasesIndex(const QVersionNumber &version) {
         return 12;
     } else if (version < Game::v1_21_4) {
         return 13;
-    } else {
+    } else if (version < Game::v1_21_5) {
         return 14;
+    } else {
+        return 15;
     }
 }
 

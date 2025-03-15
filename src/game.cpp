@@ -48,7 +48,7 @@ QVector<QString> Game::getRegistry(const QString &type,
 
 QVector<QString> Game::loadRegistry(const QString &type,
                                     const QString &version) {
-    qInfo() << "Game::loadRegistry" << type << version;
+    qDebug() << "Game::loadRegistry" << type << version;
     QElapsedTimer timer;
     timer.start();
 
@@ -104,7 +104,7 @@ QVector<QString> Game::loadRegistry(const QString &type,
     //     Glhp::fileIdList(dirPathTemplate.arg(version), realType,
     //                      QStringLiteral("minecraft"));
 
-    qInfo() << "Execution time:" << timer.nsecsElapsed() << "ns";
+    qDebug() << "Execution time:" << timer.nsecsElapsed() << "ns";
     return values;
 }
 
