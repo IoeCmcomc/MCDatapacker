@@ -814,6 +814,10 @@ bool CodeEditor::find(const QString &text,
 }
 
 void CodeEditor::replaceSelection(const QString &text) {
+    if (isReadOnly()) {
+        return;
+    }
+
     auto &&cursor = textCursor();
 
     replaceSelectedCursor(cursor, text);
@@ -822,6 +826,10 @@ void CodeEditor::replaceSelection(const QString &text) {
 
 void CodeEditor::replaceAllWith(const QString &query, const QString &text,
                                 FindAndReplaceDock::Options options) {
+    if (isReadOnly()) {
+        return;
+    }
+
     options.setFlag(FindAndReplaceDock::Option::WarpAround, false);
     if (options & FindAndReplaceDock::Option::FindInDatapack) {
     } else {
