@@ -7,9 +7,9 @@
 
 <br />
 <p align="center">
-<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/resource/app/icon/favicon_big.png" width="150">
+<img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/res/app/icon/favicon_big.png" width="150">
   <p align="center">
-    <b>MCDatapacker is a Minecraft datapack creator and editor for Minecraft 1.15 – 1.20.4.</b>
+    <b>MCDatapacker is a Minecraft datapack creator and editor for Minecraft 1.15 – 1.20.4, with partial support for 1.20.6 – 1.21.4.</b>
   </p>
 </p>
 
@@ -18,7 +18,7 @@
 MCDatapacker provides a unified interface for making and editing datapacks. It allows you to create new datapacks, open existing datapacks, manage files, and edit them quickly and conveniently.
 
 ## Features
-- Create and open any datapacks from 1.15 to 1.20.4;
+- Create and open any datapacks from 1.15 to 1.21.4;
 - Add, rename, and delete files via the left-side tree view;
 - Multi-tab interface;
 - Code editor with syntax highlighting, error checking for function and JSON files, smart code completion for function files;
@@ -32,6 +32,7 @@ MCDatapacker provides a unified interface for making and editing datapacks. It a
    - Statistics of file and command usage in a datapack;
    - Visual editor for raw JSON text (a.k.a text component);
    - Top-down advancement trees viewer;
+   - Embedded default (vanilla) datapack files (structure files not included) for offline viewing;
 - Dark mode, with automatic detection on Windows;
 - Lightweight in terms of storage and memory.
 
@@ -53,7 +54,7 @@ MCDatapacker provides a unified interface for making and editing datapacks. It a
 <img src="https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/screenshots/Raw%20JSON%20text%20editor.png" width="30%"></img>
 
 ## Download
-The program currently supports 1.15 - 1.20.4 data packs, and it run on Windows (tested on Windows 7 and Windows 11) and Linux (tested on Ubuntu 20.04.5).
+The program currently supports 1.15 - 1.20.4 data packs, with limited support for 1.20.6 - 1.21.4 data packs. The program runs on Windows (tested on Windows 7 and Windows 11) and Linux (tested on WSL and Ubuntu 20.04.5).
 
 Warning: This program may contains errors. Use it with your own risk.
 
