@@ -59,6 +59,8 @@ Warning: This program may contains errors. Use it with your own risk.
 
 Download link: https://github.com/IoeCmcomc/MCDatapacker/releases/latest
 
+All versions of the program (including development versions) are also available here: https://github.com/IoeCmcomc/MCDatapacker/releases
+
 ### Windows
 Download the zip file, extract it to a folder and run the *MCDatapacker.exe* file.
 
