@@ -81,6 +81,7 @@ namespace re2c {
     QStringView decimal(QStringView input);
     QStringView snbtNumber(QStringView input);
     QStringView itemSlot(QStringView input);
+    QStringView itemSlots(QStringView input);
     QStringView nbtPathKey(QStringView input);
     QStringView resLocPart(QStringView input);
     QStringView objective(QStringView input);
@@ -131,6 +132,18 @@ namespace re2c {
 
         /*!local:re2c
             id = [a-z0-9._]+;
+
+            id { return QStringView(input.cbegin(), YYCURSOR); }
+         *       { return QStringView(); }
+         */
+    }
+
+    QStringView itemSlots(QStringView input) {
+        const QChar *YYCURSOR = input.cbegin();
+        const QChar *YYMARKER = nullptr;
+
+        /*!local:re2c
+            id = [a-z0-9._*]+;
 
             id { return QStringView(input.cbegin(), YYCURSOR); }
          *       { return QStringView(); }

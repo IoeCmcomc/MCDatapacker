@@ -1,26 +1,29 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QSessionManager>
-#include <QTranslator>
-#include <QSettings>
-#include <QFileSystemWatcher>
-#include <QMessageBox>
 #include <QDir>
-#include <QVersionNumber>
+#include <QFileSystemWatcher>
 #include <QLocale>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QSessionManager>
+#include <QSettings>
+#include <QTranslator>
+#include <QVersionNumber>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class VisualRecipeEditorDock;
+class AdvancementTabDock;
+class CodeEditor;
+class ItemModifierDock;
 class LootTableEditorDock;
 class PredicateDock;
-class ItemModifierDock;
-class AdvancementTabDock;
 class StatusBar;
+class VisualRecipeEditorDock;
+class VanillaDatapackDock;
+class FindAndReplaceDock;
 
 namespace libqdark {
     class SystemThemeHelper;
@@ -55,6 +58,9 @@ public /*slots*/ :
     void saveAll();
     void restart();
     /* Edit menu */
+    void find();
+    void findAndReplace();
+    /* View menu */
     /* Tools menu */
     void statistics();
     void rawJsonTextEditor();
@@ -83,6 +89,12 @@ private /*slots*/ :
     void updateWindowTitle(bool changed);
     void installUpdate(const QString &url, const QString &filepath);
     void onColorModeChanged(const bool isDark);
+    void onAdvancementsDockAction(const bool checked);
+    void onItemModifierDockAction(const bool checked);
+    void onLootTableDockAction(const bool checked);
+    void onPredicateDockAction(const bool checked);
+    void onRecipeDockAction(const bool checked);
+    void onVanillaDockAction(const bool checked);
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
@@ -97,19 +109,24 @@ private:
     PackMetaInfo m_packInfo;
     QMessageBox *uniqueMessageBox                    = nullptr;
     StatusBar *m_statusBar                           = nullptr;
-    VisualRecipeEditorDock *visualRecipeEditorDock   = nullptr;
-    LootTableEditorDock *lootTableEditorDock         = nullptr;
-    PredicateDock *predicateDock                     = nullptr;
-    ItemModifierDock *itemModifierDock               = nullptr;
-    AdvancementTabDock *advancementsDock             = nullptr;
+    AdvancementTabDock *m_advancementsDock           = nullptr;
+    ItemModifierDock *m_itemModifierDock             = nullptr;
+    LootTableEditorDock *m_lootTableEditorDock       = nullptr;
+    PredicateDock *m_predicateDock                   = nullptr;
+    VanillaDatapackDock *m_vanillaDock               = nullptr;
+    VisualRecipeEditorDock *m_recipeEditorDock       = nullptr;
+    FindAndReplaceDock *m_findReplaceDock            = nullptr;
     libqdark::SystemThemeHelper *m_systemThemeHelper = nullptr;
     QVector<QAction *> recentFoldersActions;
     QString tempGameVerStr;
     QString m_initialStyleId;
+    bool m_packOpened                        = false;
     const static int maxRecentFoldersActions = 10;
 
     void initDocks();
     void initMenu();
+    void initFindDocks(FindAndReplaceDock *dock);
+    void connectEditAction(QAction * action, void (CodeEditor::*method)());
     void connectActionLink(QAction *action, const QString &&url);
     void initResourcesMenu();
     void readSettings();
@@ -129,8 +146,10 @@ private:
     void adjustForCurFolder(const QString &path);
     void updateRecentFolders();
     void updateEditMenu();
+    void updateViewMenu();
     void changeAppStyle(const bool darkMode);
     void setAppStyle(const QString &name);
+    void showFindReplaceDock(const bool replaceMode = false);
 };
 
 #endif /* MAINWINDOW_H */

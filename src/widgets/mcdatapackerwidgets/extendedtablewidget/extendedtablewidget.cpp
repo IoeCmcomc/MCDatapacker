@@ -26,7 +26,7 @@ ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
     ui->addBtn->setObjectName(QStringLiteral("__qt__passive_addBtn"));
     ui->cancelBtn->setObjectName(QStringLiteral("__qt__passive_cancelBtn"));
 
-    setContainer(new QFrame(this));
+    // setContainer(new QFrame(this));
 
     connect(ui->addBtn, &QToolButton::clicked,
             this, &ExtendedTableWidget::onAddBtn);
@@ -46,6 +46,8 @@ ExtendedTableWidget::ExtendedTableWidget(QWidget *parent) :
       QHeaderView* headerView = ui->table->horizontalHeader();
       headerView->setSectionResizeMode(QHeaderView::ResizeToContents);
  */
+
+    adjustSize();
 }
 
 QTableWidget * ExtendedTableWidget::tableWidget() const {
@@ -65,7 +67,7 @@ ExtendedTableWidget::JsonMode ExtendedTableWidget::jsonMode() const {
 }
 
 QJsonObject ExtendedTableWidget::toJsonObject() const {
-    if (m_jsonMode == JsonMode::List)
+    if (m_jsonMode == JsonMode::List || m_jsonMode == JsonMode::SimpleList)
         return QJsonObject();
 
     QJsonObject ret;
@@ -93,21 +95,25 @@ QJsonObject ExtendedTableWidget::toJsonObject() const {
 }
 
 QJsonArray ExtendedTableWidget::toJsonArray() const {
-    if (m_jsonMode != JsonMode::List)
+    if (m_jsonMode == JsonMode::SimpleMap || m_jsonMode == JsonMode::ComplexMap)
         return QJsonArray();
 
     QJsonArray ret;
     const int  cols = ui->table->columnCount();
 
     for (int row = 0; row < ui->table->rowCount(); ++row) {
-        QJsonObject obj;
-        for (int col = 0; col < cols; ++col) {
-            const auto &&value = itemDataToJson(row, col);
-            if (!value.isNull())
-                obj[m_columnMappings[col].jsonKey] = value;
+        if (m_jsonMode == JsonMode::SimpleList) {
+            ret << itemDataToJson(row, 0);
+        } else if (m_jsonMode == JsonMode::List) {
+            QJsonObject obj;
+            for (int col = 0; col < cols; ++col) {
+                const auto &&value = itemDataToJson(row, col);
+                if (!value.isNull())
+                    obj[m_columnMappings[col].jsonKey] = value;
+            }
+            if (!obj.isEmpty())
+                ret << obj;
         }
-        if (!obj.isEmpty())
-            ret << obj;
     }
     return ret;
 }
@@ -141,6 +147,7 @@ void ExtendedTableWidget::fromJson(const QJsonObject &root) {
 
 void ExtendedTableWidget::fromJson(const QJsonArray &root) {
     clear();
+    const int cols = ui->table->columnCount();
 
     if (m_jsonMode == JsonMode::List) {
         int row = 0;
@@ -156,6 +163,12 @@ void ExtendedTableWidget::fromJson(const QJsonArray &root) {
                     qWarning() << "Undefined JSON key:" << key;
                 }
             }
+            ++row;
+        }
+    } else if (m_jsonMode == JsonMode::SimpleList && (cols == 1)) {
+        int row = 0;
+        for (const auto &jsonRef : root) {
+            loadItemFromJson(row, 0, jsonRef);
             ++row;
         }
     }
@@ -190,6 +203,7 @@ void ExtendedTableWidget::setContainer(QFrame *widget) {
     auto *oldContainer = ui->container;
     if (oldContainer != widget) {
         m_layout->removeWidget(oldContainer);
+        oldContainer->hide();
         // Calling oldContainer->deleteLater() directly will not work
         // in the context of a modal dialog
         QTimer::singleShot(0, oldContainer, &QObject::deleteLater);
@@ -317,9 +331,13 @@ QJsonValue ExtendedTableWidget::itemDataToJson(int row, int col) const {
         }
 
         case EditorClass::QComboBox: {
-            const auto  *editor = qobject_cast<QComboBox *>(widget);
-            const int    index  = item->data(ComboboxIndexRole).toInt();
-            const auto &&vari   = editor->itemData(index, ComboboxDataRole);
+            const auto *editor = qobject_cast<QComboBox *>(widget);
+            Q_ASSERT(editor != nullptr);
+            if (editor->isEditable()) {
+                return item->text();
+            }
+            const int    index = item->data(ComboboxIndexRole).toInt();
+            const auto &&vari  = editor->itemData(index, ComboboxDataRole);
             if (!vari.isNull()) {
                 return vari.toJsonValue();
             } else {
@@ -375,19 +393,25 @@ void ExtendedTableWidget::loadItemFromJson(int row, int col,
 
         case EditorClass::QComboBox: {
             auto *editor = qobject_cast<QComboBox *>(widget);
-            int   index  = editor->findData(value.toVariant(),
-                                            ExtendedRole::ComboboxDataRole);
-            if (index == -1)
-                index = editor->findText(value.toString());
-            if (index == -1) {
-                delete item;
-                return;
-            }
+            Q_ASSERT(editor != nullptr);
+            if (editor->isEditable()) {
+                item->setText(value.toString());
+            } else {
+                int index = editor->findData(value.toVariant(),
+                                             ExtendedRole::ComboboxDataRole);
+                if (index == -1)
+                    index = editor->findText(value.toString());
+                if (index == -1) {
+                    delete item;
+                    return;
+                }
 
-            item->setText(editor->itemData(index, Qt::DisplayRole).toString());
-            item->setData(Qt::DecorationRole,
-                          editor->itemData(index, Qt::DecorationRole));
-            item->setData(ComboboxIndexRole, index);
+                item->setText(editor->itemData(index,
+                                               Qt::DisplayRole).toString());
+                item->setData(Qt::DecorationRole,
+                              editor->itemData(index, Qt::DecorationRole));
+                item->setData(ComboboxIndexRole, index);
+            }
             break;
         }
 

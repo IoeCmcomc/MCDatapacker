@@ -4,6 +4,7 @@ TEMPLATE = app
 TARGET = MCDatapacker
 
 QT += core gui uitools svg widgets-private gui-private
+# QT ++ testlib
 win32:QT += winextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -20,7 +21,7 @@ win32:LIBS += -lDwmapi
 DEFINES += QT_DEPRECATED_WARNINGS
 
 # Application-specific defines
-DEFINES += MCFUNCTIONPARSER_USE_CACHE
+DEFINES += MCFUNCTIONPARSER_USE_CACHE PARSENODE_REPRPRINTER
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -50,6 +51,7 @@ SOURCES += \
     entitynamestextobjectdialog.cpp \
     filenamedelegate.cpp \
     fileswitcher.cpp \
+    findandreplacedock.cpp \
     game.cpp \
     gameinfomodel.cpp \
     globalhelpers.cpp \
@@ -80,10 +82,14 @@ SOURCES += \
     nbttextobjectdialog.cpp \
     newdatapackdialog.cpp \
     norwegianwoodstyle.cpp \
+    numberproviderdialog.cpp \
     parsers/command/mcfunctionparser.cpp \
     parsers/command/minecraftparser.cpp \
     parsers/command/nodes/gamemodenode.cpp \
+    parsers/command/nodes/inlinableresourcenode.cpp \
     parsers/command/nodes/internalregexpatternnode.cpp \
+    parsers/command/nodes/itempredicatematchnode.cpp \
+    parsers/command/nodes/listnode.cpp \
     parsers/command/nodes/macronode.cpp \
     parsers/command/nodes/stylenode.cpp \
     parsers/command/nodes/uuidnode.cpp \
@@ -146,6 +152,9 @@ SOURCES += \
     tagselectordialog.cpp \
     translatedtextobjectdialog.cpp \
     truefalsebox.cpp \
+    vanilladatapackdock.cpp \
+    vanilladatapackmodel.cpp \
+    variantmapfile.cpp \
     vieweventfilter.cpp \
     visualrecipeeditordock.cpp
 
@@ -171,7 +180,9 @@ HEADERS += \
     entitynamestextobjectdialog.h \
     filenamedelegate.h \
     fileswitcher.h \
+    findandreplacedock.h \
     game.h \
+    gameconstants.h \
     gameinfomodel.h \
     globalhelpers.h \
     highlighter.h \
@@ -201,6 +212,7 @@ HEADERS += \
     nbttextobjectdialog.h \
     newdatapackdialog.h \
     norwegianwoodstyle.h \
+    numberproviderdialog.h \
     parsers/command/mcfunctionparser.h \
     parsers/command/nodes/anglenode.h \
     parsers/command/nodes/argumentnode.h \
@@ -211,9 +223,12 @@ HEADERS += \
     parsers/command/nodes/filenode.h \
     parsers/command/nodes/floatrangenode.h \
     parsers/command/nodes/gamemodenode.h \
+    parsers/command/nodes/inlinableresourcenode.h \
     parsers/command/nodes/internalregexpatternnode.h \
     parsers/command/nodes/intrangenode.h \
+    parsers/command/nodes/itempredicatematchnode.h \
     parsers/command/nodes/itemstacknode.h \
+    parsers/command/nodes/listnode.h \
     parsers/command/nodes/literalnode.h \
     parsers/command/nodes/macronode.h \
     parsers/command/nodes/mapnode.h \
@@ -268,6 +283,9 @@ HEADERS += \
     tagselectordialog.h \
     translatedtextobjectdialog.h \
     truefalsebox.h \
+    vanilladatapackdock.h \
+    vanilladatapackmodel.h \
+    variantmapfile.h \
     vieweventfilter.h \
     visualrecipeeditordock.h
 
@@ -279,6 +297,7 @@ FORMS += \
     disclaimerdialog.ui \
     entityconditiondialog.ui \
     entitynamestextobjectdialog.ui \
+    findandreplacedock.ui \
     itemconditiondialog.ui \
     itemmodifierdock.ui \
     locationconditiondialog.ui \
@@ -292,6 +311,7 @@ FORMS += \
     inventorysloteditor.ui \
     nbttextobjectdialog.ui \
     newdatapackdialog.ui \
+    numberproviderdialog.ui \
     predicatedock.ui \
     rawjsontexteditor.ui \
     scoreboardtextobjectdialog.ui \
@@ -300,6 +320,7 @@ FORMS += \
     tabbeddocumentinterface.ui \
     tagselectordialog.ui \
     translatedtextobjectdialog.ui \
+    vanilladatapackdock.ui \
     visualrecipeeditordock.ui
 
 TRANSLATIONS += \
@@ -312,26 +333,45 @@ TRANSLATIONS += \
     ../translations/qtxmlpatterns_vi.ts
 
 RESOURCES += \
-    ../resource/app/app.qrc \
-    ../resource/minecraft/info/1.15/1.15.qrc \
-    ../resource/minecraft/info/1.16/1.16.qrc \
-    ../resource/minecraft/info/1.17/1.17.qrc \
-    ../resource/minecraft/info/1.18/1.18.qrc \
-    ../resource/minecraft/info/1.18.2/1.18.2.qrc \
-    ../resource/minecraft/info/1.19/1.19.qrc \
-    ../resource/minecraft/info/1.19.3/1.19.3.qrc \
-    ../resource/minecraft/info/1.19.4/1.19.4.qrc \
-    ../resource/minecraft/info/1.20/1.20.qrc \
-    ../resource/minecraft/info/1.20.2/1.20.2.qrc \
-    ../resource/minecraft/info/1.20.4/1.20.4.qrc \
-    ../resource/minecraft/minecraft.qrc \
-    ../resource/app/icons/default/default.qrc
+    ../res/app/app.qrc \
+    ../res/mc/info/1.15/1.15.qrc \
+    ../res/mc/info/1.16/1.16.qrc \
+    ../res/mc/info/1.17/1.17.qrc \
+    ../res/mc/info/1.18/1.18.qrc \
+    ../res/mc/info/1.18.2/1.18.2.qrc \
+    ../res/mc/info/1.19/1.19.qrc \
+    ../res/mc/info/1.19.3/1.19.3.qrc \
+    ../res/mc/info/1.19.4/1.19.4.qrc \
+    ../res/mc/info/1.20/1.20.qrc \
+    ../res/mc/info/1.20.2/1.20.2.qrc \
+    ../res/mc/info/1.20.4/1.20.4.qrc \
+    ../res/mc/info/1.20.6/1.20.6.qrc \
+    ../res/mc/info/1.21/1.21.qrc \
+    ../res/mc/info/1.21.3/1.21.3.qrc \
+    ../res/mc/info/1.21.4/1.21.4.qrc \
+    ../res/mc/info/1.15/1.15-data-json.qrc \
+    ../res/mc/info/1.16/1.16-data-json.qrc \
+    ../res/mc/info/1.17/1.17-data-json.qrc \
+    ../res/mc/info/1.18/1.18-data-json.qrc \
+    ../res/mc/info/1.18.2/1.18.2-data-json.qrc \
+    ../res/mc/info/1.19/1.19-data-json.qrc \
+    ../res/mc/info/1.19.3/1.19.3-data-json.qrc \
+    ../res/mc/info/1.19.4/1.19.4-data-json.qrc \
+    ../res/mc/info/1.20/1.20-data-json.qrc \
+    ../res/mc/info/1.20.2/1.20.2-data-json.qrc \
+    ../res/mc/info/1.20.4/1.20.4-data-json.qrc \
+    ../res/mc/info/1.20.6/1.20.6-data-json.qrc \
+    ../res/mc/info/1.21/1.21-data-json.qrc \
+    ../res/mc/info/1.21.3/1.21.3-data-json.qrc \
+    ../res/mc/info/1.21.4/1.21.4-data-json.qrc \
+    ../res/mc/minecraft.qrc \
+    ../res/app/icons/default/default.qrc
 
 DISTFILES += \
     ../lib/QFindDialogs/LICENSE \
-    ../resource/app/fonts/LICENSE_Monocraft.txt
+    ../res/app/fonts/LICENSE_Monocraft.txt
 
-RC_ICONS = ../resource/app/icon/favicon.ico
+RC_ICONS = ../res/app/icon/favicon.ico
 
 include(widgets/mcdatapackerwidgets/mcdatapackerwidgets.pri)
 
@@ -341,6 +381,8 @@ include($$PWD/../lib/json/json.pri)
 include($$PWD/../lib/uberswitch/uberswitch.pri)
 include($$PWD/../lib/lru-cache/lru-cache.pri)
 include($$PWD/../lib/miniz/miniz.pri)
+
+DEFINES += QSU_INCLUDE_MOC=1
 
 #PRECOMPILED_HEADER = mcdatapacker_pch.h
 
@@ -365,6 +407,7 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\" \
     APP_VERSION_MINOR=$$VERSION_MINOR \
     APP_VERSION_PATCH=$$VERSION_PATCH
 
+QMAKE_RESOURCE_FLAGS += -threshold 40 -compress 9 -compress-algo zlib
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/release/ -lnbt
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/nbt/debug/ -lnbt
@@ -393,21 +436,6 @@ else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/
 else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/release/QFindDialogs.lib
 else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/debug/QFindDialogs.lib
 else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/QFindDialogs/libQFindDialogs.a
-
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/qlementine/release/ -lqlementine
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/qlementine/debug/ -lqlementine
-else:unix: LIBS += -L$$OUT_PWD/../lib/qlementine/ -lqlementine
-
-INCLUDEPATH += $$PWD/../lib/qlementine \
-    $$PWD/../lib/qlementine/qlementine/lib/include
-DEPENDPATH += $$PWD/../lib/qlementine
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/release/libqlementine.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/debug/libqlementine.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/release/qlementine.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/debug/qlementine.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../lib/qlementine/libqlementine.a
 
 
 win32-msvc*: {

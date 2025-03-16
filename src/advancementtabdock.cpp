@@ -4,6 +4,8 @@
 #include "inventoryitem.h"
 
 #include "globalhelpers.h"
+#include "game.h"
+#include "codefile.h"
 #include "platforms/windows_specific.h"
 
 #include <QDirIterator>
@@ -13,7 +15,6 @@
 AdvancementTabDock::AdvancementTabDock(QWidget *parent) :
     QDockWidget(parent), ui(new Ui::AdvancementTabDock) {
     ui->setupUi(this);
-    hide();
 
     connect(this, &QDockWidget::visibilityChanged, this,
             [this](const bool visible) {
@@ -52,6 +53,9 @@ void AdvancementTabDock::loadAdvancements() {
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 #endif
 
+    const QString &&itemIdField =
+        (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+
     // Read all showable advancements
 
     QDir          &&dir     = QDir::current();
@@ -69,7 +73,8 @@ void AdvancementTabDock::loadAdvancements() {
 
         const auto &&finfo = it.fileInfo();
         if (finfo.isFile()) {
-            if (Glhp::pathToFileType(dirPath, path) == CodeFile::Advancement) {
+            if (CodeFile::pathToFileType(dirPath, path) ==
+                CodeFile::Advancement) {
                 QJsonObject obj;
                 QFile       file(path);
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -86,8 +91,9 @@ void AdvancementTabDock::loadAdvancements() {
                         const auto &&display = obj["display"].toObject();
                         if (display.contains("icon")) {
                             const auto &&icon = display["icon"].toObject();
-                            if (icon.contains("item")) {
-                                const auto &&item = icon["item"].toString();
+                            if (icon.contains(itemIdField)) {
+                                const auto &&item =
+                                    icon[itemIdField].toString();
                                 if (!item.isEmpty()) {
                                     advancemInfo.displayIcon =
                                         InventoryItem{ item }.getPixmap();

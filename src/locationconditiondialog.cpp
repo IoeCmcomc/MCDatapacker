@@ -8,6 +8,7 @@
 #include <QVariant>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTableWidget>
 
 LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     QDialog(parent), BaseCondition(), ui(new Ui::LocationConditionDialog) {
@@ -19,7 +20,7 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
 
     m_biomeModel.setInfo(QStringLiteral("biome"));
     m_biomeModel.setDatapackCategory(QStringLiteral("worldgen/biome"));
-    ui->biomeCombo->setModel(&m_biomeModel);
+    ui->biomeSelector->setIdModel(&m_biomeModel);
     m_dimensionModel.setInfo(QStringLiteral("dimension"));
     m_dimensionModel.setDatapackCategory(QStringLiteral("dimension"));
     ui->dimensionCombo->setModel(&m_dimensionModel);
@@ -34,24 +35,84 @@ LocationConditionDialog::LocationConditionDialog(QWidget *parent) :
     } else {
         m_featureModel.setInfo(QStringLiteral("feature"));
     }
-    ui->featureCombo->setModel(&m_featureModel);
+    ui->structureSelector->setIdModel(&m_featureModel);
 
-    if (Game::version() < Game::v1_16) {
+    if (UNTIL_VER(v1_16)) {
         ui->smokeyCheck->hide();
     }
+    if (UNTIL_VER(v1_21)) {
+        ui->canSeeSkyCheck->hide();
+    }
 
-    from_1_17 = Game::version() >= Game::v1_17;
-    ui->blockSlot->setAcceptMultiple(from_1_17);
-    ui->blockSlot->setAcceptTag(false);
-    ui->blockSlot->setSelectCategory(InventorySlot::SelectCategory::Blocks);
-
-    connect(ui->addstateBtn, &QPushButton::clicked,
-            this, &LocationConditionDialog::onAddedState);
     initBlockGroup();
     initFluidGroup();
-    ui->stateTable->installEventFilter(&viewFilter);
 
-    adjustSize();
+    ui->blockSlot->setAcceptItemsOrTag();
+    if (UNTIL_VER(v1_20_6)) {
+        if (UNTIL_VER(v1_17)) {
+            ui->blockSlot->setAcceptMultiple(false);
+        }
+
+        ui->biomeSelector->setModes(IdTagSelector::Id);
+        ui->structureSelector->setModes(IdTagSelector::Id);
+    } else {
+        m_biomeModel.setOptionalItem(false);
+        ui->biomeSelector->setTagModel(
+            new GameInfoModel(this, "tag/worldgen/biome",
+                              GameInfoModel::Registry,
+                              GameInfoModel::PrependPrefix,
+                              "tags/worldgen/biome"));
+
+        m_featureModel.setOptionalItem(false);
+        ui->structureSelector->setTagModel(
+            new GameInfoModel(this, "tag/worldgen/structure",
+                              GameInfoModel::Registry,
+                              GameInfoModel::PrependPrefix,
+                              "tags/worldgen/structure"));
+    }
+    ui->blockSlot->setSelectCategory(InventorySlot::SelectCategory::Blocks);
+
+    m_controller.addMappings({
+        { "position", new DWCRecord{
+              { "x", ui->xInput },
+              { "y", ui->yInput },
+              { "z", ui->zInput },
+          } },
+        { FROM_VER(v1_20_6) ? "biomes" : "biome", ui->biomeSelector },
+        { "dimension", ui->dimensionCombo },
+        { "light", new DWCRecord{
+              { "light", ui->lightInput },
+          } },
+        { "block", new DWCRecord{
+              { FROM_VER(v1_17) ? "blocks" : "block", ui->blockSlot, false,
+                FROM_VER(v1_20_6) },
+              { "nbt", ui->blockNbtEdit },
+              { "state", ui->stateTable },
+          } },
+        { "fluid", new DWCRecord{
+              { FROM_VER(v1_17) ? "fluids" : "fluid", ui->fluidSelector, false,
+                FROM_VER(v1_20_6) },
+              // The conflict will be handled in the fromJson() and toJson() methods
+              { "state", ui->stateTable },
+          } },
+    });
+
+    if (FROM_VER(v1_20_6)) {
+        m_controller.addMapping("structures", ui->structureSelector);
+    } else if (FROM_VER(v1_19)) {
+        m_controller.addMapping("structure", ui->structureSelector);
+    } else {
+        m_controller.addMapping("feature", ui->structureSelector);
+    }
+
+    if (FROM_VER(v1_21)) {
+        m_controller.addMapping("can_see_sky", ui->canSeeSkyCheck);
+    }
+    if (FROM_VER(v1_16)) {
+        m_controller.addMapping("smokey", ui->smokeyCheck);
+    }
+
+    // adjustSize();
 }
 
 LocationConditionDialog::~LocationConditionDialog() {
@@ -60,166 +121,81 @@ LocationConditionDialog::~LocationConditionDialog() {
 
 QJsonObject LocationConditionDialog::toJson() const {
     QJsonObject root;
-    QJsonObject position;
 
-    if (!ui->xInput->isCurrentlyUnset())
-        position.insert("x", ui->xInput->toJson());
-    if (!ui->yInput->isCurrentlyUnset())
-        position.insert("y", ui->yInput->toJson());
-    if (!ui->zInput->isCurrentlyUnset())
-        position.insert("z", ui->zInput->toJson());
-    if (!position.isEmpty())
-        root.insert(QStringLiteral("position"), position);
+    m_controller.putValueTo(root, {});
 
-    if (ui->biomeCombo->currentIndex() != 0)
-        root.insert(QStringLiteral("biome"), ui->biomeCombo->currentData(
-                        GameInfoModel::IdRole).toString());
-    if (ui->dimensionCombo->currentIndex() != 0)
-        root.insert(QStringLiteral("dimension"),
-                    ui->dimensionCombo->currentData(
-                        Qt::UserRole + 1).toString());
-    if (ui->featureCombo->currentIndex() != 0) {
-        if (Game::version() >= Game::v1_19) {
-            root.insert(QStringLiteral("structure"),
-                        ui->featureCombo->currentData(
-                            Qt::UserRole + 1).toString());
-        } else {
-            root.insert(QStringLiteral("feature"),
-                        ui->featureCombo->currentData(
-                            Qt::UserRole + 1).toString());
-        }
-    }
-    if (!ui->lightInput->isCurrentlyUnset())
-        root.insert(QStringLiteral("light"), { { "light",
-                        ui->lightInput->toJson() } });
-    if (Game::version() >= QVersionNumber(1, 16)) {
-        ui->smokeyCheck->insertToJsonObject(root, "smokey");
-    }
-
-    if (ui->blockGroup->isChecked()) {
-        QJsonObject block;
-        if (ui->block_blockRadio->isChecked()) {
-            if (from_1_17) {
-                QJsonArray blocks;
-                for (int i = 0; i < ui->blockSlot->itemCount(); ++i) {
-                    blocks << ui->blockSlot->itemNamespacedID(i);
-                }
-                if (!blocks.isEmpty()) {
-                    block.insert(QStringLiteral("blocks"), blocks);
-                }
+    if (root.value(QStringLiteral("block")).toObject().contains("state")
+        && root.value(QStringLiteral("fluid")).toObject().contains("state")) {
+        if (ui->blockGroup->isChecked()) {
+            QJsonValueRef &&ref    = root[QStringLiteral("fluid")];
+            auto          &&refObj = ref.toObject();
+            refObj.remove("state");
+            if (refObj.isEmpty()) {
+                root.remove(QStringLiteral("fluid"));
             } else {
-                block.insert(QStringLiteral("block"),
-                             ui->blockSlot->itemNamespacedID());
+                ref = refObj;
             }
-        } else if (!ui->blockTagEdit->text().isEmpty()) {
-            block.insert(QStringLiteral("tag"), ui->blockTagEdit->text());
+        } else {
+            QJsonValueRef &&ref    = root[QStringLiteral("block")];
+            auto          &&refObj = ref.toObject();
+            refObj.remove("state");
+            if (refObj.isEmpty()) {
+                root.remove(QStringLiteral("block"));
+            } else {
+                ref = refObj;
+            }
         }
-        if (!ui->blockNBTEdit->text().isEmpty())
-            block.insert(QStringLiteral("nbt"), ui->blockNBTEdit->text());
-        QJsonObject blockStates = jsonFromStateTable(ui->stateTable);
-        if (!blockStates.isEmpty() && ui->stateGroup->isChecked())
-            block.insert(QStringLiteral("state"), blockStates);
-        root.insert(QStringLiteral("block"), block);
-    } else if (ui->fluidGroup->isChecked()) {
-        QJsonObject fluid;
-        if (ui->fluid_fluidRadio->isChecked()) {
-            fluid.insert(QStringLiteral("fluid"),
-                         ui->fluidCombo->currentData(
-                             Qt::UserRole + 1).toString());
-        } else if (!ui->fluidTagEdit->text().isEmpty()) {
-            fluid.insert(QStringLiteral("tag"), ui->fluidTagEdit->text());
-        }
-        QJsonObject fluidStates = jsonFromStateTable(ui->stateTable);
-        if (!fluidStates.isEmpty() && ui->stateGroup->isChecked())
-            fluid.insert(QStringLiteral("state"), fluidStates);
-        root.insert(QStringLiteral("fluid"), fluid);
     }
 
     return root;
 }
 
 void LocationConditionDialog::fromJson(const QJsonObject &value) {
-    if (value.contains(QStringLiteral("position"))) {
-        QJsonObject position = value[QStringLiteral("position")].toObject();
-        if (position.contains(QStringLiteral("x")))
-            ui->xInput->fromJson(position[QStringLiteral("x")]);
-        if (position.contains(QStringLiteral("y")))
-            ui->yInput->fromJson(position[QStringLiteral("y")]);
-        if (position.contains(QStringLiteral("z")))
-            ui->zInput->fromJson(position[QStringLiteral("z")]);
+    ui->blockGroup->setChecked(!value.value(QStringLiteral(
+                                                "block")).toObject().isEmpty());
+    ui->fluidGroup->setChecked(!value.value(QStringLiteral(
+                                                "fluid")).toObject().isEmpty());
+
+    if (value.value(QStringLiteral("block")).toObject().contains("state")
+        || value.value(QStringLiteral("fluid")).toObject().contains("state")) {
+        ui->stateGroup->setChecked(true);
     }
 
-    if (value.contains(QStringLiteral("biome")))
-        setComboValueFrom(ui->biomeCombo, value[QStringLiteral("biome")]);
-    if (value.contains(QStringLiteral("dimension")))
-        setComboValueFrom(ui->dimensionCombo,
-                          value[QStringLiteral("dimension")]);
-    if (Game::version() >= Game::v1_19) {
-        if (value.contains(QStringLiteral("structure"))) {
-            setComboValueFrom(ui->featureCombo,
-                              value[QStringLiteral("structure")]);
-        }
-    } else {
-        if (value.contains(QStringLiteral("feature"))) {
-            setComboValueFrom(ui->featureCombo,
-                              value[QStringLiteral("feature")]);
-        }
-    }
-    if (value.contains(QStringLiteral("light"))) {
-        auto light = value[QStringLiteral("light")].toObject();
-        if (light.contains(QStringLiteral("light")))
-            ui->lightInput->fromJson(light[QStringLiteral("light")]);
-    }
-    if (Game::version() >= Game::v1_16) {
-        ui->smokeyCheck->setupFromJsonObject(value, "smokey");
-    }
-
-    ui->blockGroup->setChecked(value.contains(QStringLiteral("block")));
-    ui->fluidGroup->setChecked(value.contains(QStringLiteral("fluid")));
-    if (value.contains(QStringLiteral("block"))) {
-        QJsonObject block = value[QStringLiteral("block")].toObject();
-        ui->block_tagRadio->setChecked(block.contains(QStringLiteral("tag")));
-        ui->blockSlot->clearItems();
-        if (from_1_17 && block.contains(QStringLiteral("blocks"))) {
-            const auto &&blocks = block["blocks"].toArray();
-            for (const auto &blockId: blocks) {
-                ui->blockSlot->appendItem(blockId.toString());
-            }
-        } else if (block.contains(QStringLiteral("block"))) {
-            InventoryItem invItem(block[QStringLiteral("block")].toString());
-            ui->blockSlot->setItem(invItem);
-        } else if (block.contains(QStringLiteral("tag"))) {
-            if (block.contains(QStringLiteral("tag")))
-                ui->blockTagEdit->setText(block[QStringLiteral(
-                                                    "tag")].toString());
-        }
-        if (block.contains(QStringLiteral("nbt")))
-            ui->blockNBTEdit->setText(block[QStringLiteral("nbt")].toString());
-
-        if (block.contains(QStringLiteral("state"))) {
-            ui->stateGroup->setChecked(true);
-            QJsonObject state = block[QStringLiteral("state")].toObject();
-            setupStateTableFromJson(ui->stateTable, state);
-        }
-    } else if (value.contains(QStringLiteral("fluid"))) {
-        QJsonObject fluid = value[QStringLiteral("fluid")].toObject();
-        ui->fluid_tagRadio->setChecked(fluid.contains(QStringLiteral("tag")));
-        if (fluid.contains(QStringLiteral("fluid"))) {
-            setComboValueFrom(ui->fluidCombo,
-                              fluid[QStringLiteral("fluid")].toString());
-        } else if (fluid.contains(QStringLiteral("tag"))) {
-            ui->blockTagEdit->setText(fluid[QStringLiteral("tag")].toString());
-        }
-        if (fluid.contains(QStringLiteral("state"))) {
-            ui->stateGroup->setChecked(true);
-            QJsonObject state = fluid[QStringLiteral("state")].toObject();
-            setupStateTableFromJson(ui->stateTable, state);
-        }
-    }
+    m_controller.setValueFrom(value, {});
 }
 
-void LocationConditionDialog::setupStateTableFromJson(QTableWidget *table,
-                                                      const QJsonObject &json) {
+void LocationConditionDialog::initBlockGroup() {
+    ui->blockGroup->setChecked(false);
+
+    connect(ui->blockGroup, &QGroupBox::toggled, this, [this](bool checked) {
+        if (ui->fluidGroup->isChecked() && checked)
+            ui->fluidGroup->setChecked(false);
+        ui->stateGroup->setEnabled(checked);
+    });
+
+    ui->stateTable->appendColumnMapping({}, ui->stateEdit);
+    ui->stateTable->appendColumnMapping({}, ui->stateValueCombo);
+}
+
+void LocationConditionDialog::initFluidGroup() {
+    ui->fluidGroup->setChecked(false);
+
+    m_fluidModel.setInfo(QStringLiteral("fluid"), GameInfoModel::PrependPrefix);
+    ui->fluidSelector->setIdModel(&m_fluidModel);
+    if (UNTIL_VER(v1_20_6)) {
+        ui->fluidSelector->setModes(IdTagSelector::Id | IdTagSelector::Tag);
+    }
+
+    connect(ui->fluidGroup, &QGroupBox::toggled, this, [this](bool checked) {
+        if (ui->blockGroup->isChecked() && checked)
+            ui->blockGroup->setChecked(false);
+        ui->stateGroup->setEnabled(checked);
+    });
+}
+
+void LocationConditionDialog::LocationConditionDialog::setupStateTableFromJson(
+    QTableWidget *table,
+    const QJsonObject &json) {
     const auto &&keys = json.keys();
 
     for (const auto &key : keys) {
@@ -232,7 +208,7 @@ void LocationConditionDialog::setupStateTableFromJson(QTableWidget *table,
     }
 }
 
-QJsonObject LocationConditionDialog::jsonFromStateTable(
+QJsonObject LocationConditionDialog::LocationConditionDialog::jsonFromStateTable(
     const QTableWidget *table) {
     QJsonObject states;
 
@@ -244,48 +220,4 @@ QJsonObject LocationConditionDialog::jsonFromStateTable(
                       Glhp::strToVariant(value).toJsonValue());
     }
     return states;
-}
-
-void LocationConditionDialog::onAddedState() {
-    if (ui->stateEdit->text().isEmpty()
-        || ui->stateValueEdit->text().isEmpty())
-        return;
-
-    QTableWidgetItem *stateItem = new QTableWidgetItem(
-        ui->stateEdit->text());
-    QTableWidgetItem *valueItem = new QTableWidgetItem(
-        ui->stateValueEdit->text());
-
-    appendRowToTableWidget(ui->stateTable, { stateItem, valueItem });
-}
-
-void LocationConditionDialog::initBlockGroup() {
-    ui->blockGroup->setChecked(false);
-
-    connect(ui->blockGroup, &QGroupBox::toggled, this, [this](bool checked) {
-        if (ui->fluidGroup->isChecked() && checked)
-            ui->fluidGroup->setChecked(false);
-        ui->stateGroup->setEnabled(checked);
-    });
-    connect(ui->block_blockRadio, &QRadioButton::toggled,
-            ui->blockSlot, &QWidget::setEnabled);
-    connect(ui->block_tagRadio, &QRadioButton::toggled,
-            ui->blockTagEdit, &QWidget::setEnabled);
-}
-
-void LocationConditionDialog::initFluidGroup() {
-    ui->fluidGroup->setChecked(false);
-
-    m_fluidModel.setInfo(QStringLiteral("fluid"), GameInfoModel::PrependPrefix);
-    ui->fluidCombo->setModel(&m_fluidModel);
-
-    connect(ui->fluidGroup, &QGroupBox::toggled, this, [this](bool checked) {
-        if (ui->blockGroup->isChecked() && checked)
-            ui->blockGroup->setChecked(false);
-        ui->stateGroup->setEnabled(checked);
-    });
-    connect(ui->fluid_fluidRadio, &QRadioButton::toggled,
-            ui->fluidCombo, &QWidget::setEnabled);
-    connect(ui->fluid_tagRadio, &QRadioButton::toggled,
-            ui->fluidTagEdit, &QWidget::setEnabled);
 }

@@ -5,14 +5,16 @@
 #include <QDebug>
 
 class InventoryItem {
+    Q_GADGET
 public:
     enum Type : unsigned int {
-        Invalid      = 0,
+        Invalid   = 0,
         Block     = 1,
         Item      = 2,
         BlockItem = Block | Item,
         Tag       = 4,
     };
+    Q_ENUM(Type)
     Q_DECLARE_FLAGS(Types, Type);
 
     InventoryItem()                           = default;
@@ -39,6 +41,9 @@ public:
     QString getNamespacedID() const;
     void setNamespacedID(const QString &id);
 
+    QVariantMap components() const;
+    void setComponents(const QVariantMap &newComponents);
+
     bool isBlock() const;
     void setIsBlock(const bool &value);
 
@@ -59,12 +64,13 @@ public:
 
     friend QDataStream &operator<<(QDataStream &out, const InventoryItem &obj);
     friend QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
-
+    friend QDebug operator<<(QDebug debug, const InventoryItem &item);
 
 private:
     mutable QPixmap m_pixmap;
     QString m_name;
     QString m_namespacedId;
+    QVariantMap m_components;
     Types m_types = Type::Invalid;
 
     void setupItem(QString id);
@@ -72,13 +78,7 @@ private:
 };
 
 Q_DECLARE_METATYPE(InventoryItem);
+Q_DECLARE_TYPEINFO(InventoryItem, Q_RELOCATABLE_TYPE);
 //Q_DECLARE_OPAQUE_POINTER(InventoryItem *)
-
-/*
-   QDataStream & operator<<(QDataStream & out, const InventoryItem &obj);
-   QDataStream &operator>>(QDataStream &in, InventoryItem &obj);
- */
-
-QDebug operator<<(QDebug debug, const InventoryItem &item);
 
 #endif /* INVENTORYITEM_H */

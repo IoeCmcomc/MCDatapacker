@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QPushButton>
+
 
 TagSelectorDialog::TagSelectorDialog(QWidget *parent,
                                      CodeFile::FileType type) :
@@ -18,12 +20,12 @@ TagSelectorDialog::TagSelectorDialog(QWidget *parent,
     model.setParent(this);
     setupTagView(type);
     connect(ui->tagFilterBox, &QLineEdit::textChanged,
-            this, [this](const QString &input) {
-        filterModel.setFilterRegularExpression(input);
-    });
+            this, &TagSelectorDialog::onFilterChanged);
 
     connect(ui->tagListView->selectionModel(),
             &QItemSelectionModel::selectionChanged,
+            this, &TagSelectorDialog::checkOK);
+    connect(ui->selectAnywayCheck, &QCheckBox::stateChanged,
             this, &TagSelectorDialog::checkOK);
 
     connect(ui->tagListView->selectionModel(),
@@ -78,13 +80,17 @@ void TagSelectorDialog::setupTagView(
     }
 
     auto &&tagStrSplited = tagStr.split('/');
-    std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
-                   tagStrSplited.begin(), [](const QString &str) -> QString {
-        return str + 's';
-    });
+    if (Game::version() < Game::v1_21) {
+        std::transform(tagStrSplited.cbegin(), tagStrSplited.cend(),
+                       tagStrSplited.begin(),
+                       [](const QString &str) -> QString {
+            return str + 's';
+        });
+    }
     const QString &tagDir = tagStrSplited.join('/');
 
-    const auto &fileIDList = Glhp::fileIdList(QDir::currentPath(), tagDir);
+    const auto &fileIDList = Glhp::fileIdList(
+        QDir::currentPath(), tagDir, {}, true, Game::version() >= Game::v1_21);
     for (const auto &id : fileIDList) {
         model.appendRow(new QStandardItem(id));
     }
@@ -112,11 +118,15 @@ QString TagSelectorDialog::getInternalSelectedID() {
 }
 
 QString TagSelectorDialog::getSelectedID() {
-    return '#' + getInternalSelectedID();
+    const QString &&id = (ui->selectAnywayCheck->isChecked())
+                             ? ui->tagFilterBox->text() : getInternalSelectedID();
+
+    return '#' + id;
 }
 
 void TagSelectorDialog::checkOK() {
-    selectButton->setEnabled(!getInternalSelectedID().isEmpty());
+    selectButton->setEnabled(!getInternalSelectedID().isEmpty()
+                             || ui->selectAnywayCheck->isChecked());
 }
 
 void TagSelectorDialog::showDetails() {
@@ -131,4 +141,14 @@ void TagSelectorDialog::showDetails() {
         }
     }
     ui->tagDetailsLabel->setText(QString());
+}
+
+void TagSelectorDialog::onFilterChanged(const QString &text) {
+    filterModel.setFilterRegularExpression(text);
+    if (!text.isEmpty() && (ui->tagListView->model()->rowCount() == 0)) {
+        ui->stackedWidget->setCurrentIndex(1);
+    } else {
+        ui->stackedWidget->setCurrentIndex(0);
+        ui->selectAnywayCheck->setChecked(false);
+    }
 }

@@ -1,6 +1,8 @@
 #include "game.h"
 
 #include "lru/lru.hpp"
+#include "globalhelpers.h"
+#include "variantmapfile.h"
 
 #include <QSettings>
 #include <QDebug>
@@ -9,6 +11,8 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QElapsedTimer>
+#include <QCborMap>
 
 QVersionNumber Game::version() {
     return QVersionNumber::fromString(versionString());
@@ -44,6 +48,10 @@ QVector<QString> Game::getRegistry(const QString &type,
 
 QVector<QString> Game::loadRegistry(const QString &type,
                                     const QString &version) {
+    qDebug() << "Game::loadRegistry" << type << version;
+    QElapsedTimer timer;
+    timer.start();
+
     const static QString &&filePathTemplate = QStringLiteral(
         ":minecraft/%1/registries/%2/data.min.json");
 
@@ -83,6 +91,20 @@ QVector<QString> Game::loadRegistry(const QString &type,
     for (const auto &value : array) {
         values << value.toString();
     }
+
+    // const static QString &&dirPathTemplate = QStringLiteral(
+    //     ":minecraft/%1/data-json");
+
+    // QString realType = type;
+    // if (type == "advancement" || type == "loot_table" || type == "recipe") {
+    //     realType += u's';
+    // }
+
+    // QVector<QString> values =
+    //     Glhp::fileIdList(dirPathTemplate.arg(version), realType,
+    //                      QStringLiteral("minecraft"));
+
+    qDebug() << "Execution time:" << timer.nsecsElapsed() << "ns";
     return values;
 }
 
@@ -134,9 +156,12 @@ QVariantMap Game::loadInfo(const QString &type, const QString &version,
     }
     /*qDebug() << finfo; */
     QFile inFile(finfo.filePath());
-    inFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "File reading error" << inFile.errorString();
+    }
     const QByteArray &&data = inFile.readAll();
     inFile.close();
+
 
     QJsonParseError       errorPtr;
     const QJsonDocument &&doc = QJsonDocument::fromJson(data, &errorPtr);
@@ -171,4 +196,101 @@ QVariantMap Game::loadInfo(const QString &type, const QString &version,
         retMap.insert(root.toVariantMap());
 
     return retMap;
+}
+
+static VanillaLookupMap loadVainllaLookupMap() {
+    QSet<QString>    versionPool;
+    VanillaLookupMap res;
+
+    QString filePath{ ":/minecraft/" + Game::versionString() +
+                      "/vanilla_lookup.cbor" };
+    VariantMapFile mapFile;
+
+    if (mapFile.fromCborFile(filePath)) {
+        auto &&root = mapFile.variantMap;
+        for (auto it = root.constBegin(); it != root.constEnd(); ++it) {
+            const auto            &aliases = it.value().toMap();
+            QMap<QString, QString> aliasMap;
+            for (auto it2 = aliases.cbegin(); it2 != aliases.cend(); ++it2) {
+                aliasMap[it2.key()] =
+                    *versionPool.insert(it2.value().toString());
+            }
+            res[it.key()] = std::move(aliasMap);
+        }
+    } else {
+        qWarning() << "Error loading file:" << mapFile.errorMessage();
+    }
+
+    return res;
+}
+
+VanillaLookupMap Game::getVainllaLookupMap() {
+    static VanillaLookupMap lookupTable = loadVainllaLookupMap();
+
+    return lookupTable;
+}
+
+bool Game::isVanillaFileExists(const QString &catDir, const QString &path) {
+    const static QString pathTemplate(
+        QStringLiteral(":minecraft/%1/data-json/data/minecraft/%2/%3"));
+
+    const QString &actualCatDir = canonicalCategory(catDir);
+
+    if (QFile::exists(pathTemplate.arg(Game::versionString(), actualCatDir,
+                                       path))) {
+        return true;
+    } else if (Game::version() > Game::v1_15) {
+        const auto &lookupMap = getVainllaLookupMap();
+        if (lookupMap.contains(actualCatDir)) {
+            const auto &&aliases = lookupMap.value(actualCatDir);
+            return aliases.contains(path);
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+QString Game::realVanillaFilePath(const QString &catDir, const QString &path) {
+    const static QString pathTemplate(
+        QStringLiteral(":/minecraft/%1/data-json/data/minecraft/%2/%3"));
+    const static QString pathTemplatePrefix(QStringLiteral(":/minecraft/"));
+
+    const QString  &actualCatDir = canonicalCategory(catDir);
+    const QString &&directPath   = pathTemplate.arg(Game::versionString(),
+                                                    actualCatDir, path);
+
+    if (QFile::exists(directPath)) {
+        return directPath;
+    } else if (Game::version() > Game::v1_15) {
+        const auto &lookupMap = getVainllaLookupMap();
+        if (lookupMap.contains(actualCatDir)) {
+            const auto &&aliases = lookupMap.value(actualCatDir);
+            if (aliases.contains(path)) {
+                // qDebug() << actualCatDir << path << aliases.value(path);
+                const auto &&aliasValue = aliases.value(path);
+                if (aliasValue.contains('/')) {
+                    return pathTemplatePrefix + aliasValue;
+                } else { // aliasValue only contains a game verison
+                    return pathTemplate.arg(aliasValue, actualCatDir, path);
+                }
+            } else {
+                return {};
+            }
+        } else {
+            return {};
+        }
+    } else {
+        return {};
+    }
+}
+
+QString Game::canonicalCategory(QStringView catDir) {
+    return canonicalCategory(catDir, Game::version());
+}
+
+QString Game::canonicalCategory(QStringView catDir,
+                                const QVersionNumber &version) {
+    return Glhp::canonicalCategory(catDir, version >= Game::v1_21);
 }

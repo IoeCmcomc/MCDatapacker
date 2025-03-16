@@ -18,7 +18,7 @@ public:
 
         void visit(LiteralNode *node) final;
         void visit(TargetSelectorNode *node) final;
-        void visit(EntityArgumentValueNode *node) final;
+        void visit(InvertibleNode *node) final;
 
         UintHash commandCounts() const;
         SelectorHash targetSelectorCounts() const;

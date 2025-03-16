@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QScreen>
 #include <QMouseEvent>
+#include <QMessageBox>
 
 InventorySlotEditor::InventorySlotEditor(InventorySlot *parent)
     : QFrame(parent), ui(new Ui::InventorySlotEditor) {
@@ -20,8 +21,11 @@ InventorySlotEditor::InventorySlotEditor(InventorySlot *parent)
         parent->selectCategory() ==
         InventorySlot::SelectCategory::ObtainableItems;
 
-
     setWindowFlags(Qt::Popup);
+
+    for (const auto &invItem : qAsConst(slot->getItems())) {
+        appendItem(invItem);
+    }
 
     if (slot->getAcceptTag()) {
         auto *newBtnMenu = new QMenu(ui->newButton);
@@ -40,9 +44,6 @@ InventorySlotEditor::InventorySlotEditor(InventorySlot *parent)
                                   &InventorySlotEditor::onNewItem);
     }
 
-    for (const auto &invItem : qAsConst(slot->getItems())) {
-        appendItem(invItem);
-    }
     ui->listView->setModel(&model);
     ui->groupBox->setTitle((m_itemsOnly ? tr("Items") : tr("Blocks")) +
                            QString(" (%1)").arg(model.rowCount()));
@@ -95,15 +96,17 @@ void InventorySlotEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void InventorySlotEditor::onNewItem() {
-    BlockItemSelectorDialog dialog(this, slot->selectCategory());
+    if (canAddItem(false)) {
+        BlockItemSelectorDialog dialog(this, slot->selectCategory());
 
-    if (dialog.exec()) {
-        auto newItems = dialog.getSelectedItems();
-        for (const auto &newItem : newItems) {
-            if (!slot->getItems().contains(newItem)
-                && slot->checkAcceptableItem(newItem)) {
-                slot->appendItem(newItem);
-                appendItem(newItem);
+        if (dialog.exec()) {
+            auto newItems = dialog.getSelectedItems();
+            for (const auto &newItem : newItems) {
+                if (!slot->getItems().contains(newItem)
+                    && slot->checkAcceptableItem(newItem)) {
+                    slot->appendItem(newItem);
+                    appendItem(newItem);
+                }
             }
         }
     }
@@ -111,16 +114,18 @@ void InventorySlotEditor::onNewItem() {
 }
 
 void InventorySlotEditor::onNewItemTag() {
-    TagSelectorDialog dialog(
-        this, (m_itemsOnly) ? CodeFile::ItemTag : CodeFile::BlockTag);
+    if (canAddItem(true)) {
+        TagSelectorDialog dialog(
+            this, (m_itemsOnly) ? CodeFile::ItemTag : CodeFile::BlockTag);
 
-    if (dialog.exec()) {
-        InventoryItem invItem(dialog.getSelectedID());
-        if ((!slot->getItems().contains(invItem)) && slot->getAcceptTag()) {
-            slot->appendItem(invItem);
-            if (!slot->getItems().contains(invItem)) return;
+        if (dialog.exec()) {
+            InventoryItem invItem(dialog.getSelectedID());
+            if ((!slot->getItems().contains(invItem)) && slot->getAcceptTag()) {
+                slot->appendItem(invItem);
+                if (!slot->getItems().contains(invItem)) return;
 
-            appendItem(invItem);
+                appendItem(invItem);
+            }
         }
     }
     show();
@@ -130,6 +135,34 @@ void InventorySlotEditor::checkRemove() {
     const auto indexes = ui->listView->selectionModel()->selectedIndexes();
 
     ui->removeButton->setDisabled(indexes.isEmpty());
+}
+
+bool InventorySlotEditor::canAddItem(const bool addingTag) {
+    // qDebug() << slot->acceptPolicies();
+    if (!(slot->acceptPolicies() & InventorySlot::AcceptTags)
+        && (slot->acceptPolicies() & InventorySlot::AcceptItems)) {
+        bool hasTags = false;
+        for (int row = 0; row < model.rowCount(); ++row) {
+            QStandardItem *item    = model.item(row);
+            const auto   &&invItem =
+                item->data(Qt::UserRole + 1).value<InventoryItem>();
+            if (invItem.isTag()) {
+                hasTags = true;
+                break;
+            }
+        }
+        if ((model.rowCount() > 0) && (hasTags || addingTag)) {
+            QMessageBox::critical(
+                this,
+                tr("Cannot add new item"),
+                tr(
+                    "This slot only accepts either an item, multiple items or an item tag."),
+                QMessageBox::Ok,
+                QMessageBox::Ok);
+            return false;
+        }
+    }
+    return true;
 }
 
 void InventorySlotEditor::onRemoveItem() {

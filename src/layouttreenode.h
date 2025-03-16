@@ -13,7 +13,7 @@ class LayoutTreeNode {
  * This class implement Buchhiem tree layout algorithm to determine
  * nodes' position, which may prodives different results from the tree layout
  * used in Minecraft's advancement tabs.
- * The actual code is based on this Python version:
+ * The actual code is based on this Python version (WTFPL license):
  * https://github.com/llimllib/pymag-trees/blob/master/buchheim.py
  */
 public:

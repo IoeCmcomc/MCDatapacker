@@ -145,7 +145,7 @@
             <string>Obfuscated</string>
            </property>
            <property name="icon">
-            <iconset resource="../resource/app/app.qrc">
+            <iconset resource="../res/app/app.qrc">
              <normaloff>:/icon/format-text-obfuscated.png</normaloff>:/icon/format-text-obfuscated.png</iconset>
            </property>
            <property name="shortcut">
@@ -188,7 +188,7 @@
             <string>Translated text</string>
            </property>
            <property name="icon">
-            <iconset resource="../resource/app/app.qrc">
+            <iconset resource="../res/app/app.qrc">
              <normaloff>:/icon/object-text-translate.png</normaloff>:/icon/object-text-translate.png</iconset>
            </property>
            <property name="shortcut">
@@ -202,7 +202,7 @@
             <string>Scoreboard value</string>
            </property>
            <property name="icon">
-            <iconset resource="../resource/app/app.qrc">
+            <iconset resource="../res/app/app.qrc">
              <normaloff>:/icon/object-text-scoreboard.png</normaloff>:/icon/object-text-scoreboard.png</iconset>
            </property>
            <property name="shortcut">
@@ -216,7 +216,7 @@
             <string>Entity names</string>
            </property>
            <property name="icon">
-            <iconset resource="../resource/app/app.qrc">
+            <iconset resource="../res/app/app.qrc">
              <normaloff>:/icon/object-text-entity.png</normaloff>:/icon/object-text-entity.png</iconset>
            </property>
            <property name="shortcut">
@@ -230,7 +230,7 @@
             <string>Keybind</string>
            </property>
            <property name="icon">
-            <iconset resource="../resource/app/app.qrc">
+            <iconset resource="../res/app/app.qrc">
              <normaloff>:/icon/object-text-keybind.png</normaloff>:/icon/object-text-keybind.png</iconset>
            </property>
            <property name="shortcut">
@@ -244,7 +244,7 @@
             <string>NBT values</string>
            </property>
            <property name="icon">
-            <iconset resource="../resource/app/app.qrc">
+            <iconset resource="../res/app/app.qrc">
              <normaloff>:/icon/object-text-snbt.png</normaloff>:/icon/object-text-snbt.png</iconset>
            </property>
            <property name="shortcut">
@@ -380,7 +380,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resource/app/app.qrc"/>
+  <include location="../res/app/app.qrc"/>
  </resources>
  <connections/>
 </ui>

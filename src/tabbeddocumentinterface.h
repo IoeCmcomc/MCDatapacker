@@ -1,14 +1,18 @@
 #ifndef TABBEDCODEEDITORINTERFACE_H
 #define TABBEDCODEEDITORINTERFACE_H
 
-#include "codeeditor.h"
-#include "imgviewer.h"
+#include "codefile.h"
 
 #include <QFrame>
-#include <QStackedWidget>
-#include <QTabBar>
+
+QT_BEGIN_NAMESPACE
+class QTextDocument;
+class QTabBar;
+QT_END_NAMESPACE
 
 class MainWindow;
+class CodeEditor;
+class ImgViewer;
 
 namespace Ui {
     class TabbedDocumentInterface;
@@ -18,10 +22,17 @@ class TabbedDocumentInterface : public QFrame {
     Q_OBJECT
 
 public:
+    enum class ActionType {
+        ZoomIn,
+        ZoomOut,
+    };
+
     explicit TabbedDocumentInterface(QWidget *parent = nullptr);
     ~TabbedDocumentInterface();
 
-    void openFile(const QString &filepath, bool reload = false);
+    void openFile(const QString &filepath,
+                  const QString &realPath = {},
+                  bool reload             = false);
 
     int getCurIndex() const;
     void setCurIndex(int i);
@@ -29,7 +40,7 @@ public:
     CodeFile * getCurFile();
     QString getCurFilePath();
     QTextDocument * getCurDoc();
-    QVector<CodeFile> * getFiles();
+    QVector<CodeFile> &getFiles();
     CodeEditor * getCodeEditor() const;
     ImgViewer * getImgViewer() const;
 
@@ -38,20 +49,27 @@ public:
     void clear();
     bool hasUnsavedChanges() const;
 
+    static QString readTextFile(QWidget *parent,
+                                const QString &path, bool &ok);
+
 public /*slots*/ :
     void onOpenFile(const QString &filepath);
+    void onOpenAliasedFile(const QString &filepath, const QString &realPath);
     void onOpenFileWithLine(const QString &filepath, const int lineNo);
+    void onOpenFileWithSelection(const QString &filepath, const int lineNo,
+                                 const int colNo, const int selLength = 0);
     bool saveCurFile();
     bool saveCurFile(const QString &path);
     bool saveAllFile();
     void onFileRenamed(const QString &path, const QString &oldName,
                        const QString &newName);
-    void undo();
-    void redo();
-    void selectAll();
-    void cut();
-    void copy();
-    void paste();
+    template<typename Func, typename ...Args>
+    void invokeCodeEditor(Func method, Args ... args) {
+        if (auto *editor = getCodeEditor()) {
+            (editor->*method)(std::forward<Args>(args)...);
+        }
+    };
+    void invokeActionType(ActionType act);
     void setPackOpened(const bool value);
     void updateRecentPacks(const QVector<QAction *> &actions, const int size);
 
@@ -62,6 +80,7 @@ signals:
     void showMessageRequest(const QString &msg, int timeout);
     void updateEditMenuRequest();
     void settingsChanged();
+    void findCompleted(const bool found);
 
 protected:
     void changeEvent(QEvent *event) override;
@@ -81,7 +100,7 @@ private:
     bool m_packOpened = false;
 
     QString readTextFile(const QString &path, bool &ok);
-    void addFile(const QString &path);
+    void addFile(const QString &path, const QString &realPath = {});
     bool saveFile(int index, const QString &filepath);
     void updateTabTitle(int index, bool changed = false);
 

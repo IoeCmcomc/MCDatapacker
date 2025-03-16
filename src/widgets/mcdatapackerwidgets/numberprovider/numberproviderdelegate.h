@@ -35,6 +35,8 @@ public:
     void setMinLimit(int value);
     void setMaxLimit(int value);
 
+    void setIntegerOnly(bool newIntegerOnly);
+
 private slots:
     void commitAndCloseEditor();
 
@@ -42,6 +44,7 @@ private:
     NumberProvider::Modes m_inputModes;
     int m_minLimit = 0;
     int m_maxLimit = INT_MAX;
+    bool m_integerOnly = false;
 
     QString textRepr(const QJsonValue &value) const;
 };

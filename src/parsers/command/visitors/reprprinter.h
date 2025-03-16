@@ -3,27 +3,30 @@
 
 #include "nodevisitor.h"
 
-#include "../nodes/rootnode.h"
-#include "../nodes/literalnode.h"
-#include "../nodes/stringnode.h"
 #include "../nodes/axesnode.h"
 #include "../nodes/blockstatenode.h"
 #include "../nodes/componentnode.h"
-#include "../nodes/stylenode.h"
-#include "../nodes/gamemodenode.h"
 #include "../nodes/entitynode.h"
 #include "../nodes/floatrangenode.h"
+#include "../nodes/gamemodenode.h"
+#include "../nodes/inlinableresourcenode.h"
+#include "../nodes/internalregexpatternnode.h"
 #include "../nodes/intrangenode.h"
 #include "../nodes/itemstacknode.h"
+#include "../nodes/listnode.h"
+#include "../nodes/itempredicatematchnode.h"
+#include "../nodes/literalnode.h"
+#include "../nodes/nbtnodes.h"
 #include "../nodes/nbtpathnode.h"
 #include "../nodes/particlenode.h"
-#include "../nodes/swizzlenode.h"
-#include "../nodes/timenode.h"
-#include "../nodes/targetselectornode.h"
-#include "../nodes/nbtnodes.h"
 #include "../nodes/resourcelocationnode.h"
+#include "../nodes/rootnode.h"
+#include "../nodes/stringnode.h"
+#include "../nodes/stylenode.h"
+#include "../nodes/swizzlenode.h"
+#include "../nodes/targetselectornode.h"
+#include "../nodes/timenode.h"
 #include "../nodes/uuidnode.h"
-#include "../nodes/internalregexpatternnode.h"
 
 #include <QDebug>
 
@@ -128,6 +131,11 @@ public:
             m_repr += "ItemStackNode(";
             node->resLoc()->accept(this, m_order);
             m_repr += ')';
+            if (node->components() /*&& !node->components()->isEmpty()*/) {
+                m_repr += '[';
+                node->components()->accept(this, m_order);
+                m_repr += ']';
+            }
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
                 node->nbt()->accept(this, m_order);
@@ -148,9 +156,9 @@ public:
 
             m_repr += ')';
         };
-        void visit(EntityArgumentValueNode *node) final {
-            m_repr += "EntityArgumentValueNode";
-            if (node->isNegative())
+        void visit(InvertibleNode *node) final {
+            m_repr += "InvertibleNode";
+            if (node->isInverted())
                 m_repr += "[!]";
             m_repr += '(';
             if (node->getNode())
@@ -352,6 +360,9 @@ public:
         void visit(ItemSlotNode *node) final {
             m_repr += QString("ItemSlotNode(\"%1\")").arg(node->value());
         };
+        void visit(ItemSlotsNode *node) final {
+            m_repr += QString("ItemSlotsNode(\"%1\")").arg(node->value());
+        };
         void visit(MessageNode *node) final {
             m_repr += QString("MessageNode(\"%1\")").arg(node->value());
         };
@@ -410,7 +421,10 @@ public:
         void visit(ParticleNode *node) final {
             m_repr += "ParticleNode(id: ";
             node->resLoc()->accept(this, m_order);
-            if (!node->params().isEmpty()) {
+            if (const auto options = node->options()) {
+                m_repr += ", options: ";
+                options->accept(this, m_order);
+            } else if (!node->params().isEmpty()) {
                 m_repr += ", params: ";
                 reprList(node->params());
             }
@@ -427,8 +441,17 @@ public:
         };
         void visit(ItemPredicateNode *node) final {
             m_repr += "ItemPredicateNode(";
-            node->resLoc()->accept(this, m_order);
+            if (node->isAll()) {
+                m_repr += "*";
+            } else {
+                node->resLoc()->accept(this, m_order);
+            }
             m_repr += ')';
+            if (node->components() /*&& !node->components()->isEmpty()*/) {
+                m_repr += '[';
+                node->components()->accept(this, m_order);
+                m_repr += ']';
+            }
             if (node->nbt() && !node->nbt()->isEmpty()) {
                 m_repr += '{';
                 node->nbt()->accept(this, m_order);
@@ -448,6 +471,51 @@ public:
         }
         void visit(GamemodeNode *node) final {
             m_repr += QString("GamemodeNode(\"%1\")").arg(node->text());
+        };
+        void visit(InlinableResourceNode *node) {
+            m_repr += "InlinableResourceNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(LootModifierNode *node) {
+            m_repr += "LootModifierNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(LootPredicateNode *node) {
+            m_repr += "LootPredicateNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(LootTableNode *node) {
+            m_repr += "LootTableNode(";
+            node->getNode()->accept(this, m_order);
+            m_repr += ')';
+        }
+        void visit(ItemPredicateMatchNode *node) final {
+            using Mode = ItemPredicateMatchNode::Mode;
+            static const QMap<Mode, QString> mode2Name {
+                { Mode::FullMatch, "FullMatch" },
+                { Mode::PartialMatch, "PartialMatch" },
+                { Mode::MatchKey, "MatchKey" },
+            };
+
+            m_repr += QString("ItemPredicateMatchNode<%1>").arg(
+                mode2Name[node->mode()]);
+
+            if (node->first) {
+                m_repr += "(key: ";
+                node->first->accept(this, m_order);
+                if (node->second) {
+                    m_repr += ", value: ";
+                    node->second->accept(this, m_order);
+                }
+                m_repr += ')';
+            }
+        };
+        void visit(ListNode *node) final {
+            m_repr += QString("ListNode[%1]").arg(node->size());
+            reprList(node->children());
         };
         void visit(InternalGreedyStringNode *node) final {
             m_repr += QString("InternalGreedyStringNode(\"%1\")").arg(

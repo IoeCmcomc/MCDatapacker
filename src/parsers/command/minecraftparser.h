@@ -5,21 +5,24 @@
 #include "nodes/axesnode.h"
 #include "nodes/blockstatenode.h"
 #include "nodes/componentnode.h"
-#include "nodes/stylenode.h"
-#include "nodes/gamemodenode.h"
 #include "nodes/entitynode.h"
 #include "nodes/floatrangenode.h"
+#include "nodes/gamemodenode.h"
+#include "nodes/inlinableresourcenode.h"
+#include "nodes/internalregexpatternnode.h"
 #include "nodes/intrangenode.h"
+#include "nodes/itempredicatematchnode.h"
 #include "nodes/itemstacknode.h"
+#include "nodes/listnode.h"
+#include "nodes/nbtnodes.h"
 #include "nodes/nbtpathnode.h"
 #include "nodes/particlenode.h"
-#include "nodes/swizzlenode.h"
-#include "nodes/timenode.h"
-#include "nodes/targetselectornode.h"
-#include "nodes/nbtnodes.h"
 #include "nodes/resourcelocationnode.h"
+#include "nodes/stylenode.h"
+#include "nodes/swizzlenode.h"
+#include "nodes/targetselectornode.h"
+#include "nodes/timenode.h"
 #include "nodes/uuidnode.h"
-#include "nodes/internalregexpatternnode.h"
 
 #include <QVersionNumber>
 #include <QDebug>
@@ -184,6 +187,27 @@ private:
 
         QString eatListSep(QChar sepChr, QChar endChr);
 
+        template<class Container, class Type, class Func>
+        QSharedPointer<Container> parseList(QChar beginChar,
+                                            QChar endChar,
+                                            QChar sepChar, Func func) {
+            auto    &&obj   = QSharedPointer<Container>::create(0);
+            const int start = pos();
+
+            obj->setLeftText(this->eat(beginChar));
+
+            while (curChar() != endChar) {
+                const auto &&trivia = skipWs(false);
+                const auto &&elem   = qSharedPointerCast<Type>(func());
+                elem->setLeadingTrivia(trivia);
+                obj->append(elem);
+                elem->setTrailingTrivia(eatListSep(sepChar, endChar));
+            }
+            obj->setRightText(eat(endChar));
+            obj->setLength(pos() - start);
+            return obj;
+        }
+
         template<class Container, class Type>
         QSharedPointer<Container> parseMap(QChar beginChar,
                                            QChar endChar,
@@ -278,11 +302,16 @@ private:
         QSharedPointer<TargetSelectorNode> parseTargetSelector();
         QSharedPointer<NbtPathStepNode> parseNbtPathStep();
         QSharedPointer<ParticleColorNode> parseParticleColor();
-        QSharedPointer<EntityArgumentValueNode> parseNegEntityArg();
+        QSharedPointer<ParticleNode> parseOldParticle();
+        QSharedPointer<InvertibleNode> parseInvertible();
+        QSharedPointer<ListNode> parseItemPredEntry();
+        QSharedPointer<ItemPredicateMatchNode> parseItemPredMatch(
+            const bool isPredicate = true);
         void parseResourceLocation(ResourceLocationNode *node,
                                    bool acceptTag = false);
         void parseBlock(BlockStateNode *node, bool acceptTag);
         void parseEntity(EntityNode *node, bool allowFakePlayer);
+        void parseInlinableResource(InlinableResourceNode *node);
 
         NodePtr invokeMethod(ArgumentNode::ParserType parserType,
                              const QVariantMap &props) final;
@@ -311,8 +340,12 @@ private:
             const QVariantMap &props = {});
         QSharedPointer<ItemEnchantmentNode> minecraft_itemEnchantment();
         QSharedPointer<ItemSlotNode> minecraft_itemSlot();
+        QSharedPointer<ItemSlotsNode> minecraft_itemSlots();
         QSharedPointer<ItemStackNode> minecraft_itemStack();
         QSharedPointer<ItemPredicateNode> minecraft_itemPredicate();
+        QSharedPointer<LootModifierNode> minecraft_lootModifier();
+        QSharedPointer<LootPredicateNode> minecraft_lootPredicate();
+        QSharedPointer<LootTableNode> minecraft_lootTable();
         QSharedPointer<MessageNode> minecraft_message();
         QSharedPointer<MobEffectNode> minecraft_mobEffect();
         QSharedPointer<NbtCompoundNode> minecraft_nbtCompoundTag();

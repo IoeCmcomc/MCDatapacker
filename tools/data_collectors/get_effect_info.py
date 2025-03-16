@@ -2,9 +2,9 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 import re
+from commons import get_httpx_soup
 
-req = urllib.request.urlopen('https://minecraft.wiki/w/Java_Edition_data_values/Effects') 
-ids_soup = BeautifulSoup(req.read(), "html.parser")
+ids_soup = get_httpx_soup('https://minecraft.wiki/w/Java_Edition_data_values/Effects?action=render')
 
 h1 = ids_soup.find("h1")
 

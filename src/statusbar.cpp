@@ -4,6 +4,7 @@
 #include "globalhelpers.h"
 #include "tabbeddocumentinterface.h"
 #include "imgviewer.h"
+#include "codeeditor.h"
 
 #include "game.h"
 
@@ -57,7 +58,7 @@ void StatusBar::onCurFileChanged() {
         m_tabsLabel->setText(tr("Tab %1 / %2")
                              .arg(m_tabbedInterface->getCurIndex() + 1)
                              .arg(m_tabbedInterface->count()));
-        m_fileLabel->setText(Glhp::fileTypeToName(
+        m_fileLabel->setText(CodeFile::fileTypeToName(
                                  m_tabbedInterface->getCurFile()->fileType));
         for (auto *label: qAsConst(m_editorLabels))
             label->clear();

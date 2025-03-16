@@ -47,7 +47,7 @@ void initComboModelView(const QString &infoType, QStandardItemModel &model,
         else
             item->setText(key);
         QString &&iconPath =
-            QString(":minecraft/texture/%1/%2.png").arg(infoType, key);
+            QString(":/minecraft/texture/%1/%2.png").arg(infoType, key);
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
@@ -77,7 +77,7 @@ void initComboModelViewFromRegistry(const QString &registry,
     for (QString value : values) {
         QStandardItem *item     = new QStandardItem(value);
         QString      &&iconPath =
-            QString(":minecraft/texture/%1/%2.png").arg(registry, value);
+            QString(":/minecraft/texture/%1/%2.png").arg(registry, value);
         QIcon icon(iconPath);
         if (!icon.pixmap(1, 1).isNull())
             item->setIcon(icon);
@@ -145,9 +145,14 @@ void appendRowToModel(QStandardItemModel &model, const QString &text,
 }
 
 void hideComboRow(QComboBox *comboBox, const int row) {
+    setComboRowHidden(comboBox, row, true);
+}
+
+void setComboRowHidden(QComboBox *comboBox, const int row, bool hidden) {
     if (auto *view = qobject_cast<QListView *>(comboBox->view())) {
         auto *model = static_cast<QStandardItemModel *>(comboBox->model());
-        view->setRowHidden(row, true);
-        model->item(row, 0)->setEnabled(false);
+        Q_ASSERT(model != nullptr);
+        view->setRowHidden(row, hidden);
+        model->item(row, 0)->setEnabled(!hidden);
     }
 }

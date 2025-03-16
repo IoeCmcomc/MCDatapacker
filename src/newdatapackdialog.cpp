@@ -8,36 +8,76 @@
 #include <QDir>
 #include <QDialogButtonBox>
 
+struct PackFormatVersion {
+    int     number = 1;
+    QString versionRange;
+};
+
+const static QVector<PackFormatVersion> formatReleases = {
+    {  4, QStringLiteral("1.13 – 1.14.4")   },
+    {  5, QStringLiteral("1.15 – 1.16.1")   },
+    {  6, QStringLiteral("1.16.2 – 1.16.5") },
+    {  7, QStringLiteral("1.17 – 1.17.1")   },
+    {  8, QStringLiteral("1.18 – 1.18.1")   },
+    {  9, QStringLiteral("1.18.2")          },
+    { 10, QStringLiteral("1.19 – 1.19.3")   },
+    { 12, QStringLiteral("1.19.4")          },
+    { 15, QStringLiteral("1.20 – 1.20.1")   },
+    { 18, QStringLiteral("1.20.2")          },
+    { 26, QStringLiteral("1.20.3 – 1.20.4") },
+    { 41, QStringLiteral("1.20.5 – 1.20.6") },
+    { 48, QStringLiteral("1.21 – 1.21.1")   },
+    { 57, QStringLiteral("1.21.2 – 1.21.3") },
+    { 61, QStringLiteral("1.21.4")          },
+    { 71, QStringLiteral("1.21.5")          },
+};
+
+int gameVerToFormatReleasesIndex(const QVersionNumber &version) {
+    if (version < Game::v1_15) {
+        return 0;
+    } else if (version < QVersionNumber(1, 16, 2)) {
+        return 1;
+    } else if (version < Game::v1_17) {
+        return 2;
+    } else if (version < Game::v1_18) {
+        return 3;
+    } else if (version < Game::v1_18_2) {
+        return 4;
+    } else if (version < Game::v1_19) {
+        return 5;
+    } else if (version < Game::v1_19_4) {
+        return 6;
+    } else if (version < Game::v1_20) {
+        return 7;
+    } else if (version < Game::v1_20_2) {
+        return 8;
+    } else if (version < QVersionNumber(1, 20, 3)) {
+        return 9;
+    } else if (version < QVersionNumber(1, 20, 5)) {
+        return 10;
+    } else if (version < Game::v1_21) {
+        return 11;
+    } else if (version < QVersionNumber(1, 21, 2)) {
+        return 12;
+    } else if (version < Game::v1_21_4) {
+        return 13;
+    } else if (version < Game::v1_21_5) {
+        return 14;
+    } else {
+        return 15;
+    }
+}
+
 NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::NewDatapackDialog) {
     ui->setupUi(this);
     ui->locationInput->setText(QDir::currentPath());
 
-    const auto &&gameVer = Game::version();
-
-    if (gameVer >= Game::v1_20_3)
-        ui->formatInput->setValue(26);
-    else if (gameVer >= Game::v1_20_2)
-        ui->formatInput->setValue(18);
-    else if (gameVer >= Game::v1_20)
-        ui->formatInput->setValue(15);
-    else if (gameVer >= Game::v1_19_4)
-        ui->formatInput->setValue(12);
-    else if (gameVer >= Game::v1_19)
-        ui->formatInput->setValue(10);
-    else if (gameVer >= Game::v1_18_2)
-        ui->formatInput->setValue(9);
-    else if (gameVer >= Game::v1_18)
-        ui->formatInput->setValue(8);
-    else if (gameVer >= Game::v1_17)
-        ui->formatInput->setValue(7);
-    else if (gameVer >= QVersionNumber(1, 16, 2))
-        ui->formatInput->setValue(6);
-    else if (gameVer >= Game::v1_15)
-        ui->formatInput->setValue(5);
-    else if (gameVer >= QVersionNumber(1, 13))
-        ui->formatInput->setValue(4);
+    for (const auto &packFormat: formatReleases) {
+        ui->gameVerCombo->addItem(packFormat.versionRange);
+    }
+    ui->gameVerCombo->setCurrentIndex(-1);
 
     connect(ui->browseBtn, &QAbstractButton::clicked,
             this, &NewDatapackDialog::browse);
@@ -50,15 +90,17 @@ NewDatapackDialog::NewDatapackDialog(QWidget *parent) :
             this, &NewDatapackDialog::checkOK);
     connect(ui->locationInput, &QLineEdit::textChanged,
             this, &NewDatapackDialog::checkOK);
-    connect(ui->formatInput, qOverload<int>(&QSpinBox::valueChanged),
-            this, &NewDatapackDialog::onFormatSpinChanged);
+    connect(ui->gameVerCombo, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &NewDatapackDialog::onGameVerComboChanged);
 
     createButton = new QPushButton(tr("Create"), this);
     ui->dialogBox->addButton(createButton, QDialogButtonBox::ActionRole);
     connect(createButton, &QAbstractButton::clicked, this, &QDialog::accept);
 
+    ui->gameVerCombo->setCurrentIndex(gameVerToFormatReleasesIndex(
+                                          Game::version()));
+
     checkOK();
-    onFormatSpinChanged(ui->formatInput->value());
 }
 
 NewDatapackDialog::~NewDatapackDialog() {
@@ -80,24 +122,9 @@ void NewDatapackDialog::checkOK() {
     createButton->setDisabled(getName().isEmpty() || getDirPath().isEmpty());
 }
 
-void NewDatapackDialog::onFormatSpinChanged(const int format) {
-    const static QMap<int, QString> formatReleases = {
-        {  4, QStringLiteral("1.13–1.14.4")   },
-        {  5, QStringLiteral("1.15–1.16.1")   },
-        {  6, QStringLiteral("1.16.2–1.16.5") },
-        {  7, QStringLiteral("1.17–1.17.1")   },
-        {  8, QStringLiteral("1.18–1.18.1")   },
-        {  9, QStringLiteral("1.18.2")        },
-        { 10, QStringLiteral("1.19–1.19.3")   },
-        { 12, QStringLiteral("1.19.4")        },
-        { 15, QStringLiteral("1.20–1.20.1")   },
-        { 18, QStringLiteral("1.20.2")        },
-        { 26, QStringLiteral("1.20.3–1.20.4") },
-    };
-
-    Q_ASSERT(format >= 0);
-
-    ui->formatDisplay->setText(formatReleases.value(format, {}));
+void NewDatapackDialog::onGameVerComboChanged(const int index) {
+    Q_ASSERT(index >= 0);
+    ui->formatInput->setValue(formatReleases[index].number);
 }
 
 QString NewDatapackDialog::getDesc() {

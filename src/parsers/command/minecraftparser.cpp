@@ -440,7 +440,7 @@ namespace Command {
                     return brigadier_integer();
                 }
                 ucase ("predicate"_QL1): {
-                    const auto &&ret = parseNegEntityArg();
+                    const auto &&ret = parseInvertible();
                     ret->setNode(minecraft_resourceLocation());
                     return ret;
                 }
@@ -453,7 +453,7 @@ namespace Command {
                         spanText(literal), !literal.isEmpty());
                 }
                 ucase ("gamemode"_QL1): {
-                    const auto &&ret        = parseNegEntityArg();
+                    const auto &&ret        = parseInvertible();
                     const QString &&literal =
                         oneOf(staticSuggestions<GamemodeNode>);
                     ret->setNode(QSharedPointer<StringNode>::create(
@@ -462,7 +462,7 @@ namespace Command {
                 }
                 ucase ("name"_QL1): {
                     const int start  = pos();
-                    const auto &&ret = parseNegEntityArg();
+                    const auto &&ret = parseInvertible();
                     QString literal;
                     if (curChar() == '"' || curChar() == '\'') {
                         literal = getQuotedString();
@@ -478,7 +478,7 @@ namespace Command {
                     return ret;
                 }
                 ucase ("type"_QL1): {
-                    const auto &&ret    = parseNegEntityArg();
+                    const auto &&ret    = parseInvertible();
                     const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(
                         0);
 
@@ -487,13 +487,13 @@ namespace Command {
                     return ret;
                 }
                 ucase ("nbt"_QL1): {
-                    const auto &&ret = parseNegEntityArg();
+                    const auto &&ret = parseInvertible();
                     ret->setNode(parseCompoundTag());
                     return ret;
                 }
                 ucase ("tag"_QL1):
                 ucase ("team"_QL1): {
-                    const auto &&ret    = parseNegEntityArg();
+                    const auto &&ret    = parseInvertible();
                     QStringView literal = getLiteralString();
                     ret->setNode(QSharedPointer<StringNode>::create(
                                      spanText(literal), true));
@@ -528,6 +528,19 @@ namespace Command {
 
             case 'e': {
                 ret->setVariable(Variable::E);
+                break;
+            }
+
+            case 'n': {
+                ret->setVariable(Variable::N);
+                if (gameVer < QVersionNumber(1, 21)) {
+                    reportError(
+                        QT_TR_NOOP(
+                            "The @n selector is only available on 1.21+"),
+                        {},
+                        pos() - 1,
+                        2);
+                }
                 break;
             }
 
@@ -654,17 +667,202 @@ namespace Command {
         return color;
     }
 
-    QSharedPointer<EntityArgumentValueNode> MinecraftParser::parseNegEntityArg()
-    {
+    QSharedPointer<ParticleNode> MinecraftParser::parseOldParticle() {
+        const int    start  = pos();
+        const auto &&ret    = QSharedPointer<ParticleNode>::create(0);
+        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+
+        parseResourceLocation(resLoc.get());
+
+        QString fullId;
+        if (!resLoc->nspace()) {
+            fullId = resLoc->id()->text();
+        } else {
+            const QString &&nspace = resLoc->nspace()->text();
+            if (nspace.isEmpty() || (nspace == "minecraft"_QL1)) {
+                fullId = resLoc->id()->text();
+            } else {
+                fullId = nspace + ":"_QL1 + resLoc->id()->text();
+            }
+        }
+        ret->setResLoc(std::move(resLoc));
+
+        uswitch (fullId) {
+            ucase ("block"_QL1):
+            ucase ("block_marker"_QL1):
+            ucase ("falling_dust"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                ret->setParams(minecraft_blockState());
+                break;
+            }
+            ucase ("dust"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                const auto &&color = parseParticleColor();
+                color->setTrailingTrivia(eat(' '));
+                ret->setParams(std::move(color), brigadier_float());
+                break;
+            }
+            ucase ("dust_color_transition"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                const auto &&startColor = parseParticleColor();
+                startColor->setTrailingTrivia(eat(' '));
+                const auto &&size = brigadier_float();
+                size->setTrailingTrivia(eat(' '));
+                const auto &&endColor = parseParticleColor();
+                ret->setParams(std::move(startColor), std::move(size),
+                               std::move(endColor));
+                break;
+            }
+            ucase ("item"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                ret->setParams(minecraft_itemStack());
+                break;
+            }
+            ucase ("sculk_charge"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                ret->setParams(brigadier_float());
+                break;
+            }
+            ucase ("shriek"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                ret->setParams(brigadier_integer());
+                break;
+            }
+            ucase ("vibration"_QL1): {
+                resLoc->setTrailingTrivia(eat(' ',
+                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
+                const auto &&pos = minecraft_vec3();
+                pos->setTrailingTrivia(eat(' '));
+                ret->setParams(std::move(pos), brigadier_integer());
+                break;
+            }
+        }
+
+        ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<InvertibleNode> MinecraftParser::parseInvertible() {
         const bool   isNegative = curChar() == '!';
         const auto &&ret        =
-            QSharedPointer<EntityArgumentValueNode>::create(isNegative);
+            QSharedPointer<InvertibleNode>::create(isNegative);
 
         if (isNegative) {
             advance();
             ret->setLeftText(spanText(pos() - 1));
         }
         return ret;
+    }
+
+    QSharedPointer<ListNode> MinecraftParser::parseItemPredEntry() {
+        auto    &&obj   = QSharedPointer<ListNode>::create(0);
+        const int start = pos();
+
+        while (curChar() != ',' && curChar() != ']') {
+            const auto &&trivia = skipWs(false);
+            const auto &&elem   = parseItemPredMatch();
+            elem->setLeadingTrivia(trivia);
+            obj->append(elem);
+
+            const int trailingTriviaPos = pos();
+            while (curChar().isSpace()) {
+                advance();
+            }
+            if (curChar() != ',' && curChar() != ']') {
+                expect('|',
+                       "Unexpected %1, expecting separator %2 or closing character");
+                advance();
+                while (curChar().isSpace()) {
+                    advance();
+                }
+            }
+
+            elem->setTrailingTrivia(spanText(trailingTriviaPos));
+        }
+        obj->setLength(pos() - start);
+        return obj;
+    }
+
+    QSharedPointer<ItemPredicateMatchNode> MinecraftParser::parseItemPredMatch(
+        const bool isPredicate) {
+        const int start = pos();
+
+        const auto &&trivia = skipWs(false);
+        auto       &&key    = parseInvertible();
+
+        key->setLeadingTrivia(trivia);
+        key->setNode(minecraft_resourceLocation());
+
+        const auto &&trailingTriviaPos = pos();
+        skipWs(false);
+
+        auto &&obj =
+            QSharedPointer<ItemPredicateMatchNode>::create(key, isPredicate);
+
+        bool      hasValue    = false;
+        const int sepValuePos = pos();
+        if (curChar() == '=') {
+            hasValue = true;
+            advance();
+            obj->first->setTrailingTrivia(spanText(trailingTriviaPos));
+            obj->setMode(ItemPredicateMatchNode::Mode::FullMatch);
+        } else if (curChar() == '~') {
+            hasValue = true;
+            advance();
+            obj->first->setTrailingTrivia(spanText(trailingTriviaPos));
+            obj->setMode(ItemPredicateMatchNode::Mode::PartialMatch);
+        } else {
+            obj->first->setTrailingTrivia(spanText(trailingTriviaPos));
+        }
+
+        if (hasValue) {
+            const auto &&valueTrivia = skipWs(false);
+            const auto &&value       = parseTagValue();
+            value->setLeadingTrivia(spanText(valueTrivia));
+            value->setTrailingTrivia(skipWs(false));
+            obj->setIsValid(obj->isValid() && value->isValid());
+            obj->second = std::move(value);
+        }
+        if (!isPredicate &&
+            obj->mode() == ItemPredicateMatchNode::Mode::PartialMatch) {
+            reportError(
+                QT_TR_NOOP(
+                    "Cannot test for sub-predicate in a item stack"),
+                {}, sepValuePos, pos() - sepValuePos);
+        }
+
+
+        obj->setLength(pos() - start);
+
+        if (!isPredicate) {
+            if (key->isInverted()) {
+                if (hasValue) {
+                    reportError(
+                        QT_TR_NOOP(
+                            "Cannot invert a key-value pair of component in an item stack"),
+                        {},
+                        start,
+                        obj->length());
+                } else if (gameVer < QVersionNumber(1, 21)) {
+                    reportError(
+                        QT_TR_NOOP(
+                            "Removal of default components in an item stack is only available on 1.21+"),
+                        {},
+                        start,
+                        obj->length());
+                }
+            } else if (!hasValue) {
+                reportError(QT_TR_NOOP("Missing component value"),
+                            {}, start, obj->length());
+            }
+        }
+        return obj;
     }
 
     void MinecraftParser::parseResourceLocation(ResourceLocationNode *node,
@@ -792,6 +990,14 @@ namespace Command {
         }
     }
 
+    void MinecraftParser::parseInlinableResource(InlinableResourceNode *node) {
+        if (curChar() == '{') {
+            node->setNode(parseCompoundTag());
+        } else {
+            node->setNode(minecraft_resourceLocation());
+        }
+    }
+
     NodePtr MinecraftParser::invokeMethod(ArgumentNode::ParserType parserType,
                                           const QVariantMap &props) {
         using ParserType = ArgumentNode::ParserType;
@@ -822,7 +1028,12 @@ namespace Command {
             case ParserType::ItemPredicate: { return minecraft_itemPredicate();
             }
             case ParserType::ItemSlot: { return minecraft_itemSlot(); }
+            case ParserType::ItemSlots: { return minecraft_itemSlots(); }
             case ParserType::ItemStack: { return minecraft_itemStack(); }
+            case ParserType::LootModifier: { return minecraft_lootModifier(); }
+            case ParserType::LootPredicate: { return minecraft_lootPredicate();
+            }
+            case ParserType::LootTable: { return minecraft_lootTable(); }
             case ParserType::Message: { return minecraft_message(); }
             case ParserType::MobEffect: { return minecraft_mobEffect(); }
             case ParserType::NbtCompoundTag: { return minecraft_nbtCompoundTag();
@@ -1133,8 +1344,7 @@ namespace Command {
         return ret;
     }
 
-    QSharedPointer<ItemSlotNode> MinecraftParser::
-    minecraft_itemSlot() {
+    QSharedPointer<ItemSlotNode> MinecraftParser::minecraft_itemSlot() {
         const auto slot = advanceView(re2c::itemSlot(peekRest()));
 
         return QSharedPointer<ItemSlotNode>::create(
@@ -1142,13 +1352,28 @@ namespace Command {
                                        QT_TR_NOOP("Invalid empty item slot")));
     }
 
-    QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
-        const int    start  = pos();
-        const auto &&ret    = QSharedPointer<ItemStackNode>::create(0);
-        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+    QSharedPointer<ItemSlotsNode> MinecraftParser::minecraft_itemSlots() {
+        const auto slot = advanceView(re2c::itemSlots(peekRest()));
 
-        parseResourceLocation(resLoc.get());
-        ret->setResLoc(std::move(resLoc));
+        return QSharedPointer<ItemSlotsNode>::create(
+            spanText(slot),
+            errorIfNot(!slot.isEmpty(),
+                       QT_TR_NOOP("Invalid empty item slot or slot range")));
+    }
+
+    QSharedPointer<ItemStackNode> MinecraftParser::minecraft_itemStack() {
+        const int    start = pos();
+        const auto &&ret   = QSharedPointer<ItemStackNode>::create(0);
+
+        ret->setResLoc(minecraft_resourceLocation());
+
+        if (curChar() == '[' && gameVer >= QVersionNumber(1, 20, 5)) {
+            ret->setComponents(
+                parseList<ListNode, ItemPredicateMatchNode>('[', ']', ',',
+                                                            [this]() {
+                return parseItemPredMatch(false);
+            }));
+        }
 
         if (curChar() == '{') {
             ret->setNbt(parseCompoundTag());
@@ -1159,17 +1384,55 @@ namespace Command {
 
     QSharedPointer<ItemPredicateNode> MinecraftParser::
     minecraft_itemPredicate() {
-        const int    start  = pos();
-        const auto &&ret    = QSharedPointer<ItemPredicateNode>::create(0);
-        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+        const int    start = pos();
+        const auto &&ret   = QSharedPointer<ItemPredicateNode>::create(0);
 
-        parseResourceLocation(resLoc.get(), true);
-        ret->setResLoc(std::move(resLoc));
+        const bool from_1_20_5 = gameVer >= QVersionNumber(1, 20, 5);
+
+        if (curChar() == '*' && from_1_20_5) {
+            ret->setAll(true);
+            advance();
+        } else {
+            const auto &&resLoc =
+                QSharedPointer<ResourceLocationNode>::create(0);
+
+            parseResourceLocation(resLoc.get(), true);
+            ret->setResLoc(std::move(resLoc));
+        }
+
+        if (curChar() == '[' && from_1_20_5) {
+            ret->setComponents(
+                parseList<ListNode, ListNode>('[', ']', ',', [this]() {
+                return parseItemPredEntry();
+            }));
+        }
 
         if (curChar() == '{') {
             ret->setNbt(parseCompoundTag());
         }
         ret->setLength(pos() - start);
+        return ret;
+    }
+
+    QSharedPointer<LootModifierNode> MinecraftParser::minecraft_lootModifier() {
+        const auto &&ret = QSharedPointer<LootModifierNode>::create(0);
+
+        parseInlinableResource(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<LootPredicateNode> MinecraftParser::minecraft_lootPredicate()
+    {
+        const auto &&ret = QSharedPointer<LootPredicateNode>::create(0);
+
+        parseInlinableResource(ret.get());
+        return ret;
+    }
+
+    QSharedPointer<LootTableNode> MinecraftParser::minecraft_lootTable() {
+        const auto &&ret = QSharedPointer<LootTableNode>::create(0);
+
+        parseInlinableResource(ret.get());
         return ret;
     }
 
@@ -1265,84 +1528,21 @@ namespace Command {
     }
 
     QSharedPointer<ParticleNode> MinecraftParser::minecraft_particle() {
-        const int    start  = pos();
-        const auto &&ret    = QSharedPointer<ParticleNode>::create(0);
-        const auto &&resLoc = QSharedPointer<ResourceLocationNode>::create(0);
+        if (gameVer >= QVersionNumber(1, 20, 5)) {
+            const int    start = pos();
+            const auto &&ret   = QSharedPointer<ParticleNode>::create(0);
 
-        parseResourceLocation(resLoc.get());
+            ret->setResLoc(minecraft_resourceLocation());
 
-        QString fullId;
-        if (!resLoc->nspace()) {
-            fullId = resLoc->id()->text();
+            if (curChar() == '{') {
+                ret->setOptions(parseCompoundTag());
+            }
+
+            ret->setLength(pos() - start);
+            return ret;
         } else {
-            const QString &&nspace = resLoc->nspace()->text();
-            if (nspace.isEmpty() || (nspace == "minecraft"_QL1)) {
-                fullId = resLoc->id()->text();
-            } else {
-                fullId = nspace + ":"_QL1 + resLoc->id()->text();
-            }
+            return parseOldParticle();
         }
-        ret->setResLoc(std::move(resLoc));
-
-        uswitch (fullId) {
-            ucase ("block"_QL1):
-            ucase ("block_marker"_QL1):
-            ucase ("falling_dust"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                ret->setParams(minecraft_blockState());
-                break;
-            }
-            ucase ("dust"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                const auto &&color = parseParticleColor();
-                color->setTrailingTrivia(eat(' '));
-                ret->setParams(std::move(color), brigadier_float());
-                break;
-            }
-            ucase ("dust_color_transition"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                const auto &&startColor = parseParticleColor();
-                startColor->setTrailingTrivia(eat(' '));
-                const auto &&size = brigadier_float();
-                size->setTrailingTrivia(eat(' '));
-                const auto &&endColor = parseParticleColor();
-                ret->setParams(std::move(startColor), std::move(size),
-                               std::move(endColor));
-                break;
-            }
-            ucase ("item"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                ret->setParams(minecraft_itemStack());
-                break;
-            }
-            ucase ("sculk_charge"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                ret->setParams(brigadier_float());
-                break;
-            }
-            ucase ("shriek"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                ret->setParams(brigadier_integer());
-                break;
-            }
-            ucase ("vibration"_QL1): {
-                resLoc->setTrailingTrivia(eat(' ',
-                                              "Unexpected %1, expecting %2 to separate between particle and parameters"));
-                const auto &&pos = minecraft_vec3();
-                pos->setTrailingTrivia(eat(' '));
-                ret->setParams(std::move(pos), brigadier_integer());
-                break;
-            }
-        }
-
-        ret->setLength(pos() - start);
-        return ret;
     }
 
     QSharedPointer<ResourceNode> MinecraftParser::

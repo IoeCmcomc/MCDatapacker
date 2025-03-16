@@ -6,6 +6,8 @@
 #include "game.h"
 #include "globalhelpers.h"
 
+#include <QDebug>
+
 namespace Command {
     CompletionProvider::CompletionProvider(const int row) : OverloadNodeVisitor(
             LetTheVisitorDecide), m_cursorRow{row} {
@@ -19,16 +21,22 @@ namespace Command {
             bool  isFirst   = true;
             for (const auto &child: children) {
                 m_pos += child->leadingTrivia().length();
-                qDebug() << m_pos << child << child->length() <<
-                    child->schemaNode();
+                // qDebug() << m_pos << child << child->length() <<
+                //     child->schemaNode();
                 if ((m_cursorRow >= m_pos) &&
                     (m_cursorRow <= (m_pos + child->length()))) {
-                    qDebug() << "I choose you" << child;
+                    //qDebug() << "I choose you" << child;
                     if (!isFirst) {
                         Q_ASSERT(prevChild->schemaNode() != nullptr);
-                        m_suggestions +=
-                            prevChild->schemaNode()->literalChildren().
-                            keys().toVector();
+                        auto &&literals =
+                            prevChild->schemaNode()->literalChildren();
+                        if (literals.isEmpty() &&
+                            prevChild->schemaNode()->redirect()) {
+                            literals =
+                                prevChild->schemaNode()->redirect()->
+                                literalChildren();
+                        }
+                        m_suggestions += literals.keys().toVector();
                     } else if (child->schemaNode()) {
                         m_suggestions +=
                             child->schemaNode()->parent()->literalChildren().
@@ -114,25 +122,52 @@ namespace Command {
     }
 
     void CompletionProvider::visit(ResourceLocationNode *node) {
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("advancements"),
-            QString(), false);
-        m_suggestions += Game::getRegistry(QStringLiteral("advancement"));
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("item_modifiers"),
-            QString(), false);
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("loot_tables"),
-            QString(), false);
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("predicates"),
-            QString(), false);
-        m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
-        m_suggestions += Glhp::fileIdList(
-            QDir::currentPath(), QStringLiteral("recipes"),
-            QString(), false);
-        m_suggestions += Game::getRegistry(QStringLiteral("recipe"));
-        m_suggestions += Game::getRegistry(QStringLiteral("sound_event"));
+        const bool from_1_21 = Game::version() >= Game::v1_21;
+
+        QString category;
+
+        if (const auto *schemaNode =
+                schemanode_cast<const Schema::ArgumentNode *>(
+                    node->schemaNode())) {
+            const auto &props = schemaNode->properties();
+            if (props.contains("category"_QL1)) {
+                category = props.value("category"_QL1).toString();
+                Glhp::removePrefix(category, "minecraft:"_QL1);
+            }
+        }
+
+        if (category == "advancement") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("advancements"),
+                QString(), false, from_1_21);
+            m_suggestions += Game::getRegistry(QStringLiteral("advancement"));
+        } else if (category == "item_modifier") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("item_modifiers"),
+                QString(), false, from_1_21);
+        } else if (category == "loot_table") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("loot_tables"),
+                QString(), false, from_1_21);
+            m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
+        } else if (category == "predicate") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("predicates"),
+                QString(), false, from_1_21);
+        } else if (category == "recipe") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("recipes"),
+                QString(), false, from_1_21);
+            m_suggestions += Game::getRegistry(QStringLiteral("recipe"));
+        } else if (category == "sound_event") {
+            m_suggestions += Game::getRegistry(QStringLiteral("sound_event"));
+        } else if (category == "worldgen/biome") {
+            m_suggestions += Glhp::fileIdList(
+                QDir::currentPath(), QStringLiteral("worldgen/biome"),
+                QString(), false, from_1_21);
+            m_suggestions +=
+                Game::getRegistry(QStringLiteral("worldgen/biome"));
+        }
     }
 
     void CompletionProvider::visit(ResourceNode *node) {
@@ -172,18 +207,20 @@ namespace Command {
     void CompletionProvider::visit(ItemStackNode *node) {
         if ((m_cursorRow >= m_pos) &&
             (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
-            addSuggestionsFromInfo(QStringLiteral("item"));
+            addItemInfo();
         }
     }
 
     void CompletionProvider::visit(ItemPredicateNode *node) {
-        if ((m_cursorRow >= m_pos) &&
-            (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
-            addSuggestionsFromInfo(QStringLiteral("item"));
-            addSuggestionsFromInfo(QStringLiteral("tag/item"), true);
-            m_suggestions += Glhp::fileIdList(
-                QDir::currentPath(), QStringLiteral("tags/items"),
-                QString(), false);
+        if (node->resLoc()) {
+            if ((m_cursorRow >= m_pos) &&
+                (m_cursorRow <= (m_pos + node->resLoc()->length()))) {
+                addItemInfo();
+                addSuggestionsFromInfo(QStringLiteral("tag/item"), true);
+                m_suggestions += Glhp::fileIdList(
+                    QDir::currentPath(), QStringLiteral("tags/items"),
+                    QString(), false);
+            }
         }
     }
 
@@ -198,15 +235,36 @@ namespace Command {
         m_suggestions += QUuid::createUuid().toString(QUuid::WithoutBraces);
     }
 
+    void CompletionProvider::visit(LootModifierNode *) {
+        m_suggestions += Glhp::fileIdList(
+            QDir::currentPath(), QStringLiteral("item_modifiers"),
+            QString(), false);
+        m_suggestions += Game::getRegistry(QStringLiteral("item_modifier"));
+    }
+
+    void CompletionProvider::visit(LootPredicateNode *) {
+        m_suggestions += Glhp::fileIdList(
+            QDir::currentPath(), QStringLiteral("predicates"),
+            QString(), false);
+        m_suggestions += Game::getRegistry(QStringLiteral("predicate"));
+    }
+
+    void CompletionProvider::visit(LootTableNode *) {
+        m_suggestions += Glhp::fileIdList(
+            QDir::currentPath(), QStringLiteral("loot_tables"),
+            QString(), false);
+        m_suggestions += Game::getRegistry(QStringLiteral("loot_table"));
+    }
+
     QVector<QString> CompletionProvider::suggestions() const {
         return m_suggestions;
     }
 
     void CompletionProvider::addSuggestionsFromRegistry(ArgumentNode *node,
                                                         const bool getTag) {
-        if (node->schemaNode()->kind() == Schema::Node::Kind::Argument) {
-            const auto *schemaNode =
-                static_cast<const Schema::ArgumentNode *>(node->schemaNode());
+        if (const auto *schemaNode =
+                schemanode_cast<const Schema::ArgumentNode *>(
+                    node->schemaNode())) {
             const auto &props    = schemaNode->properties();
             QString   &&registry = props.value("registry").toString();
             Glhp::removePrefix(registry, QLatin1String("minecraft:"));
@@ -241,6 +299,22 @@ namespace Command {
             });
         } else {
             m_suggestions += keys.toVector();
+        }
+    }
+    void CompletionProvider::addItemInfo() {
+        const QVariantMap&& itemInfoMap = Game::getInfo(QStringLiteral("item"));
+        const auto       && keys        = itemInfoMap.keys();
+
+        m_suggestions += keys.toVector();
+
+        const QVariantMap&& blockInfoMap =
+            Game::getInfo(QStringLiteral("block"));
+        for (auto it = blockInfoMap.cbegin(); it != blockInfoMap.cend(); ++it) {
+            const auto &value = it.value();
+            if ((value.type() != QVariant::Map) ||
+                !value.toMap().value("unobtainable", false).toBool()) {
+                m_suggestions += it.key();
+            }
         }
     }
 }

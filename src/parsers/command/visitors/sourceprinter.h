@@ -72,6 +72,13 @@ public:
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
+        void visit(InlinableResourceNode *node) override {
+            m_text += node->leadingTrivia();
+            m_text += node->leftText();
+            node->getNode()->accept(this, m_order);
+            m_text += node->rightText();
+            m_text += node->trailingTrivia();
+        };
         void visit(IntRangeNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
@@ -92,6 +99,26 @@ public:
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             node->resLoc()->accept(this, m_order);
+            if (node->components()) {
+                node->components()->accept(this, m_order);
+            }
+            if (node->nbt()) {
+                node->nbt()->accept(this, m_order);
+            }
+            m_text += node->rightText();
+            m_text += node->trailingTrivia();
+        };
+        void visit(ItemPredicateNode *node) override {
+            m_text += node->leadingTrivia();
+            m_text += node->leftText();
+            if (!node->isAll()) {
+                node->resLoc()->accept(this, m_order);
+            } else {
+                m_text += '*';
+            }
+            if (node->components()) {
+                node->components()->accept(this, m_order);
+            }
             if (node->nbt()) {
                 node->nbt()->accept(this, m_order);
             }
@@ -113,7 +140,7 @@ public:
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };
-        void visit(EntityArgumentValueNode *node) override {
+        void visit(InvertibleNode *node) override {
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             if (node->getNode()) {
@@ -251,7 +278,11 @@ public:
             m_text += node->leadingTrivia();
             m_text += node->leftText();
             node->resLoc()->accept(this, m_order);
-            printList(node->params());
+            if (const auto options = node->options()) {
+                options->accept(this, m_order);
+            } else {
+                printList(node->params());
+            }
             m_text += node->rightText();
             m_text += node->trailingTrivia();
         };

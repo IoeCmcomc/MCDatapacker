@@ -184,6 +184,7 @@
       <addaction name="actionUpgrader"/>
       <addaction name="actionMcstacker"/>
       <addaction name="actionMinecraft_Tools"/>
+      <addaction name="actionBDEngine"/>
      </widget>
      <widget class="QMenu" name="menu_Offline_tools">
       <property name="title">
@@ -210,7 +211,7 @@
       <addaction name="actionPlanetMinecraft"/>
       <addaction name="actionModrinth"/>
       <addaction name="actionSmithed"/>
-      <addaction name="actionDatapack_Hub"/>
+      <addaction name="actionMCCreations"/>
      </widget>
      <addaction name="menuOnlineTools"/>
      <addaction name="menu_Offline_tools"/>
@@ -229,6 +230,19 @@
     <property name="title">
      <string>&amp;Edit</string>
     </property>
+    <widget class="QMenu" name="menuAdvanced">
+     <property name="title">
+      <string>Advanced</string>
+     </property>
+     <addaction name="actionSelectCurrentLine"/>
+     <addaction name="separator"/>
+     <addaction name="actionCopyLineUp"/>
+     <addaction name="actionCopyLineDown"/>
+     <addaction name="actionMoveLineUp"/>
+     <addaction name="actionMoveLineDown"/>
+     <addaction name="separator"/>
+     <addaction name="actionToggleComment"/>
+    </widget>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
@@ -236,6 +250,11 @@
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="menuAdvanced"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionReplace"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -244,8 +263,23 @@
     <addaction name="actionStatistics"/>
     <addaction name="actionRawJsonTextEditor"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionAdvancementViewer"/>
+    <addaction name="actionItemModifierEditor"/>
+    <addaction name="actionLootTableEditor"/>
+    <addaction name="actionPredicateEditor"/>
+    <addaction name="actionRecipeEditor"/>
+    <addaction name="actionDefaultDatapack"/>
+    <addaction name="separator"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
    <addaction name="menuTools"/>
    <addaction name="menuPreferences"/>
    <addaction name="menuHelp"/>
@@ -526,6 +560,147 @@
   <action name="actionDatapack_Hub">
    <property name="text">
     <string>Datapack Hub</string>
+   </property>
+  </action>
+  <action name="actionAdvancementViewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Advancement viewer</string>
+   </property>
+  </action>
+  <action name="actionItemModifierEditor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Item modifier editor</string>
+   </property>
+  </action>
+  <action name="actionLootTableEditor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Loot table editor</string>
+   </property>
+  </action>
+  <action name="actionPredicateEditor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Predicate editor</string>
+   </property>
+  </action>
+  <action name="actionRecipeEditor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Recipe editor</string>
+   </property>
+  </action>
+  <action name="actionSelectCurrentLine">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Select current line</string>
+   </property>
+  </action>
+  <action name="actionCopyLineUp">
+   <property name="text">
+    <string>Copy lines up</string>
+   </property>
+  </action>
+  <action name="actionCopyLineDown">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Copy lines down</string>
+   </property>
+  </action>
+  <action name="actionMoveLineUp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Move lines up</string>
+   </property>
+  </action>
+  <action name="actionMoveLineDown">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Move lines down</string>
+   </property>
+  </action>
+  <action name="actionToggleComment">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Toggle comment</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Find...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionReplace">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Replace...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Zoom in</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Zoom &amp;out</string>
+   </property>
+  </action>
+  <action name="actionDefaultDatapack">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Default datapack</string>
+   </property>
+  </action>
+  <action name="actionBDEngine">
+   <property name="text">
+    <string>BDEngine – Block display editor</string>
+   </property>
+  </action>
+  <action name="actionMCCreations">
+   <property name="text">
+    <string>MCCreations</string>
    </property>
   </action>
  </widget>

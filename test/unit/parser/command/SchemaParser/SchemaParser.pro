@@ -41,11 +41,11 @@ HEADERS += \
     ../../../../../src/parsers/command/re2c_generated_functions.h
 
 RESOURCES += \
-    ../../../../../resource/minecraft/info/1.15/1.15.qrc
+    ../../../../../res/mc/info/1.15/1.15.qrc
 
 DISTFILES += \
-    ../../../../../resource/minecraft/info/1.15/summary/commands/data.min.json \
-    ../../../../../resource/minecraft/info/1.15/summary/commands/data.msgpack
+    ../../../../../res/mc/info/1.15/summary/commands/data.min.json \
+    ../../../../../res/mc/info/1.15/summary/commands/data.msgpack
 
 include($$PWD/../../../../../lib/lru-cache/lru-cache.pri)
 include($$PWD/../../../../../lib/json/json.pri)

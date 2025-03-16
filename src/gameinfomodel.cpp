@@ -15,11 +15,15 @@ GameInfoModel::GameInfoModel(QObject *parent)
     : QAbstractListModel(parent) {
 }
 
-GameInfoModel::GameInfoModel(QObject *parent, const QString &key,
-                             LoadFrom loadFrom, Options options)
+GameInfoModel::GameInfoModel(QObject *parent,
+                             const QString &key,
+                             LoadFrom loadFrom,
+                             Options options,
+                             const QString &packCategory)
     : QAbstractListModel(parent), m_key{key}, m_loadFrom{loadFrom},
     m_options{options} {
     loadData();
+    setDatapackCategory(packCategory);
 }
 
 void GameInfoModel::setSource(const QString &key, LoadFrom loadFrom,
@@ -41,7 +45,7 @@ void GameInfoModel::setRegistry(const QString &key, Options options) {
 }
 
 void GameInfoModel::setDatapackCategory(const QString &cat, bool autoWatch) {
-    m_dtpCategory = cat;
+    m_dtpCategory = Game::canonicalCategory(cat);
 
     if (autoWatch) {
         if (m_watcher) {
@@ -64,7 +68,8 @@ void GameInfoModel::setDatapackCategory(const QString &cat, bool autoWatch) {
         for (const auto &nspaceDir : nspaceDirs) {
             const QString &&watchPath = dataPath +
                                         nspaceDir.section('.', 0,
-                                                          0) + "/" + cat;
+                                                          0) + "/" +
+                                        m_dtpCategory;
             if (QFile::exists(watchPath)) {
                 qDebug() << watchPath;
                 m_watcher->addPath(watchPath);

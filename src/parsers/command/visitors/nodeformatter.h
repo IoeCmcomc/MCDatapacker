@@ -141,6 +141,14 @@ public:
                                            m_palette[CodePalette::ItemStack] };
             m_pos += node->resLoc()->length();
 
+            if (node->components()) {
+                m_formatRanges << FormatRange{
+                    m_pos, node->components()->length(),
+                    m_palette[CodePalette::ItemStack_Components]
+                    };
+                node->components()->accept(this, m_order);
+            }
+
             if (node->nbt())
                 node->nbt()->accept(this, m_order);
 
@@ -160,7 +168,7 @@ public:
                      node->trailingTrivia().length();
         }
 
-        void visit(EntityArgumentValueNode *node) final {
+        void visit(InvertibleNode *node) final {
             m_pos += node->leadingTrivia().length();
             m_pos += node->leftText().length();
             node->getNode()->accept(this, m_order);
@@ -353,10 +361,14 @@ public:
 
             m_pos += node->resLoc()->length();
             m_pos += node->resLoc()->trailingTrivia().length();
-            const auto &&params = node->params();
-            if (!params.isEmpty()) {
-                for (const auto &child: params) {
-                    child->accept(this, m_order);
+            if (const auto options = node->options()) {
+                options->accept(this, m_order);
+            } else {
+                const auto &&params = node->params();
+                if (!params.isEmpty()) {
+                    for (const auto &child: params) {
+                        child->accept(this, m_order);
+                    }
                 }
             }
 
@@ -374,13 +386,28 @@ public:
         void visit(ItemPredicateNode *node) final {
             m_pos += node->leadingTrivia().length();
 
-            m_formatRanges << FormatRange{ m_pos, node->resLoc()->length(),
+            const int baseLength = node->isAll() ? 1 : node->resLoc()->length();
+
+            m_formatRanges << FormatRange{ m_pos, baseLength,
                                            m_palette[CodePalette::ItemPredicate] };
 
-            m_pos += node->resLoc()->length();
+            m_pos += baseLength;
             if (node->nbt())
                 node->nbt()->accept(this, m_order);
 
+            if (node->components()) {
+                m_formatRanges << FormatRange{
+                    m_pos, node->components()->length(),
+                    m_palette[CodePalette::ItemStack_Components]
+                    };
+                node->components()->accept(this, m_order);
+            }
+
+            m_pos += node->trailingTrivia().length();
+        }
+        void visit(InlinableResourceNode *node) final {
+            m_pos += node->leadingTrivia().length();
+            node->getNode()->accept(this, m_order);
             m_pos += node->trailingTrivia().length();
         }
 
@@ -391,6 +418,27 @@ public:
                                            m_palette[CodePalette::Key] };
 
             m_pos += node->length() + node->trailingTrivia().length();
+        }
+
+        void visit(ItemPredicateMatchNode *node) override {
+            m_pos += node->leadingTrivia().length();
+
+            node->first->accept(this, m_order);
+            if (node->second) {
+                node->second->accept(this, m_order);
+            }
+
+            m_pos += node->trailingTrivia().length();
+        }
+        void visit(ListNode *node) override {
+            m_pos += node->leadingTrivia().length() + node->leftText().length();
+
+            for (const auto &child: qAsConst(node->children())) {
+                child->accept(this, m_order);
+            }
+
+            m_pos += node->rightText().length() +
+                     node->trailingTrivia().length();
         }
 
         FormatRanges formatRanges() const;

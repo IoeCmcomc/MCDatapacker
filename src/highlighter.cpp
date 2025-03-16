@@ -1,6 +1,7 @@
 #include "highlighter.h"
 
 #include "globalhelpers.h"
+#include "game.h"
 
 #include "lru/lru.hpp"
 
@@ -8,9 +9,7 @@
 #include <QDir>
 #include <QTextDocument>
 
-#include <chrono>
-// #include <mutex>
-// #include <thread>
+// #include <chrono>
 
 using namespace std::chrono_literals;
 
@@ -341,14 +340,29 @@ QString Highlighter::locateNamespacedId(QString id) {
         dirList = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
         dirListCache.emplace(nspaceKey, dirList);
     }
+    const bool        from_1_21        = Game::version() >= Game::v1_21;
+    const QStringView functionCategory =
+        Glhp::canonicalCategoryView(u"functions", from_1_21);
     for (const auto &catDir: qAsConst(dirList)) {
         const QString &&path = dir.path() + "/"_QL1 + catDir + "/"
                                + id.section(":", 1, 1);
-        if (catDir == QStringLiteral("functions")
+        if (catDir == functionCategory
             && QFile::exists(path + QStringLiteral(".mcfunction"))) {
             return path + QStringLiteral(".mcfunction");
         } else if (QFile::exists(path + QStringLiteral(".json"))) {
             return path + QStringLiteral(".json");
+        }
+    }
+    if (nspaceKey == QStringLiteral("minecraft") || nspaceKey.isEmpty()) {
+        const static QVector<QString> vanillaCats{
+            "advancements", "loot_tables", "recipes",
+        };
+        const QString &idPath = id.section(':', 1, 1) + ".json";
+        for (QString vanillaCat: vanillaCats) {
+            vanillaCat = Glhp::canonicalCategory(vanillaCat, from_1_21);
+            if (Game::isVanillaFileExists(vanillaCat, idPath)) {
+                return Game::realVanillaFilePath(vanillaCat, idPath);
+            }
         }
     }
     return QString();

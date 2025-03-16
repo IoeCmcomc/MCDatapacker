@@ -14,65 +14,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-static QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal) {
-    QJsonArray keyArray;
-
-    if (keyVal.isObject()) {
-        keyArray.push_back(keyVal);
-    } else {
-        keyArray = keyVal.toArray();
-    }
-    /*    qDebug() << keyVal << keyArray; */
-
-    QVector<InventoryItem> items;
-    for (const auto &key : qAsConst(keyArray)) {
-        QJsonObject &&keyJson = key.toObject();
-        QString       itemID;
-
-        if (keyJson.contains(QStringLiteral("item"))) {
-            itemID = keyJson[QStringLiteral("item")].toString();
-        } else if (keyJson.contains(QStringLiteral("tag"))) {
-            itemID = '#' +
-                     keyJson[QStringLiteral("tag")].toString();
-        } else {
-            qWarning() <<
-                "JsonToIngredients: JSON ingredient has no 'item' nor 'tag' key.";
-        }
-        /*qDebug() << keyJson << keyJson.contains("item") << itemID; */
-        if (!itemID.isEmpty() &&
-            (!items.contains(InventoryItem(itemID)))) {
-            items.push_back(InventoryItem(itemID));
-        }
-    }
-    return items;
-}
-
-static QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
-                                    const bool emptyAsArray = false) {
-    QJsonArray keyItems;
-
-    for (const auto &item : items) {
-        auto itemID = item.getNamespacedID();
-        /*
-           if (!itemID.contains(':'))
-              itemID = QStringLiteral("minecraft:") + itemID;
-         */
-        QJsonObject keyItem;
-        if (item.isTag())
-            keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
-        else
-            keyItem.insert(QStringLiteral("item"), itemID);
-        keyItems.push_back(keyItem);
-    }
-    /*qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems; */
-    if (keyItems.isEmpty()) {
-        return emptyAsArray ? QJsonArray() : QJsonValue();
-    } else if (keyItems.count() == 1) {
-        return keyItems.at(0);
-    } else {
-        return keyItems;
-    }
-}
 
 VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
     QDockWidget(parent),
@@ -89,6 +30,14 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
                                    ui->craftingSlot_7, ui->craftingSlot_8,
                                    ui->craftingSlot_9 });
 
+    const bool from_v1_21_3 = Game::version() >= Game::v1_21_3;
+    for (auto *slot: std::as_const(craftingSlots)) {
+        slot->setAcceptComponents(false);
+        if (from_v1_21_3) {
+            slot->setAcceptItemsOrTag();
+        }
+    }
+
     connect(ui->customTabBar, &QTabBar::currentChanged,
             this, &VisualRecipeEditorDock::onRecipeTabChanged);
     connect(ui->smithTypeCombo, qOverload<int>(&QComboBox::currentIndexChanged),
@@ -98,6 +47,23 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
         } else {
             ui->outputSlot->clearItems();
             ui->outputSlot->setDisabled(true);
+        }
+    });
+    connect(ui->craftTypeInput, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, [this](int index){
+        if (index == 3) {         // Transmute crafting
+            for (auto *slot: std::as_const(craftingSlots)) {
+                slot->setEnabled(false);
+                slot->clearItems();
+            }
+            ui->craftingSlot_5->setEnabled(true);
+            ui->craftingSlot_6->setEnabled(true);
+            ui->resultCountInput->setEnabled(false);
+        } else {
+            for (auto *slot: std::as_const(craftingSlots)) {
+                slot->setEnabled(true);
+            }
+            ui->resultCountInput->setEnabled(true);
         }
     });
     connect(ui->smithTypeCombo, qOverload<int>(&QComboBox::currentIndexChanged),
@@ -123,6 +89,9 @@ VisualRecipeEditorDock::VisualRecipeEditorDock(QWidget *parent) :
         ui->label_3->hide();
     } else {
         ui->smithingPlus->hide();
+    }
+    if (Game::version() < Game::v1_21_3) {
+        hideComboRow(ui->craftTypeInput, 3);
     }
 }
 
@@ -210,6 +179,10 @@ void VisualRecipeEditorDock::onRecipeTabChanged(int index) {
     if (Game::version() >= Game::v1_20) {
         ui->outputSlot->setEnabled((index != 3) ||
                                    (ui->smithTypeCombo->currentIndex() == 0));
+    }
+    if (Game::version() >= Game::v1_21_3) {
+        ui->resultCountInput->setEnabled(ui->craftTypeInput->currentIndex() <
+                                         3);
     }
 }
 
@@ -323,7 +296,7 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
             key.insert(str.second, ingredientsToJson(items));
         }
         root.insert(QStringLiteral("key"), key);
-    } else { /* Shapeless crafting */
+    } else if (craftTypeIdx == 2) { /* Shapeless crafting */
         root.insert(QStringLiteral("type"),
                     QStringLiteral("minecraft:crafting_shapeless"));
 
@@ -336,12 +309,33 @@ QJsonObject VisualRecipeEditorDock::genCraftingJson(QJsonObject root) {
                 ingredients.push_back(ingredient);
         }
         root.insert(QStringLiteral("ingredients"), ingredients);
+    } else { // Transmute crafting
+        if (ui->craftingSlot_5->isEmpty() || ui->craftingSlot_6->isEmpty())
+            return root;
+
+        root.insert(QStringLiteral("type"),
+                    QStringLiteral("minecraft:crafting_transmute"));
+
+        const auto &input = ui->craftingSlot_5->getItems();
+        root.insert(QStringLiteral("input"), ingredientsToJson(input, true));
+        const auto &material = ui->craftingSlot_6->getItems();
+        root.insert(QStringLiteral("material"),
+                    ingredientsToJson(material, true));
+        root.insert(QStringLiteral("result"),
+                    ui->outputSlot->itemNamespacedID());
     }
 
-    QJsonObject result;
-    result.insert(QStringLiteral("item"), ui->outputSlot->itemNamespacedID());
-    result.insert(QStringLiteral("count"), ui->resultCountInput->value());
-    root.insert(QStringLiteral("result"), result);
+    if (craftTypeIdx < 3) {
+        QJsonObject     result;
+        const QString &&itemIdField =
+            (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+        result.insert(itemIdField, ui->outputSlot->itemNamespacedID());
+        result.insert(QStringLiteral("count"), ui->resultCountInput->value());
+        if (Game::version() >= Game::v1_20_6) {
+            tryWriteComponents(result, ui->outputSlot);
+        }
+        root.insert(QStringLiteral("result"), result);
+    }
 
     return root;
 }
@@ -361,7 +355,15 @@ QJsonObject VisualRecipeEditorDock::genSmeltingJson(QJsonObject root) {
     const auto &items = ui->smeltingSlot_0->getItems();
     root.insert("ingredient", ingredientsToJson(items));
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result{
+            { QStringLiteral("id"), ui->outputSlot->itemNamespacedID() }, };
+        tryWriteComponents(result, ui->outputSlot);
+        root.insert(QStringLiteral("result"), result);
+    } else {
+        root.insert(QStringLiteral("result"),
+                    ui->outputSlot->itemNamespacedID());
+    }
     root.insert(QStringLiteral("experience"), ui->experienceInput->value());
     if (ui->cookTimeCheck->isChecked())
         root.insert(QStringLiteral("cookingtime"), ui->cookTimeInput->value());
@@ -375,7 +377,15 @@ QJsonObject VisualRecipeEditorDock::genStonecuttingJson(QJsonObject root) {
     const auto &items = ui->stonecuttingSlot->getItems();
     root.insert(QStringLiteral("ingredient"), ingredientsToJson(items));
 
-    root.insert(QStringLiteral("result"), ui->outputSlot->itemNamespacedID());
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result{
+            { QStringLiteral("id"), ui->outputSlot->itemNamespacedID() }, };
+        tryWriteComponents(result, ui->outputSlot);
+        root.insert(QStringLiteral("result"), result);
+    } else {
+        root.insert(QStringLiteral("result"),
+                    ui->outputSlot->itemNamespacedID());
+    }
     root.insert(QStringLiteral("count"), ui->resultCountInput->value());
 
     return root;
@@ -394,25 +404,36 @@ QJsonObject VisualRecipeEditorDock::genSmithingJson(QJsonObject root) {
                     QStringLiteral("minecraft:smithing"));
     }
 
-    if (ui->smithingSlot_0->isEmpty())
-        return root;
+    const bool until_v1_21_3 = Game::version() < Game::v1_21_3;
 
-    const auto &base = ui->smithingSlot_0->getItems();
-    root.insert(QStringLiteral("base"), ingredientsToJson(base, from_v1_20));
-    const auto &addition = ui->smithingSlot_1->getItems();
-    root.insert(QStringLiteral("addition"),
-                ingredientsToJson(addition, from_v1_20));
-    if (from_v1_20) {
+    if (!ui->smithingSlot_0->isEmpty()) {
+        const auto &base = ui->smithingSlot_0->getItems();
+        root.insert(QStringLiteral("base"),
+                    ingredientsToJson(base, from_v1_20));
+    } else if (until_v1_21_3) {
+        return root;
+    }
+
+    if (until_v1_21_3 || !ui->smithingSlot_1->isEmpty()) {
+        const auto &addition = ui->smithingSlot_1->getItems();
+        root.insert(QStringLiteral("addition"),
+                    ingredientsToJson(addition, from_v1_20));
+    }
+    if (from_v1_20 && (until_v1_21_3 || !ui->smithingSlot_2->isEmpty())) {
         const auto &templates = ui->smithingSlot_2->getItems();
         root.insert(QStringLiteral("template"),
                     ingredientsToJson(templates, true));
     }
 
     if (!from_v1_20 || (ui->smithTypeCombo->currentIndex() == 0)) {
-        QJsonObject result;
-        result.insert(QStringLiteral("item"),
-                      ui->outputSlot->itemNamespacedID());
+        QJsonObject     result;
+        const QString &&itemIdField =
+            (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+        result.insert(itemIdField, ui->outputSlot->itemNamespacedID());
         result.insert(QStringLiteral("count"), ui->resultCountInput->value());
+        if (Game::version() >= Game::v1_20_6) {
+            tryWriteComponents(result, ui->outputSlot);
+        }
         root.insert(QStringLiteral("result"), result);
     }
 
@@ -435,12 +456,14 @@ void VisualRecipeEditorDock::readRecipe() {
     ui->recipeGroupInput->setText(root[QStringLiteral("group")].toString());
 
     static const QString craftingTypes[] = {
-        QStringLiteral("crafting_shaped"), QStringLiteral("crafting_shapeless")
+        QStringLiteral("crafting_shaped"), QStringLiteral(
+            "crafting_shapeless"),
+        QStringLiteral("crafting_transmute"),
     };
 
     static const QString smeltingTypes[] = {
         QStringLiteral("smelting"), QStringLiteral("blasting"),
-        QStringLiteral("smoking"),  QStringLiteral("campfire_cooking")
+        QStringLiteral("smoking"),  QStringLiteral("campfire_cooking"),
     };
 
     if (!root.contains(QStringLiteral("type"))) return;
@@ -547,19 +570,42 @@ void VisualRecipeEditorDock::readCraftingJson(const QJsonObject &root) {
                 craftingSlots[i]->setItems(JsonToIngredients(ingredient));
             }
         }
+    } else if (type == QStringLiteral("crafting_transmute")) {
+        if (Game::version() < Game::v1_21_3) return;
+
+        ui->craftTypeInput->setCurrentIndex(3);
+
+        if (!root.contains(QStringLiteral("input"))) return;
+
+        QJsonValue input = root[QStringLiteral("input")];
+        ui->craftingSlot_5->setItems(JsonToIngredients(input));
+
+        if (!root.contains(QStringLiteral("material"))) return;
+
+        QJsonValue material = root[QStringLiteral("material")];
+        ui->craftingSlot_6->setItems(JsonToIngredients(material));
+
+        if (!root.contains(QStringLiteral("result"))) return;
+
+        ui->outputSlot->setItem(root[QStringLiteral("result")].toString());
     }
 
-    if (!root.contains(QStringLiteral("result"))) return;
+    if (type != QStringLiteral("crafting_transmute")) {
+        if (!root.contains(QStringLiteral("result"))) return;
 
-    QJsonObject result = root[QStringLiteral("result")].toObject();
-    if (!result.contains(QStringLiteral("item"))) return;
+        QJsonObject     result      = root[QStringLiteral("result")].toObject();
+        const QString &&itemIdField =
+            (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+        if (!result.contains(itemIdField)) return;
 
-    QString itemID = result[QStringLiteral("item")].toString();
-    if (!itemID.isEmpty())
-        ui->outputSlot->setItem(InventoryItem(itemID));
-    else
-        ui->outputSlot->clearItems();
-    ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt(1));
+        QString itemID = result[itemIdField].toString();
+        if (!itemID.isEmpty())
+            ui->outputSlot->setItem(InventoryItem(itemID));
+        else
+            ui->outputSlot->clearItems();
+        ui->resultCountInput->setValue(result[QStringLiteral("count")].toInt(1));
+        tryReadComponents(result, ui->outputSlot);
+    }
 }
 
 void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
@@ -585,7 +631,16 @@ void VisualRecipeEditorDock::readSmeltingJson(const QJsonObject &root) {
     ui->smeltingSlot_0->setItems(JsonToIngredients(ingredient));
     if (!root.contains(QStringLiteral("result"))) return;
 
-    QString itemID = root[QStringLiteral("result")].toString();
+    QString itemID;
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result = root[QStringLiteral("result")].toObject();
+        if (!result.contains(QStringLiteral("id"))) return;
+
+        itemID = result[QStringLiteral("id")].toString();
+        tryReadComponents(result, ui->outputSlot);
+    } else {
+        itemID = root[QStringLiteral("result")].toString();
+    }
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
@@ -613,7 +668,16 @@ void VisualRecipeEditorDock::readStonecuttingJson(const QJsonObject &root) {
 
     if (!root.contains(QStringLiteral("result"))) return;
 
-    QString itemID = root[QStringLiteral("result")].toString();
+    QString itemID;
+    if (Game::version() >= Game::v1_20_6) {
+        QJsonObject result = root[QStringLiteral("result")].toObject();
+        if (!result.contains(QStringLiteral("id"))) return;
+
+        itemID = result[QStringLiteral("id")].toString();
+        tryReadComponents(result, ui->outputSlot);
+    } else {
+        itemID = root[QStringLiteral("result")].toString();
+    }
     if (!itemID.isEmpty())
         ui->outputSlot->setItem(InventoryItem(itemID));
     else
@@ -647,15 +711,20 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
     if (root.contains("template")) {
         const QJsonValue &&templates = root[QStringLiteral("template")];
         ui->smithingSlot_2->setItems(JsonToIngredients(templates));
+    } else {
+        ui->smithingSlot_2->clearItems();
     }
 
     if (!isArmorTrimMode) {
         if (!root.contains(QStringLiteral("result"))) return;
 
-        const QJsonObject &&result = root[QStringLiteral("result")].toObject();
-        if (!result.contains(QStringLiteral("item"))) return;
+        const QJsonObject &&result =
+            root[QStringLiteral("result")].toObject();
+        const QString &&itemIdField =
+            (Game::version() >= Game::v1_20_6) ? "id"_QL1 : "item"_QL1;
+        if (!result.contains(itemIdField)) return;
 
-        const QString &&itemID = result[QStringLiteral("item")].toString();
+        const QString &&itemID = result[itemIdField].toString();
         if (!itemID.isEmpty())
             ui->outputSlot->setItem(InventoryItem(itemID));
         else
@@ -665,5 +734,102 @@ void VisualRecipeEditorDock::readSmithingJson(const QJsonObject &root) {
             ui->resultCountInput->setValue(result[QStringLiteral(
                                                       "count")].toInt());
         }
+        tryReadComponents(result, ui->outputSlot);
+    }
+}
+
+QVector<InventoryItem> VisualRecipeEditorDock::JsonToIngredients(
+    const QJsonValue &keyVal) {
+    QJsonArray keyArray;
+
+    if (keyVal.isObject() || keyVal.isString()) {
+        keyArray.push_back(keyVal);
+    } else {
+        keyArray = keyVal.toArray();
+    }
+
+    QVector<InventoryItem> items;
+    for (const auto &key : qAsConst(keyArray)) {
+        QString itemID;
+
+        if (Game::version() >= Game::v1_21_3) {
+            if (!key.isString()) {
+                qWarning() <<
+                    "JsonToIngredients: JSON ingredient has to be a string of namespaced ID or ID tag.";
+            }
+            itemID = key.toString();
+            if (itemID.startsWith('#') && keyVal.isArray()) {
+                QMessageBox::critical(this,
+                                      tr("JSON input error"),
+                                      tr(
+                                          "Item tags are not allowed in the ingredient list."));
+                return {};
+            }
+        } else {
+            QJsonObject &&keyJson = key.toObject();
+            if (keyJson.contains(QStringLiteral("item"))) {
+                itemID = keyJson[QStringLiteral("item")].toString();
+            } else if (keyJson.contains(QStringLiteral("tag"))) {
+                itemID = '#' +
+                         keyJson[QStringLiteral("tag")].toString();
+            } else {
+                qWarning() <<
+                    "JsonToIngredients: JSON ingredient has no 'item' nor 'tag' key.";
+            }
+        }
+        /*qDebug() << keyJson << keyJson.contains("item") << itemID; */
+        if (!itemID.isEmpty() &&
+            (!items.contains(InventoryItem(itemID)))) {
+            items.push_back(InventoryItem(itemID));
+        }
+    }
+    return items;
+}
+
+QJsonValue VisualRecipeEditorDock::ingredientsToJson(
+    const QVector<InventoryItem> &items, const bool emptyAsArray) {
+    QJsonArray keyItems;
+
+    for (const auto &item : items) {
+        QString &&itemID = item.getNamespacedID();
+        if (Game::version() >= Game::v1_21_3) {
+            keyItems.push_back(itemID);
+        } else {
+            QJsonObject keyItem;
+            if (item.isTag())
+                keyItem.insert(QStringLiteral("tag"), itemID.remove(0, 1));
+            else
+                keyItem.insert(QStringLiteral("item"), itemID);
+            keyItems.push_back(keyItem);
+        }
+    }
+    /*qDebug() << keyItems.isEmpty() << keyItems.count() << keyItems; */
+    if (keyItems.isEmpty()) {
+        return emptyAsArray ? QJsonArray() : QJsonValue();
+    } else if (keyItems.count() == 1) {
+        return keyItems.at(0);
+    } else {
+        return keyItems;
+    }
+}
+
+
+void VisualRecipeEditorDock::tryWriteComponents(QJsonObject &obj,
+                                                InventorySlot *slot) {
+    const auto &components = slot->itemComponents();
+
+    if (!components.isEmpty()) {
+        obj.insert(QStringLiteral("components"),
+                   QJsonObject::fromVariantMap(components));
+    }
+}
+
+void VisualRecipeEditorDock::tryReadComponents(const QJsonObject &obj,
+                                               InventorySlot *slot) {
+    if (obj.contains(QStringLiteral("components")) &&
+        !slot->isEmpty()) {
+        slot->getItem().setComponents(
+            obj[QStringLiteral("components")].toObject().toVariantMap());
+        emit slot->itemChanged();
     }
 }

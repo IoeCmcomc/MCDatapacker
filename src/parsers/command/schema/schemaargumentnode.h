@@ -30,7 +30,9 @@ public:
 
         QString name() const;
         QVariantMap properties() const;
+        void setProperties(const QVariantMap &value);
         ParserType parserType() const;
+
 
 private:
         QString m_name;

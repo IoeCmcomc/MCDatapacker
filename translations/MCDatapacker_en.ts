@@ -2,6 +2,20 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en">
 <context>
+    <name>FindAndReplaceDock</name>
+    <message numerus="yes">
+        <location filename="../src/findandreplacedock.cpp" line="609"/>
+        <source>Replacing all in the datapack is completed. Replaced %n occurrence(s).
+You may have to re-open opened files to see the replacements on these files.</source>
+        <translation>
+            <numerusform>Replacing all in the datapack is completed. Replaced %n occurrence.
+You may have to re-open opened files to see the replacements on these files.</numerusform>
+            <numerusform>Replacing all in the datapack is completed. Replaced %n occurrences.
+You may have to re-open opened files to see the replacements on these files.</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>ProblemArea</name>
     <message numerus="yes">
         <location filename="../src/problemarea.cpp" line="30"/>
@@ -15,7 +29,7 @@
 <context>
     <name>SettingsDialog</name>
     <message numerus="yes">
-        <location filename="../src/settingsdialog.cpp" line="137"/>
+        <location filename="../src/settingsdialog.cpp" line="144"/>
         <source>&lt;b style=&quot;color:green&quot;&gt;Valid&lt;/b&gt;. %n command(s) detected.</source>
         <translation>
             <numerusform>&lt;b style=&quot;color:green&quot;&gt;Valid&lt;/b&gt;. %n command detected.</numerusform>
@@ -33,7 +47,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/statusbar.cpp" line="93"/>
+        <location filename="../src/statusbar.cpp" line="94"/>
         <source>%Ln problem(s)</source>
         <translation>
             <numerusform>%Ln problem</numerusform>

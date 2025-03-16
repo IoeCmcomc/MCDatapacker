@@ -41,6 +41,7 @@ private:
     bool m_itemsOnly    = true;
 
     void appendItem(const InventoryItem &invItem);
+    bool canAddItem(const bool addingTag);
 };
 
 #endif /* INVENTORYSLOTEDITOR_H */

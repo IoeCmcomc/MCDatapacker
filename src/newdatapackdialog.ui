@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>285</height>
+    <height>327</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,93 +29,6 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="toolTip">
-        <string>Name of the datapack</string>
-       </property>
-       <property name="whatsThis">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Name of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This is also used in order to name the default namespace of this datapack.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Name:</string>
-       </property>
-       <property name="buddy">
-        <cstring>nameInput</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="nameInput"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="toolTip">
-        <string>Pack format number of the datapack</string>
-       </property>
-       <property name="whatsThis">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Pack format number of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This number indicates what Minecraft version the datapack is designed for.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Pack format:</string>
-       </property>
-       <property name="buddy">
-        <cstring>formatInput</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QSpinBox" name="formatInput">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>42</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="formatDisplay">
-         <property name="text">
-          <string notr="true"/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="toolTip">
-        <string>Where to create the datapack</string>
-       </property>
-       <property name="text">
-        <string>Location:</string>
-       </property>
-       <property name="buddy">
-        <cstring>locationInput</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLineEdit" name="locationInput"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="browseBtn">
-         <property name="text">
-          <string>Browse</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
    <item row="0" column="1">
     <widget class="QDialogButtonBox" name="dialogBox">
      <property name="orientation">
@@ -159,6 +72,101 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item row="0" column="0">
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>Name of the datapack</string>
+       </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Name of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This is also used in order to name the default namespace of this datapack.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Name:</string>
+       </property>
+       <property name="buddy">
+        <cstring>nameInput</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameInput"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="toolTip">
+        <string>The base Minecraft version range for the datapack</string>
+       </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:696;&quot;&gt;Base Minecraft version range for the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Choose a range of base Minecraft versions which the datapack is designed for. This value is only used to quickly select the appopriate pack format below and doesn't do anything else on its own.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Base game version:</string>
+       </property>
+       <property name="buddy">
+        <cstring>gameVerCombo</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="toolTip">
+        <string>The base pack format number of the datapack</string>
+       </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:696;&quot;&gt;The base pack format number of the datapack.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This number indicates what Minecraft version the datapack is designed for.&lt;/p&gt;&lt;p&gt;Starting from Minecraft 1.20.2, a datapack can have multiple pack format numbers. The new pack format range is declared in another field, and this field is kept for compatibility. In this case, this pack format should be set to the lowest pack format the pack supports.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Pack format:</string>
+       </property>
+       <property name="buddy">
+        <cstring>formatInput</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="gameVerCombo"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="formatInput">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>999</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="toolTip">
+        <string>Where to create the datapack</string>
+       </property>
+       <property name="text">
+        <string>Location:</string>
+       </property>
+       <property name="buddy">
+        <cstring>locationInput</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="locationInput"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="browseBtn">
+         <property name="text">
+          <string>Browse...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

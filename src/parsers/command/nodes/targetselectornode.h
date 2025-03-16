@@ -13,6 +13,7 @@ public:
             Unknown = -1,
             A,
             E,
+            N, // Added in 1.21
             P,
             R,
             S,

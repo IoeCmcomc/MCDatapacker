@@ -4,6 +4,7 @@
 
 #include "globalhelpers.h"
 #include "game.h"
+#include "codefile.h"
 
 #include <QModelIndex>
 #include <QFile>
@@ -20,10 +21,13 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QAction>
+#include <QProcess>
+#include <QDesktopServices>
 
 DatapackTreeView::DatapackTreeView(QWidget *parent) : QTreeView(parent) {
     dirModel.setReadOnly(false);
     dirModel.setIconProvider(&iconProvider);
+    dirModel.setNameFilterDisables(false);
 
     setItemDelegateForColumn(0, new FileNameDelegate(this));
 
@@ -55,7 +59,7 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
         cMenu->addAction(cMenuActionOpen);
     }
 
-    const auto &&fileType = Glhp::pathToFileType(dirPath, finfo.filePath());
+    const auto &&fileType = CodeFile::pathToFileType(dirPath, finfo.filePath());
     if ((fileType == CodeFile::Function || fileType >= CodeFile::JsonText) &&
         path.startsWith(QLatin1String("data/"))) {
         const QString &&filePathId = Glhp::toNamespacedID(dirPath,
@@ -104,19 +108,17 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
         }
     }
 
-
     if (path != QLatin1String("data") &&
         path != QLatin1String("pack.mcmeta")) {
-        QAction *cMenuActionRename = new QAction(tr("Rename"), cMenu);
-        connect(cMenuActionRename, &QAction::triggered,
-                this, &DatapackTreeView::contextMenuOnRename);
-        cMenu->addAction(cMenuActionRename);
-
-        QAction *cMenuActionDelete = new QAction(tr("Delete"), cMenu);
-        connect(cMenuActionDelete, &QAction::triggered,
-                this, &DatapackTreeView::contextMenuOnDelete);
-        cMenu->addAction(cMenuActionDelete);
+        cMenu->addAction(tr("Rename"), this,
+                         &DatapackTreeView::contextMenuOnRename);
+        cMenu->addAction(tr("Delete"), this,
+                         &DatapackTreeView::contextMenuOnDelete);
     }
+
+    cMenu->addAction(tr("Show containing folder"), this,
+                     &DatapackTreeView::showContainingFolder);
+
 
     if (path != QLatin1String("pack.mcmeta")) {
         cMenu->addSeparator();
@@ -149,14 +151,30 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                 addNewFileAction(newMenu, tr("Dimension type"), jsonExt,
                                  QLatin1String("type"));
             }
+            if (Game::version() >= Game::v1_21) {
+                addNewFileAction(newMenu, tr("Enchantment"), jsonExt,
+                                 QLatin1String("enchantment"));
+                addNewFileAction(newMenu, tr("Enchantment provider"), jsonExt,
+                                 QLatin1String("enchantment_provider"));
+            }
             addNewFileAction(newMenu, tr("Function"),
                              QLatin1String(".mcfunction"),
                              QLatin1String("functions"));
+            if (Game::version() >= Game::v1_21_3) {
+                addNewFileAction(newMenu, tr("Goat horn instrument"), jsonExt,
+                                 QLatin1String("instrument"));
+            }
             addNewFileAction(newMenu, tr("Loot table"), jsonExt,
                              QLatin1String("loot_tables"));
             if (Game::version() >= Game::v1_17) {
                 addNewFileAction(newMenu, tr("Item modifier"), jsonExt,
                                  QLatin1String("item_modifiers"));
+            }
+            if (Game::version() >= Game::v1_21) {
+                addNewFileAction(newMenu, tr("Jukebox provider"), jsonExt,
+                                 QLatin1String("jukebox_provider"));
+                addNewFileAction(newMenu, tr("Painting variant"), jsonExt,
+                                 QLatin1String("painting_variant"));
             }
             addNewFileAction(newMenu, tr("Predicate"), jsonExt,
                              QLatin1String("predicates"));
@@ -170,6 +188,10 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                                  QLatin1String("trim_material"));
                 addNewFileAction(newMenu, tr("Trim pattern"), jsonExt,
                                  QLatin1String("trim_pattern"));
+            }
+            if (Game::version() >= Game::v1_20_6) {
+                addNewFileAction(newMenu, tr("Wolf variant"), jsonExt,
+                                 QLatin1String("wolf_variant"));
             }
 
             /*"Tag" menu */
@@ -193,20 +215,8 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
             if (Game::version() >= Game::v1_18_2) {
                 QAction *action = new QAction(tr("Other..."), tagMenu);
 
-                connect(action, &QAction::triggered, this, [this]() {
-                    bool ok;
-                    const QString &tagType =
-                        QInputDialog::getText(
-                            this, tr("Tag folder path"),
-                            tr(
-                                "Please type the folder path of the tag (without the 'tags' prefix):"),
-                            QLineEdit::Normal, QString(), &ok);
-                    if (ok && !tagType.isEmpty()) {
-                        this->contextMenuOnNew(QLatin1String(".json"),
-                                               QStringLiteral(
-                                                   "tags/") + tagType);
-                    }
-                });
+                connect(action, &QAction::triggered, this,
+                        &DatapackTreeView::contextMenuOnNewCustomTag);
                 tagMenu->addAction(action);
             }
 
@@ -295,6 +305,8 @@ QModelIndex DatapackTreeView::getSelected() {
 void DatapackTreeView::load(const QDir &dir) {
     dirPath = dir.path();
     dirModel.setRootPath(dirPath);
+    // filterModel.setSourceModel(&dirModel);
+    // setModel(&filterModel);
     setModel(&dirModel);
 
     for (int i = 1; i < dirModel.columnCount(); ++i)
@@ -302,6 +314,8 @@ void DatapackTreeView::load(const QDir &dir) {
 
     setRootIndex(dirModel.index(dirPath));
     resizeFirstColumn();
+
+    expand(dirModel.index(dirPath + "/data"));
 
     emit datapackChanged();
 }
@@ -364,14 +378,15 @@ void DatapackTreeView::onFileRenamed(const QString &path,
     QString oldpath = path + '/' + oldName;
     QString newpath = path + '/' + newName;
 
-    if (Glhp::pathToFileType(dirPath, oldpath) == CodeFile::Function) {
+    if (CodeFile::pathToFileType(dirPath, oldpath) == CodeFile::Function) {
         if (isStringInTagFile(dirPath +
                               "/data/minecraft/tags/functions/load.json",
                               Glhp::toNamespacedID(dirPath, oldpath))) {
             contextMenuModifyTagFile
                 (dirPath + "/data/minecraft/tags/functions/load.json",
                 Glhp::toNamespacedID(dirPath, oldpath), false);
-            if (Glhp::pathToFileType(dirPath, newpath) == CodeFile::Function) {
+            if (CodeFile::pathToFileType(dirPath,
+                                         newpath) == CodeFile::Function) {
                 if (!isStringInTagFile(dirPath +
                                        "/data/minecraft/tags/functions/load.json",
                                        Glhp::toNamespacedID(dirPath,
@@ -411,8 +426,9 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
         if (finfo.exists() && finfo.isFile())
             finfo = dirModel.fileInfo(index.parent());
 
-        QDir tmpDir;
-        if (!catDir.isEmpty()) {
+        QDir           tmpDir;
+        const QString &actualCatDir = Game::canonicalCategory(catDir);
+        if (!actualCatDir.isEmpty()) {
             QString pathWithNspace = dirPath + QStringLiteral("/data/")
                                      + ((nspace.isEmpty()) ? Glhp::relNamespace(
                                             dirPath,
@@ -421,14 +437,14 @@ QModelIndex DatapackTreeView::makeNewFile(QModelIndex index,
             if (!tmpDir.exists())
                 return QModelIndex();
 
-            pathWithNspace += '/' + catDir;
+            pathWithNspace += '/' + actualCatDir;
             if (!QFileInfo::exists(pathWithNspace))
                 tmpDir.mkpath(pathWithNspace);
-            tmpDir.cd(catDir);
+            Q_UNUSED(tmpDir.cd(actualCatDir));
         }
 
         QString newPath;
-        if (catDir.isEmpty() || finfo.path().startsWith(tmpDir.path()))
+        if (actualCatDir.isEmpty() || finfo.path().startsWith(tmpDir.path()))
             newPath = finfo.filePath() + "/" + name;
         else
             newPath = tmpDir.path() + "/" + name;
@@ -452,6 +468,24 @@ void DatapackTreeView::contextMenuOnNew(const QString &ext,
         const auto fileInfo = dirModel.fileInfo(index);
         emit       openFileRequested(fileInfo.absoluteFilePath());
         edit(index);
+    }
+}
+
+void DatapackTreeView::contextMenuOnNewCustomTag() {
+    bool           ok;
+    const QString &tagType =
+        QInputDialog::getText(
+            this,
+            tr("Tag folder path"),
+            tr(
+                "Please type the folder path of the tag (without the 'tags' prefix):"),
+            QLineEdit::Normal,
+            QString(),
+            &ok);
+
+    if (ok && !tagType.isEmpty()) {
+        this->contextMenuOnNew(QLatin1String(".json"),
+                               QStringLiteral("tags/") + tagType);
     }
 }
 
@@ -582,12 +616,43 @@ void DatapackTreeView::contextMenuOnCopyId() {
 
     if (selected.isValid()) {
         QString &&filepath = dirModel.filePath(selected);
-        qApp->clipboard()->setText(Glhp::toNamespacedID(dirPath, filepath));
+        qApp->clipboard()->setText(Glhp::toNamespacedID(dirPath,
+                                                        filepath));
     }
 }
 
 void DatapackTreeView::resizeFirstColumn() {
     resizeColumnToContents(0);
+}
+
+// Based from: https://stackoverflow.com/q/3490336/12682038
+void DatapackTreeView::showContainingFolder() const {
+    QModelIndex &&selected = indexAt(cMenuPos);
+
+    if (selected.isValid()) {
+        QString &&filepath = dirModel.filePath(selected);
+#ifdef Q_OS_WIN
+        bool ok = QProcess::startDetached(QStringLiteral("explorer.exe"), {
+            QStringLiteral("/select,"), QDir::toNativeSeparators(filepath) });
+        if (ok) {
+            return;
+        }
+#elif Q_OS_MACOS // not tested
+        QProcess::execute("/usr/bin/osascript",
+                          { "-e",
+                            "tell application \"Finder\" to reveal POSIX file \"" + filepath +
+                            "\"" });
+        bool exitCode = QProcess::execute("/usr/bin/osascript",
+                                          { "-e",
+                                            "tell application \"Finder\" to activate" });
+        if (exitCode == 0) {
+            return;
+        }
+#endif
+        const auto &&finfo = dirModel.fileInfo(selected);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(finfo.isDir()? filepath :
+                                                      finfo.path()));
+    }
 }
 
 void DatapackTreeView::onDoubleClicked(const QModelIndex &index) {

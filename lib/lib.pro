@@ -2,5 +2,4 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     nbt \
-    QFindDialogs \
-    qlementine
+    QFindDialogs

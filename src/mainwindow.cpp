@@ -18,33 +18,40 @@
 #include "rawjsontexteditor.h"
 #include "darkfusionstyle.h"
 #include "norwegianwoodstyle.h"
+#include "codeeditor.h"
+#include "vanilladatapackdock.h"
+#include "numberprovider.h"
+#include "numberproviderdialog.h"
+#include "findandreplacedock.h"
 
 #include "game.h"
 #include "platforms/windows_specific.h"
 
 #include "QSimpleUpdater.h"
-#include "zip.hpp"
 #include "SystemThemeHelper.h"
-#include <oclero/qlementine.hpp>
+#include "zip.hpp"
 
-#include <QDebug>
-#include <QFileDialog>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QSettings>
-#include <QScreen>
-/*#include <QGuiApplication> */
-#include <QFileInfo>
-#include <QCloseEvent>
-#include <QProcess>
-#include <QShortcut>
 #include <QClipboard>
+#include <QCloseEvent>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QProcess>
 #include <QProgressDialog>
 #include <QSaveFile>
-#include <QDesktopServices>
+#include <QScreen>
+#include <QSettings>
+#include <QShortcut>
 
 static const QString updateDefUrl = QStringLiteral(
     "https://raw.githubusercontent.com/IoeCmcomc/MCDatapacker/master/updates.json");
+
+void bindNumberProviderDialog(NumberProvider *obj) {
+    obj->assignDialogClass<NumberProviderDialog>();
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow),
@@ -54,9 +61,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_initialStyleId = style()->objectName();
     moveOldSettings();
     readSettings();
-    loadLanguage(locale().name());
-
-    /*qDebug() << MainWindow::getMCRInfo("blockTag").count(); */
 
     m_statusBar = new StatusBar(this, ui->tabbedInterface);
     setStatusBar(m_statusBar);
@@ -124,28 +128,26 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::initDocks() {
-    visualRecipeEditorDock = new VisualRecipeEditorDock(this);
-    addDockWidget(Qt::RightDockWidgetArea, visualRecipeEditorDock);
-    visualRecipeEditorDock->hide();
+    NumberProvider::postCtorCallback = bindNumberProviderDialog;
 
-    lootTableEditorDock = new LootTableEditorDock(this);
-    addDockWidget(Qt::BottomDockWidgetArea, lootTableEditorDock);
-    lootTableEditorDock->hide();
-
-    predicateDock = new PredicateDock(this);
-    addDockWidget(Qt::RightDockWidgetArea, predicateDock);
-    predicateDock->hide();
-
-    advancementsDock = new AdvancementTabDock(this);
-    addDockWidget(Qt::BottomDockWidgetArea, advancementsDock);
-    connect(advancementsDock, &AdvancementTabDock::openFileRequested,
-            ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+    connect(ui->actionAdvancementViewer, &QAction::triggered, this,
+            &MainWindow::onAdvancementsDockAction);
 
     if (Game::version() >= Game::v1_17) {
-        itemModifierDock = new ItemModifierDock(this);
-        addDockWidget(Qt::RightDockWidgetArea, itemModifierDock);
-        itemModifierDock->hide();
+        connect(ui->actionItemModifierEditor, &QAction::triggered, this,
+                &MainWindow::onItemModifierDockAction);
+    } else {
+        ui->actionItemModifierEditor->setVisible(false);
     }
+
+    connect(ui->actionLootTableEditor, &QAction::triggered, this,
+            &MainWindow::onLootTableDockAction);
+    connect(ui->actionPredicateEditor, &QAction::triggered, this,
+            &MainWindow::onPredicateDockAction);
+    connect(ui->actionRecipeEditor, &QAction::triggered, this,
+            &MainWindow::onRecipeDockAction);
+    connect(ui->actionDefaultDatapack, &QAction::triggered, this,
+            &MainWindow::onVanillaDockAction);
 }
 
 void MainWindow::initMenu() {
@@ -170,18 +172,31 @@ void MainWindow::initMenu() {
     connect(ui->actionRestart, &QAction::triggered, this, &MainWindow::restart);
     connect(ui->actionExit, &QAction::triggered, this, &QMainWindow::close);
     /* Edit menu */
-    connect(ui->actionUndo, &QAction::triggered,
-            ui->tabbedInterface, &TabbedDocumentInterface::undo);
-    connect(ui->actionRedo, &QAction::triggered,
-            ui->tabbedInterface, &TabbedDocumentInterface::redo);
-    connect(ui->actionSelectAll, &QAction::triggered,
-            ui->tabbedInterface, &TabbedDocumentInterface::selectAll);
-    connect(ui->actionCut, &QAction::triggered,
-            ui->tabbedInterface, &TabbedDocumentInterface::cut);
-    connect(ui->actionCopy, &QAction::triggered,
-            ui->tabbedInterface, &TabbedDocumentInterface::copy);
-    connect(ui->actionPaste, &QAction::triggered,
-            ui->tabbedInterface, &TabbedDocumentInterface::paste);
+    connectEditAction(ui->actionUndo, &CodeEditor::undo);
+    connectEditAction(ui->actionRedo, &CodeEditor::redo);
+    connectEditAction(ui->actionSelectAll, &CodeEditor::selectAll);
+    connectEditAction(ui->actionCut, &CodeEditor::cut);
+    connectEditAction(ui->actionCopy, &CodeEditor::copy);
+    connectEditAction(ui->actionPaste, &CodeEditor::paste);
+    connectEditAction(ui->actionSelectCurrentLine,
+                      &CodeEditor::selectCurrentLine);
+    connectEditAction(ui->actionCopyLineUp, &CodeEditor::copyLineUp);
+    connectEditAction(ui->actionCopyLineDown, &CodeEditor::copyLineDown);
+    connectEditAction(ui->actionMoveLineUp, &CodeEditor::moveLineUp);
+    connectEditAction(ui->actionMoveLineDown, &CodeEditor::moveLineDown);
+    connectEditAction(ui->actionToggleComment, &CodeEditor::toggleComment);
+    connect(ui->actionFind, &QAction::triggered, this, &MainWindow::find);
+    connect(ui->actionReplace, &QAction::triggered,
+            this, &MainWindow::findAndReplace);
+    /* View menu */
+    connect(ui->actionZoomIn, &QAction::triggered, this, [this](){
+        ui->tabbedInterface->invokeActionType(
+            TabbedDocumentInterface::ActionType::ZoomIn);
+    });
+    connect(ui->actionZoomOut, &QAction::triggered, this, [this](){
+        ui->tabbedInterface->invokeActionType(
+            TabbedDocumentInterface::ActionType::ZoomOut);
+    });
     /* Tools menu */
     connect(ui->actionStatistics, &QAction::triggered,
             this, &MainWindow::statistics);
@@ -210,6 +225,48 @@ void MainWindow::initMenu() {
     ui->actionRedo->setShortcutContext(Qt::ApplicationShortcut);
 }
 
+void MainWindow::initFindDocks(FindAndReplaceDock *dock) {
+    connect(dock, &FindAndReplaceDock::findCurFileRequested,
+            ui->tabbedInterface,
+            [ = ](const QString &text, FindAndReplaceDock::Options options){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::find, text,
+                                              options);
+    });
+    connect(dock, &FindAndReplaceDock::resetCursorRequested,
+            ui->tabbedInterface, [ = ](){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::resetTextCursor);
+    });
+
+    connect(dock, &FindAndReplaceDock::openFileRequested,
+            ui->tabbedInterface,
+            &TabbedDocumentInterface::onOpenFileWithSelection);
+    connect(ui->tabbedInterface, &TabbedDocumentInterface::findCompleted,
+            dock, &FindAndReplaceDock::onFindCurFileCompleted);
+
+    connect(dock, &FindAndReplaceDock::replaceCurFileRequested,
+            ui->tabbedInterface, [ = ](const QString &text){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceSelection,
+                                              text);
+    });
+    connect(dock, &FindAndReplaceDock::replaceAllCurFileRequested,
+            ui->tabbedInterface,
+            [ = ](const QString &query, const QString &text,
+                  FindAndReplaceDock::Options options){
+        ui->tabbedInterface->invokeCodeEditor(&CodeEditor::replaceAllWith,
+                                              query, text, options);
+    });
+
+    addDockWidget(Qt::RightDockWidgetArea, dock);
+}
+
+void MainWindow::connectEditAction(QAction *action,
+                                   void (CodeEditor::*method)()) {
+    connect(action, &QAction::triggered,
+            ui->tabbedInterface, [ = ](){
+        ui->tabbedInterface->invokeCodeEditor(method);
+    });
+}
+
 void MainWindow::connectActionLink(QAction *action, const QString &&url) {
     connect(action, &QAction::triggered, this, [url](){
         QDesktopServices::openUrl(QUrl(url));
@@ -230,6 +287,9 @@ void MainWindow::initResourcesMenu() {
                           R"(https://mcstacker.net/)"));
     connectActionLink(ui->actionMinecraft_Tools, QStringLiteral(
                           R"(https://minecraft.tools/en/)"));
+    connectActionLink(ui->actionBDEngine, QStringLiteral(
+                          R"(https://bdengine.app/)"));
+
     // Offline tools
     connectActionLink(ui->actionPackSquash, QStringLiteral(
                           R"(https://github.com/ComunidadAylas/PackSquash/)"));
@@ -248,6 +308,7 @@ void MainWindow::initResourcesMenu() {
                           R"(https://modrinth.com/mod/command_extractor)"));
     connectActionLink(ui->actionDatamancer, QStringLiteral(
                           R"(https://modrinth.com/mod/datamancer)"));
+
     // Datapack distribution platforms
     connectActionLink(ui->actionPlanetMinecraft, QStringLiteral(
                           R"(https://www.planetminecraft.com)"));
@@ -255,8 +316,8 @@ void MainWindow::initResourcesMenu() {
                           R"(https://modrinth.com)"));
     connectActionLink(ui->actionSmithed, QStringLiteral(
                           R"(https://smithed.net)"));
-    connectActionLink(ui->actionDatapack_Hub,
-                      QStringLiteral(R"(https://datapackhub.net/)"));
+    connectActionLink(ui->actionMCCreations,
+                      QStringLiteral(R"(https://www.mccreations.net/)"));
 }
 
 void MainWindow::open() {
@@ -307,6 +368,14 @@ void MainWindow::restart() {
 
     QProcess process;
     process.startDetached(qApp->arguments()[0], qApp->arguments());
+}
+
+void MainWindow::find() {
+    showFindReplaceDock();
+}
+
+void MainWindow::findAndReplace() {
+    showFindReplaceDock(true);
 }
 
 void MainWindow::statistics() {
@@ -415,11 +484,12 @@ void MainWindow::onCurFileChanged(const QString &path) {
     auto curFileType = CodeFile::Text;
     if (auto *curFile = ui->tabbedInterface->getCurFile())
         curFileType = curFile->fileType;
-    lootTableEditorDock->setVisible(curFileType == CodeFile::LootTable);
-    visualRecipeEditorDock->setVisible(curFileType == CodeFile::Recipe);
-    predicateDock->setVisible(curFileType == CodeFile::Predicate);
-    if (itemModifierDock)
-        itemModifierDock->setVisible(curFileType == CodeFile::ItemModifier);
+
+    onItemModifierDockAction(curFileType == CodeFile::ItemModifier);
+    onLootTableDockAction(curFileType == CodeFile::LootTable);
+    onPredicateDockAction(curFileType == CodeFile::Predicate);
+    onRecipeDockAction(curFileType == CodeFile::Recipe);
+
     updateEditMenu();
     m_statusBar->onCurFileChanged();
 }
@@ -632,8 +702,12 @@ void MainWindow::loadFolder(const QString &dirPath,
     }
     ui->tabbedInterface->clear();
     ui->tabbedInterface->setPackOpened(true);
+    if (m_vanillaDock) {
+        m_vanillaDock->setPackOpened(true);
+    }
     updateWindowTitle(false);
-    m_packInfo = packInfo;
+    m_packInfo   = packInfo;
+    m_packOpened = true;
     m_statusBar->onCurDirChanged();
     adjustForCurFolder(dirPath);
 
@@ -645,7 +719,9 @@ void MainWindow::loadFolder(const QString &dirPath,
 
     emit curDirChanged(dirPath);
 
-    advancementsDock->loadAdvancements();
+    if (m_advancementsDock) {
+        m_advancementsDock->loadAdvancements();
+    }
 }
 
 bool MainWindow::folderIsVaild(const QDir &dir, bool reportError) {
@@ -815,9 +891,17 @@ void MainWindow::updateEditMenu() {
         ui->actionRedo->setEnabled(editor->getCanRedo());
         ui->actionSelectAll->setEnabled(true);
         const bool hasSelection = editor->textCursor().hasSelection();
-        ui->actionCut->setEnabled(hasSelection);
+        ui->actionCut->setEnabled(hasSelection && !editor->isReadOnly());
         ui->actionCopy->setEnabled(hasSelection);
         ui->actionPaste->setEnabled(editor->canPaste());
+        ui->actionSelectCurrentLine->setEnabled(true);
+        ui->actionCopyLineUp->setDisabled(editor->isReadOnly());
+        ui->actionCopyLineDown->setDisabled(editor->isReadOnly());
+        ui->actionMoveLineUp->setDisabled(editor->isReadOnly());
+        ui->actionMoveLineDown->setDisabled(editor->isReadOnly());
+        ui->actionToggleComment->setDisabled(editor->isReadOnly());
+        ui->actionFind->setEnabled(true);
+        ui->actionReplace->setDisabled(editor->isReadOnly());
     } else {
         ui->actionUndo->setEnabled(false);
         ui->actionRedo->setEnabled(false);
@@ -825,7 +909,28 @@ void MainWindow::updateEditMenu() {
         ui->actionCut->setEnabled(false);
         ui->actionCopy->setEnabled(false);
         ui->actionPaste->setEnabled(false);
+        ui->actionSelectCurrentLine->setEnabled(false);
+        ui->actionCopyLineUp->setEnabled(false);
+        ui->actionCopyLineDown->setEnabled(false);
+        ui->actionMoveLineUp->setEnabled(false);
+        ui->actionMoveLineDown->setEnabled(false);
+        ui->actionToggleComment->setEnabled(false);
+        ui->actionFind->setEnabled(false);
+        ui->actionReplace->setEnabled(false);
     }
+}
+
+void MainWindow::updateViewMenu() {
+    bool zoomable = !ui->tabbedInterface->hasNoFile();
+
+    if (zoomable) {
+        auto fileType = ui->tabbedInterface->getCurFile()->fileType;
+        zoomable &=
+            (fileType >= CodeFile::Text && fileType <= CodeFile::Text_end) ||
+            fileType == CodeFile::Image;
+    }
+    ui->actionZoomIn->setEnabled(zoomable);
+    ui->actionZoomOut->setEnabled(zoomable);
 }
 
 void MainWindow::changeAppStyle(const bool darkMode) {
@@ -850,12 +955,6 @@ void MainWindow::setAppStyle(const QString &name) {
             qApp->setStyle(new DarkFusionStyle);
         } else if (name == QLatin1String("NorwegianWood")) {
             qApp->setStyle(new NorwegianWoodStyle);
-        } else if (name == QLatin1String("Qlementine")) {
-            auto *style = new oclero::qlementine::QlementineStyle;
-            style->setAnimationsEnabled(false); // Prevent crash
-            style->setAutoIconColor(
-                oclero::qlementine::AutoIconColor::TextColor);
-            qApp->setStyle(style);
         } else {
             qApp->setStyle(name);
         }
@@ -863,19 +962,47 @@ void MainWindow::setAppStyle(const QString &name) {
     }
 }
 
+void MainWindow::showFindReplaceDock(const bool replaceMode) {
+    if (Q_UNLIKELY(!m_findReplaceDock)) {
+        m_findReplaceDock = new FindAndReplaceDock(this);
+        initFindDocks(m_findReplaceDock);
+    }
+
+    if (const auto *editor = ui->tabbedInterface->getCodeEditor()) {
+        const auto &&cursor = editor->textCursor();
+        if (cursor.hasSelection()) {
+            m_findReplaceDock->setQuery(cursor.selectedText());
+        }
+    }
+
+    if (replaceMode) {
+        m_findReplaceDock->setOptions(
+            m_findReplaceDock->options() |
+            FindAndReplaceDock::Option::FindAndReplace);
+    } else {
+        m_findReplaceDock->setOptions(
+            m_findReplaceDock->options().setFlag(
+                FindAndReplaceDock::Option::FindAndReplace, false));
+    }
+
+    m_findReplaceDock->show();
+    m_findReplaceDock->focusToInput();
+}
+
 void MainWindow::changeEvent(QEvent *event) {
     if (event != nullptr) {
         switch (event->type()) {
-            /* this event is sent if a translator is loaded */
+            /* This event is sent if a translator is loaded */
             case QEvent::LanguageChange: {
-                /*qDebug() << "QEvent::LanguageChange"; */
                 ui->retranslateUi(this);
                 break;
             }
 
-            /* this event is sent if the system locale changes (internal locale changes on Windows) */
+            /* This event is sent if the system locale changes
+             * (internal locale changes on Windows).
+             * It is also sent when the widget' locale changes.
+             */
             case QEvent::LocaleChange: {
-                qDebug() << "QEvent::LocaleChange" << locale();
                 const QString &locale = QSettings().value("interface/locale",
                                                           QString()).toString();
                 loadLanguage(
@@ -978,6 +1105,104 @@ void MainWindow::onColorModeChanged(const bool isDark) {
     changeAppStyle(isDark);
 }
 
+void MainWindow::onAdvancementsDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_advancementsDock)) {
+            m_advancementsDock = new AdvancementTabDock(this);
+            connect(m_advancementsDock, &QDockWidget::visibilityChanged,
+                    ui->actionAdvancementViewer, &QAction::setChecked);
+            connect(m_advancementsDock, &AdvancementTabDock::openFileRequested,
+                    ui->tabbedInterface, &TabbedDocumentInterface::onOpenFile);
+            addDockWidget(Qt::BottomDockWidgetArea, m_advancementsDock);
+        } else {
+            m_advancementsDock->show();
+        }
+        m_advancementsDock->loadAdvancements();
+    } else if (m_advancementsDock) {
+        m_advancementsDock->hide();
+    }
+}
+
+void MainWindow::onItemModifierDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_itemModifierDock)) {
+            m_itemModifierDock = new ItemModifierDock(this);
+            addDockWidget(Qt::RightDockWidgetArea, m_itemModifierDock);
+            connect(m_itemModifierDock, &QDockWidget::visibilityChanged,
+                    ui->actionItemModifierEditor, &QAction::setChecked);
+        } else {
+            m_itemModifierDock->show();
+        }
+    } else if (m_itemModifierDock) {
+        m_itemModifierDock->hide();
+    }
+}
+
+void MainWindow::onLootTableDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_lootTableEditorDock)) {
+            m_lootTableEditorDock = new LootTableEditorDock(this);
+            addDockWidget(Qt::BottomDockWidgetArea, m_lootTableEditorDock);
+            connect(m_lootTableEditorDock, &QDockWidget::visibilityChanged,
+                    ui->actionLootTableEditor, &QAction::setChecked);
+        } else {
+            m_lootTableEditorDock->show();
+        }
+    } else if (m_lootTableEditorDock) {
+        m_lootTableEditorDock->hide();
+    }
+}
+
+void MainWindow::onPredicateDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_predicateDock)) {
+            m_predicateDock = new PredicateDock(this);
+            addDockWidget(Qt::RightDockWidgetArea, m_predicateDock);
+            connect(m_predicateDock, &QDockWidget::visibilityChanged,
+                    ui->actionPredicateEditor, &QAction::setChecked);
+        } else {
+            m_predicateDock->show();
+        }
+    } else if (m_predicateDock) {
+        m_predicateDock->hide();
+    }
+}
+
+void MainWindow::onRecipeDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_recipeEditorDock)) {
+            m_recipeEditorDock = new VisualRecipeEditorDock(this);
+            addDockWidget(Qt::RightDockWidgetArea, m_recipeEditorDock);
+            connect(m_recipeEditorDock, &QDockWidget::visibilityChanged,
+                    ui->actionRecipeEditor, &QAction::setChecked);
+        } else {
+            m_recipeEditorDock->show();
+        }
+    } else if (m_recipeEditorDock) {
+        m_recipeEditorDock->hide();
+    }
+}
+
+void MainWindow::onVanillaDockAction(const bool checked) {
+    if (checked) {
+        if (Q_UNLIKELY(!m_vanillaDock)) {
+            m_vanillaDock = new VanillaDatapackDock(this);
+            m_vanillaDock->setPackOpened(m_packOpened);
+            addDockWidget(Qt::RightDockWidgetArea, m_vanillaDock);
+            connect(m_vanillaDock, &QDockWidget::visibilityChanged,
+                    ui->actionDefaultDatapack, &QAction::setChecked);
+            connect(m_vanillaDock,
+                    &VanillaDatapackDock::openFileRequested,
+                    ui->tabbedInterface,
+                    &TabbedDocumentInterface::onOpenAliasedFile);
+        } else {
+            m_vanillaDock->show();
+        }
+    } else if (m_vanillaDock) {
+        m_vanillaDock->hide();
+    }
+}
+
 void MainWindow::newDatapack() {
     auto *dialog     = new NewDatapackDialog(this);
     int   dialogCode = dialog->exec();
@@ -1063,6 +1288,9 @@ void MainWindow::setCodeEditorText(const QString &text) {
         return;
 
     if (!ui->tabbedInterface->getCodeEditor())
+        return;
+
+    if (ui->tabbedInterface->getCodeEditor()->isReadOnly())
         return;
 
     /*ui->codeEditor->setPlainText(text); */

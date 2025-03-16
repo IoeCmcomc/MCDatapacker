@@ -50,6 +50,12 @@ private:
     void readSmeltingJson(const QJsonObject &root);
     void readStonecuttingJson(const QJsonObject &root);
     void readSmithingJson(const QJsonObject &root);
+
+    QVector<InventoryItem> JsonToIngredients(const QJsonValue &keyVal);
+    QJsonValue ingredientsToJson(const QVector<InventoryItem> &items,
+                                 const bool emptyAsArray = false);
+    void tryWriteComponents(QJsonObject &obj, InventorySlot *slot);
+    void tryReadComponents(const QJsonObject &obj, InventorySlot *slot);
 };
 
 #endif /* VISUALRECIPEEDITORDOCK_H */

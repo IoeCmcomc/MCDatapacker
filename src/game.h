@@ -1,25 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <QVersionNumber>
+#include "gameconstants.h"
+
+using VanillaLookupMap = QMap<QString, QMap<QString, QString> >;
 
 namespace Game {
-    inline const QVersionNumber v1_15{ 1, 15 };
-    inline const QVersionNumber v1_16{ 1, 16 };
-    inline const QVersionNumber v1_17{ 1, 17 };
-    inline const QVersionNumber v1_18{ 1, 18 };
-    inline const QVersionNumber v1_18_2{ 1, 18, 2 };
-    inline const QVersionNumber v1_19{ 1, 19 };
-    inline const QVersionNumber v1_19_3{ 1, 19, 3 };
-    inline const QVersionNumber v1_19_4{ 1, 19, 4 };
-    inline const QVersionNumber v1_20{ 1, 20 };
-    inline const QVersionNumber v1_20_2{ 1, 20, 2 };
-    inline const QVersionNumber v1_20_3{ 1, 20, 3 };
-    inline const QVersionNumber v1_21{ 1, 21 };
-
-    inline const auto *minimumVersionString = "1.15";
-    inline const auto *defaultVersionString = "1.20.4";
-
     QVersionNumber version();
     QString versionString();
 
@@ -30,6 +16,17 @@ namespace Game {
     QVector<QString> getRegistry(const QString &type);
     QVector<QString> getRegistry(const QString &type, const QString &version);
     QVector<QString> loadRegistry(const QString &type, const QString &version);
+
+    VanillaLookupMap getVainllaLookupMap();
+    bool isVanillaFileExists(const QString &catDir, const QString &path);
+    QString realVanillaFilePath(const QString &catDir, const QString &path);
+
+    QString canonicalCategory(QStringView catDir);
+    QString canonicalCategory(QStringView catDir,
+                              const QVersionNumber &version);
 }
+
+#define FROM_VER(ver)     (Game::version() >= Game::ver)
+#define UNTIL_VER(ver)    (Game::version() < Game::ver)
 
 #endif // GAME_H

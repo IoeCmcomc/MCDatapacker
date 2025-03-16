@@ -3,6 +3,7 @@
 
 #include "parsers/command/schema/schemarootnode.h"
 #include "parsers/command/schema/schemaloader.h"
+#include "codepalette.h"
 
 //#include "mainwindow.h"
 #include "platforms/windows_specific.h"
@@ -35,6 +36,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
             this, &SettingsDialog::onCustomCmdBrowse);
     connect(ui->customCmdEdit, &QLineEdit::editingFinished,
             this, &SettingsDialog::checkCustomCmd);
+    connect(ui->customCodePaletBtn, &QToolButton::clicked,
+            this, &SettingsDialog::onCustomCodePaletteBrowse);
+    connect(ui->customCodePaletSampleBtn, &QToolButton::clicked,
+            this, &SettingsDialog::onCustomCodePaletteGetSample);
 }
 
 void SettingsDialog::setupLanguageSetting() {
@@ -103,6 +108,8 @@ void SettingsDialog::onAccepted() {
     m_settings.setValue("toggleComments",
                         ui->commentToggleModeRadio->isChecked());
     m_settings.setValue("tabSize", ui->editorTabSizeSpin->value());
+    m_settings.setValue("customCodePaletteFilePath",
+                        ui->customCodePaletEdit->text());
     m_settings.setValue("insertTabAsSpaces",
                         ui->editorTabAsSpacesCheck->isChecked());
     m_settings.setValue("showSpacesAndTabs",
@@ -145,6 +152,25 @@ void SettingsDialog::checkCustomCmd() {
     delete loader.tree();
 }
 
+void SettingsDialog::onCustomCodePaletteBrowse() {
+    ui->customCodePaletEdit->setText(
+        QFileDialog::getOpenFileName(
+            this, tr("Open code palette file"), "",
+            tr("MCDatapacker code palette files (*.json *.cbor)")
+            )
+        );
+}
+
+void SettingsDialog::onCustomCodePaletteGetSample() {
+    QString       &&filter   = tr("MCDatapacker code palette files (*.json)");
+    const QString &&filePath = QFileDialog::getSaveFileName(
+        this, tr("Save the sample code palette file"), "", filter, &filter);
+
+    if (!filePath.isEmpty()) {
+        defaultCodePalette.saveToJsonFile(filePath);
+    }
+}
+
 void SettingsDialog::initSettings() {
     m_settings.beginGroup(QStringLiteral("general"));
     ui->reloadExternChangesCombo->setCurrentIndex
@@ -153,8 +179,7 @@ void SettingsDialog::initSettings() {
 
     m_settings.beginGroup(QStringLiteral("interface"));
     auto &&styles = QStyleFactory::keys();
-    styles << QStringLiteral("DarkFusion") << QStringLiteral("NorwegianWood")
-           << QStringLiteral("Qlementine");
+    styles << QStringLiteral("DarkFusion") << QStringLiteral("NorwegianWood");
 
     ui->themeCombo->addItems(styles);
     ui->darkThemeCombo->addItems(styles);
@@ -198,6 +223,10 @@ void SettingsDialog::initSettings() {
     if (m_settings.value(QStringLiteral("toggleComments"), false).toBool())
         ui->commentToggleModeRadio->setChecked(true);
     ui->editorTabSizeSpin->setValue(m_settings.value("tabSize", 4).toInt());
+
+    ui->customCodePaletEdit->setText(
+        m_settings.value(QStringLiteral(
+                             "customCodePaletteFilePath")).toString());
     if (!m_settings.value(QStringLiteral("insertTabAsSpaces"), true).toBool())
         ui->editorTabAsSpacesCheck->setChecked(false);
     if (m_settings.value(QStringLiteral("showSpacesAndTabs"), false).toBool())

@@ -72,9 +72,12 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(document(), &QTextDocument::contentsChanged,
             this, &CodeEditor::onTextChanged);
 
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this),
+    connect(new QShortcut(QKeySequence(
+                              Qt::CTRL + Qt::Key_L), this),
+            &QShortcut::activated, this, &CodeEditor::selectCurrentLine);
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_F), this),
             &QShortcut::activated, this, &CodeEditor::openFindDialog);
-    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this),
+    connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_H), this),
             &QShortcut::activated, this, &CodeEditor::openReplaceDialog);
     connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Slash), this),
             &QShortcut::activated, this, &CodeEditor::toggleComment);
@@ -90,9 +93,6 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
     connect(new QShortcut(QKeySequence(
                               Qt::CTRL + Qt::SHIFT + Qt::Key_Up), this),
             &QShortcut::activated, this, &CodeEditor::moveLineUp);
-    connect(new QShortcut(QKeySequence(
-                              Qt::CTRL + Qt::Key_L), this),
-            &QShortcut::activated, this, &CodeEditor::selectCurrentLine);
 
     bracketSeclectFmt.setFontWeight(QFont::Bold);
     bracketSeclectFmt.setForeground(Qt::red);
@@ -111,6 +111,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
 
     updateGutterWidth(0);
     onCursorPositionChanged();
+    patchPalette();
 }
 
 void CodeEditor::setFileType(CodeFile::FileType type) {
@@ -134,6 +135,19 @@ void CodeEditor::initCompleter() {
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
     setCompleter(completer);
+}
+
+bool CodeEditor::findCursor(QTextCursor &cursor,
+                            const QString &text,
+                            FindAndReplaceDock::Options options) {
+    return FindAndReplaceDock::findCursor(document(), cursor, text, options);
+}
+
+void CodeEditor::replaceSelectedCursor(QTextCursor &cursor,
+                                       const QString &text) {
+    if (cursor.hasSelection()) {
+        cursor.insertText(text);
+    }
 }
 
 void CodeEditor::readPrefSettings() {
@@ -175,6 +189,11 @@ void CodeEditor::readPrefSettings() {
                         : option.flags() & ~Flag::ShowTabsAndSpaces);
     document()->setDefaultTextOption(option);
     settings.endGroup();
+
+    if (m_highlighter) {
+        applyHighlighterPalette();
+        m_highlighter->QSyntaxHighlighter::rehighlight();
+    }
 }
 
 void CodeEditor::wheelEvent(QWheelEvent *e) {
@@ -400,10 +419,12 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
                     Command::CompletionProvider suggester{ posInLine };
                     suggester.startVisiting(line);
                     completionInfo = suggester.suggestions();
+                    // qDebug() << "initial:" << completionInfo;
                     std::sort(completionInfo.begin(), completionInfo.end());
                     completionInfo.erase(std::unique(completionInfo.begin(),
                                                      completionInfo.end()),
                                          completionInfo.end());
+                    // qDebug() << "processed:" << completionInfo;
                 }
             }
         }
@@ -422,8 +443,8 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
     m_completer->popup()->setCurrentIndex(
         m_completer->completionModel()->index(0, 0));
 
-//    qDebug() << m_completer->completionCount() << m_completer->model() <<
-//        completionPrefix;
+    // qDebug() << m_completer->completionCount() << m_completer->model() <<
+    //     completionPrefix;
 
     QRect     cr = cursorRect();
     const int prefixOffset
@@ -434,7 +455,46 @@ void CodeEditor::startCompletion(const QString &completionPrefix) {
                 + m_completer->popup()->verticalScrollBar()->sizeHint().width());
 
     m_needCompleting = false;
-    m_completer->complete(cr);       // popup it up!
+    // Don't show if there is only one suggestion which is same as the prefix
+    if (m_completer->completionModel()->index(1, 0).isValid()
+        || m_completer->currentCompletion() != completionPrefix) {
+        m_completer->complete(cr);       // popup it up!
+    }
+}
+
+void CodeEditor::applyHighlighterPalette() {
+    Q_ASSERT(m_highlighter != nullptr);
+
+    const QString &&customPalettePath
+        = QSettings().value(QStringLiteral(
+                                "editor/customCodePaletteFilePath")).toString();
+    bool useDefault = true;
+
+    if (QFile::exists(customPalettePath)) {
+        const auto &codePalette = CodePalette::loadFromFile(customPalettePath);
+        if (!codePalette.id().isEmpty()) {
+            m_highlighter->setPalette(codePalette);
+            useDefault = false;
+        }
+    }
+    if (useDefault) {
+        if (perceivedLightness(palette().base().color()) < 50) {
+            m_highlighter->setPalette(defaultDarkCodePalette);
+        } else {
+            m_highlighter->setPalette(defaultCodePalette);
+        }
+    }
+}
+
+void CodeEditor::patchPalette() {
+    QPalette palet = palette();
+
+    palet.setColor(QPalette::Inactive, QPalette::Highlight,
+                   palet.color(QPalette::Active, QPalette::Highlight));
+    palet.setColor(QPalette::Inactive, QPalette::HighlightedText,
+                   palet.color(QPalette::Active,
+                               QPalette::HighlightedText));
+    setPalette(palet);
 }
 
 void CodeEditor::keyPressEvent(QKeyEvent *e) {
@@ -478,6 +538,12 @@ void CodeEditor::keyPressEvent(QKeyEvent *e) {
     if (!isCompletionShortcut &&
         (hasModifier || e->text().isEmpty() || completionPrefix.length() < 2
          || eow.contains(e->text().right(1)))) {
+        m_completer->popup()->hide();
+        return;
+    } else if (m_completer && m_completer->popup()->isVisible()
+               && !m_completer->completionModel()->index(1, 0).isValid()
+               && m_completer->currentCompletion() ==
+               m_completer->completionPrefix()) {
         m_completer->popup()->hide();
         return;
     } else if (isCompletionShortcut) {
@@ -528,8 +594,9 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
 
     QAction *formatAction = new QAction(tr("Format"), menu);
 
-    formatAction->setDisabled(!((CodeFile::JsonText <= m_fileType) &&
-                                (m_fileType <= CodeFile::JsonText_end)));
+    formatAction->setDisabled(isReadOnly()
+                              || !((CodeFile::JsonText <= m_fileType) &&
+                                   (m_fileType <= CodeFile::JsonText_end)));
     if (formatAction->isEnabled()) {
         connect(formatAction, &QAction::triggered, this, [ = ]() {
             QJsonDocument doc = QJsonDocument::fromJson(toPlainText().toUtf8());
@@ -545,9 +612,8 @@ void CodeEditor::contextMenuEvent(QContextMenuEvent *e) {
     }
     menu->addAction(formatAction);
 
-    /*... */
     menu->exec(e->globalPos());
-    delete menu;
+    menu->deleteLater();
 }
 
 static QPoint translatedMargins(const QPoint &p, const QMargins &margins) {
@@ -625,11 +691,7 @@ void CodeEditor::focusInEvent(QFocusEvent *e) {
 void CodeEditor::changeEvent(QEvent *e) {
     if (e->type() == QEvent::PaletteChange) {
         if (m_highlighter) {
-            if (perceivedLightness(palette().base().color()) < 50) {
-                m_highlighter->setPalette(defaultDarkCodePalette);
-            } else {
-                m_highlighter->setPalette(defaultCodePalette);
-            }
+            applyHighlighterPalette();
             onCursorPositionChanged();
             if (m_highlighter->hasAdvancedHighlighting()) {
                 m_highlighter->ensureDelayedRehighlightAll();
@@ -638,15 +700,19 @@ void CodeEditor::changeEvent(QEvent *e) {
                 m_highlighter->rehighlight();
             }
         }
+        patchPalette();
     }
     QPlainTextEdit::changeEvent(e);
 }
 
 void CodeEditor::onCursorPositionChanged() {
-//    qDebug() << "CodeEditor::onCursorPositionChanged";
+    // qDebug() << "CodeEditor::onCursorPositionChanged";
     setExtraSelections({});
     highlightCurrentLine();
     matchParentheses();
+    if (m_doHighlightSameSelection) {
+        highlightSameSelectedText();
+    }
     problemSelectionStartIndex = extraSelections().size() - 1;
     if (!problemExtraSelections.isEmpty()) {
         setExtraSelections(extraSelections() << problemExtraSelections);
@@ -662,7 +728,7 @@ void CodeEditor::highlightCurrentLine() {
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        const int factor    = 105;
+        const int factor    = 110;
         QColor    lineColor = palette().base().color();
         if (perceivedLightness(lineColor) < 50) {
             lineColor = lineColor.lighter(factor);
@@ -705,14 +771,86 @@ void CodeEditor::openFindDialog() {
 }
 
 void CodeEditor::openReplaceDialog() {
+    if (isReadOnly())
+        return;
+
     auto *frdialog = new FindReplaceDialog(this);
 
     frdialog->setEditor(this);
     frdialog->show();
 }
 
+bool CodeEditor::find(const QString &text,
+                      FindAndReplaceDock::Options options) {
+    auto &&cursor = textCursor();
+
+    if (findCursor(cursor, text, options)) {
+        m_doHighlightSameSelection = false;
+        setTextCursor(cursor);
+        m_doHighlightSameSelection = true;
+
+        QColor    color(Qt::yellow);
+        const int factor = 150;
+        if (perceivedLightness(color) < 50) {
+            color = color.darker(factor);
+        } else {
+            color = color.lighter(factor);
+        }
+        QTextCharFormat format;
+        format.setBackground(color);
+
+        highlightOccurrences(
+            text,
+            options.setFlag(FindAndReplaceDock::Option::WarpAround, false),
+            format);
+
+        emit findCompleted(true);
+        return true;
+    } else {
+        moveCursor(QTextCursor::End);
+        emit findCompleted(false);
+        return false;
+    }
+}
+
+void CodeEditor::replaceSelection(const QString &text) {
+    if (isReadOnly()) {
+        return;
+    }
+
+    auto &&cursor = textCursor();
+
+    replaceSelectedCursor(cursor, text);
+    setTextCursor(std::move(cursor));
+}
+
+void CodeEditor::replaceAllWith(const QString &query, const QString &text,
+                                FindAndReplaceDock::Options options) {
+    if (isReadOnly()) {
+        return;
+    }
+
+    options.setFlag(FindAndReplaceDock::Option::WarpAround, false);
+    if (options & FindAndReplaceDock::Option::FindInDatapack) {
+    } else {
+        auto &&cursor = textCursor();
+        cursor.beginEditBlock();
+        cursor.movePosition(QTextCursor::Start);
+
+        while (findCursor(cursor, query, options)) {
+            replaceSelectedCursor(cursor, text);
+        }
+        cursor.endEditBlock();
+        setTextCursor(cursor);
+    }
+}
+
+void CodeEditor::resetTextCursor() {
+    moveCursor(QTextCursor::Start);
+}
+
 void CodeEditor::toggleComment() {
-    if (!m_highlighter ||
+    if (isReadOnly() || !m_highlighter ||
         m_highlighter->m_singleCommentChar.isNull())
         return;
 
@@ -811,6 +949,9 @@ void CodeEditor::copyLineUp() {
 }
 
 void CodeEditor::copyLineDown() {
+    if (isReadOnly())
+        return;
+
     QTextCursor &&cursor = textCursor();
 
     selectEnclosingLines(cursor);
@@ -832,6 +973,9 @@ void CodeEditor::copyLineDown() {
 }
 
 void CodeEditor::moveLineUp() {
+    if (isReadOnly())
+        return;
+
     QTextCursor &&cursor = textCursor();
 
     selectEnclosingLines(cursor);
@@ -855,6 +999,9 @@ void CodeEditor::moveLineUp() {
 }
 
 void CodeEditor::moveLineDown() {
+    if (isReadOnly())
+        return;
+
     QTextCursor &&cursor = textCursor();
 
     selectEnclosingLines(cursor);
@@ -935,10 +1082,17 @@ Parser * CodeEditor::parser() const {
     return m_parser.get();
 }
 
-void CodeEditor::goToLine(const int lineNo) {
+void CodeEditor::goToLine(const int lineNo, const int colNo,
+                          const int selLength) {
     auto &&cursor = textCursor();
 
-    cursor.setPosition(document()->findBlockByLineNumber(lineNo).position());
+    const int pos = document()->findBlockByLineNumber(lineNo).position()
+                    + colNo;
+
+    cursor.setPosition(pos);
+    if (selLength > 0) {
+        cursor.setPosition(pos + selLength, QTextCursor::KeepAnchor);
+    }
     setTextCursor(cursor);
     centerCursor();
 }
@@ -987,11 +1141,7 @@ bool CodeEditor::getCanUndo() const {
 
 void CodeEditor::setHighlighter(Highlighter *value) {
     m_highlighter = value;
-    if (perceivedLightness(palette().base().color()) < 50) {
-        m_highlighter->setPalette(defaultDarkCodePalette);
-    } else {
-        m_highlighter->setPalette(defaultCodePalette);
-    }
+    applyHighlighterPalette();
 }
 
 void CodeEditor::displayErrors() {
@@ -1222,6 +1372,48 @@ void CodeEditor::followNamespacedId(const QMouseEvent *event) {
             }
         }
     }
+}
+
+void CodeEditor::highlightOccurrences(const QString &text,
+                                      FindAndReplaceDock::Options options,
+                                      QTextCharFormat format) {
+    QList<QTextEdit::ExtraSelection> &&selections = extraSelections();
+
+    QTextCursor highlightCursor(document());
+
+    while (findCursor(highlightCursor, text, options)) {
+        QTextEdit::ExtraSelection extra;
+        extra.format = format;
+        extra.cursor = highlightCursor;
+        selections << extra;
+    }
+
+    setExtraSelections(selections);
+}
+
+// Adaped from: https://www.qtcentre.org/threads/59746-QPlainTextEdit-find()-highlighting
+void CodeEditor::highlightSameSelectedText() {
+    const QString text = textCursor().selectedText();
+
+    if (text.isEmpty()) {
+        return;
+    }
+
+    QList<QTextEdit::ExtraSelection> &&selections = extraSelections();
+
+    QColor color = palette().color(QPalette::Active, QPalette::Highlight);
+
+    const int factor = 170;
+    if (perceivedLightness(color) < 50) {
+        color = color.lighter(factor);
+    } else {
+        color = color.darker(factor);
+    }
+    color.setAlpha(127);
+    QTextCharFormat format;
+    format.setBackground(color);
+
+    highlightOccurrences(text, {}, format);
 }
 
 QString CodeEditor::textUnderCursorExtended(QTextCursor tc) {

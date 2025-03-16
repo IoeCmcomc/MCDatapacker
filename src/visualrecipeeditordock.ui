@@ -24,6 +24,7 @@
   </property>
   <property name="font">
    <font>
+    <weight>50</weight>
     <bold>false</bold>
     <kerning>true</kerning>
    </font>
@@ -417,7 +418,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/gui_fire.png</pixmap>
+                     <pixmap resource="../res/mc/minecraft.qrc">:/minecraft/texture/gui_fire.png</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -581,7 +582,7 @@
                      <string/>
                     </property>
                     <property name="pixmap">
-                     <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/plus.png</pixmap>
+                     <pixmap resource="../res/mc/minecraft.qrc">:/minecraft/texture/plus.png</pixmap>
                     </property>
                     <property name="scaledContents">
                      <bool>true</bool>
@@ -643,7 +644,7 @@
                <enum>Qt::PlainText</enum>
               </property>
               <property name="pixmap">
-               <pixmap resource="../resource/minecraft/minecraft.qrc">:/minecraft/texture/right_arrow.png</pixmap>
+               <pixmap resource="../res/mc/minecraft.qrc">:/minecraft/texture/right_arrow.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -799,6 +800,11 @@
                    <item>
                     <property name="text">
                      <string>Shapeless</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Transmute</string>
                     </property>
                    </item>
                   </widget>
@@ -1048,6 +1054,9 @@
              </item>
              <item row="3" column="0" colspan="2">
               <widget class="TrueFalseBox" name="showNotifCheck">
+               <property name="toolTip">
+                <string>Currently, this option only works on shaped crafting recipes, including fixed shape and relative shape recipes (see MC-260148).</string>
+               </property>
                <property name="text">
                 <string>Show notification when unlocked</string>
                </property>
@@ -1121,7 +1130,7 @@
   <tabstop>showNotifCheck</tabstop>
  </tabstops>
  <resources>
-  <include location="../resource/minecraft/minecraft.qrc"/>
+  <include location="../res/mc/minecraft.qrc"/>
  </resources>
  <connections>
   <connection>

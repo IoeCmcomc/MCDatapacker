@@ -8,6 +8,8 @@
 #include "mcbuildhighlighter.h"
 #include "jsonhighlighter.h"
 #include "mainwindow.h"
+#include "codeeditor.h"
+#include "imgviewer.h"
 #include "parsers/command/mcfunctionparser.h"
 #include "parsers/jsonparser.h"
 
@@ -33,7 +35,7 @@ void openAllFiles(TabbedDocumentInterface *widget,
         const QString &&path  = it.next();
         const auto    &&finfo = it.fileInfo();
         if (finfo.isFile()) {
-            const auto type = Glhp::pathToFileType(dirPath, path);
+            const auto type = CodeFile::pathToFileType(dirPath, path);
             if ((type >= minType) && (type <= maxType)) {
                 widget->onOpenFile(path);
             }
@@ -95,12 +97,14 @@ TabbedDocumentInterface::~TabbedDocumentInterface() {
     delete ui;
 }
 
-void TabbedDocumentInterface::openFile(const QString &filepath, bool reload) {
+void TabbedDocumentInterface::openFile(const QString &filepath,
+                                       const QString &realPath,
+                                       bool reload) {
     if (filepath.isEmpty()
         || ((getCurFilePath() == filepath) && (!reload)))
         return;
     else {
-        addFile(filepath);
+        addFile(filepath, realPath);
     }
 }
 
@@ -213,18 +217,26 @@ void TabbedDocumentInterface::onModificationChanged(bool changed) {
     emit curModificationChanged(changed);
 }
 
-void TabbedDocumentInterface::addFile(const QString &path) {
+void TabbedDocumentInterface::addFile(const QString &path,
+                                      const QString &realPath) {
     CodeFile newFile(path);
     QWidget *widget = nullptr;
 
     if (newFile.fileType >= CodeFile::Text) {
         bool        ok;
-        const auto &text = readTextFile(path, ok);
+        const auto &text =
+            readTextFile(!realPath.isNull() ? realPath : path, ok);
         if (!ok)
             return;
 
         auto *codeEditor = new CodeEditor(this);
         codeEditor->setPlainText(text);
+        if (!newFile.info.isWritable()) {
+            codeEditor->setReadOnly(true);
+            codeEditor->setTextInteractionFlags(
+                codeEditor->textInteractionFlags() |
+                Qt::TextSelectableByKeyboard);
+        }
 
         if (newFile.fileType >= CodeFile::JsonText
             && newFile.fileType < CodeFile::JsonText_end) {
@@ -292,6 +304,8 @@ void TabbedDocumentInterface::addFile(const QString &path) {
 
         connect(this, &TabbedDocumentInterface::settingsChanged,
                 codeEditor, &CodeEditor::readPrefSettings);
+        connect(codeEditor, &CodeEditor::findCompleted,
+                this, &TabbedDocumentInterface::findCompleted);
 
         widget = codeEditor;
     } else if (newFile.fileType == CodeFile::Image) {
@@ -310,8 +324,13 @@ void TabbedDocumentInterface::addFile(const QString &path) {
     }
     if (widget) {
         files << newFile;
-        const auto &&icon  = Glhp::fileTypeToIcon(newFile.fileType);
-        const int    index =
+        QIcon icon;
+        if (newFile.info.isWritable()) {
+            icon = CodeFile::fileTypeToIcon(newFile.fileType);
+        } else {
+            icon.addFile(QStringLiteral(":/icon/file-readonly.png"));
+        }
+        const int index =
             ui->tabWidget->addTab(widget, icon, newFile.name());
         ui->tabWidget->setCurrentIndex(index);
     }
@@ -341,8 +360,8 @@ QTextDocument * TabbedDocumentInterface::getCurDoc() {
     }
 }
 
-QVector<CodeFile> * TabbedDocumentInterface::getFiles() {
-    return &files;
+QVector<CodeFile> &TabbedDocumentInterface::getFiles() {
+    return files;
 }
 
 CodeEditor * TabbedDocumentInterface::getCodeEditor() const {
@@ -381,6 +400,41 @@ bool TabbedDocumentInterface::hasUnsavedChanges() const {
     });
 }
 
+QString TabbedDocumentInterface::readTextFile(QWidget *parent,
+                                              const QString &path, bool &ok) {
+    QFile   file(path);
+    QString content;
+
+    // Removing QFile::Text enum allows '\r' to be recognized as a line sepatator
+    if (!file.open(QFile::ReadOnly)) {
+        QMessageBox::information(parent, tr("Loading text file error"),
+                                 tr("Cannot read file %1:\n%2.")
+                                 .arg(QDir::toNativeSeparators(path),
+                                      file.errorString()));
+        ok = false;
+    } else {
+        QTextStream in(&file);
+        in.setCodec("UTF-8");
+
+#ifndef QT_NO_CURSOR
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+#endif
+
+        while (!in.atEnd()) {
+            content += in.readLine();
+            if (!in.atEnd())
+                content += '\n';
+        }
+        ok = true;
+
+#ifndef QT_NO_CURSOR
+        QApplication::restoreOverrideCursor();
+#endif
+    }
+    file.close();
+    return content;
+}
+
 void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
     for (int i = 0; i < count(); i++) {
         if (files[i].path() == filepath) {
@@ -391,12 +445,29 @@ void TabbedDocumentInterface::onOpenFile(const QString &filepath) {
     openFile(filepath);
 }
 
+void TabbedDocumentInterface::onOpenAliasedFile(const QString &filepath,
+                                                const QString &realPath) {
+    for (int i = 0; i < count(); i++) {
+        if (files[i].path() == filepath) {
+            setCurIndex(i);
+            return;
+        }
+    }
+    openFile(filepath, realPath);
+}
+
 void TabbedDocumentInterface::onOpenFileWithLine(const QString &filepath,
                                                  const int lineNo) {
-    qDebug() << filepath << lineNo;
+    onOpenFileWithSelection(filepath, lineNo, 0);
+}
+
+void TabbedDocumentInterface::onOpenFileWithSelection(const QString &filepath,
+                                                      const int lineNo,
+                                                      const int colNo,
+                                                      const int selLength) {
     onOpenFile(filepath);
     if (auto *editor = getCodeEditor()) {
-        editor->goToLine(lineNo);
+        editor->goToLine(lineNo, colNo, selLength);
     }
 }
 
@@ -443,9 +514,9 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
             file->changePath(newpath);
             updateTabTitle(i, file->isModified);
             ui->tabWidget->setTabIcon(
-                i, Glhp::fileTypeToIcon(Glhp::pathToFileType(
-                                            QDir::currentPath(),
-                                            file->path())));
+                i, CodeFile::fileTypeToIcon(CodeFile::pathToFileType(
+                                                QDir::currentPath(),
+                                                file->path())));
 
             onModificationChanged(false);
             setCurIndex(getCurIndex());
@@ -454,39 +525,29 @@ void TabbedDocumentInterface::onFileRenamed(const QString &path,
     }
 }
 
-void TabbedDocumentInterface::undo() {
-    if (auto *editor = getCodeEditor()) {
-        editor->undo();
-    }
-}
+void TabbedDocumentInterface::invokeActionType(ActionType act) {
+    constexpr qreal zoomInFactor  = 1.15;
+    constexpr qreal zoomOutFactor = 1. / zoomInFactor;
 
-void TabbedDocumentInterface::redo() {
-    if (auto *editor = getCodeEditor()) {
-        editor->redo();
-    }
-}
-
-void TabbedDocumentInterface::selectAll() {
-    if (auto *editor = getCodeEditor()) {
-        editor->selectAll();
-    }
-}
-
-void TabbedDocumentInterface::cut() {
-    if (auto *editor = getCodeEditor()) {
-        editor->cut();
-    }
-}
-
-void TabbedDocumentInterface::copy() {
-    if (auto *editor = getCodeEditor()) {
-        editor->copy();
-    }
-}
-
-void TabbedDocumentInterface::paste() {
-    if (auto *editor = getCodeEditor()) {
-        editor->paste();
+    switch (act) {
+        case ActionType::ZoomIn: {
+            if (auto *editor = getCodeEditor()) {
+                editor->zoomIn();
+            } else if (auto *viewer = getImgViewer()) {
+                viewer->scale(zoomInFactor, zoomInFactor);
+            }
+            break;
+        }
+        case ActionType::ZoomOut: {
+            if (auto *editor = getCodeEditor()) {
+                editor->zoomOut();
+            } else if (auto *viewer = getImgViewer()) {
+                viewer->scale(zoomOutFactor, zoomOutFactor);
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
 
@@ -543,7 +604,7 @@ void TabbedDocumentInterface::onTabChanged(int index) {
         ui->stackedWidget->setCurrentIndex(2);
         emit curFileChanged(curFile->path());
     } else {
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(m_packOpened ? 1 : 0);
 
         emit curFileChanged(QString());
     }
@@ -581,35 +642,5 @@ void TabbedDocumentInterface::onSwitchPrevFile() {
 }
 
 QString TabbedDocumentInterface::readTextFile(const QString &path, bool &ok) {
-    QFile   file(path);
-    QString content;
-
-    // Removing QFile::Text enum allows '\r' to be recognized as a line sepatator
-    if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::information(this, tr("Loading text file error"),
-                                 tr("Cannot read file %1:\n%2.")
-                                 .arg(QDir::toNativeSeparators(path),
-                                      file.errorString()));
-        ok = false;
-    } else {
-        QTextStream in(&file);
-        in.setCodec("UTF-8");
-
-#ifndef QT_NO_CURSOR
-        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-
-        while (!in.atEnd()) {
-            content += in.readLine();
-            if (!in.atEnd())
-                content += '\n';
-        }
-        ok = true;
-
-#ifndef QT_NO_CURSOR
-        QApplication::restoreOverrideCursor();
-#endif
-    }
-    file.close();
-    return content;
+    return readTextFile(this, path, ok);
 }

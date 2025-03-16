@@ -57,7 +57,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="../resource/app/app.qrc">:/icon/favicon_big.png</pixmap>
+        <pixmap resource="../res/app/app.qrc">:/icon/favicon_big.png</pixmap>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -154,7 +154,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resource/app/app.qrc"/>
+  <include location="../res/app/app.qrc"/>
  </resources>
  <connections>
   <connection>

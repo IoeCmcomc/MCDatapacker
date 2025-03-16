@@ -20,9 +20,9 @@ protected:
         inline auto *Name(const Arg &v) { \
             value.Func(v);                \
             return this;                  \
-        }                                 \
+        }
 
-class CharFormatBuilder : public Builder<QTextCharFormat> {
+class CharFmtBuilder : public Builder<QTextCharFormat> {
 public:
     BUILDER_METHOD(bg, setBackground, QBrush)
     BUILDER_METHOD(fg, setForeground, QBrush)
@@ -57,6 +57,8 @@ public:
 };
 
 class CodePalette {
+    Q_GADGET
+
     using NodeKind = Command::ParseNode::Kind;
     using ArgType  = Command::ArgumentNode::ParserType;
     using NbtType  = Command::NbtNode::TagType;
@@ -93,6 +95,7 @@ public:
         ItemEnchantment,
         ItemPredicate,
         ItemSlot,
+        ItemSlots,
         ItemStack,
         Message,
         MobEffect,
@@ -147,16 +150,19 @@ public:
         NbtPath_Step,
         TargetSelector_Variable,
         TargetSelector_Arguments,
+        ItemStack_Components,
         Key,
         Operator       = Operation,
         CommandLiteral = Keyword,
         GreedyString   = (int)ArgType::InternalGreedyString,
         RegexPattern,
     };
+    Q_ENUM(Role)
 
     using RoleToFormat = QMap<Role, QTextCharFormat>;
 
-    CodePalette(std::initializer_list<QPair<Role, QTextCharFormat> > formats);
+    CodePalette(std::initializer_list<QPair<Role, QTextCharFormat> > formats,
+                const QString &id = {});
 
     inline const QTextCharFormat operator[](const Role role) const {
         return m_formats.value(role);
@@ -176,8 +182,17 @@ public:
                               static_cast<int>(Role::NbtTag)));
     }
 
+    void saveToJsonFile(const QString &filePath) const;
+    static CodePalette loadFromFile(const QString &filePath);
+
+    QString id() const;
+
 private:
+    QString m_id;
     RoleToFormat m_formats;
+
+    static QVariantMap charFormatToMap(const QTextCharFormat &fmt);
+    static QTextCharFormat charFormatFromMap(const QVariantMap &map);
 };
 
 const extern CodePalette defaultCodePalette;

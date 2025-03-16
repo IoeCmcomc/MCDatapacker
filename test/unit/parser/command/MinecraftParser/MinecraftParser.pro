@@ -21,12 +21,17 @@ SOURCES +=  tst_testminecraftparser.cpp \
     ../../../../../src/parsers/command/nodes/anglenode.cpp \
     ../../../../../src/parsers/command/nodes/blockstatenode.cpp \
     ../../../../../src/parsers/command/nodes/componentnode.cpp \
+    ../../../../../src/parsers/command/nodes/filenode.cpp \
     ../../../../../src/parsers/command/nodes/internalregexpatternnode.cpp \
+    ../../../../../src/parsers/command/nodes/itempredicatematchnode.cpp \
+    ../../../../../src/parsers/command/nodes/listnode.cpp \
+    ../../../../../src/parsers/command/nodes/macronode.cpp \
     ../../../../../src/parsers/command/nodes/stylenode.cpp \
     ../../../../../src/parsers/command/nodes/entitynode.cpp \
     ../../../../../src/parsers/command/nodes/gamemodenode.cpp \
     ../../../../../src/parsers/command/nodes/singlevaluenode.cpp \
     ../../../../../src/parsers/command/nodes/floatrangenode.cpp \
+    ../../../../../src/parsers/command/nodes/inlinableresourcenode.cpp \
     ../../../../../src/parsers/command/nodes/intrangenode.cpp \
     ../../../../../src/parsers/command/nodes/itemstacknode.cpp \
     ../../../../../src/parsers/command/nodes/literalnode.cpp \
@@ -62,12 +67,17 @@ HEADERS += \
     ../../../../../src/parsers/command/nodes/anglenode.h \
     ../../../../../src/parsers/command/nodes/blockstatenode.h \
     ../../../../../src/parsers/command/nodes/componentnode.h \
+    ../../../../../src/parsers/command/nodes/filenode.h \
     ../../../../../src/parsers/command/nodes/internalregexpatternnode.h \
+    ../../../../../src/parsers/command/nodes/itempredicatematchnode.h \
+    ../../../../../src/parsers/command/nodes/listnode.h \
+    ../../../../../src/parsers/command/nodes/macronode.h \
     ../../../../../src/parsers/command/nodes/stylenode.h \
     ../../../../../src/parsers/command/nodes/entitynode.h \
     ../../../../../src/parsers/command/nodes/gamemodenode.h \
     ../../../../../src/parsers/command/nodes/singlevaluenode.h \
     ../../../../../src/parsers/command/nodes/floatrangenode.h \
+    ../../../../../src/parsers/command/nodes/inlinableresourcenode.h \
     ../../../../../src/parsers/command/nodes/intrangenode.h \
     ../../../../../src/parsers/command/nodes/itemstacknode.h \
     ../../../../../src/parsers/command/nodes/literalnode.h \
@@ -98,10 +108,12 @@ HEADERS += \
     ../../../../../src/parsers/command/re2c_generated_functions.h
 
 RESOURCES += \
-    ../../../../../resource/minecraft/info/1.18.2/1.18.2.qrc
+    ../../../../../res/mc/info/1.18.2/1.18.2.qrc \
+    ../../../../../res/mc/info/1.21/1.21.qrc
 
 DISTFILES += \
-    ../../../../../resource/minecraft/info/1.18.2/summary/commands/data.min.json
+    ../../../../../res/mc/info/1.18.2/summary/commands/data.min.json \
+    ../../../../../res/mc/info/1.21/summary/commands/data.min.json
 
 include($$PWD/../../../../../lib/lru-cache/lru-cache.pri)
 include($$PWD/../../../../../lib/json/json.pri)

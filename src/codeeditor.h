@@ -7,6 +7,7 @@
 
 #include "codefile.h"
 #include "parsers/parser.h"
+#include "findandreplacedock.h"
 
 QT_BEGIN_NAMESPACE
 class QCompleter;
@@ -28,6 +29,12 @@ struct ProblemInfo {
     int     length = 1;
     QString message;
 };
+static_assert(qIsRelocatable<ProblemInfo>() == false);
+Q_DECLARE_TYPEINFO(ProblemInfo, Q_RELOCATABLE_TYPE);
+
+static_assert(qIsRelocatable<QTextEdit::ExtraSelection>() == false);
+Q_DECLARE_TYPEINFO(QTextEdit::ExtraSelection,
+                   Q_RELOCATABLE_TYPE);
 
 class CodeEditor : public QPlainTextEdit {
     Q_OBJECT
@@ -57,12 +64,29 @@ public:
     void setParser(std::unique_ptr<Parser> newParser);
     Parser * parser() const;
 
-    void goToLine(const int lineNo);
+    void goToLine(const int lineNo, const int colNo = 0,
+                  const int selLength               = 0);
 
 signals:
     void openFileRequest(const QString &filepath);
     void updateStatusBarRequest(CodeEditor *editor);
     void showMessageRequest(const QString &msg, int timeout);
+    void findCompleted(const bool found);
+
+public: // Slots
+    void openFindDialog();
+    void openReplaceDialog();
+    bool find(const QString &text, FindAndReplaceDock::Options options);
+    void replaceSelection(const QString &text);
+    void replaceAllWith(const QString &query, const QString &text,
+                        FindAndReplaceDock::Options options);
+    void resetTextCursor();
+    void toggleComment();
+    void copyLineUp();
+    void copyLineDown();
+    void moveLineUp();
+    void moveLineDown();
+    void selectCurrentLine();
 
 protected:
     friend class LineNumberArea;
@@ -84,14 +108,6 @@ private /*slots*/ :
     void updateGutterWidth(int newBlockCount);
     void onCursorPositionChanged();
     void updateGutter(const QRect &rect, int dy);
-    void openFindDialog();
-    void openReplaceDialog();
-    void toggleComment();
-    void copyLineUp();
-    void copyLineDown();
-    void moveLineUp();
-    void moveLineDown();
-    void selectCurrentLine();
     void onUndoAvailable(bool value);
     void onRedoAvailable(bool value);
     void insertCompletion(const QString &completion);
@@ -108,13 +124,14 @@ private:
     QList<QTextEdit::ExtraSelection> problemExtraSelections;
     Problems m_problems;
     int problemSelectionStartIndex;
-    int m_fontSize                = 13;
-    int m_tabSize                 = 4;
-    CodeFile::FileType m_fileType = CodeFile::Text;
-    bool canUndo                  = false;
-    bool canRedo                  = false;
-    bool m_insertTabAsSpaces      = true;
-    bool m_needCompleting         = false;
+    int m_fontSize                  = 13;
+    int m_tabSize                   = 4;
+    CodeFile::FileType m_fileType   = CodeFile::Text;
+    bool canUndo                    = false;
+    bool canRedo                    = false;
+    bool m_insertTabAsSpaces        = true;
+    bool m_needCompleting           = false;
+    bool m_doHighlightSameSelection = true;
 
     void highlightCurrentLine();
     void matchParentheses();
@@ -126,15 +143,26 @@ private:
                            int numRightParentheses, bool isPrimary);
     void createBracketSelection(int pos, bool isPrimary);
     void followNamespacedId(const QMouseEvent *event);
+    void highlightOccurrences(const QString &text,
+                              FindAndReplaceDock::Options options,
+                              QTextCharFormat format);
+    void highlightSameSelectedText();
 
     QString textUnderCursor() const;
     void handleKeyPressEvent(QKeyEvent *e);
     void indentOnNewLine(QKeyEvent *e);
     void initCompleter();
+    bool findCursor(QTextCursor &cursor, const QString &text,
+                    FindAndReplaceDock::Options options);
+    void replaceSelectedCursor(QTextCursor &cursor, const QString &text);
     static void startOfWordExtended(QTextCursor &tc);
     static QString textUnderCursorExtended(QTextCursor tc);
     static void selectEnclosingLines(QTextCursor &cursor);
+
     void startCompletion(const QString &completionPrefix);
+
+    void applyHighlighterPalette();
+    void patchPalette();
 };
 
 

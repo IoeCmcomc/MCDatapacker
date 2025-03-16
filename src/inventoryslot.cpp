@@ -37,6 +37,8 @@ InventorySlot::InventorySlot(QWidget *parent) : QFrame(parent) {
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     setLineWidth(2);
     setFocusPolicy(Qt::TabFocus);
+    setStatusTip(tr(
+                     "Drag-drop to move item(s). Ctrl+Drag to duplicate item(s)."));
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InventorySlot::customContextMenuRequested, this,
@@ -179,12 +181,19 @@ QString InventorySlot::itemName(const int index) {
     return items[index].getName();
 }
 
+QVariantMap InventorySlot::itemComponents(const int index) {
+    if (items.isEmpty()) return {};
+
+    return items[index].components();
+}
+
 QString InventorySlot::toolTipText() {
     QString ret;
 
     if (items.count() > 1) {
         QStringList itemNames;
-        int         c = 0;
+
+        int c = 0;
         for (const auto &item : qAsConst(items)) {
             itemNames.push_back(item.getName());
             if (c > 5) {
@@ -204,8 +213,12 @@ QString InventorySlot::toolTipText() {
 }
 
 bool InventorySlot::checkAcceptableItem(const InventoryItem &item) {
-    if (getAcceptTag() && item.isTag()) {
-        return true;
+    if (getAcceptTag()) {
+        if (item.isTag()) {
+            return true;
+        } else if (!getAcceptComponents() && !item.components().isEmpty()) {
+            return false;
+        }
     }
     if (((m_selectCategory == SelectCategory::ObtainableItems) &&
          !item.isItem())
@@ -222,27 +235,41 @@ bool InventorySlot::checkAcceptableItems(const QVector<InventoryItem> &items) {
                                            return !(!item.isBlock() &&
                                                     item.isItem());
                                        };
-    static const auto hasTagPred = [](const InventoryItem &item) {
-                                       return item.isTag();
-                                   };
     static const auto hasUnobtainablePred =
         [](const InventoryItem &item) {
             return item.getFlags() == InventoryItem::Block;
         };
     const bool onlyBlocks =
         std::all_of(items.constBegin(), items.constEnd(), onlyBlocksPred);
-    const bool hasTag = std::any_of(items.constBegin(), items.constEnd(),
-                                    hasTagPred);
-    const bool hasUnobtainable = std::any_of(items.constBegin(),
-                                             items.constEnd(),
-                                             hasUnobtainablePred);
+
+    int partialTagCount = 0;
+
+    for (const auto &item: items) {
+        if (!getAcceptComponents() && !item.components().isEmpty()) {
+            return false;
+        }
+        if (item.isTag()) {
+            ++partialTagCount;
+            // Stop counting if the count is 2
+            if (partialTagCount > 1) {
+                break;
+            }
+        }
+    }
 
     if (!getAcceptMultiple() && (items.size() > 1)) {
         return false;
     }
-    if (!getAcceptTag() && hasTag) {
+    if (!getAcceptTag() && (partialTagCount > 0)) {
         return false;
     }
+    if (!(m_acceptPolicies & AcceptTags) && (partialTagCount > 1)) {
+        return false;
+    }
+
+    const bool hasUnobtainable = std::any_of(items.constBegin(),
+                                             items.constEnd(),
+                                             hasUnobtainablePred);
     if (((m_selectCategory == SelectCategory::ObtainableItems) &&
          hasUnobtainable)
         || ((m_selectCategory == SelectCategory::Blocks) &&
@@ -266,7 +293,7 @@ void InventorySlot::onCustomContextMenu(const QPoint &point) {
 
     if (getAcceptTag()) {
         QAction *seclectTagAction = new QAction(tr("Select tag..."), cMenu);
-        seclectTagAction->setEnabled(getAcceptTag());
+        // seclectTagAction->setEnabled(getAcceptTag());
         connect(seclectTagAction, &QAction::triggered, this, [this]() {
             TagSelectorDialog dialog(
                 this, (m_selectCategory == SelectCategory::Blocks)
@@ -306,6 +333,20 @@ void InventorySlot::onTimerTimeout() {
     update();
 }
 
+InventorySlot::AcceptPolicies InventorySlot::acceptPolicies() const {
+    return m_acceptPolicies;
+}
+
+void InventorySlot::setAcceptPolicies(const AcceptPolicies &newAcceptPolicies) {
+    m_acceptPolicies = newAcceptPolicies;
+    if (!(~m_acceptPolicies & (AcceptItem | AcceptItems))) {
+        m_acceptPolicies &= ~AcceptItem;
+    }
+    if (!(~m_acceptPolicies & (AcceptTag | AcceptTags))) {
+        m_acceptPolicies &= ~AcceptTag;
+    }
+}
+
 InventorySlot::SelectCategory InventorySlot::selectCategory() const {
     return m_selectCategory;
 }
@@ -315,19 +356,70 @@ void InventorySlot::setSelectCategory(const SelectCategory &selectCategory) {
 }
 
 bool InventorySlot::getAcceptMultiple() const {
-    return m_acceptPolicies.testFlag(AcceptMultiple);
+    return m_acceptPolicies.testFlag(AcceptItems)
+           || m_acceptPolicies.testFlag(AcceptTags);
 }
 
 void InventorySlot::setAcceptMultiple(bool value) {
-    m_acceptPolicies.setFlag(AcceptMultiple, value);
+    if (value) {
+        if (m_acceptPolicies & AcceptItem) {
+            m_acceptPolicies &= ~AcceptItem;
+            m_acceptPolicies |= AcceptItems;
+        }
+        if (m_acceptPolicies & AcceptTag) {
+            m_acceptPolicies &= ~AcceptTag;
+            m_acceptPolicies |= AcceptTags;
+        }
+    } else {
+        if (m_acceptPolicies & AcceptItems) {
+            m_acceptPolicies &= ~AcceptItems;
+            m_acceptPolicies |= AcceptItem;
+        }
+        if (m_acceptPolicies & AcceptTags) {
+            m_acceptPolicies &= ~AcceptTags;
+            m_acceptPolicies |= AcceptTag;
+        }
+    }
+}
+
+bool InventorySlot::getAcceptItemsOrTag() const {
+    return m_acceptPolicies == (AcceptItems | AcceptTag);
+}
+
+void InventorySlot::setAcceptItemsOrTag() {
+    m_acceptPolicies = (AcceptItems | AcceptTag);
+}
+
+bool InventorySlot::getAcceptComponents() const {
+    return m_acceptPolicies.testFlag(AcceptComponents);
+}
+
+void InventorySlot::setAcceptComponents(bool value) {
+    if (value) {
+        m_acceptPolicies |= AcceptComponents;
+    } else {
+        m_acceptPolicies &= ~AcceptComponents;
+    }
 }
 
 bool InventorySlot::getAcceptTag() const {
-    return m_acceptPolicies.testFlag(AcceptTags);
+    return m_acceptPolicies.testFlag(AcceptTag)
+           || m_acceptPolicies.testFlag(AcceptTags);
 }
 
 void InventorySlot::setAcceptTag(bool value) {
-    m_acceptPolicies.setFlag(AcceptTags, value);
+    if (value) {
+        if (getAcceptMultiple()) {
+            m_acceptPolicies &= ~AcceptTag;
+            m_acceptPolicies |= AcceptTags;
+        } else {
+            m_acceptPolicies &= ~AcceptTags;
+            m_acceptPolicies |= AcceptTag;
+        }
+    } else {
+        m_acceptPolicies &= ~AcceptTag;
+        m_acceptPolicies &= ~AcceptTags;
+    }
 }
 
 bool InventorySlot::getIsCreative() const {

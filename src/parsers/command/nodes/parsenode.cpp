@@ -1,5 +1,9 @@
 #include "parsenode.h"
+#ifdef PARSENODE_REPRPRINTER
+#include "../visitors/reprprinter.h"
+#else
 #include "../visitors/nodevisitor.h"
+#endif
 
 #include <QDebug>
 
@@ -99,3 +103,16 @@ QDebug operator<<(QDebug debug, const Command::ParseNode &node) {
     debug.nospace() << "ParseNode(" << node.length() << ")";
     return debug;
 }
+
+#ifdef PARSENODE_REPRPRINTER
+QDebug operator<<(QDebug debug, Command::ParseNode *node) {
+    QDebugStateSaver saver(debug);
+
+    Command::ReprPrinter printer;
+
+    printer.startVisiting(node);
+
+    debug.noquote() << printer.repr();
+    return debug;
+}
+#endif

@@ -133,4 +133,7 @@ private:
     QChar m_curChar;
 };
 
+static_assert(qIsRelocatable<Parser::Error>() == false);
+// Q_DECLARE_TYPEINFO(Parser::Error, Q_RELOCATABLE_TYPE);
+
 #endif // PARSER_H

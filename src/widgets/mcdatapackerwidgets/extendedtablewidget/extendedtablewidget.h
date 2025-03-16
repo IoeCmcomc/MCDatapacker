@@ -32,15 +32,17 @@ class ExtendedTableWidget : public QWidget {
 
 public:
     enum class JsonMode {
-        SimpleMap,
-        ComplexMap,
-        List,
+        SimpleMap, // First column is key, second column is value
+        ComplexMap, // First column is key, other columns are put into a object which becomes value
+        List, // List of object of columns
+        SimpleList, // List of values in the only column
     };
     Q_ENUM(JsonMode)
     enum Enum_JsonMode { // Make JsonMode enum accessible to moc compiler
         SimpleMap  = (int)JsonMode::SimpleMap,
         ComplexMap = (int)JsonMode::ComplexMap,
         List       = (int)JsonMode::List,
+        SimpleList       = (int)JsonMode::SimpleList,
     };
 
     enum class EditorClass {
@@ -66,6 +68,7 @@ public:
         EditorClass editorClass   = EditorClass::Unknown;
         VersionPair gameVerLimits = {};
     };
+    static_assert(qIsRelocatable<ColumnMapping>() == false);
 
     ExtendedTableWidget(QWidget *parent = 0);
 
@@ -133,5 +136,6 @@ private slots:
 };
 
 typedef ExtendedTableWidget::ItemRole ExtendedRole;
+Q_DECLARE_TYPEINFO(ExtendedTableWidget::ColumnMapping, Q_RELOCATABLE_TYPE);
 
 #endif /* EXTENDEDTABLEWIDGET_H */

@@ -6,7 +6,10 @@
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include <QPushButton>
+
+QT_BEGIN_NAMESPACE
+class QPushButton;
+QT_END_NAMESPACE
 
 namespace Ui {
     class TagSelectorDialog;
@@ -25,6 +28,7 @@ public:
 protected slots:
     void checkOK();
     void showDetails();
+    void onFilterChanged(const QString &text);
 
 private:
     QSortFilterProxyModel filterModel;

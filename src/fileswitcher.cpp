@@ -5,6 +5,7 @@
 #include <QShortcut>
 #include <QApplication>
 #include <QScreen>
+#include <QKeyEvent>
 
 FileSwitcher::FileSwitcher(TabbedDocumentInterface *parent, bool backward)
     : QListWidget(parent) {
@@ -102,18 +103,20 @@ void FileSwitcher::onSelectPrevItem() {
 }
 
 void FileSwitcher::initFileList() {
-    const auto *files = parent->getFiles();
+    const auto &files = parent->getFiles();
 
-    if (!files) {
+    if (files.isEmpty()) {
         return;
     }
 
-    for (const auto &file: *files) {
+    for (const auto &file: files) {
         const QFileInfo  finfo(file.info);
         QListWidgetItem *fileItem = new QListWidgetItem(this);
-        fileItem->setText
-            (QDir::current().relativeFilePath(finfo.filePath()));
-        fileItem->setIcon(Glhp::fileTypeToIcon(file.fileType));
+        const QString  &&path     = (file.path().startsWith(":"))
+                    ? file.path()
+                    : QDir::current().relativeFilePath(file.path());
+        fileItem->setText(path);
+        fileItem->setIcon(CodeFile::fileTypeToIcon(file.fileType));
         fileItem->setToolTip(finfo.filePath());
         addItem(fileItem);
     }

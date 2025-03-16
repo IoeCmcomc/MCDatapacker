@@ -2,13 +2,14 @@ CONFIG      += plugin debug_and_release c++17
 TARGET      = $$qtLibraryTarget(mcdatapackerwidgetsplugin)
 TEMPLATE    = lib
 
-DEFINES += "__clang_major__=15"
+# DEFINES += "__clang_major__=15"
 
 HEADERS     = \
     extendedtablewidget/extendedtablewidgetplugin.h \
     extendedtablewidget/extendedtablewidgetcontainerextension.h \
     extendedtablewidget/extendedtablewidgetextensionfactory.h \
     numberprovider/numberproviderplugin.h \
+    idtagselector/idtagselectorplugin.h \
     dialogdatabutton/dialogdatabuttonplugin.h \
     multipagewidget/multipagewidgetplugin.h \
     multipagewidget/multipagewidgetcontainerextension.h \
@@ -19,6 +20,7 @@ SOURCES     = \
     extendedtablewidget/extendedtablewidgetcontainerextension.cpp \
     extendedtablewidget/extendedtablewidgetextensionfactory.cpp \
     numberprovider/numberproviderplugin.cpp \
+    idtagselector/idtagselectorplugin.cpp \
     dialogdatabutton/dialogdatabuttonplugin.cpp \
     multipagewidget/multipagewidgetplugin.cpp \
     multipagewidget/multipagewidgetcontainerextension.cpp \

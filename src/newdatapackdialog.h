@@ -26,7 +26,7 @@ public slots:
     void checkOK();
 
 private slots:
-    void onFormatSpinChanged(const int format);
+    void onGameVerComboChanged(const int index);
 
 private:
     Ui::NewDatapackDialog *ui;

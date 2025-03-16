@@ -41,7 +41,8 @@ public:
 
     explicit GameInfoModel(QObject *parent = nullptr);
     explicit GameInfoModel(QObject *parent, const QString &key,
-                           LoadFrom loadFrom, Options options = Default);
+                           LoadFrom loadFrom, Options options = Default,
+                           const QString &packCategory        = {});
 
     void setSource(const QString &key,
                    LoadFrom loadFrom, Options options           = Default);
@@ -51,9 +52,9 @@ public:
     void setOptionalItem(bool value);
     QCompleter * createCompleter();
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const final;
     QVariant data(const QModelIndex &index,
-                  int role = Qt::DisplayRole) const override;
+                  int role = Qt::DisplayRole) const final;
 
 
 public slots:
