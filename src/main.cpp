@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationName("MCDatapacker");
     QCoreApplication::setApplicationVersion(APP_VERSION);
     // qInfo() << "MCDatapacker" << ("v" APP_VERSION);
-    qInfo() << "MCDatapacker" << ("v0.11.0-alpha2");
+    qInfo() << "MCDatapacker" << ("v0.11.0");
 
     /*Q_INIT_RESOURCE(application); */
 

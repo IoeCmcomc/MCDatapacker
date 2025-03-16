@@ -3,7 +3,8 @@ TEMPLATE = app
 
 TARGET = MCDatapacker
 
-QT += core gui uitools svg widgets-private gui-private testlib
+QT += core gui uitools svg widgets-private gui-private
+# QT ++ testlib
 win32:QT += winextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
