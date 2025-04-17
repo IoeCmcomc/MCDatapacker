@@ -9,4 +9,8 @@ dirname=$PWD/$dirname
 fi
 LD_LIBRARY_PATH=$dirname
 export LD_LIBRARY_PATH
+
+export XDG_DATA_DIRS=$dirname/usr/share:~/.local/share:/usr/local/share:/usr/share:$XDG_DATA_DIRS
+export GDK_BACKEND=x11
+
 $dirname/usr/bin/$appname "$@"
