@@ -23,6 +23,7 @@ struct CodeFile {
         DimensionType,       /* 1.16.2+ */
         ChatType,            // 1.19.3+
         DamageType,          // 1.19.4+
+        TrialSpawner,  // 1.21.2+
         TrimMaterial,        // 1.20+
         TrimPattern,         // 1.20+
         WolfVariant,         // 1.20.5+

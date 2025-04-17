@@ -178,6 +178,10 @@ QMenu * DatapackTreeView::mkContextMenu(QModelIndex index) {
                              QLatin1String(".nbt"),
                              QLatin1String("structures"));
             if (Game::version() >= Game::v1_20) {
+                if (Game::version() >= Game::v1_21_3) {
+                    addNewFileAction(newMenu, tr("Trial spawner"), jsonExt,
+                                     QLatin1String("trial_spawner"));
+                }
                 addNewFileAction(newMenu, tr("Trim material"), jsonExt,
                                  QLatin1String("trim_material"));
                 addNewFileAction(newMenu, tr("Trim pattern"), jsonExt,
