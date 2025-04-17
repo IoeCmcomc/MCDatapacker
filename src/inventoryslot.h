@@ -93,6 +93,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) final;
     void keyPressEvent(QKeyEvent *event) final;
     void paintEvent(QPaintEvent *event) final;
+    void changeEvent(QEvent *event) final;
 
 private slots:
     void onCustomContextMenu(const QPoint &point);
@@ -110,6 +111,7 @@ private:
     bool isDragged                  = false;
     bool itemHidden                 = false;
 
+    void retranslateUi();
     void startDrag(QMouseEvent *event);
     void hideItem();
     void showItem();

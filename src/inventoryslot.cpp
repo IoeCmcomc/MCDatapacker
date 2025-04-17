@@ -37,8 +37,7 @@ InventorySlot::InventorySlot(QWidget *parent) : QFrame(parent) {
     setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     setLineWidth(2);
     setFocusPolicy(Qt::TabFocus);
-    setStatusTip(tr(
-                     "Drag-drop to move item(s). Ctrl+Drag to duplicate item(s)."));
+    retranslateUi();
 
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, &InventorySlot::customContextMenuRequested, this,
@@ -333,6 +332,11 @@ void InventorySlot::onTimerTimeout() {
     update();
 }
 
+void InventorySlot::retranslateUi() {
+    setStatusTip(tr(
+                     "Drag-drop to move item(s). Ctrl+Drag to duplicate item(s)."));
+}
+
 InventorySlot::AcceptPolicies InventorySlot::acceptPolicies() const {
     return m_acceptPolicies;
 }
@@ -550,6 +554,13 @@ void InventorySlot::paintEvent(QPaintEvent *event) {
 
             painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
         }
+    }
+}
+
+void InventorySlot::changeEvent(QEvent *event) {
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::LanguageChange) {
+        retranslateUi();
     }
 }
 
