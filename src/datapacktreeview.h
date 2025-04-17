@@ -56,6 +56,7 @@ private:
                             const QString &catDir = QString(),
                             const QString &nspace = QString());
     QModelIndex getSelected();
+    QString functionTagPath(const char *filename);
     bool isStringInTagFile(const QString &filepath, const QString &str);
     void contextMenuModifyTagFile(const QString &filepath, const QString &str,
                                   bool added = true);
