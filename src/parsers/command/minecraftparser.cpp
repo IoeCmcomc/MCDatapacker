@@ -461,8 +461,8 @@ namespace Command {
                     return ret;
                 }
                 ucase ("name"_QL1): {
-                    const int start  = pos();
                     const auto &&ret = parseInvertible();
+                    const int start  = pos();
                     QString literal;
                     if (curChar() == '"' || curChar() == '\'') {
                         literal = getQuotedString();
