@@ -112,8 +112,8 @@ namespace Command {
 
     template<>
     constexpr std::array staticSuggestions<OperationNode> = {
-        "="_QL1,  "<"_QL1,  ">"_QL1, "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
-        "/="_QL1, "%="_QL1,
+        "><"_QL1, "+="_QL1, "-="_QL1, "*="_QL1,
+        "/="_QL1, "%="_QL1, "="_QL1,  "<"_QL1, ">"_QL1,
     };
 
     template<>
